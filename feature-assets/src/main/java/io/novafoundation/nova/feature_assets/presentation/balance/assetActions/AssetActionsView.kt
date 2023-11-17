@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsBuy
 import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsReceive
 import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsSend
+import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsSwap
 
 class AssetActionsView @JvmOverloads constructor(
     context: Context,
@@ -34,6 +35,9 @@ class AssetActionsView @JvmOverloads constructor(
 
     val receive: TextView
         get() = assetActionsReceive
+
+    val swap: TextView
+        get() = assetActionsSwap
 
     val buy: TextView
         get() = assetActionsBuy

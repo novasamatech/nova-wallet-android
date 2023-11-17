@@ -17,18 +17,19 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryProvider
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -82,13 +83,14 @@ class BalanceDetailModule {
         sendInteractor: SendInteractor,
         router: AssetsRouter,
         transactionHistoryMixin: TransactionHistoryMixin,
-        buyMixinFactory: BuyMixinFactory,
+        buyMixinFactory: BuyMixin.Factory,
         assetPayload: AssetPayload,
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         currencyInteractor: CurrencyInteractor,
         controllableAssetCheckMixin: ControllableAssetCheckMixin,
-        externalBalancesInteractor: ExternalBalancesInteractor
+        externalBalancesInteractor: ExternalBalancesInteractor,
+        swapAvailabilityInteractor: SwapAvailabilityInteractor
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -102,7 +104,8 @@ class BalanceDetailModule {
             resourceManager = resourceManager,
             currencyInteractor = currencyInteractor,
             controllableAssetCheck = controllableAssetCheckMixin,
-            externalBalancesInteractor = externalBalancesInteractor
+            externalBalancesInteractor = externalBalancesInteractor,
+            swapAvailabilityInteractor = swapAvailabilityInteractor
         )
     }
 

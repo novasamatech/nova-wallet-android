@@ -12,7 +12,7 @@ fun ValidationSystem.Companion.rebagValidationSystem(): RebagValidationSystem = 
         error = { payload, leftForFees ->
             RebagValidationFailure.NotEnoughToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }

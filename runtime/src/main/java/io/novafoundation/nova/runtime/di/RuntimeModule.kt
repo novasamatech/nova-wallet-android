@@ -22,6 +22,7 @@ import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -56,10 +57,12 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideExtrinsicBuilderFactory(
+        chainDao: ChainDao,
         rpcCalls: RpcCalls,
         chainRegistry: ChainRegistry,
         mortalityConstructor: MortalityConstructor,
     ) = ExtrinsicBuilderFactory(
+        chainDao,
         rpcCalls,
         chainRegistry,
         mortalityConstructor
@@ -197,4 +200,10 @@ class RuntimeModule {
     fun provideGasPriceProviderFactory(
         chainRegistry: ChainRegistry
     ): GasPriceProviderFactory = RealGasPriceProviderFactory(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideMultiLocationConverterFactory(chainRegistry: ChainRegistry): MultiLocationConverterFactory {
+        return MultiLocationConverterFactory(chainRegistry)
+    }
 }

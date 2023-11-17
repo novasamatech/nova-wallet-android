@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnou
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import kotlinx.coroutines.CoroutineScope
 
 fun CoroutineScope.mapAssetTransferValidationFailureToUI(
@@ -63,10 +64,7 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
                 resourceManager.getString(R.string.wallet_send_phishing_warning_text, reason.address)
         )
 
-        AssetTransferValidationFailure.NonPositiveAmount -> Default(
-            resourceManager.getString(R.string.common_error_general_title) to
-                resourceManager.getString(R.string.common_zero_amount_error)
-        )
+        AssetTransferValidationFailure.NonPositiveAmount -> handleNonPositiveAmount(resourceManager).asDefault()
 
         is AssetTransferValidationFailure.NotEnoughFunds.ToPayCrossChainFee -> Default(
             resourceManager.getString(R.string.common_not_enough_funds_title) to

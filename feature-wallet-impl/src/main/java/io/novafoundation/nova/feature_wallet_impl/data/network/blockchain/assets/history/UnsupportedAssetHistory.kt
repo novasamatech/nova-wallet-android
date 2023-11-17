@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -16,17 +16,16 @@ class UnsupportedAssetHistory : AssetHistory {
         chain: Chain,
         chainAsset: Chain.Asset,
         blockHash: String,
-        accountId: AccountId,
-        currency: Currency
-    ): Result<List<TransferExtrinsic>> {
-        return Result.failure(UnsupportedOperationException("Unsupported"))
+        accountId: AccountId
+    ): List<RealtimeHistoryUpdate> {
+        return emptyList()
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return emptySet()
     }
 
-    override suspend fun additionalFirstPageSync(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId, page: DataPage<Operation>) {
+    override suspend fun additionalFirstPageSync(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId, page: Result<DataPage<Operation>>) {
         // do nothing
     }
 

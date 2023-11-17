@@ -170,6 +170,8 @@
     <string name="assets_search_placeholder">Токены и сети с указанным именем\nне найдены</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
     <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или получите токены\nна свой аккаунт.</string>
+    <string name="assets_swap_flow_pay_title">Токен для оплаты</string>
+    <string name="assets_swap_flow_receive_title">Токен для получения</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
@@ -207,8 +209,7 @@
     <string name="common_cancel_operation_warning">Вы уверены, что хотите отменить операцию?</string>
     <string name="common_cannot_find_app">К сожалению, у вас нет подходящего приложения для обработки этого запроса</string>
     <string name="common_cannot_open_link">Не удается открыть данную ссылку</string>
-    <string name="common_cannot_pay_network_fee_message" formatted="false">У вас недостаточно средств для оплаты комиссии сети в размере %s.\nДоступный баланс для оплаты комиссии после операции: %s</string>
-    <string name="common_cannot_pay_network_fee_title">Недостаточно токенов для оплаты комиссии</string>
+    <string name="common_cannot_pay_network_fee_message" formatted="false">Вы можете использовать не больше %s, поскольку вам нужно заплатить\n%s за комиссию за сети.</string>
     <string name="common_chain">Сеть</string>
     <string name="common_change">Изменить</string>
     <string name="common_choose_network">Выберите сеть</string>
@@ -256,7 +257,9 @@
     </plurals>
     <string name="common_frequency_days_daily">ежедневно</string>
     <string name="common_frequency_days_everyday">ежедневно</string>
+    <string name="common_get_token_format">Получить %s</string>
     <string name="common_governance">Демократия</string>
+    <string name="common_hexadecimal_string">Шестнадцатеричная строка</string>
     <plurals name="common_hours_format">
         <item quantity="one">%d час</item>
         <item quantity="few">%d часа</item>
@@ -310,6 +313,7 @@
     <string name="common_per_year">/ год</string>
     <string name="common_per_year_format">%s / год</string>
     <string name="common_per_year_long">в год</string>
+    <string name="common_percent">%</string>
     <string name="common_permission_permissions_denied_message">Для использования этого экрана необходимы запрашиваемые разрешения. Вы должны включить их в Настройках.</string>
     <string name="common_permission_permissions_denied_title">Отказано в разрешениях</string>
     <string name="common_permission_permissions_needed_message">Для использования этого экрана требуются запрашиваемые разрешения.</string>
@@ -364,6 +368,7 @@
     <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
     <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
     <string name="common_waiting">Ожидание</string>
+    <string name="common_wallet">Кошелек</string>
     <string name="common_warning">Предупреждение</string>
     <string name="common_yes">Да</string>
     <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
@@ -523,6 +528,12 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Сеть: %s\nМнемоника: %s</string>
     <string name="fee_not_yet_loaded_message">Подождите, пока будет рассчитана комиссия</string>
     <string name="fee_not_yet_loaded_title">Расчет комиссии в процессе</string>
+    <string name="fragment_swap_main_settings_button_text">Выберите токен для получения</string>
+    <string name="fragment_swap_main_settings_details_title">Детали обмена</string>
+    <string name="fragment_swap_main_settings_max_button">Макс:</string>
+    <string name="fragment_swap_main_settings_pay_title">Вы платите</string>
+    <string name="fragment_swap_main_settings_receive_title">Вы получаете</string>
+    <string name="fragment_swap_main_settings_select_token">Выберите токен</string>
     <string name="governance_unlock">Разблокировать</string>
     <string name="history_v1.9.0">История</string>
     <string name="identity_email_title">Почта</string>
@@ -602,6 +613,7 @@
     <string name="onboarding_restore_wallet">У меня уже есть кошелёк</string>
     <string name="onboarding_terms_and_conditions_1_v2_2_0">Продолжая вы соглашаетесь с нашими\nУсловиями использования и Политикой конфиденциальности</string>
     <string name="onboarding_terms_and_conditions_2">Условиями использования</string>
+    <string name="operations_swap_title">Обмен</string>
     <string name="parachain_staking_alerts_bond_more_message">Один из ваших коллаторов не генерирует награды</string>
     <string name="parachain_staking_alerts_change_collator_message">Один из ваших коллаторов не выбран в текущем раунде</string>
     <string name="parachain_staking_alerts_redeem_message">Ваш период разблокировки %s истек. Не забудьте забрать разблокированные токены</string>
@@ -1131,6 +1143,55 @@
     <string name="start_staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов. Повторите попытку позже</string>
     <string name="start_staking_max_nominators_reached_title">%s в настоящее время недоступен</string>
     <string name="start_staking_selection_validators_subtitle" formatted="false">Валидаторы: %d (макс. %d)</string>
+    <string name="swap_custom_fee_selector_description">Токен для оплаты комиссии сети</string>
+    <string name="swap_custom_fee_selector_footer">Комиссия сети добавится к введенной сумме</string>
+    <string name="swap_error_pair_not_supported">Эта пара не поддерживается</string>
+    <string name="swap_failure_balance_not_consider_consumers" formatted="false">Вы должны сохранить как минимум %s после оплаты сетевой комиссии %s, поскольку вы храните не самодостаточные токены</string>
+    <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Вы должны сохранить как минимум %s, чтобы получить %s токены</string>
+    <string name="swap_failure_insufficient_balance_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s.</string>
+    <string name="swap_failure_insufficient_balance_with_buy_ed_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s, а также конвертировать %3$s в %4$s, чтобы сохранить минимальный баланс %5$s.</string>
+    <string name="swap_failure_swap_max_button">Использовать максимум</string>
+    <string name="swap_failure_swap_min_button">Использовать минимум</string>
+    <string name="swap_failure_too_small_remaining_balance_message">На вашем балансе должно оставаться не менее %1$s. Хотите обменять максимум, добавив также оставшиеся %2$s?</string>
+    <string name="swap_failure_too_small_remaining_balance_title">На вашем балансе остается слишком маленькая сумма</string>
+    <string name="swap_failure_too_small_remaining_balance_with_buy_ed_message">На вашем балансе должно оставаться как минимум %1$s после оплаты сетевой комиссии %2$s и конвертации %3$s в %4$s, для достижения минимального баланса %5$s.\n\nХотите обменять максимум, добавив еще %6$s?</string>
+    <string name="swap_field_asset_from_title">Заплатить</string>
+    <string name="swap_field_asset_to_title">Получить</string>
+    <string name="swap_field_subtitle_default">Выберите токен</string>
+    <string name="swap_field_validation_not_enough_amount_to_swap">Недостаточно токенов для обмена</string>
+    <string name="swap_field_validation_not_enough_liquidity">Недостаточно ликвидности</string>
+    <string name="swap_field_validation_to_low_amount_out">Вы не можете получить меньше %s</string>
+    <string name="swap_get_token_buy_description">Мгновенная покупка %s с помощью кредитной карты</string>
+    <string name="swap_get_token_cross_chain_description">Перевести %s из другой сети</string>
+    <string name="swap_get_token_receive_description">Получить %s по QR или вашему адресу</string>
+    <string name="swap_get_token_using">Получить %s с помощью</string>
+    <string name="swap_invalid_slippage_failure_message" formatted="false">Проскальзывание должно быть указано в диапазоне от %s до %s</string>
+    <string name="swap_invalid_slippage_failure_title">Недопустимое проскальзывание</string>
+    <string name="swap_main_settings_asset_in_not_selecting_button_state">Выберите токен для оплаты</string>
+    <string name="swap_main_settings_asset_out_not_selecting_button_state">Выберите токен для получения</string>
+    <string name="swap_main_settings_enter_amount_disabled_button_state">Введите сумму</string>
+    <string name="swap_main_settings_wrong_amount_disabled_button_state">Введите другую сумму</string>
+    <string name="swap_minimum_balance_buy_in_alert" formatted="false">Чтобы оплатить комиссию сети с помощью %s, Nova автоматически обменяет %s на %s, чтобы поддерживать минимальный %s баланс вашей учетной записи.</string>
+    <string name="swap_network_fee_description">Комиссия сети, взимается блокчейном за обработку и проверку транзакций. Может варьироваться в зависимости от условий сети или скорости транзакции.</string>
+    <string name="swap_not_enought_liquidity_failure">В пуле недостаточно ликвидности для обмена</string>
+    <string name="swap_price_difference_description">Разница в цене представляет собой разницу между двумя различными активами. При обмене криптовалюты под разницей в цене обычно имеется ввиду разница между ценой актива, которую вы получаете и ценой актива, которую вы платите.</string>
+    <string name="swap_price_difference_title">Разница в цене</string>
+    <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
+    <string name="swap_rate_description">Курс обмена двух разных криптовалют. Он показывает, сколько криптовалюты вы можете получить в обмен на определенное количество другой криптовалюты.</string>
+    <string name="swap_rate_title">Курс</string>
+    <string name="swap_rate_was_updated_failure_message">Старый курс: %1$s ≈ %2$s.\nНовый курс: %1$s ≈ %3$s</string>
+    <string name="swap_rate_was_updated_failure_title">Обменный курс изменился</string>
+    <string name="swap_repeat_operation">Повторить операцию</string>
+    <string name="swap_settings_title">Настройки обмена</string>
+    <string name="swap_slippage">Проскальзывание</string>
+    <string name="swap_slippage_description">Проскальзывание - распространенное явление в децентрализованной торговле, когда конечная цена сделки по обмену может незначительно отличаться от ожидаемой в связи с изменением рыночных условий.</string>
+    <string name="swap_slippage_disabled_button_state">Введите другое значение</string>
+    <string name="swap_slippage_error_not_in_available_range" formatted="false">Введите значение между %s и %s</string>
+    <string name="swap_slippage_title">Проскальзывание</string>
+    <string name="swap_slippage_warning_too_big">Транзакция может подвергнуться фронтрану из-за высокого проскальзывания</string>
+    <string name="swap_slippage_warning_too_small">Транзакция может быть отменена из-за низкой устойчивости к проскальзыванию.</string>
+    <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Сумма %s меньше минимального баланса %s</string>
+    <string name="swap_too_low_amount_to_stay_abow_ed_title">Вы пытаетесь обменять слишком маленькую сумму</string>
     <string name="tabbar_staking_title">Стейкинг</string>
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="today">Сегодня</string>
@@ -1178,6 +1239,7 @@
     <string name="wallet_asset_receive">Получить</string>
     <string name="wallet_asset_receive_token">Получить %s</string>
     <string name="wallet_asset_send">Перевести</string>
+    <string name="wallet_asset_swap">Обменять</string>
     <string name="wallet_assets">Активы</string>
     <string name="wallet_assets_empty">Здесь появятся ваши активы.\nУбедитесь, что фильтр\n\"Скрыть нулевой баланс\" отключен.</string>
     <string name="wallet_assets_total_title">Стоимость активов</string>
@@ -1211,6 +1273,7 @@
         <item quantity="other">%s неизвестных сетей скрыто</item>
     </plurals>
     <string name="wallet_connect_v2">WalletConnect v2</string>
+    <string name="wallet_cross_chain_transfer">Межсетевой перевод</string>
     <string name="wallet_currency_category_cryptocurrencies">Криптовалюты</string>
     <string name="wallet_currency_category_fiat">Фиатные валюты</string>
     <string name="wallet_currency_category_popular_fiat">Популярные фиатные валюты</string>
@@ -1220,6 +1283,7 @@
     <string name="wallet_filters_extrinsics">Прочие транзакции</string>
     <string name="wallet_filters_header">Показывать</string>
     <string name="wallet_filters_rewards_and_slashes">Вознаграждения и слэши</string>
+    <string name="wallet_filters_swaps">Обмены</string>
     <string name="wallet_filters_title">Фильтры</string>
     <string name="wallet_filters_transfers">Переводы</string>
     <string name="wallet_manage_assets_title">Управление ассетами</string>
@@ -1245,7 +1309,7 @@
     <string name="wallet_send_existential_warning_title">Перевод удалит аккаунт</string>
     <string name="wallet_send_existential_warnining_transfer_dust">Ваша учетная запись будет удалена из блокчейна после перевода, потому что общий баланс становится ниже минимального. Остаток также будет переведен получателю.</string>
     <string name="wallet_send_from_network">Из сети</string>
-    <string name="wallet_send_insufficient_balance_commission">У вас недостаточно %s для оплаты комиссии</string>
+    <string name="wallet_send_insufficient_balance_commission">У вас недостаточно %s, чтобы оплатить комиссию и остаться выше минимального баланса</string>
     <string name="wallet_send_myself">Себе</string>
     <string name="wallet_send_on_chain">Внутри сети</string>
     <string name="wallet_send_phishing_warning_text">Следующий адрес: %s как известно, используется для фишинга, поэтому мы не рекомендуем отправлять токены на этот адрес. Вы все равно хотите продолжить?</string>

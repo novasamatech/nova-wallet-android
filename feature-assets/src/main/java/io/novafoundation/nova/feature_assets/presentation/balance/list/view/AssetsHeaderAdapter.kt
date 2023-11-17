@@ -43,6 +43,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
 
         fun buyClicked()
 
+        fun swapClicked()
+
         fun crowdloanBannerClicked()
 
         fun crowdloanBannerCloseClicked()
@@ -173,6 +175,7 @@ class HeaderHolder(
             balanceListCrowdloansPromoBanner.setOnCloseClickListener { handler.crowdloanBannerCloseClicked() }
 
             balanceListAssetPlaceholder.setButtonText(R.string.assets_buy_tokens_placeholder_button)
+            balanceListTotalBalance.onSwapClick { handler.swapClicked() }
         }
     }
 

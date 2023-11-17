@@ -8,15 +8,18 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfi
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.Junctions
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
-import io.novafoundation.nova.feature_wallet_api.domain.model.order
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isParachain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.junctionList
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.order
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toInterior
 import java.math.BigInteger
 
 fun MultiLocation.localView(): MultiLocation {
@@ -54,25 +57,27 @@ operator fun MultiLocation.plus(suffix: MultiLocation): MultiLocation {
     )
 }
 
-private val MultiLocation.Interior.junctionList: List<Junction>
-    get() = when (this) {
-        MultiLocation.Interior.Here -> emptyList()
-        is MultiLocation.Interior.Junctions -> junctions
-    }
-
-fun List<Junction>.toInterior() = when (size) {
-    0 -> MultiLocation.Interior.Here
-    else -> MultiLocation.Interior.Junctions(this)
-}
-
 fun MultiLocation.childView() = MultiLocation(parents + BigInteger.ONE, interior)
 
-fun CrossChainTransfersConfiguration.availableDestinations(origin: Chain.Asset): List<Pair<ChainId, ChainAssetId>> {
-    val assetTransfers = assetTransfers(origin) ?: return emptyList()
+fun CrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asset): List<FullChainAssetId> {
+    val assetTransfers = outComingAssetTransfers(origin) ?: return emptyList()
 
     return assetTransfers.xcmTransfers
         .filter { it.type != XcmTransferType.UNKNOWN }
-        .map { it.destination.chainId to it.destination.assetId }
+        .map { it.destination.fullDestinationAssetId }
+}
+
+fun CrossChainTransfersConfiguration.availableInDestinations(destination: Chain.Asset): List<FullChainAssetId> {
+    val requiredDestinationId = destination.fullId
+
+    return chains.flatMap { (originChainId, chainTransfers) ->
+        chainTransfers.mapNotNull { originAssetTransfers ->
+            val hasDestination = originAssetTransfers.xcmTransfers
+                .any { it.type != XcmTransferType.UNKNOWN && it.destination.fullDestinationAssetId == requiredDestinationId }
+
+            FullChainAssetId(originChainId, originAssetTransfers.assetId).takeIf { hasDestination }
+        }
+    }
 }
 
 fun ByteArray.accountIdToMultiLocation() = MultiLocation(
@@ -92,7 +97,7 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
     destinationChain: Chain,
     destinationParaId: ParaId? // null in case destination is relaychain
 ): CrossChainTransferConfiguration? {
-    val assetTransfers = assetTransfers(originAsset) ?: return null
+    val assetTransfers = outComingAssetTransfers(originAsset) ?: return null
     val destination = assetTransfers.xcmTransfers.find { it.destination.chainId == destinationChain.id } ?: return null
 
     val reserveAssetLocation = assetLocations.getValue(assetTransfers.assetLocation)
@@ -173,6 +178,9 @@ private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfer
     }
 }
 
-private fun CrossChainTransfersConfiguration.assetTransfers(origin: Chain.Asset): CrossChainTransfersConfiguration.AssetTransfers? {
+private fun CrossChainTransfersConfiguration.outComingAssetTransfers(origin: Chain.Asset): CrossChainTransfersConfiguration.AssetTransfers? {
     return chains[origin.chainId]?.find { it.assetId == origin.id }
 }
+
+private val CrossChainTransfersConfiguration.XcmDestination.fullDestinationAssetId: FullChainAssetId
+    get() = FullChainAssetId(chainId, assetId)

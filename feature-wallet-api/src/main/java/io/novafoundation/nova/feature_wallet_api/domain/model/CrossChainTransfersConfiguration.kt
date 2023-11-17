@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
-import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import java.math.BigInteger
 
 class CrossChainTransfersConfiguration(
@@ -71,38 +70,6 @@ enum class XCMInstructionType {
     ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset, DepositReserveAsset, ReceiveTeleportedAsset, UNKNOWN
 }
 
-fun Junctions(vararg junctions: MultiLocation.Junction) = MultiLocation.Interior.Junctions(junctions.toList())
-
-class MultiLocation(
-    val parents: BigInteger,
-    val interior: Interior
-) {
-
-    sealed class Interior {
-
-        object Here : Interior()
-
-        class Junctions(junctions: List<Junction>) : Interior() {
-            val junctions = junctions.sorted()
-        }
-    }
-
-    sealed class Junction {
-
-        class ParachainId(val id: ParaId) : Junction()
-
-        class GeneralKey(val key: String) : Junction()
-
-        class PalletInstance(val index: BigInteger) : Junction()
-
-        class GeneralIndex(val index: BigInteger) : Junction()
-
-        class AccountKey20(val accountId: AccountId) : Junction()
-
-        class AccountId32(val accountId: AccountId) : Junction()
-    }
-}
-
 class CrossChainTransferConfiguration(
     val assetLocation: MultiLocation,
     val destinationChainLocation: MultiLocation,
@@ -116,20 +83,3 @@ class CrossChainFeeConfiguration(
     val instructionWeight: Weight,
     val xcmFeeType: XcmFee<List<XCMInstructionType>>
 )
-
-val MultiLocation.Junction.order
-    get() = when (this) {
-        is MultiLocation.Junction.ParachainId -> 0
-
-        // All of these are on the same "level" - mutually exhaustive
-        is MultiLocation.Junction.PalletInstance,
-        is MultiLocation.Junction.AccountKey20,
-        is MultiLocation.Junction.AccountId32 -> 1
-
-        is MultiLocation.Junction.GeneralKey,
-        is MultiLocation.Junction.GeneralIndex -> 2
-    }
-
-private fun List<MultiLocation.Junction>.sorted(): List<MultiLocation.Junction> {
-    return sortedBy(MultiLocation.Junction::order)
-}

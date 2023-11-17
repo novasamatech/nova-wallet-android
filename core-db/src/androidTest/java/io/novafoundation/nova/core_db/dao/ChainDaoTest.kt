@@ -48,7 +48,7 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao) {
         val chainInfo = createTestChain("0x00")
 
         dao.addChain(chainInfo)
-        dao.updateRemoteRuntimeVersionIfChainExists(chainInfo.chain.id, remoteVersion = 1)
+        dao.updateRemoteRuntimeVersionIfChainExists(chainInfo.chain.id, runtimeVersion = 1, transactionVersion = 1)
 
         dao.updateChain(chainInfo)
 

@@ -6,10 +6,8 @@ import io.novafoundation.nova.common.utils.requireActualType
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
@@ -148,11 +146,6 @@ private fun XcmMultiAssetFilter.toEncodableInstance() = when (this) {
     )
 }
 
-fun MultiLocation.toEncodableInstance() = structOf(
-    "parents" to parents,
-    "interior" to interior.toEncodableInstance()
-)
-
 fun VersionedMultiAssets.toEncodableInstance() = when (this) {
     is VersionedMultiAssets.V1 -> DictEnum.Entry(
         name = "V1",
@@ -185,33 +178,3 @@ fun VersionedMultiLocation.toEncodableInstance() = when (this) {
         value = multiLocation.toEncodableInstance()
     )
 }
-
-private fun MultiLocation.Interior.toEncodableInstance() = when (this) {
-    MultiLocation.Interior.Here -> DictEnum.Entry("Here", null)
-
-    is MultiLocation.Interior.Junctions -> if (junctions.size == 1) {
-        DictEnum.Entry(
-            name = "X1",
-            value = junctions.first().toEncodableInstance()
-        )
-    } else {
-        DictEnum.Entry(
-            name = "X${junctions.size}",
-            value = junctions.map(MultiLocation.Junction::toEncodableInstance)
-        )
-    }
-}
-
-private fun MultiLocation.Junction.toEncodableInstance() = when (this) {
-    is MultiLocation.Junction.GeneralKey -> DictEnum.Entry("GeneralKey", key.fromHex())
-    is MultiLocation.Junction.PalletInstance -> DictEnum.Entry("PalletInstance", index)
-    is MultiLocation.Junction.ParachainId -> DictEnum.Entry("Parachain", id)
-    is MultiLocation.Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance(accountIdKey = "key"))
-    is MultiLocation.Junction.AccountId32 -> DictEnum.Entry("AccountId32", accountId.toJunctionAccountIdInstance(accountIdKey = "id"))
-    is MultiLocation.Junction.GeneralIndex -> DictEnum.Entry("GeneralIndex", index)
-}
-
-private fun AccountId.toJunctionAccountIdInstance(accountIdKey: String) = structOf(
-    "network" to DictEnum.Entry("Any", null),
-    accountIdKey to this
-)

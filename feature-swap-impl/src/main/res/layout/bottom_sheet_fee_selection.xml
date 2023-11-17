@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottomSheetFeeSelectionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="24dp"
+    tools:background="@color/bottom_sheet_background">
+
+    <View
+        style="@style/Widget.Nova.Puller"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        android:id="@+id/bottomSheetFeeSelectionTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/network_fee"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="@string/swap_custom_fee_selector_description" />
+
+    <io.novafoundation.nova.common.view.tabs.TabsView
+        android:id="@+id/bottomSheetFeeSelectionAssets"
+        style="@style/Widget.Nova.Tabs.OnBlack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" />
+
+    <io.novafoundation.nova.common.mixin.hints.HintsView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:HintsView_singleHint="@string/swap_custom_fee_selector_footer" />
+</LinearLayout>

@@ -83,7 +83,7 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
         viewModel.stakeTargetDetails.observe { validator ->
             with(validator.stake) {
                 validatorStakingStatus.showValue(status.text)
-                validatorStakingStatus.setPrimaryValueIcon(status.icon, tint = status.iconTint)
+                validatorStakingStatus.setPrimaryValueEndIcon(status.icon, tint = status.iconTint)
 
                 if (activeStakeModel != null) {
                     activeStakingFields.forEach(View::makeVisible)

@@ -15,9 +15,14 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
+import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionArrow
+import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionIcon
+import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionSubtitle
+import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
 import kotlinx.android.synthetic.main.item_sheet_switcher.view.itemSheetSwitcher
 
@@ -25,9 +30,9 @@ typealias ViewGetter<V> = FixedListBottomSheet.() -> V
 
 abstract class FixedListBottomSheet(
     context: Context,
-    private val onCancel: (() -> Unit)? = null,
+    onCancel: (() -> Unit)? = null,
     private val viewConfiguration: ViewConfiguration = ViewConfiguration.default()
-) : BaseBottomSheet(context) {
+) : BaseBottomSheet(context, onCancel = onCancel) {
 
     class ViewConfiguration(
         @LayoutRes val layout: Int,
@@ -50,8 +55,6 @@ abstract class FixedListBottomSheet(
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setOnCancelListener { onCancel?.invoke() }
     }
 
     final override fun setContentView(layoutResId: Int) {
@@ -121,6 +124,48 @@ fun FixedListBottomSheet.textItem(
 
         view.setDismissingClickListener(onClick)
     }
+}
+
+fun FixedListBottomSheet.textWithDescriptionItem(
+    title: String,
+    description: String,
+    @DrawableRes iconRes: Int,
+    enabled: Boolean = true,
+    showArrowWhenEnabled: Boolean = false,
+    onClick: (View) -> Unit,
+) {
+    item(R.layout.item_sheet_descriptive_action) { view ->
+        view.itemSheetDescriptiveActionTitle.text = title
+        view.itemSheetDescriptiveActionSubtitle.text = description
+
+        view.isEnabled = enabled
+
+        view.itemSheetDescriptiveActionIcon.setImageResource(iconRes)
+
+        view.itemSheetDescriptiveActionArrow.setVisible(enabled && showArrowWhenEnabled)
+
+        if (enabled) {
+            view.setDismissingClickListener(onClick)
+        }
+    }
+}
+
+fun FixedListBottomSheet.textWithDescriptionItem(
+    @StringRes titleRes: Int,
+    @StringRes descriptionRes: Int,
+    @DrawableRes iconRes: Int,
+    enabled: Boolean = true,
+    showArrowWhenEnabled: Boolean = false,
+    onClick: (View) -> Unit,
+) {
+    textWithDescriptionItem(
+        title = context.getString(titleRes),
+        description = context.getString(descriptionRes),
+        iconRes = iconRes,
+        enabled = enabled,
+        showArrowWhenEnabled = showArrowWhenEnabled,
+        onClick = onClick
+    )
 }
 
 fun FixedListBottomSheet.textItem(

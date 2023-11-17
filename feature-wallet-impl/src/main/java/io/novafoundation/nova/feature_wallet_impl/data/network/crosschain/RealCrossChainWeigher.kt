@@ -11,13 +11,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.implementations.weightTo
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee.Mode
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Id
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import java.math.BigInteger
 
 class RealCrossChainWeigher(

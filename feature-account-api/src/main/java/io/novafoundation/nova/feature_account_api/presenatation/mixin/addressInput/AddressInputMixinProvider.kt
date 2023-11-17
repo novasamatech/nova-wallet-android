@@ -30,7 +30,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,7 +86,7 @@ class AddressInputMixinFactory(
     // myself behavior
 
     fun crossChainOnlyMyself(
-        originChain: Deferred<Chain>,
+        originChain: Flow<Chain>,
         destinationChainFlow: Flow<Chain>
     ): MyselfBehaviorProvider = CrossChainOnlyBehaviorProvider(
         accountUseCase = accountUseCase,
@@ -154,7 +153,7 @@ class AddressInputMixinProvider(
     ).shareInBackground()
 
     init {
-        resetIdentifierInputOfSpecChange()
+        resetIdentifierInputOnSpecChange()
     }
 
     override suspend fun getInputSpec(): AddressInputSpec {
@@ -224,7 +223,7 @@ class AddressInputMixinProvider(
         accountIdentifierProvider.selectExternalAccount(null)
     }
 
-    private fun resetIdentifierInputOfSpecChange() {
+    private fun resetIdentifierInputOnSpecChange() {
         specProvider.spec.onEach {
             val currentInput = inputFlow.value
 

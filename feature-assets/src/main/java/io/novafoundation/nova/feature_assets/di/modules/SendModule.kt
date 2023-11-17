@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 
 @Module
@@ -18,7 +17,6 @@ class SendModule {
     @Provides
     @FeatureScope
     fun provideSendInteractor(
-        chainRegistry: ChainRegistry,
         walletRepository: WalletRepository,
         assetSourceRegistry: AssetSourceRegistry,
         crossChainTransfersRepository: CrossChainTransfersRepository,
@@ -26,7 +24,6 @@ class SendModule {
         crossChainTransactor: CrossChainTransactor,
         parachainInfoRepository: ParachainInfoRepository
     ) = SendInteractor(
-        chainRegistry,
         walletRepository,
         assetSourceRegistry,
         crossChainWeigher,

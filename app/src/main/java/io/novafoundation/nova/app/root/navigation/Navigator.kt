@@ -39,14 +39,16 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeA
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -54,6 +56,7 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.Ma
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.SwapDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
@@ -70,6 +73,9 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
@@ -124,6 +130,7 @@ class Navigator(
 
                 navController?.navigate(delayedNavigation.globalActionId, delayedNavigation.extras, navOptions)
             }
+
             is BackDelayedNavigation -> {
                 navController?.popBackStack()
             }
@@ -221,8 +228,8 @@ class Navigator(
         args = TransactionHistoryFilterFragment.getBundle(payload)
     )
 
-    override fun openSend(assetPayload: AssetPayload, initialRecipientAddress: String?) {
-        val extras = SelectSendFragment.getBundle(assetPayload, initialRecipientAddress)
+    override fun openSend(payload: SendPayload, initialRecipientAddress: String?) {
+        val extras = SelectSendFragment.getBundle(payload, initialRecipientAddress)
 
         navController?.navigate(R.id.action_open_send, extras)
     }
@@ -249,6 +256,12 @@ class Navigator(
         val bundle = PoolRewardDetailFragment.getBundle(reward)
 
         navController?.navigate(R.id.open_pool_reward_detail, bundle)
+    }
+
+    override fun openSwapDetail(swap: OperationParcelizeModel.Swap) {
+        val bundle = SwapDetailFragment.getBundle(swap)
+
+        navController?.navigate(R.id.open_swap_detail, bundle)
     }
 
     override fun openExtrinsicDetail(extrinsic: OperationParcelizeModel.Extrinsic) {
@@ -333,6 +346,19 @@ class Navigator(
 
     override fun openStaking() {
         stakingDashboardDelegate.openStakingDashboard()
+    }
+
+    override fun closeSendFlow() {
+        navController?.navigate(R.id.action_close_send_flow)
+    }
+
+    override fun openSwapFlow() {
+        val payload = SwapFlowPayload.InitialSelecting
+        navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
+    }
+
+    override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
+        navController?.navigate(R.id.action_open_swapSetupAmount, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
     }
 
     override fun openNfts() {

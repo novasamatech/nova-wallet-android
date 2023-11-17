@@ -66,8 +66,7 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:textColor="@color/button_text_accent"
-            app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
-            app:drawableTint="@color/icon_accent"
+            app:drawableStartCompat="@drawable/ic_info_accent"
             app:layout_constraintStart_toStartOf="@+id/advertisementCardSubTitle"
             app:layout_constraintTop_toBottomOf="@+id/advertisementCardSubTitle"
             tools:text="@string/common_how_it_works" />

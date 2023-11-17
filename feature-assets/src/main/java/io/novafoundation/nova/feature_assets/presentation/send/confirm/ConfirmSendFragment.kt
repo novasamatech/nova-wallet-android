@@ -91,10 +91,10 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel>() {
         viewModel.wallet.observe(confirmSendWallet::showWallet)
 
         viewModel.transferDirectionModel.observe {
-            confirmSendFromNetwork.showChain(it.originChainUi)
+            confirmSendFromNetwork.showChain(it.origin)
             confirmSendFromNetwork.setTitle(it.originChainLabel)
 
-            confirmSendToNetwork.showChainOrHide(it.destinationChainUi)
+            confirmSendToNetwork.showChainOrHide(it.destination)
         }
 
         viewModel.amountModel.observe(confirmSendAmount::setAmount)

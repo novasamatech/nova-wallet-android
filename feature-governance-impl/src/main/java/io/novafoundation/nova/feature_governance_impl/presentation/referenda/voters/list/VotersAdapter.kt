@@ -99,9 +99,8 @@ class ExpandableVoterHolder(
 ) : GroupedListHolder(containerView) {
 
     init {
-        with(containerView) {
-            setBackgroundResource(R.drawable.bg_primary_list_item)
-        }
+        containerView.setBackgroundResource(R.drawable.bg_primary_list_item)
+        containerView.itemVoterAddressContainer.setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
     }
 
     fun bind(item: ExpandableVoterRVItem) = with(containerView) {
@@ -109,12 +108,12 @@ class ExpandableVoterHolder(
 
         if (item.isExpandable) {
             itemVoterAddressContainer.background = context.addRipple()
-            itemVoterAddressContainer.setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
+            itemVoterAddressContainer.isClickable = true
             containerView.setOnClickListener { eventHandler.onExpandItemClick(absoluteAdapterPosition) }
             bindExpanding(item)
         } else {
             itemVoterAddressContainer.background = null
-            itemVoterAddressContainer.setOnClickListener(null)
+            itemVoterAddressContainer.isClickable = false
             containerView.setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
         }
 

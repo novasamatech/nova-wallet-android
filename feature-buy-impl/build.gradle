@@ -1,0 +1,109 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply from: '../tests.gradle'
+apply from: '../scripts/secrets.gradle'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    namespace 'io.novafoundation.nova.feature_buy_impl'
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "RAMP_TOKEN", "\"n8ev677z3z7enckabyc249j84ajpc28o9tmsgob7\""
+        buildConfigField "String", "RAMP_HOST", "\"ri-widget-staging.firebaseapp.com\""
+
+        buildConfigField "String", "TRANSAK_TOKEN", "\"ed6a6887-57fd-493a-8075-4718b463913b\""
+        buildConfigField "String", "TRANSAK_HOST", "\"staging-global.transak.com\""
+
+        buildConfigField "String", "MOONPAY_PRIVATE_KEY", readStringSecret("MOONPAY_TEST_SECRET")
+        buildConfigField "String", "MOONPAY_HOST", "\"buy-staging.moonpay.com\""
+        buildConfigField "String", "MOONPAY_PUBLIC_KEY", "\"pk_test_DMRuyL6Nf1qc9OzjPBmCFBeCGkFwiZs0\""
+
+        buildConfigField "String", "MERCURYO_WIDGET_ID", "\"fde83da2-2a4c-4af9-a2ca-30aead5d65a0\""
+        buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_TEST_SECRET")
+        buildConfigField "String", "MERCURYO_HOST", "\"sandbox-exchange.mrcr.io\""
+
+        buildConfigField "String", "BANXA_HOST", "\"novawallet.banxa-sandbox.com\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "RAMP_TOKEN", "\"6hrtmyabadyjf6q4jc6h45yv3k8h7s88ebgubscd\""
+            buildConfigField "String", "RAMP_HOST", "\"buy.ramp.network\""
+
+            buildConfigField "String", "TRANSAK_TOKEN", "\"861a131b-1721-4e99-8ec3-7349840c888f\""
+            buildConfigField "String", "TRANSAK_HOST", "\"global.transak.com\""
+
+            buildConfigField "String", "MOONPAY_PRIVATE_KEY", readStringSecret("MOONPAY_PRODUCTION_SECRET")
+            buildConfigField "String", "MOONPAY_PUBLIC_KEY", "\"pk_live_Boi6Rl107p7XuJWBL8GJRzGWlmUSoxbz\""
+            buildConfigField "String", "MOONPAY_HOST", "\"buy.moonpay.com\""
+
+            buildConfigField "String", "MERCURYO_WIDGET_ID", "\"07c3ca04-f4a8-4d68-a192-83a1794ba705\""
+            buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_PRODUCTION_SECRET")
+            buildConfigField "String", "MERCURYO_HOST", "\"exchange.mercuryo.io\""
+
+            buildConfigField "String", "BANXA_HOST", "\"novawallet.banxa.com\""
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+}
+
+dependencies {
+    implementation project(':core-db')
+    implementation project(':common')
+    implementation project(':feature-wallet-api')
+    implementation project(':feature-account-api')
+    implementation project(':feature-buy-api')
+    implementation project(':runtime')
+
+    implementation kotlinDep
+
+    implementation androidDep
+    implementation materialDep
+    implementation constraintDep
+
+    implementation coroutinesDep
+    implementation coroutinesAndroidDep
+    implementation viewModelKtxDep
+    implementation liveDataKtxDep
+    implementation lifeCycleKtxDep
+
+    implementation daggerDep
+    kapt daggerKapt
+
+    implementation roomDep
+    kapt roomKapt
+
+    implementation lifecycleDep
+    kapt lifecycleKapt
+
+    testImplementation jUnitDep
+    testImplementation mockitoDep
+
+    implementation insetterDep
+
+    implementation shimmerDep
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
+}

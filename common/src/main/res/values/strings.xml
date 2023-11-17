@@ -1,12 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fee and remain above minimal balance</string>
+
+    <string name="operations_swap_title">Swap</string>
+
+    <string name="swap_repeat_operation">Repeat the operation</string>
+
+    <string name="wallet_filters_swaps">Swaps</string>
+
+    <string name="swap_failure_balance_not_consider_consumers">You should keep at least %s after paying %s network fee as you are holding non sufficient tokens</string>
+    <string name="swap_failure_balance_not_consider_non_sufficient_assets">You must keep at least %s to receive %s token</string>
+
+    <string name="swap_rate_description">Exchange rate between two different cryptocurrencies. It represents how much of one cryptocurrency you can get in exchange for a certain amount of another cryptocurrency.</string>
+    <string name="swap_price_difference_description">Price difference refers to the difference in price between two different assets. When making a swap in crypto, the price difference is usually the difference between the price of the asset you are swapping for and the price of the asset you are swapping with.</string>
+    <string name="swap_slippage_description">Swap slippage is a common occurrence in decentralized trading where the final price of a swap transaction might slightly differ from the expected price, due to changing market conditions.</string>
+    <string name="swap_network_fee_description">A network fees charged by the blockchain to process and validate any transactions. May vary depending on network conditions or transaction speed.</string>
+
+    <string name="swap_main_settings_asset_in_not_selecting_button_state">Select a token to pay</string>
+    <string name="swap_main_settings_asset_out_not_selecting_button_state">Select a token to receive</string>
+    <string name="swap_main_settings_enter_amount_disabled_button_state">Enter amount</string>
+    <string name="swap_main_settings_wrong_amount_disabled_button_state">Enter other amount</string>
+
+    <string name="swap_field_validation_not_enough_liquidity">Not enough liquidity</string>
+    <string name="swap_field_validation_not_enough_amount_to_swap">Not enough tokens to swap</string>
+    <string name="swap_field_validation_to_low_amount_out">You can’t receive less than %s</string>
+
+    <string name="common_cannot_pay_network_fee_message">You can use up to %s since you need to pay\n%s for network fee.</string>
+
+    <string name="swap_too_low_amount_to_stay_abow_ed_title">You are trying to swap too small amount</string>
+    <string name="swap_too_low_amount_to_stay_abow_ed_message">Amount of %s is less than minimum balance of %s</string>
+
+    <string name="swap_invalid_slippage_failure_title">Invalid slippage</string>
+    <string name="swap_invalid_slippage_failure_message">Slippage must be specified between %s and %s</string>
+    <string name="swap_rate_was_updated_failure_title">Swap rate was updated</string>
+    <string name="swap_rate_was_updated_failure_message">Old rate: %1$s ≈ %2$s.\nNew rate: %1$s ≈ %3$s</string>
+    <string name="swap_not_enought_liquidity_failure">Pool doesn’t have enough liquidity to swap</string>
+    <string name="swap_failure_too_small_remaining_balance_title">Too small amount remains on your balance</string>
+    <string name="swap_failure_too_small_remaining_balance_message">You should leave at least %1$s on your balance. Do you want to perform full swap by adding remaining %2$s as well?</string>
+    <string name="swap_failure_too_small_remaining_balance_with_buy_ed_message">You should keep at least %1$s after paying %2$s network fee and converting %3$s to %4$s to meet %5$s minimum balance.\n\nDo you want to fully swap by adding remaining %6$s as well?</string>
+    <string name="swap_failure_insufficient_balance_message">You can swap up to %1$s since you need to pay %2$s for network fee.</string>
+    <string name="swap_failure_insufficient_balance_with_buy_ed_message">You can swap up to %1$s since you need to pay %2$s for network fee and also convert %3$s to %4$s to meet %5$s minimum balance.</string>
+
+    <string name="swap_failure_swap_max_button">Swap max</string>
+    <string name="swap_failure_swap_min_button">Swap min</string>
+
+    <string name="wallet_cross_chain_transfer">Cross-chain transfer</string>
+
+    <string name="common_hexadecimal_string">Hexadecimal string</string>
+
+    <string name="swap_get_token_using">Get %s using</string>
+    <string name="swap_get_token_cross_chain_description">Transfer %s from another network</string>
+    <string name="swap_get_token_receive_description">Receive %s with QR or your address</string>
+    <string name="swap_get_token_buy_description">Instantly buy %s with a credit card</string>
+
+    <string name="common_get_token_format">Get %s</string>
+
+    <string name="swap_custom_fee_selector_description">Token for paying network fee</string>
+    <string name="swap_custom_fee_selector_footer">Network fee is added on top of entered amount</string>
+    <string name="swap_minimum_balance_buy_in_alert">To pay network fee with %s, Nova will automatically swap %s for %s to maintain your account\'s minimum %s balance.</string>
+
+    <string name="swap_slippage_disabled_button_state">Enter other value</string>
+    <string name="swap_slippage_error_not_in_available_range">Enter a value between %s and %s</string>
+    <string name="swap_slippage_warning_too_small">Transaction might be reverted because of low slippage tolerance.</string>
+    <string name="swap_slippage_warning_too_big">Transaction might be frontrun because of high slippage.</string>
+    <string name="swap_slippage">Slippage</string>
+    <string name="swap_settings_title">Swap settings</string>
+
+    <string name="common_percent" translatable="false">%</string>
+
+    <string name="assets_swap_flow_pay_title">Token to pay</string>
+    <string name="assets_swap_flow_receive_title">Token to receive</string>
+
+    <string name="swap_error_pair_not_supported">This pair is not supported</string>
+    <string name="swap_price_impact">%s ≈ %s</string>
+
+    <string name="swap_field_subtitle_default">Select a token</string>
+    <string name="swap_field_asset_from_title">Pay</string>
+    <string name="swap_field_asset_to_title">Receive</string>
+
+    <string name="swap_rate_title">Rate</string>
+    <string name="swap_price_difference_title">Price difference</string>
+    <string name="swap_slippage_title">Slippage</string>
+    <string name="common_wallet">Wallet</string>
+
+    <string name="fragment_swap_main_settings_max_button">Max:</string>
+    <string name="fragment_swap_main_settings_pay_title">You pay</string>
+    <string name="fragment_swap_main_settings_receive_title">You receive</string>
+    <string name="fragment_swap_main_settings_details_title">Swap details</string>
+    <string name="wallet_asset_swap">Swap</string>
+    <string name="fragment_swap_main_settings_select_token">Select a token</string>
+
     <string name="assets_crowdloan_unlock_banner_title">Boost your DOT 🚀</string>
     <string name="assets_crowdloan_unlock_banner_description">Received your DOT back from crowdloans? Start staking your DOT today to get the maximum possible rewards!</string>
 
     <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
     <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
 
-    <!--<string name="assets_send_flow_placeholder_button">Buy tokens</string>-->
     <string name="assets_buy_tokens_placeholder_button">Buy tokens</string>
 
     <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
@@ -692,9 +782,6 @@
     <string name="yield_boost_not_enough_execution_fee_title">Not enough tokens to pay first execution fee</string>
     <string name="yield_boost_not_enough_execution_fee_message">You don’t have enough balance to pay the network fee of %s and the yield boost execution fee of %s.\nAvailable balance to pay the fee: %s</string>
 
-    <string name="common_cannot_pay_network_fee_message">You don’t have enough balance to pay the network fee of %s.\nAvailable  balance to pay fee after operation: %s</string>
-    <string name="common_cannot_pay_network_fee_title">Not enough tokens to pay the fee</string>
-
     <string name="common_no_changes">No changes</string>
 
     <string name="staking_turing_destination_payout">without Yield Boost</string>
@@ -1061,8 +1148,6 @@
     <string name="wallet_send_existential_warnining_transfer_dust">Your account will be removed from blockchain after transfer cause it makes total balance lower than minimal. Remaining balance will be transferred to recipient as well.</string>
     <string name="wallet_send_dead_recipient_commission_asset_title">Recipient is not able to accept transfer</string>
     <string name="wallet_send_dead_recipient_commission_asset_message">Your transfer will fail since the destination account does not have enough %s to accept other token transfers</string>
-
-    <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fees</string>
 
     <string name="common_close">Close</string>
 

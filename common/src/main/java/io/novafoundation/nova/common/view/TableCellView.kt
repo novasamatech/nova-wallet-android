@@ -45,8 +45,6 @@ import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueProgress
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueSecondary
 
-private val ICON_TINT_DEFAULT = R.color.icon_secondary
-
 open class TableCellView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -120,6 +118,11 @@ open class TableCellView @JvmOverloads constructor(
         image.makeVisible()
     }
 
+    fun setOnValueClickListener(onClick: View.OnClickListener?) {
+        valuePrimary.setOnClickListener(onClick)
+        valueSecondary.setOnClickListener(onClick)
+    }
+
     fun loadImage(
         url: String?,
         @DrawableRes placeholderRes: Int? = null,
@@ -156,8 +159,12 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValueDivider.setVisible(visible)
     }
 
-    fun setPrimaryValueIcon(@DrawableRes icon: Int?, @ColorRes tint: Int = ICON_TINT_DEFAULT) {
+    fun setPrimaryValueEndIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = null) {
         tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
+    }
+
+    fun setPrimaryValueStartIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = null) {
+        tableCellValuePrimary.setDrawableStart(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
     fun setPrimaryValueStyle(style: FieldStyle) {
@@ -165,27 +172,30 @@ open class TableCellView @JvmOverloads constructor(
             FieldStyle.PRIMARY -> {
                 valuePrimary.setTextColorRes(R.color.text_primary)
             }
+
             FieldStyle.LINK -> {
                 valuePrimary.setTextColor(context.getAccentColor())
             }
+
             FieldStyle.POSITIVE -> {
                 valuePrimary.setTextColorRes(R.color.text_positive)
             }
+
             FieldStyle.SECONDARY -> {
                 valuePrimary.setTextColorRes(R.color.text_tertiary)
             }
         }
     }
 
-    fun setTitleIconEnd(@DrawableRes icon: Int?) {
-        tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
+    fun setTitleIconEnd(@DrawableRes icon: Int?, tintRes: Int?) {
+        tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
     }
 
-    fun setTitleIconStart(@DrawableRes icon: Int?) {
-        tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
+    fun setTitleIconStart(@DrawableRes icon: Int?, tintRes: Int?) {
+        tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
     }
 
-    fun showValue(primary: String, secondary: String? = null) {
+    fun showValue(primary: CharSequence, secondary: String? = null) {
         postToSelf {
             contentGroup.makeVisible()
 
@@ -220,21 +230,36 @@ open class TableCellView @JvmOverloads constructor(
         val dividerVisible = typedArray.getBoolean(R.styleable.TableCellView_dividerVisible, true)
         setDividerVisible(dividerVisible)
 
-        val primaryValueIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIcon)
-        primaryValueIcon?.let {
-            val primaryValueIconTint = typedArray.getResourceId(R.styleable.TableCellView_primaryValueIconTint, ICON_TINT_DEFAULT)
+        val primaryValueEndIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueEndIcon)
+        primaryValueEndIcon?.let {
+            val primaryValueIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIconTint)
 
-            setPrimaryValueIcon(primaryValueIcon, primaryValueIconTint)
+            setPrimaryValueEndIcon(primaryValueEndIcon, primaryValueIconTint)
+        }
+
+        val primaryValueStartIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueStartIcon)
+        primaryValueStartIcon?.let {
+            val primaryValueIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIconTint)
+
+            setPrimaryValueStartIcon(primaryValueStartIcon, primaryValueIconTint)
         }
 
         val primaryValueStyle = typedArray.getEnum(R.styleable.TableCellView_primaryValueStyle, default = FieldStyle.PRIMARY)
         setPrimaryValueStyle(primaryValueStyle)
 
         val titleIconEnd = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
-        titleIconEnd?.let(::setTitleIconEnd)
+        titleIconEnd?.let {
+            val titleIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconTint)
+
+            setTitleIconEnd(titleIconEnd, titleIconTint)
+        }
 
         val titleIconStart = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconStart)
-        titleIconStart?.let(::setTitleIconStart)
+        titleIconStart?.let {
+            val titleIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconTint)
+
+            setTitleIconStart(titleIconStart, titleIconTint)
+        }
 
         val titleTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleValueTextAppearance)
         titleTextAppearance?.let(title::setTextAppearance)
@@ -250,7 +275,7 @@ open class TableCellView @JvmOverloads constructor(
     }
 }
 
-fun TableCellView.showValueOrHide(primary: String?, secondary: String? = null) {
+fun TableCellView.showValueOrHide(primary: CharSequence?, secondary: String? = null) {
     if (primary != null) {
         showValue(primary, secondary)
     }
@@ -261,10 +286,10 @@ fun TableCellView.showValueOrHide(primary: String?, secondary: String? = null) {
 @Suppress("LiftReturnOrAssignment")
 fun TableCellView.setExtraInfoAvailable(available: Boolean) {
     if (available) {
-        setPrimaryValueIcon(R.drawable.ic_info_cicrle_filled_16)
+        setPrimaryValueEndIcon(R.drawable.ic_info)
         isEnabled = true
     } else {
-        setPrimaryValueIcon(null)
+        setPrimaryValueEndIcon(null)
         isEnabled = false
     }
 }

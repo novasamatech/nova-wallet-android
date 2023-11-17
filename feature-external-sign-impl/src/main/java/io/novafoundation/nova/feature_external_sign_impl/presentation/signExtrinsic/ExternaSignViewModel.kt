@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDApp
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +64,7 @@ class ExternaSignViewModel(
     override val originFeeMixin: FeeLoaderMixin.Presentation? = commissionTokenFlow?.let { it ->
         feeLoaderMixinFactory.create(
             tokenFlow = it,
-            configuration = FeeLoaderMixin.Configuration(showZeroFiat = false)
+            configuration = GenericFeeLoaderMixin.Configuration(showZeroFiat = false)
         )
     }
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.model.response
 
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigInteger
 
 class SubqueryHistoryElementResponse(val query: Query) {
@@ -22,6 +23,7 @@ class SubqueryHistoryElementResponse(val query: Query) {
                 val transfer: Transfer?,
                 val extrinsic: Extrinsic?,
                 val assetTransfer: AssetTransfer?,
+                val swap: Swap?
             ) {
                 class Reward(
                     val era: Int,
@@ -60,6 +62,18 @@ class SubqueryHistoryElementResponse(val query: Query) {
                     val from: String,
                     val fee: BigInteger,
                     val success: Boolean
+                )
+
+                class Swap(
+                    val assetIdIn: String?,
+                    val amountIn: Balance,
+                    val assetIdOut: String?,
+                    val amountOut: Balance,
+                    val sender: String,
+                    val receiver: String,
+                    val fee: Balance,
+                    val assetIdFee: String?,
+                    val success: Boolean?
                 )
             }
         }

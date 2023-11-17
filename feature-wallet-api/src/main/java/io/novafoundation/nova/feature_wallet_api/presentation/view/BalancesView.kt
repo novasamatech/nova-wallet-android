@@ -5,12 +5,14 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.showLoadingState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -70,3 +72,5 @@ fun TableCellView.showAmount(amountModel: AmountModel) {
 fun TableCellView.showAmountOrHide(amountModel: AmountModel?) {
     showValueOrHide(amountModel?.token, amountModel?.fiat)
 }
+
+fun TableCellView.showLoadingAmount(model: ExtendedLoadingState<AmountModel?>) = showLoadingState(model, ::showAmountOrHide)

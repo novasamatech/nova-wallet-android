@@ -10,8 +10,6 @@
     android:layout_marginTop="16dp"
     android:includeFontPadding="false"
     android:text="@string/crowdloan_acala_learn_types"
-    app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
-    app:drawableTint="?attr/colorAccent"
-    app:drawableEndCompat="@drawable/ic_chevron_right">
+    app:drawableStartCompat="@drawable/ic_info_accent">
 
 </TextView>

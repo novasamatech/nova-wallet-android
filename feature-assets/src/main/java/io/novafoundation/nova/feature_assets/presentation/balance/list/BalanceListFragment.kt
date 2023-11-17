@@ -182,4 +182,8 @@ class BalanceListFragment :
     override fun crowdloanBannerCloseClicked() {
         viewModel.crowdloanBannerCloseClicked()
     }
+
+    override fun swapClicked() {
+        viewModel.swapClicked()
+    }
 }

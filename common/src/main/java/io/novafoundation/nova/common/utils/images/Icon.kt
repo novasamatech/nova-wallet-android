@@ -6,6 +6,8 @@ import androidx.annotation.DrawableRes
 import coil.ImageLoader
 import coil.load
 import coil.request.ImageRequest
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 
 sealed class Icon {
 
@@ -23,6 +25,15 @@ fun ImageView.setIcon(icon: Icon, imageLoader: ImageLoader, builder: ExtraImageR
         is Icon.FromDrawable -> load(icon.data, imageLoader, builder)
         is Icon.FromLink -> load(icon.data, imageLoader, builder)
         is Icon.FromDrawableRes -> load(icon.res, imageLoader, builder)
+    }
+}
+
+fun ImageView.setIconOrMakeGone(icon: Icon?, imageLoader: ImageLoader, builder: ExtraImageRequestBuilding = {}) {
+    if (icon == null) {
+        this.makeGone()
+    } else {
+        this.makeVisible()
+        setIcon(icon, imageLoader, builder)
     }
 }
 

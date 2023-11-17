@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 
 @Subcomponent(
     modules = [
@@ -21,7 +21,7 @@ interface SelectSendComponent {
         fun create(
             @BindsInstance fragment: Fragment,
             @BindsInstance recipientAddress: String?,
-            @BindsInstance payload: AssetPayload
+            @BindsInstance payload: SendPayload
         ): SelectSendComponent
     }
 

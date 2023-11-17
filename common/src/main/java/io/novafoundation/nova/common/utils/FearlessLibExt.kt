@@ -20,10 +20,13 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytesOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
@@ -50,6 +53,8 @@ import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+
+typealias PalletName = String
 
 val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
     get() = "//44//60//0/0/0"
@@ -103,6 +108,9 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
 
     return stream.toByteArray()
 }
+
+fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) =
+    bytesOrNull(runtime, value)?.toHexString(withPrefix = true)
 
 fun RuntimeSnapshot.isParachain() = metadata.hasModule(Modules.PARACHAIN_SYSTEM)
 
@@ -216,6 +224,10 @@ fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
 
 fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
 
+fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
+
+fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -260,6 +272,8 @@ fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction?): Bo
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
+
+fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 
@@ -321,4 +335,9 @@ object Modules {
     const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
 
     const val NOMINATION_POOLS = "NominationPools"
+
+    const val ASSET_CONVERSION = "AssetConversion"
+
+    const val TRANSACTION_PAYMENT = "TransactionPayment"
+    const val ASSET_TX_PAYMENT = "AssetTxPayment"
 }

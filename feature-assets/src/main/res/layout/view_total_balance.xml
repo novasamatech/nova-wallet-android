@@ -89,8 +89,7 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginStart="4dp"
-            android:src="@drawable/ic_info_cicrle_filled_16"
-            app:tint="@color/chip_icon" />
+            android:src="@drawable/ic_info" />
 
     </LinearLayout>
 
@@ -98,6 +97,7 @@
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:layout_marginTop="16dp"
+        android:animateLayoutChanges="true"
         app:layout_cardBackgroundColor="@color/block_background"
         app:layout_cardBorderColor="@color/container_card_actions_border"
         app:layout_cardRadius="10dp"
@@ -122,8 +122,18 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/wallet_asset_receive"
-            app:drawableTopCompat="@drawable/ic_receive"
-            tools:drawableTop="@drawable/ic_receive" />
+            app:drawableTopCompat="@drawable/ic_arrow_down"
+            tools:drawableTop="@drawable/ic_arrow_down" />
+
+        <TextView
+            android:id="@+id/viewAssetsTotalBalanceSwap"
+            style="@style/Widget.Nova.ActionButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/wallet_asset_swap"
+            app:drawableTopCompat="@drawable/ic_swap"
+            tools:drawableTop="@drawable/ic_swap" />
 
         <TextView
             android:id="@+id/viewAssetsTotalBalanceBuy"

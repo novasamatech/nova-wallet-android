@@ -131,21 +131,21 @@
                         android:id="@+id/delegateDetailsDelegations"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_delegations" />
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/delegateDetailsVotedRecently"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         tools:title="@string/delegation_recent_votes_format" />
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/delegateDetailsVotedOverall"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_all_votes" />
 
                 </io.novafoundation.nova.common.view.TableView>

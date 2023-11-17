@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownAmount
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownItem
@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -69,6 +70,7 @@ class BalanceListViewModel(
     private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val resourceManager: ResourceManager,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
+    private val swapAvailabilityInteractor: SwapAvailabilityInteractor
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -128,12 +130,16 @@ class BalanceListViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    val totalBalanceFlow = balanceBreakdown.map {
+    val totalBalanceFlow = combine(
+        balanceBreakdown,
+        swapAvailabilityInteractor.anySwapAvailableFlow()
+    ) { breakdown, swapSupported ->
         val currency = selectedCurrency.first()
         TotalBalanceModel(
-            isBreakdownAbailable = it.breakdown.isNotEmpty(),
-            totalBalanceFiat = it.total.formatAsCurrency(currency).formatAsTotalBalance(),
-            lockedBalanceFiat = it.locksTotal.amount.formatAsCurrency(currency)
+            isBreakdownAbailable = breakdown.breakdown.isNotEmpty(),
+            totalBalanceFiat = breakdown.total.formatAsCurrency(currency).formatAsTotalBalance(),
+            lockedBalanceFiat = breakdown.locksTotal.amount.formatAsCurrency(currency),
+            enableSwap = swapSupported
         )
     }
         .inBackground()
@@ -329,6 +335,10 @@ class BalanceListViewModel(
 
     fun crowdloanBannerCloseClicked() {
         hideCrowdloanBanner()
+    }
+
+    fun swapClicked() {
+        router.openSwapFlow()
     }
 
     private fun hideCrowdloanBanner() = launch {

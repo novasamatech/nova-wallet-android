@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
+import io.novafoundation.nova.common.utils.useAttributes
 
 class HintsView @JvmOverloads constructor(
     context: Context,
@@ -19,6 +20,8 @@ class HintsView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
+
+        attrs?.let(::applyAttributes)
     }
 
     fun setHints(hints: List<CharSequence>) {
@@ -39,6 +42,15 @@ class HintsView @JvmOverloads constructor(
             }
         }.forEach(::addView)
     }
+
+    private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.HintsView) {
+        val singleHint = it.getText(R.styleable.HintsView_HintsView_singleHint)
+        singleHint?.let(::setSingleHint)
+    }
+}
+
+fun HintsView.setSingleHint(hint: CharSequence) {
+    setHints(listOf(hint))
 }
 
 fun BaseFragment<*>.observeHints(mixin: HintsMixin, view: HintsView) {

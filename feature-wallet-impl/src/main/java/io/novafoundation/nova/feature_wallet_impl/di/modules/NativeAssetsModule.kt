@@ -5,11 +5,12 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
@@ -19,8 +20,10 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.utility.NativeAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
+import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import javax.inject.Named
 import javax.inject.Qualifier
 
 @Qualifier
@@ -45,19 +48,34 @@ class NativeAssetsModule {
         assetSourceRegistry: AssetSourceRegistry,
         extrinsicService: ExtrinsicService,
         phishingValidationFactory: PhishingValidationFactory,
-        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
-    ) = NativeAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory)
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        accountRepository: AccountRepository,
+    ) = NativeAssetTransfers(
+        chainRegistry,
+        assetSourceRegistry,
+        extrinsicService,
+        phishingValidationFactory,
+        enoughTotalToStayAboveEDValidationFactory,
+        storageDataSource,
+        accountRepository
+    )
 
     @Provides
     @FeatureScope
     fun provideHistory(
         chainRegistry: ChainRegistry,
-        eventsRepository: EventsRepository,
-        walletRepository: WalletRepository,
+        realtimeOperationFetcherFactory: SubstrateRealtimeOperationFetcher.Factory,
         subQueryOperationsApi: SubQueryOperationsApi,
         cursorStorage: TransferCursorStorage,
         coinPriceRepository: CoinPriceRepository
-    ) = NativeAssetHistory(chainRegistry, eventsRepository, walletRepository, subQueryOperationsApi, cursorStorage, coinPriceRepository)
+    ) = NativeAssetHistory(
+        chainRegistry = chainRegistry,
+        realtimeOperationFetcherFactory = realtimeOperationFetcherFactory,
+        walletOperationsApi = subQueryOperationsApi,
+        cursorStorage = cursorStorage,
+        coinPriceRepository = coinPriceRepository
+    )
 
     @Provides
     @NativeAsset

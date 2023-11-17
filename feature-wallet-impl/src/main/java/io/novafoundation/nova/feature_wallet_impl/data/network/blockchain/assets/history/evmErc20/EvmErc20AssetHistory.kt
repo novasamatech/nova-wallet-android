@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmErc20
 
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
@@ -60,13 +60,12 @@ class EvmErc20AssetHistory(
         chainAsset: Chain.Asset,
         blockHash: String,
         accountId: AccountId,
-        currency: Currency
-    ): Result<List<TransferExtrinsic>> {
+    ): List<RealtimeHistoryUpdate> {
         // we fetch transfers alongside with balance updates in EvmAssetBalance
-        return Result.success(emptyList())
+        return emptyList()
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return setOf(TransactionFilter.TRANSFER)
     }
 
@@ -90,11 +89,11 @@ class EvmErc20AssetHistory(
                 fiatAmount = coinRate?.convertPlanks(chainAsset, remote.value),
                 receiver = remote.to,
                 sender = remote.from,
-                status = Operation.Status.COMPLETED,
                 fee = remote.feeUsed
             ),
             time = remote.timeStamp.seconds.inWholeMilliseconds,
-            chainAsset = chainAsset
+            chainAsset = chainAsset,
+            status = Operation.Status.COMPLETED,
         )
     }
 }

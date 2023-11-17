@@ -153,6 +153,10 @@ suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): ChainWi
     return ChainWithAsset(chain, chain.assetsById.getValue(assetId))
 }
 
+suspend fun ChainRegistry.chainWithAsset(fullChainAssetId: FullChainAssetId): ChainWithAsset {
+    return chainWithAsset(fullChainAssetId.chainId, fullChainAssetId.assetId)
+}
+
 suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
     val chain = chainsById.first().getValue(chainId)
 
@@ -161,6 +165,12 @@ suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
 
 suspend fun ChainRegistry.asset(fullChainAssetId: FullChainAssetId): Chain.Asset {
     return asset(fullChainAssetId.chainId, fullChainAssetId.assetId)
+}
+
+fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
+    return ids.map { (chainId, assetId) ->
+        getValue(chainId).assetsById.getValue(assetId)
+    }
 }
 
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)

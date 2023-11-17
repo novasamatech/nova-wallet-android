@@ -3,10 +3,9 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
@@ -23,7 +22,6 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import org.web3j.protocol.core.methods.response.EthBlock
 import org.web3j.protocol.core.methods.response.EthBlock.TransactionResult
@@ -36,7 +34,6 @@ import kotlin.time.Duration.Companion.seconds
 class EvmNativeAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
-    private val walletRepository: WalletRepository,
     coinPriceRepository: CoinPriceRepository
 ) : EvmAssetHistory(coinPriceRepository) {
 
@@ -77,14 +74,13 @@ class EvmNativeAssetHistory(
         chainAsset: Chain.Asset,
         blockHash: String,
         accountId: AccountId,
-        currency: Currency
-    ): Result<List<TransferExtrinsic>> = runCatching {
+    ): List<RealtimeHistoryUpdate> {
         val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
 
         val block = ethereumApi.ethGetBlockByHash(blockHash, true).sendSuspend()
         val txs = block.block.transactions as List<TransactionResult<EthBlock.TransactionObject>>
 
-        txs.mapNotNull {
+        return txs.mapNotNull {
             val tx = it.get()
 
             val isTransfer = tx.input.removeHexPrefix().isEmpty()
@@ -94,18 +90,20 @@ class EvmNativeAssetHistory(
 
             val txReceipt = ethereumApi.ethGetTransactionReceipt(tx.hash).sendSuspend().transactionReceipt.getOrNull()
 
-            TransferExtrinsic(
-                senderId = chain.accountIdOf(tx.from),
-                recipientId = chain.accountIdOf(tx.to),
-                amountInPlanks = tx.value,
-                chainAsset = chainAsset,
+            RealtimeHistoryUpdate(
                 status = txReceipt.extrinsicStatus(),
-                hash = tx.hash
+                txHash = tx.hash,
+                type = RealtimeHistoryUpdate.Type.Transfer(
+                    senderId = chain.accountIdOf(tx.from),
+                    recipientId = chain.accountIdOf(tx.to),
+                    amountInPlanks = tx.value,
+                    chainAsset = chainAsset,
+                )
             )
         }
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return setOf(TransactionFilter.TRANSFER, TransactionFilter.EXTRINSIC)
     }
 
@@ -113,11 +111,11 @@ class EvmNativeAssetHistory(
         return true
     }
 
-    private fun TransactionReceipt?.extrinsicStatus(): ExtrinsicStatus {
+    private fun TransactionReceipt?.extrinsicStatus(): Operation.Status {
         return when (this?.isStatusOK) {
-            true -> ExtrinsicStatus.SUCCESS
-            false -> ExtrinsicStatus.FAILURE
-            null -> ExtrinsicStatus.UNKNOWN
+            true -> Operation.Status.COMPLETED
+            false -> Operation.Status.FAILED
+            null -> Operation.Status.PENDING
         }
     }
 
@@ -148,6 +146,7 @@ class EvmNativeAssetHistory(
             time = remote.timeStamp.seconds.inWholeMilliseconds,
             chainAsset = chainAsset,
             extrinsicHash = remote.hash,
+            status = remote.operationStatus(),
         )
     }
 
@@ -163,7 +162,6 @@ class EvmNativeAssetHistory(
             fiatAmount = coinRate?.convertPlanks(chainAsset, remote.value),
             receiver = remote.to,
             sender = remote.from,
-            status = remote.operationStatus(),
             fee = remote.feeUsed
         )
     }
@@ -180,7 +178,6 @@ class EvmNativeAssetHistory(
             ),
             fee = remote.feeUsed,
             fiatFee = coinRate?.convertPlanks(chainAsset, remote.feeUsed),
-            status = remote.operationStatus()
         )
     }
 

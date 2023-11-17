@@ -28,7 +28,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:actionIcon="@drawable/ic_info_cicrle_filled_16" />
+            app:actionIcon="@drawable/ic_info" />
 
         <io.novafoundation.nova.common.view.TableView
             android:layout_width="match_parent"
@@ -55,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/staking_validator_total_stake"
-                app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                app:titleIcon="@drawable/ic_info" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/validatorStakingMinimumStake"
