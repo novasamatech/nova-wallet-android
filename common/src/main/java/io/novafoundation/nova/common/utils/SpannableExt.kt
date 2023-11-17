@@ -10,7 +10,6 @@ import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
-import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.view.View
 import androidx.annotation.FontRes

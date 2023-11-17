@@ -60,6 +60,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatP
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -92,6 +94,7 @@ class StartStakingLandingViewModel(
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
+    private val chainRegistry: ChainRegistry,
     private val contextManager: ContextManager
 ) : BaseViewModel(),
     Browserable,
@@ -148,9 +151,7 @@ class StartStakingLandingViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
-        updateSystemFactory.create(availableStakingOptionsPayload.chainId, availableStakingOptionsPayload.stakingTypes)
-            .start()
-            .launchIn(this)
+        launchSync()
 
         closeOnStakingStarted()
     }
@@ -188,6 +189,16 @@ class StartStakingLandingViewModel(
 
     fun termsOfUseClicked() {
         openBrowserEvent.value = Event(appLinksProvider.termsUrl)
+    }
+
+    private fun launchSync() {
+        launch {
+            // Start syncing for all staking type since we need to show it on select staking type screen
+            val asset = chainRegistry.asset(availableStakingOptionsPayload.chainId, availableStakingOptionsPayload.assetId)
+            updateSystemFactory.create(availableStakingOptionsPayload.chainId, asset.staking)
+                .start()
+                .launchIn(this)
+        }
     }
 
     private fun closeOnStakingStarted() = launch {
