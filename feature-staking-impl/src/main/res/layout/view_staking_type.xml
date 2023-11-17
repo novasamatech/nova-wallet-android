@@ -69,7 +69,7 @@
             android:includeFontPadding="false"
             android:lineSpacingExtra="8dp"
             android:paddingBottom="16dp"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/staking_type_banner_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/stakingTypeTitle"
             tools:text="Minimum stake: 1 DOT\nRewards: Claim manually" />

@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         tools:text="@string/remove_votes_suggestion_description"
-        android:textColor="@color/text_tertiary" />
+        android:textColor="@color/text_secondary" />
 
     <LinearLayout
         android:layout_width="match_parent"

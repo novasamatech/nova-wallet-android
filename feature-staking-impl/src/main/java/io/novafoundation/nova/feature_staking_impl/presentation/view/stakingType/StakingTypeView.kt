@@ -64,10 +64,10 @@ class StakingTypeView @JvmOverloads constructor(
     fun setSelectable(isSelectable: Boolean) {
         if (isSelectable) {
             stakingTypeTitle.setTextColorRes(R.color.text_primary)
-            stakingTypeConditions.setTextColorRes(R.color.text_secondary)
+            stakingTypeConditions.setTextColorRes(R.color.staking_type_banner_text)
         } else {
-            stakingTypeTitle.setTextColorRes(R.color.button_text_inactive)
-            stakingTypeConditions.setTextColorRes(R.color.button_text_inactive)
+            stakingTypeTitle.setTextColorRes(R.color.staking_type_banner_text_inactive)
+            stakingTypeConditions.setTextColorRes(R.color.staking_type_banner_text_inactive)
         }
     }
 

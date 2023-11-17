@@ -13,8 +13,7 @@
 
     <!-- Text Colors -->
     <color name="text_primary">#E0FFFFFF</color>
-    <color name="text_secondary">#A3FFFFFF</color>
-    <color name="text_tertiary">#7AFFFFFF</color>
+    <color name="text_secondary">#7AFFFFFF</color>
     <color name="button_text">#E0FFFFFF</color>
     <color name="chip_text">#A3FFFFFF</color>
     <color name="button_text_inactive">#52FFFFFF</color>
@@ -33,6 +32,9 @@
     <color name="conviction_slider_text_4x">#B6F234</color>
     <color name="conviction_slider_text_5x">#DAC71B</color>
     <color name="conviction_slider_text_6x">#F19B27</color>
+    <color name="link_text">#A3FFFFFF</color>
+    <color name="staking_type_banner_text">#A3FFFFFF</color>
+    <color name="staking_type_banner_text_inactive">#52FFFFFF</color>
 
     <color name="crowdloan_banner_gradient_start">#BD387F</color>
     <color name="crowdloan_banner_gradient_end">#FF7A00</color>

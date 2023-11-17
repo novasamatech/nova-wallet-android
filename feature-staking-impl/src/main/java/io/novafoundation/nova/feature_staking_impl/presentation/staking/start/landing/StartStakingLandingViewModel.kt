@@ -226,7 +226,7 @@ class StartStakingLandingViewModel(
 
     private fun createMoreInfoText(chain: Chain): CharSequence {
         val iconColor = resourceManager.getColor(R.color.chip_icon)
-        val clickableTextColor = resourceManager.getColor(R.color.text_secondary)
+        val clickableTextColor = resourceManager.getColor(R.color.link_text)
         val chevronSize = resourceManager.measureInPx(20)
         val chevronRight = resourceManager.getDrawable(R.drawable.ic_chevron_right).apply {
             setBounds(0, 0, chevronSize, chevronSize)

@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center_horizontal"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         android:visibility="invisible"
         tools:text="Subtitle" />
 </merge>

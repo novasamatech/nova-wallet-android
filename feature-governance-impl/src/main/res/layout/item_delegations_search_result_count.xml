@@ -8,5 +8,5 @@
     android:layout_marginHorizontal="16dp"
     android:paddingVertical="8dp"
     android:textAllCaps="true"
-    android:textColor="@color/text_tertiary"
+    android:textColor="@color/text_secondary"
     tools:text="@string/delegate_search_result_count" />

@@ -60,7 +60,7 @@
         android:ellipsize="middle"
         android:singleLine="true"
         android:layout_marginBottom="9dp"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/addressTitle"
         app:layout_constraintHorizontal_bias="0.5"

@@ -49,7 +49,7 @@ class StartStakingLandingFooterViewHolder(
     init {
         with(itemView) {
             val iconColor = context.getColor(R.color.chip_icon)
-            val clickablePartColor = context.getColor(R.color.text_secondary)
+            val clickablePartColor = context.getColor(R.color.link_text)
             val chevronSize = 20.dp(context)
             val chevronRight = ContextCompat.getDrawable(context, R.drawable.ic_chevron_right)
                 ?.apply {

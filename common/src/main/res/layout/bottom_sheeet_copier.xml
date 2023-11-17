@@ -22,7 +22,7 @@
         android:paddingHorizontal="48dp"
         android:paddingTop="16dp"
         android:paddingBottom="8dp"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         android:textSize="13sp"
         tools:text="value" />
 </LinearLayout>

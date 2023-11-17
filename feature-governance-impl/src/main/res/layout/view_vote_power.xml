@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/referendum_vote_select_conviction_title"
-        android:textColor="@color/text_tertiary" />
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.input.seekbar.Seekbar
         android:id="@+id/votePowerSelector"

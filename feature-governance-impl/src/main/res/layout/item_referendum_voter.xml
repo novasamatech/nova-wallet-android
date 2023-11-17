@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:includeFontPadding="false"
-            android:textColor="@color/text_tertiary"
+            android:textColor="@color/text_secondary"
             tools:text="3,000 KSM × 0.1x" />
 
     </LinearLayout>
