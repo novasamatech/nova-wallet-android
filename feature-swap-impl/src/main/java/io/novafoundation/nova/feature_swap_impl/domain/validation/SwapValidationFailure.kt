@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
-import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
@@ -28,15 +27,11 @@ sealed class SwapValidationFailure {
 
     sealed class NotEnoughFunds : SwapValidationFailure() {
 
-        class ToStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
+        class ToPayFeeAndStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
 
         object InUsedAsset : NotEnoughFunds()
 
-        class InCommissionAsset(
-            override val chainAsset: Chain.Asset,
-            override val maxUsable: BigDecimal,
-            override val fee: BigDecimal
-        ) : NotEnoughFunds(), NotEnoughToPayFeesError
+        object ToPayFee : NotEnoughFunds()
     }
 
     class AmountOutIsTooLowToStayAboveED(

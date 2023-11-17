@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
-import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
+import io.novafoundation.nova.feature_wallet_api.domain.validation.notSufficientBalanceToPayFeeErrorMessage
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
@@ -41,11 +41,11 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
     amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit
 ): TransformedFailure? {
     return when (val reason = status.reason) {
-        is NotEnoughFunds.ToStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
+        is NotEnoughFunds.ToPayFeeAndStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
 
         NotEnoughFunds.InUsedAsset -> resourceManager.amountIsTooBig().asDefault()
 
-        is NotEnoughFunds.InCommissionAsset -> handleNotEnoughFeeError(reason, resourceManager).asDefault()
+        NotEnoughFunds.ToPayFee -> resourceManager.notSufficientBalanceToPayFeeErrorMessage().asDefault()
 
         InvalidSlippage -> TitleAndMessage(
             resourceManager.getString(R.string.swap_invalid_slippage_failure_title),

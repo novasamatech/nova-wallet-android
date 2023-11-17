@@ -13,11 +13,9 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.Sw
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
-import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughBalanceToStayAboveEDValidation
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceConsideringConsumersValidation
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import java.math.BigDecimal
 
 typealias SwapValidationSystem = ValidationSystem<SwapValidationPayload, SwapValidationFailure>
@@ -46,7 +44,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
     assetSourceRegistry,
     chainExtractor = { it.detailedAssetIn.chain },
     assetExtractor = { it.detailedAssetIn.asset.token.configuration },
-    totalBalanceExtractor = { it.detailedAssetIn.asset.totalInPlanks },
+    balanceExtractor = { it.detailedAssetIn.asset.freeInPlanks },
     feeExtractor = { it.totalDeductedAmountInFeeToken },
     amountExtractor = { it.detailedAssetIn.amountInPlanks },
     error = { payload, existentialDeposit ->
@@ -71,13 +69,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceInFeeAsset() = sufficientBalanc
     available = { it.feeAsset.transferable },
     amount = { BigDecimal.ZERO },
     fee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
-    error = { payload, availableToPayFees ->
-        SwapValidationFailure.NotEnoughFunds.InCommissionAsset(
-            chainAsset = payload.feeAsset.token.configuration,
-            fee = payload.feeAsset.token.amountFromPlanks(payload.swapFee.networkFee.amount),
-            maxUsable = availableToPayFees
-        )
-    }
+    error = { _, _ -> SwapValidationFailure.NotEnoughFunds.ToPayFee }
 )
 
 fun SwapValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
@@ -92,16 +84,6 @@ fun SwapValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalan
 fun SwapValidationSystemBuilder.sufficientAssetOutBalanceToStayAboveED(
     assetSourceRegistry: AssetSourceRegistry
 ) = sufficientAmountOutToStayAboveEDValidation(assetSourceRegistry)
-
-fun SwapValidationSystemBuilder.sufficientBalanceToPayFeeConsideringED(
-    assetSourceRegistry: AssetSourceRegistry
-) = enoughBalanceToStayAboveEDValidation(
-    assetSourceRegistry,
-    fee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
-    balance = { it.feeAsset.free },
-    chainWithAsset = { ChainWithAsset(it.detailedAssetIn.chain, it.feeAsset.token.configuration) },
-    error = { payload, _ -> SwapValidationFailure.NotEnoughFunds.ToStayAboveED(payload.feeAsset.token.configuration) }
-)
 
 fun SwapValidationSystemBuilder.checkForFeeChanges(
     swapService: SwapService
