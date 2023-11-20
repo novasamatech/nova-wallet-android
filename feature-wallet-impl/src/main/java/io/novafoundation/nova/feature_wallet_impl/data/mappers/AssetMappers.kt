@@ -59,14 +59,14 @@ fun mapAssetLocalToAsset(
 }
 
 private fun mapTransferableModeFromLocal(modeLocal: TransferableModeLocal?): TransferableMode {
-    return when(modeLocal ?: AssetLocal.defaultTransferableMode()) {
+    return when (modeLocal ?: AssetLocal.defaultTransferableMode()) {
         TransferableModeLocal.REGULAR -> TransferableMode.REGULAR
         TransferableModeLocal.HOLDS_AND_FREEZES -> TransferableMode.HOLDS_AND_FREEZES
     }
 }
 
 private fun mapEdCountingModeFromLocal(modeLocal: EDCountingModeLocal?): EDCountingMode {
-    return when(modeLocal ?: AssetLocal.defaultEdCountingMode()) {
+    return when (modeLocal ?: AssetLocal.defaultEdCountingMode()) {
         EDCountingModeLocal.TOTAL -> EDCountingMode.TOTAL
         EDCountingModeLocal.FREE -> EDCountingMode.FREE
     }

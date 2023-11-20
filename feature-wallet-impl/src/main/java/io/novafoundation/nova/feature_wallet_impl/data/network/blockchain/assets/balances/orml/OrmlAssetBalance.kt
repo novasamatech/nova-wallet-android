@@ -108,7 +108,6 @@ class OrmlAssetBalance(
                 edCountingMode = EDCountingModeLocal.TOTAL,
             )
         }
-
     }
 
     private fun RuntimeSnapshot.ormlBalanceKey(accountId: AccountId, chainAsset: Chain.Asset): String {

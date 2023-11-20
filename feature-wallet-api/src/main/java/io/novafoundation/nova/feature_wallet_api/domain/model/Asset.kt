@@ -36,14 +36,14 @@ data class Asset(
     companion object {
 
         fun TransferableMode.calculateTransferable(free: Balance, frozen: Balance, reserved: Balance): Balance {
-            return when(this) {
+            return when (this) {
                 TransferableMode.REGULAR -> legacyTransferable(free, frozen)
                 TransferableMode.HOLDS_AND_FREEZES -> holdAndFreezesTransferable(free, frozen, reserved)
             }
         }
 
         fun EDCountingMode.calculateBalanceCountedTowardsEd(free: Balance, reserved: Balance): Balance {
-            return when(this) {
+            return when (this) {
                 EDCountingMode.TOTAL -> totalBalance(free, reserved)
                 EDCountingMode.FREE -> free
             }

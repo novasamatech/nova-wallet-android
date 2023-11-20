@@ -78,7 +78,7 @@ private fun hasSplitFrozen(accountInfo: Struct.Instance): Boolean {
     return "miscFrozen" in accountInfo.mapping
 }
 
-private fun bindAccountDataFlags(instance: Any?) : AccountDataFlags {
+private fun bindAccountDataFlags(instance: Any?): AccountDataFlags {
     return if (instance != null) {
         AccountDataFlags(bindNumber(instance))
     } else {
