@@ -37,10 +37,14 @@ import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 
 val Chain.typesUsage: TypesUsage
     get() = when {
-        types == null -> TypesUsage.BASE
-        types.overridesCommon -> TypesUsage.OWN
-        else -> TypesUsage.BOTH
+        types == null -> TypesUsage.NONE
+        !types.overridesCommon && types.url != null -> TypesUsage.BOTH
+        !types.overridesCommon && types.url == null -> TypesUsage.BASE
+        else -> TypesUsage.OWN
     }
+
+val TypesUsage.requiresBaseTypes: Boolean
+    get() = this == TypesUsage.BASE || this == TypesUsage.BOTH
 
 val Chain.utilityAsset
     get() = assets.first(Chain.Asset::isUtilityAsset)

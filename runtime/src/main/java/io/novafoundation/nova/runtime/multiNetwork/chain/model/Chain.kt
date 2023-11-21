@@ -47,7 +47,7 @@ data class Chain(
     )
 
     data class Types(
-        val url: String,
+        val url: String?,
         val overridesCommon: Boolean,
     )
 
@@ -189,5 +189,5 @@ data class Chain(
 }
 
 enum class TypesUsage {
-    BASE, OWN, BOTH,
+    BASE, OWN, BOTH, NONE
 }
