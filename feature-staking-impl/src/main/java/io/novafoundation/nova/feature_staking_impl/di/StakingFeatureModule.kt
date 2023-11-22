@@ -99,6 +99,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -321,7 +322,8 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideStakingConstantsRepository(
         chainRegistry: ChainRegistry,
-    ) = StakingConstantsRepository(chainRegistry)
+        runtimeCallsApi: MultiChainRuntimeCallsApi
+    ) = StakingConstantsRepository(chainRegistry, runtimeCallsApi)
 
     @Provides
     @FeatureScope

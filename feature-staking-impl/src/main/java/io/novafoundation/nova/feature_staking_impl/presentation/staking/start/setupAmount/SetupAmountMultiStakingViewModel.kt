@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -33,12 +33,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectW
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -199,17 +199,17 @@ class SetupAmountMultiStakingViewModel(
     }
 
     private fun runSelectionUpdates() {
-        combine(
-            multiStakingSelectionTypeFlow,
-            amountChooserMixin.amountInput
-        ) { multiStakingSelectionType, amountInput ->
-            val amount = amountInput.toBigDecimalOrNull() ?: return@combine
-            val asset = currentAssetFlow.first()
-            val planks = asset.token.planksFromAmount(amount)
+        launch {
+            combineToPair(
+                multiStakingSelectionTypeFlow,
+                amountChooserMixin.amountState
+            ).collectLatest { (multiStakingSelectionType, amountInput) ->
+                val amount = amountInput.value ?: return@collectLatest
+                val asset = currentAssetFlow.first()
+                val planks = asset.token.planksFromAmount(amount)
 
-            multiStakingSelectionType.updateSelectionFor(planks)
+                multiStakingSelectionType.updateSelectionFor(planks)
+            }
         }
-            .inBackground()
-            .launchIn(viewModelScope)
     }
 }

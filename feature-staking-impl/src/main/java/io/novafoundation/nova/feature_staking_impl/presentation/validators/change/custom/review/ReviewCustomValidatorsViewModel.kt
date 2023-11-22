@@ -52,7 +52,8 @@ class ReviewCustomValidatorsViewModel(
         .share()
 
     private val maxValidatorsPerNominatorFlow = flowOf {
-        interactor.maxValidatorsPerNominator()
+        val activeStake = confirmSetupState.first().activeStake
+        interactor.maxValidatorsPerNominator(activeStake)
     }.share()
 
     val selectionStateFlow = combine(
