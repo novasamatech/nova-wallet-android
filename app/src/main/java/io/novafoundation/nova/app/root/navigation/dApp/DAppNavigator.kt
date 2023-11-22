@@ -11,18 +11,25 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFr
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 
 class DAppNavigator(
-    navigationHolder: NavigationHolder,
+    private val navigationHolder: NavigationHolder,
 ) : BaseNavigator(navigationHolder), DAppRouter {
 
     override fun openChangeAccount() = performNavigation(R.id.action_open_switch_wallet)
 
-    override fun openDAppBrowser(initialUrl: String) = performNavigation(
-        cases = arrayOf(
-            R.id.mainFragment to R.id.action_mainFragment_to_dappBrowserGraph,
-            R.id.dappSearchFragment to R.id.action_dappSearchFragment_to_dapp_browser_graph,
-        ),
-        args = DAppBrowserFragment.getBundle(initialUrl)
-    )
+    override fun openDAppBrowser(initialUrl: String) {
+        // Close deapp browser if it is already opened
+        // TODO it's better to provide new url to existing browser
+        val currentDestination = navigationHolder.navController?.currentDestination
+        if (currentDestination?.id == R.id.DAppBrowserFragment) {
+            back()
+        }
+
+        val destinationId = when (navigationHolder.navController?.currentDestination?.id) {
+            R.id.dappSearchFragment -> R.id.action_dappSearchFragment_to_dapp_browser_graph
+            else -> R.id.action_mainFragment_to_dappBrowserGraph
+        }
+        performNavigation(destinationId, DAppBrowserFragment.getBundle(initialUrl))
+    }
 
     override fun openDappSearch() = performNavigation(
         actionId = R.id.action_mainFragment_to_dappSearchGraph,
