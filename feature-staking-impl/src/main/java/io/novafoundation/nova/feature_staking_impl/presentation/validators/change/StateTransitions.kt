@@ -22,7 +22,7 @@ fun SetupStakingSharedState.setRecommendedValidators(
 ) = setValidators(validators, SelectionMethod.RECOMMENDED)
 
 fun SetupStakingSharedState.activeStake(): Balance {
-    return when(val state = setupStakingProcess.value) {
+    return when (val state = setupStakingProcess.value) {
         is SetupStakingProcess.ReadyToSubmit -> state.activeStake
         else -> throw IllegalArgumentException("Cannot get active stake from $state state")
     }
