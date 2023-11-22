@@ -24,7 +24,7 @@ class DAppNavigator(
             back()
         }
 
-        val destinationId = when (navigationHolder.navController?.currentDestination?.id) {
+        val destinationId = when (currentDestination?.id) {
             R.id.dappSearchFragment -> R.id.action_dappSearchFragment_to_dapp_browser_graph
             else -> R.id.action_mainFragment_to_dappBrowserGraph
         }
