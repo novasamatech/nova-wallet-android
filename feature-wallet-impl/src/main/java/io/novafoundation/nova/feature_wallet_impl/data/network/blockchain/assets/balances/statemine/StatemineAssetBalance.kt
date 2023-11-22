@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
+import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
+import io.novafoundation.nova.core_db.model.AssetLocal.TransferableModeLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
@@ -136,10 +138,13 @@ class StatemineAssetBalance(
         } else {
             BigInteger.ZERO
         }
+        val freeBalance = assetAccount.balance
 
         it.copy(
             frozenInPlanks = frozenBalance,
-            freeInPlanks = assetAccount.balance
+            freeInPlanks = freeBalance,
+            transferableMode = TransferableModeLocal.REGULAR,
+            edCountingMode = EDCountingModeLocal.TOTAL,
         )
     }
 }

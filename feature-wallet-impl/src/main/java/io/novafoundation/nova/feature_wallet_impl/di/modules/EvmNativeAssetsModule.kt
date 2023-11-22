@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evnNative.EvmNativeAssetBalance
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmNative.EvmNativeAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmNative.EvmNativeAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.evmNative.EvmNativeAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi

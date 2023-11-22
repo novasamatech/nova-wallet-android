@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
+import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -51,7 +52,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
         fee = { it.originFee },
-        balance = { it.originCommissionAsset.total },
+        balance = { it.originCommissionAsset.balanceCountedTowardsED() },
         chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
         error = { payload, _ -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset) }
     )
@@ -74,7 +75,7 @@ fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
     fee: AmountProducer<AssetTransferPayload>,
     extraAmount: AmountProducer<AssetTransferPayload>,
 ) = doNotCrossExistentialDeposit(
-    totalBalance = { it.originUsedAsset.total },
+    countableTowardsEdBalance = { it.originUsedAsset.balanceCountedTowardsED() },
     fee = fee,
     extraAmount = extraAmount,
     existentialDeposit = { assetSourceRegistry.existentialDepositForUsedAsset(it.transfer) },

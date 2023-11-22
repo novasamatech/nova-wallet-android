@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
+import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -209,7 +210,7 @@ class RealGovernanceUnlockInteractor(
 
             val transferableCurrent = asset.transferableInPlanks
             val newTotalLocked = balanceLocks.maxLockReplacing(convictionVoting.voteLockId, replaceWith = newGovernanceLock)
-            val newTransferable = asset.freeInPlanks - newTotalLocked
+            val newTransferable = asset.transferableReplacingFrozen(newTotalLocked)
 
             val governanceLockChange = claimable.amount
             val transferableChange = (newTransferable - transferableCurrent).abs()
