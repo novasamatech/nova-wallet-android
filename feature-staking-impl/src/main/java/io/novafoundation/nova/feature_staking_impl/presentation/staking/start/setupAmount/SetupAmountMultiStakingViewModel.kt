@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDec
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWithV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -199,7 +200,7 @@ class SetupAmountMultiStakingViewModel(
     }
 
     private fun runSelectionUpdates() {
-        launch {
+        launch(Dispatchers.Default) {
             combineToPair(
                 multiStakingSelectionTypeFlow,
                 amountChooserMixin.amountState
