@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -40,6 +42,7 @@ interface RootComponent {
         fun create(
             @BindsInstance navigationHolder: NavigationHolder,
             @BindsInstance rootRouter: RootRouter,
+            @BindsInstance governanceRouter: GovernanceRouter,
             @BindsInstance stakingDashboardNavigator: StakingDashboardNavigator,
             deps: RootDependencies
         ): RootComponent
@@ -53,6 +56,7 @@ interface RootComponent {
             CrowdloanFeatureApi::class,
             AssetsFeatureApi::class,
             CurrencyFeatureApi::class,
+            GovernanceFeatureApi::class,
             DbApi::class,
             CommonApi::class,
             RuntimeApi::class,

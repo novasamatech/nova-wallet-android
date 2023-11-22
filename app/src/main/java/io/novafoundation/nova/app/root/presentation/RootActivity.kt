@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -126,9 +127,9 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     }
 
     private fun processIntent(intent: Intent) {
-        val uri = intent.data?.toString()
-
-        uri?.let { viewModel.externalUrlOpened(uri) }
+        intent.data?.let {
+            viewModel.handleDeepLink(it)
+        }
     }
 
 //    private fun processJsonOpenIntent() {

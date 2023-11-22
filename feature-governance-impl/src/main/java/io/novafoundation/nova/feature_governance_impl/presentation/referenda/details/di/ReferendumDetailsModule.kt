@@ -12,9 +12,11 @@ import io.novafoundation.nova.common.di.modules.shared.MarkdownShortModule
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
@@ -55,6 +57,8 @@ class ReferendumDetailsModule {
         governanceDAppsInteractor: GovernanceDAppsInteractor,
         validationSystem: ReferendumPreVoteValidationSystem,
         validationExecutor: ValidationExecutor,
+        updateSystem: UpdateSystem,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -71,7 +75,9 @@ class ReferendumDetailsModule {
             markwon = markwon,
             governanceDAppsInteractor = governanceDAppsInteractor,
             validationExecutor = validationExecutor,
-            validationSystem = validationSystem
+            validationSystem = validationSystem,
+            updateSystem = updateSystem,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 
