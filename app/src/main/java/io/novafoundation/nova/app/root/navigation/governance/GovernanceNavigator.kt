@@ -45,7 +45,14 @@ class GovernanceNavigator(
 ) : BaseNavigator(navigationHolder), GovernanceRouter {
 
     override fun openReferendum(payload: ReferendumDetailsPayload) {
-        val destinationId = when (navigationHolder.navController?.currentDestination?.id) {
+        // Close referendum details screen if it is already opened to open new one
+        // TODO: It's better to open new screen on top of the old one, but we need to consider that single shared state will be used for all screens
+        val currentDestination = navigationHolder.navController?.currentDestination
+        if (currentDestination?.id == R.id.referendumDetailsFragment) {
+            back()
+        }
+
+        val destinationId = when (currentDestination?.id) {
             R.id.referendaSearchFragment -> R.id.action_open_referendum_details_from_referenda_search
             else -> R.id.action_open_referendum_details
         }

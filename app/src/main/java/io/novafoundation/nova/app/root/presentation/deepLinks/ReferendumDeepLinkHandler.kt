@@ -13,6 +13,8 @@ import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
+private const val GOV_DEEP_LINK_PREFIX = "/open/gov"
+
 class ReferendumDeepLinkHandler(
     private val governanceRouter: GovernanceRouter,
     private val chainRegistry: ChainRegistry,
@@ -32,7 +34,7 @@ class ReferendumDeepLinkHandler(
         val governanceType = data.getGovernanceType()
 
         return userAccounts.isNotEmpty() &&
-            path.startsWith("/open/gov") == true &&
+            path.startsWith(GOV_DEEP_LINK_PREFIX) == true &&
             chain != null &&
             governanceType != null &&
             referendumId != null
