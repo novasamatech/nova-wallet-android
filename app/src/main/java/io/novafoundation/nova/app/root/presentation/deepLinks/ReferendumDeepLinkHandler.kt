@@ -1,11 +1,8 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks
 
-import android.content.Intent
 import android.net.Uri
-import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.GovernanceStateUpdater
-import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.runtime.ext.utilityAsset

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks
 
-import android.content.Intent
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.merge

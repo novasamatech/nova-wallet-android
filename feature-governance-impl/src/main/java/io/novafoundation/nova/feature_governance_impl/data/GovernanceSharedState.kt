@@ -28,7 +28,8 @@ class GovernanceSharedState(
         }
     },
     preferencesKey = GOVERNANCE_SHARED_STATE
-), GovernanceStateUpdater {
+),
+    GovernanceStateUpdater {
 
     override fun update(chainId: ChainId, assetId: Int, governanceType: Chain.Governance) {
         update(chainId, assetId, governanceType.name)

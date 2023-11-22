@@ -10,7 +10,6 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.app.root.presentation.RootViewModel
-import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule

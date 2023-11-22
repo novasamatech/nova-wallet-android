@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment

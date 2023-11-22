@@ -119,7 +119,7 @@ class RealVoteReferendumInteractor(
 
         val selectedReferendumFlow = governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId)
             .filterNotNull()
-        
+
         val balanceLocksFlow = locksRepository.observeBalanceLocks(chain, chainAsset)
 
         return combine(votingInformation, selectedReferendumFlow, balanceLocksFlow) { (locksByTrack, voting, votedReferenda), selectedReferendum, locks ->
