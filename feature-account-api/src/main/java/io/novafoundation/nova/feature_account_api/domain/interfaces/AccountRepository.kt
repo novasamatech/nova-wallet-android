@@ -43,6 +43,8 @@ interface AccountRepository {
 
     suspend fun allMetaAccounts(): List<MetaAccount>
 
+    suspend fun hasMetaAccounts(): Boolean
+
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>

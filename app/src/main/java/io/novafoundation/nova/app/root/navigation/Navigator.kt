@@ -166,13 +166,7 @@ class Navigator(
     }
 
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
-        val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
-            R.id.welcomeFragment -> R.id.action_welcomeFragment_to_import_nav_graph
-            R.id.accountDetailsFragment -> R.id.action_accountDetailsFragment_to_import_nav_graph
-            else -> throw IllegalArgumentException("Unknown current destination to open import account screen: $currentDestinationId")
-        }
-
-        navController?.navigate(destination, ImportAccountFragment.getBundle(payload))
+        navController?.navigate(R.id.action_import_nav_graph, ImportAccountFragment.getBundle(payload))
     }
 
     override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -46,6 +47,7 @@ interface RootComponent {
             @BindsInstance rootRouter: RootRouter,
             @BindsInstance governanceRouter: GovernanceRouter,
             @BindsInstance dAppRouter: DAppRouter,
+            @BindsInstance accountRouter: AccountRouter,
             @BindsInstance stakingDashboardNavigator: StakingDashboardNavigator,
             deps: RootDependencies
         ): RootComponent

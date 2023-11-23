@@ -1,6 +1,8 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks
 
 import android.net.Uri
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.GovernanceStateUpdater
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -17,7 +19,8 @@ class ReferendumDeepLinkHandler(
     private val governanceRouter: GovernanceRouter,
     private val chainRegistry: ChainRegistry,
     private val governanceStateUpdater: GovernanceStateUpdater,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val automaticInteractionGate: AutomaticInteractionGate
 ) : DeepLinkHandler {
 
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
@@ -39,12 +42,13 @@ class ReferendumDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        val chainId = data.getChainId() ?: return
-        val referendumId = data.getReferendumId() ?: return
-        val governanceType = data.getGovernanceType() ?: return
+        val chainId = data.getChainId() ?: return // TODO: show error message instead
+        val referendumId = data.getReferendumId() ?: return // TODO: show error message instead
+        val governanceType = data.getGovernanceType() ?: return // TODO: show error message instead
         val chain = chainRegistry.getChain(chainId)
         val payload = ReferendumDetailsPayload(referendumId)
 
+        automaticInteractionGate.awaitInteractionAllowed()
         governanceStateUpdater.update(chain.id, chain.utilityAsset.id, governanceType)
         governanceRouter.openReferendum(payload)
     }
