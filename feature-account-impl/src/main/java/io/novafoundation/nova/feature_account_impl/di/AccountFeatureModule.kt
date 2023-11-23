@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_impl.di.modules.AdvancedEncryptionStoreModule
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
 import io.novafoundation.nova.feature_account_impl.di.modules.SignersModule
@@ -86,7 +87,9 @@ import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
 import javax.inject.Named
 
-@Module(includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class, IdentityProviderModule::class])
+@Module(
+    includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class, IdentityProviderModule::class, AdvancedEncryptionStoreModule::class]
+)
 class AccountFeatureModule {
 
     @Provides

@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWall
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -21,7 +20,6 @@ import javax.inject.Inject
 class AccountFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val accountRouter: AccountRouter,
-    private val advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
     private val polkadotVaultSignCommunicator: PolkadotVaultVariantSignCommunicator,
     private val ledgerSignCommunicator: LedgerSignCommunicator,
     private val selectAddressCommunicator: SelectAddressCommunicator,
@@ -42,7 +40,6 @@ class AccountFeatureHolder @Inject constructor(
         return DaggerAccountFeatureComponent.factory()
             .create(
                 accountRouter = accountRouter,
-                advancedEncryptionCommunicator = advancedEncryptionCommunicator,
                 polkadotVaultSignInterScreenCommunicator = polkadotVaultSignCommunicator,
                 ledgerSignInterScreenCommunicator = ledgerSignCommunicator,
                 selectAddressCommunicator = selectAddressCommunicator,

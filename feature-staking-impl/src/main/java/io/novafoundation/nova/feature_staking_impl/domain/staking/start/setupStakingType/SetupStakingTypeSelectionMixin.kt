@@ -46,7 +46,7 @@ class SetupStakingTypeSelectionMixin(
         .filterNotNull()
 
     suspend fun apply() {
-        val recommendableSelection = editableSelectionStoreProvider.getSelectionStore(scope).currentSelection ?: return
+        val recommendableSelection = editableSelectionStoreProvider.getSelectionStore(scope).getCurrentSelection() ?: return
         currentSelectionStoreProvider.getSelectionStore(scope)
             .updateSelection(recommendableSelection)
     }
