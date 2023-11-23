@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryptionModel
@@ -21,6 +20,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.advanced
 import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.spacedWords
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -36,7 +36,7 @@ class BackupMnemonicViewModel(
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
-    private val advancedEncryptionSelectionStore by coroutineScope.lazyAsync {
+    private val advancedEncryptionSelectionStore = async {
         advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope)
     }
 

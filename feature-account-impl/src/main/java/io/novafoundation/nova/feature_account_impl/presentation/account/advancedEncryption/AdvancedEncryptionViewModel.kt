@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.input.modifyIfNotNull
 import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
@@ -26,6 +25,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryp
 import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncryptionSelectionStoreProvider
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -42,7 +42,7 @@ class AdvancedEncryptionViewModel(
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
-    private val advancedEncryptionSelectionStore by lazyAsync { advancedEncryptionSelectionStoreProvider.getSelectionStore(this) }
+    private val advancedEncryptionSelectionStore = async { advancedEncryptionSelectionStoreProvider.getSelectionStore(this) }
 
     private val encryptionTypes = getCryptoTypeModels()
 

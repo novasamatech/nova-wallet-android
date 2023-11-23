@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
@@ -13,6 +12,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.importing.Import
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.view.ImportSourceView
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.view.SeedImportView
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -26,9 +26,7 @@ class RawSeedImportSource(
     private val coroutineScope: CoroutineScope
 ) : ImportSource(R.string.account_import_seed_title), CoroutineScope by coroutineScope {
 
-    private val advancedEncryptionSelectionStore by coroutineScope.lazyAsync {
-        advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope)
-    }
+    private val advancedEncryptionSelectionStore = async { advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope) }
 
     override val encryptionOptionsAvailable: Boolean = true
 

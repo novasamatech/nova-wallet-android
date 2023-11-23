@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
@@ -16,6 +15,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.importing.source
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.view.MnemonicImportView
 import jp.co.soramitsu.fearless_utils.exceptions.Bip39Exception
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -30,9 +30,7 @@ class MnemonicImportSource(
     private val coroutineScope: CoroutineScope
 ) : ImportSource(R.string.account_import_mnemonic_title), CoroutineScope by coroutineScope {
 
-    private val advancedEncryptionSelectionStore by lazyAsync {
-        advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope)
-    }
+    private var advancedEncryptionSelectionStore = async { advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope) }
 
     override val encryptionOptionsAvailable: Boolean = true
 
@@ -41,15 +39,15 @@ class MnemonicImportSource(
     override val fieldsValidFlow: Flow<Boolean> = mnemonicContentFlow.map { it.isNotEmpty() }
 
     init {
-        val preset = importType.preset
-        if (preset != null) {
-            launch {
+        launch {
+            val preset = importType.preset
+            if (preset != null) {
                 val advancedSettings = preset.toAdvancedEncryption()
                 advancedEncryptionSelectionStore().updateSelection(advancedSettings)
             }
-        }
 
-        importType.mnemonic?.let { mnemonicContentFlow.value = it }
+            importType.mnemonic?.let { mnemonicContentFlow.value = it }
+        }
     }
 
     override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*>): ImportSourceView<*> {

@@ -7,9 +7,9 @@ private const val KEY = "advanced_encryption_selection_store"
 
 class AdvancedEncryptionSelectionStoreProvider(
     computationalCache: ComputationalCache
-) : ComputationalCacheSelectionStoreProvider<AdvencedEncryptionSelectionStore>(computationalCache, KEY) {
+) : ComputationalCacheSelectionStoreProvider<AdvancedEncryptionSelectionStore>(computationalCache, KEY) {
 
-    protected override fun initSelectionStore(): AdvencedEncryptionSelectionStore {
-        return AdvencedEncryptionSelectionStore()
+    protected override fun initSelectionStore(): AdvancedEncryptionSelectionStore {
+        return AdvancedEncryptionSelectionStore()
     }
 }
