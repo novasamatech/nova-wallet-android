@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -34,9 +33,7 @@ class RealPalletXcmRepository(
             chainId = chainId,
             getCall = { it.moduleOrNull(it.xcmPalletName())?.callOrNull("reserve_transfer_assets") },
             argumentName = "dest"
-        ).also {
-            Log.d("RX", "Detected lowest MultiLocation version: $it")
-        }
+        )
     }
 
     override suspend fun lowestPresentMultiAssetsVersion(chainId: ChainId): XcmVersion? {
@@ -44,9 +41,7 @@ class RealPalletXcmRepository(
             chainId = chainId,
             getCall = { it.moduleOrNull(it.xcmPalletName())?.callOrNull("reserve_transfer_assets") },
             argumentName = "assets"
-        ).also {
-            Log.d("RX", "Detected lowest MultiAssets version: $it")
-        }
+        )
     }
 
     override suspend fun lowestPresentMultiAssetVersion(chainId: ChainId): XcmVersion? {
