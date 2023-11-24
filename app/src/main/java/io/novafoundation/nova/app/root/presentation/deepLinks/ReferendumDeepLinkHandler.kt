@@ -30,7 +30,7 @@ class ReferendumDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        //TODO: check if user has account
+        // TODO: check if user has account
         val chainId = data.getChainId() ?: return
         val referendumId = data.getReferendumId() ?: return
         val governanceType = data.getGovernanceType() ?: return
