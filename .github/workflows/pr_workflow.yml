@@ -3,13 +3,13 @@ name: PR Workflow
 on:
   pull_request:
     branches:
-      - 'master'
+      - 'develop'
   pull_request_review_comment:
     types: [created, edited, deleted]
  
 jobs:
   checkRef:
-    if: github.event.pull_request.base.ref == 'master' || github.event_name == 'pull_request'
+    if: github.event.pull_request.base.ref == 'develop' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     outputs:
       is_rc: ${{ steps.check_ref.outputs.ref_contains_rc }}
