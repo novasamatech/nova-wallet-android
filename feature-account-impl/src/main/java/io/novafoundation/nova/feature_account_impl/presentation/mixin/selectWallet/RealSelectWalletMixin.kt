@@ -118,5 +118,4 @@ internal class RealSelectWalletMixin(
     } else {
         nonSelectableMetaId()
     }
-
 }

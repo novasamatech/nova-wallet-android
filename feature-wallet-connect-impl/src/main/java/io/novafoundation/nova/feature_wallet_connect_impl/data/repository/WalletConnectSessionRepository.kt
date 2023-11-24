@@ -29,7 +29,7 @@ interface WalletConnectSessionRepository {
     fun numberOfSessionsFlow(pairingTopics: Set<String>): Flow<Int>
 }
 
-class InMemoryWalletConnectSessionRepository: WalletConnectSessionRepository {
+class InMemoryWalletConnectSessionRepository : WalletConnectSessionRepository {
 
     private val state = singleReplaySharedFlow<List<Session>>()
 
@@ -66,7 +66,7 @@ class InMemoryWalletConnectSessionRepository: WalletConnectSessionRepository {
     }
 
     override fun numberOfSessionsFlow(pairingTopics: Set<String>): Flow<Int> {
-        return state.map {  sessions ->
+        return state.map { sessions ->
             sessions.filter { it.pairingTopic in pairingTopics }.size
         }
     }
