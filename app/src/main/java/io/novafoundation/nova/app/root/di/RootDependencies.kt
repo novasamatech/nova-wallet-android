@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -56,6 +57,8 @@ interface RootDependencies {
     fun safeModeService(): SafeModeService
 
     fun rootScope(): RootScope
+
+    fun governanceStateUpdater(): MutableGovernanceState
 
     val systemCallExecutor: SystemCallExecutor
 
