@@ -11,9 +11,7 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.SubstrateJunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
