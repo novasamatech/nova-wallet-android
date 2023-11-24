@@ -94,6 +94,17 @@ class DappInteractor(
         }
     }
 
+    suspend fun getDAppInfo(dAppUrl: String): DAppInfo {
+        val baseUrl = Urls.normalizeUrl(dAppUrl)
+
+        return withContext(Dispatchers.Default) {
+            DAppInfo(
+                baseUrl = baseUrl,
+                metadata = dAppMetadataRepository.getDAppMetadata(baseUrl)
+            )
+        }
+    }
+
     private fun MutableMap<DappCategory, List<DApp>>.putCategory(category: DappCategory, items: Collection<DApp>) {
         put(category, items.sortedWith(dAppComparator))
     }
@@ -104,17 +115,6 @@ class DappInteractor(
             label = dApp.name,
             icon = dApp.iconLink
         )
-    }
-
-    suspend fun getDAppInfo(dAppUrl: String): DAppInfo {
-        val baseUrl = Urls.normalizeUrl(dAppUrl)
-
-        return withContext(Dispatchers.Default) {
-            DAppInfo(
-                baseUrl = baseUrl,
-                metadata = dAppMetadataRepository.getDAppMetadata(baseUrl)
-            )
-        }
     }
 
     private inline fun CoroutineScope.runSync(crossinline sync: suspend () -> Unit): Job {

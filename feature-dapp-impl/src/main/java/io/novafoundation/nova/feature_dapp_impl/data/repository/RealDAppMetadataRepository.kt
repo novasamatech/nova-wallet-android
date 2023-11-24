@@ -31,6 +31,12 @@ class RealDAppMetadataRepository(
         dappMetadatasFlow.emit(dappMetadatas)
     }
 
+    override suspend fun syncAndGetDapp(baseUrl: String): DappMetadata? {
+        syncDAppMetadatas()
+
+        return getDAppMetadata(baseUrl)
+    }
+
     override suspend fun getDAppMetadata(baseUrl: String): DappMetadata? {
         return dappMetadatasFlow.first()
             .dApps
