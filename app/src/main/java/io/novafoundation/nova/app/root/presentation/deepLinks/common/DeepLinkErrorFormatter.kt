@@ -4,12 +4,10 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.DAppHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ImportMnemonicHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ReferendumHandlingException
-import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.resources.ResourceManager
 
 fun formatDeepLinkHandlingException(resourceManager: ResourceManager, exception: DeepLinkHandlingException): String {
     return when (exception) {
-
         is ReferendumHandlingException -> handleReferendumException(resourceManager, exception)
 
         is DAppHandlingException -> handleDAppException(resourceManager, exception)

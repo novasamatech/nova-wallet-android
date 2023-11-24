@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 import android.net.Uri
 import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
 import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.DAppHandlingException
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
