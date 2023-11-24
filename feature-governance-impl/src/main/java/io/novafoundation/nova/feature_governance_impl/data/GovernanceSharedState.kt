@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.data
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_governance_api.data.GovernanceStateUpdater
+import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceAdditionalState
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -29,7 +29,7 @@ class GovernanceSharedState(
     },
     preferencesKey = GOVERNANCE_SHARED_STATE
 ),
-    GovernanceStateUpdater {
+    MutableGovernanceState {
 
     override fun update(chainId: ChainId, assetId: Int, governanceType: Chain.Governance) {
         update(chainId, assetId, governanceType.name)
