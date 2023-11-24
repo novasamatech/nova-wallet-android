@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
-import io.novafoundation.nova.feature_governance_api.data.GovernanceStateUpdater
+import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -57,14 +57,14 @@ class DeepLinkModule {
     fun provideReferendumDeepLinkHandler(
         governanceRouter: GovernanceRouter,
         chainRegistry: ChainRegistry,
-        governanceStateUpdater: GovernanceStateUpdater,
+        mutableGovernanceState: MutableGovernanceState,
         accountRepository: AccountRepository,
         automaticInteractionGate: AutomaticInteractionGate
     ): DeepLinkHandler {
         return ReferendumDeepLinkHandler(
             governanceRouter,
             chainRegistry,
-            governanceStateUpdater,
+            mutableGovernanceState,
             accountRepository,
             automaticInteractionGate
         )
