@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRep
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_governance_api.data.GovernanceStateUpdater
+import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -59,7 +59,7 @@ interface RootDependencies {
 
     fun rootScope(): RootScope
 
-    fun governanceStateUpdater(): GovernanceStateUpdater
+    fun governanceStateUpdater(): MutableGovernanceState
 
     fun dappMetadataRepository(): DAppMetadataRepository
 

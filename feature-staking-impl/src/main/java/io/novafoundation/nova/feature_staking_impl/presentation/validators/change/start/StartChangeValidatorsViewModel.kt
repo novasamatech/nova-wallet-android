@@ -15,7 +15,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.Valida
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.retractValidators
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.reset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.transform
@@ -39,7 +40,7 @@ class StartChangeValidatorsViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     private val maxValidatorsPerNominator = flowOf {
-        interactor.maxValidatorsPerNominator()
+        interactor.maxValidatorsPerNominator(setupStakingSharedState.activeStake())
     }.share()
 
     val validatorsLoading = MutableStateFlow(true)
@@ -84,7 +85,7 @@ class StartChangeValidatorsViewModel(
     }
 
     fun backClicked() {
-        setupStakingSharedState.retractValidators()
+        setupStakingSharedState.reset()
 
         router.back()
     }

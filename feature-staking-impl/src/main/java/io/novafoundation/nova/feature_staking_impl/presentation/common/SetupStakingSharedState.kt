@@ -2,25 +2,24 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common
 
 import android.util.Log
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import kotlinx.coroutines.flow.MutableStateFlow
 
 sealed class SetupStakingProcess {
 
     object Initial : SetupStakingProcess() {
 
-        fun changeValidatorsFlow() = ChoosingValidators
-    }
-
-    object ChoosingValidators : SetupStakingProcess() {
-
-        fun previous() = Initial
-
-        fun next(validators: List<Validator>, selectionMethod: ReadyToSubmit.SelectionMethod): SetupStakingProcess {
-            return ReadyToSubmit(validators, selectionMethod)
+        fun next(
+            activeStake: Balance,
+            validators: List<Validator>,
+            selectionMethod: ReadyToSubmit.SelectionMethod
+        ): SetupStakingProcess {
+            return ReadyToSubmit(activeStake, validators, selectionMethod)
         }
     }
 
     class ReadyToSubmit(
+        val activeStake: Balance,
         val validators: List<Validator>,
         val selectionMethod: SelectionMethod
     ) : SetupStakingProcess() {
@@ -32,13 +31,13 @@ sealed class SetupStakingProcess {
         fun changeValidators(
             newValidators: List<Validator>,
             selectionMethod: SelectionMethod
-        ) = ReadyToSubmit(newValidators, selectionMethod)
+        ) = ReadyToSubmit(activeStake, newValidators, selectionMethod)
 
-        fun previous(): ChoosingValidators {
-            return ChoosingValidators
+        fun previous(): Initial {
+            return Initial
         }
 
-        fun finish() = Initial
+        fun reset() = Initial
     }
 }
 

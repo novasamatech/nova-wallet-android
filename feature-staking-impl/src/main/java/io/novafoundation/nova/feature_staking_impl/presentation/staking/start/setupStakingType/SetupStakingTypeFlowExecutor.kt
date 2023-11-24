@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.getValidatorsOrEmpty
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -53,8 +54,9 @@ class SetupDirectStakingFlowExecutor(
         val selectionStore = editableSelectionStoreProvider.getSelectionStore(coroutineScope)
         setupStakingSharedState.set(
             SetupStakingProcess.ReadyToSubmit(
-                selectionStore.getValidatorsOrEmpty(),
-                SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM
+                activeStake = selectionStore.currentSelection?.selection?.stake.orZero(),
+                validators = selectionStore.getValidatorsOrEmpty(),
+                selectionMethod = SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM
             )
         )
         router.openSelectCustomValidators()

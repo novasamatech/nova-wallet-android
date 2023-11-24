@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redee
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.numberOfSlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.totalRedeemableIn
@@ -12,8 +14,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.totalPointsAfterRedeemAt
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.unlockChunksFor
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
@@ -71,7 +71,7 @@ class RealNominationPoolsRedeemInteractor(
             val chain = stakingSharedState.chain()
             val activeEra = stakingRepository.getActiveEraIndex(chain.id)
 
-            extrinsicService.submitExtrinsicWithSelectedWallet(chain) {
+            extrinsicService.submitExtrinsicWithSelectedWalletV2(chain) {
                 redeem(poolMember)
             }.map {
                 val totalAfterRedeem = poolMember.totalPointsAfterRedeemAt(activeEra)
