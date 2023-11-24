@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
 import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
@@ -153,7 +155,12 @@ class RootViewModel(
 
     fun handleDeepLink(data: Uri) {
         launch {
-            deepLinkHandler.handleDeepLink(data)
+            try {
+                deepLinkHandler.handleDeepLink(data)
+            } catch (e: DeepLinkHandlingException) {
+                val errorMessage = formatDeepLinkHandlingException(resourceManager, e)
+                showError(errorMessage)
+            }
         }
     }
 }
