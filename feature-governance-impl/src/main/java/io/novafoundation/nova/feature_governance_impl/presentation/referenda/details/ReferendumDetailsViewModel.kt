@@ -102,7 +102,7 @@ class ReferendumDetailsViewModel(
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
     private val selectedChainFlow = selectedAssetSharedState.selectedChainFlow()
 
-    private val nullableReferendumDetailsFlow = flowOfAll {
+    private val optionalReferendumDetailsFlow = flowOfAll {
         val account = selectedAccount.first()
         val selectedGovernanceOption = selectedAssetSharedState.selectedOption()
         val voterAccountId = account.accountIdIn(selectedGovernanceOption.assetWithChain.chain)
@@ -111,7 +111,7 @@ class ReferendumDetailsViewModel(
     }.inBackground()
         .shareWhileSubscribed()
 
-    private val referendumDetailsFlow = nullableReferendumDetailsFlow
+    private val referendumDetailsFlow = optionalReferendumDetailsFlow
         .filterNotNull()
         .shareInBackground()
 
@@ -172,7 +172,7 @@ class ReferendumDetailsViewModel(
     val referendumNotAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
     init {
-        nullableReferendumDetailsFlow
+        optionalReferendumDetailsFlow
             .onEach {
                 if (it == null) {
                     showErrorAndCloseScreen()

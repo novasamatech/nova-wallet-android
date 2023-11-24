@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct
 
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.chain
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
@@ -12,6 +14,7 @@ import kotlinx.coroutines.async
 class DirectStakingRecommendation(
     private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
+    private val stakingConstantsRepository: StakingConstantsRepository,
     private val stakingOption: StakingOption,
     private val scope: CoroutineScope
 ) : SingleStakingRecommendation {
@@ -26,14 +29,15 @@ class DirectStakingRecommendation(
 
     override suspend fun recommendedSelection(stake: Balance): StartMultiStakingSelection {
         val provider = recommendationSettingsProvider.await()
-        val recommendationSettings = provider.defaultSettings()
+        val maximumValidatorsPerNominator = stakingConstantsRepository.maxValidatorsPerNominator(stakingOption.chain.id, stake)
+        val recommendationSettings = provider.defaultSettings(maximumValidatorsPerNominator)
         val recommendator = recommendator.await()
 
         val recommendedValidators = recommendator.recommendations(recommendationSettings)
 
         return DirectStakingSelection(
             validators = recommendedValidators,
-            validatorsLimit = provider.maximumValidatorsPerNominator,
+            validatorsLimit = maximumValidatorsPerNominator,
             stakingOption = stakingOption,
             stake = stake
         )

@@ -8,6 +8,8 @@ interface DAppMetadataRepository {
 
     suspend fun syncDAppMetadatas()
 
+    suspend fun syncAndGetDapp(baseUrl: String): DappMetadata?
+
     suspend fun getDAppMetadata(baseUrl: String): DappMetadata?
 
     suspend fun findDAppMetadataByExactUrlMatch(fullUrl: String): DappMetadata?

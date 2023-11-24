@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
-import io.novafoundation.nova.feature_governance_api.data.GovernanceStateUpdater
+import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -101,7 +101,7 @@ class GovernanceFeatureModule {
     @FeatureScope
     fun provideGovernanceStateUpdater(
         governanceSharedState: GovernanceSharedState
-    ): GovernanceStateUpdater = governanceSharedState
+    ): MutableGovernanceState = governanceSharedState
 
     @Provides
     @FeatureScope
