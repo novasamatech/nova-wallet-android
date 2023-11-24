@@ -1,12 +1,12 @@
-# name: Pull request
+name: Pull request
 
-# on:
-#   pull_request:
+on:
+  pull_request:
 
 
-# jobs:
-#   test:
-#     uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
-#     with:
-#       branch: ${{github.head_ref}}
-#     secrets: inherit
+jobs:
+  test:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    with:
+      branch: ${{github.head_ref}}
+    secrets: inherit

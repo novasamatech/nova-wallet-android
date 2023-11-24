@@ -37,6 +37,7 @@ jobs:
     if: needs.checkRef.outputs.is_rc == '1'
 
     steps:
+      - uses: actions/checkout@v4
       - name: Find Comment
         uses: peter-evans/find-comment@v2
         id: fc
@@ -61,33 +62,9 @@ jobs:
         with:
           app_id: ${{ secrets.PR_APP_ID }}
           private_key: ${{ secrets.PR_APP_TOKEN }}
-      
+
       - name: Run Python script
-        run: |
-          import requests
-          import sys
-          import os
-      
-          def parse_base_params(comment_link):
-            response = requests.get(comment_link).json()
-            try:
-              lines = response["body"].split("\n")
-            except:
-              print("Please, create a comment with 'Release time: YYYY-MM-DDTHH:MM:SSZ', 'Release severity: Major | Critical | Normal' and 'Release notes:'")
-              exit(1)
-            time = next((s.split(': ')[1] for s in lines if s.startswith('Release time: ')), '').strip()
-            severity = next((s.split(': ')[1] for s in lines if s.startswith('Release severity: ')), '').strip()
-
-            if not time or not severity:
-              print(f"Current values: Time - '{time}', Severity - '{severity}'")
-              print("Time or severity cannot be empty, please set it in the PR comment with lines 'Release time:' and 'Release severity:'")
-              sys.exit(1)
-
-            with open(os.getenv('GITHUB_ENV'), 'a') as f:
-                f.write(f'TIME={time}\n')
-                f.write(f'SEVERITY={severity}\n')
-          parse_base_params(os.getenv("COMMENT_LINK"))
-        shell: python
+        run: python .github/workflows/pr_comment_extract_data.py
 
       - name: Create new branch and file in nova-wallet-android-releases repo
         uses: peter-evans/repository-dispatch@v2
