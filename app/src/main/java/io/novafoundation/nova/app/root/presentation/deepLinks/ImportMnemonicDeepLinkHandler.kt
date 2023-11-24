@@ -3,12 +3,14 @@ package io.novafoundation.nova.app.root.presentation.deepLinks
 import android.net.Uri
 import com.walletconnect.util.hexToBytes
 import io.novafoundation.nova.core.model.CryptoType
+import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.AdvancedEncryptionModel
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -29,8 +31,13 @@ class ImportMnemonicDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        val mnemonicEntropy = data.getMnemonic() ?: return // TODO: show error message instead
-        val mnemonic = MnemonicCreator.fromEntropy(mnemonicEntropy.hexToBytes())
+        val mnemonic = data.getMnemonic() ?: return // TODO: show error message instead
+        val substrateDP = data.getSubstrateDP()
+        val ethereumDerivationPath = data.getEthereumDP()
+
+        val isDerivationPathsValid = isDerivationPathsValid(substrateDP, ethereumDerivationPath)
+        if (!isDerivationPathsValid) return // TODO: show error message instead
+
         val importAccountPayload = ImportAccountPayload(
             prepareMnemonicPreset(
                 mnemonic = mnemonic.words,
@@ -60,8 +67,9 @@ class ImportMnemonicDeepLinkHandler(
         )
     }
 
-    private fun Uri.getMnemonic(): String? {
-        return getQueryParameter("mnemonic")
+    private fun Uri.getMnemonic(): Mnemonic? {
+        val mnemonicHex = getQueryParameter("mnemonic") ?: return null
+        return MnemonicCreator.fromEntropy(mnemonicHex.hexToBytes())
     }
 
     private fun Uri.getSubstrateCryptoType(): String? {
@@ -85,5 +93,10 @@ class ImportMnemonicDeepLinkHandler(
             2 -> CryptoType.ECDSA
             else -> fallback()
         }
+    }
+
+    private fun isDerivationPathsValid(substrateDP: String?, ethereumDP: String?): Boolean {
+        return DerivationPathDecoder.isEthereumDerivationPathValid(ethereumDP) &&
+            DerivationPathDecoder.isSubstrateDerivationPathValid(substrateDP)
     }
 }
