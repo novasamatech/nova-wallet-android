@@ -64,7 +64,7 @@ jobs:
           private_key: ${{ secrets.PR_APP_TOKEN }}
 
       - name: Run Python script
-        run: python .github/workflows/pr_comment_extract_data.py
+        run: python .github/scripts/pr_comment_extract_data.py
 
       - name: Create new branch and file in nova-wallet-android-releases repo
         uses: peter-evans/repository-dispatch@v2
