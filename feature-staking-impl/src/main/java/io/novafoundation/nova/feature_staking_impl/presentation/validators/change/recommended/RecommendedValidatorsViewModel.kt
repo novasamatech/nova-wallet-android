@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setRecommendedValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
@@ -43,8 +44,12 @@ class RecommendedValidatorsViewModel(
     private val selectedAssetState: AnySelectedAssetOptionSharedState
 ) : BaseViewModel() {
 
+    private val maxValidatorsPerNominator by lazyAsync {
+        interactor.maxValidatorsPerNominator(sharedStateSetup.activeStake())
+    }
+
     private val recommendedSettings by lazyAsync {
-        recommendationSettingsProviderFactory.create(scope = viewModelScope).defaultSettings()
+        recommendationSettingsProviderFactory.create(scope = viewModelScope).defaultSettings(maxValidatorsPerNominator())
     }
 
     private val recommendedValidators = flow {
@@ -59,7 +64,7 @@ class RecommendedValidatorsViewModel(
     }.inBackground().share()
 
     val selectedTitle = recommendedValidators.map {
-        val maxValidators = interactor.maxValidatorsPerNominator()
+        val maxValidators = maxValidatorsPerNominator()
 
         resourceManager.getString(R.string.staking_custom_header_validators_title, it.size, maxValidators)
     }.inBackground().share()

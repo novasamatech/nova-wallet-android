@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class RecommendationSettingsProvider(
     maximumRewardedNominators: Int,
     private val runtimeSnapshot: RuntimeSnapshot,
-    val maximumValidatorsPerNominator: Int
 ) {
 
     private val alwaysEnabledFilters = runtimeSnapshot.availableDependents<RecommendationFilter>(
@@ -58,7 +57,7 @@ class RecommendationSettingsProvider(
 
     fun currentSettings() = customSettingsFlow.value
 
-    fun defaultSettings(): RecommendationSettings {
+    fun defaultSettings(maximumValidatorsPerNominator: Int): RecommendationSettings {
         return RecommendationSettings(
             alwaysEnabledFilters = alwaysEnabledFilters,
             customEnabledFilters = customizableFilters,

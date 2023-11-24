@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.asset
 import io.novafoundation.nova.feature_staking_impl.data.chain
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.minStake
@@ -31,6 +32,7 @@ class DirectStakingPropertiesFactory(
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val stakingSharedComputation: StakingSharedComputation,
     private val stakingRepository: StakingRepository,
+    private val stakingConstantsRepository: StakingConstantsRepository,
 ) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
@@ -40,7 +42,8 @@ class DirectStakingPropertiesFactory(
             stakingOption = stakingOption,
             scope = scope,
             stakingSharedComputation = stakingSharedComputation,
-            stakingRepository = stakingRepository
+            stakingRepository = stakingRepository,
+            stakingConstantsRepository = stakingConstantsRepository
         )
     }
 }
@@ -52,6 +55,7 @@ private class DirectStakingProperties(
     private val scope: CoroutineScope,
     private val stakingSharedComputation: StakingSharedComputation,
     private val stakingRepository: StakingRepository,
+    private val stakingConstantsRepository: StakingConstantsRepository,
 ) : SingleStakingProperties {
 
     override val stakingType: Chain.Asset.StakingType = stakingOption.stakingType
@@ -65,6 +69,7 @@ private class DirectStakingProperties(
     }
 
     override val recommendation: SingleStakingRecommendation = DirectStakingRecommendation(
+        stakingConstantsRepository = stakingConstantsRepository,
         validatorRecommenderFactory = validatorRecommenderFactory,
         recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
         stakingOption = stakingOption,
@@ -106,14 +111,14 @@ private class DirectStakingProperties(
 
     private fun StartMultiStakingValidationSystemBuilder.enoughAvailableToStake() {
         sufficientBalance(
-            fee = { it.fee.decimalAmount },
+            fee = { it.fee.networkFeeDecimalAmount },
             available = { it.amountOf(availableBalance(it.asset)) },
             amount = { it.amountOf(it.selection.stake) },
             error = { payload, availableToPayFees ->
                 StartMultiStakingValidationFailure.NotEnoughToPayFees(
                     chainAsset = payload.asset.token.configuration,
                     maxUsable = availableToPayFees,
-                    fee = payload.fee.decimalAmount
+                    fee = payload.fee.networkFeeDecimalAmount
                 )
             }
         )

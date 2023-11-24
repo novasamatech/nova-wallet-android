@@ -22,7 +22,6 @@ class RecommendationSettingsProviderFactory(
 
             RecommendationSettingsProvider(
                 maximumRewardedNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId),
-                maximumValidatorsPerNominator = stakingConstantsRepository.maxValidatorsPerNominator(chainId),
                 runtimeSnapshot = chainRegistry.getRuntime(chainId)
             )
         }

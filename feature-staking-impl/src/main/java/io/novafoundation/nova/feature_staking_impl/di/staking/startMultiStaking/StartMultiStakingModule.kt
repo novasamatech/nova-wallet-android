@@ -10,13 +10,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SearchNominationPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
@@ -163,13 +164,15 @@ class StartMultiStakingModule {
         validatorRecommenderFactory: ValidatorRecommenderFactory,
         recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
         stakingSharedComputation: StakingSharedComputation,
-        stakingRepository: StakingRepository
+        stakingRepository: StakingRepository,
+        stakingConstantsRepository: StakingConstantsRepository,
     ): SingleStakingPropertiesFactory {
         return DirectStakingPropertiesFactory(
             validatorRecommenderFactory = validatorRecommenderFactory,
             recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
             stakingSharedComputation = stakingSharedComputation,
-            stakingRepository = stakingRepository
+            stakingRepository = stakingRepository,
+            stakingConstantsRepository = stakingConstantsRepository
         )
     }
 
