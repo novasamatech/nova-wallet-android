@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.det
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -25,22 +24,13 @@ class ReferendumDeepLinkHandler(
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
 
     override suspend fun matches(data: Uri): Boolean {
-        val userAccounts = accountRepository.allMetaAccounts()
         val path = data.path ?: return false
-        val chainId = data.getChainId() ?: return false
-        val referendumId = data.getReferendumId()
-        val chainsById = chainRegistry.chainsById()
-        val chain = chainsById[chainId]
-        val governanceType = data.getGovernanceType()
 
-        return userAccounts.isNotEmpty() &&
-            path.startsWith(GOV_DEEP_LINK_PREFIX) == true &&
-            chain != null &&
-            governanceType != null &&
-            referendumId != null
+        return path.startsWith(GOV_DEEP_LINK_PREFIX)
     }
 
     override suspend fun handleDeepLink(data: Uri) {
+        //TODO: check if user has account
         val chainId = data.getChainId() ?: return
         val referendumId = data.getReferendumId() ?: return
         val governanceType = data.getGovernanceType() ?: return
@@ -68,14 +58,14 @@ class ReferendumDeepLinkHandler(
             ?.toIntOrNull()
 
         return when {
-            govType == null -> supportedGov.getIfExist(Chain.Governance.V2) ?: supportedGov.firstOrNull()
+            govType == null -> Chain.Governance.V2.takeIfContainedIn(supportedGov) ?: supportedGov.firstOrNull()
             govType == 0 && supportedGov.contains(Chain.Governance.V2) -> return Chain.Governance.V2
             govType == 1 && supportedGov.contains(Chain.Governance.V1) -> return Chain.Governance.V1
             else -> null
         }
     }
 
-    private fun List<Chain.Governance>.getIfExist(governance: Chain.Governance): Chain.Governance? {
-        return this.firstOrNull { it == governance }
+    private fun Chain.Governance.takeIfContainedIn(list: List<Chain.Governance>): Chain.Governance? {
+        return list.firstOrNull { it == this }
     }
 }
