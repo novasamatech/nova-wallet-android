@@ -100,6 +100,9 @@ class SettingsViewModel(
         .map { Event(true) }
         .asLiveData()
 
+    private val _enableBiometryOptionEvent = MutableLiveData<Event<Boolean>>()
+    val enableBiometryOptionEvent: LiveData<Event<Boolean>> = _enableBiometryOptionEvent
+
     init {
         syncWalletConnectSessions()
         setupBiometric()
@@ -231,10 +234,14 @@ class SettingsViewModel(
     }
 
     private fun setupBiometric() {
-        biometricService.biometryServiceResponseFlow
-            .filterIsInstance<BiometricResponse.Success>()
-            .onEach { biometricService.toggle() }
-            .launchIn(this)
+        val isBiometryAvailableOnHardware = biometricService.isBiometryAvailableOnHardware()
+        _enableBiometryOptionEvent.value = isBiometryAvailableOnHardware.event()
+        if (isBiometryAvailableOnHardware) {
+            biometricService.biometryServiceResponseFlow
+                .filterIsInstance<BiometricResponse.Success>()
+                .onEach { biometricService.toggle() }
+                .launchIn(this)
+        }
     }
 
     fun onResume() {

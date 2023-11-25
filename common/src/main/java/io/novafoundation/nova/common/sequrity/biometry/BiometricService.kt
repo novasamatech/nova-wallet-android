@@ -19,6 +19,8 @@ interface BiometricService {
 
     fun isEnabled(): Boolean
 
+    fun isBiometryAvailableOnHardware(): Boolean
+
     fun isEnabledFlow(): Flow<Boolean>
 
     suspend fun toggle()

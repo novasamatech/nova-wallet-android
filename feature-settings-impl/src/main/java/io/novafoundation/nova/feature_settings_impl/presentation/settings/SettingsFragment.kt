@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
@@ -137,6 +138,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         viewModel.openEmailEvent.observeEvent { requireContext().sendEmailIntent(it) }
 
         viewModel.walletConnectSessionsUi.observe(settingsWalletConnect::setValue)
+
+        viewModel.enableBiometryOptionEvent.observeEvent {
+            settingsBiometricAuth.isVisible = it
+        }
     }
 
     override fun onResume() {

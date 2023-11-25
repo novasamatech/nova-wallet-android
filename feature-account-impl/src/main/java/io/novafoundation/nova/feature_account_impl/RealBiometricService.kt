@@ -43,6 +43,10 @@ class RealBiometricService(
         return accountRepository.isBiometricEnabled()
     }
 
+    override fun isBiometryAvailableOnHardware(): Boolean {
+        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+    }
+
     override fun isEnabledFlow(): Flow<Boolean> = accountRepository.isBiometricEnabledFlow()
 
     override suspend fun toggle() {
