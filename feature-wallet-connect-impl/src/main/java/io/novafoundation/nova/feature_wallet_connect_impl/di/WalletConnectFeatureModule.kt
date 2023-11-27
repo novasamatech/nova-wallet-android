@@ -14,7 +14,9 @@ import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTyped
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
-import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.RealWalletConnectSessionRepository
+import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.InMemoryWalletConnectSessionRepository
+import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.RealWalletConnectPairingRepository
+import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectPairingRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectSessionRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.RealWalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.RealWalletConnectSessionsUseCase
@@ -58,22 +60,28 @@ class WalletConnectFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSessionRepository(dao: WalletConnectSessionsDao): WalletConnectSessionRepository = RealWalletConnectSessionRepository(dao)
+    fun providePairingRepository(dao: WalletConnectSessionsDao): WalletConnectPairingRepository = RealWalletConnectPairingRepository(dao)
+
+    @Provides
+    @FeatureScope
+    fun provideSessionRepository(): WalletConnectSessionRepository = InMemoryWalletConnectSessionRepository()
 
     @Provides
     @FeatureScope
     fun provideInteractor(
         caip2Resolver: Caip2Resolver,
         requestFactory: WalletConnectRequest.Factory,
+        walletConnectPairingRepository: WalletConnectPairingRepository,
         walletConnectSessionRepository: WalletConnectSessionRepository,
         accountRepository: AccountRepository,
         caip2Parser: Caip2Parser
     ): WalletConnectSessionInteractor = RealWalletConnectSessionInteractor(
         caip2Resolver = caip2Resolver,
         walletConnectRequestFactory = requestFactory,
-        walletConnectSessionRepository = walletConnectSessionRepository,
+        walletConnectPairingRepository = walletConnectPairingRepository,
         accountRepository = accountRepository,
-        caip2Parser = caip2Parser
+        caip2Parser = caip2Parser,
+        walletConnectSessionRepository = walletConnectSessionRepository
     )
 
     @Provides
@@ -100,7 +108,10 @@ class WalletConnectFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSessionUseCase(repository: WalletConnectSessionRepository): WalletConnectSessionsUseCase {
-        return RealWalletConnectSessionsUseCase(repository)
+    fun provideSessionUseCase(
+        pairingRepository: WalletConnectPairingRepository,
+        sessionRepository: WalletConnectSessionRepository
+    ): WalletConnectSessionsUseCase {
+        return RealWalletConnectSessionsUseCase(pairingRepository, sessionRepository)
     }
 }

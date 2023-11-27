@@ -6,4 +6,5 @@ class SelectedWalletModel(
     val title: String,
     val subtitle: String,
     val icon: Drawable,
+    val selectionAllowed: Boolean
 )

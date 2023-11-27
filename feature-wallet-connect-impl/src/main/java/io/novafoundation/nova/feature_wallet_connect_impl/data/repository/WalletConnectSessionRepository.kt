@@ -1,89 +1,81 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.data.repository
 
-import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
-import io.novafoundation.nova.core_db.model.WalletConnectSessionAccountLocal
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
+import com.walletconnect.web3.wallet.client.Wallet.Model.Session
+import io.novafoundation.nova.common.utils.added
+import io.novafoundation.nova.common.utils.removed
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface WalletConnectSessionRepository {
 
-    suspend fun addSessionAccount(sessionAccount: WalletConnectSessionAccount)
+    suspend fun setSessions(sessions: List<Session>)
 
-    suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount?
+    suspend fun getSession(sessionTopic: String): Session?
 
-    suspend fun deleteSessionAccount(sessionTopic: String)
+    fun allSessionsFlow(): Flow<List<Session>>
 
-    fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>>
+    fun sessionFlow(sessionTopic: String): Flow<Session?>
 
-    fun sessionAccountsByMetaIdFlow(metaId: Long): Flow<List<WalletConnectSessionAccount>>
+    suspend fun addSession(session: Session)
 
-    fun numberOfSessionAccountsFlow(): Flow<Int>
+    suspend fun removeSession(sessionTopic: String)
 
-    fun numberOfSessionAccountsFlow(metaAccount: MetaAccount): Flow<Int>
+    fun numberOfSessionsFlow(): Flow<Int>
 
     suspend fun numberOfSessionAccounts(): Int
 
-    fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?>
-
-    suspend fun removeAllSessionsOtherThan(activeSessionTopics: List<String>)
+    fun numberOfSessionsFlow(pairingTopics: Set<String>): Flow<Int>
 }
 
-class RealWalletConnectSessionRepository(
-    private val dao: WalletConnectSessionsDao,
-) : WalletConnectSessionRepository {
+class InMemoryWalletConnectSessionRepository : WalletConnectSessionRepository {
 
-    override suspend fun addSessionAccount(sessionAccount: WalletConnectSessionAccount) {
-        dao.insertSession(mapSessionToLocal(sessionAccount))
+    private val state = singleReplaySharedFlow<List<Session>>()
+
+    override suspend fun setSessions(sessions: List<Session>) {
+        state.emit(sessions)
     }
 
-    override suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount? {
-        return dao.getSession(sessionTopic)?.let(::mapSessionFromLocal)
+    override suspend fun getSession(sessionTopic: String): Session? {
+        return state.first().find { it.topic == sessionTopic }
     }
 
-    override suspend fun deleteSessionAccount(sessionTopic: String) {
-        dao.deleteSession(sessionTopic)
+    override fun allSessionsFlow(): Flow<List<Session>> {
+        return state
     }
 
-    override fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>> {
-        return dao.allSessionsFlow().mapList(::mapSessionFromLocal)
+    override fun sessionFlow(sessionTopic: String): Flow<Session?> {
+        return state.map { allSessions -> allSessions.find { it.topic == sessionTopic } }
     }
 
-    override fun sessionAccountsByMetaIdFlow(metaId: Long): Flow<List<WalletConnectSessionAccount>> {
-        return dao.sessionsByMetaIdFlow(metaId).mapList(::mapSessionFromLocal)
+    override suspend fun addSession(session: Session) {
+        modifyState { current ->
+            current.added(session)
+        }
     }
 
-    override fun numberOfSessionAccountsFlow(): Flow<Int> {
-        return dao.numberOfSessionsFlow()
+    override suspend fun removeSession(sessionTopic: String) {
+        modifyState { current ->
+            current.removed { it.topic == sessionTopic }
+        }
     }
 
-    override fun numberOfSessionAccountsFlow(metaAccount: MetaAccount): Flow<Int> {
-        return dao.numberOfSessionsFlow(metaAccount.id)
+    override fun numberOfSessionsFlow(): Flow<Int> {
+        return state.map { it.size }
+    }
+
+    override fun numberOfSessionsFlow(pairingTopics: Set<String>): Flow<Int> {
+        return state.map { sessions ->
+            sessions.filter { it.pairingTopic in pairingTopics }.size
+        }
     }
 
     override suspend fun numberOfSessionAccounts(): Int {
-        return dao.numberOfSessions()
+        return state.first().size
     }
 
-    override fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?> {
-        return dao.sessionFlow(sessionTopic).map { localSession -> localSession?.let(::mapSessionFromLocal) }
-    }
-
-    override suspend fun removeAllSessionsOtherThan(activeSessionTopics: List<String>) {
-        dao.removeAllSessionsOtherThan(activeSessionTopics)
-    }
-
-    private fun mapSessionToLocal(session: WalletConnectSessionAccount): WalletConnectSessionAccountLocal {
-        return with(session) {
-            WalletConnectSessionAccountLocal(sessionTopic = sessionTopic, metaId = metaId)
-        }
-    }
-
-    private fun mapSessionFromLocal(sessionLocal: WalletConnectSessionAccountLocal): WalletConnectSessionAccount {
-        return with(sessionLocal) {
-            WalletConnectSessionAccount(sessionTopic = sessionTopic, metaId = metaId)
-        }
+    private suspend fun modifyState(modify: (List<Session>) -> List<Session>) {
+        state.emit(modify(state.first()))
     }
 }

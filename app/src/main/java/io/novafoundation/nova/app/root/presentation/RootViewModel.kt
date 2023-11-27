@@ -14,6 +14,7 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
 import kotlinx.coroutines.cancel
@@ -34,6 +35,7 @@ class RootViewModel(
     private val safeModeService: SafeModeService,
     private val updateNotificationsInteractor: UpdateNotificationsInteractor,
     private val walletConnectService: WalletConnectService,
+    private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val rootScope: RootScope
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
@@ -55,11 +57,17 @@ class RootViewModel(
 
         syncCurrencies()
 
+        syncWalletConnectSessions()
+
         updatePhishingAddresses()
 
         walletConnectService.onPairErrorLiveData.observeForever {
             showError(it.peekContent())
         }
+    }
+
+    private fun syncWalletConnectSessions() = launch {
+        walletConnectSessionsUseCase.syncActiveSessions()
     }
 
     private fun checkForUpdates() {

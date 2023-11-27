@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_wallet_connect_impl.domain.session
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionProposal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectPairingAccount
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSession
-import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionDetails
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionProposal
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
@@ -27,7 +27,9 @@ interface WalletConnectSessionInteractor {
 
     suspend fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete)
 
-    suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount?
+    suspend fun getSession(sessionTopic: String): Wallet.Model.Session?
+
+    suspend fun getPairingAccount(pairingTopic: String): WalletConnectPairingAccount?
 
     fun activeSessionsFlow(metaId: Long?): Flow<List<WalletConnectSession>>
 

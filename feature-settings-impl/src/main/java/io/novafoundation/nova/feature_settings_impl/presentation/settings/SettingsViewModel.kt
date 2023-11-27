@@ -10,26 +10,26 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.sequrity.biometry.BiometricResponse
-import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
+import io.novafoundation.nova.common.sequrity.biometry.BiometricResponse
+import io.novafoundation.nova.common.sequrity.biometry.BiometricService
+import io.novafoundation.nova.common.sequrity.biometry.mapBiometricErrors
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
-import io.novafoundation.nova.common.sequrity.biometry.mapBiometricErrors
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -101,7 +101,6 @@ class SettingsViewModel(
         .asLiveData()
 
     init {
-        syncWalletConnectSessions()
         setupBiometric()
     }
 
@@ -224,10 +223,6 @@ class SettingsViewModel(
 
     private fun openLink(link: String) {
         openBrowserEvent.value = link.event()
-    }
-
-    private fun syncWalletConnectSessions() = launch {
-        walletConnectSessionsUseCase.syncActiveSessions()
     }
 
     private fun setupBiometric() {
