@@ -36,15 +36,13 @@ class ReferendumDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        if (!accountRepository.hasMetaAccounts()) return
+        automaticInteractionGate.awaitInteractionAllowed()
 
         val chainId = data.getChainId() ?: throw ReferendumHandlingException.ChainIsNotFound
         val referendumId = data.getReferendumId() ?: throw ReferendumHandlingException.ReferendumIsNotSpecified
         val chain = chainRegistry.getChainOrNull(chainId) ?: throw ReferendumHandlingException.ChainIsNotFound
         val governanceType = data.getGovernanceType(chain)
         val payload = ReferendumDetailsPayload(referendumId)
-
-        automaticInteractionGate.awaitInteractionAllowed()
 
         mutableGovernanceState.update(chain.id, chain.utilityAsset.id, governanceType)
         governanceRouter.openReferendum(payload)

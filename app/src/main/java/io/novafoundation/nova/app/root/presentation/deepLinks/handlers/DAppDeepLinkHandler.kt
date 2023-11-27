@@ -30,7 +30,7 @@ class DAppDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        if (!accountRepository.hasMetaAccounts()) return
+        automaticInteractionGate.awaitInteractionAllowed()
 
         val url = data.getDappUrl() ?: throw DAppHandlingException.UrlIsInvalid
         val normalizedUrl = runCatching { Urls.normalizeUrl(url) }.getOrNull() ?: throw DAppHandlingException.UrlIsInvalid
@@ -38,7 +38,6 @@ class DAppDeepLinkHandler(
         val dAppMetadata = dappRepository.syncAndGetDapp(normalizedUrl)
         if (dAppMetadata == null) throw DAppHandlingException.DomainIsNotMatched(normalizedUrl)
 
-        automaticInteractionGate.awaitInteractionAllowed()
         dAppRouter.openDAppBrowser(normalizedUrl)
     }
 

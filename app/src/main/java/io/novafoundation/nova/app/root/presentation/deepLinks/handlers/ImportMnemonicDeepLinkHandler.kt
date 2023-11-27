@@ -40,6 +40,10 @@ class ImportMnemonicDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
+        if (accountRepository.hasMetaAccounts()) {
+            automaticInteractionGate.awaitInteractionAllowed()
+        }
+
         val mnemonic = data.getMnemonic()
         val substrateDP = data.getSubstrateDP()
         val ethereumDerivationPath = data.getEthereumDP()
@@ -56,10 +60,6 @@ class ImportMnemonicDeepLinkHandler(
             ),
             AddAccountPayload.MetaAccount
         )
-
-        if (accountRepository.hasMetaAccounts()) {
-            automaticInteractionGate.awaitInteractionAllowed()
-        }
 
         accountRouter.openImportAccountScreen(importAccountPayload)
     }
