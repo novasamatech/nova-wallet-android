@@ -65,6 +65,7 @@ import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_38_39
 import io.novafoundation.nova.core_db.migrations.AddPoolIdToOperations_46_47
+import io.novafoundation.nova.core_db.migrations.AddProxyAccount_53_54
 import io.novafoundation.nova.core_db.migrations.AddRewardAccountToStakingDashboard_43_44
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
@@ -134,7 +135,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 53,
+    version = 54,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -224,7 +225,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
                     .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51, AddBalanceModesToAssets_51_52)
-                    .addMigrations(ChangeSessionTopicToParing_52_53)
+                    .addMigrations(ChangeSessionTopicToParing_52_53, AddProxyAccount_53_54)
                     .build()
             }
             return instance!!
