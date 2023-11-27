@@ -4,6 +4,7 @@ import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
@@ -113,6 +114,8 @@ interface AccountFeatureDependencies {
     fun twoFactorVerificationService(): TwoFactorVerificationService
 
     fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
+
+    fun computationalCache(): ComputationalCache
 
     val systemCallExecutor: SystemCallExecutor
 

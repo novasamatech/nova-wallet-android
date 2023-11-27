@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVari
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
@@ -148,6 +150,10 @@ class Navigator(
             R.id.finishImportParitySignerFragment -> navController?.navigate(R.id.action_finishImportParitySignerFragment_to_pincodeFragment, bundle)
             R.id.finishImportLedgerFragment -> navController?.navigate(R.id.action_finishImportLedgerFragment_to_pincodeFragment, bundle)
         }
+    }
+
+    override fun openAdvancedSettings(payload: AdvancedEncryptionModePayload) {
+        navController?.navigate(R.id.action_open_advancedEncryptionFragment, AdvancedEncryptionFragment.getBundle(payload))
     }
 
     override fun openConfirmMnemonicOnCreate(confirmMnemonicPayload: ConfirmMnemonicPayload) {

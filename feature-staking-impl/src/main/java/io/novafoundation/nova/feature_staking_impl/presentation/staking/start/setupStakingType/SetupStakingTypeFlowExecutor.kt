@@ -54,7 +54,7 @@ class SetupDirectStakingFlowExecutor(
         val selectionStore = editableSelectionStoreProvider.getSelectionStore(coroutineScope)
         setupStakingSharedState.set(
             SetupStakingProcess.ReadyToSubmit(
-                activeStake = selectionStore.currentSelection?.selection?.stake.orZero(),
+                activeStake = selectionStore.getCurrentSelection()?.selection?.stake.orZero(),
                 validators = selectionStore.getValidatorsOrEmpty(),
                 selectionMethod = SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM
             )

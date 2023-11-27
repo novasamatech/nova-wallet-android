@@ -14,10 +14,12 @@ import io.novafoundation.nova.common.utils.input.unmodifiableInput
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryptionInput
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.chainAccountFor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.chainIdOrNull
-import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
@@ -42,10 +44,21 @@ class AdvancedEncryptionInteractor(
         return accountRepository.getEncryptionTypes()
     }
 
-    suspend fun getInitialInputState(payload: AdvancedEncryptionPayload): AdvancedEncryptionInput {
+    suspend fun getRecommendedAdvancedEncryption(): AdvancedEncryption {
+        return AdvancedEncryption(
+            substrateCryptoType = DEFAULT_SUBSTRATE_ENCRYPTION,
+            ethereumCryptoType = ETHEREUM_ENCRYPTION,
+            derivationPaths = AdvancedEncryption.DerivationPaths(
+                substrate = DEFAULT_SUBSTRATE_DERIVATION_PATH,
+                ethereum = ETHEREUM_DEFAULT_DERIVATION_PATH
+            )
+        )
+    }
+
+    suspend fun getInitialInputState(payload: AdvancedEncryptionModePayload): AdvancedEncryptionInput {
         return when (payload) {
-            is AdvancedEncryptionPayload.Change -> getChangeInitialInputState(payload.addAccountPayload.chainIdOrNull)
-            is AdvancedEncryptionPayload.View -> getViewInitialInputState(payload.metaAccountId, payload.chainId, payload.hideDerivationPaths)
+            is AdvancedEncryptionModePayload.Change -> getChangeInitialInputState(payload.addAccountPayload.chainIdOrNull)
+            is AdvancedEncryptionModePayload.View -> getViewInitialInputState(payload.metaAccountId, payload.chainId, payload.hideDerivationPaths)
         }
     }
 
