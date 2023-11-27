@@ -8,7 +8,7 @@ import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.dao.assetOf
 import io.novafoundation.nova.core_db.dao.chainOf
 import io.novafoundation.nova.core_db.dao.testMetaAccount
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.math.BigInteger

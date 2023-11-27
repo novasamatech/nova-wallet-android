@@ -16,6 +16,7 @@ import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
 import io.novafoundation.nova.core_db.converters.NftTypeConverters
 import io.novafoundation.nova.core_db.converters.OperationConverters
+import io.novafoundation.nova.core_db.converters.ProxyAccountConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
@@ -115,15 +116,16 @@ import io.novafoundation.nova.core_db.model.StakingRewardPeriodLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.WalletConnectPairingLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.core_db.model.operation.DirectRewardTypeLocal
 import io.novafoundation.nova.core_db.model.operation.ExtrinsicTypeLocal
 import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
@@ -170,6 +172,7 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         StakingDashboardItemLocal::class,
         StakingRewardPeriodLocal::class,
         ExternalBalanceLocal::class,
+        ProxyAccountLocal::class
     ],
 )
 @TypeConverters(
@@ -184,6 +187,7 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
     ExternalApiConverters::class,
     ChainConverters::class,
     ExternalBalanceTypeConverters::class,
+    ProxyAccountConverters::class
 )
 abstract class AppDatabase : RoomDatabase() {
 

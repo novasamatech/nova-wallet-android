@@ -6,10 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
-import io.novafoundation.nova.core_db.model.chain.MetaAccountPositionUpdate
-import io.novafoundation.nova.core_db.model.chain.RelationJoinedMetaAccountInfo
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
+import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import org.intellij.lang.annotations.Language
