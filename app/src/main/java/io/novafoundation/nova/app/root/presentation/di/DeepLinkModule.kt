@@ -7,10 +7,14 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.deepLinks.BuyCallbackDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.DAppDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.ImportMnemonicDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.ReferendumDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
@@ -22,15 +26,29 @@ class DeepLinkModule {
 
     @Provides
     @IntoSet
+    fun provideImportMnemonicDeepLinkHandler(
+        accountRouter: AccountRouter,
+        encryptionDefaults: EncryptionDefaults
+    ): DeepLinkHandler {
+        return ImportMnemonicDeepLinkHandler(
+            accountRouter,
+            encryptionDefaults
+        )
+    }
+
+    @Provides
+    @IntoSet
     fun provideDappDeepLinkHandler(
         accountRepository: AccountRepository,
         dAppMetadataRepository: DAppMetadataRepository,
-        dAppRouter: DAppRouter
+        dAppRouter: DAppRouter,
+        automaticInteractionGate: AutomaticInteractionGate
     ): DeepLinkHandler {
         return DAppDeepLinkHandler(
             accountRepository,
             dAppMetadataRepository,
-            dAppRouter
+            dAppRouter,
+            automaticInteractionGate
         )
     }
 
@@ -40,13 +58,15 @@ class DeepLinkModule {
         governanceRouter: GovernanceRouter,
         chainRegistry: ChainRegistry,
         mutableGovernanceState: MutableGovernanceState,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        automaticInteractionGate: AutomaticInteractionGate
     ): DeepLinkHandler {
         return ReferendumDeepLinkHandler(
             governanceRouter,
             chainRegistry,
             mutableGovernanceState,
-            accountRepository
+            accountRepository,
+            automaticInteractionGate
         )
     }
 

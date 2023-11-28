@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -28,6 +29,7 @@ class RootFeatureHolder @Inject constructor(
     private val navigator: Navigator,
     private val governanceRouter: GovernanceRouter,
     private val dAppRouter: DAppRouter,
+    private val accountRouter: AccountRouter,
     private val stakingDashboardNavigator: StakingDashboardNavigator,
     featureContainer: FeatureContainer
 ) : FeatureApiHolder(featureContainer) {
@@ -50,6 +52,6 @@ class RootFeatureHolder @Inject constructor(
             .build()
 
         return DaggerRootComponent.factory()
-            .create(navigationHolder, navigator, governanceRouter, dAppRouter, stakingDashboardNavigator, rootFeatureDependencies)
+            .create(navigationHolder, navigator, governanceRouter, dAppRouter, accountRouter, stakingDashboardNavigator, rootFeatureDependencies)
     }
 }

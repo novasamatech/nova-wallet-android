@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
-import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -154,7 +153,6 @@ class RootViewModel(
 
     fun handleDeepLink(data: Uri) {
         launch {
-            automaticInteractionGate.awaitInteractionAllowed()
             deepLinkHandler.handleDeepLink(data)
         }
     }

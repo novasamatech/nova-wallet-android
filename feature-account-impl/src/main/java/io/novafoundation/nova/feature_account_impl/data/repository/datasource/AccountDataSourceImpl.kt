@@ -258,6 +258,10 @@ class AccountDataSourceImpl(
         secretStoreV2.putChainAccountSecrets(metaId, accountId, secrets)
     }
 
+    override suspend fun hasMetaAccounts(): Boolean {
+        return metaAccountDao.hasMetaAccounts()
+    }
+
     private inline fun async(crossinline action: suspend () -> Unit) {
         GlobalScope.launch(Dispatchers.Default) {
             action()
