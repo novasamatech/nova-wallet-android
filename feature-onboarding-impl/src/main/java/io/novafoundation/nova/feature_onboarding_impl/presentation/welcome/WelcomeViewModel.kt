@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.asImportType
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.model.HardwareWalletModel
@@ -49,7 +50,7 @@ class WelcomeViewModel(
 
     fun importAccountClicked() {
         val payload = ImportTypeChooserMixin.Payload(
-            onChosen = { router.openImportAccountScreen(ImportAccountPayload(it, addAccountPayload)) }
+            onChosen = { router.openImportAccountScreen(ImportAccountPayload(it.asImportType(), addAccountPayload)) }
         )
 
         importTypeChooserMixin.showChooser(payload)

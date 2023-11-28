@@ -9,11 +9,13 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.RootViewModel
+import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -26,7 +28,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Module(
     includes = [
-        ViewModelModule::class
+        ViewModelModule::class,
+        DeepLinkModule::class
     ]
 )
 class RootActivityModule {
@@ -47,6 +50,8 @@ class RootActivityModule {
         updateNotificationsInteractor: UpdateNotificationsInteractor,
         walletConnectService: WalletConnectService,
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
+        deepLinkHandler: RootDeepLinkHandler,
+        automaticInteractionGate: AutomaticInteractionGate,
         rootScope: RootScope
     ): ViewModel {
         return RootViewModel(
@@ -62,6 +67,8 @@ class RootActivityModule {
             updateNotificationsInteractor,
             walletConnectService,
             walletConnectSessionsUseCase,
+            deepLinkHandler,
+            automaticInteractionGate,
             rootScope
         )
     }

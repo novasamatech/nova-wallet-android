@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupAccountNameChooserUi
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountViewModel
-import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.ImportSource
+import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.ImportSource
 
 class ImportAccountNameViews(
     val nameInput: InputField,

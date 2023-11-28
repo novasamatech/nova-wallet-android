@@ -5,15 +5,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
-sealed class AdvancedEncryptionPayload : Parcelable {
+sealed class AdvancedEncryptionModePayload : Parcelable {
 
     @Parcelize
-    class Change(val addAccountPayload: AddAccountPayload) : AdvancedEncryptionPayload()
+    class Change(val addAccountPayload: AddAccountPayload) : AdvancedEncryptionModePayload()
 
     @Parcelize
     class View(
         val metaAccountId: Long,
         val chainId: ChainId,
         val hideDerivationPaths: Boolean = false
-    ) : AdvancedEncryptionPayload()
+    ) : AdvancedEncryptionModePayload()
 }

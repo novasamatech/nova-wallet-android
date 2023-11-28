@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.asImportType
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -36,7 +37,7 @@ class AddAccountLauncherProvider(
     }
 
     private fun importTypeSelected(chainAccountPayload: AddAccountPayload.ChainAccount, secretType: SecretType) {
-        router.openImportAccountScreen(ImportAccountPayload(secretType, chainAccountPayload))
+        router.openImportAccountScreen(ImportAccountPayload(secretType.asImportType(), chainAccountPayload))
     }
 
     override fun initiateLaunch(chain: Chain, metaAccount: MetaAccount) {
@@ -44,7 +45,7 @@ class AddAccountLauncherProvider(
             LightMetaAccount.Type.SECRETS -> launchAddFromSecrets(chain, metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> launchAddWatchOnly(chain, metaAccount)
             // adding chain accounts is not supported for Polkadot Vault like wallets
-            LightMetaAccount.Type.PARITY_SIGNER, LightMetaAccount.Type.POLKADOT_VAULT -> { }
+            LightMetaAccount.Type.PARITY_SIGNER, LightMetaAccount.Type.POLKADOT_VAULT -> {}
             LightMetaAccount.Type.LEDGER -> launchAddLedger(chain, metaAccount)
         }
     }
