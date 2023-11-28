@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.view.AccountView
 
 fun BaseFragment<*>.setupSelectWalletMixin(mixin: SelectWalletMixin, view: AccountView) {
-    view.setActionIcon(R.drawable.ic_chevron_right)
     view.setActionTint(R.color.icon_secondary)
     view.setShowBackground(true)
 
@@ -13,6 +12,14 @@ fun BaseFragment<*>.setupSelectWalletMixin(mixin: SelectWalletMixin, view: Accou
         view.setTitle(it.title)
         view.setSubTitle(it.subtitle)
         view.setIcon(it.icon)
+
+        if (it.selectionAllowed) {
+            view.setActionIcon(R.drawable.ic_chevron_right)
+            view.isEnabled = true
+        } else {
+            view.setActionIcon(null as Int?)
+            view.isEnabled = false
+        }
     }
 
     view.setOnClickListener { mixin.walletSelectorClicked() }

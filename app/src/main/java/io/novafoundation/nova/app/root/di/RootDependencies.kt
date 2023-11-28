@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -75,4 +76,6 @@ interface RootDependencies {
     val imageLoader: ImageLoader
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val walletConnectSessionsUseCase: WalletConnectSessionsUseCase
 }

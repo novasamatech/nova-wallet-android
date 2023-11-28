@@ -34,9 +34,11 @@ class EditableStakingTypeItemFormatter(
             else -> return null
         }
 
+        val isSelected = selectedStakingType == stakingType
+
         return EditableStakingTypeRVItem(
-            isSelected = selectedStakingType == stakingType,
-            isSelectable = validatedStakingType.isAvailable,
+            isSelected = isSelected,
+            isSelectable = validatedStakingType.isAvailable || isSelected,
             title = resourceManager.getString(titleRes),
             imageRes = imageRes,
             conditions = mapConditions(asset, validatedStakingType.stakingTypeDetails),
