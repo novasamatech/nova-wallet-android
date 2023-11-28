@@ -20,13 +20,11 @@ class DAppNavigator(
         // Close deapp browser if it is already opened
         // TODO it's better to provide new url to existing browser
         val currentDestination = navigationHolder.navController?.currentDestination
-        if (currentDestination?.id == R.id.DAppBrowserFragment) {
-            back()
-        }
 
         val destinationId = when (currentDestination?.id) {
+            R.id.DAppBrowserFragment -> R.id.action_DAppBrowserFragment_to_DAppBrowserFragment
             R.id.dappSearchFragment -> R.id.action_dappSearchFragment_to_dapp_browser_graph
-            else -> R.id.action_mainFragment_to_dappBrowserGraph
+            else -> R.id.action_dappBrowserGraph
         }
         performNavigation(destinationId, DAppBrowserFragment.getBundle(initialUrl))
     }
