@@ -156,6 +156,9 @@ interface MetaAccountDao {
 
         return metaId
     }
+
+    @Query("SELECT EXISTS(SELECT * FROM meta_accounts)")
+    suspend fun hasMetaAccounts(): Boolean
 }
 
 class MetaAccountWithBalanceLocal(

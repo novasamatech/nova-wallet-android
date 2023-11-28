@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.Valida
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.RealStartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsProviderFactory
@@ -139,7 +138,7 @@ class StartMultiStakingModule {
     fun provideStartMultiStakingSelectionStoreProvider(
         computationalCache: ComputationalCache
     ): StartMultiStakingSelectionStoreProvider {
-        return RealStartMultiStakingSelectionStoreProvider(computationalCache, "MultiStakingSelection")
+        return StartMultiStakingSelectionStoreProvider(computationalCache, "MultiStakingSelection")
     }
 
     @Provides
@@ -148,7 +147,7 @@ class StartMultiStakingModule {
     fun provideStakingTypeEditingSelectionStoreProvider(
         computationalCache: ComputationalCache
     ): StartMultiStakingSelectionStoreProvider {
-        return RealStartMultiStakingSelectionStoreProvider(computationalCache, "StakingTypeEditing")
+        return StartMultiStakingSelectionStoreProvider(computationalCache, "StakingTypeEditing")
     }
 
     @Provides

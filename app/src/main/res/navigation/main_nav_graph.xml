@@ -274,14 +274,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_dappBrowserGraph"
-            app:destination="@id/dapp_browser_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_mainFragment_to_dappSearchGraph"
             app:destination="@id/dapp_search_graph"
             app:enterAnim="@anim/fragment_open_enter"
@@ -514,14 +506,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_accountDetailsFragment_to_import_nav_graph"
-            app:destination="@id/import_nav_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_accountDetailsFragment_to_changeWatchAccountFragment"
             app:destination="@id/changeWatchAccountFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -545,8 +529,6 @@
         tools:layout="@layout/fragment_change_watch_wallet" />
 
     <include app:graph="@navigation/mnemonic_nav_graph" />
-
-    <include app:graph="@navigation/import_nav_graph" />
 
     <action
         android:id="@+id/action_open_mnemonic_nav_graph"
@@ -642,8 +624,8 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_open_exit"
-            app:popUpToInclusive="true"
-            app:popUpTo="@id/selectSendFragment" />
+            app:popUpTo="@id/selectSendFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -830,7 +812,7 @@
     <fragment
         android:id="@+id/swapFlowFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment"
-        android:label="AssetSwapFlowFragment"/>
+        android:label="AssetSwapFlowFragment" />
 
     <include app:graph="@navigation/start_swap_nav_graph" />
 

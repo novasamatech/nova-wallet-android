@@ -13,7 +13,7 @@ interface ReferendumDetailsInteractor {
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
-    ): Flow<ReferendumDetails>
+    ): Flow<ReferendumDetails?>
 
     suspend fun detailsFor(
         preImage: PreImage,

@@ -12,9 +12,9 @@ import io.novafoundation.nova.common.utils.removed
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryption
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapAdvancedEncryptionResponseToAdvancedEncryption
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapOptionalNameToNameChooserState
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -139,7 +139,7 @@ class ConfirmMnemonicViewModel(
             with(extras) {
                 val accountNameState = mapOptionalNameToNameChooserState(accountName)
                 val addAccountType = mapAddAccountPayloadToAddAccountType(addAccountPayload, accountNameState)
-                val advancedEncryption = mapAdvancedEncryptionResponseToAdvancedEncryption(advancedEncryptionPayload)
+                val advancedEncryption = advancedEncryptionModel.toAdvancedEncryption()
 
                 addAccountInteractor.createAccount(mnemonicString, advancedEncryption, addAccountType)
                     .onSuccess { continueBasedOnCodeStatus() }
@@ -154,6 +154,7 @@ class ConfirmMnemonicViewModel(
                 resourceManager.getString(R.string.account_invalid_derivation_path_title) to
                     resourceManager.getString(R.string.account_invalid_derivation_path_message_v2_2_0)
             }
+
             else -> {
                 resourceManager.getString(R.string.common_error_general_title) to
                     resourceManager.getString(R.string.common_undefined_error_message)

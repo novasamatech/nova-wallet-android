@@ -63,7 +63,7 @@ class RealReferendumDetailsInteractor(
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
-    ): Flow<ReferendumDetails> {
+    ): Flow<ReferendumDetails?> {
         return flowOfAll { referendumDetailsFlowSuspend(referendumId, selectedGovernanceOption, voterAccountId) }
     }
 
@@ -90,7 +90,7 @@ class RealReferendumDetailsInteractor(
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
-    ): Flow<ReferendumDetails> {
+    ): Flow<ReferendumDetails?> {
         val chain = selectedGovernanceOption.assetWithChain.chain
 
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
@@ -103,6 +103,7 @@ class RealReferendumDetailsInteractor(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { onChainReferendum, currentBlockNumber ->
+            if (onChainReferendum == null) return@combine null
 
             val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
             val track = onChainReferendum.track()?.let(tracksById::get)
@@ -248,14 +249,17 @@ private suspend fun PreImageRepository.preImageOf(
         is Proposal.Inline -> {
             PreImage(encodedCall = proposal.encodedCall, call = proposal.call)
         }
+
         is Proposal.Legacy -> {
             val request = PreImageRequest(proposal.hash, knownSize = null, fetchIf = ALWAYS)
             getPreimageFor(request, chainId)
         }
+
         is Proposal.Lookup -> {
             val request = PreImageRequest(proposal.hash, knownSize = proposal.callLength, fetchIf = ALWAYS)
             getPreimageFor(request, chainId)
         }
+
         null -> null
     }
 }

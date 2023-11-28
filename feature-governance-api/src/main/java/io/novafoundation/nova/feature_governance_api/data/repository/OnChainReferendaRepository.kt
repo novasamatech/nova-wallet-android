@@ -24,7 +24,7 @@ interface OnChainReferendaRepository {
 
     suspend fun getOnChainReferenda(chainId: ChainId, referendaIds: Collection<ReferendumId>): Map<ReferendumId, OnChainReferendum>
 
-    suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum>
+    suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum?>
 
     suspend fun getReferendaExecutionBlocks(chainId: ChainId, approvedReferendaIds: Collection<ReferendumId>): Map<ReferendumId, BlockNumber>
 }

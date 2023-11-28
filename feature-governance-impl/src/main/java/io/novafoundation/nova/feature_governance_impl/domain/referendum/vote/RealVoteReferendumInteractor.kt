@@ -42,6 +42,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 private const val VOTE_ASSISTANT_CACHE_KEY = "RealVoteReferendumInteractor.VoteAssistant"
@@ -117,6 +118,8 @@ class RealVoteReferendumInteractor(
         }
 
         val selectedReferendumFlow = governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId)
+            .filterNotNull()
+
         val balanceLocksFlow = locksRepository.observeBalanceLocks(chain, chainAsset)
 
         return combine(votingInformation, selectedReferendumFlow, balanceLocksFlow) { (locksByTrack, voting, votedReferenda), selectedReferendum, locks ->

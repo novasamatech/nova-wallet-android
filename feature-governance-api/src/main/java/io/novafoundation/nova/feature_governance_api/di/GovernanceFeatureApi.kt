@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.di
 
 import io.novafoundation.nova.core.updater.UpdateSystem
+import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
@@ -29,4 +30,6 @@ interface GovernanceFeatureApi {
     val newDelegationChooseTrackInteractor: ChooseTrackInteractor
 
     val delegateDelegatorsInteractor: DelegateDelegatorsInteractor
+
+    val mutableGovernanceState: MutableGovernanceState
 }

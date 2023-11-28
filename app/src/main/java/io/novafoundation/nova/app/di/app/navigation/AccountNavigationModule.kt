@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
-import io.novafoundation.nova.app.root.navigation.account.AdvancedEncryptionCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.PolkadotVaultVariantSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectAddressCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectWalletCommunicatorImpl
@@ -15,7 +14,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
 @Module
@@ -26,12 +24,6 @@ class AccountNavigationModule {
     fun providePinCodeTwoFactorVerificationCommunicator(
         navigationHolder: NavigationHolder
     ): PinCodeTwoFactorVerificationCommunicator = PinCodeTwoFactorVerificationCommunicatorImpl(navigationHolder)
-
-    @Provides
-    @ApplicationScope
-    fun provideAdvancedEncryptionCommunicator(
-        navigationHolder: NavigationHolder
-    ): AdvancedEncryptionCommunicator = AdvancedEncryptionCommunicatorImpl(navigationHolder)
 
     @Provides
     @ApplicationScope

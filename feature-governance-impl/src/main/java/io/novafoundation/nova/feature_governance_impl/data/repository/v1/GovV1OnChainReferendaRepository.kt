@@ -111,13 +111,13 @@ class GovV1OnChainReferendaRepository(
         }.filterNotNull()
     }
 
-    override suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum> {
+    override suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum?> {
         return remoteStorageSource.subscribe(chainId) {
             val votingPeriod = runtime.votingPeriod()
 
             runtime.metadata.democracy().storage("ReferendumInfoOf").observe(
                 referendumId.value,
-                binding = { bindReferendum(it, referendumId, votingPeriod, runtime)!! }
+                binding = { bindReferendum(it, referendumId, votingPeriod, runtime) }
             )
         }
     }
@@ -185,6 +185,7 @@ class GovV1OnChainReferendaRepository(
                     threshold = bindThreshold(status["threshold"])
                 )
             }
+
             "Finished" -> {
                 val status = asDictEnum.value.castToStruct()
                 val approved = bindBoolean(status["approved"])
@@ -196,6 +197,7 @@ class GovV1OnChainReferendaRepository(
                     OnChainReferendumStatus.Rejected(end)
                 }
             }
+
             else -> throw IllegalArgumentException("Unsupported referendum status")
         }
 

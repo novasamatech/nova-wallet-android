@@ -76,7 +76,7 @@ class RealStakingTypeDetailsProvider(
 
     override suspend fun getValidationPayload(): EditingStakingTypePayload? {
         val selectionStore = currentSelectionStoreProvider.getSelectionStore(coroutineScope)
-        val selectedStake = selectionStore.currentSelection?.selection?.stake ?: return null
+        val selectedStake = selectionStore.getCurrentSelection()?.selection?.stake ?: return null
         return EditingStakingTypePayload(selectedStake, stakingType, singleStakingProperties.minStake())
     }
 }

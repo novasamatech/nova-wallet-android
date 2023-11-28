@@ -180,7 +180,7 @@ class RelayStakingNavigator(
     override fun openRebag() = performNavigation(R.id.action_stakingFragment_to_rebag)
 
     override fun openDAppBrowser(url: String) = performNavigation(
-        actionId = R.id.action_mainFragment_to_dappBrowserGraph,
+        actionId = R.id.action_dappBrowserGraph,
         args = DAppBrowserFragment.getBundle(url)
     )
 

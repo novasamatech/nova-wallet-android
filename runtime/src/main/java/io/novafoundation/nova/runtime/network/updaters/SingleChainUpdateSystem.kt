@@ -5,10 +5,12 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState.SupportedAssetOption
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.shareIn
 
 abstract class SingleChainUpdateSystem<A>(
     chainRegistry: ChainRegistry,
@@ -18,13 +20,15 @@ abstract class SingleChainUpdateSystem<A>(
 
     abstract fun getUpdaters(selectedAssetOption: SupportedAssetOption<A>): Collection<Updater<*>>
 
-    override fun start(): Flow<Updater.SideEffect> = singleAssetSharedState.selectedOption.flatMapLatest { selectedOption ->
+    private val updateFlow = singleAssetSharedState.selectedOption.flatMapLatest { selectedOption ->
         val chain = selectedOption.assetWithChain.chain
 
         val updaters = getUpdaters(selectedOption)
 
         runUpdaters(chain, updaters)
-    }.flowOn(Dispatchers.Default)
+    }.shareIn(CoroutineScope(Dispatchers.Default), replay = 1, started = SharingStarted.WhileSubscribed())
+
+    override fun start(): Flow<Updater.SideEffect> = updateFlow
 }
 
 class ConstantSingleChainUpdateSystem(

@@ -38,7 +38,7 @@ class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel>() {
 
         private const val PAYLOAD = "CreateAccountFragment.payload"
 
-        fun getBundle(payload: AdvancedEncryptionPayload): Bundle {
+        fun getBundle(payload: AdvancedEncryptionModePayload): Bundle {
             return Bundle().apply {
                 putParcelable(PAYLOAD, payload)
             }
