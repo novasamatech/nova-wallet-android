@@ -22,6 +22,8 @@ data class ChainLocal(
     @ColumnInfo(defaultValue = "1")
     val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
+    @ColumnInfo(defaultValue = "0")
+    val supportProxy: Boolean,
     val swap: String,
     val governance: String,
     val additional: String?,

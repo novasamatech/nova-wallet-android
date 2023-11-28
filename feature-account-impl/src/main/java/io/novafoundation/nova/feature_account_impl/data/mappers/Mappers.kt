@@ -38,19 +38,21 @@ fun mapCryptoTypeToCryptoTypeModel(
 ): CryptoTypeModel {
     val name = when (encryptionType) {
         CryptoType.SR25519 -> "${resourceManager.getString(R.string.sr25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.sr25519_selection_subtitle
-        )
+            resourceManager.getString(
+                R.string.sr25519_selection_subtitle
+            )
         }"
+
         CryptoType.ED25519 -> "${resourceManager.getString(R.string.ed25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.ed25519_selection_subtitle
-        )
+            resourceManager.getString(
+                R.string.ed25519_selection_subtitle
+            )
         }"
+
         CryptoType.ECDSA -> "${resourceManager.getString(R.string.ecdsa_selection_title)} ${
-        resourceManager.getString(
-            R.string.ecdsa_selection_subtitle
-        )
+            resourceManager.getString(
+                R.string.ecdsa_selection_subtitle
+            )
         }"
     }
 
@@ -92,6 +94,7 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
         MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
         MetaAccountLocal.Type.LEDGER -> LightMetaAccount.Type.LEDGER
         MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
+        MetaAccountLocal.Type.PROXY -> TODO()
     }
 }
 
@@ -128,6 +131,7 @@ fun mapMetaAccountLocalToMetaAccount(
         MetaAccount(
             id = id,
             chainAccounts = chainAccounts,
+            proxies = listOf(), // TODO
             substratePublicKey = substratePublicKey,
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substrateAccountId,
@@ -168,6 +172,7 @@ fun mapAddAccountPayloadToAddAccountType(
 
             AddAccountType.MetaAccount(accountNameState.value)
         }
+
         is AddAccountPayload.ChainAccount -> AddAccountType.ChainAccount(payload.chainId, payload.metaId)
     }
 }

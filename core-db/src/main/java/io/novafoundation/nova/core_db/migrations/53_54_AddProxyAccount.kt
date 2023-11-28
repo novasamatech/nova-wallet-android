@@ -20,5 +20,7 @@ val AddProxyAccount_53_54 = object : Migration(53, 54) {
             FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimMargin()
         )
+
+        database.execSQL("ALTER TABLE 'chains' ADD COLUMN `supportProxy` INTEGER NOT NULL DEFAULT 0")
     }
 }

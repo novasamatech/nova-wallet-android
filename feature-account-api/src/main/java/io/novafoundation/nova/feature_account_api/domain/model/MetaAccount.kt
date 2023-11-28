@@ -60,6 +60,7 @@ fun LightMetaAccount(
 class MetaAccount(
     override val id: Long,
     val chainAccounts: Map<ChainId, ChainAccount>,
+    val proxies: List<ProxyAccount>,
     override val substratePublicKey: ByteArray?,
     override val substrateCryptoType: CryptoType?,
     override val substrateAccountId: ByteArray?,
@@ -77,6 +78,17 @@ class MetaAccount(
         val accountId: ByteArray,
         val cryptoType: CryptoType?,
     )
+
+    class ProxyAccount(
+        val metaId: Long,
+        val proxyAccountId: ByteArray,
+        val proxyType: ProxyType,
+    ) {
+
+        enum class ProxyType {
+            ANY, UNSUPPORTED
+        }
+    }
 }
 
 fun MetaAccount.hasAccountIn(chain: Chain) = when {
@@ -141,6 +153,7 @@ fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
                 MultiChainEncryption.substrateFrom(cryptoType)
             }
         }
+
         chain.isEthereumBased -> MultiChainEncryption.Ethereum
         else -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
     }

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
@@ -57,6 +58,14 @@ interface RootDependencies {
     fun safeModeService(): SafeModeService
 
     fun rootScope(): RootScope
+
+    fun proxySyncService(): ProxySyncService
+
+    fun governanceStateUpdater(): MutableGovernanceState
+
+    fun dappMetadataRepository(): DAppMetadataRepository
+
+    fun encryptionDefaults(): EncryptionDefaults
 
     val systemCallExecutor: SystemCallExecutor
 

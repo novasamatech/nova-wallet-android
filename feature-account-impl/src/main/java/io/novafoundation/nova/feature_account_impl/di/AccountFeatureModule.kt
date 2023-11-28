@@ -22,7 +22,9 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -46,9 +48,11 @@ import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.Rea
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
+import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.RealProxyRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
@@ -88,6 +92,33 @@ import javax.inject.Named
 
 @Module(includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class, IdentityProviderModule::class])
 class AccountFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideProxyRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource
+    ): ProxyRepository = RealProxyRepository(storageDataSource)
+
+    @Provides
+    @FeatureScope
+    fun provideProxySyncService(
+        chainRegistry: ChainRegistry,
+        proxyRepository: ProxyRepository,
+        accounRepository: AccountRepository
+    ): ProxySyncService = RealProxySyncService(
+        chainRegistry,
+        proxyRepository,
+        accounRepository
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideEncryptionDefaults(): EncryptionDefaults = EncryptionDefaults(
+        substrateCryptoType = CryptoType.SR25519,
+        substrateDerivationPath = "",
+        ethereumCryptoType = mapEncryptionToCryptoType(MultiChainEncryption.Ethereum.encryptionType),
+        ethereumDerivationPath = BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH
+    )
 
     @Provides
     @FeatureScope
