@@ -345,6 +345,8 @@ class Navigator(
     }
 
     override fun openStaking() {
+        if (navController?.currentDestination?.id != R.id.mainFragment) navController?.navigate(R.id.action_open_main)
+
         stakingDashboardDelegate.openStakingDashboard()
     }
 
