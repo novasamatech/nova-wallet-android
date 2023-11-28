@@ -3,11 +3,6 @@ package io.novafoundation.nova.app.root.presentation.deepLinks
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 
-interface DeepLinkHandlerFactory {
-
-    fun create(): DeepLinkHandler
-}
-
 interface DeepLinkHandler {
 
     val callbackFlow: Flow<CallbackEvent>

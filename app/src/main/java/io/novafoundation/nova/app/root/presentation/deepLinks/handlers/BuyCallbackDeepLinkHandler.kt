@@ -1,8 +1,10 @@
-package io.novafoundation.nova.app.root.presentation.deepLinks
+package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.domain.RootInteractor
+import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
+import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -4,11 +4,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.app.root.domain.RootInteractor
-import io.novafoundation.nova.app.root.presentation.deepLinks.BuyCallbackDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.DAppDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.BuyCallbackDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.DAppDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.ImportMnemonicDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.ReferendumDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ImportMnemonicDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -28,11 +28,15 @@ class DeepLinkModule {
     @IntoSet
     fun provideImportMnemonicDeepLinkHandler(
         accountRouter: AccountRouter,
-        encryptionDefaults: EncryptionDefaults
+        encryptionDefaults: EncryptionDefaults,
+        accountRepository: AccountRepository,
+        automaticInteractionGate: AutomaticInteractionGate
     ): DeepLinkHandler {
         return ImportMnemonicDeepLinkHandler(
             accountRouter,
-            encryptionDefaults
+            encryptionDefaults,
+            accountRepository,
+            automaticInteractionGate
         )
     }
 

@@ -1,6 +1,9 @@
-package io.novafoundation.nova.app.root.presentation.deepLinks
+package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
+import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
+import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ReferendumHandlingException
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -10,9 +13,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.det
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import java.math.BigInteger
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 private const val GOV_DEEP_LINK_PREFIX = "/open/gov"
 
@@ -24,7 +27,7 @@ class ReferendumDeepLinkHandler(
     private val automaticInteractionGate: AutomaticInteractionGate
 ) : DeepLinkHandler {
 
-    override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
+    override val callbackFlow = MutableSharedFlow<CallbackEvent>()
 
     override suspend fun matches(data: Uri): Boolean {
         val path = data.path ?: return false
@@ -33,14 +36,14 @@ class ReferendumDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        // TODO: check if user has account
-        val chainId = data.getChainId() ?: return // TODO: show error message instead
-        val referendumId = data.getReferendumId() ?: return // TODO: show error message instead
-        val governanceType = data.getGovernanceType() ?: return // TODO: show error message instead
-        val chain = chainRegistry.getChain(chainId)
+        automaticInteractionGate.awaitInteractionAllowed()
+
+        val chainId = data.getChainId() ?: throw ReferendumHandlingException.ChainIsNotFound
+        val referendumId = data.getReferendumId() ?: throw ReferendumHandlingException.ReferendumIsNotSpecified
+        val chain = chainRegistry.getChainOrNull(chainId) ?: throw ReferendumHandlingException.ChainIsNotFound
+        val governanceType = data.getGovernanceType(chain)
         val payload = ReferendumDetailsPayload(referendumId)
 
-        automaticInteractionGate.awaitInteractionAllowed()
         mutableGovernanceState.update(chain.id, chain.utilityAsset.id, governanceType)
         governanceRouter.openReferendum(payload)
     }
@@ -54,18 +57,18 @@ class ReferendumDeepLinkHandler(
             ?.toBigIntegerOrNull()
     }
 
-    private suspend fun Uri.getGovernanceType(): Chain.Governance? {
-        val chainId = this.getChainId() ?: return null
-        val chain = chainRegistry.getChain(chainId)
+    private suspend fun Uri.getGovernanceType(chain: Chain): Chain.Governance {
         val supportedGov = chain.governance
         val govType = getQueryParameter("type")
             ?.toIntOrNull()
 
         return when {
-            govType == null -> Chain.Governance.V2.takeIfContainedIn(supportedGov) ?: supportedGov.firstOrNull()
-            govType == 0 && supportedGov.contains(Chain.Governance.V2) -> return Chain.Governance.V2
-            govType == 1 && supportedGov.contains(Chain.Governance.V1) -> return Chain.Governance.V1
-            else -> null
+            govType == null && supportedGov.contains(Chain.Governance.V2) -> Chain.Governance.V2
+            govType == null && supportedGov.size == 1 -> supportedGov.first()
+            govType == 0 && supportedGov.contains(Chain.Governance.V2) -> Chain.Governance.V2
+            govType == 1 && supportedGov.contains(Chain.Governance.V1) -> Chain.Governance.V1
+            govType !in 0..1 -> throw ReferendumHandlingException.GovernanceTypeIsNotSupported
+            else -> throw ReferendumHandlingException.GovernanceTypeIsNotSepcified
         }
     }
 

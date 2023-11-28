@@ -1,6 +1,9 @@
-package io.novafoundation.nova.app.root.presentation.deepLinks
+package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
+import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
+import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.DAppHandlingException
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
@@ -27,14 +30,14 @@ class DAppDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        // TODO: check that user has accounts here
-        val url = data.getDappUrl() ?: return
-        val normalizedUrl = Urls.normalizeUrl(url)
+        automaticInteractionGate.awaitInteractionAllowed()
+
+        val url = data.getDappUrl() ?: throw DAppHandlingException.UrlIsInvalid
+        val normalizedUrl = runCatching { Urls.normalizeUrl(url) }.getOrNull() ?: throw DAppHandlingException.UrlIsInvalid
 
         val dAppMetadata = dappRepository.syncAndGetDapp(normalizedUrl)
-        if (dAppMetadata == null) return // TODO: handle error
+        if (dAppMetadata == null) throw DAppHandlingException.DomainIsNotMatched(normalizedUrl)
 
-        automaticInteractionGate.awaitInteractionAllowed()
         dAppRouter.openDAppBrowser(normalizedUrl)
     }
 

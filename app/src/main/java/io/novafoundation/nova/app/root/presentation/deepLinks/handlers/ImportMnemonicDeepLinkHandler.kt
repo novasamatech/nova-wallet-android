@@ -1,7 +1,13 @@
-package io.novafoundation.nova.app.root.presentation.deepLinks
+package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
 import com.walletconnect.util.hexToBytes
+import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
+import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ImportMnemonicHandlingException
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -9,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.AdvancedEncryptionModel
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
@@ -19,7 +26,9 @@ private const val IMPORT_WALLET_DEEP_LINK_PREFIX = "/create/wallet"
 
 class ImportMnemonicDeepLinkHandler(
     private val accountRouter: AccountRouter,
-    private val encryptionDefaults: EncryptionDefaults
+    private val encryptionDefaults: EncryptionDefaults,
+    private val accountRepository: AccountRepository,
+    private val automaticInteractionGate: AutomaticInteractionGate,
 ) : DeepLinkHandler {
 
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
@@ -31,12 +40,16 @@ class ImportMnemonicDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        val mnemonic = data.getMnemonic() ?: return // TODO: show error message instead
+        if (accountRepository.hasMetaAccounts()) {
+            automaticInteractionGate.awaitInteractionAllowed()
+        }
+
+        val mnemonic = data.getMnemonic()
         val substrateDP = data.getSubstrateDP()
         val ethereumDerivationPath = data.getEthereumDP()
 
         val isDerivationPathsValid = isDerivationPathsValid(substrateDP, ethereumDerivationPath)
-        if (!isDerivationPathsValid) return // TODO: show error message instead
+        if (!isDerivationPathsValid) throw ImportMnemonicHandlingException.InvalidDerivationPath
 
         val importAccountPayload = ImportAccountPayload(
             prepareMnemonicPreset(
@@ -47,6 +60,7 @@ class ImportMnemonicDeepLinkHandler(
             ),
             AddAccountPayload.MetaAccount
         )
+
         accountRouter.openImportAccountScreen(importAccountPayload)
     }
 
@@ -67,9 +81,10 @@ class ImportMnemonicDeepLinkHandler(
         )
     }
 
-    private fun Uri.getMnemonic(): Mnemonic? {
-        val mnemonicHex = getQueryParameter("mnemonic") ?: return null
-        return MnemonicCreator.fromEntropy(mnemonicHex.hexToBytes())
+    private fun Uri.getMnemonic(): Mnemonic {
+        val mnemonicHex = getQueryParameter("mnemonic")
+        return runCatching { MnemonicCreator.fromEntropy(mnemonicHex!!.hexToBytes()) }.getOrNull()
+            ?: throw ImportMnemonicHandlingException.InvalidMnemonic
     }
 
     private fun Uri.getSubstrateCryptoType(): String? {
@@ -88,10 +103,11 @@ class ImportMnemonicDeepLinkHandler(
         val intCryptoType = this?.toIntOrNull()
 
         return when (intCryptoType) {
+            null -> fallback()
             0 -> CryptoType.SR25519
             1 -> CryptoType.ED25519
             2 -> CryptoType.ECDSA
-            else -> fallback()
+            else -> throw DeepLinkHandlingException.ImportMnemonicHandlingException.InvalidCryptoType
         }
     }
 
