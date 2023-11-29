@@ -168,6 +168,7 @@ class Navigator(
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
         val currentDestination = navController?.currentDestination ?: return
         val actionId = when (currentDestination.id) {
+            // Wee need the slpash fragment case to close app if we use back navigation in import mnemonic screen
             R.id.splashFragment -> R.id.action_splashFragment_to_import_nav_graph
             else -> R.id.action_import_nav_graph
         }
