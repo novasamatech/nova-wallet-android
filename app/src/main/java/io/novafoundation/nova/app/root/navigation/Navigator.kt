@@ -166,7 +166,12 @@ class Navigator(
     }
 
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
-        navController?.navigate(R.id.action_import_nav_graph, ImportAccountFragment.getBundle(payload))
+        val currentDestination = navController?.currentDestination ?: return
+        val actionId = when (currentDestination.id) {
+            R.id.splashFragment -> R.id.action_splashFragment_to_import_nav_graph
+            else -> R.id.action_import_nav_graph
+        }
+        navController?.navigate(actionId, ImportAccountFragment.getBundle(payload))
     }
 
     override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {
