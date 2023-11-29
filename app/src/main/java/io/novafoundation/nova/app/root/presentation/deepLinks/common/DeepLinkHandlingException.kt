@@ -8,7 +8,7 @@ sealed class DeepLinkHandlingException : Exception() {
 
         object ChainIsNotFound : ReferendumHandlingException()
 
-        object GovernanceTypeIsNotSepcified : ReferendumHandlingException()
+        object GovernanceTypeIsNotSpecified : ReferendumHandlingException()
 
         object GovernanceTypeIsNotSupported : ReferendumHandlingException()
     }
