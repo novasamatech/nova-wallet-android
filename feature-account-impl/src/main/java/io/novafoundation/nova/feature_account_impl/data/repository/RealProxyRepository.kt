@@ -27,7 +27,7 @@ class RealProxyRepository(
 
         return delegatorToProxies
             .mapNotNull { (delegator, proxies) ->
-                val matchedProxies = matchProxiesToAccountAccountsAndMap(proxies, accountIdToMetaAccounts)
+                val matchedProxies = matchProxiesToAccountsAndMap(proxies, accountIdToMetaAccounts)
 
                 if (matchedProxies.isEmpty()) return@mapNotNull null
 
@@ -75,7 +75,7 @@ class RealProxyRepository(
         )
     }
 
-    private fun matchProxiesToAccountAccountsAndMap(
+    private fun matchProxiesToAccountsAndMap(
         proxies: Map<AccountIdKey, String>,
         accountIdToMetaAccounts: Map<AccountIdKey, MetaAccountId>
     ): List<ProxiedWithProxies.Proxy> {
