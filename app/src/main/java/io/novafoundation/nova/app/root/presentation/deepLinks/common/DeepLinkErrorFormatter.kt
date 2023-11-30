@@ -22,7 +22,7 @@ private fun handleReferendumException(resourceManager: ResourceManager, exceptio
 
         ReferendumHandlingException.ChainIsNotFound -> resourceManager.getString(R.string.deep_linking_chain_id_is_not_found)
 
-        ReferendumHandlingException.GovernanceTypeIsNotSepcified -> resourceManager.getString(R.string.deep_linking_governance_type_is_not_specified)
+        ReferendumHandlingException.GovernanceTypeIsNotSpecified -> resourceManager.getString(R.string.deep_linking_governance_type_is_not_specified)
 
         ReferendumHandlingException.GovernanceTypeIsNotSupported -> resourceManager.getString(R.string.deep_linking_governance_type_is_not_supported)
     }

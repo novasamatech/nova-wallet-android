@@ -62,13 +62,16 @@ class ReferendumDeepLinkHandler(
         val govType = getQueryParameter("type")
             ?.toIntOrNull()
 
+        val cantSelectGovType = govType == null && supportedGov.size > 1 && !supportedGov.contains(Chain.Governance.V2)
+
         return when {
+            cantSelectGovType -> throw ReferendumHandlingException.GovernanceTypeIsNotSpecified
             govType == null && supportedGov.contains(Chain.Governance.V2) -> Chain.Governance.V2
             govType == null && supportedGov.size == 1 -> supportedGov.first()
             govType == 0 && supportedGov.contains(Chain.Governance.V2) -> Chain.Governance.V2
             govType == 1 && supportedGov.contains(Chain.Governance.V1) -> Chain.Governance.V1
             govType !in 0..1 -> throw ReferendumHandlingException.GovernanceTypeIsNotSupported
-            else -> throw ReferendumHandlingException.GovernanceTypeIsNotSepcified
+            else -> throw ReferendumHandlingException.GovernanceTypeIsNotSupported
         }
     }
 

@@ -123,13 +123,13 @@ class GovV2OnChainReferendaRepository(
         }.filterNotNull()
     }
 
-    override suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum> {
+    override suspend fun onChainReferendumFlow(chainId: ChainId, referendumId: ReferendumId): Flow<OnChainReferendum?> {
         return remoteStorageSource.subscribe(chainId) {
             val allTracks = getTracksById(chainId)
 
             runtime.metadata.referenda().storage("ReferendumInfoFor").observe(
                 referendumId.value,
-                binding = { bindReferendum(it, referendumId, allTracks, runtime)!! }
+                binding = { bindReferendum(it, referendumId, allTracks, runtime) }
             )
         }
     }
@@ -182,6 +182,7 @@ class GovV2OnChainReferendaRepository(
                     threshold = Gov2VotingThreshold(tracksById.getValue(trackId))
                 )
             }
+
             "Approved" -> OnChainReferendumStatus.Approved(bindCompletedReferendumSince(asDictEnum.value))
             "Rejected" -> OnChainReferendumStatus.Rejected(bindCompletedReferendumSince(asDictEnum.value))
             "Cancelled" -> OnChainReferendumStatus.Cancelled(bindCompletedReferendumSince(asDictEnum.value))
@@ -256,6 +257,7 @@ class GovV2OnChainReferendaRepository(
                     yOffset = bindFixedI64(valueStruct["y_offset"])
                 )
             }
+
             "LinearDecreasing" -> {
                 LinearDecreasingCurve(
                     length = bindPerbill(valueStruct["length"]),
@@ -263,6 +265,7 @@ class GovV2OnChainReferendaRepository(
                     ceil = bindPerbill(valueStruct["ceil"])
                 )
             }
+
             "SteppedDecreasing" -> {
                 SteppedDecreasingCurve(
                     begin = bindPerbill(valueStruct["begin"]),
@@ -271,6 +274,7 @@ class GovV2OnChainReferendaRepository(
                     period = bindPerbill(valueStruct["period"])
                 )
             }
+
             else -> incompatible()
         }
     }
