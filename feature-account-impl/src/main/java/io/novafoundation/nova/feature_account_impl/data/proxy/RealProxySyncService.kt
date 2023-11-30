@@ -142,7 +142,7 @@ class RealProxySyncService(
             metaId = metaId,
             chainId = chainId,
             proxiedAccountId = proxiedAccountId,
-            proxyType = ProxyAccountLocal.ProxyType.ANY, //TODO map proxyType
+            proxyType = ProxyAccountLocal.ProxyType.ANY, // TODO map proxyType
             status = ProxyAccountLocal.Status.ACTIVE
         )
     }

@@ -49,7 +49,7 @@ class SelectedAccountUseCase(
             }
 
             LightMetaAccount.Type.LEDGER -> R.drawable.ic_ledger
-            LightMetaAccount.Type.PROXIED -> null //TODO Add icon for proxy account
+            LightMetaAccount.Type.PROXIED -> null // TODO Add icon for proxy account
         }
 
         SelectedWalletModel(

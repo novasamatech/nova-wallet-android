@@ -27,7 +27,7 @@ data class ProxyAccountLocal(
 ) : Identifiable {
 
     enum class ProxyType {
-        ANY, UNKNOWN //TODO add more
+        ANY, UNKNOWN // TODO add more
     }
 
     enum class Status {

@@ -32,7 +32,7 @@ class MetaAccountTypePresentationMapper(
                 title = resourceManager.getString(R.string.common_ledger)
             )
 
-            LightMetaAccount.Type.PROXIED -> null //TODO Add icon for proxy account
+            LightMetaAccount.Type.PROXIED -> null // TODO Add icon for proxy account
         }
     }
 }

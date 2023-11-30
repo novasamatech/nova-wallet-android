@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.root.domain
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncService
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_buy_impl.domain.providers.ExternalProvider
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
