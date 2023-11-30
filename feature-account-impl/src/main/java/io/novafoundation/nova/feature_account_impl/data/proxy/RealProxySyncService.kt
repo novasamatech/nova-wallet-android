@@ -89,7 +89,7 @@ class RealProxySyncService(
                     LightMetaAccount.Type.LEDGER,
                     LightMetaAccount.Type.POLKADOT_VAULT -> true
 
-                    LightMetaAccount.Type.WATCH_ONLY -> false
+                    LightMetaAccount.Type.WATCH_ONLY,
                     LightMetaAccount.Type.PROXIED -> false
                 }
             }
