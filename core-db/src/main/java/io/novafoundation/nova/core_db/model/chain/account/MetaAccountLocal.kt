@@ -46,7 +46,7 @@ class MetaAccountLocal(
     var id: Long = 0
 
     enum class Type {
-        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT, PROXY
+        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT, PROXIED
     }
 }
 

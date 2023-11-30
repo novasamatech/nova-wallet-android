@@ -27,6 +27,7 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.PARITY_SIGNER -> paritySignerSigner
             LightMetaAccount.Type.POLKADOT_VAULT -> polkadotVaultSigner
             LightMetaAccount.Type.LEDGER -> ledgerSigner
+            LightMetaAccount.Type.PROXIED -> TODO()
         }
     }
 

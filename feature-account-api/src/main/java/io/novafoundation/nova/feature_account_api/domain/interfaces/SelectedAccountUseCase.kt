@@ -47,7 +47,9 @@ class SelectedAccountUseCase(
                 val config = polkadotVaultVariantConfigProvider.variantConfigFor(type.asPolkadotVaultVariantOrThrow())
                 config.common.iconRes
             }
+
             LightMetaAccount.Type.LEDGER -> R.drawable.ic_ledger
+            LightMetaAccount.Type.PROXIED -> null //TODO Add icon for proxy account
         }
 
         SelectedWalletModel(

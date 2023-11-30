@@ -71,6 +71,8 @@ import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
@@ -113,11 +115,15 @@ class AccountFeatureModule {
     fun provideProxySyncService(
         chainRegistry: ChainRegistry,
         proxyRepository: ProxyRepository,
-        accounRepository: AccountRepository
+        accounRepository: AccountRepository,
+        metaAccountDao: MetaAccountDao,
+        @OnChainIdentity identityProvider: IdentityProvider
     ): ProxySyncService = RealProxySyncService(
         chainRegistry,
         proxyRepository,
-        accounRepository
+        accounRepository,
+        metaAccountDao,
+        identityProvider
     )
 
     @Provides

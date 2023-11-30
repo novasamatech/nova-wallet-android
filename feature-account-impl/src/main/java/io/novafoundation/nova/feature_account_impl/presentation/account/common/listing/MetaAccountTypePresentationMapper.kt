@@ -31,6 +31,8 @@ class MetaAccountTypePresentationMapper(
                 iconRes = R.drawable.ic_ledger,
                 title = resourceManager.getString(R.string.common_ledger)
             )
+
+            LightMetaAccount.Type.PROXIED -> null //TODO Add icon for proxy account
         }
     }
 }

@@ -106,7 +106,7 @@ class AccountDetailsViewModel(
 
     private suspend fun mapFromToTextHeader(from: AccountInChain.From): TextHeader? {
         return when (metaAccount().type) {
-            Type.LEDGER, Type.PARITY_SIGNER, Type.POLKADOT_VAULT -> null
+            Type.LEDGER, Type.PARITY_SIGNER, Type.POLKADOT_VAULT, Type.PROXIED -> null
             Type.SECRETS, Type.WATCH_ONLY -> {
                 val resId = when (from) {
                     AccountInChain.From.META_ACCOUNT -> R.string.account_shared_secret
@@ -125,6 +125,7 @@ class AccountDetailsViewModel(
                 val polkadotVaultVariant = metaAccount.type.asPolkadotVaultVariantOrThrow()
                 resourceManager.formatWithPolkadotVaultLabel(R.string.account_details_parity_signer_not_supported, polkadotVaultVariant)
             }
+
             else -> resourceManager.getString(R.string.account_no_chain_projection)
         }
 
@@ -177,7 +178,7 @@ class AccountDetailsViewModel(
         return when (accountType) {
             Type.SECRETS -> setOf(AccountAction.EXPORT, AccountAction.CHANGE)
             Type.WATCH_ONLY -> setOf(AccountAction.CHANGE)
-            Type.PARITY_SIGNER, Type.POLKADOT_VAULT -> emptySet()
+            Type.PARITY_SIGNER, Type.POLKADOT_VAULT, Type.PROXIED -> emptySet()
             Type.LEDGER -> setOf(AccountAction.CHANGE)
         }
     }
@@ -191,6 +192,7 @@ class AccountDetailsViewModel(
                 ),
                 text = resourceManager.getString(R.string.account_details_watch_only_alert)
             )
+
             Type.PARITY_SIGNER, Type.POLKADOT_VAULT -> {
                 val polkadotVaultVariant = accountType.asPolkadotVaultVariantOrThrow()
                 val variantConfig = polkadotVaultVariantConfigProvider.variantConfigFor(polkadotVaultVariant)
@@ -203,6 +205,7 @@ class AccountDetailsViewModel(
                     text = resourceManager.formatWithPolkadotVaultLabel(R.string.account_details_parity_signer_alert, polkadotVaultVariant)
                 )
             }
+
             Type.SECRETS -> null
             Type.LEDGER -> AccountTypeAlert(
                 style = AlertView.Style(
@@ -211,6 +214,8 @@ class AccountDetailsViewModel(
                 ),
                 text = resourceManager.getString(R.string.ledger_wallet_details_description)
             )
+
+            Type.PROXIED -> TODO() // Make a valid alert here
         }
     }
 

@@ -94,7 +94,7 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
         MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
         MetaAccountLocal.Type.LEDGER -> LightMetaAccount.Type.LEDGER
         MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
-        MetaAccountLocal.Type.PROXY -> TODO()
+        MetaAccountLocal.Type.PROXIED -> LightMetaAccount.Type.PROXIED
     }
 }
 

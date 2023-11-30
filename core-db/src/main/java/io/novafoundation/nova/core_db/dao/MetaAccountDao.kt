@@ -9,6 +9,7 @@ import androidx.room.Update
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
+import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +78,14 @@ private const val META_ACCOUNT_WITH_BALANCE_QUERY = """
 @Dao
 interface MetaAccountDao {
 
+    @Transaction
+    suspend fun insertMetaAccountWithNewPosition(metaAccount: suspend (Int) -> MetaAccountLocal): Long {
+        val position = nextAccountPosition()
+        val metaId = insertMetaAccount(metaAccount(position))
+
+        return metaId
+    }
+
     @Insert
     suspend fun insertMetaAccount(metaAccount: MetaAccountLocal): Long
 
@@ -85,6 +94,9 @@ interface MetaAccountDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChainAccounts(chainAccounts: List<ChainAccountLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertProxies(proxiesLocal: List<ProxyAccountLocal>)
 
     @Query("SELECT * FROM meta_accounts")
     fun getMetaAccounts(): List<MetaAccountLocal>
@@ -104,6 +116,9 @@ interface MetaAccountDao {
 
     @Query(META_ACCOUNT_WITH_BALANCE_QUERY)
     fun metaAccountWithBalanceFlow(metaId: Long): Flow<List<MetaAccountWithBalanceLocal>>
+
+    @Query("SELECT * FROM proxy_accounts")
+    suspend fun getAllProxyAccounts(): List<ProxyAccountLocal>
 
     @Query("UPDATE meta_accounts SET isSelected = (id = :metaId)")
     suspend fun selectMetaAccount(metaId: Long)
