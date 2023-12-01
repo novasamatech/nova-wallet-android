@@ -136,13 +136,14 @@ class RealProxySyncService(
     private fun createProxyAccount(
         metaId: Long,
         chainId: ChainId,
-        proxiedAccountId: AccountId
+        proxiedAccountId: AccountId,
+        proxyType: String
     ): ProxyAccountLocal {
         return ProxyAccountLocal(
             metaId = metaId,
             chainId = chainId,
             proxiedAccountId = proxiedAccountId,
-            proxyType = ProxyAccountLocal.ProxyType.ANY, // TODO map proxyType
+            proxyType = proxyType,
             status = ProxyAccountLocal.Status.ACTIVE
         )
     }
@@ -150,7 +151,7 @@ class RealProxySyncService(
     private fun List<ProxiedWithProxies>.formatToLocalProxies(): List<ProxyAccountLocal> {
         return flatMap { proxied ->
             proxied.proxies.map { proxy ->
-                createProxyAccount(proxy.metaId, proxied.chainId, proxied.accountId)
+                createProxyAccount(proxy.metaId, proxied.chainId, proxied.accountId, proxy.proxyType)
             }
         }
     }

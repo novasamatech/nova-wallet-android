@@ -22,13 +22,9 @@ data class ProxyAccountLocal(
     val metaId: Long,
     val chainId: String,
     val proxiedAccountId: ByteArray,
-    val proxyType: ProxyType,
+    val proxyType: String,
     val status: Status,
 ) : Identifiable {
-
-    enum class ProxyType {
-        ANY, UNKNOWN // TODO add more
-    }
 
     enum class Status {
         ACTIVE, DEACTIVATED

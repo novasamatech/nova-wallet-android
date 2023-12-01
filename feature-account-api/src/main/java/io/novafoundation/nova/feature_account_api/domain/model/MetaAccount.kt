@@ -78,17 +78,6 @@ class MetaAccount(
         val accountId: ByteArray,
         val cryptoType: CryptoType?,
     )
-
-    class ProxyAccount(
-        val metaId: Long,
-        val proxyAccountId: ByteArray,
-        val proxyType: ProxyType,
-    ) {
-
-        enum class ProxyType {
-            ANY, UNSUPPORTED
-        }
-    }
 }
 
 fun MetaAccount.hasAccountIn(chain: Chain) = when {
