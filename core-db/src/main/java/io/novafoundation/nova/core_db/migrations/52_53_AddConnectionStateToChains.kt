@@ -4,7 +4,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 
-val AddConnectionStateToChains_52_53 = object : Migration(52, 53) {
+val AddConnectionStateToChains_53_54 = object : Migration(53, 54) {
     override fun migrate(database: SupportSQLiteDatabase) {
         val defaultConnectionState = ChainLocal.Default.CONNECTION_STATE_DEFAULT
 
