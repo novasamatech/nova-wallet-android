@@ -21,5 +21,4 @@ interface NftRepository {
     suspend fun fullNftSync(nft: Nft)
 }
 
-
 class NftSyncTrigger(val chain: Chain)

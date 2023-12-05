@@ -29,7 +29,6 @@ class NftProvidersRegistry(
             Chain.Geneses.STATEMINE, Chain.Geneses.KUSAMA -> true
             else -> false
         }
-
     }
 
     fun get(nftTypeKey: Nft.Type.Key): NftProvider {

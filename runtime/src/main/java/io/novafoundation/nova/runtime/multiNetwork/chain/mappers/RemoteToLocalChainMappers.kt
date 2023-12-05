@@ -98,7 +98,6 @@ private fun ConnectionStateLocal.isNotDefault(): Boolean {
     return this != ConnectionStateLocal.LIGHT_SYNC
 }
 
-
 private fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
 
 private fun mapSwapListToLocal(swap: List<Chain.Swap>) = swap.joinToString(separator = ",", transform = Chain.Swap::name)

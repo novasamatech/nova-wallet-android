@@ -341,7 +341,7 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
 }
 
 fun mapConnectionStateToLocal(domain: ConnectionState): ConnectionStateLocal {
-    return when(domain) {
+    return when (domain) {
         ConnectionState.FULL_SYNC -> ConnectionStateLocal.FULL_SYNC
         ConnectionState.LIGHT_SYNC -> ConnectionStateLocal.LIGHT_SYNC
         ConnectionState.DISABLED -> ConnectionStateLocal.DISABLED
@@ -349,7 +349,7 @@ fun mapConnectionStateToLocal(domain: ConnectionState): ConnectionStateLocal {
 }
 
 private fun mapConnectionStateFromLocal(local: ConnectionStateLocal): ConnectionState {
-    return when(local) {
+    return when (local) {
         ConnectionStateLocal.FULL_SYNC -> ConnectionState.FULL_SYNC
         ConnectionStateLocal.LIGHT_SYNC -> ConnectionState.LIGHT_SYNC
         ConnectionStateLocal.DISABLED -> ConnectionState.DISABLED
