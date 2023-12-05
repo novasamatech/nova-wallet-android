@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.importing
 
 import android.content.Intent
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -12,13 +13,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
-import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithAccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.ImportSourceFactory
-import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.FileRequester
-import io.novafoundation.nova.feature_account_impl.presentation.importing.source.model.ImportError
+import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.FileRequester
+import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.ImportError
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,19 +30,19 @@ class ImportAccountViewModel(
     private val router: AccountRouter,
     private val resourceManager: ResourceManager,
     accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
-    private val advancedEncryptionRequester: AdvancedEncryptionRequester,
     private val payload: ImportAccountPayload,
-    importSourceFactory: ImportSourceFactory,
+    private val importSourceFactory: ImportSourceFactory,
 ) : BaseViewModel(),
     WithAccountNameChooserMixin {
 
     override val accountNameChooser: AccountNameChooserMixin.Presentation = accountNameChooserFactory.create(scope = this)
 
     val importSource = importSourceFactory.create(
-        secretType = payload.type,
+        importType = payload.importType,
         scope = this,
         payload = payload.addAccountPayload,
-        accountNameChooserMixin = accountNameChooser
+        accountNameChooserMixin = accountNameChooser,
+        coroutineScope = viewModelScope
     )
 
     private val importInProgressFlow = MutableStateFlow(false)
@@ -65,12 +65,12 @@ class ImportAccountViewModel(
     }
 
     fun optionsClicked() {
-        advancedEncryptionRequester.openRequest(AdvancedEncryptionPayload.Change(payload.addAccountPayload))
+        router.openAdvancedSettings(AdvancedEncryptionModePayload.Change(payload.addAccountPayload))
     }
 
     fun nextClicked() = launch {
         importInProgressFlow.withFlagSet {
-            val nameState = accountNameChooser.nameState.value!!
+            val nameState = accountNameChooser.nameState.value
             val addAccountType = mapAddAccountPayloadToAddAccountType(payload.addAccountPayload, nameState)
 
             importSource.performImport(addAccountType)
@@ -106,10 +106,12 @@ class ImportAccountViewModel(
                     titleRes = R.string.account_add_already_exists_message,
                     messageRes = R.string.account_error_try_another_one
                 )
+
                 is JunctionDecoder.DecodingError, is BIP32JunctionDecoder.DecodingError -> ImportError(
                     titleRes = R.string.account_invalid_derivation_path_title,
                     messageRes = R.string.account_invalid_derivation_path_message_v2_2_0
                 )
+
                 else -> ImportError()
             }
         }

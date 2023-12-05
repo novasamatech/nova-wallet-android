@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confir
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.AdvancedEncryptionModel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -14,6 +14,6 @@ class ConfirmMnemonicPayload(
     class CreateExtras(
         val accountName: String?,
         val addAccountPayload: AddAccountPayload,
-        val advancedEncryptionPayload: AdvancedEncryptionCommunicator.Response
+        val advancedEncryptionModel: AdvancedEncryptionModel
     ) : Parcelable
 }

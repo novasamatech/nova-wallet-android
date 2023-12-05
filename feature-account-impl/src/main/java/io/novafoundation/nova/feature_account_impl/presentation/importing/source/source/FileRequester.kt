@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.importing.source.model
+package io.novafoundation.nova.feature_account_impl.presentation.importing.source.source
 
 import android.net.Uri
 import androidx.lifecycle.LiveData

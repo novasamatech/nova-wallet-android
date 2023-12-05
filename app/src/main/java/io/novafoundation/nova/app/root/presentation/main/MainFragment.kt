@@ -65,8 +65,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             insets
         }
 
-        val nestedNavHostFragment =
-            childFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
+        val nestedNavHostFragment = childFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
 
         navController = nestedNavHostFragment.navController
         stakingDashboardNavigator.setStakingTabNavController(navController!!)

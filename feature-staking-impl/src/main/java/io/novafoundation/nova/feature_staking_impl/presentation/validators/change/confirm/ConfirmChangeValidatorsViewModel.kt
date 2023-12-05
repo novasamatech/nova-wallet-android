@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -29,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.stakingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.hints.ConfirmStakeHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -60,6 +63,10 @@ class ConfirmChangeValidatorsViewModel(
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
 
+    private val maxValidatorsPerNominator by lazyAsync {
+        interactor.maxValidatorsPerNominator(setupStakingSharedState.activeStake())
+    }
+
     private val currentProcessState = setupStakingSharedState.get<SetupStakingProcess.ReadyToSubmit>()
 
     val hintsMixin = hintsMixinFactory.create(coroutineScope = this)
@@ -88,7 +95,7 @@ class ConfirmChangeValidatorsViewModel(
 
     val nominationsFlow = flowOf {
         val selectedCount = currentProcessState.validators.size
-        val maxValidatorsPerNominator = interactor.maxValidatorsPerNominator()
+        val maxValidatorsPerNominator = maxValidatorsPerNominator()
 
         resourceManager.getString(R.string.staking_confirm_nominations, selectedCount, maxValidatorsPerNominator)
     }
@@ -157,7 +164,7 @@ class ConfirmChangeValidatorsViewModel(
         if (setupResult.isSuccess) {
             showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-            setupStakingSharedState.set(currentProcessState.finish())
+            setupStakingSharedState.set(currentProcessState.reset())
 
             router.returnToCurrentValidators()
         } else {

@@ -1,19 +1,25 @@
 package io.novafoundation.nova.app.root.presentation
 
+import android.net.Uri
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.domain.RootInteractor
+import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
+import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
 import kotlinx.coroutines.cancel
@@ -34,6 +40,9 @@ class RootViewModel(
     private val safeModeService: SafeModeService,
     private val updateNotificationsInteractor: UpdateNotificationsInteractor,
     private val walletConnectService: WalletConnectService,
+    private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
+    private val deepLinkHandler: DeepLinkHandler,
+    private val automaticInteractionGate: AutomaticInteractionGate,
     private val rootScope: RootScope
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
@@ -55,11 +64,33 @@ class RootViewModel(
 
         syncCurrencies()
 
+        syncWalletConnectSessions()
+
         updatePhishingAddresses()
 
         walletConnectService.onPairErrorLiveData.observeForever {
             showError(it.peekContent())
         }
+
+        subscribeDeepLinkCallback()
+    }
+
+    private fun subscribeDeepLinkCallback() {
+        deepLinkHandler.callbackFlow
+            .onEach { handleDeepLinkCallbackEvent(it) }
+            .launchIn(this)
+    }
+
+    private fun handleDeepLinkCallbackEvent(event: CallbackEvent) {
+        when (event) {
+            is CallbackEvent.Message -> {
+                showMessage(event.message)
+            }
+        }
+    }
+
+    private fun syncWalletConnectSessions() = launch {
+        walletConnectSessionsUseCase.syncActiveSessions()
     }
 
     private fun checkForUpdates() {
@@ -112,12 +143,6 @@ class RootViewModel(
         }
     }
 
-    fun externalUrlOpened(uri: String) {
-        if (interactor.isBuyProviderRedirectLink(uri)) {
-            showMessage(resourceManager.getString(R.string.buy_completed))
-        }
-    }
-
     private fun verifyUserIfNeed() {
         launch {
             if (interactor.isAccountSelected() && interactor.isPinCodeSet()) {
@@ -134,5 +159,16 @@ class RootViewModel(
 
     override fun onCleared() {
         rootScope.cancel()
+    }
+
+    fun handleDeepLink(data: Uri) {
+        launch {
+            try {
+                deepLinkHandler.handleDeepLink(data)
+            } catch (e: DeepLinkHandlingException) {
+                val errorMessage = formatDeepLinkHandlingException(resourceManager, e)
+                showError(errorMessage)
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmT
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
@@ -50,6 +51,8 @@ interface AccountFeatureApi {
     fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
 
     fun biometricServiceFactory(): BiometricServiceFactory
+
+    fun encryptionDefaults(): EncryptionDefaults
 
     val addressInputMixinFactory: AddressInputMixinFactory
 

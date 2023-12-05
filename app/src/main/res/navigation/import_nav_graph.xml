@@ -2,8 +2,8 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/importAccountFragment"
-    android:id="@+id/import_nav_graph">
+    android:id="@+id/import_nav_graph"
+    app:startDestination="@id/importAccountFragment">
 
     <fragment
         android:id="@+id/importAccountFragment"
@@ -18,7 +18,7 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/welcomeFragment"
+            app:popUpTo="@id/root_nav_graph"
             app:popUpToInclusive="true">
 
         </action>
@@ -33,9 +33,9 @@
 
     <fragment
         android:id="@+id/advancedEncryptionFragment"
-        tools:layout="@layout/fragment_advanced_encryption"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment"
-        android:label="AdvancedEncryptionFragment" />
+        android:label="AdvancedEncryptionFragment"
+        tools:layout="@layout/fragment_advanced_encryption" />
 
     <action
         android:id="@+id/action_open_advancedEncryptionFragment"

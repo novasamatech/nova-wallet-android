@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVari
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
@@ -150,6 +152,10 @@ class Navigator(
         }
     }
 
+    override fun openAdvancedSettings(payload: AdvancedEncryptionModePayload) {
+        navController?.navigate(R.id.action_open_advancedEncryptionFragment, AdvancedEncryptionFragment.getBundle(payload))
+    }
+
     override fun openConfirmMnemonicOnCreate(confirmMnemonicPayload: ConfirmMnemonicPayload) {
         val bundle = ConfirmMnemonicFragment.getBundle(confirmMnemonicPayload)
 
@@ -160,13 +166,13 @@ class Navigator(
     }
 
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
-        val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
-            R.id.welcomeFragment -> R.id.action_welcomeFragment_to_import_nav_graph
-            R.id.accountDetailsFragment -> R.id.action_accountDetailsFragment_to_import_nav_graph
-            else -> throw IllegalArgumentException("Unknown current destination to open import account screen: $currentDestinationId")
+        val currentDestination = navController?.currentDestination ?: return
+        val actionId = when (currentDestination.id) {
+            // Wee need the slpash fragment case to close app if we use back navigation in import mnemonic screen
+            R.id.splashFragment -> R.id.action_splashFragment_to_import_nav_graph
+            else -> R.id.action_import_nav_graph
         }
-
-        navController?.navigate(destination, ImportAccountFragment.getBundle(payload))
+        navController?.navigate(actionId, ImportAccountFragment.getBundle(payload))
     }
 
     override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {
@@ -345,6 +351,8 @@ class Navigator(
     }
 
     override fun openStaking() {
+        if (navController?.currentDestination?.id != R.id.mainFragment) navController?.navigate(R.id.action_open_main)
+
         stakingDashboardDelegate.openStakingDashboard()
     }
 

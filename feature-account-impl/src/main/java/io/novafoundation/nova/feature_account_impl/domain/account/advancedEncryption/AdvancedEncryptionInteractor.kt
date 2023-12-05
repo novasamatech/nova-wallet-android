@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption
 
-import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.derivationPath
 import io.novafoundation.nova.common.data.secrets.v2.ethereumDerivationPath
 import io.novafoundation.nova.common.data.secrets.v2.substrateDerivationPath
-import io.novafoundation.nova.common.utils.DEFAULT_DERIVATION_PATH
 import io.novafoundation.nova.common.utils.fold
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.disabledInput
@@ -14,21 +12,15 @@ import io.novafoundation.nova.common.utils.input.unmodifiableInput
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryptionInput
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.chainAccountFor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.chainIdOrNull
-import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
-import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
-
-private val DEFAULT_SUBSTRATE_ENCRYPTION = mapEncryptionToCryptoType(EncryptionType.SR25519)
-private val ETHEREUM_ENCRYPTION = mapEncryptionToCryptoType(MultiChainEncryption.Ethereum.encryptionType)
-
-private const val DEFAULT_SUBSTRATE_DERIVATION_PATH = ""
-private val ETHEREUM_DEFAULT_DERIVATION_PATH = BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH
 
 private typealias DerivationPathModifier = String?.() -> Input<String>
 
@@ -36,16 +28,28 @@ class AdvancedEncryptionInteractor(
     private val accountRepository: AccountRepository,
     private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
+    private val encryptionDefaults: EncryptionDefaults
 ) {
 
     fun getCryptoTypes(): List<CryptoType> {
         return accountRepository.getEncryptionTypes()
     }
 
-    suspend fun getInitialInputState(payload: AdvancedEncryptionPayload): AdvancedEncryptionInput {
+    suspend fun getRecommendedAdvancedEncryption(): AdvancedEncryption {
+        return AdvancedEncryption(
+            substrateCryptoType = encryptionDefaults.substrateCryptoType,
+            ethereumCryptoType = encryptionDefaults.ethereumCryptoType,
+            derivationPaths = AdvancedEncryption.DerivationPaths(
+                substrate = encryptionDefaults.substrateDerivationPath,
+                ethereum = encryptionDefaults.ethereumDerivationPath
+            )
+        )
+    }
+
+    suspend fun getInitialInputState(payload: AdvancedEncryptionModePayload): AdvancedEncryptionInput {
         return when (payload) {
-            is AdvancedEncryptionPayload.Change -> getChangeInitialInputState(payload.addAccountPayload.chainIdOrNull)
-            is AdvancedEncryptionPayload.View -> getViewInitialInputState(payload.metaAccountId, payload.chainId, payload.hideDerivationPaths)
+            is AdvancedEncryptionModePayload.Change -> getChangeInitialInputState(payload.addAccountPayload.chainIdOrNull)
+            is AdvancedEncryptionModePayload.View -> getViewInitialInputState(payload.metaAccountId, payload.chainId, payload.hideDerivationPaths)
         }
     }
 
@@ -67,7 +71,7 @@ class AdvancedEncryptionInteractor(
                     AdvancedEncryptionInput(
                         substrateCryptoType = disabledInput(),
                         substrateDerivationPath = disabledInput(),
-                        ethereumCryptoType = ETHEREUM_ENCRYPTION.asReadOnlyInput(),
+                        ethereumCryptoType = encryptionDefaults.ethereumCryptoType.asReadOnlyInput(),
                         ethereumDerivationPath = metaAccountSecrets.ethereumDerivationPath.derivationPathModifier()
                     )
                 } else {
@@ -84,7 +88,7 @@ class AdvancedEncryptionInteractor(
                     AdvancedEncryptionInput(
                         substrateCryptoType = disabledInput(),
                         substrateDerivationPath = disabledInput(),
-                        ethereumCryptoType = ETHEREUM_ENCRYPTION.asReadOnlyInput(),
+                        ethereumCryptoType = encryptionDefaults.ethereumCryptoType.asReadOnlyInput(),
                         ethereumDerivationPath = chainAccountSecrets.derivationPath.derivationPathModifier()
                     )
                 } else {
@@ -108,23 +112,23 @@ class AdvancedEncryptionInteractor(
             AdvancedEncryptionInput(
                 substrateCryptoType = disabledInput(),
                 substrateDerivationPath = disabledInput(),
-                ethereumCryptoType = ETHEREUM_ENCRYPTION.unmodifiableInput(),
-                ethereumDerivationPath = ETHEREUM_DEFAULT_DERIVATION_PATH.modifiableInput()
+                ethereumCryptoType = encryptionDefaults.ethereumCryptoType.unmodifiableInput(),
+                ethereumDerivationPath = encryptionDefaults.ethereumDerivationPath.modifiableInput()
             )
         } else { // Substrate Chain Account
             AdvancedEncryptionInput(
-                substrateCryptoType = DEFAULT_SUBSTRATE_ENCRYPTION.modifiableInput(),
-                substrateDerivationPath = DEFAULT_SUBSTRATE_DERIVATION_PATH.modifiableInput(),
+                substrateCryptoType = encryptionDefaults.substrateCryptoType.modifiableInput(),
+                substrateDerivationPath = encryptionDefaults.substrateDerivationPath.modifiableInput(),
                 ethereumCryptoType = disabledInput(),
                 ethereumDerivationPath = disabledInput()
             )
         }
     } else { // MetaAccount
         AdvancedEncryptionInput(
-            substrateCryptoType = DEFAULT_SUBSTRATE_ENCRYPTION.modifiableInput(),
-            substrateDerivationPath = DEFAULT_SUBSTRATE_DERIVATION_PATH.modifiableInput(),
-            ethereumCryptoType = ETHEREUM_ENCRYPTION.unmodifiableInput(),
-            ethereumDerivationPath = ETHEREUM_DEFAULT_DERIVATION_PATH.modifiableInput()
+            substrateCryptoType = encryptionDefaults.substrateCryptoType.modifiableInput(),
+            substrateDerivationPath = encryptionDefaults.substrateDerivationPath.modifiableInput(),
+            ethereumCryptoType = encryptionDefaults.ethereumCryptoType.unmodifiableInput(),
+            ethereumDerivationPath = encryptionDefaults.ethereumDerivationPath.modifiableInput()
         )
     }
 

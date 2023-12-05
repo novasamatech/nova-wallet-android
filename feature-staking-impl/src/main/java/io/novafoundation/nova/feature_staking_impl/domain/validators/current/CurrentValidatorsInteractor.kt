@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.controller
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.validators.getValidators
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +39,7 @@ class CurrentValidatorsInteractor(
 
     suspend fun nominatedValidatorsFlow(
         nominatorState: StakingState.Stash,
+        activeStake: Balance,
         scope: CoroutineScope,
     ): Flow<GroupedList<Status.Group, NominatedValidator>> {
         if (nominatorState !is StakingState.Stash.Nominator) {
@@ -97,7 +99,7 @@ class CurrentValidatorsInteractor(
             val electedGroup = Status.Group.Active(totalElectiveCount)
 
             val waitingForNextEraGroup = Status.Group.WaitingForNextEra(
-                maxValidatorsPerNominator = stakingConstantsRepository.maxValidatorsPerNominator(chainId),
+                maxValidatorsPerNominator = stakingConstantsRepository.maxValidatorsPerNominator(chainId, activeStake),
                 numberOfValidators = groupedByStatusClass.groupSize(Status.WaitingForNextEra::class)
             )
 

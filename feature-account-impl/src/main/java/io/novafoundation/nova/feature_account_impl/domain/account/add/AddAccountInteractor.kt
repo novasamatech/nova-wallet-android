@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
 import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
-import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryption
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 
 class AddAccountInteractor(
     private val addAccountRepository: AddAccountRepository,

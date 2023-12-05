@@ -8,11 +8,10 @@ import io.novafoundation.nova.common.data.secrets.v2.mapKeypairStructToKeypair
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.deriveSeed32
 import io.novafoundation.nova.core.model.CryptoType
+import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.SubstrateJunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
@@ -144,9 +143,8 @@ class AccountSecretsFactory(
 
     private fun decodeDerivationPath(derivationPath: String?, ethereum: Boolean): JunctionDecoder.DecodeResult? {
         return when {
-            derivationPath.isNullOrEmpty() -> null
-            ethereum -> BIP32JunctionDecoder.decode(derivationPath)
-            else -> SubstrateJunctionDecoder.decode(derivationPath)
+            ethereum -> DerivationPathDecoder.decodeEthereumDerivationPath(derivationPath)
+            else -> DerivationPathDecoder.decodeSubstrateDerivationPath(derivationPath)
         }
     }
 }

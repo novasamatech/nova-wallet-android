@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption
+package io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption
 
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.core.model.CryptoType

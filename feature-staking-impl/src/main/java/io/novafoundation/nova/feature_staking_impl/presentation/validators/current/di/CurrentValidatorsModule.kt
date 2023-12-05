@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validators.current.Cur
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.CurrentValidatorsViewModel
-import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 
 @Module(includes = [ViewModelModule::class])
 class CurrentValidatorsModule {
@@ -33,7 +33,7 @@ class CurrentValidatorsModule {
         setupStakingSharedState: SetupStakingSharedState,
         router: StakingRouter,
         selectedAssetState: StakingSharedState,
-        tokenUseCase: TokenUseCase,
+        assetUseCase: AssetUseCase,
         validationExecutor: ValidationExecutor
     ): ViewModel {
         return CurrentValidatorsViewModel(
@@ -44,8 +44,8 @@ class CurrentValidatorsModule {
             currentValidatorsInteractor = currentValidatorsInteractor,
             setupStakingSharedState = setupStakingSharedState,
             selectedAssetState = selectedAssetState,
-            tokenUseCase = tokenUseCase,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            assetUseCase = assetUseCase,
         )
     }
 

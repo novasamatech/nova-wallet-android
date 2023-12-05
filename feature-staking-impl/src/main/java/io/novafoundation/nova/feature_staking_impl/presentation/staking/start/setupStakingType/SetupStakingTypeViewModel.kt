@@ -199,7 +199,7 @@ class SetupStakingTypeViewModel(
 
     private suspend fun getEnteredAmount(): BigInteger? {
         return currentSelectionStoreProvider.getSelectionStore(viewModelScope)
-            .currentSelection
+            .getCurrentSelection()
             ?.selection
             ?.stake
     }

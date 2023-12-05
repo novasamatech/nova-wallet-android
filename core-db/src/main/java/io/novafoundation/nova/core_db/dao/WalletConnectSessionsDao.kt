@@ -4,39 +4,30 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import io.novafoundation.nova.core_db.model.WalletConnectSessionAccountLocal
+import io.novafoundation.nova.core_db.model.WalletConnectPairingLocal
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WalletConnectSessionsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSession(session: WalletConnectSessionAccountLocal)
+    suspend fun insertPairing(pairing: WalletConnectPairingLocal)
 
-    @Query("DELETE FROM wallet_connect_sessions WHERE sessionTopic = :sessionTopic")
-    suspend fun deleteSession(sessionTopic: String)
+    @Query("DELETE FROM wallet_connect_pairings WHERE pairingTopic = :pairingTopic")
+    suspend fun deletePairing(pairingTopic: String)
 
-    @Query("SELECT * FROM wallet_connect_sessions WHERE sessionTopic = :sessionTopic")
-    suspend fun getSession(sessionTopic: String): WalletConnectSessionAccountLocal?
+    @Query("SELECT * FROM wallet_connect_pairings WHERE pairingTopic = :pairingTopic")
+    suspend fun getPairing(pairingTopic: String): WalletConnectPairingLocal?
 
-    @Query("SELECT * FROM wallet_connect_sessions WHERE sessionTopic = :sessionTopic")
-    fun sessionFlow(sessionTopic: String): Flow<WalletConnectSessionAccountLocal?>
+    @Query("SELECT * FROM wallet_connect_pairings WHERE pairingTopic = :pairingTopic")
+    fun pairingFlow(pairingTopic: String): Flow<WalletConnectPairingLocal?>
 
-    @Query("DELETE FROM wallet_connect_sessions WHERE sessionTopic NOT IN (:sessionTopics)")
-    suspend fun removeAllSessionsOtherThan(sessionTopics: List<String>)
+    @Query("DELETE FROM wallet_connect_pairings WHERE pairingTopic NOT IN (:pairingTopics)")
+    suspend fun removeAllPairingsOtherThan(pairingTopics: List<String>)
 
-    @Query("SELECT * FROM wallet_connect_sessions")
-    fun allSessionsFlow(): Flow<List<WalletConnectSessionAccountLocal>>
+    @Query("SELECT * FROM wallet_connect_pairings")
+    fun allPairingsFlow(): Flow<List<WalletConnectPairingLocal>>
 
-    @Query("SELECT * FROM wallet_connect_sessions WHERE metaId = :metaId")
-    fun sessionsByMetaIdFlow(metaId: Long): Flow<List<WalletConnectSessionAccountLocal>>
-
-    @Query("SELECT COUNT(*) FROM wallet_connect_sessions")
-    fun numberOfSessionsFlow(): Flow<Int>
-
-    @Query("SELECT COUNT(*) FROM wallet_connect_sessions WHERE metaId = :metaId")
-    fun numberOfSessionsFlow(metaId: Long): Flow<Int>
-
-    @Query("SELECT COUNT(*) FROM wallet_connect_sessions")
-    suspend fun numberOfSessions(): Int
+    @Query("SELECT * FROM wallet_connect_pairings WHERE metaId = :metaId")
+    fun pairingsByMetaIdFlow(metaId: Long): Flow<List<WalletConnectPairingLocal>>
 }

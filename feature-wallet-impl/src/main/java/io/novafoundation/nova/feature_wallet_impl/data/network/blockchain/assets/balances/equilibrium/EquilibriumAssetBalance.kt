@@ -24,6 +24,8 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.model.AssetLocal
+import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
+import io.novafoundation.nova.core_db.model.AssetLocal.TransferableModeLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
@@ -140,16 +142,18 @@ class EquilibriumAssetBalance(
             val reservedByAssetId = reservedBalancesWithBlocks.associateBy { it.assetId }
 
             val diff = assetCache.updateAssetsByChain(metaAccount, chain) { asset: Chain.Asset ->
-                val free = freeByAssetId[asset.id]?.balance
-                val reserved = reservedByAssetId[asset.id]?.reservedBalance
-                val locks = if (asset.isUtilityAsset) assetBalances.lock else BigInteger.ZERO
+                val free = freeByAssetId[asset.id]?.balance.orZero()
+                val reserved = reservedByAssetId[asset.id]?.reservedBalance.orZero()
+                val locks = if (asset.isUtilityAsset) assetBalances.lock.orZero() else BigInteger.ZERO
                 AssetLocal(
                     assetId = asset.id,
                     chainId = asset.chainId,
                     metaId = metaAccount.id,
-                    freeInPlanks = free.orZero(),
-                    reservedInPlanks = reserved.orZero(),
-                    frozenInPlanks = locks.orZero(),
+                    freeInPlanks = free,
+                    reservedInPlanks = reserved,
+                    frozenInPlanks = locks,
+                    transferableMode = TransferableModeLocal.REGULAR,
+                    edCountingMode = EDCountingModeLocal.TOTAL,
                     redeemableInPlanks = BigInteger.ZERO,
                     bondedInPlanks = BigInteger.ZERO,
                     unbondingInPlanks = BigInteger.ZERO

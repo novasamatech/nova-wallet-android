@@ -35,7 +35,7 @@ private class ConfirmGovernanceUnlockHintsMixin(
 ) : HintsMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
 
     override val hintsFlow: Flow<List<CharSequence>> = remainsLockedInfoFlow.map { remainsLockedInfo ->
-        if (remainsLockedInfo != null) {
+        if (remainsLockedInfo != null && remainsLockedInfo.lockedInIds.isNotEmpty()) {
             listOf(remainsLockedHint(assetFlow.first(), remainsLockedInfo))
         } else {
             emptyList()
