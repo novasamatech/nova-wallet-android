@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,6 +19,7 @@ import io.novafoundation.nova.common.utils.mapNullable
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
@@ -65,8 +69,11 @@ import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.selectedChainFlow
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -86,6 +93,8 @@ class ReferendumDetailsViewModel(
     val markwon: Markwon,
     private val validationSystem: ReferendumPreVoteValidationSystem,
     private val validationExecutor: ValidationExecutor,
+    private val updateSystem: UpdateSystem,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -93,15 +102,18 @@ class ReferendumDetailsViewModel(
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
     private val selectedChainFlow = selectedAssetSharedState.selectedChainFlow()
 
-    private val referendumDetailsFlow = flowOfAll {
+    private val optionalReferendumDetailsFlow = flowOfAll {
         val account = selectedAccount.first()
         val selectedGovernanceOption = selectedAssetSharedState.selectedOption()
         val voterAccountId = account.accountIdIn(selectedGovernanceOption.assetWithChain.chain)
 
         interactor.referendumDetailsFlow(payload.toReferendumId(), selectedGovernanceOption, voterAccountId)
-    }
-        .inBackground()
+    }.inBackground()
         .shareWhileSubscribed()
+
+    private val referendumDetailsFlow = optionalReferendumDetailsFlow
+        .filterNotNull()
+        .shareInBackground()
 
     private val proposerFlow = referendumDetailsFlow.map { it.proposer }
     private val proposerIdentityProvider = governanceIdentityProviderFactory.proposerProvider(proposerFlow)
@@ -156,6 +168,20 @@ class ReferendumDetailsViewModel(
     }
         .mapList(::mapGovernanceDAppToUi)
         .shareInBackground()
+
+    val referendumNotAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
+
+    init {
+        optionalReferendumDetailsFlow
+            .onEach {
+                if (it == null) {
+                    showErrorAndCloseScreen()
+                }
+            }.launchIn(this)
+
+        updateSystem.start()
+            .launchIn(this)
+    }
 
     fun backClicked() {
         router.back()
@@ -267,6 +293,7 @@ class ReferendumDetailsViewModel(
                     PreparingReason.WaitingForDeposit -> R.string.referendum_timeline_state_waiting_deposit
                 }
             }
+
             is ReferendumStatus.Ongoing.Confirming -> R.string.referendum_timeline_state_passing
             is ReferendumStatus.Ongoing.Deciding -> R.string.referendum_timeline_state_deciding
             is ReferendumStatus.Ongoing.InQueue -> R.string.referendum_timeline_state_in_queue
@@ -311,11 +338,13 @@ class ReferendumDetailsViewModel(
                 voteTypeRes = R.string.referendum_vote_aye,
                 votesValue = formatVotesAmount(voting.approval.ayeVotes.amount, chainAsset)
             )
+
             VoteType.NAY -> VotersModel(
                 voteTypeColorRes = R.color.nay_indicator,
                 voteTypeRes = R.string.referendum_vote_nay,
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )
+
             VoteType.ABSTAIN -> null
         }
     }
@@ -418,5 +447,14 @@ class ReferendumDetailsViewModel(
                 addAccountDescriptionRes = R.string.referendum_missing_account_message
             )
         }
+    }
+
+    private suspend fun showErrorAndCloseScreen() {
+        val confirmationInfo = ConfirmationDialogInfo.titleAndButton(
+            title = R.string.referendim_details_not_found_title,
+            button = R.string.common_ok,
+        )
+        referendumNotAwaitableAction.awaitAction(confirmationInfo)
+        router.back()
     }
 }

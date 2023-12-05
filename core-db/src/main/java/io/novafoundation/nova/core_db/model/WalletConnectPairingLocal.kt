@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Entity(
-    tableName = "wallet_connect_sessions",
+    tableName = "wallet_connect_pairings",
     foreignKeys = [
         ForeignKey(
             parentColumns = ["id"],
@@ -17,9 +17,9 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ),
     ]
 )
-class WalletConnectSessionAccountLocal(
+class WalletConnectPairingLocal(
     @PrimaryKey
-    val sessionTopic: String,
+    val pairingTopic: String,
     @ColumnInfo(index = true)
     val metaId: Long
 )

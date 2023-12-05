@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.asGsonParsedIntOrNull
 import io.novafoundation.nova.common.utils.asGsonParsedLongOrNull
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
@@ -28,6 +29,7 @@ private const val CHAIN_THEME_COLOR = "themeColor"
 private const val CHAIN_STAKING_WIKI = "stakingWiki"
 private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
 private const val RELAYCHAIN_AS_NATIVE = "relaychainAsNative"
+private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -47,7 +49,8 @@ fun mapRemoteChainToLocal(
             themeColor = (it[CHAIN_THEME_COLOR] as? String),
             stakingWiki = (it[CHAIN_STAKING_WIKI] as? String),
             defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull(),
-            relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean
+            relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
+            stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
         )
     }
 

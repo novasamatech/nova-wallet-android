@@ -77,8 +77,8 @@ internal class RealWalletConnectService(
     }
 
     private suspend fun handleSessionRequest(sessionRequest: Wallet.Model.SessionRequest) {
-        val sdkSession = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: run { respondNoSession(sessionRequest); return }
-        val appSession = interactor.getSessionAccount(sessionRequest.topic) ?: run { respondNoSession(sessionRequest); return }
+        val sdkSession = interactor.getSession(sessionRequest.topic) ?: run { respondNoSession(sessionRequest); return }
+        val appPairing = interactor.getPairingAccount(sdkSession.pairingTopic) ?: run { respondNoSession(sessionRequest); return }
 
         val walletConnectRequest = interactor.parseSessionRequest(sessionRequest)
             .onFailure { error ->
@@ -94,7 +94,7 @@ internal class RealWalletConnectService(
                 ExternalSignPayload(
                     signRequest = walletConnectRequest.toExternalSignRequest(),
                     dappMetadata = mapWalletConnectSessionToSignDAppMetadata(sdkSession),
-                    wallet = ExternalSignWallet.WithId(appSession.metaId)
+                    wallet = ExternalSignWallet.WithId(appPairing.metaId)
                 )
             )
         }

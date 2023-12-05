@@ -7,18 +7,20 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryptionModel
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
+import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncryptionSelectionStoreProvider
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionRequester
-import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionPayload
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.spacedWords
-import io.novafoundation.nova.feature_account_impl.presentation.lastResponseOrDefault
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -30,9 +32,13 @@ class BackupMnemonicViewModel(
     private val router: AccountRouter,
     private val payload: BackupMnemonicPayload,
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor,
-    private val resourceManager: ResourceManager,
-    private val advancedEncryptionRequester: AdvancedEncryptionRequester
+    private val advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
+    private val resourceManager: ResourceManager
 ) : BaseViewModel() {
+
+    private val advancedEncryptionSelectionStore = async {
+        advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope)
+    }
 
     private val mnemonicFlow = flowOf {
         when (payload) {
@@ -76,11 +82,11 @@ class BackupMnemonicViewModel(
 
     fun optionsClicked() {
         val advancedEncryptionPayload = when (payload) {
-            is BackupMnemonicPayload.Confirm -> AdvancedEncryptionPayload.View(payload.metaAccountId, payload.chainId)
-            is BackupMnemonicPayload.Create -> AdvancedEncryptionPayload.Change(payload.addAccountPayload)
+            is BackupMnemonicPayload.Confirm -> AdvancedEncryptionModePayload.View(payload.metaAccountId, payload.chainId)
+            is BackupMnemonicPayload.Create -> AdvancedEncryptionModePayload.Change(payload.addAccountPayload)
         }
 
-        advancedEncryptionRequester.openRequest(advancedEncryptionPayload)
+        router.openAdvancedSettings(advancedEncryptionPayload)
     }
 
     fun warningAccepted() {
@@ -93,12 +99,13 @@ class BackupMnemonicViewModel(
 
     fun nextClicked() = launch {
         val createExtras = (payload as? BackupMnemonicPayload.Create)?.let {
-            val advancedEncryptionResponse = advancedEncryptionRequester.lastResponseOrDefault(it.addAccountPayload, advancedEncryptionInteractor)
+            val advancedEncryption = advancedEncryptionSelectionStore().getCurrentSelection()
+                ?: advancedEncryptionInteractor.getRecommendedAdvancedEncryption()
 
             CreateExtras(
                 accountName = it.newWalletName,
                 addAccountPayload = it.addAccountPayload,
-                advancedEncryptionPayload = advancedEncryptionResponse
+                advancedEncryptionModel = advancedEncryption.toAdvancedEncryptionModel()
             )
         }
 

@@ -34,6 +34,7 @@ internal class RealAutomaticInteractionGate : AutomaticInteractionGate, Coroutin
         initialCheck && backgroundCheck
     }
         .stateIn(this, SharingStarted.Eagerly, initialValue = false)
+
     override fun initialPinPassed() {
         initialPinPassed.value = true
     }

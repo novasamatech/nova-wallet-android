@@ -3,11 +3,16 @@ name: PR Workflow
 on:
   pull_request:
     branches:
-      - 'develop' # master
-
+      - 'master'
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+ 
 jobs:
   checkRef:
+    if: github.event.pull_request.base.ref == 'master' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    outputs:
+      is_rc: ${{ steps.check_ref.outputs.ref_contains_rc }}
     
     steps:
       - uses: actions/checkout@v2
@@ -15,7 +20,7 @@ jobs:
         id: check_ref
         run: |
           echo ${{ github.head_ref || github.ref_name }}
-          if [[ "${{ github.head_ref || github.ref_name }}" == *"/rc/"* ]]; then
+          if [[ "${{ github.head_ref || github.ref_name }}" == *"rc"* ]]; then
             echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
           else
             echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
@@ -25,19 +30,46 @@ jobs:
         run: |
           echo "Output: ${{ steps.check_ref.outputs.ref_contains_rc }}"
 
-  build:
+  make-or-update-pr:
     runs-on: ubuntu-latest
+    permissions: write-all
+    needs: checkRef
+    if: needs.checkRef.outputs.is_rc == '1'
 
     steps:
-      - name: Check if comment contains "Release notes"
-        if: github.ref == 'refs/heads/master'
-        uses: actions/github-script@v4
+      - uses: actions/checkout@v4
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: fc
         with:
-          script: |
-            const comment = github.event.pull_request.comments.find(c => c.body.includes('Release notes'));
-            if (!comment) {
-              console.log('No comment found with "Release notes"');
-              throw new Error('Missing release notes');
-            } else {
-              console.log('Comment found with "Release notes"');
-            }
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: Release notes
+
+      - name: Create comment link
+        id: create_link
+        run: |
+          echo "COMMENT_LINK=https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ steps.fc.outputs.comment-id }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Extract version from branch name
+        id: extract_version
+        run: |
+          VERSION=${{ github.head_ref }}
+          echo "::set-output name=version::${VERSION#*rc/}"
+
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.PR_APP_ID }}
+          private_key: ${{ secrets.PR_APP_TOKEN }}
+
+      - name: Run Python script
+        run: python .github/scripts/pr_comment_extract_data.py
+
+      - name: Create new branch and file in nova-wallet-android-releases repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          repository: novasamatech/nova-wallet-android-releases
+          event-type: create-pr
+          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "comment_link": "${{ env.COMMENT_LINK }}", "time": "${{ env.TIME }}", "severity": "${{ env.SEVERITY }}"}'

@@ -17,8 +17,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
+import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncryptionSelectionStoreProvider
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.AccountNameChooserFactory
 import io.novafoundation.nova.feature_account_impl.presentation.importing.FileReader
@@ -32,14 +32,14 @@ class ImportAccountModule {
     fun provideImportSourceFactory(
         addAccountInteractor: AddAccountInteractor,
         clipboardManager: ClipboardManager,
-        advancedEncryptionRequester: AdvancedEncryptionCommunicator,
+        advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
         fileReader: FileReader,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     ) = ImportSourceFactory(
         addAccountInteractor = addAccountInteractor,
         clipboardManager = clipboardManager,
         advancedEncryptionInteractor = advancedEncryptionInteractor,
-        advancedEncryptionRequester = advancedEncryptionRequester,
+        advancedEncryptionSelectionStoreProvider = advancedEncryptionSelectionStoreProvider,
         fileReader = fileReader
     )
 
@@ -62,7 +62,6 @@ class ImportAccountModule {
         router: AccountRouter,
         resourceManager: ResourceManager,
         accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
-        advancedEncryptionRequester: AdvancedEncryptionCommunicator,
         importSourceFactory: ImportSourceFactory,
         payload: ImportAccountPayload,
     ): ViewModel {
@@ -71,7 +70,6 @@ class ImportAccountModule {
             router,
             resourceManager,
             accountNameChooserFactory,
-            advancedEncryptionRequester,
             payload,
             importSourceFactory
         )

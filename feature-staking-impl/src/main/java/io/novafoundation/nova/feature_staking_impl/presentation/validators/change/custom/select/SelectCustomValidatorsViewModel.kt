@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.model.ContinueButtonState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class SelectCustomValidatorsViewModel(
@@ -91,8 +93,8 @@ class SelectCustomValidatorsViewModel(
     private val selectedValidators = MutableStateFlow(emptySet<SetItem<Validator>>())
 
     private val maxSelectedValidatorsFlow = flowOf {
-        interactor.maxValidatorsPerNominator()
-    }.share()
+        interactor.maxValidatorsPerNominator(setupStakingSharedState.activeStake())
+    }.shareInBackground()
 
     val validatorModelsFlow = combine(
         shownValidators,
@@ -136,6 +138,7 @@ class SelectCustomValidatorsViewModel(
     }.inBackground().share()
 
     val fillWithRecommendedEnabled = selectedValidators.map { it.size < maxSelectedValidatorsFlow.first() }
+        .onStart { emit(false) }
         .share()
 
     val clearFiltersEnabled = recommendationSettingsFlow.map { it.customEnabledFilters.isNotEmpty() || it.postProcessors.isNotEmpty() }
@@ -205,7 +208,9 @@ class SelectCustomValidatorsViewModel(
 
     fun fillRestWithRecommended() {
         mutateSelected { selected ->
-            val recommended = recommendator().recommendations(recommendationSettingsProvider().defaultSettings())
+            val maxValidatorsPerNominator = maxSelectedValidatorsFlow.first()
+            val defaultSettings = recommendationSettingsProvider().defaultSettings(maxValidatorsPerNominator)
+            val recommended = recommendator().recommendations(defaultSettings)
 
             val missingFromRecommended = recommended.asSetItems() - selected
             val neededToFill = maxSelectedValidatorsFlow.first() - selected.size

@@ -128,6 +128,10 @@ class AccountRepositoryImpl(
         return accountDataSource.allMetaAccounts()
     }
 
+    override suspend fun hasMetaAccounts(): Boolean {
+        return accountDataSource.hasMetaAccounts()
+    }
+
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
         return accountDataSource.allLightMetaAccounts()
     }

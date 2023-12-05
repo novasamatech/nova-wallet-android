@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignC
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
@@ -112,7 +111,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
         fun create(
             @BindsInstance accountRouter: AccountRouter,
-            @BindsInstance advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
             @BindsInstance polkadotVaultSignInterScreenCommunicator: PolkadotVaultVariantSignCommunicator,
             @BindsInstance ledgerSignInterScreenCommunicator: LedgerSignCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,

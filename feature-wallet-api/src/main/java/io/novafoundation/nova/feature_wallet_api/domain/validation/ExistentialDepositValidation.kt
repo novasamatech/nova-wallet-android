@@ -9,7 +9,7 @@ import java.math.BigDecimal
 typealias ExistentialDepositError<E, P> = (remainingAmount: BigDecimal, payload: P) -> E
 
 class ExistentialDepositValidation<P, E>(
-    private val totalBalanceProducer: AmountProducer<P>,
+    private val countableTowardsEdBalance: AmountProducer<P>,
     private val feeProducer: AmountProducer<P>,
     private val extraAmountProducer: AmountProducer<P>,
     private val errorProducer: ExistentialDepositError<E, P>,
@@ -19,11 +19,11 @@ class ExistentialDepositValidation<P, E>(
     override suspend fun validate(value: P): ValidationStatus<E> {
         val existentialDeposit = existentialDeposit(value)
 
-        val totalBalance = totalBalanceProducer(value)
+        val countableTowardsEd = countableTowardsEdBalance(value)
         val fee = feeProducer(value)
         val extraAmount = extraAmountProducer(value)
 
-        val remainingAmount = totalBalance - fee - extraAmount
+        val remainingAmount = countableTowardsEd - fee - extraAmount
 
         return validOrWarning(remainingAmount >= existentialDeposit) {
             errorProducer(remainingAmount, value)
@@ -32,14 +32,14 @@ class ExistentialDepositValidation<P, E>(
 }
 
 fun <P, E> ValidationSystemBuilder<P, E>.doNotCrossExistentialDeposit(
-    totalBalance: AmountProducer<P>,
+    countableTowardsEdBalance: AmountProducer<P>,
     fee: AmountProducer<P> = { BigDecimal.ZERO },
     extraAmount: AmountProducer<P> = { BigDecimal.ZERO },
     existentialDeposit: AmountProducer<P>,
     error: ExistentialDepositError<E, P>,
 ) = validate(
     ExistentialDepositValidation(
-        totalBalanceProducer = totalBalance,
+        countableTowardsEdBalance = countableTowardsEdBalance,
         feeProducer = fee,
         extraAmountProducer = extraAmount,
         errorProducer = error,
