@@ -49,6 +49,8 @@ interface AccountDataSource : SecretStoreV1 {
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
+    fun activeMetaAccountsFlow(): Flow<List<MetaAccount>>
+
     fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
 
     fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>>

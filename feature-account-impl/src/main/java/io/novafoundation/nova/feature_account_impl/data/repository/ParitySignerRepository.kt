@@ -32,9 +32,11 @@ class RealParitySignerRepository(
             ethereumPublicKey = null,
             ethereumAddress = null,
             name = name,
+            parentMetaId = null,
             isSelected = false,
             position = accountDao.nextAccountPosition(),
-            type = variant.asMetaAccountTypeLocal()
+            type = variant.asMetaAccountTypeLocal(),
+            status = MetaAccountLocal.Status.ACTIVE
         )
 
         return accountDao.insertMetaAccount(metaAccount)

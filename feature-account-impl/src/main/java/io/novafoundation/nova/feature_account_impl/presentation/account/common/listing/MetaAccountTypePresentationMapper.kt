@@ -32,7 +32,10 @@ class MetaAccountTypePresentationMapper(
                 title = resourceManager.getString(R.string.common_ledger)
             )
 
-            LightMetaAccount.Type.PROXIED -> null // TODO Add icon for proxy account
+            LightMetaAccount.Type.PROXIED -> ChipLabelModel(
+                iconRes = R.drawable.ic_proxy,
+                title = resourceManager.getString(R.string.account_proxieds)
+            )
         }
     }
 }

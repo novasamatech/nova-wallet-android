@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.managem
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.dialog.warningDialog
@@ -11,11 +12,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_accounts.accountListToolbar
 import kotlinx.android.synthetic.main.fragment_accounts.accountsList
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
 
 class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), AccountsAdapter.AccountItemHandler {
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     private lateinit var adapter: AccountsAdapter
 
@@ -26,7 +31,7 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), Accoun
     ) = layoutInflater.inflate(R.layout.fragment_accounts, container, false)
 
     override fun initViews() {
-        adapter = AccountsAdapter(this, initialMode = viewModel.mode.value)
+        adapter = AccountsAdapter(this, imageLoader, initialMode = viewModel.mode.value)
 
         accountsList.setHasFixedSize(true)
         accountsList.adapter = adapter

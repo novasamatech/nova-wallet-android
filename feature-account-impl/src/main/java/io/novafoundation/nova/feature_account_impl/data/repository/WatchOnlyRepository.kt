@@ -61,9 +61,11 @@ class RealWatchOnlyRepository(
             ethereumPublicKey = null,
             ethereumAddress = ethereumAccountId,
             name = name,
+            parentMetaId = null,
             isSelected = false,
             position = accountDao.nextAccountPosition(),
-            type = MetaAccountLocal.Type.WATCH_ONLY
+            type = MetaAccountLocal.Type.WATCH_ONLY,
+            status = MetaAccountLocal.Status.ACTIVE
         )
 
         return accountDao.insertMetaAccount(metaAccount)

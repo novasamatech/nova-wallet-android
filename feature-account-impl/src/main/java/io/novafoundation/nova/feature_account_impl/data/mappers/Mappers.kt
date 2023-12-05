@@ -10,10 +10,12 @@ import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
+import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
@@ -38,21 +40,21 @@ fun mapCryptoTypeToCryptoTypeModel(
 ): CryptoTypeModel {
     val name = when (encryptionType) {
         CryptoType.SR25519 -> "${resourceManager.getString(R.string.sr25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.sr25519_selection_subtitle
-        )
+            resourceManager.getString(
+                R.string.sr25519_selection_subtitle
+            )
         }"
 
         CryptoType.ED25519 -> "${resourceManager.getString(R.string.ed25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.ed25519_selection_subtitle
-        )
+            resourceManager.getString(
+                R.string.ed25519_selection_subtitle
+            )
         }"
 
         CryptoType.ECDSA -> "${resourceManager.getString(R.string.ecdsa_selection_title)} ${
-        resourceManager.getString(
-            R.string.ecdsa_selection_subtitle
-        )
+            resourceManager.getString(
+                R.string.ecdsa_selection_subtitle
+            )
         }"
     }
 
@@ -127,11 +129,20 @@ fun mapMetaAccountLocalToMetaAccount(
         }
     ).filterNotNull()
 
+    val proxyAccount = joinedMetaAccountInfo.proxyAccountLocal?.let {
+        ProxyAccount(
+            metaId = it.proxyMetaId,
+            chainId = it.chainId,
+            proxiedAccountId = it.proxiedAccountId,
+            proxyType = mapProxyTypeToString(it.proxyType)
+        )
+    }
+
     return with(joinedMetaAccountInfo.metaAccount) {
         MetaAccount(
             id = id,
             chainAccounts = chainAccounts,
-            proxies = listOf(), // TODO
+            proxy = proxyAccount,
             substratePublicKey = substratePublicKey,
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substrateAccountId,
@@ -180,4 +191,18 @@ fun mapAddAccountPayloadToAddAccountType(
 fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
     null -> AccountNameChooserMixin.State.NoInput
     else -> AccountNameChooserMixin.State.Input(name)
+}
+
+private fun mapProxyTypeToString(proxyType: String): ProxyAccount.ProxyType {
+    return when (proxyType) {
+        "Any" -> ProxyAccount.ProxyType.Any
+        "NonTransfer" -> ProxyAccount.ProxyType.NonTransfer
+        "Governance" -> ProxyAccount.ProxyType.Governance
+        "Staking" -> ProxyAccount.ProxyType.Staking
+        "IdentityJudgement" -> ProxyAccount.ProxyType.IdentityJudgement
+        "CancelProxy" -> ProxyAccount.ProxyType.CancelProxy
+        "Auction" -> ProxyAccount.ProxyType.Auction
+        "NominationPools" -> ProxyAccount.ProxyType.NominationPools
+        else -> ProxyAccount.ProxyType.Other(proxyType)
+    }
 }

@@ -48,9 +48,11 @@ class RealLedgerRepository(
             ethereumPublicKey = null,
             ethereumAddress = null,
             name = name,
+            parentMetaId = null,
             isSelected = false,
             position = metaAccountDao.nextAccountPosition(),
-            type = MetaAccountLocal.Type.LEDGER
+            type = MetaAccountLocal.Type.LEDGER,
+            status = MetaAccountLocal.Status.ACTIVE
         )
 
         val metaId = metaAccountDao.insertMetaAndChainAccounts(metaAccount) { metaId ->
