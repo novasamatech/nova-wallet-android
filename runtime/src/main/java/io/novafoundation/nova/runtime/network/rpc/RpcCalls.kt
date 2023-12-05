@@ -20,6 +20,7 @@ import io.novafoundation.nova.runtime.extrinsic.asExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
@@ -137,7 +138,7 @@ class RpcCalls(
         return socketFor(chainId).executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
     }
 
-    private fun socketFor(chainId: ChainId) = chainRegistry.getConnection(chainId).socketService
+    private suspend fun socketFor(chainId: ChainId) = chainRegistry.getSocket(chainId)
 
     private fun bindPartialFee(decoded: Any?): FeeResponse {
         val asStruct = decoded.castToStruct()

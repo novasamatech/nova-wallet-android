@@ -30,6 +30,7 @@ data class Chain(
     val hasCrowdloans: Boolean,
     val governance: List<Governance>,
     val swap: List<Swap>,
+    val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
 ) : Identifiable {
@@ -183,6 +184,24 @@ data class Chain(
 
     enum class Swap {
         ASSET_CONVERSION
+    }
+
+    enum class ConnectionState {
+        /**
+         * Runtime sync is performed for the chain and the chain can be considered ready for any operation
+         */
+        FULL_SYNC,
+
+        /**
+         * Websocket connection is established for the chain, but runtime is not synced.
+         * Thus, only runtime-independent operations can be performed
+         */
+        LIGHT_SYNC,
+
+        /**
+         * Chain is completely disabled - it does not initialize websockets not allocates any other resources
+         */
+        DISABLED
     }
 
     override val identifier: String = id

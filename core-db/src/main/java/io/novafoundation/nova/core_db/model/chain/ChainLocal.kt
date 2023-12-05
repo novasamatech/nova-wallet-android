@@ -25,12 +25,17 @@ data class ChainLocal(
     val swap: String,
     val governance: String,
     val additional: String?,
+    val connectionState: ConnectionStateLocal,
     @ColumnInfo(defaultValue = NODE_SELECTION_STRATEGY_DEFAULT)
     val nodeSelectionStrategy: NodeSelectionStrategyLocal,
 ) : Identifiable {
 
     enum class NodeSelectionStrategyLocal {
         ROUND_ROBIN, UNIFORM, UNKNOWN
+    }
+
+    enum class ConnectionStateLocal {
+        FULL_SYNC, LIGHT_SYNC, DISABLED
     }
 
     object Default {

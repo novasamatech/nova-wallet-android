@@ -9,6 +9,7 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.ext.isFullSync
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -47,7 +48,7 @@ class ContributionsUpdateSystem(
     override fun start(): Flow<Updater.SideEffect> {
         return flowOfAll {
             chainRegistry.currentChains.mapLatest { chains ->
-                chains.filter { it.hasCrowdloans }
+                chains.filter { it.connectionState.isFullSync && it.hasCrowdloans }
             }.transformLatestDiffed {
                 emitAll(run(it))
             }

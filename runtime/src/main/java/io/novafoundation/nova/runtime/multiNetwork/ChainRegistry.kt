@@ -9,12 +9,17 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
+import io.novafoundation.nova.runtime.ext.isFullSync
+import io.novafoundation.nova.runtime.ext.level
 import io.novafoundation.nova.runtime.ext.requiresBaseTypes
 import io.novafoundation.nova.runtime.ext.typesUsage
 import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainLocalToChain
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapConnectionStateToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ConnectionState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -34,13 +39,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-
-data class ChainService(
-    val runtimeProvider: RuntimeProvider,
-    val connection: ChainConnection
-)
 
 data class ChainWithAsset(
     val chain: Chain,
@@ -64,7 +65,7 @@ class ChainRegistry(
         .mapList { mapChainLocalToChain(it, gson) }
         .diffed()
         .map { diff ->
-            diff.removed.forEach { unregisterChain(it.id) }
+            diff.removed.forEach { unregisterChain(it) }
             diff.newOrUpdated.forEach { chain -> registerChain(chain) }
 
             diff.all
@@ -84,17 +85,48 @@ class ChainRegistry(
         syncBaseTypesIfNeeded()
     }
 
-    fun getConnection(chainId: String): ChainConnection = connectionPool.getConnection(chainId.removeHexPrefix())
+    suspend fun getConnection(chainId: String): ChainConnection {
+        requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
-    fun getConnectionOrNull(chainId: String): ChainConnection? = connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
+        return connectionPool.getConnection(chainId.removeHexPrefix())
+    }
 
-    fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
+    suspend fun getConnectionOrNull(chainId: String): ChainConnection? {
+        requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
-    fun getEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
+        return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
+    }
+
+    suspend fun getEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
+        requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
+
         return web3ApiPool.getWeb3Api(chainId, connectionType)
     }
 
+    suspend fun getRuntimeProvider(chainId: String): RuntimeProvider {
+        requireConnectionStateAtLeast(chainId, ConnectionState.FULL_SYNC)
+
+        return runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
+    }
+
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
+
+    suspend fun enableFullSync(chainId: ChainId) {
+        chainDao.setConnectionState(chainId, ConnectionStateLocal.FULL_SYNC)
+    }
+
+    private suspend fun requireConnectionStateAtLeast(chainId: ChainId, state: ConnectionState) {
+        val chain = getChain(chainId)
+
+        if (chain.connectionState.level >= state.level) return
+
+        Log.d("ConnectionState", "Requested state $state for ${chain.name}, current is ${chain.connectionState}. Triggering state change to $state")
+        // TODO debug logs, remove before merging
+        Log.d("ConnectionState", "CallStack: ${Thread.currentThread().stackTrace.joinToString("\n")}")
+
+        chainDao.setConnectionState(chainId, mapConnectionStateToLocal(state))
+        awaitConnectionStateIsAtLeast(chainId, state)
+    }
 
     private fun syncChainsAndAssets() {
         launch {
@@ -107,37 +139,79 @@ class ChainRegistry(
         }
     }
 
-    private fun unregisterChain(chainId: ChainId) {
-        runtimeProviderPool.removeRuntimeProvider(chainId)
-        runtimeSubscriptionPool.removeSubscription(chainId)
-        runtimeSyncService.unregisterChain(chainId)
-        connectionPool.removeConnection(chainId)
+    private suspend fun awaitConnectionStateIsAtLeast(chainId: ChainId, state: ConnectionState): Chain = chainsById
+        .mapNotNull { chainsById -> chainsById[chainId] }
+        .first { it.connectionState.level >= state.level }
 
-        web3ApiPool.removeApis(chainId)
+    private fun unregisterChain(chain: Chain) {
+        unregisterSubstrateServices(chain)
+        unregisterConnections(chain.id)
     }
 
     private suspend fun registerChain(chain: Chain) {
-        val connection = connectionPool.setupConnection(chain)
+        return when (chain.connectionState) {
+            ConnectionState.FULL_SYNC -> registerFullSyncChain(chain)
+            ConnectionState.LIGHT_SYNC -> registerLightSyncChain(chain)
+            ConnectionState.DISABLED -> registerDisabledChain(chain)
+        }
+    }
+
+    private fun registerDisabledChain(chain: Chain) {
+        unregisterSubstrateServices(chain)
+        unregisterConnections(chain.id)
+    }
+
+    private suspend fun registerLightSyncChain(chain: Chain) {
+        registerConnection(chain)
+
+        unregisterSubstrateServices(chain)
+    }
+
+    private suspend fun registerFullSyncChain(chain: Chain) {
+        val connection = registerConnection(chain)
 
         if (chain.hasSubstrateRuntime) {
             runtimeProviderPool.setupRuntimeProvider(chain)
             runtimeSyncService.registerChain(chain, connection)
             runtimeSubscriptionPool.setupRuntimeSubscription(chain, connection)
         }
+    }
+
+    private suspend fun registerConnection(chain: Chain): ChainConnection {
+        val connection = connectionPool.setupConnection(chain)
 
         if (chain.isEthereumBased) {
             web3ApiPool.setupWssApi(chain.id, connection.socketService)
             web3ApiPool.setupHttpsApi(chain)
         }
+
+        return connection
     }
 
     private fun syncBaseTypesIfNeeded() = launch {
         val chains = currentChains.first()
-        val needToSyncBaseTypes = chains.any { it.typesUsage.requiresBaseTypes }
+        val needToSyncBaseTypes = chains.any { it.typesUsage.requiresBaseTypes && it.connectionState.shouldSyncRuntime() }
 
         if (needToSyncBaseTypes) {
             baseTypeSynchronizer.sync()
         }
+    }
+
+    private fun unregisterSubstrateServices(chain: Chain) {
+        if (chain.hasSubstrateRuntime) {
+            runtimeProviderPool.removeRuntimeProvider(chain.id)
+            runtimeSubscriptionPool.removeSubscription(chain.id)
+            runtimeSyncService.unregisterChain(chain.id)
+        }
+    }
+
+    private fun unregisterConnections(chainId: ChainId) {
+        connectionPool.removeConnection(chainId)
+        web3ApiPool.removeApis(chainId)
+    }
+
+    private fun ConnectionState.shouldSyncRuntime(): Boolean {
+        return isFullSync
     }
 }
 
@@ -193,62 +267,35 @@ suspend inline fun ChainRegistry.findChainsById(predicate: (Chain) -> Boolean): 
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
-fun ChainRegistry.getSocket(chainId: String): SocketService = getConnection(chainId).socketService
+suspend fun ChainRegistry.getSocket(chainId: String): SocketService = getConnection(chainId).socketService
 
-fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getConnectionOrNull(chainId)?.socketService
+suspend fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getConnectionOrNull(chainId)?.socketService
 
-suspend fun ChainRegistry.awaitChains() {
-    chainsById.first()
-}
-
-suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
-    awaitChains()
-
-    return getSocket(chainId)
-}
-
-suspend fun ChainRegistry.awaitSocketOrNull(chainId: String): SocketService? {
-    awaitChains()
-
-    return getSocketOrNull(chainId)
-}
-
-suspend fun ChainRegistry.awaitEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
-    awaitChains()
-
-    return getEthereumApi(chainId, connectionType)
-}
-
-suspend fun ChainRegistry.awaitEthereumApiOrThrow(chainId: String, connectionType: ConnectionType): Web3Api {
-    return requireNotNull(awaitEthereumApi(chainId, connectionType)) {
+suspend fun ChainRegistry.getEthereumApiOrThrow(chainId: String, connectionType: ConnectionType): Web3Api {
+    return requireNotNull(getEthereumApi(chainId, connectionType)) {
         "Ethereum Api is not found for chain $chainId and connection type ${connectionType.name}"
     }
 }
 
-suspend fun ChainRegistry.awaitSubscriptionEthereumApiOrThrow(chainId: String): Web3Api {
-    return awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
+suspend fun ChainRegistry.getSubscriptionEthereumApiOrThrow(chainId: String): Web3Api {
+    return getEthereumApiOrThrow(chainId, ConnectionType.WSS)
 }
 
-suspend fun ChainRegistry.awaitSubscriptionEthereumApi(chainId: String): Web3Api? {
-    return awaitEthereumApi(chainId, ConnectionType.WSS)
+suspend fun ChainRegistry.getSubscriptionEthereumApi(chainId: String): Web3Api? {
+    return getEthereumApi(chainId, ConnectionType.WSS)
 }
 
-suspend fun ChainRegistry.awaitCallEthereumApiOrThrow(chainId: String): Web3Api {
-    return awaitEthereumApi(chainId, ConnectionType.HTTPS)
-        ?: awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
+suspend fun ChainRegistry.getCallEthereumApiOrThrow(chainId: String): Web3Api {
+    return getEthereumApi(chainId, ConnectionType.HTTPS)
+        ?: getEthereumApiOrThrow(chainId, ConnectionType.WSS)
 }
 
-suspend fun ChainRegistry.awaitCallEthereumApi(chainId: String): Web3Api? {
-    return awaitEthereumApi(chainId, ConnectionType.HTTPS)
-        ?: awaitEthereumApi(chainId, ConnectionType.WSS)
+suspend fun ChainRegistry.getCallEthereumApi(chainId: String): Web3Api? {
+    return getEthereumApi(chainId, ConnectionType.HTTPS)
+        ?: getEthereumApi(chainId, ConnectionType.WSS)
 }
 
 suspend fun ChainRegistry.chainsById(): ChainsById = ChainsById(chainsById.first())
-
-fun ChainRegistry.getService(chainId: String) = ChainService(
-    runtimeProvider = getRuntimeProvider(chainId),
-    connection = getConnection(chainId)
-)
 
 suspend fun ChainRegistry.findEvmChain(evmChainId: Int): Chain? {
     return findChain { it.isEthereumBased && it.addressPrefix == evmChainId }
@@ -256,7 +303,7 @@ suspend fun ChainRegistry.findEvmChain(evmChainId: Int): Chain? {
 
 suspend fun ChainRegistry.findEvmCallApi(evmChainId: Int): Web3Api? {
     return findEvmChain(evmChainId)?.let {
-        awaitCallEthereumApi(it.id)
+        getCallEthereumApi(it.id)
     }
 }
 

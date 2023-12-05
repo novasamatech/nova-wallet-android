@@ -24,6 +24,14 @@ class NftProvidersRegistry(
         }
     }
 
+    fun nftSupported(chain: Chain): Boolean {
+        return when (chain.id) {
+            Chain.Geneses.STATEMINE, Chain.Geneses.KUSAMA -> true
+            else -> false
+        }
+
+    }
+
     fun get(nftTypeKey: Nft.Type.Key): NftProvider {
         return when (nftTypeKey) {
             Nft.Type.Key.RMRKV1 -> rmrkV1NftProvider
