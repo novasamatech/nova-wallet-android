@@ -121,8 +121,6 @@ class ChainRegistry(
         if (chain.connectionState.level >= state.level) return
 
         Log.d("ConnectionState", "Requested state $state for ${chain.name}, current is ${chain.connectionState}. Triggering state change to $state")
-        // TODO debug logs, remove before merging
-        Log.d("ConnectionState", "CallStack: ${Thread.currentThread().stackTrace.joinToString("\n")}")
 
         chainDao.setConnectionState(chainId, mapConnectionStateToLocal(state))
         awaitConnectionStateIsAtLeast(chainId, state)
