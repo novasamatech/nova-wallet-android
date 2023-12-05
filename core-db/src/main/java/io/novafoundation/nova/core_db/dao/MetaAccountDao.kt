@@ -154,7 +154,7 @@ interface MetaAccountDao {
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
     suspend fun updateName(metaId: Long, newName: String)
 
-    @Query("DELETE FROM meta_accounts WHERE id = :metaId")
+    @Query("DELETE FROM meta_accounts WHERE id = :metaId OR parentMetaId = :metaId")
     suspend fun delete(metaId: Long)
 
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")

@@ -9,18 +9,9 @@ import io.novafoundation.nova.core.model.CryptoType
 
 @Entity(
     tableName = MetaAccountLocal.TABLE_NAME,
-    foreignKeys = [
-        ForeignKey(
-            parentColumns = ["id"],
-            childColumns = ["parentMetaId"],
-            entity = MetaAccountLocal::class,
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
     indices = [
         Index(value = ["substrateAccountId"]),
-        Index(value = ["ethereumAddress"]),
-        Index(value = ["parentMetaId"])
+        Index(value = ["ethereumAddress"])
     ]
 )
 class MetaAccountLocal(
