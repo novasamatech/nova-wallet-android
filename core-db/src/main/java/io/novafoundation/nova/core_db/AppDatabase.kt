@@ -46,6 +46,7 @@ import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_1
 import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
+import io.novafoundation.nova.core_db.migrations.AddConnectionStateToChains_52_53
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
@@ -130,7 +131,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 52,
+    version = 53,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -218,6 +219,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
                     .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51)
+                    .addMigrations(AddConnectionStateToChains_52_53)
                     .build()
             }
             return instance!!

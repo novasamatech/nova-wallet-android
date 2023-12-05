@@ -43,6 +43,8 @@ data class ChainLocal(
         const val NODE_SELECTION_STRATEGY_DEFAULT = "ROUND_ROBIN"
 
         const val HAS_SUBSTRATE_RUNTIME = 1
+
+        const val CONNECTION_STATE_DEFAULT = "LIGHT_SYNC"
     }
 
     @Ignore
