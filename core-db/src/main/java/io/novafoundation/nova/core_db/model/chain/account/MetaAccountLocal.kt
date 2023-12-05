@@ -2,7 +2,6 @@ package io.novafoundation.nova.core_db.model.chain.account
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import io.novafoundation.nova.core.model.CryptoType

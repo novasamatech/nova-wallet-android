@@ -2,7 +2,6 @@ package io.novafoundation.nova.core_db.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
 val AddProxyAccount_53_54 = object : Migration(53, 54) {
 

@@ -3,7 +3,6 @@ package io.novafoundation.nova.core_db.model.chain.account
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
-import androidx.room.Index
 import io.novafoundation.nova.common.utils.Identifiable
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 

@@ -50,7 +50,6 @@ fun SpannableStringBuilder.appendEnd(span: Any): SpannableStringBuilder {
     return this
 }
 
-
 fun clickableSpan(onClick: () -> Unit) = object : ClickableSpan() {
     override fun updateDrawState(ds: TextPaint) {
         ds.isUnderlineText = false

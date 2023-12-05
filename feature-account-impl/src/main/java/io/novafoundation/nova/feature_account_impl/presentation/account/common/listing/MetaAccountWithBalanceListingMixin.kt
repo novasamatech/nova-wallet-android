@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
 
-import android.text.Spannable
 import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -9,7 +8,6 @@ import io.novafoundation.nova.common.utils.appendEnd
 import io.novafoundation.nova.common.utils.appendSpace
 import io.novafoundation.nova.common.utils.append
 import io.novafoundation.nova.common.utils.colorSpan
-import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount

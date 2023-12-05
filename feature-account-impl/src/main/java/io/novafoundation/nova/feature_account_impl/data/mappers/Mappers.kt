@@ -10,7 +10,6 @@ import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
-import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -40,21 +39,21 @@ fun mapCryptoTypeToCryptoTypeModel(
 ): CryptoTypeModel {
     val name = when (encryptionType) {
         CryptoType.SR25519 -> "${resourceManager.getString(R.string.sr25519_selection_title)} ${
-            resourceManager.getString(
-                R.string.sr25519_selection_subtitle
-            )
+        resourceManager.getString(
+            R.string.sr25519_selection_subtitle
+        )
         }"
 
         CryptoType.ED25519 -> "${resourceManager.getString(R.string.ed25519_selection_title)} ${
-            resourceManager.getString(
-                R.string.ed25519_selection_subtitle
-            )
+        resourceManager.getString(
+            R.string.ed25519_selection_subtitle
+        )
         }"
 
         CryptoType.ECDSA -> "${resourceManager.getString(R.string.ecdsa_selection_title)} ${
-            resourceManager.getString(
-                R.string.ecdsa_selection_subtitle
-            )
+        resourceManager.getString(
+            R.string.ecdsa_selection_subtitle
+        )
         }"
     }
 
