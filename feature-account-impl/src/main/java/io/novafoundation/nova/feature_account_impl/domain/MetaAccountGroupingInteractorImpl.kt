@@ -135,9 +135,9 @@ class MetaAccountGroupingInteractorImpl(
                     LightMetaAccount.Type.SECRETS,
                     LightMetaAccount.Type.POLKADOT_VAULT,
                     LightMetaAccount.Type.PARITY_SIGNER,
+                    LightMetaAccount.Type.PROXIED,
                     LightMetaAccount.Type.LEDGER -> true
 
-                    LightMetaAccount.Type.PROXIED,
                     LightMetaAccount.Type.WATCH_ONLY -> false
                 }
             }
