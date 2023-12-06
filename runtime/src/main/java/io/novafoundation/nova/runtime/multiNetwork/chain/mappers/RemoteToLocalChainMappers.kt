@@ -92,9 +92,11 @@ private fun determineConnectionState(remoteChain: ChainRemote, oldLocalChain: Ch
         return oldLocalChain.connectionState
     }
 
-    val fullSyncByDefault = FULL_SYNC_BY_DEFAULT in remoteChain.options.orEmpty()
+    val options = remoteChain.options.orEmpty()
+    val fullSyncByDefault = FULL_SYNC_BY_DEFAULT in options
+    val hasNoSubstrateRuntime = NO_SUBSTRATE_RUNTIME in options
 
-    return if (fullSyncByDefault) ConnectionStateLocal.FULL_SYNC else ConnectionStateLocal.LIGHT_SYNC
+    return if (fullSyncByDefault || hasNoSubstrateRuntime) ConnectionStateLocal.FULL_SYNC else ConnectionStateLocal.LIGHT_SYNC
 }
 
 private fun ConnectionStateLocal.isNotDefault(): Boolean {

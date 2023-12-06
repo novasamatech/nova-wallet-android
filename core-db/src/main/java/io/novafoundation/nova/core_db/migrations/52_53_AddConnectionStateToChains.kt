@@ -18,7 +18,7 @@ val AddConnectionStateToChains_53_54 = object : Migration(53, 54) {
                 SELECT DISTINCT chainId
                 FROM assets
                 WHERE freeInPlanks > 0 OR frozenInPlanks > 0 OR reservedInPlanks > 0
-            ) 
+            ) OR hasSubstrateRuntime = 0
             """.trimIndent()
         )
     }

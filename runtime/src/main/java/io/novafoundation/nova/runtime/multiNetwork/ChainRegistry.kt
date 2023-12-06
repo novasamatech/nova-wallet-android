@@ -137,9 +137,11 @@ class ChainRegistry(
         }
     }
 
-    private suspend fun awaitConnectionStateIsAtLeast(chainId: ChainId, state: ConnectionState): Chain = chainsById
-        .mapNotNull { chainsById -> chainsById[chainId] }
-        .first { it.connectionState.level >= state.level }
+    private suspend fun awaitConnectionStateIsAtLeast(chainId: ChainId, state: ConnectionState): Unit {
+        chainsById
+            .mapNotNull { chainsById -> chainsById[chainId] }
+            .first { it.connectionState.level >= state.level }
+    }
 
     private fun unregisterChain(chain: Chain) {
         unregisterSubstrateServices(chain)
