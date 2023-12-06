@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
+import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
@@ -280,7 +281,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
 
     val types = chainLocal.chain.types?.let {
         Chain.Types(
-            url = it.url,
+            url = it.url.nullIfEmpty(),
             overridesCommon = it.overridesCommon
         )
     }

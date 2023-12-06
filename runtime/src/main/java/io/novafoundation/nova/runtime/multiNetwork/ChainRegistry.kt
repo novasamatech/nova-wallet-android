@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.runtime.ext.requiresBaseTypes
+import io.novafoundation.nova.runtime.ext.typesUsage
 import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainLocalToChain
@@ -79,7 +81,7 @@ class ChainRegistry(
     init {
         syncChainsAndAssets()
 
-        baseTypeSynchronizer.sync()
+        syncBaseTypesIfNeeded()
     }
 
     fun getConnection(chainId: String): ChainConnection = connectionPool.getConnection(chainId.removeHexPrefix())
@@ -126,6 +128,15 @@ class ChainRegistry(
         if (chain.isEthereumBased) {
             web3ApiPool.setupWssApi(chain.id, connection.socketService)
             web3ApiPool.setupHttpsApi(chain)
+        }
+    }
+
+    private fun syncBaseTypesIfNeeded() = launch {
+        val chains = currentChains.first()
+        val needToSyncBaseTypes = chains.any { it.typesUsage.requiresBaseTypes }
+
+        if (needToSyncBaseTypes) {
+            baseTypeSynchronizer.sync()
         }
     }
 }

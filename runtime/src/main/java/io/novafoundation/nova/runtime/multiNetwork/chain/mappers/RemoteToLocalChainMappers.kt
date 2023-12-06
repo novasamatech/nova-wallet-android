@@ -35,7 +35,7 @@ fun mapRemoteChainToLocal(
 ): ChainLocal {
     val types = chainRemote.types?.let {
         ChainLocal.TypesConfig(
-            url = it.url,
+            url = it.url.orEmpty(),
             overridesCommon = it.overridesCommon
         )
     }
