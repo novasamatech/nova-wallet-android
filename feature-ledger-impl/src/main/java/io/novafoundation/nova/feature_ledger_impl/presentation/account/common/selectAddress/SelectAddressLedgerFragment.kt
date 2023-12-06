@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
@@ -21,7 +22,7 @@ import javax.inject.Inject
 
 abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     BaseFragment<V>(),
-    AccountsAdapter.AccountItemHandler,
+    AccountHolder.AccountItemHandler,
     LedgerSelectAddressLoadMoreAdapter.Handler {
 
     companion object {
@@ -34,7 +35,7 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) { AccountsAdapter(this, imageLoader, AccountsAdapter.Mode.VIEW) }
+    private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) { AccountsAdapter(this, imageLoader, AccountHolder.Mode.OPEN) }
     private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
 
     @Inject

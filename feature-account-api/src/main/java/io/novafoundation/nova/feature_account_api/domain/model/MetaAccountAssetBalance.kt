@@ -20,4 +20,5 @@ class MetaAccountWithTotalBalance(
     val proxyChain: Chain?,
     val totalBalance: BigDecimal,
     val currency: Currency,
+    val hasUpdates: Boolean,
 )

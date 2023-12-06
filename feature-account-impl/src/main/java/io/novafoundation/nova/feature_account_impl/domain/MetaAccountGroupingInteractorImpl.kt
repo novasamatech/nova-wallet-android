@@ -6,12 +6,14 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.removed
 import io.novafoundation.nova.common.utils.sumByBigDecimal
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedAndProxyMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
@@ -20,12 +22,14 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 
 class MetaAccountGroupingInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val currencyRepository: CurrencyRepository,
+    private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
 ) : MetaAccountGroupingInteractor {
 
     override fun metaAccountsWithTotalBalanceFlow(): Flow<GroupedList<LightMetaAccount.Type, MetaAccountWithTotalBalance>> {
@@ -33,14 +37,15 @@ class MetaAccountGroupingInteractorImpl(
             currencyRepository.observeSelectCurrency(),
             accountRepository.activeMetaAccountsFlow(),
             accountRepository.metaAccountBalancesFlow(),
+            metaAccountsUpdatesRegistry.observeUpdates(),
             chainRegistry.chainsById
-        ) { selectedCurrency, accounts, allBalances, chains ->
+        ) { selectedCurrency, accounts, allBalances, updatedMetaAccounts, chains ->
             val groupedBalances = allBalances.groupBy(MetaAccountAssetBalance::metaId)
 
             accounts.map { metaAccount ->
                 val accountBalances = groupedBalances[metaAccount.id] ?: emptyList()
-
-                metaAccountWithTotalBalance(accountBalances, metaAccount, accounts, selectedCurrency, chains)
+                val hasUpdates = updatedMetaAccounts.contains(metaAccount.id)
+                metaAccountWithTotalBalance(accountBalances, metaAccount, accounts, selectedCurrency, chains, hasUpdates)
             }
                 .groupBy { it.metaAccount.type }
                 .toSortedMap(metaAccountTypeComparator())
@@ -55,7 +60,7 @@ class MetaAccountGroupingInteractorImpl(
             accountRepository.metaAccountBalancesFlow(metaId),
             chainRegistry.chainsById
         ) { selectedCurrency, allMetaAccounts, metaAccount, metaAccountBalances, chains ->
-            metaAccountWithTotalBalance(metaAccountBalances, metaAccount, allMetaAccounts, selectedCurrency, chains)
+            metaAccountWithTotalBalance(metaAccountBalances, metaAccount, allMetaAccounts, selectedCurrency, chains, false)
         }
     }
 
@@ -65,6 +70,26 @@ class MetaAccountGroupingInteractorImpl(
         getValidMetaAccountsForTransaction(fromChain, destinationChain)
             .groupBy(MetaAccount::type)
             .toSortedMap(metaAccountTypeComparator())
+    }
+
+    override fun updatedProxieds(): Flow<GroupedList<LightMetaAccount.State, ProxiedAndProxyMetaAccount>> {
+        return combine(
+            metaAccountsUpdatesRegistry.observeUpdates(),
+            accountRepository.allMetaAccountsFlow(),
+            chainRegistry.chainsById
+        ) { metaIds, metaAccount, chainsById ->
+            val metaById = metaAccount.associateBy(MetaAccount::id)
+            metaAccount
+                .filter { it.type == LightMetaAccount.Type.PROXIED && metaIds.contains(it.id) }
+                .map {
+                    ProxiedAndProxyMetaAccount(
+                        it,
+                        metaById[it.proxy?.metaId] ?: error("Proxy meta account not found"),
+                        chainsById[it.proxy?.chainId] ?: error("Proxy chain not found")
+                    )
+                }
+                .groupBy { it.proxied.state }
+        }.catch { emit(emptyMap()) }
     }
 
     override suspend fun hasAvailableMetaAccountsForDestination(fromId: ChainId, destinationId: ChainId): Boolean {
@@ -79,7 +104,8 @@ class MetaAccountGroupingInteractorImpl(
         metaAccount: MetaAccount,
         allMetaAccounts: List<MetaAccount>,
         selectedCurrency: Currency,
-        chains: Map<ChainId, Chain>
+        chains: Map<ChainId, Chain>,
+        hasUpdates: Boolean
     ): MetaAccountWithTotalBalance {
         val totalBalance = metaAccountBalances.sumByBigDecimal {
             val totalInPlanks = it.freeInPlanks + it.reservedInPlanks + it.offChainBalance.orZero()
@@ -94,7 +120,8 @@ class MetaAccountGroupingInteractorImpl(
             proxyMetaAccount = proxyMetaAccount,
             proxyChain = metaAccount.proxy?.chainId?.let(chains::getValue),
             totalBalance = totalBalance,
-            currency = selectedCurrency
+            currency = selectedCurrency,
+            hasUpdates = hasUpdates
         )
     }
 
@@ -103,7 +130,17 @@ class MetaAccountGroupingInteractorImpl(
         val fromChainAddress = selectedMetaAccount.addressIn(from)
         return accountRepository.allMetaAccounts()
             .removed { fromChainAddress == it.addressIn(destination) }
-            .filter { it.type != LightMetaAccount.Type.WATCH_ONLY }
+            .filter {
+                when (it.type) {
+                    LightMetaAccount.Type.SECRETS,
+                    LightMetaAccount.Type.POLKADOT_VAULT,
+                    LightMetaAccount.Type.PARITY_SIGNER,
+                    LightMetaAccount.Type.LEDGER -> true
+
+                    LightMetaAccount.Type.PROXIED,
+                    LightMetaAccount.Type.WATCH_ONLY -> false
+                }
+            }
     }
 
     private fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {

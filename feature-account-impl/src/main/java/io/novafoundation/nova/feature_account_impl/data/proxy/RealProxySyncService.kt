@@ -2,12 +2,12 @@ package io.novafoundation.nova.feature_account_impl.data.proxy
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.data.model.ProxiedWithProxy
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
@@ -30,7 +30,8 @@ class RealProxySyncService(
     private val proxyRepository: ProxyRepository,
     private val accounRepository: AccountRepository,
     private val accountDao: MetaAccountDao,
-    private val identityProvider: IdentityProvider
+    private val identityProvider: IdentityProvider,
+    private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
 ) : ProxySyncService {
 
     override suspend fun startSyncing() {
@@ -68,11 +69,14 @@ class RealProxySyncService(
             createProxyAccount(proxiedMetaId, proxy.metaId, proxied.chainId, proxied.accountId, proxy.proxyType)
         }
 
-        val deactivatedMetaAccounts = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
+        val deactivatedMetaAccountIds = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
 
         accountDao.insertChainAccounts(chains)
         accountDao.insertProxies(newProxies)
-        accountDao.changeAccountsStatus(deactivatedMetaAccounts, MetaAccountLocal.Status.DEACTIVATED)
+        accountDao.changeAccountsStatus(deactivatedMetaAccountIds, MetaAccountLocal.Status.DEACTIVATED)
+
+        val changedMetaIds = proxiedsToMetaId.map { it.second } + deactivatedMetaAccountIds
+        metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
     }
 
     override suspend fun syncForMetaAccount(metaAccount: MetaAccount) {
@@ -96,16 +100,6 @@ class RealProxySyncService(
             .map { it.proxiedMetaId }
     }
 
-    private suspend fun getProxiedsToRemove(
-        oldProxies: List<ProxyAccountLocal>,
-        proxiedsMetaAccounts: List<MetaAccountLocal>
-    ): List<Long> {
-        val proxiedsMetaIds = proxiedsMetaAccounts.mapToSet { it.id }
-
-        return oldProxies.filter { it.proxiedMetaId !in proxiedsMetaIds }
-            .map { it.proxiedMetaId }
-    }
-
     private suspend fun getMetaAccounts(): List<MetaAccount> {
         return accounRepository.allMetaAccounts()
             .filter {
@@ -113,9 +107,9 @@ class RealProxySyncService(
                     LightMetaAccount.Type.SECRETS,
                     LightMetaAccount.Type.PARITY_SIGNER,
                     LightMetaAccount.Type.LEDGER,
-                    LightMetaAccount.Type.POLKADOT_VAULT -> true
+                    LightMetaAccount.Type.POLKADOT_VAULT,
+                    LightMetaAccount.Type.WATCH_ONLY -> true
 
-                    LightMetaAccount.Type.WATCH_ONLY,
                     LightMetaAccount.Type.PROXIED -> false
                 }
             }

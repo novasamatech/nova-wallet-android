@@ -149,7 +149,8 @@ fun mapMetaAccountLocalToMetaAccount(
             ethereumPublicKey = ethereumPublicKey,
             isSelected = isSelected,
             name = name,
-            type = mapMetaAccountTypeFromLocal(type)
+            type = mapMetaAccountTypeFromLocal(type),
+            state = mapMetaAccountStateFromLocal(status)
         )
     }
 }
@@ -203,5 +204,12 @@ private fun mapProxyTypeToString(proxyType: String): ProxyAccount.ProxyType {
         "Auction" -> ProxyAccount.ProxyType.Auction
         "NominationPools" -> ProxyAccount.ProxyType.NominationPools
         else -> ProxyAccount.ProxyType.Other(proxyType)
+    }
+}
+
+private fun mapMetaAccountStateFromLocal(local: MetaAccountLocal.Status): LightMetaAccount.State {
+    return when (local) {
+        MetaAccountLocal.Status.ACTIVE -> LightMetaAccount.State.ACTIVE
+        MetaAccountLocal.Status.DEACTIVATED -> LightMetaAccount.State.DEACTIVATED
     }
 }

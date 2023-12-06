@@ -5,15 +5,16 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:orientation="horizontal"
-    tools:parentTag="android.widget.LinearLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:id="@+id/viewSelectedWalletTypeIcon"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="11dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/icon_primary"
         tools:src="@drawable/ic_watch_only_filled" />
 
@@ -21,7 +22,17 @@
         android:id="@+id/viewSelectedWalletAccountIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="end"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/viewSelectedWalletTypeIcon"
+        app:layout_goneMarginStart="0dp"
         tools:src="@drawable/ic_polkadot_24" />
 
+    <ImageView
+        android:id="@+id/viewSelectedWalletAccountUpdateIndicator"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="end"
+        android:src="@drawable/shape_updates_indicator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </merge>

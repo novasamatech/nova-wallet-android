@@ -8,8 +8,9 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import javax.inject.Inject
@@ -17,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_accounts.accountListToolbar
 import kotlinx.android.synthetic.main.fragment_accounts.accountsList
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
 
-class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), AccountsAdapter.AccountItemHandler {
+class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), AccountHolder.AccountItemHandler {
 
     @Inject
     lateinit var imageLoader: ImageLoader

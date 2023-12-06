@@ -29,9 +29,14 @@ interface LightMetaAccount {
     val isSelected: Boolean
     val name: String
     val type: Type
+    val state: LightMetaAccount.State
 
     enum class Type {
         SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT, PROXIED
+    }
+
+    enum class State {
+        ACTIVE, DEACTIVATED
     }
 }
 
@@ -69,6 +74,7 @@ class MetaAccount(
     override val isSelected: Boolean,
     override val name: String,
     override val type: LightMetaAccount.Type,
+    override val state: LightMetaAccount.State
 ) : LightMetaAccount {
 
     class ChainAccount(

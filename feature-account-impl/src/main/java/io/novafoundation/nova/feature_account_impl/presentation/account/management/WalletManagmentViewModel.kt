@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAc
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter.Mode
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder.Mode
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
@@ -21,15 +21,15 @@ class WalletManagmentViewModel(
     private val accountRouter: AccountRouter,
     private val resourceManager: ResourceManager,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
+    private val accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory
 ) : BaseViewModel() {
 
     val walletsListingMixin = accountListingMixinFactory.create(this)
 
-    val mode = MutableStateFlow(Mode.VIEW)
+    val mode = MutableStateFlow(Mode.OPEN)
 
     val toolbarAction = mode.map {
-        if (it == Mode.VIEW) {
+        if (it == Mode.OPEN) {
             resourceManager.getString(R.string.common_edit)
         } else {
             resourceManager.getString(R.string.common_done)
@@ -44,7 +44,7 @@ class WalletManagmentViewModel(
     }
 
     fun editClicked() {
-        val newMode = if (mode.value == Mode.VIEW) Mode.EDIT else Mode.VIEW
+        val newMode = if (mode.value == Mode.OPEN) Mode.EDIT else Mode.OPEN
 
         mode.value = newMode
     }
