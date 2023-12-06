@@ -6,5 +6,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface PaymentUpdaterFactory {
 
-    fun create(chain: Chain): Updater<MetaAccount>
+    fun createFullSync(chain: Chain): Updater<MetaAccount>
+
+    fun createLightSync(chain: Chain): Updater<MetaAccount>
 }

@@ -63,6 +63,19 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
 
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
 
+val Chain.ConnectionState.isFullSync: Boolean
+    get() = this == Chain.ConnectionState.FULL_SYNC
+
+val Chain.ConnectionState.isDisabled: Boolean
+    get() = this == Chain.ConnectionState.DISABLED
+
+val Chain.ConnectionState.level: Int
+    get() = when (this) {
+        Chain.ConnectionState.FULL_SYNC -> 2
+        Chain.ConnectionState.LIGHT_SYNC -> 1
+        Chain.ConnectionState.DISABLED -> 0
+    }
+
 fun Chain.Additional?.relaychainAsNative(): Boolean {
     return this?.relaychainAsNative ?: false
 }

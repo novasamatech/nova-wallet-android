@@ -13,7 +13,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/4e5d532cfc76b21b197b5c2ad145911988591078/chains/v16/chains_dev.json\""
+        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v17/chains_dev.json\""
         buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v2/assets_dev.json\""
 
         buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/tests/chains_for_testBalance.json\""
@@ -30,7 +30,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v16/chains.json\""
+            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v17/chains.json\""
             buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v2/assets.json\""
         }
     }

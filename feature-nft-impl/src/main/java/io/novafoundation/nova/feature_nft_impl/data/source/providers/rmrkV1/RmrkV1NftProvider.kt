@@ -22,6 +22,8 @@ class RmrkV1NftProvider(
     private val nftDao: NftDao
 ) : NftProvider {
 
+    override val requireFullChainSync: Boolean = false
+
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
         throw UnsupportedOperationException("RmrkV1 not supported")
     }
