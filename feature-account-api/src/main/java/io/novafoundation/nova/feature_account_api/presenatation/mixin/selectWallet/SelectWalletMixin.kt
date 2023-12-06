@@ -9,7 +9,31 @@ interface SelectWalletMixin {
 
     interface Factory {
 
-        fun create(coroutineScope: CoroutineScope): SelectWalletMixin
+        fun create(
+            coroutineScope: CoroutineScope,
+            selectionParams: suspend () -> SelectionParams
+        ): SelectWalletMixin
+    }
+
+    class SelectionParams(
+        val selectionAllowed: Boolean,
+        val initialSelection: InitialSelection
+    ) {
+
+        companion object {
+
+            fun default(): SelectionParams = SelectionParams(
+                selectionAllowed = true,
+                initialSelection = InitialSelection.ActiveWallet
+            )
+        }
+    }
+
+    sealed interface InitialSelection {
+
+        object ActiveWallet : InitialSelection
+
+        class SpecificWallet(val metaId: Long) : InitialSelection
     }
 
     val selectedMetaAccountFlow: Flow<MetaAccount>

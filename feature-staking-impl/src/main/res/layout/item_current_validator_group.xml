@@ -29,7 +29,7 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         tools:text="Your stake is allocated to the following validator." />
 
 </LinearLayout>

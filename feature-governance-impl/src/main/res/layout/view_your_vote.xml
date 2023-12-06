@@ -19,7 +19,7 @@
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:maxLines="2"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/linearLayout"
@@ -73,7 +73,7 @@
             style="@style/TextAppearance.NovaFoundation.Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_tertiary"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp"
             tools:text="10 KSM × 6x" />
 

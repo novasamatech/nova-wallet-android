@@ -12,9 +12,12 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.RealReferendumDetailsInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParser
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasuryApproveProposalParser
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasurySpendParser
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.RealReferendumPreImageParser
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallAdapter
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.batch.BatchAdapter
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasuryApproveProposalAdapter
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasurySpendAdapter
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
@@ -26,17 +29,30 @@ class ReferendumDetailsModule {
     @IntoSet
     fun provideTreasuryApproveParser(
         treasuryRepository: TreasuryRepository
-    ): ReferendumCallParser = TreasuryApproveProposalParser(treasuryRepository)
+    ): ReferendumCallAdapter = TreasuryApproveProposalAdapter(treasuryRepository)
 
     @Provides
     @FeatureScope
     @IntoSet
-    fun provideTreasurySpendParser(): ReferendumCallParser = TreasurySpendParser()
+    fun provideTreasurySpendParser(): ReferendumCallAdapter = TreasurySpendAdapter()
+
+    @Provides
+    @FeatureScope
+    @IntoSet
+    fun provideBatchAdapter(): ReferendumCallAdapter = BatchAdapter()
+
+    @Provides
+    @FeatureScope
+    fun providePreImageParser(
+        callAdapters: Set<@JvmSuppressWildcards ReferendumCallAdapter>
+    ): ReferendumPreImageParser {
+        return RealReferendumPreImageParser(callAdapters)
+    }
 
     @Provides
     @FeatureScope
     fun provideReferendumDetailsInteractor(
-        callParsers: Set<@JvmSuppressWildcards ReferendumCallParser>,
+        preImageParser: ReferendumPreImageParser,
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository,
         referendaConstructor: ReferendaConstructor,
@@ -44,7 +60,7 @@ class ReferendumDetailsModule {
         @ExtrinsicSerialization callFormatter: Gson,
         identityRepository: OnChainIdentityRepository,
     ): ReferendumDetailsInteractor = RealReferendumDetailsInteractor(
-        preImageParsers = callParsers,
+        preImageParser = preImageParser,
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         referendaConstructor = referendaConstructor,

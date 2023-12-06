@@ -297,8 +297,8 @@ class BalanceListViewModel(
     private fun String.formatAsTotalBalance(): CharSequence {
         val amountWithFraction = toAmountWithFraction()
 
-        val textSecondary = resourceManager.getColor(R.color.text_secondary)
-        val colorSpan = ForegroundColorSpan(textSecondary)
+        val textColor = resourceManager.getColor(R.color.text_secondary)
+        val colorSpan = ForegroundColorSpan(textColor)
         val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(R.dimen.total_balance_fraction_size))
 
         return with(amountWithFraction) {

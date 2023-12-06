@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
-import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryption
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.model.NetworkTypeIdentifier

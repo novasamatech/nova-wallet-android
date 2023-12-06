@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redee
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
@@ -37,7 +38,7 @@ private fun NominationPoolsRedeemValidationSystemBuilder.sufficientCommissionBal
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
         fee = { it.fee },
-        balance = { it.asset.total },
+        balance = { it.asset.balanceCountedTowardsED() },
         chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
         error = { payload, _ -> NominationPoolsRedeemValidationFailure.ToStayAboveED(payload.chain.utilityAsset) }
     )

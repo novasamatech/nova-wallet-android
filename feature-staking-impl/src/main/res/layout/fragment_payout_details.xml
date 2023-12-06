@@ -23,7 +23,7 @@
         android:background="@drawable/bg_icon_container_on_color"
         android:padding="11dp"
         android:src="@drawable/ic_staking_filled"
-        app:tint="@color/text_tertiary" />
+        app:tint="@color/text_secondary" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
         android:layout_width="match_parent"

@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import io.novafoundation.nova.core_db.converters.AssetSourceConverter
+import io.novafoundation.nova.core_db.converters.AssetConverters
 import io.novafoundation.nova.core_db.converters.ChainConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.CurrencyConverters
@@ -43,6 +43,7 @@ import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
+import io.novafoundation.nova.core_db.migrations.AddBalanceModesToAssets_51_52
 import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
@@ -79,6 +80,7 @@ import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.migrations.ChangeChainNodes_20_21
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
+import io.novafoundation.nova.core_db.migrations.ChangeSessionTopicToParing_52_53
 import io.novafoundation.nova.core_db.migrations.ChangeTokens_19_20
 import io.novafoundation.nova.core_db.migrations.ExtractExternalApiToSeparateTable_35_36
 import io.novafoundation.nova.core_db.migrations.FixBrokenForeignKeys_31_32
@@ -113,7 +115,7 @@ import io.novafoundation.nova.core_db.model.StakingRewardPeriodLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
-import io.novafoundation.nova.core_db.model.WalletConnectSessionAccountLocal
+import io.novafoundation.nova.core_db.model.WalletConnectPairingLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
@@ -130,7 +132,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 51,
+    version = 53,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -163,7 +165,7 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         ContributionLocal::class,
         GovernanceDAppLocal::class,
         BrowserHostSettingsLocal::class,
-        WalletConnectSessionAccountLocal::class,
+        WalletConnectPairingLocal::class,
         CoinPriceLocal::class,
         StakingDashboardItemLocal::class,
         StakingRewardPeriodLocal::class,
@@ -178,7 +180,7 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
     NftTypeConverters::class,
     MetaAccountTypeConverters::class,
     CurrencyConverters::class,
-    AssetSourceConverter::class,
+    AssetConverters::class,
     ExternalApiConverters::class,
     ChainConverters::class,
     ExternalBalanceTypeConverters::class,
@@ -217,7 +219,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
-                    .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51)
+                    .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51, AddBalanceModesToAssets_51_52)
+                    .addMigrations(ChangeSessionTopicToParing_52_53)
                     .build()
             }
             return instance!!

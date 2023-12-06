@@ -93,7 +93,7 @@ class RealMultiStakingTargetSelectionFormatter(
             notRecommendedText()?.let {
                 ColoredText(
                     text = it,
-                    colorRes = R.color.text_tertiary
+                    colorRes = R.color.text_secondary
                 )
             }
         }

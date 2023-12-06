@@ -18,7 +18,7 @@
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@+id/itemDelegateType"
         app:layout_constraintEnd_toEndOf="parent"

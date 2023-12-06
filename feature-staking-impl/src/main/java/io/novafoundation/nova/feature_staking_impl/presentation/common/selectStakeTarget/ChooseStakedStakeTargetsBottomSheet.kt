@@ -104,7 +104,7 @@ private class ViewHolder<T : Identifiable>(
         itemSelectStakedCollatorCollator.bindSelectedCollator(item)
         itemSelectStakedCollatorCheck.isChecked = isSelected
 
-        val primaryTextColor = if (item.active) R.color.text_primary else R.color.text_tertiary
+        val primaryTextColor = if (item.active) R.color.text_primary else R.color.text_secondary
 
         with(itemSelectStakedCollatorCollator) {
             itemStakingTargetName.setTextColorRes(primaryTextColor)

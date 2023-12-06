@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="deep_linking_chain_id_is_not_found">Chain is not found</string>
+    <string name="deep_linking_governance_type_is_not_specified">Governance type is not specified</string>
+    <string name="deep_linking_governance_type_is_not_supported">Governance type is not supported</string>
+    <string name="deep_linking_url_is_invalid">Invalid url</string>
+    <string name="deep_linking_domain_is_not_matched">Domain from the link %s is not allowed</string>
+    <string name="deep_linking_invalid_mnemonic">Mnemonic is not valid</string>
+    <string name="deep_linking_invalid_crypto_type">Crypto type is invalid</string>
+    <string name="deep_linking_invalid_derivation_path">Invalid derivation path</string>
+
+    <string name="referendim_details_not_found_title">Referendum not found</string>
+
+    <string name="settings_wiki">Wiki</string>
+
     <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fee and remain above minimal balance</string>
 
     <string name="operations_swap_title">Swap</string>

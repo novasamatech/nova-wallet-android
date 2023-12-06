@@ -59,21 +59,3 @@ fun <P, E> EnoughTotalToStayAboveEDValidationFactory.validate(
 ) {
     validate(create(fee, balance, chainWithAsset, error))
 }
-
-fun <P, E> ValidationSystemBuilder<P, E>.enoughBalanceToStayAboveEDValidation(
-    assetSourceRegistry: AssetSourceRegistry,
-    fee: AmountProducer<P>,
-    balance: AmountProducer<P>,
-    chainWithAsset: (P) -> ChainWithAsset,
-    error: (P, BigDecimal) -> E
-) {
-    validate(
-        EnoughBalanceToStayAboveEDValidation(
-            assetSourceRegistry = assetSourceRegistry,
-            fee = fee,
-            balance = balance,
-            chainWithAsset = chainWithAsset,
-            error = error
-        )
-    )
-}

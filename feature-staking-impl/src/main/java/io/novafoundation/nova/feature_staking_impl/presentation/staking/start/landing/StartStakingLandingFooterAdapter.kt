@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.drawableSpan
+import io.novafoundation.nova.common.utils.fontSpan
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
@@ -49,7 +50,7 @@ class StartStakingLandingFooterViewHolder(
     init {
         with(itemView) {
             val iconColor = context.getColor(R.color.chip_icon)
-            val clickablePartColor = context.getColor(R.color.text_secondary)
+            val clickablePartColor = context.getColor(R.color.link_text)
             val chevronSize = 20.dp(context)
             val chevronRight = ContextCompat.getDrawable(context, R.drawable.ic_chevron_right)
                 ?.apply {
@@ -59,6 +60,7 @@ class StartStakingLandingFooterViewHolder(
             val termsClickablePart = resources.getText(R.string.start_staking_fragment_terms_of_use_clicable_part)
                 .toSpannable(colorSpan(clickablePartColor))
                 .setFullSpan(clickableSpan { clickHandler.onTermsOfUseClicked() })
+                .setFullSpan(fontSpan(context, R.font.public_sans_semi_bold))
                 .setEndSpan(drawableSpan(chevronRight!!))
 
             itemStakingLandingFooterTermsOfUse.text = SpannableFormatter.format(

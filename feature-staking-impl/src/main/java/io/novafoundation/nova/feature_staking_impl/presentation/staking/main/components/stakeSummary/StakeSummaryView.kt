@@ -39,7 +39,7 @@ class StakeSummaryView @JvmOverloads constructor(
         class Waiting(
             val timeLeft: Long,
             @StringRes customMessageFormat: Int
-        ) : Status(customMessageFormat, R.color.text_tertiary, R.drawable.ic_indicator_inactive_pulse)
+        ) : Status(customMessageFormat, R.color.text_secondary, R.drawable.ic_indicator_inactive_pulse)
     }
 
     init {

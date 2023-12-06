@@ -45,7 +45,7 @@
             android:layout_gravity="center"
             android:ellipsize="middle"
             android:lines="1"
-            android:textColor="@color/text_tertiary"
+            android:textColor="@color/text_secondary"
             tools:text="4o7m5DDh2PpU...KitjHcxRiE7eQuTJ" />
 
     </LinearLayout>

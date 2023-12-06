@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         android:visibility="gone"
         app:layout_constraintBaseline_toBaselineOf="@id/goNextTitle"
         app:layout_constraintBottom_toBottomOf="@+id/goNextTitle"

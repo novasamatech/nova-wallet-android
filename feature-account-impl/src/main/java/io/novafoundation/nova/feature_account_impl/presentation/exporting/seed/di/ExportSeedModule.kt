@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportSeedInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedViewModel
 
@@ -22,14 +21,12 @@ class ExportSeedModule {
     @ViewModelKey(ExportSeedViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
-        advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
         interactor: ExportSeedInteractor,
         payload: ExportPayload,
     ): ViewModel {
         return ExportSeedViewModel(
             router,
             interactor,
-            advancedEncryptionCommunicator,
             payload
         )
     }

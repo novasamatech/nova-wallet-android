@@ -50,12 +50,17 @@ class WalletConnectApproveSessionViewModel(
     private val selectWalletMixinFactory: SelectWalletMixin.Factory
 ) : BaseViewModel() {
 
-    val selectWalletMixin = selectWalletMixinFactory.create(this)
+    private val proposal = responder.requireLastInput()
+
+    val selectWalletMixin = selectWalletMixinFactory.create(
+        coroutineScope = this,
+        selectionParams = ::walletSelectionParams
+    )
 
     private val processState = MutableStateFlow(ProgressState.IDLE)
 
     private val sessionProposalFlow = flowOf {
-        interactor.resolveSessionProposal(responder.requireLastInput())
+        interactor.resolveSessionProposal(proposal)
     }.shareInBackground()
 
     val sessionMetadata = sessionProposalFlow.map { it.dappMetadata }
@@ -116,6 +121,22 @@ class WalletConnectApproveSessionViewModel(
 
     fun networksClicked() = launch {
         _showNetworksBottomSheet.value = networksListFlow.first().event()
+    }
+
+    private suspend fun walletSelectionParams(): SelectWalletMixin.SelectionParams {
+        val pairingAccount = interactor.getPairingAccount(proposal.pairingTopic)
+
+        return if (pairingAccount != null) {
+            SelectWalletMixin.SelectionParams(
+                selectionAllowed = false,
+                initialSelection = SelectWalletMixin.InitialSelection.SpecificWallet(pairingAccount.metaId)
+            )
+        } else {
+            SelectWalletMixin.SelectionParams(
+                selectionAllowed = true,
+                initialSelection = SelectWalletMixin.InitialSelection.ActiveWallet
+            )
+        }
     }
 
     private fun constructSessionAlerts(metaAccount: MetaAccount, sessionProposal: WalletConnectSessionProposal): SessionAlerts {

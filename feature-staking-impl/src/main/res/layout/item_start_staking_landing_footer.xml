@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal|bottom"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         tools:text="@string/start_staking_fragment_more_info" />
 
     <TextView
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center_horizontal"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         tools:text="@string/start_staking_fragment_terms_of_use" />
 
 </LinearLayout>

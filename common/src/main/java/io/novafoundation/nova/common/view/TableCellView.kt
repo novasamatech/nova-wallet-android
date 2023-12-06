@@ -61,8 +61,8 @@ open class TableCellView @JvmOverloads constructor(
             return TableCellView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
-                valueSecondary.setTextColorRes(R.color.text_tertiary)
-                title.setTextColorRes(R.color.text_tertiary)
+                valueSecondary.setTextColorRes(R.color.text_secondary)
+                title.setTextColorRes(R.color.text_secondary)
             }
         }
     }
@@ -182,7 +182,7 @@ open class TableCellView @JvmOverloads constructor(
             }
 
             FieldStyle.SECONDARY -> {
-                valuePrimary.setTextColorRes(R.color.text_tertiary)
+                valuePrimary.setTextColorRes(R.color.text_secondary)
             }
         }
     }

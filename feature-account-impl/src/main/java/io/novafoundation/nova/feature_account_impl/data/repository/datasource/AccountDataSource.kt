@@ -85,4 +85,6 @@ interface AccountDataSource : SecretStoreV1 {
         cryptoType: CryptoType,
         secrets: EncodableStruct<ChainAccountSecrets>
     )
+
+    suspend fun hasMetaAccounts(): Boolean
 }

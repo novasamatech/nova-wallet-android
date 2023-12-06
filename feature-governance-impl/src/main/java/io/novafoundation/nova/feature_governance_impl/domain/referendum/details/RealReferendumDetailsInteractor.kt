@@ -39,19 +39,18 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.constructReferendumStatus
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParser
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
 class RealReferendumDetailsInteractor(
-    private val preImageParsers: Collection<ReferendumCallParser>,
+    private val preImageParser: ReferendumPreImageParser,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
     private val referendaConstructor: ReferendaConstructor,
@@ -64,14 +63,12 @@ class RealReferendumDetailsInteractor(
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
-    ): Flow<ReferendumDetails> {
+    ): Flow<ReferendumDetails?> {
         return flowOfAll { referendumDetailsFlowSuspend(referendumId, selectedGovernanceOption, voterAccountId) }
     }
 
     override suspend fun detailsFor(preImage: PreImage, chain: Chain): ReferendumCall? {
-        return preImageParsers.tryFindNonNull { parser ->
-            parser.parse(preImage, chain.id)
-        }
+        return preImageParser.parse(preImage, chain.id)
     }
 
     override suspend fun previewFor(preImage: PreImage): PreimagePreview {
@@ -93,7 +90,7 @@ class RealReferendumDetailsInteractor(
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
-    ): Flow<ReferendumDetails> {
+    ): Flow<ReferendumDetails?> {
         val chain = selectedGovernanceOption.assetWithChain.chain
 
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
@@ -106,6 +103,7 @@ class RealReferendumDetailsInteractor(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { onChainReferendum, currentBlockNumber ->
+            if (onChainReferendum == null) return@combine null
 
             val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
             val track = onChainReferendum.track()?.let(tracksById::get)
@@ -251,14 +249,17 @@ private suspend fun PreImageRepository.preImageOf(
         is Proposal.Inline -> {
             PreImage(encodedCall = proposal.encodedCall, call = proposal.call)
         }
+
         is Proposal.Legacy -> {
             val request = PreImageRequest(proposal.hash, knownSize = null, fetchIf = ALWAYS)
             getPreimageFor(request, chainId)
         }
+
         is Proposal.Lookup -> {
             val request = PreImageRequest(proposal.hash, knownSize = proposal.callLength, fetchIf = ALWAYS)
             getPreimageFor(request, chainId)
         }
+
         null -> null
     }
 }

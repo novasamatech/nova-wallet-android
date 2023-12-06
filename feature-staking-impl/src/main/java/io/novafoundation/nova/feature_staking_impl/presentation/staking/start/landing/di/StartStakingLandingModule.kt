@@ -54,6 +54,7 @@ class StartStakingLandingModule {
         selectedMetaAccountUseCase: SelectedAccountUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         stakingStartedDetectionService: StakingStartedDetectionService,
+        chainRegistry: ChainRegistry,
         contextManager: ContextManager
     ): ViewModel {
         return StartStakingLandingViewModel(
@@ -67,6 +68,7 @@ class StartStakingLandingModule {
             selectedMetaAccountUseCase = selectedMetaAccountUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             stakingStartedDetectionService = stakingStartedDetectionService,
+            chainRegistry = chainRegistry,
             contextManager = contextManager
         )
     }

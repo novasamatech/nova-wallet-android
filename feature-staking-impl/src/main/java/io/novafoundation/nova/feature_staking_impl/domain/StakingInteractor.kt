@@ -75,6 +75,7 @@ class StakingInteractor(
     private val assetUseCase: AssetUseCase,
     private val stakingSharedComputation: StakingSharedComputation,
 ) {
+
     suspend fun calculatePendingPayouts(scope: CoroutineScope): Result<PendingPayoutsStatistics> = withContext(Dispatchers.Default) {
         runCatching {
             val currentStakingState = selectedAccountStakingStateFlow(scope).first()
@@ -214,10 +215,6 @@ class StakingInteractor(
         getLockupDuration(stakingSharedState.chainId(), sharedComputationScope)
     }
 
-    suspend fun getEraDuration(sharedComputationScope: CoroutineScope) = withContext(Dispatchers.Default) {
-        getEraTimeCalculator(sharedComputationScope).eraDuration()
-    }
-
     fun selectedAccountStakingStateFlow(scope: CoroutineScope) = flowOfAll {
         val assetWithChain = stakingSharedState.chainAndAsset()
 
@@ -261,8 +258,8 @@ class StakingInteractor(
         stakingRepository.getRewardDestination(accountStakingState)
     }
 
-    suspend fun maxValidatorsPerNominator(): Int = withContext(Dispatchers.Default) {
-        stakingConstantsRepository.maxValidatorsPerNominator(stakingSharedState.chainId())
+    suspend fun maxValidatorsPerNominator(stake: Balance): Int = withContext(Dispatchers.Default) {
+        stakingConstantsRepository.maxValidatorsPerNominator(stakingSharedState.chainId(), stake)
     }
 
     suspend fun maxRewardedNominators(): Int = withContext(Dispatchers.Default) {

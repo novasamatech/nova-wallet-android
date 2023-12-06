@@ -1,7 +1,9 @@
 package io.novafoundation.nova.common.resources
 
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
+import androidx.annotation.FontRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
@@ -36,6 +38,8 @@ interface ResourceManager {
     fun getDrawable(@DrawableRes id: Int): Drawable
 
     fun getDimensionPixelSize(id: Int): Int
+
+    fun getFont(@FontRes fontRes: Int): Typeface
 }
 
 fun ResourceManager.formatTimeLeft(elapsedTimeInMillis: Long): String {

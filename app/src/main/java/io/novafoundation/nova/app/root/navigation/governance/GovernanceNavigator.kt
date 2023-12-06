@@ -45,14 +45,13 @@ class GovernanceNavigator(
 ) : BaseNavigator(navigationHolder), GovernanceRouter {
 
     override fun openReferendum(payload: ReferendumDetailsPayload) {
-        performNavigation(
-            cases = arrayOf(
-                R.id.mainFragment to R.id.action_open_referendum_details,
-                R.id.votedReferendaFragment to R.id.action_open_referendum_details,
-                R.id.referendaSearchFragment to R.id.action_open_referendum_details_from_referenda_search,
-            ),
-            args = ReferendumDetailsFragment.getBundle(payload)
-        )
+        val currentDestination = navigationHolder.navController?.currentDestination
+        val destinationId = when (currentDestination?.id) {
+            R.id.referendumDetailsFragment -> R.id.action_referendumDetailsFragment_to_referendumDetailsFragment
+            R.id.referendaSearchFragment -> R.id.action_open_referendum_details_from_referenda_search
+            else -> R.id.action_open_referendum_details
+        }
+        performNavigation(destinationId, ReferendumDetailsFragment.getBundle(payload))
     }
 
     override fun openReferendumFullDetails(payload: ReferendumFullDetailsPayload) = performNavigation(

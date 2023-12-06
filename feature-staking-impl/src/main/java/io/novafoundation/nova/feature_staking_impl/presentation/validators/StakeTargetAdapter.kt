@@ -145,7 +145,7 @@ class StakingTargetViewHolder<V>(override val containerView: View) : RecyclerVie
             }
 
             is StakeTargetModel.Scoring.OneField -> {
-                itemStakingTargetScoringPrimary.setTextColorRes(R.color.text_tertiary)
+                itemStakingTargetScoringPrimary.setTextColorRes(R.color.text_secondary)
                 itemStakingTargetScoringPrimary.makeVisible()
                 itemStakingTargetScoringSecondary.makeGone()
                 itemStakingTargetScoringPrimary.setColoredText(scoring.field)

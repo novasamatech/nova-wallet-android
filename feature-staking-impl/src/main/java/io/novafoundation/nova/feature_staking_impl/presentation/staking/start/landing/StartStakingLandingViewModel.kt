@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.fontSpan
 import io.novafoundation.nova.common.utils.formatAsSpannable
 import io.novafoundation.nova.common.utils.formatting.duration.BoundedDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.DayAndHourDurationFormatter
@@ -59,6 +60,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatP
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -91,6 +94,7 @@ class StartStakingLandingViewModel(
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
+    private val chainRegistry: ChainRegistry,
     private val contextManager: ContextManager
 ) : BaseViewModel(),
     Browserable,
@@ -147,9 +151,7 @@ class StartStakingLandingViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
-        updateSystemFactory.create(availableStakingOptionsPayload.chainId, availableStakingOptionsPayload.stakingTypes)
-            .start()
-            .launchIn(this)
+        launchSync()
 
         closeOnStakingStarted()
     }
@@ -189,6 +191,16 @@ class StartStakingLandingViewModel(
         openBrowserEvent.value = Event(appLinksProvider.termsUrl)
     }
 
+    private fun launchSync() {
+        launch {
+            // Start syncing for all staking type since we need to show it on select staking type screen
+            val asset = chainRegistry.asset(availableStakingOptionsPayload.chainId, availableStakingOptionsPayload.assetId)
+            updateSystemFactory.create(availableStakingOptionsPayload.chainId, asset.staking)
+                .start()
+                .launchIn(this)
+        }
+    }
+
     private fun closeOnStakingStarted() = launch {
         val stakingStartedChain = stakingStartedDetectionService.awaitStakingStarted(
             stakingOptionIds = stakingOptionIds,
@@ -226,7 +238,7 @@ class StartStakingLandingViewModel(
 
     private fun createMoreInfoText(chain: Chain): CharSequence {
         val iconColor = resourceManager.getColor(R.color.chip_icon)
-        val clickableTextColor = resourceManager.getColor(R.color.text_secondary)
+        val clickableTextColor = resourceManager.getColor(R.color.link_text)
         val chevronSize = resourceManager.measureInPx(20)
         val chevronRight = resourceManager.getDrawable(R.drawable.ic_chevron_right).apply {
             setBounds(0, 0, chevronSize, chevronSize)
@@ -235,6 +247,7 @@ class StartStakingLandingViewModel(
         val clickablePart = resourceManager.getString(R.string.start_staking_fragment_more_info_clicable_part)
             .toSpannable(colorSpan(clickableTextColor))
             .setFullSpan(clickableSpan { novaWikiClicked(chain.additional?.stakingWiki) })
+            .setFullSpan(fontSpan(resourceManager, R.font.public_sans_semi_bold))
             .setEndSpan(drawableSpan(chevronRight))
 
         return SpannableFormatter.format(

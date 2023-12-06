@@ -35,7 +35,7 @@ private class ConfirmGovernanceUnlockHintsMixin(
 ) : HintsMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
 
     override val hintsFlow: Flow<List<CharSequence>> = remainsLockedInfoFlow.map { remainsLockedInfo ->
-        if (remainsLockedInfo != null) {
+        if (remainsLockedInfo != null && remainsLockedInfo.lockedInIds.isNotEmpty()) {
             listOf(remainsLockedHint(assetFlow.first(), remainsLockedInfo))
         } else {
             emptyList()
@@ -57,7 +57,7 @@ private class ConfirmGovernanceUnlockHintsMixin(
             append(" ")
 
             val rest = resourceManager.getString(R.string.referendum_unlock_remains_locked_format, lockedIdsPart)
-            appendColored(rest, R.color.text_tertiary)
+            appendColored(rest, R.color.text_secondary)
         }
     }
 }

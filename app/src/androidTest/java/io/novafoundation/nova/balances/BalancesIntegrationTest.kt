@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.fromJson
+import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
@@ -125,6 +126,11 @@ class BalancesIntegrationTest(
             withTimeout(80.seconds) {
                 extrinsicService.estimateFee(chain) {
                     systemRemark(byteArrayOf(0))
+
+                    val haveBatch = runtime.metadata.hasModule("Utility")
+                    if (haveBatch) {
+                        systemRemark(byteArrayOf(0))
+                    }
                 }
             }
         }
