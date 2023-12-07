@@ -11,6 +11,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.WRITE_SECRET_PAT }}
 
       - name: Version in build.gradle
         run: |
