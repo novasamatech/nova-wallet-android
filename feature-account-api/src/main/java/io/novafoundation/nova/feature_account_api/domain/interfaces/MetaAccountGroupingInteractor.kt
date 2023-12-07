@@ -16,7 +16,7 @@ interface MetaAccountGroupingInteractor {
 
     fun getMetaAccountsForTransaction(fromId: ChainId, destinationId: ChainId): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>>
 
-    fun updatedProxieds(): Flow<GroupedList<LightMetaAccount.State, ProxiedAndProxyMetaAccount>>
+    fun updatedProxieds(): Flow<GroupedList<LightMetaAccount.Status, ProxiedAndProxyMetaAccount>>
 
     suspend fun hasAvailableMetaAccountsForDestination(fromId: ChainId, destinationId: ChainId): Boolean
 }

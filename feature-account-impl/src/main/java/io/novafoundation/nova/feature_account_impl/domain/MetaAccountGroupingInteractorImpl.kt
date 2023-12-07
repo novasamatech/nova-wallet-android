@@ -72,15 +72,15 @@ class MetaAccountGroupingInteractorImpl(
             .toSortedMap(metaAccountTypeComparator())
     }
 
-    override fun updatedProxieds(): Flow<GroupedList<LightMetaAccount.State, ProxiedAndProxyMetaAccount>> {
+    override fun updatedProxieds(): Flow<GroupedList<LightMetaAccount.Status, ProxiedAndProxyMetaAccount>> {
         return combine(
             metaAccountsUpdatesRegistry.observeUpdates(),
             accountRepository.allMetaAccountsFlow(),
             chainRegistry.chainsById
-        ) { metaIds, metaAccount, chainsById ->
+        ) { updatedMetaIds, metaAccount, chainsById ->
             val metaById = metaAccount.associateBy(MetaAccount::id)
             metaAccount
-                .filter { it.type == LightMetaAccount.Type.PROXIED && metaIds.contains(it.id) }
+                .filter { it.type == LightMetaAccount.Type.PROXIED && updatedMetaIds.contains(it.id) }
                 .map {
                     ProxiedAndProxyMetaAccount(
                         it,
@@ -88,8 +88,9 @@ class MetaAccountGroupingInteractorImpl(
                         chainsById[it.proxy?.chainId] ?: error("Proxy chain not found")
                     )
                 }
-                .groupBy { it.proxied.state }
-        }.catch { emit(emptyMap()) }
+                .groupBy { it.proxied.status }
+                .toSortedMap(metaAccountStateComparator())
+        }.catch { emit(sortedMapOf()) }
     }
 
     override suspend fun hasAvailableMetaAccountsForDestination(fromId: ChainId, destinationId: ChainId): Boolean {
@@ -151,6 +152,13 @@ class MetaAccountGroupingInteractorImpl(
             LightMetaAccount.Type.LEDGER -> 3
             LightMetaAccount.Type.PROXIED -> 4
             LightMetaAccount.Type.WATCH_ONLY -> 5
+        }
+    }
+
+    private fun metaAccountStateComparator() = compareBy<LightMetaAccount.Status> {
+        when (it) {
+            LightMetaAccount.Status.ACTIVE -> 0
+            LightMetaAccount.Status.DEACTIVATED -> 1
         }
     }
 }

@@ -49,10 +49,10 @@ private class DelegatedMetaAccountUpdatesListingMixin(
         }
         .shareInBackground()
 
-    private fun mapHeader(state: LightMetaAccount.State): AccountTitleGroupRvItem {
-        val text = when (state) {
-            LightMetaAccount.State.ACTIVE -> resourceManager.getString(R.string.account_proxieds)
-            LightMetaAccount.State.DEACTIVATED -> resourceManager.getString(R.string.proxieds_updates_deactivated_title)
+    private fun mapHeader(status: LightMetaAccount.Status): AccountTitleGroupRvItem {
+        val text = when (status) {
+            LightMetaAccount.Status.ACTIVE -> resourceManager.getString(R.string.account_proxieds)
+            LightMetaAccount.Status.DEACTIVATED -> resourceManager.getString(R.string.proxieds_updates_deactivated_title)
         }
 
         return AccountTitleGroupRvItem(text)
@@ -68,7 +68,7 @@ private class DelegatedMetaAccountUpdatesListingMixin(
             picture = walletUiUseCase.walletIcon(proxied),
             chainIconUrl = proxiedWithProxy.chain.icon,
             subtitleIconRes = null,
-            enabled = proxiedWithProxy.proxied.state == LightMetaAccount.State.ACTIVE,
+            enabled = proxiedWithProxy.proxied.status == LightMetaAccount.Status.ACTIVE,
             updateIndicator = false
         )
     }
