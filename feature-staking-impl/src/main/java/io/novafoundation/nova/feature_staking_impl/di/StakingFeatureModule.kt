@@ -155,13 +155,15 @@ class StakingFeatureModule {
         stakingStoriesDataSource: StakingStoriesDataSource,
         walletConstants: WalletConstants,
         chainRegistry: ChainRegistry,
+        storageCache: StorageCache
     ): StakingRepository = StakingRepositoryImpl(
         accountStakingDao = accountStakingDao,
         remoteStorage = remoteStorageSource,
         localStorage = localStorageSource,
         stakingStoriesDataSource = stakingStoriesDataSource,
         walletConstants = walletConstants,
-        chainRegistry = chainRegistry
+        chainRegistry = chainRegistry,
+        storageCache = storageCache
     )
 
     @Provides
@@ -329,13 +331,11 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideRecommendationSettingsProviderFactory(
-        stakingConstantsRepository: StakingConstantsRepository,
         computationalCache: ComputationalCache,
         sharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
     ) = RecommendationSettingsProviderFactory(
         computationalCache,
-        stakingConstantsRepository,
         chainRegistry,
         sharedState
     )

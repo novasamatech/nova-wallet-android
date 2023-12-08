@@ -82,7 +82,7 @@ class CurrentValidatorsInteractor(
 
                             val userNominationRank = userNominationIndex + 1
 
-                            val willBeRewarded = userNominationRank < maxRewardedNominators
+                            val willBeRewarded = maxRewardedNominators == null || userNominationRank < maxRewardedNominators
 
                             Status.Active(nomination = userIndividualExposure.value, willUserBeRewarded = willBeRewarded)
                         }

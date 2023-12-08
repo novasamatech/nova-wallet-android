@@ -86,11 +86,13 @@ class RelaychainStakingUpdatersModule {
         chainRegistry: ChainRegistry,
         @DefaultBulkRetriever bulkRetriever: BulkRetriever,
         storageCache: StorageCache,
+        scope: ActiveEraScope
     ) = ValidatorExposureUpdater(
         bulkRetriever,
         sharedState,
         chainRegistry,
-        storageCache
+        storageCache,
+        scope
     )
 
     @Provides

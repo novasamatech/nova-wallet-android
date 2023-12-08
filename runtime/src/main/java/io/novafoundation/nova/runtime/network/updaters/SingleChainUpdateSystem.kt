@@ -26,7 +26,7 @@ abstract class SingleChainUpdateSystem<A>(
         val updaters = getUpdaters(selectedOption)
 
         runUpdaters(chain, updaters)
-    }.shareIn(CoroutineScope(Dispatchers.Default), replay = 1, started = SharingStarted.WhileSubscribed())
+    }.shareIn(CoroutineScope(Dispatchers.IO), replay = 1, started = SharingStarted.WhileSubscribed())
 
     override fun start(): Flow<Updater.SideEffect> = updateFlow
 }

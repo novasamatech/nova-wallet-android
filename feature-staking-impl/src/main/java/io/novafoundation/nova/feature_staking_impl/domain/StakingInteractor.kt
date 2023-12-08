@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
-import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
@@ -10,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
-import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
@@ -262,7 +259,7 @@ class StakingInteractor(
         stakingConstantsRepository.maxValidatorsPerNominator(stakingSharedState.chainId(), stake)
     }
 
-    suspend fun maxRewardedNominators(): Int = withContext(Dispatchers.Default) {
+    suspend fun maxRewardedNominators(): Int? = withContext(Dispatchers.Default) {
         stakingConstantsRepository.maxRewardedNominatorPerValidator(stakingSharedState.chainId())
     }
 
@@ -327,13 +324,14 @@ class StakingInteractor(
     private suspend fun activeNominators(chainId: ChainId, exposures: Collection<Exposure>): Int {
         val activeNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
-        return exposures.fold(mutableSetOf<AccountIdKey>()) { acc, exposure ->
-            acc += exposure.others.sortedByDescending(IndividualExposure::value)
-                .take(activeNominatorsPerValidator)
-                .map { it.who.intoKey() }
-
-            acc
-        }.size
+        return exposures.fold(0) { acc, exposure ->
+            val othersSize =  exposure.others.size
+            acc + if (activeNominatorsPerValidator != null) {
+                othersSize.coerceAtMost(activeNominatorsPerValidator)
+            } else {
+                othersSize
+            }
+        }
     }
 
     private fun totalStake(exposures: Collection<Exposure>): BigInteger {
@@ -350,7 +348,7 @@ class StakingInteractor(
     private class StatusResolutionContext(
         val activeEraInfo: ActiveEraInfo,
         val asset: Asset,
-        val rewardedNominatorsPerValidator: Int,
+        val rewardedNominatorsPerValidator: Int?,
         val activeStake: Balance,
     )
 }

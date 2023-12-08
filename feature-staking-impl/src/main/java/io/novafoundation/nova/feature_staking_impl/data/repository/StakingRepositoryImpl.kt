@@ -6,11 +6,16 @@ import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.common.utils.staking
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
+import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
+import io.novafoundation.nova.feature_staking_api.domain.model.ExposureOverview
+import io.novafoundation.nova.feature_staking_api.domain.model.ExposurePage
+import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
@@ -23,6 +28,8 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.st
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindExposure
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindExposureOverview
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindExposurePage
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindHistoryDepth
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindMaxNominators
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindMinBond
@@ -32,6 +39,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashDeferDuration
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashingSpans
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -66,6 +74,7 @@ class StakingRepositoryImpl(
     private val walletConstants: WalletConstants,
     private val chainRegistry: ChainRegistry,
     private val stakingStoriesDataSource: StakingStoriesDataSource,
+    private val storageCache: StorageCache,
 ) : StakingRepository {
 
     override suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex {
@@ -109,7 +118,54 @@ class StakingRepositoryImpl(
         binding = { scale, runtime -> bindActiveEra(scale, runtime) }
     )
 
-    override suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex) = localStorage.query(chainId) {
+    override suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex): AccountIdMap<Exposure> {
+        val isPagedExposures = isPagedExposuresUsed(chainId)
+
+        return if (isPagedExposures) {
+            fetchPagedEraStakers(chainId, eraIndex)
+        } else {
+            fetchLegacyEraStakers(chainId, eraIndex)
+        }
+    }
+
+    private suspend fun fetchPagedEraStakers(chainId: ChainId, eraIndex: EraIndex): AccountIdMap<Exposure> = localStorage.query(chainId) {
+        val eraStakersOverview = metadata.staking().storage("ErasStakersOverview").entries(
+            eraIndex,
+            keyExtractor = { (_: BigInteger, accountId: ByteArray) -> accountId.toHexString() },
+            binding = { instance, _ -> bindExposureOverview(instance) }
+        )
+
+        val eraStakersPaged = runtime.metadata.staking().storage("ErasStakersPaged").entries(
+            eraIndex,
+            keyExtractor = { (_: BigInteger, accountId: ByteArray, page: BigInteger) -> accountId.toHexString() to page.toInt() },
+            binding = { instance, _ -> bindExposurePage(instance) }
+        )
+
+        mergeOverviewsAndPagedOthers(eraStakersOverview, eraStakersPaged)
+    }
+
+    private fun mergeOverviewsAndPagedOthers(
+        eraStakerOverviews: AccountIdMap<ExposureOverview>,
+        othersPaged: Map<Pair<String, Int>, ExposurePage>
+    ): AccountIdMap<Exposure> {
+        return eraStakerOverviews.mapValues { (accountId, overview) ->
+            // avoid unnecessary growth allocations by pre-allocating exact needed number of elements
+            val others = ArrayList<IndividualExposure>(overview.nominatorCount.toInt())
+
+            (0 until overview.pageCount.toInt()).forEach { pageNumber ->
+                val page = othersPaged[accountId to pageNumber]?.others.orEmpty()
+                others.addAll(page)
+            }
+
+            Exposure(
+                total = overview.total,
+                own = overview.own,
+                others = others
+            )
+        }
+    }
+
+    private suspend fun fetchLegacyEraStakers(chainId: ChainId, eraIndex: EraIndex): AccountIdMap<Exposure> = localStorage.query(chainId) {
         runtime.metadata.staking().storage("ErasStakers").entries(
             eraIndex,
             keyExtractor = { (_: BigInteger, accountId: ByteArray) -> accountId.toHexString() },
@@ -268,6 +324,12 @@ class StakingRepositoryImpl(
                 else -> StakingState.Stash.None(chain, chainAsset, accountId, controllerId, stashId)
             }
         }
+    }
+
+    private suspend fun isPagedExposuresUsed(chainId: ChainId): Boolean {
+        val isPagedExposuresValue = storageCache.getEntry(ValidatorExposureUpdater.STORAGE_KEY_PAGED_EXPOSURES, chainId)
+
+        return ValidatorExposureUpdater.decodeIsPagedExposuresValue(isPagedExposuresValue.content)
     }
 
     private fun observeAccountValidatorPrefs(chainId: ChainId, stashId: AccountId): Flow<ValidatorPrefs?> {
