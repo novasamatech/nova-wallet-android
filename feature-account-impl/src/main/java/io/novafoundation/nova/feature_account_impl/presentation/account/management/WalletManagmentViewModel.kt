@@ -26,10 +26,10 @@ class WalletManagmentViewModel(
 
     val walletsListingMixin = accountListingMixinFactory.create(this)
 
-    val mode = MutableStateFlow(Mode.OPEN)
+    val mode = MutableStateFlow(Mode.SELECT)
 
     val toolbarAction = mode.map {
-        if (it == Mode.OPEN) {
+        if (it == Mode.SELECT) {
             resourceManager.getString(R.string.common_edit)
         } else {
             resourceManager.getString(R.string.common_done)
@@ -44,7 +44,7 @@ class WalletManagmentViewModel(
     }
 
     fun editClicked() {
-        val newMode = if (mode.value == Mode.OPEN) Mode.EDIT else Mode.OPEN
+        val newMode = if (mode.value == Mode.SELECT) Mode.EDIT else Mode.SELECT
 
         mode.value = newMode
     }

@@ -32,7 +32,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader) : GroupedL
     }
 
     enum class Mode {
-        VIEW, OPEN, EDIT, SWITCH
+        VIEW, SELECT, EDIT, SWITCH
     }
 
     init {
@@ -92,7 +92,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader) : GroupedL
                 setOnClickListener(null)
             }
 
-            Mode.OPEN -> {
+            Mode.SELECT -> {
                 itemAccountArrow.visibility = View.VISIBLE
 
                 itemAccountDelete.visibility = View.GONE

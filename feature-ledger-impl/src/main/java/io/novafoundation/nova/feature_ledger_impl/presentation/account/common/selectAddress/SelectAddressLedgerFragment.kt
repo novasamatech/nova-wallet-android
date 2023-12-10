@@ -35,7 +35,7 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) { AccountsAdapter(this, imageLoader, AccountHolder.Mode.OPEN) }
+    private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) { AccountsAdapter(this, imageLoader, AccountHolder.Mode.SELECT) }
     private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
 
     @Inject
