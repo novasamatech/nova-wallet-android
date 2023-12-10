@@ -41,45 +41,46 @@ class RealProxySyncService(
         val metaAccounts = getMetaAccounts()
         if (metaAccounts.isEmpty()) return
 
-        val supportedProxyChains = getSupportedProxyChains()
-        val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
+        runCatching {
+            val supportedProxyChains = getSupportedProxyChains()
+            val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
 
-        val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
-            proxyRepository.getProxyDelegatorsForAccounts(chain.id, accountIds)
-        }
-
-        val oldProxies = accountDao.getAllProxyAccounts()
-
-        val notAddedProxies = filterNotAddedProxieds(proxiedsWithProxies, oldProxies)
-
-        val identitiesByChain = notAddedProxies.loadProxiedIdentities()
-        val proxiedsToMetaId = notAddedProxies.map {
-            val identity = identitiesByChain[it.proxied.chainId]?.get(it.proxied.accountId.intoKey())
-            val proxiedMetaId = accountDao.insertMetaAccountWithNewPosition { nextPosition ->
-                createMetaAccount(it.proxied.chainId, it.proxy.metaId, it.proxied.accountId, identity, nextPosition)
+            val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
+                proxyRepository.getProxyDelegatorsForAccounts(chain.id, accountIds)
             }
-            it to proxiedMetaId
-        }
 
-        val chains = proxiedsToMetaId.map { (proxiedWithProxy, proxiedMetaId) ->
-            val proxied = proxiedWithProxy.proxied
-            createChainAccount(proxiedMetaId, proxied.chainId, proxied.accountId)
-        }
+            val oldProxies = accountDao.getAllProxyAccounts()
 
-        val newProxies = proxiedsToMetaId.map { (proxiedWithProxy, proxiedMetaId) ->
-            val proxied = proxiedWithProxy.proxied
-            val proxy = proxiedWithProxy.proxy
-            createProxyAccount(proxiedMetaId, proxy.metaId, proxied.chainId, proxied.accountId, proxy.proxyType)
-        }
+            val notAddedProxies = filterNotAddedProxieds(proxiedsWithProxies, oldProxies)
 
-        val deactivatedMetaAccountIds = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
+            val identitiesByChain = notAddedProxies.loadProxiedIdentities()
+            val proxiedsToMetaId = notAddedProxies.map {
+                val identity = identitiesByChain[it.proxied.chainId]?.get(it.proxied.accountId.intoKey())
+                val proxiedMetaId = accountDao.insertMetaAccountWithNewPosition { nextPosition ->
+                    createMetaAccount(it.proxied.chainId, it.proxy.metaId, it.proxied.accountId, identity, nextPosition)
+                }
+                it to proxiedMetaId
+            }
+
+            val chains = proxiedsToMetaId.map { (proxiedWithProxy, proxiedMetaId) ->
+                val proxied = proxiedWithProxy.proxied
+                createChainAccount(proxiedMetaId, proxied.chainId, proxied.accountId)
+            }
+
+            val newProxies = proxiedsToMetaId.map { (proxiedWithProxy, proxiedMetaId) ->
+                val proxied = proxiedWithProxy.proxied
+                val proxy = proxiedWithProxy.proxy
+                createProxyAccount(proxiedMetaId, proxy.metaId, proxied.chainId, proxied.accountId, proxy.proxyType)
+            }
+
+            val deactivatedMetaAccountIds = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
 
             accountDao.insertChainAccounts(chains)
             accountDao.insertProxies(newProxies)
             accountDao.changeAccountsStatus(deactivatedMetaAccountIds, MetaAccountLocal.Status.DEACTIVATED)
 
-        val changedMetaIds = proxiedsToMetaId.map { it.second } + deactivatedMetaAccountIds
-        metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
+            val changedMetaIds = proxiedsToMetaId.map { it.second } + deactivatedMetaAccountIds
+            metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
         }.onFailure {
             Log.e(LOG_TAG, "Failed to sync proxy delegators", it)
         }
