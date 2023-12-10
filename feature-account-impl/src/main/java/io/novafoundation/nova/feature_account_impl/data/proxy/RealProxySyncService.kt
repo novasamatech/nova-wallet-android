@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.data.proxy
 
+import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
@@ -75,6 +77,8 @@ class RealProxySyncService(
             accountDao.insertChainAccounts(chains)
             accountDao.insertProxies(newProxies)
             accountDao.changeAccountsStatus(deactivatedMetaAccounts, MetaAccountLocal.Status.DEACTIVATED)
+        }.onFailure {
+            Log.e(LOG_TAG, "Failed to sync proxy delegators", it)
         }
     }
 
