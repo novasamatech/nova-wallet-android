@@ -53,6 +53,8 @@ import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
+import org.web3j.crypto.Sign
 
 typealias PalletName = String
 
@@ -278,6 +280,15 @@ fun GenericCall.Instance.instanceOf(moduleName: String, vararg callNames: String
 fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
+
+fun SignedRaw.toEcdsaSignatureData(): Sign.SignatureData {
+    return signatureWrapper.run {
+        require(this is SignatureWrapper.Ecdsa)
+        Sign.SignatureData(v, r, s)
+    }
+}
+
+fun SignedRaw.asHexString() = signatureWrapper.asHexString()
 
 fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
 

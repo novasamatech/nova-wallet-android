@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.ethereum.transaction
 
 import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.common.utils.toEcdsaSignatureData
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionBuilding
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
@@ -21,7 +22,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import org.web3j.crypto.RawTransaction
@@ -99,7 +99,7 @@ internal class RealEvmTransactionService(
         val accountId = metaAccount.requireAccountIdIn(chain)
 
         val signerPayload = SignerPayloadRaw(encodedTx, accountId)
-        val signatureData = signer.signRaw(signerPayload).toSignatureData()
+        val signatureData = signer.signRaw(signerPayload).toEcdsaSignatureData()
 
         val eip155SignatureData: Sign.SignatureData = TransactionEncoder.createEip155SignatureData(signatureData, ethereumChainId)
 
@@ -122,12 +122,6 @@ internal class RealEvmTransactionService(
         ethEstimateGas(tx).sendSuspend().amountUsed
     } catch (rpcException: EvmRpcException) {
         default
-    }
-
-    private fun SignatureWrapper.toSignatureData(): Sign.SignatureData {
-        require(this is SignatureWrapper.Ecdsa)
-
-        return Sign.SignatureData(v, r, s)
     }
 
     private fun RawTransaction.encodeWith(signatureData: Sign.SignatureData): ByteArray {
