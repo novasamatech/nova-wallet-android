@@ -34,8 +34,10 @@ class RealProxySyncService(
 ) : ProxySyncService {
 
     override suspend fun startSyncing() {
-        val metaAccounts = getMetaAccounts()
-        if (metaAccounts.isEmpty()) return
+        if (!accounRepository.hasMetaAccounts()) return
+
+        runCatching {
+            val metaAccounts = getMetaAccounts()
 
         val supportedProxyChains = getSupportedProxyChains()
         val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }

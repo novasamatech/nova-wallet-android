@@ -50,7 +50,7 @@ interface StorageQueryContext {
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>,
-        onDecodeException: (Exception) -> Unit = { throw it }
+        recover: (exception: Exception, rawValue: String?) -> Unit = { exception, _ -> throw exception }
     ): Map<K, V>
 
     suspend fun StorageEntry.entriesRaw(
@@ -65,7 +65,7 @@ interface StorageQueryContext {
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>,
-        onDecodeException: (Exception) -> Unit = { throw it }
+        recover: (exception: Exception, rawValue: String?) -> Unit = { exception, _ -> throw exception }
     ): Map<K, V>
 
     suspend fun <V> StorageEntry.query(
