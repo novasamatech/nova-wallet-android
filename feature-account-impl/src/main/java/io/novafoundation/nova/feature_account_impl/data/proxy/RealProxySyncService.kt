@@ -36,23 +36,25 @@ class RealProxySyncService(
     override suspend fun startSyncing() {
         if (!accounRepository.hasMetaAccounts()) return
 
-        val metaAccounts = getMetaAccounts()
+        runCatching {
+            val metaAccounts = getMetaAccounts()
 
-        val supportedProxyChains = getSupportedProxyChains()
-        val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
+            val supportedProxyChains = getSupportedProxyChains()
+            val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
 
-        // proxiedsWithProxies will be usefull when we union differen proxy types to one account
-        val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
-            proxyRepository.getProxyDelegatorsForAccounts(chain.id, accountIds)
+            // proxiedsWithProxies will be usefull when we union differen proxy types to one account
+            val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
+                proxyRepository.getProxyDelegatorsForAccounts(chain.id, accountIds)
+            }
+
+            val newProxies = proxiedsWithProxies.formatToLocalProxies()
+            val oldProxies = accountDao.getAllProxyAccounts()
+
+            val proxiesDiff = CollectionDiffer.findDiff(newProxies, oldProxies, forceUseNewItems = false)
+
+            insertMetaAndChainAccounts(proxiesDiff)
+            insertProxies(proxiesDiff)
         }
-
-        val newProxies = proxiedsWithProxies.formatToLocalProxies()
-        val oldProxies = accountDao.getAllProxyAccounts()
-
-        val proxiesDiff = CollectionDiffer.findDiff(newProxies, oldProxies, forceUseNewItems = false)
-
-        insertMetaAndChainAccounts(proxiesDiff)
-        insertProxies(proxiesDiff)
     }
 
     private suspend fun insertMetaAndChainAccounts(proxiesDiff: CollectionDiffer.Diff<ProxyAccountLocal>) {

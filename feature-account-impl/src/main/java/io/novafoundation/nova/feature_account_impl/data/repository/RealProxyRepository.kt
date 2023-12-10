@@ -23,7 +23,7 @@ class RealProxyRepository(
     override suspend fun getProxyDelegatorsForAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxies> {
         val delegatorToProxies = receiveAllProxies(chainId)
 
-        val accountIdToMetaAccounts = metaAccountIds.associateBy { it.accountId.intoKey() }
+        val accountIdToMetaAccounts = metaAccountIds.groupBy { it.accountId.intoKey() }
 
         return delegatorToProxies
             .mapNotNull { (delegator, proxies) ->
@@ -46,7 +46,9 @@ class RealProxyRepository(
                     binding = { result, _ ->
                         bindProxyAccounts(result)
                     },
-                    onDecodeException = { }
+                    recover = { _, _ ->
+                        // Do nothing if entry binding throws an exception
+                    }
                 )
         }
     }
@@ -77,16 +79,18 @@ class RealProxyRepository(
 
     private fun matchProxiesToAccountsAndMap(
         proxies: Map<AccountIdKey, String>,
-        accountIdToMetaAccounts: Map<AccountIdKey, MetaAccountId>
+        accountIdToMetaAccounts: Map<AccountIdKey, List<MetaAccountId>>
     ): List<ProxiedWithProxies.Proxy> {
-        return proxies.mapNotNull { (proxyAccountId, proxyType) ->
-            val matchedAccount = accountIdToMetaAccounts[proxyAccountId] ?: return@mapNotNull null
+        return proxies.flatMap { (proxyAccountId, proxyType) ->
+            val matchedAccounts = accountIdToMetaAccounts[proxyAccountId] ?: return@flatMap emptyList()
 
-            ProxiedWithProxies.Proxy(
-                accountId = proxyAccountId.value,
-                metaId = matchedAccount.metaId,
-                proxyType = proxyType
-            )
+            matchedAccounts.map {
+                ProxiedWithProxies.Proxy(
+                    accountId = proxyAccountId.value,
+                    metaId = it.metaId,
+                    proxyType = proxyType
+                )
+            }
         }
     }
 }
