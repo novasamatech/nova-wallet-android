@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.data.proxy
 
+import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
@@ -71,12 +74,15 @@ class RealProxySyncService(
 
         val deactivatedMetaAccountIds = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
 
-        accountDao.insertChainAccounts(chains)
-        accountDao.insertProxies(newProxies)
-        accountDao.changeAccountsStatus(deactivatedMetaAccountIds, MetaAccountLocal.Status.DEACTIVATED)
+            accountDao.insertChainAccounts(chains)
+            accountDao.insertProxies(newProxies)
+            accountDao.changeAccountsStatus(deactivatedMetaAccountIds, MetaAccountLocal.Status.DEACTIVATED)
 
         val changedMetaIds = proxiedsToMetaId.map { it.second } + deactivatedMetaAccountIds
         metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
+        }.onFailure {
+            Log.e(LOG_TAG, "Failed to sync proxy delegators", it)
+        }
     }
 
     override suspend fun syncForMetaAccount(metaAccount: MetaAccount) {
@@ -100,6 +106,16 @@ class RealProxySyncService(
             .map { it.proxiedMetaId }
     }
 
+    private suspend fun getProxiedsToRemove(
+        oldProxies: List<ProxyAccountLocal>,
+        proxiedsMetaAccounts: List<MetaAccountLocal>
+    ): List<Long> {
+        val proxiedsMetaIds = proxiedsMetaAccounts.mapToSet { it.id }
+
+        return oldProxies.filter { it.proxiedMetaId !in proxiedsMetaIds }
+            .map { it.proxiedMetaId }
+    }
+
     private suspend fun getMetaAccounts(): List<MetaAccount> {
         return accounRepository.allMetaAccounts()
             .filter {
@@ -107,9 +123,9 @@ class RealProxySyncService(
                     LightMetaAccount.Type.SECRETS,
                     LightMetaAccount.Type.PARITY_SIGNER,
                     LightMetaAccount.Type.LEDGER,
-                    LightMetaAccount.Type.POLKADOT_VAULT,
-                    LightMetaAccount.Type.WATCH_ONLY -> true
+                    LightMetaAccount.Type.POLKADOT_VAULT -> true
 
+                    LightMetaAccount.Type.WATCH_ONLY,
                     LightMetaAccount.Type.PROXIED -> false
                 }
             }

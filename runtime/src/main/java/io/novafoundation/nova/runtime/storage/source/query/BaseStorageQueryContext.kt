@@ -62,7 +62,7 @@ abstract class BaseStorageQueryContext(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>,
-        onDecodeException: (Exception) -> Unit
+        recover: (exception: Exception, rawValue: String?) -> Unit
     ): Map<K, V> {
         val prefix = storageKey(runtime, *prefixArgs)
 
@@ -73,7 +73,7 @@ abstract class BaseStorageQueryContext(
             storageEntry = this,
             keyExtractor = keyExtractor,
             binding = binding,
-            onDecodeException = onDecodeException
+            recover = recover
         )
     }
 
@@ -81,7 +81,7 @@ abstract class BaseStorageQueryContext(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>,
-        onDecodeException: (Exception) -> Unit
+        recover: (exception: Exception, rawValue: String?) -> Unit
     ): Map<K, V> {
         val entries = queryKeys(storageKeys(runtime, keysArguments), at)
 
@@ -90,7 +90,7 @@ abstract class BaseStorageQueryContext(
             storageEntry = this,
             keyExtractor = keyExtractor,
             binding = binding,
-            onDecodeException = onDecodeException
+            recover = recover
         )
     }
 
@@ -242,7 +242,7 @@ abstract class BaseStorageQueryContext(
         storageEntry: StorageEntry,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>,
-        onDecodeException: (Exception) -> Unit = { throw it }
+        recover: (exception: Exception, rawValue: String?) -> Unit = { exception, _ -> throw exception }
     ): Map<K, V> {
         val returnType = storageEntry.type.value ?: incompatible()
 
@@ -255,7 +255,7 @@ abstract class BaseStorageQueryContext(
                 val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
                 binding(decoded, key)
             } catch (e: Exception) {
-                onDecodeException(e)
+                recover(e, value)
                 null
             }
         }
