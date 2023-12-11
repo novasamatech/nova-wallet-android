@@ -11,9 +11,10 @@ import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncrypt
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
@@ -36,14 +37,14 @@ class SecretsSigner(
     private val twoFactorVerificationService: TwoFactorVerificationService
 ) : Signer {
 
-    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
+    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         runTwoFactorVerificationIfEnabled()
 
         val delegate = createDelegate(payloadExtrinsic.accountId)
         return delegate.signExtrinsic(payloadExtrinsic)
     }
 
-    override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
+    override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
         runTwoFactorVerificationIfEnabled()
 
         val delegate = createDelegate(payload.accountId)

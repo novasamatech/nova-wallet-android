@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_external_sign_impl.data.evmApi
 
+import io.novafoundation.nova.common.utils.toEcdsaSignatureData
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProvider
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource
@@ -7,7 +8,6 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.Ev
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.findEvmCallApi
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
@@ -166,7 +166,7 @@ private class Web3JEvmApi(
     ): String {
         val encodedTx = TransactionEncoder.encode(transaction, ethereumChainId)
         val signerPayload = SignerPayloadRaw(encodedTx, accountId)
-        val signatureData = signer.signRaw(signerPayload).toSignatureData()
+        val signatureData = signer.signRaw(signerPayload).toEcdsaSignatureData()
 
         val eip155SignatureData: SignatureData = TransactionEncoder.createEip155SignatureData(signatureData, ethereumChainId)
 
@@ -193,12 +193,6 @@ private class Web3JEvmApi(
 
     private suspend fun estimateGasLimit(tx: Transaction): BigInteger {
         return web3.ethEstimateGas(tx).sendSuspend().amountUsed
-    }
-
-    private fun SignatureWrapper.toSignatureData(): SignatureData {
-        require(this is SignatureWrapper.Ecdsa)
-
-        return SignatureData(v, r, s)
     }
 
     private fun RawTransaction.encodeWith(signatureData: SignatureData): ByteArray {
