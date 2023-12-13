@@ -322,6 +322,8 @@ class PayoutRepository(
         chainId: ChainId,
         payoutTargets: List<PayoutTarget>,
     ): List<PagedValidatorEraStake> {
+        if (payoutTargets.isEmpty()) return emptyList()
+
         val pagedExposures = remoteStorage.fetchPagedExposures(chainId, payoutTargets)
 
         return pagedExposures.mapNotNull { (key, pagedExposure) ->
@@ -386,6 +388,8 @@ class PayoutRepository(
         chainId: ChainId,
         payoutTargets: List<PayoutTarget>,
     ): List<LegacyValidatorEraStake> {
+        if (payoutTargets.isEmpty()) return emptyList()
+
         return remoteStorage.query(chainId) {
             val eraAndValidatorKeys = payoutTargets.map { listOf(it.era, it.validatorStash.value) }
 
