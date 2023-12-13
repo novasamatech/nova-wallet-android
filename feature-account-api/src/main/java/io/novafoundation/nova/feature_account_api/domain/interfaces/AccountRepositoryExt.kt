@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_account_api.domain.interfaces
 
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -19,4 +21,11 @@ suspend fun AccountRepository.getIdOfSelectedMetaAccountIn(chain: Chain): Accoun
     val metaAccount = getSelectedMetaAccount()
 
     return metaAccount.accountIdIn(chain)
+}
+
+suspend fun AccountRepository.requireMetaAccountFor(transactionOrigin: TransactionOrigin): MetaAccount {
+    return when (transactionOrigin) {
+        TransactionOrigin.SelectedWallet -> getSelectedMetaAccount()
+        is TransactionOrigin.WalletWithAccount -> findMetaAccountOrThrow(transactionOrigin.accountId)
+    }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.data.extrinsic
 
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
@@ -23,8 +24,9 @@ class ExtrinsicSubmission(val hash: String, val origin: AccountId)
 
 interface ExtrinsicService {
 
-    suspend fun submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(
+    suspend fun submitMultiExtrinsicAwaitingInclusion(
         chain: Chain,
+        origin: TransactionOrigin,
         formExtrinsic: FormMultiExtrinsicWithOrigin,
     ): RetriableMultiResult<ExtrinsicStatus.InBlock>
 
@@ -76,7 +78,7 @@ interface ExtrinsicService {
     suspend fun estimateMultiFee(
         chain: Chain,
         formExtrinsic: FormMultiExtrinsic,
-    ): BigInteger
+    ): Fee
 
     suspend fun estimateFee(chainId: ChainId, extrinsic: String): Fee
 }

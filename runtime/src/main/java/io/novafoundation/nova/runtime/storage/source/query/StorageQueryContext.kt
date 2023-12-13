@@ -9,6 +9,9 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 typealias StorageKeyComponents = ComponentHolder
 typealias DynamicInstanceBinder<V> = (dynamicInstance: Any?) -> V
@@ -75,9 +78,10 @@ interface StorageQueryContext {
         vararg keyArguments: Any?
     ): String?
 
-    suspend fun multi(
+    @Deprecated("Use multi for better smart-casting", replaceWith = ReplaceWith(expression = "multi(builderBlock)"))
+    suspend fun multiInternal(
         builderBlock: MultiQueryBuilder.() -> Unit
-    ): Map<StorageEntry, Map<StorageKeyComponents, Any?>>
+    ): MultiQueryBuilder.Result
 
     // no keyExtractor short-cut
     suspend fun <V> StorageEntry.entries(
@@ -103,9 +107,20 @@ interface StorageQueryContext {
     suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V
 }
 
-fun Map<StorageEntry, Map<StorageKeyComponents, Any?>>.singleValueOf(storageEntry: StorageEntry) = getValue(storageEntry).values.first()
+@Suppress("DEPRECATION")
+@OptIn(ExperimentalContracts::class)
+suspend fun StorageQueryContext.multi(
+    builderBlock: MultiQueryBuilder.() -> Unit
+): MultiQueryBuilder.Result {
+    contract {
+        callsInPlace(builderBlock, InvocationKind.EXACTLY_ONCE)
+    }
 
-fun Collection<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
+    return multiInternal(builderBlock)
+}
+
+
+fun Iterable<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
 
 val StorageQueryContext.metadata: RuntimeMetadata
     get() = runtime.metadata

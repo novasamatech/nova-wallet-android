@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.relaychain
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
@@ -188,10 +189,9 @@ class RelaychainStakingUpdatersModule {
     fun provideHistoricalMediator(
         sharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
-        @DefaultBulkRetriever bulkRetriever: BulkRetriever,
-        stakingRepository: StakingRepository,
         storageCache: StorageCache,
         activeEraScope: ActiveEraScope,
+        preferences: Preferences
     ) = HistoricalUpdateMediator(
         historicalUpdaters = listOf(
             HistoricalTotalValidatorRewardUpdater(),
@@ -199,10 +199,9 @@ class RelaychainStakingUpdatersModule {
         ),
         stakingSharedState = sharedState,
         chainRegistry = chainRegistry,
-        bulkRetriever = bulkRetriever,
-        stakingRepository = stakingRepository,
         storageCache = storageCache,
-        scope = activeEraScope
+        scope = activeEraScope,
+        preferences = preferences
     )
 
     @Provides

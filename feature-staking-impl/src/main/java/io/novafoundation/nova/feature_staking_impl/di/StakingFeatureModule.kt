@@ -103,6 +103,7 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
@@ -416,12 +417,8 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideValidatorSetFetcher(
         stakingApi: StakingApi,
-        stakingRepository: StakingRepository,
     ): SubQueryValidatorSetFetcher {
-        return SubQueryValidatorSetFetcher(
-            stakingApi,
-            stakingRepository
-        )
+        return SubQueryValidatorSetFetcher(stakingApi)
     }
 
     @Provides
@@ -443,11 +440,11 @@ class StakingFeatureModule {
     fun providePayoutRepository(
         stakingRepository: StakingRepository,
         validatorSetFetcher: SubQueryValidatorSetFetcher,
-        @PayoutsBulkRetriever bulkRetriever: BulkRetriever,
-        storageCache: StorageCache,
         chainRegistry: ChainRegistry,
+        rpcCalls: RpcCalls,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
     ): PayoutRepository {
-        return PayoutRepository(stakingRepository, bulkRetriever, validatorSetFetcher, storageCache, chainRegistry)
+        return PayoutRepository(stakingRepository, validatorSetFetcher, chainRegistry, remoteStorageSource, rpcCalls)
     }
 
     @Provides

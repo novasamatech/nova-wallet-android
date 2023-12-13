@@ -333,13 +333,12 @@ class StakingRepositoryImpl(
     }
 
     private fun observeAccountValidatorPrefs(chainId: ChainId, stashId: AccountId): Flow<ValidatorPrefs?> {
-        return localStorage.observe(
-            chainId = chainId,
-            keyBuilder = { it.metadata.staking().storage("Validators").storageKey(it, stashId) },
-            binder = { scale, runtime ->
-                scale?.let { bindValidatorPrefs(it, runtime) }
-            }
-        )
+        return localStorage.subscribe(chainId) {
+            runtime.metadata.staking().storage("Validators").observe(
+               stashId,
+                binding = { decoded -> decoded?.let { bindValidatorPrefs(decoded) } }
+            )
+        }
     }
 
     private fun observeAccountNominations(chainId: ChainId, stashId: AccountId): Flow<Nominations?> {

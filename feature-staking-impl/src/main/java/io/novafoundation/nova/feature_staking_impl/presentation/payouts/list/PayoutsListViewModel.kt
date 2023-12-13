@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.payouts.list
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -8,8 +9,6 @@ import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.requireException
-import io.novafoundation.nova.common.utils.requireValue
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
@@ -81,10 +80,12 @@ class PayoutsListViewModel(
         launch {
             val result = interactor.calculatePendingPayouts(viewModelScope)
 
-            if (result.isSuccess) {
-                payoutsStatisticsFlow.emit(result.requireValue())
-            } else {
-                val errorMessage = result.requireException().message ?: resourceManager.getString(R.string.common_undefined_error_message)
+            result.onSuccess { value ->
+                payoutsStatisticsFlow.emit(value)
+            }.onFailure { exception ->
+                val errorMessage = exception.message ?: resourceManager.getString(R.string.common_undefined_error_message)
+
+                Log.w("RX", "Failed to construct payout list", exception)
 
                 retryEvent.value = Event(
                     RetryPayload(
@@ -139,7 +140,8 @@ class PayoutsListViewModel(
                 amountInPlanks = amountInPlanks,
                 timeLeftCalculatedAt = timeLeftCalculatedAt,
                 timeLeft = timeLeft,
-                closeToExpire = closeToExpire
+                closeToExpire = closeToExpire,
+                pagesToClaim = pagesToClaim
             )
         }
     }

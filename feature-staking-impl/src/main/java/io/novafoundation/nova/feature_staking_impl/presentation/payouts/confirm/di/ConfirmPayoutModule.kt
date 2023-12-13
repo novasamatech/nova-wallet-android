@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -43,7 +44,8 @@ class ConfirmPayoutModule {
         resourceManager: ResourceManager,
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
-    ): ViewModel {
+        partialRetriableMixinFactory: PartialRetriableMixin.Factory,
+        ): ViewModel {
         return ConfirmPayoutViewModel(
             interactor = interactor,
             payoutInteractor = payoutInteractor,
@@ -56,7 +58,8 @@ class ConfirmPayoutModule {
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
             selectedAssetState = singleAssetSharedState,
-            walletUiUseCase = walletUiUseCase
+            walletUiUseCase = walletUiUseCase,
+            partialRetriableMixinFactory = partialRetriableMixinFactory
         )
     }
 

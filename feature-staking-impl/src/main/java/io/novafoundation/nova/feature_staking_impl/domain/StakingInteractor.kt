@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.fullId
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
-import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
@@ -38,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chain
@@ -86,8 +86,8 @@ class StakingInteractor(
 
             val payouts = payoutRepository.calculateUnpaidPayouts(currentStakingState)
 
-            val allValidatorAddresses = payouts.map(Payout::validatorAddress).distinct()
-            val identityMapping = identityRepository.getIdentitiesFromAddresses(currentStakingState.chain, allValidatorAddresses)
+            val allValidatorStashes = payouts.map{ it.validatorStash.value }.distinct()
+            val identityMapping = identityRepository.getIdentitiesFromIds(allValidatorStashes, chainId)
 
             val pendingPayouts = payouts.map {
                 val erasLeft = remainingEras(createdAtEra = it.era, activeEraIndex, historyDepth)
@@ -97,9 +97,12 @@ class StakingInteractor(
                 val leftTime = calculator.calculateTillEraSet(destinationEra = it.era + historyDepth + ERA_OFFSET).toLong()
                 val currentTimestamp = System.currentTimeMillis()
                 with(it) {
-                    val validatorIdentity = identityMapping[validatorAddress]
+                    val validatorIdentity = identityMapping[validatorStash]
 
-                    val validatorInfo = PendingPayout.ValidatorInfo(validatorAddress, validatorIdentity?.display)
+                    val validatorInfo = PendingPayout.ValidatorInfo(
+                        address = currentStakingState.chain.addressOf(validatorStash.value),
+                        identityName = validatorIdentity?.display
+                    )
 
                     PendingPayout(
                         validatorInfo = validatorInfo,
@@ -107,7 +110,8 @@ class StakingInteractor(
                         amountInPlanks = amount,
                         timeLeft = leftTime,
                         timeLeftCalculatedAt = currentTimestamp,
-                        closeToExpire = closeToExpire
+                        closeToExpire = closeToExpire,
+                        pagesToClaim = pagesToClaim
                     )
                 }
             }.sortedBy { it.era }

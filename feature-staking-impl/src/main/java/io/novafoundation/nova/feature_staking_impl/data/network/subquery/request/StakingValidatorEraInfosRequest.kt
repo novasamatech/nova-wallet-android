@@ -1,15 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.subquery.request
 
+import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
 import java.math.BigInteger
 
-class StakingEraValidatorInfosRequest(eraFrom: BigInteger, eraTo: BigInteger, accountAddress: String) {
+class StakingValidatorEraInfosRequest(eraFrom: BigInteger, eraTo: BigInteger, validatorStashAddress: String): SubQueryFilters {
     val query = """
-        {
             query {
                 eraValidatorInfos(
                     filter:{
                         era:{ greaterThanOrEqualTo: $eraFrom, lessThanOrEqualTo: $eraTo},
-                        others:{ contains:[{who: "$accountAddress"}]}
+                        ${"address" equalTo validatorStashAddress}
                     }
                 ) {
                     nodes {
@@ -21,6 +21,5 @@ class StakingEraValidatorInfosRequest(eraFrom: BigInteger, eraTo: BigInteger, ac
                     }
                 }
             }
-        }
     """.trimIndent()
 }

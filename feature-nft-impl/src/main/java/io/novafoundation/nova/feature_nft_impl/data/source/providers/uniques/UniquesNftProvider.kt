@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.uniques
@@ -22,7 +23,9 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.singleValueOf
+import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
+import io.novafoundation.nova.runtime.storage.source.multi.singleValueOf
+import io.novafoundation.nova.runtime.storage.source.query.multi
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -51,29 +54,31 @@ class UniquesNftProvider(
 
             val classesIds = classesWithInstances.map { (collection, _) -> collection }.distinct()
 
-            val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
-            val instanceMetadataStorage = runtime.metadata.uniques().storage("InstanceMetadataOf")
-            val classStorage = runtime.metadata.uniques().storage("Class")
+            val classMetadataDescriptor: MultiQueryBuilder.Descriptor<BigInteger, ByteArray?>
+            val totalIssuanceDescriptor: MultiQueryBuilder.Descriptor<BigInteger, BigInteger>
+            val instanceMetadataDescriptor: MultiQueryBuilder.Descriptor<Pair<BigInteger, BigInteger>, ByteArray?>
 
             val multiQueryResults = multi {
-                classStorage.querySingleArgKeys(classesIds)
-                classMetadataStorage.querySingleArgKeys(classesIds)
-                instanceMetadataStorage.queryKeys(classesWithInstances)
+                classMetadataDescriptor = runtime.metadata.uniques().storage("ClassMetadataOf").querySingleArgKeys(
+                    keysArgs = classesIds,
+                    keyExtractor = { (classId: BigInteger) -> classId },
+                    binding = ::bindMetadata
+                )
+                instanceMetadataDescriptor = runtime.metadata.uniques().storage("InstanceMetadataOf").querySingleArgKeys(
+                    keysArgs = classesIds,
+                    keyExtractor = { (classId: BigInteger, instance: BigInteger) -> classId to instance },
+                    binding = ::bindMetadata
+                )
+                totalIssuanceDescriptor = runtime.metadata.uniques().storage("Class").queryKeys(
+                    keysArgs = classesWithInstances,
+                    keyExtractor = { (classId: BigInteger) -> classId },
+                    binding = { bindNumber(it.castToStruct()["items"]) }
+                )
             }
 
-            val classMetadatas = multiQueryResults.getValue(classMetadataStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
-                .mapValues { (_, parsedValue) -> bindMetadata(parsedValue) }
-
-            val totalIssuances = multiQueryResults.getValue(classStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
-                .mapValues { (_, parsedValue) ->
-                    bindNumber(parsedValue.cast<Struct.Instance>()["items"])
-                }
-
-            val instancesMetadatas = multiQueryResults.getValue(instanceMetadataStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() to keyComponents.component2<BigInteger>() }
-                .mapValues { (_, parsedValue) -> bindMetadata(parsedValue) }
+            val classMetadatas = multiQueryResults[classMetadataDescriptor]
+            val totalIssuances = multiQueryResults[totalIssuanceDescriptor]
+            val instancesMetadatas = multiQueryResults[instanceMetadataDescriptor]
 
             classesWithInstances.map { (collectionId, instanceId) ->
                 val instanceKey = collectionId to instanceId
@@ -138,14 +143,15 @@ class UniquesNftProvider(
             val classId = nftLocal.collectionId.toBigInteger()
 
             remoteStorage.query(chain.id) {
-                val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
-                val classStorage = runtime.metadata.uniques().storage("Class")
+                var classMetadataDescriptor: MultiQueryBuilder.Descriptor<*, ByteArray?>
+                var classDescriptor: MultiQueryBuilder.Descriptor<*, AccountId>
 
                 val queryResults = multi {
-                    classMetadataStorage.queryKey(classId)
-                    classStorage.queryKey(classId)
+                    classMetadataDescriptor = runtime.metadata.uniques().storage("ClassMetadataOf").queryKey(classId, binding = ::bindMetadata)
+                    classDescriptor = runtime.metadata.uniques().storage("Class").queryKey(classId, binding = ::bindIssuer)
                 }
-                val classMetadataPointer = bindMetadata(queryResults.singleValueOf(classMetadataStorage))
+
+                val classMetadataPointer = queryResults.singleValueOf(classMetadataDescriptor)
 
                 val collection = if (classMetadataPointer == null) {
                     NftDetails.Collection(nftLocal.collectionId)
@@ -160,8 +166,7 @@ class UniquesNftProvider(
                     )
                 }
 
-                val classIssuerRaw = queryResults.singleValueOf(classStorage)
-                val classIssuer = bindAccountId(classIssuerRaw.cast<Struct.Instance>()["issuer"])
+                val classIssuer = queryResults.singleValueOf(classDescriptor)
 
                 NftDetails(
                     identifier = nftLocal.identifier,
@@ -178,6 +183,8 @@ class UniquesNftProvider(
             }
         }
     }
+
+    private fun bindIssuer(dynamic: Any?): AccountId = bindAccountId(dynamic.castToStruct()["issuer"])
 
     private fun bindMetadata(dynamic: Any?): ByteArray? = dynamic?.cast<Struct.Instance>()?.getTyped("data")
 

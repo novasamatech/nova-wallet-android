@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters
 
-import android.util.Log
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.staking
@@ -63,22 +62,15 @@ class ValidatorExposureUpdater(
         val activeEra = scopeValue
         val socketService = storageSubscriptionBuilder.socketService ?: return emptyFlow()
 
-        Log.d("RX", "Starting exposure updater")
-
         return flow<Updater.SideEffect> {
             val chainId = stakingSharedState.chainId()
             val runtime = chainRegistry.getRuntime(chainId)
 
             if (checkValuesInCache(activeEra, chainId, runtime)) {
-                Log.d("RX", "Exposures for era $activeEra already in the cache, skipping sync")
                 return@flow
             }
 
-            Log.d("RX", "Exposures for era $activeEra are not found, starting sync")
-
             cleanupOutdatedEras(chainId, runtime)
-
-            Log.d("RX", "Removed all outdated exposures")
 
             syncNewExposures(activeEra, runtime, socketService, chainId)
         }.noSideAffects()
@@ -129,14 +121,11 @@ class ValidatorExposureUpdater(
 
             if (!pagedExposuresWerePresent) {
                 fetchLegacyExposures(era, runtimeSnapshot, socketService, chainId)
-                Log.d("RX", "Fetched legacy exposures")
             } else {
-                Log.d("RX", "Fetched paged exposures")
                 pagedExposureUsed = true
             }
         } else {
             fetchLegacyExposures(era, runtimeSnapshot, socketService, chainId)
-            Log.d("RX", "Fetched legacy exposures")
         }
 
         saveIsExposuresUsedFlag(pagedExposureUsed, chainId)
@@ -174,8 +163,6 @@ class ValidatorExposureUpdater(
     private suspend fun saveIsExposuresUsedFlag(isUsed: Boolean, chainId: String) {
         val encodedValue = isPagedExposuresValue(isUsed)
         val entry = StorageEntry(STORAGE_KEY_PAGED_EXPOSURES, encodedValue)
-
-        Log.d("RX", "Saving is paged exposures used flag: $encodedValue")
 
         storageCache.insert(entry, chainId)
     }
