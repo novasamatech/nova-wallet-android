@@ -119,7 +119,6 @@ suspend fun StorageQueryContext.multi(
     return multiInternal(builderBlock)
 }
 
-
 fun Iterable<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
 
 val StorageQueryContext.metadata: RuntimeMetadata

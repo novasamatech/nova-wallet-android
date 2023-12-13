@@ -6,5 +6,5 @@ sealed class TransactionOrigin {
 
     object SelectedWallet : TransactionOrigin()
 
-    class WalletWithAccount(val accountId: AccountId): TransactionOrigin()
+    class WalletWithAccount(val accountId: AccountId) : TransactionOrigin()
 }

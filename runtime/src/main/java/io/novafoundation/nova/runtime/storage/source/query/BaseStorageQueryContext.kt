@@ -252,10 +252,10 @@ abstract class BaseStorageQueryContext(
     }
 
     @JvmInline
-    private value class MultiQueryResult(val delegate: Map<MultiQueryBuilder.Descriptor<*, *>, Map<Any?, Any?>>): MultiQueryBuilder.Result {
+    private value class MultiQueryResult(val delegate: Map<MultiQueryBuilder.Descriptor<*, *>, Map<Any?, Any?>>) : MultiQueryBuilder.Result {
         @Suppress("UNCHECKED_CAST")
         override fun <K, V> get(descriptor: MultiQueryBuilder.Descriptor<K, V>): Map<K, V> {
-           return delegate.getValue(descriptor) as Map<K, V>
+            return delegate.getValue(descriptor) as Map<K, V>
         }
     }
 }

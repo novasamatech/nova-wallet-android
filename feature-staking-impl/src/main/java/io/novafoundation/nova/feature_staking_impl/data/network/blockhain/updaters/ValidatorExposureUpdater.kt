@@ -171,7 +171,6 @@ class ValidatorExposureUpdater(
         return metadata.staking().hasStorage("ErasStakersPaged")
     }
 
-
     private fun RuntimeSnapshot.eraStakersPrefixFor(era: BigInteger): String {
         return metadata.staking().storage("ErasStakers").storageKey(this, era)
     }
@@ -195,6 +194,4 @@ class ValidatorExposureUpdater(
     private fun RuntimeSnapshot.eraStakersPrefix(): String {
         return metadata.staking().storage("ErasStakers").storageKey(this)
     }
-
-
 }

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.subquery.reques
 import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
 import java.math.BigInteger
 
-class StakingValidatorEraInfosRequest(eraFrom: BigInteger, eraTo: BigInteger, validatorStashAddress: String): SubQueryFilters {
+class StakingValidatorEraInfosRequest(eraFrom: BigInteger, eraTo: BigInteger, validatorStashAddress: String) : SubQueryFilters {
     val query = """
             query {
                 eraValidatorInfos(

@@ -45,7 +45,7 @@ class ConfirmPayoutModule {
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-        ): ViewModel {
+    ): ViewModel {
         return ConfirmPayoutViewModel(
             interactor = interactor,
             payoutInteractor = payoutInteractor,

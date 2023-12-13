@@ -11,7 +11,7 @@ interface PagedExposuresMigrationTracker {
 
         object NotPresent : SavedValue<Nothing>()
 
-        class Present<T>(val value: T): SavedValue<T>()
+        class Present<T>(val value: T) : SavedValue<T>()
     }
 
     suspend fun saveFirstPagedExposuresEra(chainId: ChainId, era: EraIndex)
@@ -19,7 +19,7 @@ interface PagedExposuresMigrationTracker {
     suspend fun getFirstPagedExposuresEra(chainId: ChainId): SavedValue<EraIndex?>
 }
 
-suspend fun PagedExposuresMigrationTracker.getFirstPagedExposuresEraIndex(chainId: ChainId, historicalRange: List<EraIndex>) : SavedValue<Int?> {
+suspend fun PagedExposuresMigrationTracker.getFirstPagedExposuresEraIndex(chainId: ChainId, historicalRange: List<EraIndex>): SavedValue<Int?> {
     return getFirstPagedExposuresEra(chainId).map { era ->
         if (era == null) return@map null
 
@@ -28,7 +28,7 @@ suspend fun PagedExposuresMigrationTracker.getFirstPagedExposuresEraIndex(chainI
 }
 
 inline fun <T, R> PagedExposuresMigrationTracker.SavedValue<T>.map(mapper: (T) -> R): SavedValue<R> {
-    return when(this) {
+    return when (this) {
         SavedValue.NotPresent -> SavedValue.NotPresent
         is SavedValue.Present -> SavedValue.Present(mapper(value))
     }

@@ -86,7 +86,7 @@ class StakingInteractor(
 
             val payouts = payoutRepository.calculateUnpaidPayouts(currentStakingState)
 
-            val allValidatorStashes = payouts.map{ it.validatorStash.value }.distinct()
+            val allValidatorStashes = payouts.map { it.validatorStash.value }.distinct()
             val identityMapping = identityRepository.getIdentitiesFromIds(allValidatorStashes, chainId)
 
             val pendingPayouts = payouts.map {
@@ -329,7 +329,7 @@ class StakingInteractor(
         val activeNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return exposures.fold(0) { acc, exposure ->
-            val othersSize =  exposure.others.size
+            val othersSize = exposure.others.size
             acc + if (activeNominatorsPerValidator != null) {
                 othersSize.coerceAtMost(activeNominatorsPerValidator)
             } else {

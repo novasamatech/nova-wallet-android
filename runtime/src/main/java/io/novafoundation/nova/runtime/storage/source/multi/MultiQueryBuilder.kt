@@ -31,7 +31,7 @@ interface MultiQueryBuilder {
     ): Descriptor<K, V>
 
     fun <K, V> StorageEntry.querySingleArgKeys(
-        keysArgs:Iterable<Any?>,
+        keysArgs: Iterable<Any?>,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinder<V>
     ): Descriptor<K, V> = queryKeys(keysArgs.wrapSingleArgumentKeys(), keyExtractor, binding)

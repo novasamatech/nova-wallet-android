@@ -335,7 +335,7 @@ class StakingRepositoryImpl(
     private fun observeAccountValidatorPrefs(chainId: ChainId, stashId: AccountId): Flow<ValidatorPrefs?> {
         return localStorage.subscribe(chainId) {
             runtime.metadata.staking().storage("Validators").observe(
-               stashId,
+                stashId,
                 binding = { decoded -> decoded?.let { bindValidatorPrefs(decoded) } }
             )
         }

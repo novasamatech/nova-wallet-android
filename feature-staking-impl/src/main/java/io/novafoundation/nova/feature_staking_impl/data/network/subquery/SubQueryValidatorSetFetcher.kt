@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import java.math.BigInteger
 
-data class PayoutTarget(val validatorStash:  AccountIdKey, val era: BigInteger)
+data class PayoutTarget(val validatorStash: AccountIdKey, val era: BigInteger)
 
 class SubQueryValidatorSetFetcher(
     private val stakingApi: StakingApi,
@@ -23,7 +23,7 @@ class SubQueryValidatorSetFetcher(
         stashAccountAddress: String,
         eraRange: List<EraIndex>,
     ): List<PayoutTarget> {
-        return findPayoutTargets(chain) {apiUrl ->
+        return findPayoutTargets(chain) { apiUrl ->
             stakingApi.getNominatorEraInfos(
                 apiUrl,
                 StakingNominatorEraInfosRequest(
@@ -40,7 +40,7 @@ class SubQueryValidatorSetFetcher(
         stashAccountAddress: String,
         eraRange: List<EraIndex>,
     ): List<PayoutTarget> {
-        return findPayoutTargets(chain) {apiUrl ->
+        return findPayoutTargets(chain) { apiUrl ->
             stakingApi.getValidatorEraInfos(
                 apiUrl,
                 StakingValidatorEraInfosRequest(

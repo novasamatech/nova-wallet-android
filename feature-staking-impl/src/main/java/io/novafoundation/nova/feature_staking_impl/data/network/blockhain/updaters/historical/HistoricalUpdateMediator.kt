@@ -53,6 +53,6 @@ class HistoricalUpdateMediator(
     }
 
     private fun isHistoricalDataClearedKey(chainId: ChainId): String {
-        return "HistoricalUpdateMediator.HistoricalDataCleared::${chainId}"
+        return "HistoricalUpdateMediator.HistoricalDataCleared::$chainId"
     }
 }

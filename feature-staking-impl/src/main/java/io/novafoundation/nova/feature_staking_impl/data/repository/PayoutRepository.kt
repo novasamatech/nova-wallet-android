@@ -165,7 +165,7 @@ class PayoutRepository(
         val pagedEraPrefix = runtime.metadata.staking().storage("ErasStakersOverview").storageKey(runtime, eraIndex)
         val storageSize = rpcCalls.getStorageSize(chainId, pagedEraPrefix)
 
-        Log.d("PayoutRepository", "Fetched storage size for era ${eraIndex}: $storageSize")
+        Log.d("PayoutRepository", "Fetched storage size for era $eraIndex: $storageSize")
 
         return storageSize.isPositive()
     }
@@ -358,7 +358,6 @@ class PayoutRepository(
                 }
             }
 
-
             val pages = runtime.metadata.staking().storage("ErasStakersPaged").entries(
                 keysArguments = pageKeys,
                 keyExtractor = { (era: EraIndex, validatorStash: AccountId, page: BigInteger) -> Triple(era, validatorStash.intoKey(), page.toInt()) },
@@ -446,7 +445,6 @@ class PayoutRepository(
             )
         }
     }
-
 
     private data class PartitionedHistoricalRange(
         val legacy: List<BigInteger>,

@@ -32,7 +32,7 @@ suspend fun BulkRetriever.fetchPrefixValuesToCache(
     prefix: String,
     storageCache: StorageCache,
     chainId: String
-) : Int {
+): Int {
     val allKeys = retrieveAllKeys(socketService, prefix)
 
     if (allKeys.isNotEmpty()) {

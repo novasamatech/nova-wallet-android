@@ -60,7 +60,6 @@ class MultiQueryBuilderImpl(
         return newDescriptor
     }
 
-
     private inner class RealDescriptor<K, V>(
         private val storageEntry: StorageEntry,
         private val keyExtractor: (StorageKeyComponents) -> K,
