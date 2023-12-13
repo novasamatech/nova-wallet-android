@@ -212,7 +212,7 @@ class PayoutRepository(
 
             val claimedLegacyRewards = metadata.staking().storage("Ledger").entries(
                 keysArguments = stashByController.keys.map { listOf(it.value) },
-                keyExtractor = { (controller: AccountId) -> controller.intoKey() },
+                keyExtractor = { (controller: AccountId) -> stashByController.getValue(controller.intoKey()) },
                 binding = { decoded, _ -> decoded?.let { bindStakingLedger(decoded).claimedRewards.toSet() } }
             )
 
@@ -330,7 +330,7 @@ class PayoutRepository(
             val (era, accountId) = key
             PagedValidatorEraStake(accountId, era, pagedExposure)
         }.also {
-            Log.d("RX", "Fetched getPagedValidatorHistoricalStats")
+            Log.d("RX", "Fetched getPagedValidatorHistoricalStats for ${payoutTargets.size} targets")
         }
     }
 
@@ -351,7 +351,7 @@ class PayoutRepository(
                 if (exposureOverview == null) return@flatMap emptyList()
 
                 (0 until exposureOverview.pageCount.toInt()).map { page ->
-                    listOf(key.first, key.second.value, page)
+                    listOf(key.first, key.second.value, page.toBigInteger())
                 }
             }
 
@@ -402,7 +402,7 @@ class PayoutRepository(
 
                 LegacyValidatorEraStake(payoutTarget.validatorStash, payoutTarget.era, exposure)
             }.also {
-                Log.d("RX", "Fetched LegacyValidatorEraStake")
+                Log.d("RX", "Fetched LegacyValidatorEraStake for ${payoutTargets.size} targets")
             }
         }
     }

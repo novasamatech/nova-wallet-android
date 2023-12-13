@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.subquery.EraValidatorInfoQuery
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.model.stakingExternalApi
+import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingNominatorEraInfosRequest
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingValidatorEraInfosRequest
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -22,24 +23,16 @@ class SubQueryValidatorSetFetcher(
         stashAccountAddress: String,
         eraRange: List<EraIndex>,
     ): List<PayoutTarget> {
-        // TODO test code while subQuery westend doesn't work
-        return eraRange.map {
-            PayoutTarget(
-                validatorStash = "5C556QTtg1bJ43GDSgeowa3Ark6aeSHGTac1b2rKSXtgmSmW".toAccountId().intoKey(),
-                era = it
+        return findPayoutTargets(chain) {apiUrl ->
+            stakingApi.getNominatorEraInfos(
+                apiUrl,
+                StakingNominatorEraInfosRequest(
+                    eraFrom = eraRange.first(),
+                    eraTo = eraRange.last(),
+                    nominatorStashAddress = stashAccountAddress
+                )
             )
         }
-
-//        return findPayoutTargets(chain) {apiUrl ->
-//            stakingApi.getNominatorEraInfos(
-//                apiUrl,
-//                StakingNominatorEraInfosRequest(
-//                    eraFrom = eraRange.first(),
-//                    eraTo = eraRange.last(),
-//                    nominatorStashAddress = stashAccountAddress
-//                )
-//            )
-//        }
     }
 
     suspend fun findValidatorPayoutTargets(

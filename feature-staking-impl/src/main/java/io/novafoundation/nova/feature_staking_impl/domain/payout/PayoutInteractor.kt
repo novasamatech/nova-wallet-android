@@ -74,7 +74,7 @@ class PayoutInteractor(
     private fun CallBuilder.payoutStakersByPage(era: BigInteger, validatorId: AccountId, page: Int) {
         addCall(
             "Staking",
-            "payout_stakers",
+            "payout_stakers_by_page",
             mapOf(
                 "validator_stash" to validatorId,
                 "era" to era,
