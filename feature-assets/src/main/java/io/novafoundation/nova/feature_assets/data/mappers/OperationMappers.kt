@@ -169,7 +169,7 @@ private fun mapExtrinsicFromLocal(
     val content = when (local.contentType) {
         ExtrinsicTypeLocal.ContentType.SUBSTRATE_CALL -> Content.SubstrateCall(
             module = local.module,
-            call = local.call
+            call = local.call.orEmpty()
         )
         ExtrinsicTypeLocal.ContentType.SMART_CONTRACT_CALL -> Content.ContractCall(
             contractAddress = local.module,
