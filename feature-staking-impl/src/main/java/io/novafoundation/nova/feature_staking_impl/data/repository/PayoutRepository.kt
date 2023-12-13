@@ -96,19 +96,20 @@ class PayoutRepository(
         val historicalRange = stakingRepository.historicalEras(chainId)
         val payoutTargets = retrievePayoutTargets(historicalRange)
 
-        Log.d("RX", "Fetched payoutTargets")
+        Log.d("PayoutRepository", "Fetched payoutTargets")
 
         val involvedEras = payoutTargets.map { it.era }.distinct()
 
         val validatorEraStakes = getValidatorHistoricalStats(chainId, runtime, historicalRange, payoutTargets)
 
         val historicalTotalEraRewards = retrieveTotalEraReward(chainId, runtime, involvedEras)
-        Log.d("RX", "Fetched historicalTotalEraRewards")
+        Log.d("PayoutRepository", "Fetched historicalTotalEraRewards")
+
         val historicalRewardDistribution = retrieveEraPointsDistribution(chainId, runtime, involvedEras)
-        Log.d("RX", "Fetched historicalRewardDistribution")
+        Log.d("PayoutRepository", "Fetched historicalRewardDistribution")
 
         val eraClaims = fetchValidatorEraClaims(chain, payoutTargets)
-        Log.d("RX", "Fetched eraClaims")
+        Log.d("PayoutRepository", "Fetched eraClaims")
 
         return validatorEraStakes.mapNotNull { validatorEraStake ->
             val key = validatorEraStake.era to validatorEraStake.stash
@@ -123,7 +124,7 @@ class PayoutRepository(
 
             calculatePayout(rewardCalculationContext)
         }.also {
-            Log.d("RX", "Constructed payouts")
+            Log.d("PayoutRepository", "Constructed payouts")
         }
     }
 
@@ -156,7 +157,7 @@ class PayoutRepository(
         if (isExposurePaged(oldestEra, runtime, chainId)) return 0
 
         return historicalRange.findPartitionPoint { era -> isExposurePaged(era, runtime, chainId) }.also {
-            Log.d("RX", "Fount first paged exposures era: ${it?.let { historicalRange[it] }}")
+            Log.d("PayoutRepository", "Fount first paged exposures era: ${it?.let { historicalRange[it] }}")
         }
     }
 
@@ -164,7 +165,7 @@ class PayoutRepository(
         val pagedEraPrefix = runtime.metadata.staking().storage("ErasStakersOverview").storageKey(runtime, eraIndex)
         val storageSize = rpcCalls.getStorageSize(chainId, pagedEraPrefix)
 
-        Log.d("RX", "Fetched storage size for era ${eraIndex}: $storageSize")
+        Log.d("PayoutRepository", "Fetched storage size for era ${eraIndex}: $storageSize")
 
         return storageSize.isPositive()
     }
@@ -201,7 +202,7 @@ class PayoutRepository(
                 }
             }
 
-            Log.d("RX", "Fetched prefs, controllers and claimed pages")
+            Log.d("PayoutRepository", "Fetched prefs, controllers and claimed pages")
 
             val validatorsPrefs = multiQueryResults[validatorsPrefsDescriptor]
             val controllers = multiQueryResults[controllersDescriptor]
@@ -216,7 +217,7 @@ class PayoutRepository(
                 binding = { decoded, _ -> decoded?.let { bindStakingLedger(decoded).claimedRewards.toSet() } }
             )
 
-            Log.d("RX", "Fetched claimedLegacyRewards")
+            Log.d("PayoutRepository", "Fetched claimedLegacyRewards")
 
             val allClaimedPages = claimedPagesDescriptor?.let(multiQueryResults::get)
 
@@ -332,7 +333,7 @@ class PayoutRepository(
             val (era, accountId) = key
             PagedValidatorEraStake(accountId, era, pagedExposure)
         }.also {
-            Log.d("RX", "Fetched getPagedValidatorHistoricalStats for ${payoutTargets.size} targets")
+            Log.d("PayoutRepository", "Fetched getPagedValidatorHistoricalStats for ${payoutTargets.size} targets")
         }
     }
 
@@ -406,7 +407,7 @@ class PayoutRepository(
 
                 LegacyValidatorEraStake(payoutTarget.validatorStash, payoutTarget.era, exposure)
             }.also {
-                Log.d("RX", "Fetched LegacyValidatorEraStake for ${payoutTargets.size} targets")
+                Log.d("PayoutRepository", "Fetched LegacyValidatorEraStake for ${payoutTargets.size} targets")
             }
         }
     }
