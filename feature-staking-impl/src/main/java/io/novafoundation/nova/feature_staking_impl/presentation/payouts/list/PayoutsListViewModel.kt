@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.payouts.list
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -84,8 +83,6 @@ class PayoutsListViewModel(
                 payoutsStatisticsFlow.emit(value)
             }.onFailure { exception ->
                 val errorMessage = exception.message ?: resourceManager.getString(R.string.common_undefined_error_message)
-
-                Log.w("RX", "Failed to construct payout list", exception)
 
                 retryEvent.value = Event(
                     RetryPayload(
