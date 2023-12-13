@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_nft_impl.data.repository
 
 import android.util.Log
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
-import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.transformLatestDiffed
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -26,6 +25,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -62,9 +63,10 @@ class NftRepositoryImpl(
     }
 
     override fun initialNftSyncTrigger(): Flow<NftSyncTrigger> {
-        return flowOfAll { chainRegistry.currentChains }
+        return chainRegistry.currentChains
             .map { chains -> chains.filter { nftProvidersRegistry.nftSupported(it) } }
-            .transformLatestDiffed { NftSyncTrigger(it) }
+            .transformLatestDiffed { emitAll(flowOf(NftSyncTrigger(it))) }
+            .flowOn(Dispatchers.Default)
     }
 
     override suspend fun initialNftSync(
@@ -95,6 +97,8 @@ class NftRepositoryImpl(
                     // prevent whole sync from failing if some particular provider fails
                     runCatching {
                         nftProvider.initialNftsSync(chain, metaAccount, forceOverwrite)
+
+                        Log.d(NFT_TAG, "Completed sync in ${chain.name} using ${nftProvider::class.simpleName}")
                     }.onFailure {
                         Log.e(NFT_TAG, "Failed to sync nfts in ${chain.name} using ${nftProvider::class.simpleName}", it)
                     }

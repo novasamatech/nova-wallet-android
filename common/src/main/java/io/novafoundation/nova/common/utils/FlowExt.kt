@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
@@ -259,7 +261,7 @@ private fun <K> MutableMap<K, CoroutineScope>.removeAndCancel(key: K) {
     remove(key)?.also(CoroutineScope::cancel)
 }
 
-fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend FlowCollector<R>.(value: T) -> Unit): Flow<R> = flow {
+fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend FlowCollector<R>.(value: T) -> Unit): Flow<R> = channelFlow {
     val parentScope = CoroutineScope(coroutineContext)
     val itemScopes = mutableMapOf<String, CoroutineScope>()
 
@@ -275,10 +277,16 @@ fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend
             itemScopes[newOrUpdatedItem.identifier] = chainScope
 
             chainScope.launch {
-                transform(this@flow, newOrUpdatedItem)
+                transform(SendingCollector(this@channelFlow), newOrUpdatedItem)
             }
         }
     }.launchIn(parentScope)
+}
+
+private class SendingCollector<T>(
+    private val channel: SendChannel<T>
+) : FlowCollector<T> {
+    override suspend fun emit(value: T): Unit = channel.send(value)
 }
 
 fun <T> singleReplaySharedFlow() = MutableSharedFlow<T>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
