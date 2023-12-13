@@ -25,8 +25,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -65,8 +63,7 @@ class NftRepositoryImpl(
     override fun initialNftSyncTrigger(): Flow<NftSyncTrigger> {
         return chainRegistry.currentChains
             .map { chains -> chains.filter { nftProvidersRegistry.nftSupported(it) } }
-            .transformLatestDiffed { emitAll(flowOf(NftSyncTrigger(it))) }
-            .flowOn(Dispatchers.Default)
+            .transformLatestDiffed { emit(NftSyncTrigger(it)) }
     }
 
     override suspend fun initialNftSync(
