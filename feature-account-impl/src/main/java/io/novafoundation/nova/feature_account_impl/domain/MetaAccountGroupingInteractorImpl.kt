@@ -103,7 +103,8 @@ class MetaAccountGroupingInteractorImpl(
             LightMetaAccount.Type.POLKADOT_VAULT -> 1
             LightMetaAccount.Type.PARITY_SIGNER -> 2
             LightMetaAccount.Type.LEDGER -> 3
-            LightMetaAccount.Type.WATCH_ONLY -> 4
+            LightMetaAccount.Type.PROXIED -> 4
+            LightMetaAccount.Type.WATCH_ONLY -> 5
         }
     }
 }

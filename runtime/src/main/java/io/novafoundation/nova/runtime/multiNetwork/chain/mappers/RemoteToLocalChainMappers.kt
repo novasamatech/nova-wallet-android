@@ -19,6 +19,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemot
 private const val ETHEREUM_OPTION = "ethereumBased"
 private const val CROWDLOAN_OPTION = "crowdloans"
 private const val TESTNET_OPTION = "testnet"
+private const val PROXY_OPTION = "proxy"
 private const val SWAP_HUB = "swap-hub"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
 
@@ -64,6 +65,7 @@ fun mapRemoteChainToLocal(
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
+            supportProxy = PROXY_OPTION in optionsOrEmpty,
             hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             swap = mapSwapRemoteOptionsToLocal(optionsOrEmpty),

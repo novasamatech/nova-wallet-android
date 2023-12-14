@@ -31,7 +31,7 @@ interface LightMetaAccount {
     val type: Type
 
     enum class Type {
-        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT
+        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT, PROXIED
     }
 }
 
@@ -60,6 +60,7 @@ fun LightMetaAccount(
 class MetaAccount(
     override val id: Long,
     val chainAccounts: Map<ChainId, ChainAccount>,
+    val proxies: List<ProxyAccount>,
     override val substratePublicKey: ByteArray?,
     override val substrateCryptoType: CryptoType?,
     override val substrateAccountId: ByteArray?,
@@ -141,6 +142,7 @@ fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
                 MultiChainEncryption.substrateFrom(cryptoType)
             }
         }
+
         chain.isEthereumBased -> MultiChainEncryption.Ethereum
         else -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
     }

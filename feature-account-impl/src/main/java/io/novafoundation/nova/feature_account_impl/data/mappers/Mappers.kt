@@ -7,9 +7,9 @@ import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core.model.Node.NetworkType
 import io.novafoundation.nova.core_db.dao.MetaAccountWithBalanceLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.JoinedMetaAccountInfo
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -42,11 +42,13 @@ fun mapCryptoTypeToCryptoTypeModel(
             R.string.sr25519_selection_subtitle
         )
         }"
+
         CryptoType.ED25519 -> "${resourceManager.getString(R.string.ed25519_selection_title)} ${
         resourceManager.getString(
             R.string.ed25519_selection_subtitle
         )
         }"
+
         CryptoType.ECDSA -> "${resourceManager.getString(R.string.ecdsa_selection_title)} ${
         resourceManager.getString(
             R.string.ecdsa_selection_subtitle
@@ -92,6 +94,7 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
         MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
         MetaAccountLocal.Type.LEDGER -> LightMetaAccount.Type.LEDGER
         MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
+        MetaAccountLocal.Type.PROXIED -> LightMetaAccount.Type.PROXIED
     }
 }
 
@@ -128,6 +131,7 @@ fun mapMetaAccountLocalToMetaAccount(
         MetaAccount(
             id = id,
             chainAccounts = chainAccounts,
+            proxies = listOf(), // TODO
             substratePublicKey = substratePublicKey,
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substrateAccountId,
@@ -168,6 +172,7 @@ fun mapAddAccountPayloadToAddAccountType(
 
             AddAccountType.MetaAccount(accountNameState.value)
         }
+
         is AddAccountPayload.ChainAccount -> AddAccountType.ChainAccount(payload.chainId, payload.metaId)
     }
 }

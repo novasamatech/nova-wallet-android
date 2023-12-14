@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInt
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -61,6 +62,8 @@ class RootViewModel(
             .launchIn(this)
 
         checkForUpdates()
+
+        syncProxies()
 
         syncCurrencies()
 
@@ -105,6 +108,10 @@ class RootViewModel(
 
     private fun syncCurrencies() {
         launch { currencyInteractor.syncCurrencies() }
+    }
+
+    private fun syncProxies() {
+        launch(Dispatchers.Default) { interactor.syncProxies() }
     }
 
     private fun handleUpdatesSideEffect(sideEffect: Updater.SideEffect) {

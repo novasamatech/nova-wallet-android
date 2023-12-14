@@ -344,4 +344,6 @@ object Modules {
     const val ASSET_TX_PAYMENT = "AssetTxPayment"
 
     const val UTILITY = "Utility"
+
+    const val PROXY = "Proxy"
 }

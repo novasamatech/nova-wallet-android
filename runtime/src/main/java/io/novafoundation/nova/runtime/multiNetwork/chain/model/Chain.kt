@@ -28,6 +28,7 @@ data class Chain(
     val isTestNet: Boolean,
     val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
+    val supportProxy: Boolean,
     val governance: List<Governance>,
     val swap: List<Swap>,
     val parentId: String?,
