@@ -284,6 +284,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_switch_wallet)
     }
 
+    override fun openDelegatedAccountsUpdates() {
+        navController?.navigate(R.id.action_switchWalletFragment_to_delegatedAccountUpdates)
+    }
+
     override fun openSelectAddress(arguments: Bundle) {
         navController?.navigate(R.id.action_open_select_address, arguments)
     }

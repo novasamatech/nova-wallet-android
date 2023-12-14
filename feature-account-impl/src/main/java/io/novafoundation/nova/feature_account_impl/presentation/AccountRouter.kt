@@ -32,6 +32,8 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openSwitchWallet()
 
+    fun openDelegatedAccountsUpdates()
+
     fun openNodes()
 
     fun openAddAccount(payload: AddAccountPayload)

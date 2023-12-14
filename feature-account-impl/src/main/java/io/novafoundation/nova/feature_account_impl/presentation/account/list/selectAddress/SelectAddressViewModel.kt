@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionResponder
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -20,7 +20,7 @@ class SelectAddressViewModel(
 
     override val walletsListingMixin = accountListingMixinFactory.create(this, request.fromChainId, request.destinationChainId, request.selectedAddress)
 
-    override val mode: AccountsAdapter.Mode = AccountsAdapter.Mode.SWITCH
+    override val mode: AccountHolder.Mode = AccountHolder.Mode.SWITCH
 
     override fun accountClicked(accountModel: AccountUi) {
         launch {

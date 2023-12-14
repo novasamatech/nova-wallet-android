@@ -24,4 +24,9 @@ class SwitchWalletFragment : WalletListFragment<SwitchWalletViewModel>() {
             .create(this)
             .inject(this)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.onDestroy()
+    }
 }

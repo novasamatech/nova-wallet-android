@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
@@ -23,11 +24,13 @@ class SwitchWalletModule {
         accountInteractor: AccountInteractor,
         router: AccountRouter,
         accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
     ): ViewModel {
         return SwitchWalletViewModel(
             accountInteractor = accountInteractor,
             router = router,
             accountListingMixinFactory = accountListingMixinFactory,
+            metaAccountsUpdatesRegistry = metaAccountsUpdatesRegistry
         )
     }
 

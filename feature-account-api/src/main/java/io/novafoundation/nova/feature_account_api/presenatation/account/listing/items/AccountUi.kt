@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_api.presenatation.account.listing
+package io.novafoundation.nova.feature_account_api.presenatation.account.listing.items
 
 import android.graphics.drawable.Drawable
 
@@ -10,5 +10,7 @@ class AccountUi(
     val isClickable: Boolean,
     val picture: Drawable,
     val chainIconUrl: String?,
+    val enabled: Boolean,
+    val updateIndicator: Boolean,
     val subtitleIconRes: Int?
 )

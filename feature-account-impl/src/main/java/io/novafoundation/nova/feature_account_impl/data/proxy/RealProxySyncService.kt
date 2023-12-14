@@ -10,6 +10,7 @@ import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.data.model.ProxiedWithProxy
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
@@ -32,15 +33,15 @@ class RealProxySyncService(
     private val proxyRepository: ProxyRepository,
     private val accounRepository: AccountRepository,
     private val accountDao: MetaAccountDao,
-    private val identityProvider: IdentityProvider
+    private val identityProvider: IdentityProvider,
+    private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
 ) : ProxySyncService {
 
     override suspend fun startSyncing() {
-        if (!accounRepository.hasMetaAccounts()) return
+        val metaAccounts = getMetaAccounts()
+        if (metaAccounts.isEmpty()) return
 
         runCatching {
-            val metaAccounts = getMetaAccounts()
-
             val supportedProxyChains = getSupportedProxyChains()
             val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
 
@@ -72,11 +73,14 @@ class RealProxySyncService(
                 createProxyAccount(proxiedMetaId, proxy.metaId, proxied.chainId, proxied.accountId, proxy.proxyType)
             }
 
-            val deactivatedMetaAccounts = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
+            val deactivatedMetaAccountIds = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
 
             accountDao.insertChainAccounts(chains)
             accountDao.insertProxies(newProxies)
-            accountDao.changeAccountsStatus(deactivatedMetaAccounts, MetaAccountLocal.Status.DEACTIVATED)
+            accountDao.changeAccountsStatus(deactivatedMetaAccountIds, MetaAccountLocal.Status.DEACTIVATED)
+
+            val changedMetaIds = proxiedsToMetaId.map { it.second } + deactivatedMetaAccountIds
+            metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
         }.onFailure {
             Log.e(LOG_TAG, "Failed to sync proxy delegators", it)
         }
