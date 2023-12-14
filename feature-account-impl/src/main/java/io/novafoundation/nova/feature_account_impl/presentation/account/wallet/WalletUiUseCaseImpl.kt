@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_DEFAULT
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
+import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_MEDIUM
 import io.novafoundation.nova.common.utils.ByteArrayComparator
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -53,39 +54,40 @@ class WalletUiUseCaseImpl(
         return WalletModel(
             metaId = metaAccount.id,
             name = metaAccount.name,
-            icon = walletIcon(metaAccount)
+            icon = walletIcon(metaAccount, SIZE_MEDIUM)
         )
     }
 
     override suspend fun walletIcon(
         metaAccount: MetaAccount,
+        iconSize: Int,
         transparentBackground: Boolean
     ): Drawable {
         val seed = metaAccount.walletIconSeed()
 
-        return generateWalletIcon(seed, transparentBackground)
+        return generateWalletIcon(seed, iconSize, transparentBackground)
     }
 
     override suspend fun walletUiFor(metaAccount: MetaAccount): WalletModel {
         return WalletModel(
             metaId = metaAccount.id,
             name = metaAccount.name,
-            icon = walletIcon(metaAccount, transparentBackground = true)
+            icon = walletIcon(metaAccount, SIZE_MEDIUM, transparentBackground = true)
         )
     }
 
     private suspend fun maybeGenerateIcon(accountId: AccountId, shouldGenerate: Boolean): Drawable? {
         return if (shouldGenerate) {
-            generateWalletIcon(seed = accountId, transparentBackground = true)
+            generateWalletIcon(seed = accountId, iconSize = SIZE_MEDIUM, transparentBackground = true)
         } else {
             null
         }
     }
 
-    private suspend fun generateWalletIcon(seed: ByteArray, transparentBackground: Boolean): Drawable {
+    private suspend fun generateWalletIcon(seed: ByteArray, iconSize: Int, transparentBackground: Boolean): Drawable {
         return addressIconGenerator.createAddressIcon(
             accountId = seed,
-            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+            sizeInDp = iconSize,
             backgroundColorRes = if (transparentBackground) BACKGROUND_TRANSPARENT else BACKGROUND_DEFAULT
         )
     }

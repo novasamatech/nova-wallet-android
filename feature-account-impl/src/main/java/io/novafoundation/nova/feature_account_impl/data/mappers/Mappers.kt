@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
+import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
@@ -127,11 +128,20 @@ fun mapMetaAccountLocalToMetaAccount(
         }
     ).filterNotNull()
 
+    val proxyAccount = joinedMetaAccountInfo.proxyAccountLocal?.let {
+        ProxyAccount(
+            metaId = it.proxyMetaId,
+            chainId = it.chainId,
+            proxiedAccountId = it.proxiedAccountId,
+            proxyType = mapProxyTypeToString(it.proxyType)
+        )
+    }
+
     return with(joinedMetaAccountInfo.metaAccount) {
         MetaAccount(
             id = id,
             chainAccounts = chainAccounts,
-            proxies = listOf(), // TODO
+            proxy = proxyAccount,
             substratePublicKey = substratePublicKey,
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substrateAccountId,
@@ -180,4 +190,18 @@ fun mapAddAccountPayloadToAddAccountType(
 fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
     null -> AccountNameChooserMixin.State.NoInput
     else -> AccountNameChooserMixin.State.Input(name)
+}
+
+private fun mapProxyTypeToString(proxyType: String): ProxyAccount.ProxyType {
+    return when (proxyType) {
+        "Any" -> ProxyAccount.ProxyType.Any
+        "NonTransfer" -> ProxyAccount.ProxyType.NonTransfer
+        "Governance" -> ProxyAccount.ProxyType.Governance
+        "Staking" -> ProxyAccount.ProxyType.Staking
+        "IdentityJudgement" -> ProxyAccount.ProxyType.IdentityJudgement
+        "CancelProxy" -> ProxyAccount.ProxyType.CancelProxy
+        "Auction" -> ProxyAccount.ProxyType.Auction
+        "NominationPools" -> ProxyAccount.ProxyType.NominationPools
+        else -> ProxyAccount.ProxyType.Other(proxyType)
+    }
 }

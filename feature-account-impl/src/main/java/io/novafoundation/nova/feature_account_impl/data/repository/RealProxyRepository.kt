@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.feature_account_api.data.model.ProxiedWithProxies
+import io.novafoundation.nova.feature_account_api.data.model.ProxiedWithProxy
 import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -20,7 +20,7 @@ class RealProxyRepository(
     private val remoteSource: StorageDataSource
 ) : ProxyRepository {
 
-    override suspend fun getProxyDelegatorsForAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxies> {
+    override suspend fun getProxyDelegatorsForAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxy> {
         val delegatorToProxies = receiveAllProxies(chainId)
 
         val accountIdToMetaAccounts = metaAccountIds.groupBy { it.accountId.intoKey() }
@@ -32,8 +32,8 @@ class RealProxyRepository(
                 if (matchedProxies.isEmpty()) return@mapNotNull null
 
                 delegator to matchedProxies
-            }.map { (delegator, proxies) ->
-                mapToProxiedWithProxies(chainId, delegator, proxies)
+            }.flatMap { (delegator, proxies) ->
+                proxies.map { proxy -> mapToProxiedWithProxies(chainId, delegator, proxy) }
             }
     }
 
@@ -68,24 +68,26 @@ class RealProxyRepository(
     private fun mapToProxiedWithProxies(
         chainId: ChainId,
         delegator: AccountIdKey,
-        proxies: List<ProxiedWithProxies.Proxy>
-    ): ProxiedWithProxies {
-        return ProxiedWithProxies(
-            accountId = delegator.value,
-            chainId = chainId,
-            proxies = proxies
+        proxies: ProxiedWithProxy.Proxy
+    ): ProxiedWithProxy {
+        return ProxiedWithProxy(
+            proxied = ProxiedWithProxy.Proxied(
+                accountId = delegator.value,
+                chainId = chainId
+            ),
+            proxy = proxies
         )
     }
 
     private fun matchProxiesToAccountsAndMap(
         proxies: Map<AccountIdKey, String>,
         accountIdToMetaAccounts: Map<AccountIdKey, List<MetaAccountId>>
-    ): List<ProxiedWithProxies.Proxy> {
+    ): List<ProxiedWithProxy.Proxy> {
         return proxies.flatMap { (proxyAccountId, proxyType) ->
             val matchedAccounts = accountIdToMetaAccounts[proxyAccountId] ?: return@flatMap emptyList()
 
             matchedAccounts.map {
-                ProxiedWithProxies.Proxy(
+                ProxiedWithProxy.Proxy(
                     accountId = proxyAccountId.value,
                     metaId = it.metaId,
                     proxyType = proxyType

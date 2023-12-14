@@ -155,6 +155,13 @@ class AccountDataSourceImpl(
         }
     }
 
+    override fun activeMetaAccountsFlow(): Flow<List<MetaAccount>> {
+        return metaAccountDao.getJoinedMetaAccountsInfoByStatusFlow(MetaAccountLocal.Status.ACTIVE)
+            .map { accountsLocal ->
+                accountsLocal.map(::mapMetaAccountLocalToMetaAccount)
+            }
+    }
+
     override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
         return metaAccountDao.metaAccountsWithBalanceFlow().mapList(::mapMetaAccountWithBalanceFromLocal)
     }
@@ -226,9 +233,11 @@ class AccountDataSourceImpl(
             ethereumPublicKey = ethereumPublicKey,
             ethereumAddress = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value,
             name = name,
+            parentMetaId = null,
             isSelected = false,
             position = metaAccountDao.nextAccountPosition(),
-            type = MetaAccountLocal.Type.SECRETS
+            type = MetaAccountLocal.Type.SECRETS,
+            status = MetaAccountLocal.Status.ACTIVE
         )
 
         val metaId = metaAccountDao.insertMetaAccount(metaAccountLocal)

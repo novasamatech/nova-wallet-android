@@ -389,7 +389,8 @@ class AccountFeatureModule {
         walletUseCase: WalletUiUseCase,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         accountTypePresentationMapper: MetaAccountTypePresentationMapper,
-    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, accountTypePresentationMapper)
+        resourceManager: ResourceManager
+    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, accountTypePresentationMapper, resourceManager)
 
     @Provides
     @FeatureScope

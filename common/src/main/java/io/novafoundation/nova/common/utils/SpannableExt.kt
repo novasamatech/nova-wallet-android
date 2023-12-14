@@ -28,10 +28,26 @@ fun Spannable.setFullSpan(span: Any): Spannable {
 
 // This method is nice for ImageSpan
 fun Spannable.setEndSpan(span: Any): Spannable {
-    val spannable = SpannableStringBuilder(this)
-    spannable.append(" ")
-        .setSpan(span, length, length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-    return spannable
+    return SpannableStringBuilder(this)
+        .appendEnd(span)
+}
+
+fun SpannableStringBuilder.appendSpace(): SpannableStringBuilder {
+    append(" ")
+    return this
+}
+
+fun SpannableStringBuilder.append(text: CharSequence?, span: Any): SpannableStringBuilder {
+    val startSpan = length
+    append(text)
+        .setSpan(span, startSpan, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+    return this
+}
+
+fun SpannableStringBuilder.appendEnd(span: Any): SpannableStringBuilder {
+    appendSpace()
+        .setSpan(span, length - 1, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+    return this
 }
 
 fun clickableSpan(onClick: () -> Unit) = object : ClickableSpan() {

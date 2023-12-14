@@ -140,6 +140,10 @@ class AccountRepositoryImpl(
         return accountDataSource.allMetaAccountsFlow()
     }
 
+    override fun activeMetaAccountsFlow(): Flow<List<MetaAccount>> {
+        return accountDataSource.activeMetaAccountsFlow()
+    }
+
     override fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
         return accountDataSource.metaAccountsWithBalancesFlow()
     }

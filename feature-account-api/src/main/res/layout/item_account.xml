@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
-    android:background="@drawable/bg_primary_list_item">
+    android:background="@drawable/bg_primary_list_item"
+    tools:background="@color/secondary_screen_background">
 
     <ImageView
         android:id="@+id/itemAccountDelete"
@@ -30,6 +31,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginStart="16dp"
         tools:src="@color/icon_primary" />
+
+    <ImageView
+        android:id="@+id/itemChainIcon"
+        android:layout_width="17dp"
+        android:layout_height="17dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="19dp"
+        android:background="@drawable/bg_chain_wallet"
+        android:padding="1.5dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/itemAccountIcon"
+        app:layout_constraintTop_toTopOf="@+id/itemAccountIcon"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/itemAccountTitle"

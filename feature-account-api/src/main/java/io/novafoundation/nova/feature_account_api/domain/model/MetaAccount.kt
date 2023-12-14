@@ -60,7 +60,7 @@ fun LightMetaAccount(
 class MetaAccount(
     override val id: Long,
     val chainAccounts: Map<ChainId, ChainAccount>,
-    val proxies: List<ProxyAccount>,
+    val proxy: ProxyAccount?,
     override val substratePublicKey: ByteArray?,
     override val substrateCryptoType: CryptoType?,
     override val substrateAccountId: ByteArray?,

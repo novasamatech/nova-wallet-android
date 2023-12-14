@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.core.view.isVisible
+import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -12,10 +13,12 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.ChipLabelModel
 import io.novafoundation.nova.common.view.ChipLabelView
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import kotlinx.android.synthetic.main.item_account.view.itemAccountArrow
 import kotlinx.android.synthetic.main.item_account.view.itemAccountCheck
 import kotlinx.android.synthetic.main.item_account.view.itemAccountContainer
@@ -23,9 +26,11 @@ import kotlinx.android.synthetic.main.item_account.view.itemAccountDelete
 import kotlinx.android.synthetic.main.item_account.view.itemAccountIcon
 import kotlinx.android.synthetic.main.item_account.view.itemAccountSubtitle
 import kotlinx.android.synthetic.main.item_account.view.itemAccountTitle
+import kotlinx.android.synthetic.main.item_account.view.itemChainIcon
 
 class AccountsAdapter(
     private val accountItemHandler: AccountItemHandler,
+    private val imageLoader: ImageLoader,
     initialMode: Mode
 ) : GroupedListAdapter<ChipLabelModel, AccountUi>(DiffCallback()) {
 
@@ -57,7 +62,7 @@ class AccountsAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return AccountHolder(parent.inflateChild(R.layout.item_account))
+        return AccountHolder(parent.inflateChild(R.layout.item_account), imageLoader)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: ChipLabelModel) {
@@ -102,7 +107,7 @@ class AccountTypeHolder(override val containerView: ChipLabelView) : GroupedList
     }
 }
 
-class AccountHolder(view: View) : GroupedListHolder(view) {
+class AccountHolder(view: View, private val imageLoader: ImageLoader) : GroupedListHolder(view) {
 
     init {
         val lt = LayoutTransition().apply {
@@ -123,6 +128,9 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
         bindMode(mode, accountModel, handler)
 
         itemAccountIcon.setImageDrawable(accountModel.picture)
+        itemChainIcon.letOrHide(accountModel.chainIconUrl) {
+            itemChainIcon.loadChainIcon(it, imageLoader = imageLoader)
+        }
     }
 
     fun bindName(accountModel: AccountUi) {

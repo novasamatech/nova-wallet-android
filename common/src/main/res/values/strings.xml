@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="proxy_wallet_subtitle">%s proxy:</string>
+    <string name="account_proxy_type_any">Any</string>
+    <string name="account_proxy_type_non_transfer">Non Transfer</string>
+    <string name="account_proxy_type_governance">Governance</string>
+    <string name="account_proxy_type_staking">Staking</string>
+    <string name="account_proxy_type_identity_judgement">Identity Judgement</string>
+    <string name="account_proxy_type_cancel_proxy">Cancel Proxy</string>
+    <string name="account_proxy_type_auction">Auction</string>
+    <string name="account_proxy_type_nomination_pools">Nomination Pools</string>
+
+    <string name="account_proxieds">Delegated to you (Proxieds)</string>
+
     <string name="deep_linking_chain_id_is_not_found">Chain is not found</string>
     <string name="deep_linking_governance_type_is_not_specified">Governance type is not specified</string>
     <string name="deep_linking_governance_type_is_not_supported">Governance type is not supported</string>

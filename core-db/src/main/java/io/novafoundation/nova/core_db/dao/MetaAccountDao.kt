@@ -111,6 +111,9 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     fun getJoinedMetaAccountsInfoFlow(): Flow<List<RelationJoinedMetaAccountInfo>>
 
+    @Query("SELECT * FROM meta_accounts WHERE status = :status")
+    fun getJoinedMetaAccountsInfoByStatusFlow(status: MetaAccountLocal.Status): Flow<List<RelationJoinedMetaAccountInfo>>
+
     @Query(META_ACCOUNTS_WITH_BALANCE_QUERY)
     fun metaAccountsWithBalanceFlow(): Flow<List<MetaAccountWithBalanceLocal>>
 
@@ -151,7 +154,7 @@ interface MetaAccountDao {
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
     suspend fun updateName(metaId: Long, newName: String)
 
-    @Query("DELETE FROM meta_accounts WHERE id = :metaId")
+    @Query("DELETE FROM meta_accounts WHERE id = :metaId OR parentMetaId = :metaId")
     suspend fun delete(metaId: Long)
 
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")
@@ -174,6 +177,9 @@ interface MetaAccountDao {
 
     @Query("SELECT EXISTS(SELECT * FROM meta_accounts)")
     suspend fun hasMetaAccounts(): Boolean
+
+    @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
+    suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)
 }
 
 class MetaAccountWithBalanceLocal(

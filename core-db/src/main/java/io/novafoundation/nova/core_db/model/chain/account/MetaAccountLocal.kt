@@ -1,5 +1,6 @@
 package io.novafoundation.nova.core_db.model.chain.account
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -19,10 +20,17 @@ class MetaAccountLocal(
     val ethereumPublicKey: ByteArray?,
     val ethereumAddress: ByteArray?,
     val name: String,
+    val parentMetaId: Long?,
     val isSelected: Boolean,
     val position: Int,
     val type: Type,
+    @ColumnInfo(defaultValue = "ACTIVE")
+    val status: Status,
 ) {
+
+    enum class Status {
+        ACTIVE, DEACTIVATED
+    }
 
     companion object Table {
         const val TABLE_NAME = "meta_accounts"

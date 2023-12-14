@@ -1,16 +1,16 @@
 package io.novafoundation.nova.core_db.converters
 
 import androidx.room.TypeConverter
-import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
 class ProxyAccountConverters {
     @TypeConverter
-    fun fromStatusType(type: ProxyAccountLocal.Status): String {
+    fun fromStatusType(type: MetaAccountLocal.Status): String {
         return type.name
     }
 
     @TypeConverter
-    fun toStatusType(name: String): ProxyAccountLocal.Status {
-        return ProxyAccountLocal.Status.valueOf(name)
+    fun toStatusType(name: String): MetaAccountLocal.Status {
+        return MetaAccountLocal.Status.valueOf(name)
     }
 }

@@ -49,6 +49,8 @@ interface AccountRepository {
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
+    fun activeMetaAccountsFlow(): Flow<List<MetaAccount>>
+
     fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
 
     fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>>

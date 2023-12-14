@@ -157,6 +157,7 @@ abstract class SelectAddressLedgerViewModel(
                 isSelected = false,
                 isClickable = true,
                 picture = addressModel.image,
+                chainIconUrl = null,
                 subtitleIconRes = null
             )
         }

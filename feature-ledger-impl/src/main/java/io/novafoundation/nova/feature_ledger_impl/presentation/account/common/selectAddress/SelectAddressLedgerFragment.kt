@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
+import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
@@ -30,7 +31,10 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
         fun getBundle(payload: SelectLedgerAddressPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    private val addressesAdapter = AccountsAdapter(this, AccountsAdapter.Mode.VIEW)
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
+
+    private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) { AccountsAdapter(this, imageLoader, AccountsAdapter.Mode.VIEW) }
     private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
 
     @Inject
