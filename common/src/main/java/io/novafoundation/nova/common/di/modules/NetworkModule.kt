@@ -35,6 +35,8 @@ private const val HTTP_CACHE = "http_cache"
 private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MiB
 private const val TIMEOUT_SECONDS = 20L
 
+private const val SOCKET_CONNECTION_TIMEOUT = 5_000
+
 @Module
 class NetworkModule {
 
@@ -103,7 +105,9 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
-    fun provideSocketFactory() = WebSocketFactory()
+    fun provideSocketFactory() = WebSocketFactory().apply {
+        connectionTimeout = SOCKET_CONNECTION_TIMEOUT
+    }
 
     @Provides
     fun provideReconnector() = Reconnector()

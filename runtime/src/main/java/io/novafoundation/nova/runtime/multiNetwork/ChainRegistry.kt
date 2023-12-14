@@ -137,7 +137,7 @@ class ChainRegistry(
         }
     }
 
-    private suspend fun awaitConnectionStateIsAtLeast(chainId: ChainId, state: ConnectionState): Unit {
+    private suspend fun awaitConnectionStateIsAtLeast(chainId: ChainId, state: ConnectionState) {
         chainsById
             .mapNotNull { chainsById -> chainsById[chainId] }
             .first { it.connectionState.level >= state.level }

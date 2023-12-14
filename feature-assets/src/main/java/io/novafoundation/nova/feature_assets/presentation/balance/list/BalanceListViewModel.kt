@@ -191,6 +191,7 @@ class BalanceListViewModel(
 
         walletInteractor.nftSyncTrigger()
             .onEach { trigger -> walletInteractor.syncChainNfts(selectedMetaAccount.first(), trigger.chain) }
+            .launchIn(viewModelScope)
     }
 
     fun fullSync() {

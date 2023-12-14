@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.domain.assets.list
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_nft_api.data.model.isFullySynced
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -25,7 +26,7 @@ class AssetsListInteractor(
             .map { nfts ->
                 NftPreviews(
                     totalNftsCount = nfts.size,
-                    nftPreviews = nfts.take(PREVIEW_COUNT)
+                    nftPreviews = nfts.sortedBy { it.isFullySynced }.take(PREVIEW_COUNT)
                 )
             }
     }
