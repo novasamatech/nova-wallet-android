@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
@@ -85,6 +86,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.language.RealLanguageUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
@@ -495,4 +498,10 @@ class AccountFeatureModule {
     fun provideBiometricServiceFactory(accountRepository: AccountRepository): BiometricServiceFactory {
         return RealBiometricServiceFactory(accountRepository)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideSigningNotSupportedPresentable(
+        contextManager: ContextManager
+    ): SigningNotSupportedPresentable = RealSigningNotSupportedPresentable(contextManager)
 }
