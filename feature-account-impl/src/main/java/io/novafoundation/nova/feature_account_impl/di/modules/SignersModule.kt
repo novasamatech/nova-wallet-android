@@ -8,15 +8,20 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.DefaultMutableSharedState
 import io.novafoundation.nova.common.utils.MutableSharedState
+import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
+import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.RealSignerProvider
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSigner
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSigner
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultSigner
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedFeeSignerFactory
+import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
@@ -37,6 +42,22 @@ class SignersModule {
         chainRegistry: ChainRegistry,
         twoFactorVerificationService: TwoFactorVerificationService
     ) = SecretsSignerFactory(secretStoreV2, chainRegistry, twoFactorVerificationService)
+
+    @Provides
+    @FeatureScope
+    fun provideProxiedSignerFactory(
+        secretStoreV2: SecretStoreV2,
+        chainRegistry: ChainRegistry,
+        accountRepository: AccountRepository,
+        proxySigningPresenter: ProxySigningPresenter,
+        proxyRepository: ProxyRepository,
+    ) = ProxiedSignerFactory(secretStoreV2, chainRegistry, accountRepository, proxySigningPresenter, proxyRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideProxiedFeeSignerFactory(
+        accountRepository: AccountRepository
+    ) = ProxiedFeeSignerFactory(accountRepository)
 
     @Provides
     @FeatureScope
@@ -89,15 +110,19 @@ class SignersModule {
     @FeatureScope
     fun provideSignerProvider(
         secretsSignerFactory: SecretsSignerFactory,
+        proxiedSignerFactory: ProxiedSignerFactory,
         watchOnlySigner: WatchOnlySigner,
         paritySignerSigner: ParitySignerSigner,
         polkadotVaultSigner: PolkadotVaultSigner,
+        proxiedFeeSignerFactory: ProxiedFeeSignerFactory,
         ledgerSigner: LedgerSigner
     ): SignerProvider = RealSignerProvider(
         secretsSignerFactory = secretsSignerFactory,
         watchOnlySigner = watchOnlySigner,
         paritySignerSigner = paritySignerSigner,
         polkadotVaultSigner = polkadotVaultSigner,
+        proxiedSignerFactory = proxiedSignerFactory,
+        proxiedFeeSignerFactory = proxiedFeeSignerFactory,
         ledgerSigner = ledgerSigner
     )
 }

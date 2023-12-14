@@ -75,6 +75,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
@@ -104,7 +105,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 
 @Module(
-    includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class, IdentityProviderModule::class, AdvancedEncryptionStoreModule::class]
+    includes = [SignersModule::class, WatchOnlyModule::class, ProxySigningModule::class, ParitySignerModule::class, IdentityProviderModule::class, AdvancedEncryptionStoreModule::class]
 )
 class AccountFeatureModule {
 
@@ -117,8 +118,9 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideProxyRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource
-    ): ProxyRepository = RealProxyRepository(storageDataSource)
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): ProxyRepository = RealProxyRepository(storageDataSource, chainRegistry)
 
     @Provides
     @FeatureScope

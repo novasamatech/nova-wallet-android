@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.failedSigningIfNotCancelled
@@ -200,7 +201,7 @@ class PolkadotExternalSignInteractor(
         val accountId = chain.accountIdOf(address)
 
         val signer = if (forFee) {
-            signerProvider.feeSigner(chain)
+            signerProvider.feeSigner(resolveMetaAccount(), chain)
         } else {
             resolveWalletSigner()
         }

@@ -19,16 +19,16 @@ open class ActionNotAllowedBottomSheet(
     private val onSuccess: () -> Unit,
 ) : BaseBottomSheet(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
 
-    val image: ImageView
+    val iconView: ImageView
         get() = actionNotAllowedImage
 
-    val title: TextView
+    val titleView: TextView
         get() = actionNotAllowedTitle
 
-    val subtitle: TextView
+    val subtitleView: TextView
         get() = actionNotAllowedSubtitle
 
-    val button: PrimaryButton
+    val buttonView: PrimaryButton
         get() = actionNotAllowedOk
 
     init {
@@ -50,13 +50,13 @@ open class ActionNotAllowedBottomSheet(
         super.setContentView(layoutResId)
     }
 
-    protected fun applySolidIconStyle(@DrawableRes src: Int) = with(image) {
+    protected fun applySolidIconStyle(@DrawableRes src: Int) = with(iconView) {
         setPadding(12.dp)
         setBackgroundResource(R.drawable.bg_icon_big)
         setImageResource(src)
     }
 
-    protected fun applyDashedIconStyle(@DrawableRes src: Int) = with(image) {
+    protected fun applyDashedIconStyle(@DrawableRes src: Int) = with(iconView) {
         setPadding(12.dp)
         setBackgroundResource(R.drawable.bg_icon_big_dashed)
         setImageResource(src)

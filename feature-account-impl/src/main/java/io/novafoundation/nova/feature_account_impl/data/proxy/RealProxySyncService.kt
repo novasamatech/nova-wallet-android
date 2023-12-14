@@ -124,9 +124,9 @@ class RealProxySyncService(
                     LightMetaAccount.Type.SECRETS,
                     LightMetaAccount.Type.PARITY_SIGNER,
                     LightMetaAccount.Type.LEDGER,
-                    LightMetaAccount.Type.POLKADOT_VAULT -> true
+                    LightMetaAccount.Type.POLKADOT_VAULT,
+                    LightMetaAccount.Type.WATCH_ONLY -> true
 
-                    LightMetaAccount.Type.WATCH_ONLY,
                     LightMetaAccount.Type.PROXIED -> false
                 }
             }
@@ -156,9 +156,9 @@ class RealProxySyncService(
         return MetaAccountLocal(
             substratePublicKey = null,
             substrateCryptoType = null,
-            substrateAccountId = if (chain.isSubstrateBased) proxiedAccountId else null,
+            substrateAccountId = null,
             ethereumPublicKey = null,
-            ethereumAddress = if (chain.isEthereumBased) proxiedAccountId else null,
+            ethereumAddress = null,
             name = identity?.name ?: chain.addressOf(proxiedAccountId),
             parentMetaId = parentMetaId,
             isSelected = false,

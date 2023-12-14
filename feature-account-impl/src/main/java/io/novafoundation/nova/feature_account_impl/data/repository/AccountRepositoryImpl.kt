@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
+import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
@@ -255,6 +256,14 @@ class AccountRepositoryImpl(
         return accountDataSource.accountExists(accountId)
     }
 
+    override suspend fun getProxyAccountsByMetaId(metaId: Long): List<ProxyAccount> {
+        return accountDataSource.getProxyAccountsByMetaId(metaId)
+    }
+
+    override suspend fun getProxyAccountsByProxiedAccountId(accountId: AccountId): List<ProxyAccount> {
+        return accountDataSource.getProxyAccountsByProxiedAccountId(accountId)
+    }
+    
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }
