@@ -46,7 +46,7 @@ class RealProxyRepository(
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
                 .query(
-                    keyArguments = arrayOf(AccountIdKey(proxiedAccountId)),
+                    keyArguments = arrayOf(proxiedAccountId),
                     binding = { result ->
                         bindProxyAccounts(result)
                     }

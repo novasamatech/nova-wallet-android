@@ -10,20 +10,21 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.Addres
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 suspend fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
-    accountId: AccountId,
+    proxyAccountId: AccountId,
     proxyType: ProxyAccount.ProxyType,
     callInstance: CallRepresentation.Instance
 ): SignerPayloadExtrinsic {
+    val proxiedAccountId = accountId
     val callBuilder = SimpleCallBuilder(runtime)
     callBuilder.addCall(
         moduleName = Modules.PROXY,
         callName = "proxy",
         arguments = mapOf(
-            "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId),
+            "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, proxiedAccountId),
             "force_proxy_type" to DictEnum.Entry(proxyType.name, null),
             "call" to callInstance.call
         )
     )
 
-    return copy(call = CallRepresentation.Instance(callBuilder.calls.first()))
+    return copy(accountId = proxyAccountId, call = CallRepresentation.Instance(callBuilder.calls.first()))
 }

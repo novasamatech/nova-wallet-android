@@ -80,7 +80,7 @@ class ProxiedSigner(
             .matchToProxyTypes(availableProxyTypes)
             ?: throw notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
-        return payload.wrapIntoProxyPayload(proxiedMetaAccount.getAccountId(payload.chainId), proxyType, callInstance)
+        return payload.wrapIntoProxyPayload(proxyMetaAccount.getAccountId(payload.chainId), proxyType, callInstance)
     }
 
     private suspend fun requestResume(proxyMetaAccount: MetaAccount) {
