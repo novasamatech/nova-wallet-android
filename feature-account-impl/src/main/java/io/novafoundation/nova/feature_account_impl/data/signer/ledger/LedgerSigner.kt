@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.SeparateFlowSigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
@@ -18,7 +18,7 @@ class LedgerSigner(
     private val messageSigningNotSupported: SigningNotSupportedPresentable
 ) : SeparateFlowSigner(signingSharedState, signFlowRequester) {
 
-    override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
+    override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
         messageSigningNotSupported.presentSigningNotSupported(
             SigningNotSupportedPresentable.Payload(
                 iconRes = R.drawable.ic_ledger,

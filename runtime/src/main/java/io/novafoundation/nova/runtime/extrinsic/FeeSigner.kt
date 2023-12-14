@@ -4,11 +4,12 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
@@ -19,13 +20,13 @@ class FeeSigner(private val chain: Chain) : Signer {
 
     private val keypair = generateFakeKeyPair()
 
-    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
+    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         val signer = KeyPairSigner(keypair, multiChainEncryption())
 
         return signer.signExtrinsic(payloadExtrinsic)
     }
 
-    override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
+    override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
         val signer = KeyPairSigner(keypair, multiChainEncryption())
 
         return signer.signRaw(payload)
