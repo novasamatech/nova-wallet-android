@@ -14,7 +14,9 @@ class ModuleToProxyTypeMatcher(private val module: String) {
 
     private fun getModulesSupportedByProxyType(proxyType: ProxyAccount.ProxyType): SupportedModules {
         return when (proxyType) {
-            ProxyAccount.ProxyType.Any -> SupportedModules.AnyModule
+            ProxyAccount.ProxyType.Any,
+            is ProxyAccount.ProxyType.Other -> SupportedModules.AnyModule
+
             ProxyAccount.ProxyType.NonTransfer -> SupportedModules.SpeificModules(Modules.STAKING, Modules.REFERENDA, Modules.NOMINATION_POOLS)
             ProxyAccount.ProxyType.Governance -> SupportedModules.SpeificModules(Modules.REFERENDA)
             ProxyAccount.ProxyType.Staking -> SupportedModules.SpeificModules(Modules.STAKING)
@@ -22,7 +24,6 @@ class ModuleToProxyTypeMatcher(private val module: String) {
             ProxyAccount.ProxyType.CancelProxy -> SupportedModules.SpeificModules(Modules.PROXY)
             ProxyAccount.ProxyType.Auction -> SupportedModules.SpeificModules(Modules.AUCTIONS)
             ProxyAccount.ProxyType.NominationPools -> SupportedModules.SpeificModules(Modules.NOMINATION_POOLS)
-            is ProxyAccount.ProxyType.Other -> SupportedModules.SpeificModules()
         }
     }
 }

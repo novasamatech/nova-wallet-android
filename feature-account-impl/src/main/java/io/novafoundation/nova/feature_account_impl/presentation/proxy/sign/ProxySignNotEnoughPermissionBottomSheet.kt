@@ -16,7 +16,7 @@ class ProxySignNotEnoughPermissionBottomSheet(
 
         titleView.setText(R.string.proxy_signing_not_enough_permission_title)
         subtitleView.setText(subtitle)
-        buttonView.setText(R.string.common_okay_back)
+        buttonView.setText(R.string.common_ok_back)
 
         applySolidIconStyle(R.drawable.ic_proxy)
     }

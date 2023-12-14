@@ -9,9 +9,7 @@
     <string name="proxy_signing_not_enough_permission_title">Oops! Not enough permission</string>
     <string name="proxy_signing_not_enough_permission_message">%1$s delegated %2$s only for %3$s</string>
 
-    <string name="proxy_signing_is_not_supported_title">Signing is not supported</string>
     <string name="proxy_signing_is_not_supported_message">Proxied wallets does not support signing arbitrary messages — only transactions</string>
-    <string name="common_okay_back">Okay, back</string>
 
     <string name="delegated_accounts_fragment_title">Delegated accounts update</string>
     <string name="delegated_accounts_fragment_explanation">Nova Wallet automatically adds delegated authorities (Proxy) to a separate category for you. You can always manage wallets in Settings.</string>

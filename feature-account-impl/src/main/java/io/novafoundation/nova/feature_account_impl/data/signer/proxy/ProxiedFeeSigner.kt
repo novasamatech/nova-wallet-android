@@ -74,7 +74,7 @@ class ProxiedFeeSigner(
 
     private suspend fun getProxyMetaAccount(): MetaAccount {
         if (proxyMetaAccount == null) {
-            proxyMetaAccount = proxiedMetaAccount.proxy?.metaId?.let { accountRepository.getMetaAccount(it) }
+            proxyMetaAccount = accountRepository.getMetaAccount(proxiedMetaAccount.proxy!!.metaId)
         }
 
         return proxyMetaAccount ?: throw IllegalStateException("Proxy meta account not found")

@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 
 interface ProxySigningPresenter {
 
-    suspend fun requestResume(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount): Boolean
+    suspend fun acknowledgeProxyOperation(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount): Boolean
 
     suspend fun notEnoughPermission(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount, proxyTypes: List<ProxyAccount.ProxyType>)
 

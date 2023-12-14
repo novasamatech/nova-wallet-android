@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount.ProxyType
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
@@ -51,7 +52,7 @@ class ProxiedSigner(
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         val proxyMetaAccount = getProxyMetaAccount()
 
-        requestResume(proxyMetaAccount)
+        acknowledgeProxyOperation(proxyMetaAccount)
 
         val delegate = createDelegate(proxyMetaAccount)
         val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic)
@@ -60,7 +61,7 @@ class ProxiedSigner(
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
-        throw signingNotSupported()
+        signingNotSupported()
     }
 
     private suspend fun createDelegate(proxyMetaAccount: MetaAccount): Signer {
@@ -74,17 +75,17 @@ class ProxiedSigner(
             proxyMetaAccount.getAccountId(payload.chainId)
         )
 
-        val callInstance = payload.call.toCallInstance() ?: throw IllegalStateException("Call instance is not found")
+        val callInstance = payload.call.toCallInstance() ?: signingNotSupported()
         val module = callInstance.call.module
         val proxyType = module.toProxyTypeMatcher()
             .matchToProxyTypes(availableProxyTypes)
-            ?: throw notEnoughPermission(proxyMetaAccount, availableProxyTypes)
+            ?: notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
         return payload.wrapIntoProxyPayload(proxyMetaAccount.getAccountId(payload.chainId), proxyType, callInstance)
     }
 
-    private suspend fun requestResume(proxyMetaAccount: MetaAccount) {
-        val resume = proxySigningPresenter.requestResume(proxiedMetaAccount, proxyMetaAccount)
+    private suspend fun acknowledgeProxyOperation(proxyMetaAccount: MetaAccount) {
+        val resume = proxySigningPresenter.acknowledgeProxyOperation(proxiedMetaAccount, proxyMetaAccount)
         if (!resume) {
             throw SigningCancelledException()
         }
@@ -100,13 +101,13 @@ class ProxiedSigner(
         return accountRepository.getMetaAccount(proxyAccount.metaId)
     }
 
-    private suspend fun notEnoughPermission(proxyMetaAccount: MetaAccount, availableProxyTypes: List<ProxyType>): SigningCancelledException {
+    private suspend fun notEnoughPermission(proxyMetaAccount: MetaAccount, availableProxyTypes: List<ProxyType>): Nothing {
         proxySigningPresenter.notEnoughPermission(proxiedMetaAccount, proxyMetaAccount, availableProxyTypes)
-        return SigningCancelledException()
+        throw SigningCancelledException()
     }
 
-    private suspend fun signingNotSupported(): SigningCancelledException {
+    private suspend fun signingNotSupported(): Nothing {
         proxySigningPresenter.signingIsNotSupported()
-        return SigningCancelledException()
+        throw SigningCancelledException()
     }
 }

@@ -28,17 +28,15 @@ class ProxySignWarningBottomSheet(
 
         proxySigningWarningMessage.setText(subtitle)
 
-        proxySigningWarningContinue.setOnClickListener {
+        proxySigningWarningContinue.setDismissingClickListener {
             if (proxySigningWarningDontShowAgain.isChecked) {
                 dontShowAgain()
             }
             finishWithContinue = true
-            dismiss()
         }
 
-        proxySigningWarningCancel.setOnClickListener {
+        proxySigningWarningCancel.setDismissingClickListener {
             finishWithContinue = false
-            dismiss()
         }
 
         setOnDismissListener { onFinish(finishWithContinue) }

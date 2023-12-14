@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -21,11 +22,12 @@ private const val KEY_DONT_SHOW_AGAIN = "proxy_sign_warning_dont_show_again"
 class RealProxySigningPresenter(
     private val contextManager: ContextManager,
     private val resourceManager: ResourceManager,
+    private val signingNotSupportedPresentable: SigningNotSupportedPresentable,
     private val preferences: Preferences
 ) : ProxySigningPresenter {
 
-    override suspend fun requestResume(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount): Boolean = withContext(Dispatchers.Main) {
-        if (notNeedToShowWarning(proxiedMetaAccount)) {
+    override suspend fun acknowledgeProxyOperation(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount): Boolean = withContext(Dispatchers.Main) {
+        if (noNeedToShowWarning(proxiedMetaAccount)) {
             return@withContext true
         }
 
@@ -57,17 +59,16 @@ class RealProxySigningPresenter(
         }
     }
 
-    override suspend fun signingIsNotSupported() = withContext(Dispatchers.Main) {
-        suspendCoroutine { continuation ->
-            val bottomSheet = ProxySignOperationNotSupportedBottomSheet(
-                contextManager.getActivity()!!,
-                onSuccess = { continuation.resume(Unit) }
+    override suspend fun signingIsNotSupported() {
+        signingNotSupportedPresentable.presentSigningNotSupported(
+            SigningNotSupportedPresentable.Payload(
+                iconRes = R.drawable.ic_proxy,
+                message = resourceManager.getString(R.string.proxy_signing_is_not_supported_message)
             )
-            bottomSheet.show()
-        }
+        )
     }
 
-    private fun notNeedToShowWarning(proxyMetaAccount: MetaAccount): Boolean {
+    private fun noNeedToShowWarning(proxyMetaAccount: MetaAccount): Boolean {
         return preferences.getBoolean(makePrefsKey(proxyMetaAccount), false)
     }
 
