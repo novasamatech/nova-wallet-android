@@ -9,10 +9,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_account_api.data.model.ProxiedWithProxy
 import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountId
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
-import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapProxyTypeToString
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId

@@ -263,7 +263,7 @@ class AccountRepositoryImpl(
     override suspend fun getProxyAccountsByProxiedAccountId(accountId: AccountId): List<ProxyAccount> {
         return accountDataSource.getProxyAccountsByProxiedAccountId(accountId)
     }
-    
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }

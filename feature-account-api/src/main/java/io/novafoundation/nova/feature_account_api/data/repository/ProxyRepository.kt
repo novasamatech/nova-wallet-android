@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_api.data.repository
 
 import io.novafoundation.nova.feature_account_api.data.model.ProxiedWithProxy
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountId
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId

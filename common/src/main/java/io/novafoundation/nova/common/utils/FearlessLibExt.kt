@@ -306,7 +306,6 @@ fun CallRepresentation.toCallInstance(): CallRepresentation.Instance? {
     return (this as? CallRepresentation.Instance)
 }
 
-
 object Modules {
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"

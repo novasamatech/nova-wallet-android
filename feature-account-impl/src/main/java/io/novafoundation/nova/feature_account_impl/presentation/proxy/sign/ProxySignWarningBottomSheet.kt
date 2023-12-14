@@ -2,10 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.proxy.sign
 
 import android.content.Context
 import android.os.Bundle
-import android.widget.CheckBox
-import android.widget.TextView
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.view.PrimaryButton
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_account_impl.R
 import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningCancel

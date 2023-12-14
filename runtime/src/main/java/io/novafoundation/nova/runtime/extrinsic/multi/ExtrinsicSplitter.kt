@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.times
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
-import io.novafoundation.nova.runtime.extrinsic.feeSigner.DefaultFeeSigner
 import io.novafoundation.nova.runtime.extrinsic.feeSigner.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
