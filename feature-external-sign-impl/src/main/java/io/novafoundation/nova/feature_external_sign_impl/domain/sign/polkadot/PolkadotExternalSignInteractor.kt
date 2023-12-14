@@ -152,7 +152,7 @@ class PolkadotExternalSignInteractor(
             is CallRepresentation.Bytes -> extrinsicBuilder.build(rawCallBytes = callRepresentation.bytes)
         }
 
-        extrinsicService.estimateFee(chain.id, extrinsic)
+        extrinsicService.estimateFee(chain, extrinsic)
     }
 
     private fun readableBytesContent(signBytesPayload: PolkadotSignPayload.Raw): String {

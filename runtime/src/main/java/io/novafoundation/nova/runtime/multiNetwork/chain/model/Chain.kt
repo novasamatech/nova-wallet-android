@@ -46,6 +46,7 @@ data class Chain(
         val defaultBlockTimeMillis: Long?,
         val relaychainAsNative: Boolean?,
         val stakingMaxElectingVoters: Int?,
+        val feeViaRuntimeCall: Boolean?,
     )
 
     data class Types(
