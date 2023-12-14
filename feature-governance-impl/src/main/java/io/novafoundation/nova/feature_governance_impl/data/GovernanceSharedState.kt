@@ -21,8 +21,8 @@ class GovernanceSharedState(
     chainRegistry = chainRegistry,
     supportedOptions = { chain, asset ->
         if (asset.isUtilityAsset) {
-            val shouldIncludeSuffix = chain.governance.size > 1
-            chain.governance.map { RealGovernanceAdditionalState(it, shouldIncludeSuffix) }
+            val multipleGovernanceTypesPresent = chain.governance.size > 1
+            chain.governance.map { RealGovernanceAdditionalState(it, multipleGovernanceTypesPresent) }
         } else {
             emptyList()
         }
@@ -38,13 +38,14 @@ class GovernanceSharedState(
 
 class RealGovernanceAdditionalState(
     override val governanceType: Chain.Governance,
-    private val shouldIncludeSuffix: Boolean
+    private val multipleGovernanceTypesPresent: Boolean
 ) : GovernanceAdditionalState {
 
     override val identifier: String = governanceType.name
 
     override fun format(resourceManager: ResourceManager): String? {
-        if (!shouldIncludeSuffix) return null
+        val shouldShowSuffix = multipleGovernanceTypesPresent || governanceType == Chain.Governance.V2
+        if (!shouldShowSuffix) return null
 
         return when (governanceType) {
             Chain.Governance.V1 -> resourceManager.getString(R.string.assets_balance_details_locks_democrac_v1)
