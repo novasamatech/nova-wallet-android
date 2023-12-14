@@ -13,6 +13,7 @@ class RealMetaAccountsUpdatesRegistry(
 
     override fun addMetaIds(ids: List<Long>) {
         val metaIdsSet = getUpdates()
+            .toMutableSet()
         metaIdsSet.addAll(ids)
         val metaIdsJoinedToString = metaIdsSet.joinToString(",")
         if (metaIdsJoinedToString.isNotEmpty()) {
@@ -25,7 +26,7 @@ class RealMetaAccountsUpdatesRegistry(
             .map { getUpdates() }
     }
 
-    override fun getUpdates(): MutableSet<Long> {
+    override fun getUpdates(): Set<Long> {
         val metaIds = preferences.getString(KEY)
         if (metaIds.isNullOrEmpty()) return mutableSetOf()
 
@@ -36,6 +37,7 @@ class RealMetaAccountsUpdatesRegistry(
 
     override fun remove(ids: List<Long>) {
         val metaIdsSet = getUpdates()
+            .toMutableSet()
         metaIdsSet.removeAll(ids)
         val metaIdsJoinedToString = metaIdsSet.joinToString(",")
 
