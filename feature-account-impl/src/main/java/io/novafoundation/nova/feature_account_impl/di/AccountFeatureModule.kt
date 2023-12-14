@@ -105,7 +105,14 @@ import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 
 @Module(
-    includes = [SignersModule::class, WatchOnlyModule::class, ProxySigningModule::class, ParitySignerModule::class, IdentityProviderModule::class, AdvancedEncryptionStoreModule::class]
+    includes = [
+        SignersModule::class,
+        WatchOnlyModule::class,
+        ProxySigningModule::class,
+        ParitySignerModule::class,
+        IdentityProviderModule::class,
+        AdvancedEncryptionStoreModule::class
+    ]
 )
 class AccountFeatureModule {
 
