@@ -22,7 +22,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 
 class MetaAccountGroupingInteractorImpl(
@@ -81,16 +80,16 @@ class MetaAccountGroupingInteractorImpl(
             val metaById = metaAccount.associateBy(MetaAccount::id)
             metaAccount
                 .filter { it.type == LightMetaAccount.Type.PROXIED && updatedMetaIds.contains(it.id) }
-                .map {
+                .mapNotNull {
                     ProxiedAndProxyMetaAccount(
                         it,
-                        metaById[it.proxy?.metaId] ?: error("Proxy meta account not found"),
-                        chainsById[it.proxy?.chainId] ?: error("Proxy chain not found")
+                        metaById[it.proxy?.metaId] ?: return@mapNotNull null,
+                        chainsById[it.proxy?.chainId] ?: return@mapNotNull null
                     )
                 }
                 .groupBy { it.proxied.status }
                 .toSortedMap(metaAccountStateComparator())
-        }.catch { emit(sortedMapOf()) }
+        }
     }
 
     override suspend fun hasAvailableMetaAccountsForDestination(fromId: ChainId, destinationId: ChainId): Boolean {
