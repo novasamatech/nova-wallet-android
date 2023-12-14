@@ -180,12 +180,6 @@ interface MetaAccountDao {
 
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)
-
-    @Query("SELECT * FROM proxy_accounts WHERE proxyMetaId = :metaId")
-    fun getProxyAccountsByMetaId(metaId: Long): List<ProxyAccountLocal>
-
-    @Query("SELECT * FROM proxy_accounts WHERE proxiedAccountId = :accountId")
-    fun getProxyAccountsByProxiedAccountId(accountId: AccountId): List<ProxyAccountLocal>
 }
 
 class MetaAccountWithBalanceLocal(

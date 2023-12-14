@@ -68,7 +68,11 @@ class ProxiedSigner(
     }
 
     private suspend fun modifyPayload(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic): SignerPayloadExtrinsic {
-        val availableProxyTypes = proxyRepository.getDelegatedProxyTypes(payload.chainId, proxiedMetaAccount.getAccountId(payload.chainId))
+        val availableProxyTypes = proxyRepository.getDelegatedProxyTypes(
+            payload.chainId,
+            proxiedMetaAccount.getAccountId(payload.chainId),
+            proxyMetaAccount.getAccountId(payload.chainId)
+        )
 
         val callInstance = payload.call.toCallInstance() ?: throw IllegalStateException("Call instance is not found")
         val module = callInstance.call.module
@@ -76,7 +80,7 @@ class ProxiedSigner(
             .matchToProxyTypes(availableProxyTypes)
             ?: throw notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
-        return payload.modifyPayload(proxiedMetaAccount.getAccountId(payload.chainId), proxyType, callInstance)
+        return payload.wrapIntoProxyPayload(proxiedMetaAccount.getAccountId(payload.chainId), proxyType, callInstance)
     }
 
     private suspend fun requestResume(proxyMetaAccount: MetaAccount) {

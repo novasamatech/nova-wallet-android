@@ -41,19 +41,20 @@ class RealProxyRepository(
             }
     }
 
-    override suspend fun getDelegatedProxyTypes(chainId: ChainId, accountId: AccountId): List<ProxyAccount.ProxyType> {
+    override suspend fun getDelegatedProxyTypes(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyAccount.ProxyType> {
         val proxies = remoteSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
                 .query(
-                    keyArguments = arrayOf(AccountIdKey(accountId)),
+                    keyArguments = arrayOf(AccountIdKey(proxiedAccountId)),
                     binding = { result ->
                         bindProxyAccounts(result)
                     }
                 )
         }
 
-        return proxies.map { mapProxyTypeToString(it.value) }
+        return proxies.filter { it.key == proxyAccountId.intoKey() }
+            .map { mapProxyTypeToString(it.value) }
     }
 
     private suspend fun receiveAllProxies(chainId: ChainId): Map<AccountIdKey, Map<AccountIdKey, String>> {

@@ -44,7 +44,7 @@ class ProxiedFeeSigner(
         if (callInstance == null) {
             return delegator.signExtrinsic(payloadExtrinsic)
         } else {
-            val modifienPayloadExtrinsic = payloadExtrinsic.modifyPayload(
+            val modifienPayloadExtrinsic = payloadExtrinsic.wrapIntoProxyPayload(
                 getProxyAccountId(),
                 ProxyAccount.ProxyType.Any,
                 callInstance

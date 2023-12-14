@@ -9,7 +9,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrins
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
-suspend fun SignerPayloadExtrinsic.modifyPayload(
+suspend fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
     accountId: AccountId,
     proxyType: ProxyAccount.ProxyType,
     callInstance: CallRepresentation.Instance

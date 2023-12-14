@@ -24,11 +24,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToLightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapProxyAccountFromLocal
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -271,16 +269,6 @@ class AccountDataSourceImpl(
 
     override suspend fun hasMetaAccounts(): Boolean {
         return metaAccountDao.hasMetaAccounts()
-    }
-
-    override suspend fun getProxyAccountsByMetaId(metaId: Long): List<ProxyAccount> {
-        val proxyAccounts = metaAccountDao.getProxyAccountsByMetaId(metaId)
-        return proxyAccounts.map { mapProxyAccountFromLocal(it) }
-    }
-
-    override suspend fun getProxyAccountsByProxiedAccountId(accountId: AccountId): List<ProxyAccount> {
-        val proxyAccounts = metaAccountDao.getProxyAccountsByProxiedAccountId(accountId)
-        return proxyAccounts.map { mapProxyAccountFromLocal(it) }
     }
 
     private inline fun async(crossinline action: suspend () -> Unit) {

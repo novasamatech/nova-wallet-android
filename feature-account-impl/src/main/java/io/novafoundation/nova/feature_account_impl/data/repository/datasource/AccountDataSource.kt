@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
@@ -90,8 +89,4 @@ interface AccountDataSource : SecretStoreV1 {
     )
 
     suspend fun hasMetaAccounts(): Boolean
-
-    suspend fun getProxyAccountsByMetaId(metaId: Long): List<ProxyAccount>
-
-    suspend fun getProxyAccountsByProxiedAccountId(accountId: AccountId): List<ProxyAccount>
 }
