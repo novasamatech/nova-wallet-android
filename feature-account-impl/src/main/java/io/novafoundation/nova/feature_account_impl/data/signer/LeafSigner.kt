@@ -8,7 +8,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 abstract class LeafSigner(
     private val metaAccount: MetaAccount,
-): NovaSigner {
+) : NovaSigner {
 
     override suspend fun signerAccountId(chain: Chain): AccountId {
         return metaAccount.requireAccountIdIn(chain)

@@ -42,7 +42,6 @@ fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
     )
 }
 
-
 fun Map<String, Any?>.modifyNonce(runtimeSnapshot: RuntimeSnapshot, newNonce: BigInteger): Map<String, Any?> {
     return buildMap {
         putAll(this@modifyNonce)
