@@ -32,10 +32,12 @@ class ChainSyncService(
         val oldExplorers = localChainsJoinedInfo.flatMap { it.explorers }
         val oldExternalApis = localChainsJoinedInfo.flatMap { it.externalApis }
 
+        val oldChainsById = oldChains.associateBy { it.id }
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
-        val newChains = remoteChains.map { mapRemoteChainToLocal(it, gson) }
+
+        val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], gson) }
         val newAssets = remoteChains.flatMap { chain ->
             chain.assets.map {
                 val fullAssetId = FullAssetIdLocal(chain.chainId, it.assetId)

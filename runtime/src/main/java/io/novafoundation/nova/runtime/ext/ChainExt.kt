@@ -37,10 +37,14 @@ import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 
 val Chain.typesUsage: TypesUsage
     get() = when {
-        types == null -> TypesUsage.BASE
-        types.overridesCommon -> TypesUsage.OWN
-        else -> TypesUsage.BOTH
+        types == null -> TypesUsage.NONE
+        !types.overridesCommon && types.url != null -> TypesUsage.BOTH
+        !types.overridesCommon && types.url == null -> TypesUsage.BASE
+        else -> TypesUsage.OWN
     }
+
+val TypesUsage.requiresBaseTypes: Boolean
+    get() = this == TypesUsage.BASE || this == TypesUsage.BOTH
 
 val Chain.utilityAsset
     get() = assets.first(Chain.Asset::isUtilityAsset)
@@ -59,8 +63,25 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
 
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
 
+val Chain.ConnectionState.isFullSync: Boolean
+    get() = this == Chain.ConnectionState.FULL_SYNC
+
+val Chain.ConnectionState.isDisabled: Boolean
+    get() = this == Chain.ConnectionState.DISABLED
+
+val Chain.ConnectionState.level: Int
+    get() = when (this) {
+        Chain.ConnectionState.FULL_SYNC -> 2
+        Chain.ConnectionState.LIGHT_SYNC -> 1
+        Chain.ConnectionState.DISABLED -> 0
+    }
+
 fun Chain.Additional?.relaychainAsNative(): Boolean {
     return this?.relaychainAsNative ?: false
+}
+
+fun Chain.Additional?.feeViaRuntimeCall(): Boolean {
+    return this?.feeViaRuntimeCall ?: false
 }
 
 enum class StakingTypeGroup {

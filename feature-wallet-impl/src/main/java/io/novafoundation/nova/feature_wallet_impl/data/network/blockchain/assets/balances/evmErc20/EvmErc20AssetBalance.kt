@@ -19,7 +19,7 @@ import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
@@ -66,7 +66,7 @@ class EvmErc20AssetBalance(
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
         val erc20Type = chainAsset.requireErc20()
-        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
+        val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
         val accountAddress = chain.addressOf(accountId)
 
         return erc20Standard.querySingle(erc20Type.contractAddress, ethereumApi)

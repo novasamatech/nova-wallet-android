@@ -16,7 +16,7 @@ import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -106,7 +106,7 @@ class RealAddTokensInteractor(
         contractAddress: String,
         query: suspend Erc20Queries.() -> R
     ): R {
-        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
+        val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chainId)
         val erc20Queries = erc20Standard.querySingle(contractAddress, ethereumApi)
 
         return query(erc20Queries)

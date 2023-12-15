@@ -184,10 +184,14 @@ class WalletFeatureModule {
         operationDao: OperationDao,
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
+        chainRegistry: ChainRegistry,
+        assetCache: AssetCache
     ): PaymentUpdaterFactory = RealPaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
         accountUpdateScope,
+        chainRegistry,
+        assetCache
     )
 
     @Provides
