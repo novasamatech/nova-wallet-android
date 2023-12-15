@@ -79,9 +79,14 @@ private const val META_ACCOUNT_WITH_BALANCE_QUERY = """
 interface MetaAccountDao {
 
     @Transaction
-    suspend fun insertMetaAccountWithNewPosition(metaAccount: suspend (Int) -> MetaAccountLocal): Long {
-        val position = nextAccountPosition()
-        val metaId = insertMetaAccount(metaAccount(position))
+    suspend fun insertProxiedMetaAccount(
+        metaAccount: MetaAccountLocal,
+        chainAccount: (metaId: Long) -> ChainAccountLocal,
+        proxyAccount: (metaId: Long) -> ProxyAccountLocal
+    ): Long {
+        val metaId = insertMetaAccount(metaAccount)
+        insertChainAccount(chainAccount(metaId))
+        insertProxy(proxyAccount(metaId))
 
         return metaId
     }
@@ -94,6 +99,9 @@ interface MetaAccountDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChainAccounts(chainAccounts: List<ChainAccountLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertProxy(proxyLocal: ProxyAccountLocal)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertProxies(proxiesLocal: List<ProxyAccountLocal>)
