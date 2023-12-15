@@ -15,9 +15,11 @@ import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
 import io.novafoundation.nova.common.utils.extrinsicHash
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novafoundation.nova.runtime.ext.feeViaRuntimeCall
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.asExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
@@ -44,10 +46,11 @@ class RpcCalls(
     private val runtimeCallsApi: MultiChainRuntimeCallsApi
 ) {
 
-    suspend fun getExtrinsicFee(chainId: ChainId, extrinsic: String): FeeResponse {
+    suspend fun getExtrinsicFee(chain: Chain, extrinsic: String): FeeResponse {
+        val chainId = chain.id
         val runtime = chainRegistry.getRuntime(chainId)
 
-        return if (runtime.typeRegistry[FEE_DECODE_TYPE] != null) {
+        return if (chain.additional.feeViaRuntimeCall() && runtime.typeRegistry[FEE_DECODE_TYPE] != null) {
             val lengthInBytes = extrinsic.fromHex().size
 
             runtimeCallsApi.forChain(chainId).call(

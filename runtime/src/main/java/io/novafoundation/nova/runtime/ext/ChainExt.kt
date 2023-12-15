@@ -80,6 +80,10 @@ fun Chain.Additional?.relaychainAsNative(): Boolean {
     return this?.relaychainAsNative ?: false
 }
 
+fun Chain.Additional?.feeViaRuntimeCall(): Boolean {
+    return this?.feeViaRuntimeCall ?: false
+}
+
 enum class StakingTypeGroup {
 
     RELAYCHAIN, PARACHAIN, NOMINATION_POOL, UNSUPPORTED
