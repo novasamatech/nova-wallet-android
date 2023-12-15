@@ -17,8 +17,8 @@ class AcknowledgePhishingBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title.setText(R.string.dapp_phishing_title)
-        subtitle.setText(R.string.dapp_phishing_subtitle)
+        titleView.setText(R.string.dapp_phishing_title)
+        subtitleView.setText(R.string.dapp_phishing_subtitle)
 
         applySolidIconStyle(R.drawable.ic_warning_filled)
     }

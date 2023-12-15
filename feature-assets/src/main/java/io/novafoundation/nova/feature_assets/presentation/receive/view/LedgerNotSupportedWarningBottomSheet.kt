@@ -14,8 +14,8 @@ class LedgerNotSupportedWarningBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title.setText(R.string.assets_receive_ledger_not_supported_title)
-        subtitle.text = message
+        titleView.setText(R.string.assets_receive_ledger_not_supported_title)
+        subtitleView.text = message
 
         applySolidIconStyle(R.drawable.ic_ledger)
     }

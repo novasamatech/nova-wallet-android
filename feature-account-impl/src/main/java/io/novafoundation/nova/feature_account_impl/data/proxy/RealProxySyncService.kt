@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountId
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.isSubstrateBased
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -124,9 +123,9 @@ class RealProxySyncService(
                     LightMetaAccount.Type.SECRETS,
                     LightMetaAccount.Type.PARITY_SIGNER,
                     LightMetaAccount.Type.LEDGER,
-                    LightMetaAccount.Type.POLKADOT_VAULT -> true
+                    LightMetaAccount.Type.POLKADOT_VAULT,
+                    LightMetaAccount.Type.WATCH_ONLY -> true
 
-                    LightMetaAccount.Type.WATCH_ONLY,
                     LightMetaAccount.Type.PROXIED -> false
                 }
             }
@@ -156,9 +155,9 @@ class RealProxySyncService(
         return MetaAccountLocal(
             substratePublicKey = null,
             substrateCryptoType = null,
-            substrateAccountId = if (chain.isSubstrateBased) proxiedAccountId else null,
+            substrateAccountId = null,
             ethereumPublicKey = null,
-            ethereumAddress = if (chain.isEthereumBased) proxiedAccountId else null,
+            ethereumAddress = null,
             name = identity?.name ?: chain.addressOf(proxiedAccountId),
             parentMetaId = parentMetaId,
             isSelected = false,

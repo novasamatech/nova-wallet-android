@@ -10,6 +10,7 @@ import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -129,12 +130,7 @@ fun mapMetaAccountLocalToMetaAccount(
     ).filterNotNull()
 
     val proxyAccount = joinedMetaAccountInfo.proxyAccountLocal?.let {
-        ProxyAccount(
-            metaId = it.proxyMetaId,
-            chainId = it.chainId,
-            proxiedAccountId = it.proxiedAccountId,
-            proxyType = mapProxyTypeToString(it.proxyType)
-        )
+        mapProxyAccountFromLocal(it)
     }
 
     return with(joinedMetaAccountInfo.metaAccount) {
@@ -174,6 +170,17 @@ fun mapMetaAccountLocalToLightMetaAccount(
     }
 }
 
+fun mapProxyAccountFromLocal(proxyAccountLocal: ProxyAccountLocal): ProxyAccount {
+    return with(proxyAccountLocal) {
+        ProxyAccount(
+            metaId = proxyMetaId,
+            chainId = chainId,
+            proxiedAccountId = proxiedAccountId,
+            proxyType = mapProxyTypeToString(proxyType)
+        )
+    }
+}
+
 fun mapAddAccountPayloadToAddAccountType(
     payload: AddAccountPayload,
     accountNameState: AccountNameChooserMixin.State,
@@ -194,7 +201,7 @@ fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
     else -> AccountNameChooserMixin.State.Input(name)
 }
 
-private fun mapProxyTypeToString(proxyType: String): ProxyAccount.ProxyType {
+fun mapProxyTypeToString(proxyType: String): ProxyAccount.ProxyType {
     return when (proxyType) {
         "Any" -> ProxyAccount.ProxyType.Any
         "NonTransfer" -> ProxyAccount.ProxyType.NonTransfer

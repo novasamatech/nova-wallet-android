@@ -9,24 +9,24 @@ class ProxyAccount(
     val proxyType: ProxyType,
 ) {
 
-    sealed interface ProxyType {
+    sealed class ProxyType(val name: String) {
 
-        object Any : ProxyType
+        object Any : ProxyType("Any")
 
-        object NonTransfer : ProxyType
+        object NonTransfer : ProxyType("NonTransfer")
 
-        object Governance : ProxyType
+        object Governance : ProxyType("Governance")
 
-        object Staking : ProxyType
+        object Staking : ProxyType("Staking")
 
-        object IdentityJudgement : ProxyType
+        object IdentityJudgement : ProxyType("IdentityJudgement")
 
-        object CancelProxy : ProxyType
+        object CancelProxy : ProxyType("CancelProxy")
 
-        object Auction : ProxyType
+        object Auction : ProxyType("Auction")
 
-        object NominationPools : ProxyType
+        object NominationPools : ProxyType("NominationPools")
 
-        class Other(val name: String) : ProxyType
+        class Other(name: String) : ProxyType(name)
     }
 }

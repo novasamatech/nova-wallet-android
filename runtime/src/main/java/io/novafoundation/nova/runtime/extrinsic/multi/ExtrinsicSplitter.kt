@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.times
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
-import io.novafoundation.nova.runtime.extrinsic.FeeSigner
+import io.novafoundation.nova.runtime.extrinsic.feeSigner.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
@@ -24,10 +24,11 @@ typealias SplitCalls = List<List<GenericCall.Instance>>
 
 interface ExtrinsicSplitter {
 
-    suspend fun split(callBuilder: CallBuilder, chain: Chain): SplitCalls
+    suspend fun split(signer: FeeSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls
 }
 
 private typealias CallWeightsByType = Map<String, Deferred<Weight>>
+
 private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
 
 internal class RealExtrinsicSplitter(
@@ -35,8 +36,8 @@ internal class RealExtrinsicSplitter(
     private val blockLimitsRepository: BlockLimitsRepository,
 ) : ExtrinsicSplitter {
 
-    override suspend fun split(callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
-        val weightByCallId = estimateWeightByCallType(callBuilder, chain)
+    override suspend fun split(signer: FeeSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
+        val weightByCallId = estimateWeightByCallType(signer, callBuilder, chain)
 
         val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id) * LEAVE_SOME_SPACE_MULTIPLIER
 
@@ -51,11 +52,11 @@ internal class RealExtrinsicSplitter(
         }
 
     @Suppress("SuspendFunctionOnCoroutineScope")
-    private suspend fun CoroutineScope.estimateWeightByCallType(callBuilder: CallBuilder, chain: Chain): CallWeightsByType {
+    private suspend fun CoroutineScope.estimateWeightByCallType(signer: FeeSigner, callBuilder: CallBuilder, chain: Chain): CallWeightsByType {
         return callBuilder.calls.groupBy { it.uniqueId }
             .mapValues { (_, calls) ->
                 val sample = calls.first()
-                val sampleExtrinsic = wrapInFakeExtrinsic(sample, callBuilder.runtime, chain)
+                val sampleExtrinsic = wrapInFakeExtrinsic(signer, sample, callBuilder.runtime, chain)
 
                 async { rpcCalls.getExtrinsicFee(chain.id, sampleExtrinsic).weight }
             }
@@ -90,8 +91,7 @@ internal class RealExtrinsicSplitter(
         return split
     }
 
-    private suspend fun wrapInFakeExtrinsic(call: GenericCall.Instance, runtime: RuntimeSnapshot, chain: Chain): String {
-        val signer = FeeSigner(chain)
+    private suspend fun wrapInFakeExtrinsic(signer: FeeSigner, call: GenericCall.Instance, runtime: RuntimeSnapshot, chain: Chain): String {
         val genesisHash = chain.requireGenesisHash().fromHex()
 
         return ExtrinsicBuilder(

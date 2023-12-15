@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
@@ -75,6 +76,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
@@ -84,6 +86,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.language.RealLanguageUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
@@ -104,7 +108,14 @@ import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 
 @Module(
-    includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class, IdentityProviderModule::class, AdvancedEncryptionStoreModule::class]
+    includes = [
+        SignersModule::class,
+        WatchOnlyModule::class,
+        ProxySigningModule::class,
+        ParitySignerModule::class,
+        IdentityProviderModule::class,
+        AdvancedEncryptionStoreModule::class
+    ]
 )
 class AccountFeatureModule {
 
@@ -117,8 +128,9 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideProxyRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource
-    ): ProxyRepository = RealProxyRepository(storageDataSource)
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): ProxyRepository = RealProxyRepository(storageDataSource, chainRegistry)
 
     @Provides
     @FeatureScope
@@ -486,4 +498,10 @@ class AccountFeatureModule {
     fun provideBiometricServiceFactory(accountRepository: AccountRepository): BiometricServiceFactory {
         return RealBiometricServiceFactory(accountRepository)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideSigningNotSupportedPresentable(
+        contextManager: ContextManager
+    ): SigningNotSupportedPresentable = RealSigningNotSupportedPresentable(contextManager)
 }

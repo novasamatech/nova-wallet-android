@@ -200,7 +200,7 @@ class PolkadotExternalSignInteractor(
         val accountId = chain.accountIdOf(address)
 
         val signer = if (forFee) {
-            signerProvider.feeSigner(chain)
+            signerProvider.feeSigner(resolveMetaAccount(), chain)
         } else {
             resolveWalletSigner()
         }

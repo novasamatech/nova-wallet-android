@@ -10,6 +10,9 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_account_api.data.model.ProxiedWithProxy
 import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountId
+import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
+import io.novafoundation.nova.feature_account_impl.data.mappers.mapProxyTypeToString
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -17,7 +20,8 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 
 class RealProxyRepository(
-    private val remoteSource: StorageDataSource
+    private val remoteSource: StorageDataSource,
+    private val chainRegistry: ChainRegistry
 ) : ProxyRepository {
 
     override suspend fun getProxyDelegatorsForAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxy> {
@@ -35,6 +39,22 @@ class RealProxyRepository(
             }.flatMap { (delegator, proxies) ->
                 proxies.map { proxy -> mapToProxiedWithProxies(chainId, delegator, proxy) }
             }
+    }
+
+    override suspend fun getDelegatedProxyTypes(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyAccount.ProxyType> {
+        val proxies = remoteSource.query(chainId) {
+            runtime.metadata.module(Modules.PROXY)
+                .storage("Proxies")
+                .query(
+                    keyArguments = arrayOf(proxiedAccountId),
+                    binding = { result ->
+                        bindProxyAccounts(result)
+                    }
+                )
+        }
+
+        return proxies.filter { it.key == proxyAccountId.intoKey() }
+            .map { mapProxyTypeToString(it.value) }
     }
 
     private suspend fun receiveAllProxies(chainId: ChainId): Map<AccountIdKey, Map<AccountIdKey, String>> {
@@ -68,14 +88,14 @@ class RealProxyRepository(
     private fun mapToProxiedWithProxies(
         chainId: ChainId,
         delegator: AccountIdKey,
-        proxies: ProxiedWithProxy.Proxy
+        proxy: ProxiedWithProxy.Proxy
     ): ProxiedWithProxy {
         return ProxiedWithProxy(
             proxied = ProxiedWithProxy.Proxied(
                 accountId = delegator.value,
                 chainId = chainId
             ),
-            proxy = proxies
+            proxy = proxy
         )
     }
 

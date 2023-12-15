@@ -53,6 +53,7 @@ import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
 import org.web3j.crypto.Sign
 
@@ -301,6 +302,10 @@ fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress
 val SignerPayloadExtrinsic.chainId: String
     get() = genesisHash.toHexString()
 
+fun CallRepresentation.toCallInstance(): CallRepresentation.Instance? {
+    return (this as? CallRepresentation.Instance)
+}
+
 object Modules {
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
@@ -357,4 +362,6 @@ object Modules {
     const val UTILITY = "Utility"
 
     const val PROXY = "Proxy"
+
+    const val AUCTIONS = "auctions"
 }

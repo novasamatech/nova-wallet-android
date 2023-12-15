@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
+import io.novafoundation.nova.runtime.extrinsic.feeSigner.FeeSigner
 import io.novafoundation.nova.runtime.mapper.toRuntimeVersion
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -26,9 +27,10 @@ class ExtrinsicBuilderFactory(
      * Create with special signer for fee calculation
      */
     suspend fun createForFee(
+        signer: FeeSigner,
         chain: Chain,
     ): ExtrinsicBuilder {
-        return createMultiForFee(chain).first()
+        return createMultiForFee(signer, chain).first()
     }
 
     /**
@@ -43,10 +45,9 @@ class ExtrinsicBuilderFactory(
     }
 
     suspend fun createMultiForFee(
+        signer: FeeSigner,
         chain: Chain,
     ): Sequence<ExtrinsicBuilder> {
-        val signer = FeeSigner(chain)
-
         return createMulti(chain, signer, signer.accountId())
     }
 
