@@ -15,23 +15,31 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.mapProxyTypeToSt
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+
+private class OnChainProxyModel(
+    val accountId: AccountIdKey,
+    val proxyType: String,
+    val delay: BigInteger
+)
 
 class RealProxyRepository(
     private val remoteSource: StorageDataSource,
     private val chainRegistry: ChainRegistry
 ) : ProxyRepository {
 
-    override suspend fun getProxyDelegatorsForAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxy> {
+    override suspend fun getAllProxiesForMetaAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxy> {
         val delegatorToProxies = receiveAllProxies(chainId)
 
         val accountIdToMetaAccounts = metaAccountIds.groupBy { it.accountId.intoKey() }
 
         return delegatorToProxies
             .mapNotNull { (delegator, proxies) ->
-                val matchedProxies = matchProxiesToAccountsAndMap(proxies, accountIdToMetaAccounts)
+                val notDelayedProxies = proxies.filter { it.delay == BigInteger.ZERO }
+                val matchedProxies = matchProxiesToAccountsAndMap(notDelayedProxies, accountIdToMetaAccounts)
 
                 if (matchedProxies.isEmpty()) return@mapNotNull null
 
@@ -53,11 +61,11 @@ class RealProxyRepository(
                 )
         }
 
-        return proxies.filter { it.key == proxyAccountId.intoKey() }
-            .map { mapProxyTypeToString(it.value) }
+        return proxies.filter { it.accountId == proxyAccountId.intoKey() }
+            .map { mapProxyTypeToString(it.proxyType) }
     }
 
-    private suspend fun receiveAllProxies(chainId: ChainId): Map<AccountIdKey, Map<AccountIdKey, String>> {
+    private suspend fun receiveAllProxies(chainId: ChainId): Map<AccountIdKey, List<OnChainProxyModel>> {
         return remoteSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
@@ -73,7 +81,7 @@ class RealProxyRepository(
         }
     }
 
-    private fun bindProxyAccounts(dynamicInstance: Any?): Map<AccountIdKey, String> {
+    private fun bindProxyAccounts(dynamicInstance: Any?): List<OnChainProxyModel> {
         val root = dynamicInstance.castToList()
         val proxies = root[0].castToList()
 
@@ -81,8 +89,13 @@ class RealProxyRepository(
             val proxy = it.castToStruct()
             val proxyAccountId: ByteArray = proxy.getTyped("delegate")
             val proxyType = proxy.get<Any?>("proxyType").castToDictEnum()
-            proxyAccountId.intoKey() to proxyType.name
-        }.toMap()
+            val delay = proxy.getTyped<BigInteger>("delay")
+            OnChainProxyModel(
+                proxyAccountId.intoKey(),
+                proxyType.name,
+                delay
+            )
+        }
     }
 
     private fun mapToProxiedWithProxies(
@@ -100,17 +113,17 @@ class RealProxyRepository(
     }
 
     private fun matchProxiesToAccountsAndMap(
-        proxies: Map<AccountIdKey, String>,
+        proxies: List<OnChainProxyModel>,
         accountIdToMetaAccounts: Map<AccountIdKey, List<MetaAccountId>>
     ): List<ProxiedWithProxy.Proxy> {
-        return proxies.flatMap { (proxyAccountId, proxyType) ->
-            val matchedAccounts = accountIdToMetaAccounts[proxyAccountId] ?: return@flatMap emptyList()
+        return proxies.flatMap { onChainProxy ->
+            val matchedAccounts = accountIdToMetaAccounts[onChainProxy.accountId] ?: return@flatMap emptyList()
 
             matchedAccounts.map {
                 ProxiedWithProxy.Proxy(
-                    accountId = proxyAccountId.value,
+                    accountId = onChainProxy.accountId.value,
                     metaId = it.metaId,
-                    proxyType = proxyType
+                    proxyType = onChainProxy.proxyType
                 )
             }
         }
