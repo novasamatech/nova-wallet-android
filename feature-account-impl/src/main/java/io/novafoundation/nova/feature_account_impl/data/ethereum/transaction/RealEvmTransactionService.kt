@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
@@ -19,9 +20,10 @@ import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
+import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import org.web3j.crypto.RawTransaction
@@ -49,7 +51,7 @@ internal class RealEvmTransactionService(
         val web3Api = chainRegistry.getCallEthereumApiOrThrow(chainId)
         val chain = chainRegistry.getChain(chainId)
 
-        val submittingMetaAccount = findMetaAccountFor(origin)
+        val submittingMetaAccount = accountRepository.requireMetaAccountFor(origin)
         val submittingAddress = submittingMetaAccount.requireAddressIn(chain)
 
         val txBuilder = EvmTransactionBuilder().apply(building)
@@ -69,7 +71,7 @@ internal class RealEvmTransactionService(
         building: EvmTransactionBuilding
     ): Result<TransactionHash> = runCatching {
         val chain = chainRegistry.getChain(chainId)
-        val submittingMetaAccount = findMetaAccountFor(origin)
+        val submittingMetaAccount = accountRepository.requireMetaAccountFor(origin)
         val submittingAddress = submittingMetaAccount.requireAddressIn(chain)
 
         val web3Api = chainRegistry.getCallEthereumApiOrThrow(chainId)
@@ -104,12 +106,6 @@ internal class RealEvmTransactionService(
         val eip155SignatureData: Sign.SignatureData = TransactionEncoder.createEip155SignatureData(signatureData, ethereumChainId)
 
         return txForSign.encodeWith(eip155SignatureData).toHexString(withPrefix = true)
-    }
-
-    private suspend fun findMetaAccountFor(origin: TransactionOrigin): MetaAccount {
-        return when (origin) {
-            TransactionOrigin.SelectedWallet -> accountRepository.getSelectedMetaAccount()
-        }
     }
 
     private suspend fun Web3Api.getNonce(address: String): BigInteger {

@@ -19,7 +19,7 @@ class StakeTargetDetailsPayload(
     @Parcelize
     class DisplayConfig(
         val rewardSuffix: RewardSuffix,
-        val rewardedStakersPerStakeTarget: Int,
+        val rewardedStakersPerStakeTarget: Int?,
         @StringRes val titleRes: Int,
         @StringRes val stakersLabelRes: Int,
         @StringRes val oversubscribedWarningText: Int,

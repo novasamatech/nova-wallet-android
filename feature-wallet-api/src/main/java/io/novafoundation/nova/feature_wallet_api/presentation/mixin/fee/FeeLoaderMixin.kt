@@ -79,9 +79,9 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
         @Deprecated(
             message = "Use `awaitDecimalFee` instead since it holds more information about fee",
-            replaceWith = ReplaceWith("awaitDecimalFee().decimalAmount")
+            replaceWith = ReplaceWith("awaitDecimalFee().networkFeeDecimalAmount")
         )
-        suspend fun awaitFee(): BigDecimal = awaitDecimalFee().decimalAmount
+        suspend fun awaitFee(): BigDecimal = awaitDecimalFee().networkFeeDecimalAmount
     }
 
     interface Factory {
@@ -258,6 +258,27 @@ fun <I> FeeLoaderMixin.Presentation.connectWithV2(
         loadFeeV2(
             coroutineScope = scope,
             feeConstructor = { feeConstructor(it, input) },
+            onRetryCancelled = onRetryCancelled
+        )
+    }
+        .inBackground()
+        .launchIn(scope)
+}
+
+fun <I1, I2> FeeLoaderMixin.Presentation.connectWithV2(
+    inputSource1: Flow<I1>,
+    inputSource2: Flow<I2>,
+    scope: CoroutineScope,
+    feeConstructor: suspend Token.(input1: I1, input2: I2) -> Fee,
+    onRetryCancelled: () -> Unit = {}
+) {
+    combine(
+        inputSource1,
+        inputSource2
+    ) { input1, input2 ->
+        loadFeeV2(
+            coroutineScope = scope,
+            feeConstructor = { feeConstructor(it, input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
     }

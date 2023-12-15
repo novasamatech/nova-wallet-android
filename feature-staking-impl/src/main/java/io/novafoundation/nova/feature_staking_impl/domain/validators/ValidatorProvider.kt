@@ -64,7 +64,7 @@ class ValidatorProvider(
                     ownStake = it.own,
                     nominatorStakes = it.others,
                     apy = rewardCalculator.getApyFor(accountIdHex),
-                    isOversubscribed = it.others.size > maxNominators
+                    isOversubscribed = maxNominators != null && it.others.size > maxNominators
                 )
             }
 

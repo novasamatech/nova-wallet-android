@@ -24,7 +24,12 @@ class StakingConstantsRepository(
             ?: MAX_UNLOCK_CHUNKS_FALLBACK.toBigInteger()
     }
 
-    suspend fun maxRewardedNominatorPerValidator(chainId: ChainId): Int = getNumberConstant(chainId, "MaxNominatorRewardedPerValidator").toInt()
+    /**
+     * Returns maxRewardedNominatorPerValidator or null in case there is no limitation on rewarded nominators per validator
+     */
+    suspend fun maxRewardedNominatorPerValidator(chainId: ChainId): Int? {
+        return getOptionalNumberConstant(chainId, "MaxNominatorRewardedPerValidator")?.toInt()
+    }
 
     suspend fun lockupPeriodInEras(chainId: ChainId): BigInteger = getNumberConstant(chainId, "BondingDuration")
 
