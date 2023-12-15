@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindi
 
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
+import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.getList
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
@@ -24,15 +25,18 @@ fun bindStakingLedger(scale: String, runtime: RuntimeSnapshot): StakingLedger {
 }
 
 @UseCaseBinding
-fun bindStakingLedger(dynamicInstance: Any): StakingLedger {
-    requireType<Struct.Instance>(dynamicInstance)
+fun bindStakingLedger(decoded: Any): StakingLedger {
+    requireType<Struct.Instance>(decoded)
 
     return StakingLedger(
-        stashId = dynamicInstance.getTyped("stash"),
-        total = dynamicInstance.getTyped("total"),
-        active = dynamicInstance.getTyped("active"),
-        unlocking = dynamicInstance.getList("unlocking").map(::bindUnlockChunk),
-        claimedRewards = dynamicInstance.getList("claimedRewards").map(::bindEraIndex)
+        stashId = decoded.getTyped("stash"),
+        total = decoded.getTyped("total"),
+        active = decoded.getTyped("active"),
+        unlocking = decoded.getList("unlocking").map(::bindUnlockChunk),
+        claimedRewards = bindList(
+            dynamicInstance = decoded["claimedRewards"] ?: decoded["legacyClaimedRewards"] ?: emptyList<Nothing>(),
+            itemBinder = ::bindEraIndex
+        )
     )
 }
 

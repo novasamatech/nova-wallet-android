@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.requireException
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -17,13 +17,13 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.payout.MakePayoutPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.payout.PayoutValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.mapPendingPayoutParcelToPayout
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
@@ -48,6 +48,7 @@ class ConfirmPayoutViewModel(
     private val resourceManager: ResourceManager,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     walletUiUseCase: WalletUiUseCase,
+    partialRetriableMixinFactory: PartialRetriableMixin.Factory,
 ) : BaseViewModel(),
     ExternalActions.Presentation by externalActions,
     FeeLoaderMixin by feeLoaderMixin,
@@ -60,7 +61,7 @@ class ConfirmPayoutViewModel(
         .filterIsInstance<StakingState.Stash>()
         .share()
 
-    private val payouts = payload.payouts.map { Payout(it.validatorInfo.address, it.era, it.amountInPlanks) }
+    private val payouts = payload.payouts.map(::mapPendingPayoutParcelToPayout)
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -77,6 +78,8 @@ class ConfirmPayoutViewModel(
         addressModelGenerator.createAccountAddressModel(selectedAssetState.chain(), stakingState.accountAddress)
     }
         .shareInBackground()
+
+    val partialRetriableMixin = partialRetriableMixinFactory.create(scope = this)
 
     init {
         loadFee()
@@ -104,9 +107,7 @@ class ConfirmPayoutViewModel(
             val accountAddress = stakingStateFlow.first().accountAddress
             val amount = asset.token.configuration.amountFromPlanks(payload.totalRewardInPlanks)
 
-            val payoutStakersPayloads = payouts.map { MakePayoutPayload.PayoutStakersPayload(it.era, it.validatorAddress) }
-
-            val makePayoutPayload = MakePayoutPayload(accountAddress, fee, amount, asset, payoutStakersPayloads)
+            val makePayoutPayload = MakePayoutPayload(accountAddress, fee, amount, asset, payouts)
 
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
@@ -122,24 +123,22 @@ class ConfirmPayoutViewModel(
     private fun sendTransaction(payload: MakePayoutPayload) = launch {
         val result = payoutInteractor.makePayouts(payload)
 
-        _showNextProgress.value = false
-
-        if (result.isSuccess) {
-            showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
-
-            router.returnToStakingMain()
-        } else {
-            showError(result.requireException())
-        }
+        partialRetriableMixin.handleMultiResult(
+            multiResult = result,
+            onSuccess = {
+                showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
+                router.returnToStakingMain()
+            },
+            progressConsumer = _showNextProgress.progressConsumer(),
+            onRetryCancelled = { router.back() }
+        )
     }
 
     private fun loadFee() {
-        feeLoaderMixin.loadFee(
-            viewModelScope,
+        feeLoaderMixin.loadFeeV2(
+            coroutineScope = viewModelScope,
             feeConstructor = {
-                val address = stakingStateFlow.first().accountAddress
-
-                payoutInteractor.estimatePayoutFee(address, payouts)
+                payoutInteractor.estimatePayoutFee(payouts)
             },
             onRetryCancelled = ::backClicked
         )

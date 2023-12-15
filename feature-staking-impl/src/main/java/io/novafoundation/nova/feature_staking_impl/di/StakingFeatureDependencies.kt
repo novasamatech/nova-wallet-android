@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
@@ -160,4 +161,6 @@ interface StakingFeatureDependencies {
     val locksRepository: BalanceLocksRepository
 
     val externalBalanceDao: ExternalBalanceDao
+
+    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
 }

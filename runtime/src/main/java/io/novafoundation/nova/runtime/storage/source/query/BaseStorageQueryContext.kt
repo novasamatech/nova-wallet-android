@@ -194,22 +194,23 @@ abstract class BaseStorageQueryContext(
         }
     }
 
-    override suspend fun multi(
+    @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
+    override suspend fun multiInternal(
         builderBlock: MultiQueryBuilder.() -> Unit
-    ): Map<StorageEntry, Map<StorageKeyComponents, Any?>> {
-        val keysByStorageEntry = MultiQueryBuilderImpl(runtime).apply(builderBlock).build()
+    ): MultiQueryBuilder.Result {
+        val builder = MultiQueryBuilderImpl(runtime).apply(builderBlock)
 
-        val keys = keysByStorageEntry.flatMap { (_, keys) -> keys }
+        val keys = builder.keys().flatMap { (_, keys) -> keys }
         val values = queryKeys(keys, at)
 
-        return keysByStorageEntry.mapValues { (storageEntry, keys) ->
-            val valueType = storageEntry.type.value!!
-
+        val delegate = builder.descriptors().mapValues { (descriptor, keys) ->
             keys.associateBy(
-                keySelector = { key -> storageEntry.splitKeyToComponents(runtime, key) },
-                valueTransform = { key -> values[key]?.let { valueType.fromHex(runtime, it) } }
+                keySelector = { key -> descriptor.parseKey(key) },
+                valueTransform = { key -> descriptor.parseValue(values[key]) }
             )
         }
+
+        return MultiQueryResult(delegate)
     }
 
     override suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V {
@@ -258,6 +259,14 @@ abstract class BaseStorageQueryContext(
                 recover(e, value)
                 null
             }
+        }
+    }
+
+    @JvmInline
+    private value class MultiQueryResult(val delegate: Map<MultiQueryBuilder.Descriptor<*, *>, Map<Any?, Any?>>) : MultiQueryBuilder.Result {
+        @Suppress("UNCHECKED_CAST")
+        override fun <K, V> get(descriptor: MultiQueryBuilder.Descriptor<K, V>): Map<K, V> {
+            return delegate.getValue(descriptor) as Map<K, V>
         }
     }
 }
