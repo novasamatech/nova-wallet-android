@@ -6,17 +6,20 @@ import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
+import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ConnectionState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
@@ -280,7 +283,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
 
     val types = chainLocal.chain.types?.let {
         Chain.Types(
-            url = it.url,
+            url = it.url.nullIfEmpty(),
             overridesCommon = it.overridesCommon
         )
     }
@@ -312,6 +315,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
             swap = mapSwapListFromLocal(swap),
+            connectionState = mapConnectionStateFromLocal(connectionState),
             additional = additional
         )
     }
@@ -335,6 +339,22 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
         source = mapAssetSourceFromLocal(local.source),
         enabled = local.enabled
     )
+}
+
+fun mapConnectionStateToLocal(domain: ConnectionState): ConnectionStateLocal {
+    return when (domain) {
+        ConnectionState.FULL_SYNC -> ConnectionStateLocal.FULL_SYNC
+        ConnectionState.LIGHT_SYNC -> ConnectionStateLocal.LIGHT_SYNC
+        ConnectionState.DISABLED -> ConnectionStateLocal.DISABLED
+    }
+}
+
+private fun mapConnectionStateFromLocal(local: ConnectionStateLocal): ConnectionState {
+    return when (local) {
+        ConnectionStateLocal.FULL_SYNC -> ConnectionState.FULL_SYNC
+        ConnectionStateLocal.LIGHT_SYNC -> ConnectionState.LIGHT_SYNC
+        ConnectionStateLocal.DISABLED -> ConnectionState.DISABLED
+    }
 }
 
 private fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {

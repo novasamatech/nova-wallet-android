@@ -20,7 +20,7 @@ import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import org.web3j.protocol.core.methods.response.EthBlock
@@ -75,7 +75,7 @@ class EvmNativeAssetHistory(
         blockHash: String,
         accountId: AccountId,
     ): List<RealtimeHistoryUpdate> {
-        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
+        val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
 
         val block = ethereumApi.ethGetBlockByHash(blockHash, true).sendSuspend()
         val txs = block.block.transactions as List<TransactionResult<EthBlock.TransactionObject>>

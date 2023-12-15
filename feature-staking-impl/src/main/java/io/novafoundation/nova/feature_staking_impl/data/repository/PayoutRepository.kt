@@ -24,7 +24,8 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.getService
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -92,13 +93,13 @@ class PayoutRepository(
     ): List<Payout> {
         val chainId = chain.id
 
-        val (runtimeProvider, connection) = chainRegistry.getService(chainId)
-        val runtime = runtimeProvider.get()
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val socketService = chainRegistry.getSocket(chain.id)
 
         val validatorAddresses = retrieveValidatorAddresses()
 
         val historicalRange = stakingRepository.historicalEras(chainId)
-        val validatorStats = getValidatorHistoricalStats(runtime, connection.socketService, historicalRange, validatorAddresses)
+        val validatorStats = getValidatorHistoricalStats(runtime, socketService, historicalRange, validatorAddresses)
         val historicalRangeSet = historicalRange.toSet()
 
         val historicalTotalEraRewards = retrieveTotalEraReward(chainId, runtime, historicalRange)

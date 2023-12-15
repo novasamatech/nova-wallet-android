@@ -40,6 +40,6 @@ class ExtrinsicTypeLocal(
 class ExtrinsicTypeJoin(
     val contentType: ExtrinsicTypeLocal.ContentType,
     val module: String,
-    val call: String,
+    val call: String?,
     val fee: BigInteger,
 )

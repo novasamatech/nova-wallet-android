@@ -55,5 +55,5 @@ class RemoteStorageSource(
         )
     }
 
-    private fun getSocketService(chainId: String) = chainRegistry.getSocket(chainId)
+    private suspend fun getSocketService(chainId: String) = chainRegistry.getSocket(chainId)
 }

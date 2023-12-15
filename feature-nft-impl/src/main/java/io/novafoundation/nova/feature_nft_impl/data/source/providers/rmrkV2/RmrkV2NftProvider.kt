@@ -27,6 +27,8 @@ class RmrkV2NftProvider(
     private val nftDao: NftDao
 ) : NftProvider {
 
+    override val requireFullChainSync: Boolean = false
+
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
         val address = metaAccount.addressIn(chain) ?: return
         val nfts = singularV2Api.getAccountNfts(address)

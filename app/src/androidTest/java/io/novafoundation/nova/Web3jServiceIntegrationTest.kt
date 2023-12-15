@@ -10,7 +10,7 @@ import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
-import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -132,6 +132,6 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
     private suspend fun moonbeamWeb3j(): Web3Api {
         val moonbeamChainId = "fe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d"
 
-        return chainRegistry.awaitEthereumApiOrThrow(moonbeamChainId, Chain.Node.ConnectionType.WSS)
+        return chainRegistry.getEthereumApiOrThrow(moonbeamChainId, Chain.Node.ConnectionType.WSS)
     }
 }

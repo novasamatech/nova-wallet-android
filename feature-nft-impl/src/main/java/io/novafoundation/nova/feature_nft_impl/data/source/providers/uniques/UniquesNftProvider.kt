@@ -36,6 +36,8 @@ class UniquesNftProvider(
     private val ipfsApi: IpfsApi,
 ) : NftProvider {
 
+    override val requireFullChainSync: Boolean = true
+
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
         val accountId = metaAccount.accountIdIn(chain) ?: return
 

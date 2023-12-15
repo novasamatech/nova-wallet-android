@@ -122,6 +122,9 @@ abstract class ChainDao {
     @Query("UPDATE chain_runtimes SET syncedVersion = :syncedVersion WHERE chainId = :chainId")
     abstract suspend fun updateSyncedRuntimeVersion(chainId: String, syncedVersion: Int)
 
+    @Query("UPDATE chains SET connectionState = :connectionState WHERE id = :chainId")
+    abstract suspend fun setConnectionState(chainId: String, connectionState: ChainLocal.ConnectionStateLocal)
+
     @Transaction
     open suspend fun updateRemoteRuntimeVersionIfChainExists(chainId: String, runtimeVersion: Int, transactionVersion: Int) {
         if (!chainExists(chainId)) return

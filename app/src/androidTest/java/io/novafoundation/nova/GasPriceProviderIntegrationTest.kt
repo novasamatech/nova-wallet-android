@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.runtime.ethereum.gas.LegacyGasPriceProvider
 import io.novafoundation.nova.runtime.ethereum.gas.MaxPriorityFeeGasProvider
 import io.novafoundation.nova.runtime.ext.Ids
-import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
@@ -18,7 +18,7 @@ class GasPriceProviderIntegrationTest : BaseIntegrationTest() {
 
     @Test
     fun compareLegacyAndImprovedGasPriceEstimations() = runTest {
-        val api = chainRegistry.awaitCallEthereumApiOrThrow(Chain.Ids.MOONBEAM)
+        val api = chainRegistry.getCallEthereumApiOrThrow(Chain.Ids.MOONBEAM)
 
         val legacy = LegacyGasPriceProvider(api)
         val improved = MaxPriorityFeeGasProvider(api)

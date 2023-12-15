@@ -44,10 +44,10 @@ import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
-import io.novafoundation.nova.core_db.migrations.AddBalanceModesToAssets_51_52
 import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
+import io.novafoundation.nova.core_db.migrations.AddConnectionStateToChains_53_54
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
@@ -65,7 +65,7 @@ import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_38_39
 import io.novafoundation.nova.core_db.migrations.AddPoolIdToOperations_46_47
-import io.novafoundation.nova.core_db.migrations.AddProxyAccount_53_54
+import io.novafoundation.nova.core_db.migrations.AddProxyAccount_54_55
 import io.novafoundation.nova.core_db.migrations.AddRewardAccountToStakingDashboard_43_44
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
@@ -117,7 +117,6 @@ import io.novafoundation.nova.core_db.model.StakingRewardPeriodLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
-import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.WalletConnectPairingLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
@@ -125,6 +124,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.core_db.model.operation.DirectRewardTypeLocal
@@ -135,7 +135,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 54,
+    version = 55,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -224,8 +224,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
-                    .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51, AddBalanceModesToAssets_51_52)
-                    .addMigrations(ChangeSessionTopicToParing_52_53, AddProxyAccount_53_54)
+                    .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51)
+                    .addMigrations(ChangeSessionTopicToParing_52_53, AddConnectionStateToChains_53_54, AddProxyAccount_54_55)
                     .build()
             }
             return instance!!

@@ -13,8 +13,6 @@ class RuntimeSubscriptionPool(
 
     private val pool = ConcurrentHashMap<String, RuntimeVersionSubscription>()
 
-    fun getRuntimeSubscription(chainId: String) = pool.getValue(chainId)
-
     fun setupRuntimeSubscription(chain: Chain, connection: ChainConnection): RuntimeVersionSubscription {
         return pool.getOrPut(chain.id) {
             RuntimeVersionSubscription(chain.id, connection, chainDao, runtimeSyncService)

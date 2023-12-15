@@ -134,7 +134,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumDetails.toString())
 
         val callDetails = referendumDetailsInteractor.detailsFor(
-            preImage = referendumDetails.onChainMetadata!!.preImage!!,
+            preImage = referendumDetails?.onChainMetadata!!.preImage!!,
             chain = chain
         )
 

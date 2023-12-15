@@ -55,4 +55,7 @@ val <T> LoadingState<T>.dataOrNull: T?
         else -> null
     }
 
+val LoadingState<*>.isLoading: Boolean
+    get() = this is LoadingState.Loading
+
 suspend inline fun <reified T> Flow<LoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T

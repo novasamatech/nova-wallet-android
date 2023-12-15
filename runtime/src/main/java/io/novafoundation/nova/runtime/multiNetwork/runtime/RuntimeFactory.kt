@@ -96,6 +96,7 @@ class RuntimeFactory(
 
                 Triple(types, null, ownHash)
             }
+            TypesUsage.NONE -> Triple(typePreset, null, null)
         }
 
         val typeRegistry = TypeRegistry(types, DynamicTypeResolver(DynamicTypeResolver.DEFAULT_COMPOUND_EXTENSIONS + GenericsExtension))

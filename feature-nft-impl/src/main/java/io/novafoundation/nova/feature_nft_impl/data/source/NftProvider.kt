@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface NftProvider {
 
+    val requireFullChainSync: Boolean
+
     suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean)
 
     suspend fun nftFullSync(nft: Nft)
