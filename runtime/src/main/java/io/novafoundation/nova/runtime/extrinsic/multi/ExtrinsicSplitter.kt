@@ -57,7 +57,7 @@ internal class RealExtrinsicSplitter(
                 val sample = calls.first()
                 val sampleExtrinsic = wrapInFakeExtrinsic(sample, callBuilder.runtime, chain)
 
-                async { rpcCalls.getExtrinsicFee(chain.id, sampleExtrinsic).weight }
+                async { rpcCalls.getExtrinsicFee(chain, sampleExtrinsic).weight }
             }
     }
 

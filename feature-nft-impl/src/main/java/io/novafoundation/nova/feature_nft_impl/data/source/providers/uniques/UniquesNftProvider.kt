@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
-import io.novafoundation.nova.runtime.ext.isFullSync
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -43,7 +42,6 @@ class UniquesNftProvider(
     override val requireFullChainSync: Boolean = true
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
-        if (chain.connectionState.isFullSync) return
         val accountId = metaAccount.accountIdIn(chain) ?: return
 
         val newNfts = remoteStorage.query(chain.id) {

@@ -26,7 +26,6 @@ import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -119,7 +118,7 @@ class RealExtrinsicService(
             .also { it.formExtrinsic() }
             .build()
 
-        return rpcCalls.getExtrinsicFee(chain.id, extrinsic)
+        return rpcCalls.getExtrinsicFee(chain, extrinsic)
     }
 
     override suspend fun estimateFee(
@@ -130,15 +129,16 @@ class RealExtrinsicService(
         extrinsicBuilder.formExtrinsic()
         val extrinsic = extrinsicBuilder.build()
 
-        return estimateFee(chain.id, extrinsic).amount
+        return estimateFee(chain, extrinsic).amount
     }
 
     override suspend fun estimateFeeV2(chain: Chain, formExtrinsic: suspend ExtrinsicBuilder.() -> Unit): Fee {
         return InlineFee(estimateFee(chain, formExtrinsic))
     }
 
-    override suspend fun estimateFee(chainId: ChainId, extrinsic: String): Fee {
-        val baseFee = rpcCalls.getExtrinsicFee(chainId, extrinsic).partialFee
+    override suspend fun estimateFee(chain: Chain, extrinsic: String): Fee {
+        val chainId = chain.id
+        val baseFee = rpcCalls.getExtrinsicFee(chain, extrinsic).partialFee
 
         val runtime = chainRegistry.getRuntime(chainId)
 
@@ -154,7 +154,7 @@ class RealExtrinsicService(
 
         val extrinsics = constructSplitExtrinsics(chain, formExtrinsic, feeExtrinsicBuilderSequence)
 
-        val separateFees = extrinsics.map { estimateFee(chain.id, it).amount }
+        val separateFees = extrinsics.map { estimateFee(chain, it).amount }
         val totalFee = separateFees.sum()
 
         return InlineFee(totalFee)

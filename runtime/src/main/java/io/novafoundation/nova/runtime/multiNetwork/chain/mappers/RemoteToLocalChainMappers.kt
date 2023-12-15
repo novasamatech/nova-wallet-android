@@ -30,6 +30,7 @@ private const val CHAIN_STAKING_WIKI = "stakingWiki"
 private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
 private const val RELAYCHAIN_AS_NATIVE = "relaychainAsNative"
 private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
+private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -51,6 +52,7 @@ fun mapRemoteChainToLocal(
             defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull(),
             relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
             stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
+            feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean
         )
     }
 
