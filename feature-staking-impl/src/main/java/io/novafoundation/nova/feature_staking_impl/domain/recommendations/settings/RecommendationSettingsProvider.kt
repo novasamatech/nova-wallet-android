@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class RecommendationSettingsProvider(
-    maximumRewardedNominators: Int,
     private val runtimeSnapshot: RuntimeSnapshot,
 ) {
 
@@ -23,7 +22,7 @@ class RecommendationSettingsProvider(
     private val customizableFilters = runtimeSnapshot.availableDependents(
         NotSlashedFilter,
         HasIdentityFilter,
-        NotOverSubscribedFilter(maximumRewardedNominators)
+        NotOverSubscribedFilter
     )
 
     val allAvailableFilters = alwaysEnabledFilters + customizableFilters

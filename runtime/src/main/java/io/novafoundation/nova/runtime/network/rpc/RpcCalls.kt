@@ -9,11 +9,14 @@ import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequ
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetFinalizedHeadRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetHeaderRequest
+import io.novafoundation.nova.common.data.network.runtime.calls.GetStorageSize
 import io.novafoundation.nova.common.data.network.runtime.calls.NextAccountIndexRequest
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
+import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.extrinsicHash
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.feeViaRuntimeCall
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
@@ -139,6 +142,10 @@ class RpcCalls(
      */
     suspend fun getBlockHash(chainId: ChainId, blockNumber: BlockNumber? = null): String {
         return socketFor(chainId).executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
+    }
+
+    suspend fun getStorageSize(chainId: ChainId, storageKey: String): BigInteger {
+        return socketFor(chainId).executeAsync(GetStorageSize(storageKey)).result?.asGsonParsedNumber().orZero()
     }
 
     private suspend fun socketFor(chainId: ChainId) = chainRegistry.getSocket(chainId)

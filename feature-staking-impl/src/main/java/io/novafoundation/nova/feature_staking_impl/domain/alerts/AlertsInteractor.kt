@@ -42,7 +42,7 @@ class AlertsInteractor(
     class AlertContext(
         val exposures: Map<String, Exposure>,
         val stakingState: StakingState,
-        val maxRewardedNominatorsPerValidator: Int,
+        val maxRewardedNominatorsPerValidator: Int?,
         val minRecommendedStake: Balance,
         val activeEra: BigInteger,
         val asset: Asset,
