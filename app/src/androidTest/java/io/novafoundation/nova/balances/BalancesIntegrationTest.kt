@@ -48,11 +48,9 @@ class BalancesIntegrationTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{1}")
-        fun data(): ArrayList<Array<String?>> {
+        fun data(): List<Array<String?>> {
             val arrayOfNetworks: Array<TestData> = Gson().fromJson(URL(TEST_CHAINS_URL).readText())
-            val listNetworks: ArrayList<Array<String?>> = ArrayList()
-            arrayOfNetworks.forEach { listNetworks.add(arrayOf(it.chainId, it.name, it.account)) }
-            return listNetworks
+            return arrayOfNetworks.map { arrayOf(it.chainId, it.name, it.account) }
         }
 
         class TestData(
@@ -123,7 +121,7 @@ class BalancesIntegrationTest(
 
     private suspend fun testFeeLoadingAsync(chain: Chain) {
         return coroutineScope {
-            withTimeout(80.seconds) {
+            withTimeout(10.seconds) {
                 extrinsicService.estimateFee(chain) {
                     systemRemark(byteArrayOf(0))
 
