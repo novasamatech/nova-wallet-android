@@ -15,6 +15,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
+import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
+import io.novafoundation.nova.runtime.storage.source.query.multi
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -88,60 +90,71 @@ class NftUniquesIntegrationTest {
 
             val classesIds = classesWithInstances.map { (collection, _) -> collection }.distinct()
 
-            val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
-            val classStorage = runtime.metadata.uniques().storage("Class")
-            val instanceMetadataStorage = runtime.metadata.uniques().storage("InstanceMetadataOf")
-            val instanceDetailsStorage = runtime.metadata.uniques().storage("Asset")
+            val classDetailsDescriptor: MultiQueryBuilder.Descriptor<BigInteger, UniquesClass.Details>
+            val classMetadatasDescriptor: MultiQueryBuilder.Descriptor<BigInteger, UniquesClass.Metadata?>
+            val instancesDetailsDescriptor: MultiQueryBuilder.Descriptor<Pair<BigInteger, BigInteger>, UniquesInstance.Details>
+            val instancesMetadataDescriptor: MultiQueryBuilder.Descriptor<Pair<BigInteger, BigInteger>, UniquesInstance.Metadata?>
 
-            val multiQueryResults = multiInternal {
-                classMetadataStorage.querySingleArgKeys(classesIds)
-                classStorage.querySingleArgKeys(classesIds)
-                instanceMetadataStorage.queryKeys(classesWithInstances)
-                instanceDetailsStorage.queryKeys(classesWithInstances)
+            val multiQueryResults = multi {
+                classDetailsDescriptor = runtime.metadata.uniques().storage("Class").querySingleArgKeys(
+                    keysArgs = classesIds,
+                    keyExtractor = { it.component1<BigInteger>() },
+                    binding = { parsedValue ->
+                        val classDetailsStruct = parsedValue.cast<Struct.Instance>()
+
+                        UniquesClass.Details(
+                            instances = classDetailsStruct.getTyped("instances"),
+                            frozen = classDetailsStruct.getTyped("isFrozen")
+                        )
+                    }
+                )
+
+                classMetadatasDescriptor = runtime.metadata.uniques().storage("ClassMetadataOf").querySingleArgKeys(
+                    keysArgs = classesIds,
+                    keyExtractor = { it.component1<BigInteger>() },
+                    binding = { parsedValue ->
+                        parsedValue?.cast<Struct.Instance>()?.let { classMetadataStruct ->
+                            UniquesClass.Metadata(
+                                deposit = classMetadataStruct.getTyped("deposit"),
+                                data = bindString(classMetadataStruct["data"])
+                            )
+                        }
+                    }
+                )
+
+                instancesDetailsDescriptor = runtime.metadata.uniques().storage("Asset").queryKeys(
+                    keysArgs = classesWithInstances,
+                    keyExtractor = { it.component1<BigInteger>() to it.component2<BigInteger>() },
+                    binding = { parsedValue ->
+                        val instanceDetailsStruct = parsedValue.cast<Struct.Instance>()
+
+                        UniquesInstance.Details(
+                            owner = chain.addressOf(bindAccountId(instanceDetailsStruct["owner"])),
+                            frozen = bindBoolean(instanceDetailsStruct["isFrozen"])
+                        )
+                    }
+                )
+
+                instancesMetadataDescriptor = runtime.metadata.uniques().storage("InstanceMetadataOf").queryKeys(
+                    keysArgs = classesWithInstances,
+                    keyExtractor = { it.component1<BigInteger>() to it.component2<BigInteger>() },
+                    binding = { parsedValue ->
+                        parsedValue?.cast<Struct.Instance>()?.let {
+                            UniquesInstance.Metadata(
+                                data = bindString(it["data"])
+                            )
+                        }
+                    }
+                )
             }
 
-            val classDetails = multiQueryResults.getValue(classStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
-                .mapValues { (_, parsedValue) ->
-                    val classDetailsStruct = parsedValue.cast<Struct.Instance>()
+            val classDetails = multiQueryResults[classDetailsDescriptor]
 
-                    UniquesClass.Details(
-                        instances = classDetailsStruct.getTyped("instances"),
-                        frozen = classDetailsStruct.getTyped("isFrozen")
-                    )
-                }
+            val classMetadatas = multiQueryResults[classMetadatasDescriptor]
 
-            val classMetadatas = multiQueryResults.getValue(classMetadataStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
-                .mapValues { (_, parsedValue) ->
-                    parsedValue?.cast<Struct.Instance>()?.let { classMetadataStruct ->
-                        UniquesClass.Metadata(
-                            deposit = classMetadataStruct.getTyped("deposit"),
-                            data = bindString(classMetadataStruct["data"])
-                        )
-                    }
-                }
+            val instancesDetails = multiQueryResults[instancesDetailsDescriptor]
 
-            val instancesDetails = multiQueryResults.getValue(instanceDetailsStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() to keyComponents.component2<BigInteger>() }
-                .mapValues { (_, parsedValue) ->
-                    val instanceDetailsStruct = parsedValue.cast<Struct.Instance>()
-
-                    UniquesInstance.Details(
-                        owner = chain.addressOf(bindAccountId(instanceDetailsStruct["owner"])),
-                        frozen = bindBoolean(instanceDetailsStruct["isFrozen"])
-                    )
-                }
-
-            val instancesMetadatas = multiQueryResults.getValue(instanceMetadataStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() to keyComponents.component2<BigInteger>() }
-                .mapValues { (_, parsedValue) ->
-                    parsedValue?.cast<Struct.Instance>()?.let {
-                        UniquesInstance.Metadata(
-                            data = bindString(it["data"])
-                        )
-                    }
-                }
+            val instancesMetadatas = multiQueryResults[instancesMetadataDescriptor]
 
             val classes = classesIds.associateWith { classId ->
                 UniquesClass(
