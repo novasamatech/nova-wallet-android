@@ -32,5 +32,5 @@ interface CrowdloanRouter {
 
     fun openSwitchWallet()
 
-    fun openAccountDetails(metaId: Long)
+    fun openWalletDetails(metaId: Long)
 }

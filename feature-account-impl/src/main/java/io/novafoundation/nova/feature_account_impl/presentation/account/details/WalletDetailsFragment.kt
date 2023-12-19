@@ -52,7 +52,7 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel>(), ChainAccou
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_account_details, container, false)
+    ) = layoutInflater.inflate(R.layout.fragment_wallet_details, container, false)
 
     override fun initViews() {
         accountDetailsToolbar.setHomeButtonListener {

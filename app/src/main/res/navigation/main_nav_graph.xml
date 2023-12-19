@@ -85,7 +85,7 @@
         app:exitAnim="@anim/fragment_close_exit"
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_open_exit"
-        app:popUpTo="@+id/accountDetailsFragment" />
+        app:popUpTo="@+id/walletDetailsFragment" />
 
     <action
         android:id="@+id/action_export_seed"
@@ -113,7 +113,7 @@
 
     <action
         android:id="@+id/action_open_account_details"
-        app:destination="@id/accountDetailsFragment"
+        app:destination="@id/walletDetailsFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -507,10 +507,10 @@
         tools:layout="@layout/fragment_languages" />
 
     <fragment
-        android:id="@+id/accountDetailsFragment"
+        android:id="@+id/walletDetailsFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment"
-        android:label="AccountDetailsFragment"
-        tools:layout="@layout/fragment_account_details">
+        android:label="WalletDetailsFragment"
+        tools:layout="@layout/fragment_wallet_details">
 
 
         <action

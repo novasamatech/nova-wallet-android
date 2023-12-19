@@ -41,7 +41,7 @@ class ParachainStakingNavigator(
     )
 
     override fun openWalletDetails(metaId: Long) {
-        commonNavigator.openAccountDetails(metaId)
+        commonNavigator.openWalletDetails(metaId)
     }
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)

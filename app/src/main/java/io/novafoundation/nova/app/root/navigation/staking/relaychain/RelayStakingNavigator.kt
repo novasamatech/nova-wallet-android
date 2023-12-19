@@ -48,7 +48,7 @@ class RelayStakingNavigator(
 
     override fun openSwitchWallet() = commonNavigator.openSwitchWallet()
 
-    override fun openAccountDetails(metaAccountId: Long) = commonNavigator.openAccountDetails(metaAccountId)
+    override fun openWalletDetails(metaAccountId: Long) = commonNavigator.openWalletDetails(metaAccountId)
 
     override fun openCustomRebond() {
         performNavigation(R.id.action_stakingFragment_to_customRebondFragment)
