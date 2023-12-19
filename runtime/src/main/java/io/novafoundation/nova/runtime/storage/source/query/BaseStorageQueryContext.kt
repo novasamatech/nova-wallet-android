@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncom
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.common.utils.mapValuesNotNull
-import io.novafoundation.nova.common.utils.splitKeyToComponents
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl

@@ -22,7 +22,6 @@ internal class ProxyNode : NestedCallNode {
 
     private val proxyCalls = arrayOf("proxy", "proxyAnnounced")
 
-
     override fun canVisit(call: GenericCall.Instance): Boolean {
         return call.module.name == Modules.PROXY && call.function.name in proxyCalls
     }
@@ -89,7 +88,6 @@ internal class ProxyNode : NestedCallNode {
 
         context.nestedVisit(visit)
     }
-
 
     private fun GenericEvent.Instance.isProxySucceeded(): Boolean {
         return arguments.first().castToDictEnum().name == "Ok"

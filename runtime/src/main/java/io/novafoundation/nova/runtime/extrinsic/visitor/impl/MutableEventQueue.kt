@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.impl;
+package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 
 import io.novafoundation.nova.common.utils.instanceOf
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
@@ -51,7 +51,6 @@ internal inline fun MutableEventQueue.takeFromEndOrThrow(vararg eventTypes: Even
         "No required event found for types ${eventTypes.joinToString { it.name }}"
     }
 }
-
 
 data class EventWithIndex(val event: GenericEvent.Instance, val eventIndex: Int)
 

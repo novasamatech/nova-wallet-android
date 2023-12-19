@@ -36,7 +36,8 @@ internal class RealExtrinsicWalk(
             rootExtrinsic = source,
             call = source.extrinsic.call,
             success = source.isSuccess(),
-            events = source.events.asReversed(), // Extrinsic Walk expects events to go from latest to newest however `ExtrinsicWithEvents` has them in opposite order
+            // Extrinsic Walk expects events to go from latest to newest however `ExtrinsicWithEvents` has them in opposite order
+            events = source.events.asReversed(),
             origin = source.extrinsic.signer()
         )
 
@@ -57,7 +58,7 @@ internal class RealExtrinsicWalk(
             val origin = visitedCall.origin
             val newLogger = IndentVisitorLogger(indent = depth + 1)
 
-            newLogger.info("Visiting leaf: ${display}, success: ${visitedCall.success}, origin: ${origin.toAddress(42)}")
+            newLogger.info("Visiting leaf: $display, success: ${visitedCall.success}, origin: ${origin.toAddress(42)}")
 
             // Reverse events back to hide previously done reverse from clients
             val withReversedEvents = visitedCall.copy(events = visitedCall.events.asReversed())
@@ -122,7 +123,7 @@ internal class RealExtrinsicWalk(
         }
 
         override fun endExclusiveToSkipInternalEvents(call: GenericCall.Instance): Int {
-           return this@RealExtrinsicWalk.endExclusiveToSkipInternalEvents(runtime, call, eventQueue, endExclusive = eventsSize)
+            return this@RealExtrinsicWalk.endExclusiveToSkipInternalEvents(runtime, call, eventQueue, endExclusive = eventsSize)
         }
     }
 

@@ -17,7 +17,7 @@ internal class IndentVisitorLogger(
     private val indentPrefix = " ".repeat(indent)
 
     override fun info(message: String) {
-       Log.d(tag, indentPrefix + message)
+        Log.d(tag, indentPrefix + message)
     }
 
     override fun error(message: String) {
