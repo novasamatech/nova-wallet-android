@@ -20,7 +20,7 @@ fun interface ExtrinsicVisitor {
     fun visit(visit: ExtrinsicVisit)
 }
 
-data class ExtrinsicVisit(
+class ExtrinsicVisit(
 
     /**
      * Whole extrinsic object. Useful for accessing data outside if the current visit scope, e.g. some top-level events

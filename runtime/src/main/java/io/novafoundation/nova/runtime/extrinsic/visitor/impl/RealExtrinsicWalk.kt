@@ -36,8 +36,7 @@ internal class RealExtrinsicWalk(
             rootExtrinsic = source,
             call = source.extrinsic.call,
             success = source.isSuccess(),
-            // Extrinsic Walk expects events to go from latest to newest however `ExtrinsicWithEvents` has them in opposite order
-            events = source.events.asReversed(),
+            events = source.events,
             origin = source.extrinsic.signer()
         )
 
@@ -60,10 +59,7 @@ internal class RealExtrinsicWalk(
 
             newLogger.info("Visiting leaf: $display, success: ${visitedCall.success}, origin: ${origin.toAddress(42)}")
 
-            // Reverse events back to hide previously done reverse from clients
-            val withReversedEvents = visitedCall.copy(events = visitedCall.events.asReversed())
-
-            visitor.visit(withReversedEvents)
+            visitor.visit(visitedCall)
         } else {
             val eventQueue = RealEventQueue(visitedCall.events)
             val newLogger = IndentVisitorLogger(indent = depth)

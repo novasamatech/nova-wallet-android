@@ -80,7 +80,7 @@ internal class ProxyWalkTest {
 
     @Test
     fun shouldVisitSucceededSimpleCall() = runBlocking {
-        val events = listOf(extrinsicSuccess(), testEvent())
+        val events = listOf(testEvent(), extrinsicSuccess())
 
         val extrinsic = createExtrinsic(
             signer = proxied,
@@ -115,7 +115,7 @@ internal class ProxyWalkTest {
     @Test
     fun shouldVisitSucceededSingleProxyCall() = runBlocking {
         val innerProxyEvents = listOf(testEvent())
-        val events = listOf(extrinsicSuccess(), proxyExecuted(success = true)) + innerProxyEvents
+        val events = innerProxyEvents + listOf(proxyExecuted(success = true), extrinsicSuccess())
 
         val extrinsic = createExtrinsic(
             signer = proxy,
@@ -136,7 +136,7 @@ internal class ProxyWalkTest {
     @Test
     fun shouldVisitFailedSingleProxyCall() = runBlocking {
         val innerProxyEvents = emptyList<GenericEvent.Instance>()
-        val events = listOf(extrinsicSuccess(), proxyExecuted(success = false))
+        val events = listOf(proxyExecuted(success = false), extrinsicSuccess())
 
         val extrinsic = createExtrinsic(
             signer = proxy,
@@ -157,7 +157,7 @@ internal class ProxyWalkTest {
     @Test
     fun shouldVisitSucceededMultipleProxyCalls() = runBlocking {
         val innerProxyEvents = listOf(testEvent())
-        val events = listOf(extrinsicSuccess(), proxyExecuted(success = true), proxyExecuted(success = true), proxyExecuted(success = true)) + innerProxyEvents
+        val events = innerProxyEvents + listOf(proxyExecuted(success = true), proxyExecuted(success = true), proxyExecuted(success = true), extrinsicSuccess())
 
         val proxy1 = byteArrayOf(0x00)
         val proxy2 = byteArrayOf(0x01)
@@ -189,7 +189,7 @@ internal class ProxyWalkTest {
     @Test
     fun shouldVisitFailedMultipleProxyCalls() = runBlocking {
         val innerProxyEvents = emptyList<GenericCall.Instance>()
-        val events = listOf(extrinsicSuccess(), proxyExecuted(success = false)) // only outer-most proxy succeeded
+        val events = listOf(proxyExecuted(success = false), proxyExecuted(success = true), extrinsicSuccess()) // only outer-most proxy succeeded
 
         val proxy1 = byteArrayOf(0x00)
         val proxy2 = byteArrayOf(0x01)
