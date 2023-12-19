@@ -21,6 +21,8 @@ import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.impl.RealExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
@@ -206,4 +208,10 @@ class RuntimeModule {
     fun provideMultiLocationConverterFactory(chainRegistry: ChainRegistry): MultiLocationConverterFactory {
         return MultiLocationConverterFactory(chainRegistry)
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideExtrinsicWalk(
+        chainRegistry: ChainRegistry,
+    ): ExtrinsicWalk = RealExtrinsicWalk(chainRegistry)
 }

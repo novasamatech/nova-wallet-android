@@ -5,22 +5,22 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.h
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Extractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Factory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.walkToList
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.status
 
 internal class SubstrateRealtimeOperationFetcherFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
-    private val eventsRepository: EventsRepository
+    private val eventsRepository: EventsRepository,
+    private val callWalk: ExtrinsicWalk,
 ) : Factory {
 
     override fun create(sources: List<Factory.Source>): SubstrateRealtimeOperationFetcher {
         val extractors = sources.map { it.extractor() }
 
-        return RealSubstrateRealtimeOperationFetcher(eventsRepository, extractors)
+        return RealSubstrateRealtimeOperationFetcher(eventsRepository, extractors, callWalk)
     }
 
     private fun Factory.Source.extractor(): Extractor {
@@ -43,7 +43,8 @@ internal class SubstrateRealtimeOperationFetcherFactory(
 
 private class RealSubstrateRealtimeOperationFetcher(
     private val repository: EventsRepository,
-    private val extractors: List<Extractor>
+    private val extractors: List<Extractor>,
+    private val callWalk: ExtrinsicWalk,
 ) : SubstrateRealtimeOperationFetcher {
 
     override suspend fun extractRealtimeHistoryUpdates(
@@ -54,23 +55,19 @@ private class RealSubstrateRealtimeOperationFetcher(
         val extrinsics = repository.getExtrinsicsWithEvents(chain.id, blockHash)
 
         return extrinsics.flatMap { extrinsic ->
-            extractors.mapNotNull {
-                val type = runCatching { it.extractRealtimeHistoryUpdates(extrinsic, chain, chainAsset) }.getOrNull() ?: return@mapNotNull null
+            val visits = runCatching { callWalk.walkToList(extrinsic, chain.id) }.getOrElse { emptyList() }
 
-                RealtimeHistoryUpdate(
-                    txHash = extrinsic.extrinsicHash,
-                    status = extrinsic.operationStatus(),
-                    type = type
-                )
+            visits.flatMap { extrinsicVisit ->
+                extractors.mapNotNull {
+                    val type = runCatching { it.extractRealtimeHistoryUpdates(extrinsicVisit, chain, chainAsset) }.getOrNull() ?: return@mapNotNull null
+
+                    RealtimeHistoryUpdate(
+                        txHash = extrinsic.extrinsicHash,
+                        status = Operation.Status.fromSuccess(extrinsicVisit.success),
+                        type = type
+                    )
+                }
             }
-        }
-    }
-
-    private fun ExtrinsicWithEvents.operationStatus(): Operation.Status {
-        return when (status()) {
-            ExtrinsicStatus.SUCCESS -> Operation.Status.COMPLETED
-            ExtrinsicStatus.FAILURE -> Operation.Status.FAILED
-            null -> Operation.Status.PENDING
         }
     }
 }
