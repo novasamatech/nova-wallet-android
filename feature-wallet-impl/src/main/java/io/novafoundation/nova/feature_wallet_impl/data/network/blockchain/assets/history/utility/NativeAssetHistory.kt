@@ -61,7 +61,7 @@ class NativeAssetHistory(
             val amount = bindNumber(call.arguments["value"])
 
             return RealtimeHistoryUpdate.Type.Transfer(
-                senderId = bindAccountIdentifier(extrinsicVisit.origin),
+                senderId = extrinsicVisit.origin,
                 recipientId = bindAccountIdentifier(call.arguments["dest"]),
                 amountInPlanks = amount,
                 chainAsset = chainAsset,

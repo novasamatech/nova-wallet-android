@@ -14,13 +14,13 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepo
 internal class SubstrateRealtimeOperationFetcherFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val eventsRepository: EventsRepository,
-    private val callWalk: ExtrinsicWalk,
+    private val extrinsicWalk: ExtrinsicWalk,
 ) : Factory {
 
     override fun create(sources: List<Factory.Source>): SubstrateRealtimeOperationFetcher {
         val extractors = sources.map { it.extractor() }
 
-        return RealSubstrateRealtimeOperationFetcher(eventsRepository, extractors, callWalk)
+        return RealSubstrateRealtimeOperationFetcher(eventsRepository, extractors, extrinsicWalk)
     }
 
     private fun Factory.Source.extractor(): Extractor {
