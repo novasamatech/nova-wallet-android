@@ -271,6 +271,10 @@ class AccountDataSourceImpl(
         return metaAccountDao.hasMetaAccounts()
     }
 
+    override suspend fun getLastProxyAccountId(proxiedMetaId: Long): Long? {
+        return metaAccountDao.getLastProxyAccountId(proxiedMetaId)
+    }
+
     private inline fun async(crossinline action: suspend () -> Unit) {
         GlobalScope.launch(Dispatchers.Default) {
             action()

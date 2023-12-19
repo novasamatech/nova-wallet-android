@@ -89,4 +89,6 @@ interface AccountDataSource : SecretStoreV1 {
     )
 
     suspend fun hasMetaAccounts(): Boolean
+
+    suspend fun getLastProxyAccountId(proxiedMetaId: Long): Long?
 }

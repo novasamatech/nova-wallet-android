@@ -122,4 +122,6 @@ interface AccountRepository {
     ): String
 
     suspend fun isAccountExists(accountId: AccountId): Boolean
+
+    suspend fun getLastProxyAccountFor(proxiedMetaId: Long): MetaAccount?
 }

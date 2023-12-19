@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.di.modules
+package io.novafoundation.nova.feature_account_impl.di.modules.signers
 
 import dagger.Module
 import dagger.Provides
@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notS
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
-@Module
+@Module(includes = [ProxiedSignerModule::class])
 class SignersModule {
 
     @Provides
@@ -42,16 +42,6 @@ class SignersModule {
         chainRegistry: ChainRegistry,
         twoFactorVerificationService: TwoFactorVerificationService
     ) = SecretsSignerFactory(secretStoreV2, chainRegistry, twoFactorVerificationService)
-
-    @Provides
-    @FeatureScope
-    fun provideProxiedSignerFactory(
-        secretStoreV2: SecretStoreV2,
-        chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository,
-        proxySigningPresenter: ProxySigningPresenter,
-        proxyRepository: ProxyRepository,
-    ) = ProxiedSignerFactory(secretStoreV2, chainRegistry, accountRepository, proxySigningPresenter, proxyRepository)
 
     @Provides
     @FeatureScope

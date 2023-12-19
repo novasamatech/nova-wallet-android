@@ -255,6 +255,11 @@ class AccountRepositoryImpl(
         return accountDataSource.accountExists(accountId)
     }
 
+    override suspend fun getLastProxyAccountFor(proxiedMetaId: Long): MetaAccount? {
+        val lastProxyMetaId = accountDataSource.getLastProxyAccountId(proxiedMetaId)
+        return lastProxyMetaId?.let { accountDataSource.getMetaAccount(it) }
+    }
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }
