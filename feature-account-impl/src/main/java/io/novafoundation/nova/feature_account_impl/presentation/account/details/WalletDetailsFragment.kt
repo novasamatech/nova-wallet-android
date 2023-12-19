@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 private const val ACCOUNT_ID_KEY = "ACCOUNT_ADDRESS_KEY"
 
-class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAccountsAdapter.Handler {
+class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel>(), ChainAccountsAdapter.Handler {
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -81,7 +81,7 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
             .inject(this)
     }
 
-    override fun subscribe(viewModel: AccountDetailsViewModel) {
+    override fun subscribe(viewModel: WalletDetailsViewModel) {
         setupExternalActions(viewModel) { context, payload ->
             ChainAccountActionsSheet(
                 context,
@@ -103,7 +103,8 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
         viewModel.typeAlert.observe {
             if (it != null) {
                 accountDetailsTypeAlert.makeVisible()
-                accountDetailsTypeAlert.setText(it.text)
+                accountDetailsTypeAlert.setMessage(it.message)
+                accountDetailsTypeAlert.setSubMessage(it.subMessage)
                 accountDetailsTypeAlert.setStyle(it.style)
             } else {
                 accountDetailsTypeAlert.makeGone()

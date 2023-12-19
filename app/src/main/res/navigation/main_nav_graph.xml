@@ -508,7 +508,7 @@
 
     <fragment
         android:id="@+id/accountDetailsFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment"
         android:label="AccountDetailsFragment"
         tools:layout="@layout/fragment_account_details">
 
