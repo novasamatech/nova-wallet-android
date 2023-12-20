@@ -21,10 +21,10 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.ui.setupAddAccountLauncher
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsToolbar
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsTypeAlert
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsChainAccounts
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsNameField
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsToolbar
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsTypeAlert
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
