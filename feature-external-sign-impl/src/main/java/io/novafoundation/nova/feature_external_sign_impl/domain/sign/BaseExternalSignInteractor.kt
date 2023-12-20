@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
+import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 
 abstract class BaseExternalSignInteractor(
     private val accountRepository: AccountRepository,
@@ -12,7 +12,7 @@ abstract class BaseExternalSignInteractor(
     private val signerProvider: SignerProvider,
 ) : ExternalSignInteractor {
 
-    protected suspend fun resolveWalletSigner(): Signer {
+    protected suspend fun resolveWalletSigner(): NovaSigner {
         val metaAccount = resolveMetaAccount()
 
         return signerProvider.signerFor(metaAccount)
