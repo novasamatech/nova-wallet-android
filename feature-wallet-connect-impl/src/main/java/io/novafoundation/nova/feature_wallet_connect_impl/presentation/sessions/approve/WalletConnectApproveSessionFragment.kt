@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.common.view.setTextOrHide
+import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.chain.showChainsOverview
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.setupSelectWalletMixin
@@ -78,8 +78,8 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
         viewModel.title.observe(wcApproveSessionTitle::setText)
 
         viewModel.sessionAlerts.observe { sessionAlerts ->
-            wcApproveSessionChainsAlert.setTextOrHide(sessionAlerts.unsupportedChains?.alertContent)
-            wcApproveSessionAccountsAlert.setTextOrHide(sessionAlerts.missingAccounts?.alertContent)
+            wcApproveSessionChainsAlert.setMessageOrHide(sessionAlerts.unsupportedChains?.alertContent)
+            wcApproveSessionAccountsAlert.setMessageOrHide(sessionAlerts.missingAccounts?.alertContent)
         }
 
         viewModel.allowButtonState.observe(wcApproveSessionAllow::setState)

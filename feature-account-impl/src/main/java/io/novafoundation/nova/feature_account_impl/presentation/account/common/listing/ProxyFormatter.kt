@@ -25,17 +25,24 @@ class ProxyFormatter(
         proxyAccountIcon: Drawable,
         proxyAccount: ProxyAccount
     ): CharSequence {
-        val proxyType = mapProxyTypeToString(resourceManager, proxyAccount.proxyType)
+        val proxyType = mapProxyTypeToString(proxyAccount.proxyType)
+        val formattedProxyMetaAccount = mapProxyMetaAccount(proxyAccountName, proxyAccountIcon)
 
-        return SpannableStringBuilder(resourceManager.getString(R.string.proxy_wallet_subtitle, proxyType))
+        return SpannableStringBuilder(proxyType)
+            .append(":")
             .appendSpace()
+            .append(formattedProxyMetaAccount)
+    }
+
+    suspend fun mapProxyMetaAccount(proxyAccountName: String, proxyAccountIcon: Drawable): CharSequence {
+        return SpannableStringBuilder()
             .appendEnd(drawableSpan(proxyAccountIcon))
             .appendSpace()
             .append(proxyAccountName, colorSpan(resourceManager.getColor(R.color.text_primary)))
     }
 
-    fun mapProxyTypeToString(resourceManager: ResourceManager, type: ProxyAccount.ProxyType): String {
-        return when (type) {
+    fun mapProxyTypeToString(type: ProxyAccount.ProxyType): String {
+        val proxyType = when (type) {
             ProxyAccount.ProxyType.Any -> resourceManager.getString(R.string.account_proxy_type_any)
             ProxyAccount.ProxyType.NonTransfer -> resourceManager.getString(R.string.account_proxy_type_any)
             ProxyAccount.ProxyType.Governance -> resourceManager.getString(R.string.account_proxy_type_governance)
@@ -46,6 +53,8 @@ class ProxyFormatter(
             ProxyAccount.ProxyType.NominationPools -> resourceManager.getString(R.string.account_proxy_type_nomination_pools)
             is ProxyAccount.ProxyType.Other -> type.name.splitCamelCase().joinToString { it.capitalize() }
         }
+
+        return resourceManager.getString(R.string.proxy_wallet_type, proxyType)
     }
 
     suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {

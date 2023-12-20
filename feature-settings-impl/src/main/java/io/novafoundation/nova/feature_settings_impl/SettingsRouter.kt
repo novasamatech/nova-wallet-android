@@ -10,7 +10,7 @@ interface SettingsRouter {
 
     fun openChangePinCode()
 
-    fun openAccountDetails(metaId: Long)
+    fun openWalletDetails(metaId: Long)
 
     fun openSwitchWallet()
 

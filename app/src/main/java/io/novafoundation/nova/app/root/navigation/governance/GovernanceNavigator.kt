@@ -79,8 +79,8 @@ class GovernanceNavigator(
         }
     }
 
-    override fun openAccountDetails(id: Long) {
-        commonNavigator.openAccountDetails(id)
+    override fun openWalletDetails(id: Long) {
+        commonNavigator.openWalletDetails(id)
     }
 
     override fun openAddDelegation() {

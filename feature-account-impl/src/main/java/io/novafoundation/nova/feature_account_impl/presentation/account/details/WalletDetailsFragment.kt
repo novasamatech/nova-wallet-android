@@ -21,16 +21,16 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.ui.setupAddAccountLauncher
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsChainAccounts
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsNameField
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsToolbar
-import kotlinx.android.synthetic.main.fragment_account_details.accountDetailsTypeAlert
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsChainAccounts
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsNameField
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsToolbar
+import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsTypeAlert
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 private const val ACCOUNT_ID_KEY = "ACCOUNT_ADDRESS_KEY"
 
-class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAccountsAdapter.Handler {
+class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel>(), ChainAccountsAdapter.Handler {
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -52,7 +52,7 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_account_details, container, false)
+    ) = layoutInflater.inflate(R.layout.fragment_wallet_details, container, false)
 
     override fun initViews() {
         accountDetailsToolbar.setHomeButtonListener {
@@ -81,7 +81,7 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
             .inject(this)
     }
 
-    override fun subscribe(viewModel: AccountDetailsViewModel) {
+    override fun subscribe(viewModel: WalletDetailsViewModel) {
         setupExternalActions(viewModel) { context, payload ->
             ChainAccountActionsSheet(
                 context,
@@ -103,7 +103,8 @@ class AccountDetailsFragment : BaseFragment<AccountDetailsViewModel>(), ChainAcc
         viewModel.typeAlert.observe {
             if (it != null) {
                 accountDetailsTypeAlert.makeVisible()
-                accountDetailsTypeAlert.setText(it.text)
+                accountDetailsTypeAlert.setMessage(it.message)
+                accountDetailsTypeAlert.setSubMessage(it.subMessage)
                 accountDetailsTypeAlert.setStyle(it.style)
             } else {
                 accountDetailsTypeAlert.makeGone()

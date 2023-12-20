@@ -40,7 +40,7 @@ class WalletManagmentViewModel(
     val confirmAccountDeletion = actionAwaitableMixinFactory.confirmingOrDenyingAction<Unit>()
 
     fun accountClicked(accountModel: AccountUi) {
-        accountRouter.openAccountDetails(accountModel.id)
+        accountRouter.openWalletDetails(accountModel.id)
     }
 
     fun editClicked() {

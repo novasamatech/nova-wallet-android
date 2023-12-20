@@ -4,5 +4,6 @@ import io.novafoundation.nova.common.view.AlertView
 
 class AccountTypeAlert(
     val style: AlertView.Style,
-    val text: String
+    val message: String,
+    val subMessage: CharSequence? = null
 )

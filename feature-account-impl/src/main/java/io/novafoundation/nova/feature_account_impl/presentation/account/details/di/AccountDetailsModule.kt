@@ -14,9 +14,12 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
-import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -24,31 +27,52 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 class AccountDetailsModule {
 
     @Provides
-    @IntoMap
-    @ViewModelKey(AccountDetailsViewModel::class)
-    fun provideViewModel(
-        interactor: AccountDetailsInteractor,
-        router: AccountRouter,
+    fun provideAccountFormatterFactory(
         resourceManager: ResourceManager,
         @Caching iconGenerator: AddressIconGenerator,
+    ): AccountFormatterFactory {
+        return AccountFormatterFactory(iconGenerator, resourceManager)
+    }
+
+    @Provides
+    fun provideWalletDetailsMixinFactory(
+        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
+        resourceManager: ResourceManager,
+        accountFormatterFactory: AccountFormatterFactory,
+        proxyFormatter: ProxyFormatter,
+        interactor: WalletDetailsInteractor
+    ): WalletDetailsMixinFactory {
+        return WalletDetailsMixinFactory(
+            polkadotVaultVariantConfigProvider,
+            resourceManager,
+            accountFormatterFactory,
+            proxyFormatter,
+            interactor
+        )
+    }
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(WalletDetailsViewModel::class)
+    fun provideViewModel(
+        interactor: WalletDetailsInteractor,
+        router: AccountRouter,
         metaId: Long,
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
-        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
+        walletDetailsMixinFactory: WalletDetailsMixinFactory
     ): ViewModel {
-        return AccountDetailsViewModel(
+        return WalletDetailsViewModel(
             interactor = interactor,
             accountRouter = router,
-            iconGenerator = iconGenerator,
-            resourceManager = resourceManager,
             metaId = metaId,
             externalActions = externalActions,
             chainRegistry = chainRegistry,
             importTypeChooserMixin = importTypeChooserMixin,
             addAccountLauncherMixin = addAccountLauncherMixin,
-            polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider
+            walletDetailsMixinFactory = walletDetailsMixinFactory
         )
     }
 
@@ -56,7 +80,7 @@ class AccountDetailsModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): AccountDetailsViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(AccountDetailsViewModel::class.java)
+    ): WalletDetailsViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(WalletDetailsViewModel::class.java)
     }
 }
