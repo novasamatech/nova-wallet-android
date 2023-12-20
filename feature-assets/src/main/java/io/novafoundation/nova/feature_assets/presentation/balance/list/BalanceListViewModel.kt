@@ -23,7 +23,6 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownAmount
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownItem
@@ -39,6 +38,7 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
@@ -85,7 +85,7 @@ class BalanceListViewModel(
 
     private val fullSyncActions: List<SyncAction> = listOf(
         { walletInteractor.syncAssetsRates(selectedCurrency.first()) },
-        walletInteractor::syncNfts
+        walletInteractor::syncAllNfts
     )
 
     private val assetsFlow = walletInteractor.assetsFlow()
@@ -95,7 +95,7 @@ class BalanceListViewModel(
     private val isFiltersEnabledFlow = walletInteractor.isFiltersEnabledFlow()
 
     private val accountChangeSyncActions: List<SyncAction> = listOf(
-        walletInteractor::syncNfts
+        walletInteractor::syncAllNfts
     )
 
     private val selectedMetaAccount = selectedAccountUseCase.selectedMetaAccountFlow()
@@ -188,6 +188,10 @@ class BalanceListViewModel(
         selectedMetaAccount
             .mapLatest { syncWith(accountChangeSyncActions, it) }
             .launchIn(this)
+
+        walletInteractor.nftSyncTrigger()
+            .onEach { trigger -> walletInteractor.syncChainNfts(selectedMetaAccount.first(), trigger.chain) }
+            .launchIn(viewModelScope)
     }
 
     fun fullSync() {

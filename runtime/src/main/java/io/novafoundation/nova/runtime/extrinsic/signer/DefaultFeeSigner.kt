@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.extrinsic.feeSigner
+package io.novafoundation.nova.runtime.extrinsic.signer
 
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -15,7 +15,7 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 private val FAKE_CRYPTO_TYPE = EncryptionType.ECDSA
 
-class DefaultFeeSigner(private val chain: Chain) : FeeSigner {
+class DefaultFeeSigner(private val chain: Chain) : NovaSigner {
 
     private val keypair = generateFakeKeyPair()
 
@@ -31,7 +31,13 @@ class DefaultFeeSigner(private val chain: Chain) : FeeSigner {
         return signer.signRaw(payload)
     }
 
-    override suspend fun accountId() = chain.accountIdOf(keypair.publicKey)
+    override suspend fun signerAccountId(chain: Chain): ByteArray {
+        require(chain.id == this.chain.id) {
+            "Signer was created for the different chain, expected ${this.chain.name}, got ${chain.name}"
+        }
+
+        return chain.accountIdOf(keypair.publicKey)
+    }
 
     private fun multiChainEncryption() = if (chain.isEthereumBased) {
         MultiChainEncryption.Ethereum

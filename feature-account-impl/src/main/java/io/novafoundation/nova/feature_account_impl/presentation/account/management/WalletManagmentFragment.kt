@@ -32,7 +32,12 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), Accoun
     ) = layoutInflater.inflate(R.layout.fragment_accounts, container, false)
 
     override fun initViews() {
-        adapter = AccountsAdapter(this, imageLoader, initialMode = viewModel.mode.value)
+        adapter = AccountsAdapter(
+            this,
+            imageLoader,
+            initialMode = viewModel.mode.value,
+            chainBorderColor = R.color.secondary_screen_background
+        )
 
         accountsList.setHasFixedSize(true)
         accountsList.adapter = adapter

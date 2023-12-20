@@ -202,7 +202,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                 val nominatorsCount = stake.stakers.size
                 val rewardsWithLabel = displayConfig.rewardSuffix.format(resourceManager, stake.rewards)
 
-                val formattedMaxStakers = displayConfig.rewardedStakersPerStakeTarget.format()
+                val formattedMaxStakers = displayConfig.rewardedStakersPerStakeTarget?.format()
 
                 ValidatorStakeModel(
                     status = ValidatorStakeModel.Status(
@@ -214,7 +214,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                         totalStake = totalStakeModel,
                         minimumStake = stake.minimumStake?.let { mapAmountToAmountModel(it, asset) },
                         nominatorsCount = nominatorsCount.format(),
-                        maxNominations = resourceManager.getString(R.string.staking_nominations_rewarded_format, formattedMaxStakers),
+                        maxNominations = formattedMaxStakers?.let { resourceManager.getString(R.string.staking_nominations_rewarded_format, it) },
                         apy = rewardsWithLabel
                     )
                 )

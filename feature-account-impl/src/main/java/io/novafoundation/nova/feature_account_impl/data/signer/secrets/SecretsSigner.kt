@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionFor
+import io.novafoundation.nova.feature_account_impl.data.signer.LeafSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
@@ -15,7 +16,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
@@ -26,7 +26,12 @@ class SecretsSignerFactory(
 ) {
 
     fun create(metaAccount: MetaAccount): SecretsSigner {
-        return SecretsSigner(metaAccount, secretStoreV2, chainRegistry, twoFactorVerificationService)
+        return SecretsSigner(
+            metaAccount = metaAccount,
+            secretStoreV2 = secretStoreV2,
+            chainRegistry = chainRegistry,
+            twoFactorVerificationService = twoFactorVerificationService
+        )
     }
 }
 
@@ -34,8 +39,8 @@ class SecretsSigner(
     private val metaAccount: MetaAccount,
     private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
-    private val twoFactorVerificationService: TwoFactorVerificationService
-) : Signer {
+    private val twoFactorVerificationService: TwoFactorVerificationService,
+) : LeafSigner(metaAccount) {
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         runTwoFactorVerificationIfEnabled()

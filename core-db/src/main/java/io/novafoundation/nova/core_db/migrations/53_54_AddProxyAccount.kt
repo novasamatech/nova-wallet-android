@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddProxyAccount_53_54 = object : Migration(53, 54) {
+val AddProxyAccount_54_55 = object : Migration(54, 55) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

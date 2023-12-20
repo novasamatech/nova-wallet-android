@@ -4,13 +4,13 @@ import android.graphics.drawable.Drawable
 
 class AccountUi(
     val id: Long,
-    val title: String,
+    val title: CharSequence,
     val subtitle: CharSequence,
     val isSelected: Boolean,
     val isClickable: Boolean,
     val picture: Drawable,
     val chainIconUrl: String?,
-    val enabled: Boolean,
     val updateIndicator: Boolean,
-    val subtitleIconRes: Int?
+    val subtitleIconRes: Int?,
+    val chainIconOpacity: Float = 1f
 )

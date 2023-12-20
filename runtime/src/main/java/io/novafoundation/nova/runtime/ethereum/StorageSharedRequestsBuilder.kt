@@ -8,10 +8,10 @@ import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.subscribtion.EthereumRequestsAggregator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApi
-import io.novafoundation.nova.runtime.multiNetwork.awaitSocketOrNull
-import io.novafoundation.nova.runtime.multiNetwork.awaitSubscriptionEthereumApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApi
+import io.novafoundation.nova.runtime.multiNetwork.getSocketOrNull
+import io.novafoundation.nova.runtime.multiNetwork.getSubscriptionEthereumApi
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.StorageSubscriptionMultiplexer
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsing
@@ -34,10 +34,10 @@ class StorageSharedRequestsBuilderFactory(
         val substrateProxy = StorageSubscriptionMultiplexer.Builder()
         val ethereumProxy = EthereumRequestsAggregator.Builder()
 
-        val rpcSocket = chainRegistry.awaitSocketOrNull(chainId)
+        val rpcSocket = chainRegistry.getSocketOrNull(chainId)
 
-        val subscriptionApi = chainRegistry.awaitSubscriptionEthereumApi(chainId)
-        val callApi = chainRegistry.awaitCallEthereumApi(chainId)
+        val subscriptionApi = chainRegistry.getSubscriptionEthereumApi(chainId)
+        val callApi = chainRegistry.getCallEthereumApi(chainId)
 
         return StorageSharedRequestsBuilder(
             socketService = rpcSocket,

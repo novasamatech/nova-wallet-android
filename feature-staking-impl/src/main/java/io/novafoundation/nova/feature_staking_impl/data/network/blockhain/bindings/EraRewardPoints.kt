@@ -4,33 +4,27 @@ import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getList
 import io.novafoundation.nova.common.data.network.runtime.binding.requireType
 import io.novafoundation.nova.common.utils.second
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import java.math.BigInteger
 
-typealias RewardPoint = BigInteger
+typealias RewardPoints = BigInteger
 
 class EraRewardPoints(
-    val totalPoints: RewardPoint,
+    val totalPoints: RewardPoints,
     val individual: List<Individual>
 ) {
-    class Individual(val accountId: AccountId, val rewardPoints: RewardPoint)
+    class Individual(val accountId: AccountId, val rewardPoints: RewardPoints)
 }
 
 @UseCaseBinding
 fun bindEraRewardPoints(
-    scale: String?,
-    runtime: RuntimeSnapshot,
-    type: Type<*>,
+    decoded: Any?
 ): EraRewardPoints {
-    val dynamicInstance = scale?.let { type.fromHexOrNull(runtime, it) }.cast<Struct.Instance>()
+    val dynamicInstance = decoded.castToStruct()
 
     return EraRewardPoints(
         totalPoints = bindRewardPoint(dynamicInstance["total"]),
@@ -46,4 +40,4 @@ fun bindEraRewardPoints(
 }
 
 @HelperBinding
-fun bindRewardPoint(dynamicInstance: Any?): RewardPoint = bindNumber(dynamicInstance)
+fun bindRewardPoint(dynamicInstance: Any?): RewardPoints = bindNumber(dynamicInstance)

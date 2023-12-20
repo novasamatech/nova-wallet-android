@@ -8,7 +8,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface ProxyRepository {
 
-    suspend fun getProxyDelegatorsForAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxy>
+    suspend fun getAllProxiesForMetaAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxy>
 
     suspend fun getDelegatedProxyTypes(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyAccount.ProxyType>
 }

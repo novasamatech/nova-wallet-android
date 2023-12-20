@@ -6,14 +6,15 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.dataOrNull
+import io.novafoundation.nova.common.presentation.isLoading
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
@@ -21,11 +22,11 @@ import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftCounter
 import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreview1
 import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreview2
 import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreview3
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftsShimmer
-import javax.inject.Inject
 import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreviewHolder1
 import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreviewHolder2
 import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreviewHolder3
+import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftsShimmer
+import javax.inject.Inject
 
 class GoToNftsView @JvmOverloads constructor(
     context: Context,
@@ -62,7 +63,8 @@ class GoToNftsView @JvmOverloads constructor(
     }
 
     fun setPreviews(previews: List<NftPreviewUi>?) {
-        val shouldShowLoading = previews == null || previews.any { it is LoadingState.Loading }
+        setVisible(previews != null && previews.isNotEmpty())
+        val shouldShowLoading = previews == null || previews.all { it is LoadingState.Loading }
 
         if (shouldShowLoading) {
             previewHolders.forEach(View::makeGone)
@@ -70,12 +72,10 @@ class GoToNftsView @JvmOverloads constructor(
         } else {
             goToNftsShimmer.makeGone()
 
-            setVisible(previews!!.isNotEmpty())
-
             previewHolders.forEachIndexed { index, view ->
-                val previewContent = previews.getOrNull(index)
+                val previewContent = previews!!.getOrNull(index)
 
-                if (previewContent == null) { // no such element
+                if (previewContent == null || previewContent.isLoading) {
                     view.makeGone()
                 } else {
                     view.makeVisible()

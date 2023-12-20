@@ -93,7 +93,7 @@ class NftUniquesIntegrationTest {
             val instanceMetadataStorage = runtime.metadata.uniques().storage("InstanceMetadataOf")
             val instanceDetailsStorage = runtime.metadata.uniques().storage("Asset")
 
-            val multiQueryResults = multi {
+            val multiQueryResults = multiInternal {
                 classMetadataStorage.querySingleArgKeys(classesIds)
                 classStorage.querySingleArgKeys(classesIds)
                 instanceMetadataStorage.queryKeys(classesWithInstances)

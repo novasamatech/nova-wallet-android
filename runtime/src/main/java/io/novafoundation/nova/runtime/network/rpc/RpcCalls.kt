@@ -9,17 +9,23 @@ import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequ
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetFinalizedHeadRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetHeaderRequest
+import io.novafoundation.nova.common.data.network.runtime.calls.GetStorageSize
 import io.novafoundation.nova.common.data.network.runtime.calls.NextAccountIndexRequest
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
+import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.extrinsicHash
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novafoundation.nova.runtime.ext.feeViaRuntimeCall
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.asExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
@@ -43,10 +49,11 @@ class RpcCalls(
     private val runtimeCallsApi: MultiChainRuntimeCallsApi
 ) {
 
-    suspend fun getExtrinsicFee(chainId: ChainId, extrinsic: String): FeeResponse {
+    suspend fun getExtrinsicFee(chain: Chain, extrinsic: String): FeeResponse {
+        val chainId = chain.id
         val runtime = chainRegistry.getRuntime(chainId)
 
-        return if (runtime.typeRegistry[FEE_DECODE_TYPE] != null) {
+        return if (chain.additional.feeViaRuntimeCall() && runtime.typeRegistry[FEE_DECODE_TYPE] != null) {
             val lengthInBytes = extrinsic.fromHex().size
 
             runtimeCallsApi.forChain(chainId).call(
@@ -137,7 +144,11 @@ class RpcCalls(
         return socketFor(chainId).executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
     }
 
-    private fun socketFor(chainId: ChainId) = chainRegistry.getConnection(chainId).socketService
+    suspend fun getStorageSize(chainId: ChainId, storageKey: String): BigInteger {
+        return socketFor(chainId).executeAsync(GetStorageSize(storageKey)).result?.asGsonParsedNumber().orZero()
+    }
+
+    private suspend fun socketFor(chainId: ChainId) = chainRegistry.getSocket(chainId)
 
     private fun bindPartialFee(decoded: Any?): FeeResponse {
         val asStruct = decoded.castToStruct()

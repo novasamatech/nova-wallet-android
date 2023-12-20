@@ -13,9 +13,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlinx.coroutines.flow.first
 
 typealias MaxClick = () -> Unit
 
@@ -42,7 +42,6 @@ interface AmountChooserMixinBase : CoroutineScope {
 
     interface Presentation : AmountChooserMixinBase {
 
-        @Deprecated("Use amountState instead")
         val amount: Flow<BigDecimal>
 
         val amountState: Flow<InputState<BigDecimal?>>

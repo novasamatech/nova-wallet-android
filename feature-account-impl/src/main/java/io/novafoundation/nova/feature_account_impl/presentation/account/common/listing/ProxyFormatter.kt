@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
 
+import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.append
@@ -20,11 +21,12 @@ class ProxyFormatter(
 ) {
 
     suspend fun mapProxyMetaAccountSubtitle(
-        proxyMetaAccount: MetaAccount,
+        proxyAccountName: String,
+        proxyAccountIcon: Drawable,
         proxyAccount: ProxyAccount
     ): CharSequence {
         val proxyType = mapProxyTypeToString(proxyAccount.proxyType)
-        val formattedProxyMetaAccount = mapProxyMetaAccount(proxyMetaAccount)
+        val formattedProxyMetaAccount = mapProxyMetaAccount(proxyAccountName, proxyAccountIcon)
 
         return SpannableStringBuilder(proxyType)
             .append(":")
@@ -32,13 +34,11 @@ class ProxyFormatter(
             .append(formattedProxyMetaAccount)
     }
 
-    suspend fun mapProxyMetaAccount(proxyMetaAccount: MetaAccount): CharSequence {
-        val accountIconDrawable = walletUiUseCase.walletIcon(proxyMetaAccount, 16)
-
+    suspend fun mapProxyMetaAccount(proxyAccountName: String, proxyAccountIcon: Drawable): CharSequence {
         return SpannableStringBuilder()
-            .appendEnd(drawableSpan(accountIconDrawable))
+            .appendEnd(drawableSpan(proxyAccountIcon))
             .appendSpace()
-            .append(proxyMetaAccount.name, colorSpan(resourceManager.getColor(R.color.text_primary)))
+            .append(proxyAccountName, colorSpan(resourceManager.getColor(R.color.text_primary)))
     }
 
     fun mapProxyTypeToString(type: ProxyAccount.ProxyType): String {
@@ -55,5 +55,9 @@ class ProxyFormatter(
         }
 
         return resourceManager.getString(R.string.proxy_wallet_type, proxyType)
+    }
+
+    suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
+        return walletUiUseCase.walletIcon(metaAccount, 16)
     }
 }

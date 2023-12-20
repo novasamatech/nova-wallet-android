@@ -14,6 +14,7 @@ data class PendingPayout(
     val timeLeft: Long,
     val timeLeftCalculatedAt: Long,
     val closeToExpire: Boolean,
+    val pagesToClaim: List<Int>,
 ) {
     class ValidatorInfo(
         val address: String,

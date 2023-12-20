@@ -39,6 +39,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.EraType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.Nonce
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromUtf8
@@ -152,7 +153,7 @@ class PolkadotExternalSignInteractor(
             is CallRepresentation.Bytes -> extrinsicBuilder.build(rawCallBytes = callRepresentation.bytes)
         }
 
-        extrinsicService.estimateFee(chain.id, extrinsic)
+        extrinsicService.estimateFee(chain, extrinsic)
     }
 
     private fun readableBytesContent(signBytesPayload: PolkadotSignPayload.Raw): String {
@@ -208,7 +209,7 @@ class PolkadotExternalSignInteractor(
         return with(parsedExtrinsic) {
             ExtrinsicBuilder(
                 runtime = runtime,
-                nonce = nonce,
+                nonce = Nonce.singleTx(nonce),
                 runtimeVersion = RuntimeVersion(
                     specVersion = specVersion,
                     transactionVersion = transactionVersion

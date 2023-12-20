@@ -50,17 +50,6 @@ fun ExtrinsicBuilder.nominate(targets: List<MultiAddress>): ExtrinsicBuilder {
     )
 }
 
-fun ExtrinsicBuilder.payoutStakers(era: BigInteger, validatorId: AccountId): ExtrinsicBuilder {
-    return call(
-        "Staking",
-        "payout_stakers",
-        mapOf(
-            "validator_stash" to validatorId,
-            "era" to era
-        )
-    )
-}
-
 fun ExtrinsicBuilder.bondMore(amount: BigInteger): ExtrinsicBuilder {
     return call(
         "Staking",

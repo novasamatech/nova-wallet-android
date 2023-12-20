@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByN
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_nft_api.data.repository.NftSyncTrigger
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -68,8 +69,16 @@ class WalletInteractorImpl(
         }
     }
 
-    override suspend fun syncNfts(metaAccount: MetaAccount) {
+    override fun nftSyncTrigger(): Flow<NftSyncTrigger> {
+        return nftRepository.initialNftSyncTrigger()
+    }
+
+    override suspend fun syncAllNfts(metaAccount: MetaAccount) {
         nftRepository.initialNftSync(metaAccount, forceOverwrite = false)
+    }
+
+    override suspend fun syncChainNfts(metaAccount: MetaAccount, chain: Chain) {
+        nftRepository.initialNftSync(metaAccount, chain)
     }
 
     override fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset> {
