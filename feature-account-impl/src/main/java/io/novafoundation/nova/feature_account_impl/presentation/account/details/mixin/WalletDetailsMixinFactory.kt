@@ -24,14 +24,7 @@ class WalletDetailsMixinFactory(
 
             Type.LEDGER -> LedgerWalletDetailsMixin(resourceManager, accountFormatterFactory, interactor, metaAccount)
 
-            Type.PARITY_SIGNER -> ParitySignerWalletDetailsMixin(
-                polkadotVaultVariantConfigProvider,
-                resourceManager,
-                accountFormatterFactory,
-                interactor,
-                metaAccount
-            )
-
+            Type.PARITY_SIGNER,
             Type.POLKADOT_VAULT -> PolkadotVaultWalletDetailsMixin(
                 polkadotVaultVariantConfigProvider,
                 resourceManager,
