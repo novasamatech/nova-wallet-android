@@ -64,9 +64,8 @@ private class MetaAccountWithBalanceListingMixin(
             isClickable = true,
             picture = walletUiUseCase.walletIcon(metaAccount),
             chainIconUrl = proxyChain?.icon,
-            subtitleIconRes = null,
-            enabled = true,
-            updateIndicator = hasUpdates
+            updateIndicator = hasUpdates,
+            subtitleIconRes = null
         )
     }
 
@@ -90,7 +89,11 @@ private class MetaAccountWithBalanceListingMixin(
         val proxy = metaAccount.proxy ?: return formattedTotalBalance()
         val proxyMetaAccount = proxyMetaAccount ?: return formattedTotalBalance()
 
-        return proxyFormatter.mapProxyMetaAccountSubtitle(proxyMetaAccount, proxy)
+        return proxyFormatter.mapProxyMetaAccountSubtitle(
+            proxyMetaAccount.name,
+            proxyFormatter.makeAccountDrawable(proxyMetaAccount),
+            proxy
+        )
     }
 
     private fun MetaAccountWithTotalBalance.formattedTotalBalance(): String {

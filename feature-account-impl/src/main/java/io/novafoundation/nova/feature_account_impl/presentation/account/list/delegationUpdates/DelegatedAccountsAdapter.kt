@@ -20,6 +20,7 @@ class DelegatedAccountsAdapter(
     diffCallback = AccountDiffCallback(AccountTitleGroupRvItem::class.java),
     groupFactory = DelegatedAccountsGroupFactory(),
     groupBinder = { holder, item -> (holder as AccountTitleHolder).bind(item) },
+    chainBorderColor = R.color.bottom_sheet_background,
     initialMode = AccountHolder.Mode.VIEW
 )
 

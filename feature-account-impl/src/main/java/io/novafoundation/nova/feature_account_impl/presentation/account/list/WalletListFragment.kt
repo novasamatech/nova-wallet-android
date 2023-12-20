@@ -25,7 +25,7 @@ abstract class WalletListFragment<T : WalletListViewModel> :
     lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        AccountsAdapter(this, imageLoader, initialMode = viewModel.mode)
+        AccountsAdapter(this, imageLoader, initialMode = viewModel.mode, chainBorderColor = R.color.bottom_sheet_background)
     }
 
     override fun onCreateView(

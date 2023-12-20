@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.common.
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
+import io.novafoundation.nova.common.utils.colorSpan
+import io.novafoundation.nova.common.utils.toSpannable
+import io.novafoundation.nova.common.utils.withAlphaDrawable
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedAndProxyMetaAccount
@@ -32,6 +35,8 @@ class DelegatedMetaAccountUpdatesListingMixinFactory(
     }
 }
 
+private const val ICON_ALPHA = 0.56f
+
 private class DelegatedMetaAccountUpdatesListingMixin(
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val walletUiUseCase: WalletUiUseCase,
@@ -59,25 +64,36 @@ private class DelegatedMetaAccountUpdatesListingMixin(
     }
 
     private suspend fun mapProxiedToUi(proxiedWithProxy: ProxiedAndProxyMetaAccount) = with(proxiedWithProxy) {
+        val isEnabled = proxiedWithProxy.proxied.status == LightMetaAccount.Status.ACTIVE
+        val secondaryColor = resourceManager.getColor(R.color.text_secondary)
+        val title = proxied.name
+        val subtitle = mapSubtitle(this, isEnabled)
+        val walletIcon = walletUiUseCase.walletIcon(proxied)
         AccountUi(
             id = proxied.id,
-            title = proxied.name,
-            subtitle = mapSubtitle(this),
+            title = if (isEnabled) title else title.toSpannable(colorSpan(secondaryColor)),
+            subtitle = if (isEnabled) subtitle else subtitle.toSpannable(colorSpan(secondaryColor)),
             isSelected = false,
             isClickable = true,
-            picture = walletUiUseCase.walletIcon(proxied),
+            picture = if (isEnabled) walletIcon else walletIcon.withAlphaDrawable(ICON_ALPHA),
             chainIconUrl = proxiedWithProxy.chain.icon,
+            chainIconOpacity = ICON_ALPHA,
             subtitleIconRes = null,
-            enabled = proxiedWithProxy.proxied.status == LightMetaAccount.Status.ACTIVE,
             updateIndicator = false
         )
     }
 
     private suspend fun mapSubtitle(
-        proxiedWithProxy: ProxiedAndProxyMetaAccount
+        proxiedWithProxy: ProxiedAndProxyMetaAccount,
+        isEnabled: Boolean
     ): CharSequence {
         val proxy = proxiedWithProxy.proxied.proxy ?: return proxiedWithProxy.proxiedAddress() // fallback
-        return proxyFormatter.mapProxyMetaAccountSubtitle(proxiedWithProxy.proxy, proxy)
+        val proxyIcon = proxyFormatter.makeAccountDrawable(proxiedWithProxy.proxy)
+        return proxyFormatter.mapProxyMetaAccountSubtitle(
+            proxiedWithProxy.proxy.name,
+            if (isEnabled) proxyIcon else proxyIcon.withAlphaDrawable(ICON_ALPHA),
+            proxy
+        )
     }
 
     private fun ProxiedAndProxyMetaAccount.proxiedAddress(): String {
