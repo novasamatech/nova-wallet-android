@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.enabledAssets
 import io.novafoundation.nova.runtime.ext.localId
@@ -28,23 +27,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onEach
 
-class RealPaymentUpdaterFactory(
-    private val operationDao: OperationDao,
-    private val assetSourceRegistry: AssetSourceRegistry,
-    private val scope: AccountUpdateScope,
-) : PaymentUpdaterFactory {
-
-    override fun create(chain: Chain): Updater<MetaAccount> {
-        return PaymentUpdater(
-            operationDao = operationDao,
-            assetSourceRegistry = assetSourceRegistry,
-            scope = scope,
-            chain = chain,
-        )
-    }
-}
-
-private class PaymentUpdater(
+internal class FullSyncPaymentUpdater(
     private val operationDao: OperationDao,
     private val assetSourceRegistry: AssetSourceRegistry,
     override val scope: AccountUpdateScope,

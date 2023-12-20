@@ -1,7 +1,7 @@
 package io.novafoundation.nova.runtime.ethereum.gas
 
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import org.web3j.protocol.Web3j
 
@@ -23,7 +23,7 @@ class RealGasPriceProviderFactory(
 ) : GasPriceProviderFactory {
 
     override suspend fun createKnown(chainId: ChainId): GasPriceProvider {
-        val api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
+        val api = chainRegistry.getCallEthereumApiOrThrow(chainId)
 
         return create(api)
     }

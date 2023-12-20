@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
-import io.novafoundation.nova.runtime.multiNetwork.awaitSubscriptionEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.getSubscriptionEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +50,7 @@ class EvmNativeAssetBalance(
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
+        val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
 
         return ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
     }
@@ -62,8 +62,8 @@ class EvmNativeAssetBalance(
         accountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
-        val subscriptionApi = chainRegistry.awaitSubscriptionEthereumApiOrThrow(chain.id)
-        val callApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
+        val subscriptionApi = chainRegistry.getSubscriptionEthereumApiOrThrow(chain.id)
+        val callApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
 
         val address = chain.addressOf(accountId)
 

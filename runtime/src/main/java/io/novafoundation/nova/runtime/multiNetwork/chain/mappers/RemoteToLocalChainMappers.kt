@@ -10,6 +10,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -21,6 +22,7 @@ private const val CROWDLOAN_OPTION = "crowdloans"
 private const val TESTNET_OPTION = "testnet"
 private const val SWAP_HUB = "swap-hub"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
+private const val FULL_SYNC_BY_DEFAULT = "fullSyncByDefault"
 
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 private const val CHAIN_THEME_COLOR = "themeColor"
@@ -28,14 +30,16 @@ private const val CHAIN_STAKING_WIKI = "stakingWiki"
 private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
 private const val RELAYCHAIN_AS_NATIVE = "relaychainAsNative"
 private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
+private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
+    oldChain: ChainLocal?,
     gson: Gson
 ): ChainLocal {
     val types = chainRemote.types?.let {
         ChainLocal.TypesConfig(
-            url = it.url,
+            url = it.url.orEmpty(),
             overridesCommon = it.overridesCommon
         )
     }
@@ -48,6 +52,7 @@ fun mapRemoteChainToLocal(
             defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull(),
             relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
             stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
+            feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean
         )
     }
 
@@ -67,6 +72,7 @@ fun mapRemoteChainToLocal(
             hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             swap = mapSwapRemoteOptionsToLocal(optionsOrEmpty),
+            connectionState = determineConnectionState(chainRemote, oldChain),
             additional = gson.toJson(additional),
             nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy)
         )
@@ -75,7 +81,7 @@ fun mapRemoteChainToLocal(
     return chainLocal
 }
 
-fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal {
+private fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal {
     return when (remote) {
         null, "roundRobin" -> NodeSelectionStrategyLocal.ROUND_ROBIN
         "uniform" -> NodeSelectionStrategyLocal.UNIFORM
@@ -83,17 +89,33 @@ fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal
     }
 }
 
-fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
+private fun determineConnectionState(remoteChain: ChainRemote, oldLocalChain: ChainLocal?): ConnectionStateLocal {
+    if (oldLocalChain != null && oldLocalChain.connectionState.isNotDefault()) {
+        return oldLocalChain.connectionState
+    }
 
-fun mapSwapListToLocal(swap: List<Chain.Swap>) = swap.joinToString(separator = ",", transform = Chain.Swap::name)
+    val options = remoteChain.options.orEmpty()
+    val fullSyncByDefault = FULL_SYNC_BY_DEFAULT in options
+    val hasNoSubstrateRuntime = NO_SUBSTRATE_RUNTIME in options
 
-fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): String {
+    return if (fullSyncByDefault || hasNoSubstrateRuntime) ConnectionStateLocal.FULL_SYNC else ConnectionStateLocal.LIGHT_SYNC
+}
+
+private fun ConnectionStateLocal.isNotDefault(): Boolean {
+    return this != ConnectionStateLocal.LIGHT_SYNC
+}
+
+private fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
+
+private fun mapSwapListToLocal(swap: List<Chain.Swap>) = swap.joinToString(separator = ",", transform = Chain.Swap::name)
+
+private fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): String {
     val domainGovernanceTypes = remoteOptions.governanceTypesFromOptions()
 
     return mapGovernanceListToLocal(domainGovernanceTypes)
 }
 
-fun mapSwapRemoteOptionsToLocal(remoteOptions: Set<String>): String {
+private fun mapSwapRemoteOptionsToLocal(remoteOptions: Set<String>): String {
     val domainGovernanceTypes = remoteOptions.swapTypesFromOptions()
 
     return mapSwapListToLocal(domainGovernanceTypes)

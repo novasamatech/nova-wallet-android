@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_nft_api.data.repository.NftSyncTrigger
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
@@ -25,7 +26,11 @@ interface WalletInteractor {
 
     suspend fun syncAssetsRates(currency: Currency)
 
-    suspend fun syncNfts(metaAccount: MetaAccount)
+    fun nftSyncTrigger(): Flow<NftSyncTrigger>
+
+    suspend fun syncAllNfts(metaAccount: MetaAccount)
+
+    suspend fun syncChainNfts(metaAccount: MetaAccount, chain: Chain)
 
     fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset>
 
