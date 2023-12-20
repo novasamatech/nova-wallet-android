@@ -17,8 +17,6 @@ typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: Submission
 typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: SubmissionOrigin) -> Unit
 typealias FormMultiExtrinsic = suspend CallBuilder.() -> Unit
 
-typealias ExtrinsicHash = String
-
 class SubmissionOrigin(
     /**
      * Origin that was originally requested to sign the transaction
