@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 
-
 class RealExtrinsicService(
     private val rpcCalls: RpcCalls,
     private val chainRegistry: ChainRegistry,

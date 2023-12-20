@@ -55,7 +55,6 @@ sealed class StakingState(
     }
 }
 
-
 fun StakingState.Stash.stashTransactionOrigin(): TransactionOrigin = TransactionOrigin.WalletWithAccount(stashId)
 
 fun StakingState.Stash.controllerTransactionOrigin(): TransactionOrigin = TransactionOrigin.WalletWithAccount(controllerId)

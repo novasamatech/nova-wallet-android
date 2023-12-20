@@ -122,5 +122,5 @@ interface AccountRepository {
         password: String
     ): String
 
-    suspend fun isAccountExists(accountId: AccountId,  chainId: ChainId): Boolean
+    suspend fun isAccountExists(accountId: AccountId, chainId: ChainId): Boolean
 }
