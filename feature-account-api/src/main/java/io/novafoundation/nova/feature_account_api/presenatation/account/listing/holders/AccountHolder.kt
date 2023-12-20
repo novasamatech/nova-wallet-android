@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_account_api.presenatation.account.listing
 
 import android.animation.LayoutTransition
 import android.view.View
+import androidx.annotation.ColorRes
 import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.utils.AlphaColorFilter
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
@@ -20,7 +22,7 @@ import kotlinx.android.synthetic.main.item_account.view.itemAccountSubtitle
 import kotlinx.android.synthetic.main.item_account.view.itemAccountTitle
 import kotlinx.android.synthetic.main.item_account.view.itemChainIcon
 
-class AccountHolder(view: View, private val imageLoader: ImageLoader) : GroupedListHolder(view) {
+class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes private val chainBorderColor: Int) : GroupedListHolder(view) {
 
     interface AccountItemHandler {
 
@@ -42,6 +44,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader) : GroupedL
         }
 
         containerView.itemAccountContainer.layoutTransition = lt
+        containerView.itemChainIcon.backgroundTintList = containerView.context.getColorStateList(chainBorderColor)
     }
 
     fun bind(
@@ -55,6 +58,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader) : GroupedL
 
         itemAccountIcon.setImageDrawable(accountModel.picture)
         itemChainIcon.letOrHide(accountModel.chainIconUrl) {
+            itemChainIcon.colorFilter = AlphaColorFilter(accountModel.chainIconOpacity)
             itemChainIcon.loadChainIcon(it, imageLoader = imageLoader)
         }
 
@@ -63,8 +67,6 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader) : GroupedL
         } else {
             itemAccountTitle.setDrawableEnd(null)
         }
-
-        itemAccountContainer.alpha = if (accountModel.enabled) 1f else 0.56f
     }
 
     fun bindName(accountModel: AccountUi) {
