@@ -40,13 +40,14 @@ class ProxiedWalletDetailsMixin(
         val proxyAccount = metaAccount.proxy ?: return@flowOf null
         val proxyMetaAccount = interactor.getMetaAccount(proxyAccount.metaId)
 
+        val proxyAccountWithIcon = proxyFormatter.mapProxyMetaAccount(proxyMetaAccount.name, proxyFormatter.makeAccountDrawable(proxyMetaAccount))
         AccountTypeAlert(
             style = AlertView.Style(
                 backgroundColorRes = R.color.block_background,
                 iconRes = R.drawable.ic_proxy
             ),
             message = resourceManager.getString(R.string.proxied_wallet_details_info_warning),
-            subMessage = SpannableStringBuilder(proxyFormatter.mapProxyMetaAccount(proxyMetaAccount))
+            subMessage = SpannableStringBuilder(proxyAccountWithIcon)
                 .appendSpace()
                 .append(proxyFormatter.mapProxyTypeToString(proxyAccount.proxyType))
         )
