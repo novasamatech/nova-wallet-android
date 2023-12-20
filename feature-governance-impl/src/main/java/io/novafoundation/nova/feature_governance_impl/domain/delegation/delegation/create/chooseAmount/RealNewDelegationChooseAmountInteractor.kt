@@ -60,7 +60,7 @@ class RealNewDelegationChooseAmountInteractor(
         val (chain, governanceSource) = useSelectedGovernance()
         val origin = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
-        return extrinsicService.estimateMultiFee(chain) {
+        return extrinsicService.estimateMultiFee(chain, TransactionOrigin.SelectedWallet) {
             delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }
@@ -75,7 +75,16 @@ class RealNewDelegationChooseAmountInteractor(
         val (chain, governanceSource) = useSelectedGovernance()
 
         return extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) { origin ->
-            delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
+            delegate(
+                governanceSource = governanceSource,
+                amount = amount,
+                conviction = conviction,
+                delegate = delegate,
+                user = origin.requestedOrigin,
+                chain = chain,
+                tracks = tracks,
+                shouldRemoveOtherTracks = shouldRemoveOtherTracks
+            )
         }
     }
 

@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import kotlin.time.ExperimentalTime
 
 class CustomRebondViewModel(
     private val router: StakingRouter,
@@ -87,7 +86,6 @@ class CustomRebondViewModel(
         router.back()
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun listenFee() {
         amountChooserMixin.backPressuredAmount
             .onEach { loadFee(it) }
@@ -100,7 +98,7 @@ class CustomRebondViewModel(
             feeConstructor = { token ->
                 val amountInPlanks = token.planksFromAmount(amount)
 
-                rebondInteractor.estimateFee(amountInPlanks)
+                rebondInteractor.estimateFee(amountInPlanks, accountStakingFlow.first())
             },
             onRetryCancelled = ::backClicked
         )

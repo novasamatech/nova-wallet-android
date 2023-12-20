@@ -95,8 +95,8 @@ class SendInteractor(
             crossChainTransactor.performTransfer(config, transfer, crossChainFeePlanks)
         } else {
             getAssetTransfers(transfer).performTransfer(transfer)
-                .onSuccess { hash ->
-                    walletRepository.insertPendingTransfer(hash, transfer, originFee)
+                .onSuccess { submission ->
+                    walletRepository.insertPendingTransfer(submission.hash, transfer, originFee)
                 }
         }
     }

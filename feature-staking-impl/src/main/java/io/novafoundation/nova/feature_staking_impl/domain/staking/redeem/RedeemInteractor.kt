@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.redeem
 
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.numberOfSlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.controllerTransactionOrigin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.withdrawUnbonded
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.Dispatchers
@@ -16,9 +18,9 @@ class RedeemInteractor(
     private val stakingRepository: StakingRepository,
 ) {
 
-    suspend fun estimateFee(stakingState: StakingState.Stash): BigInteger {
+    suspend fun estimateFee(stakingState: StakingState.Stash): Fee {
         return withContext(Dispatchers.IO) {
-            extrinsicService.estimateFee(stakingState.chain) {
+            extrinsicService.estimateFee(stakingState.chain, stakingState.controllerTransactionOrigin()) {
                 withdrawUnbonded(getSlashingSpansNumber(stakingState))
             }
         }
@@ -26,7 +28,7 @@ class RedeemInteractor(
 
     suspend fun redeem(stakingState: StakingState.Stash, asset: Asset): Result<RedeemConsequences> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsicWithAnySuitableWallet(stakingState.chain, stakingState.controllerId) {
+            extrinsicService.submitExtrinsic(stakingState.chain, stakingState.controllerTransactionOrigin()) {
                 withdrawUnbonded(getSlashingSpansNumber(stakingState))
             }.map {
                 RedeemConsequences(willKillStash = asset.isRedeemingAll())

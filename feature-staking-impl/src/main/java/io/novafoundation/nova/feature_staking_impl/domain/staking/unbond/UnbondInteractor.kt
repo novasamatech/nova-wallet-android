@@ -3,8 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.controllerTransactionOrigin
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.chill
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.unbond
@@ -32,9 +35,9 @@ class UnbondInteractor(
         stashState: StakingState.Stash,
         currentBondedBalance: BigInteger,
         amount: BigInteger
-    ): BigInteger {
+    ): Fee {
         return withContext(Dispatchers.IO) {
-            extrinsicService.estimateFee(stashState.chain) {
+            extrinsicService.estimateFee(stashState.chain, stashState.controllerTransactionOrigin()) {
                 constructUnbondExtrinsic(stashState, currentBondedBalance, amount)
             }
         }
@@ -44,9 +47,9 @@ class UnbondInteractor(
         stashState: StakingState.Stash,
         currentBondedBalance: BigInteger,
         amount: BigInteger
-    ): Result<String> {
+    ): Result<ExtrinsicSubmission> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsicWithAnySuitableWallet(stashState.chain, stashState.controllerId) {
+            extrinsicService.submitExtrinsic(stashState.chain, stashState.controllerTransactionOrigin()) {
                 constructUnbondExtrinsic(stashState, currentBondedBalance, amount)
             }
         }
