@@ -38,7 +38,7 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openAddAccount(payload: AddAccountPayload)
 
-    fun openAccountDetails(metaId: Long)
+    fun openWalletDetails(metaId: Long)
 
     fun openNodeDetails(nodeId: Int)
 

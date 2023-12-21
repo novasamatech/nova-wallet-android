@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.listing
 
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
@@ -29,6 +30,7 @@ abstract class CommonAccountsAdapter<Group : AccountGroupRvItem>(
     private val diffCallback: AccountDiffCallback<Group>,
     private val groupFactory: AccountGroupViewHolderFactory,
     private val groupBinder: AccountGroupViewHolderBinder<Group>,
+    @ColorRes private val chainBorderColor: Int,
     initialMode: AccountHolder.Mode,
 ) : GroupedListAdapter<Group, AccountUi>(diffCallback) {
 
@@ -45,7 +47,7 @@ abstract class CommonAccountsAdapter<Group : AccountGroupRvItem>(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return AccountHolder(parent.inflateChild(R.layout.item_account), imageLoader)
+        return AccountHolder(parent.inflateChild(R.layout.item_account), imageLoader, chainBorderColor)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: Group) {

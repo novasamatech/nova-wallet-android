@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
-import io.novafoundation.nova.runtime.extrinsic.feeSigner.FeeSigner
+import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.mapper.toRuntimeVersion
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -13,8 +13,10 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.Nonce
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersion
+import java.math.BigInteger
 
 class ExtrinsicBuilderFactory(
     private val chainDao: ChainDao,
@@ -27,7 +29,7 @@ class ExtrinsicBuilderFactory(
      * Create with special signer for fee calculation
      */
     suspend fun createForFee(
-        signer: FeeSigner,
+        signer: NovaSigner,
         chain: Chain,
     ): ExtrinsicBuilder {
         return createMultiForFee(signer, chain).first()
@@ -45,10 +47,10 @@ class ExtrinsicBuilderFactory(
     }
 
     suspend fun createMultiForFee(
-        signer: FeeSigner,
+        signer: NovaSigner,
         chain: Chain,
     ): Sequence<ExtrinsicBuilder> {
-        return createMulti(chain, signer, signer.accountId())
+        return createMulti(chain, signer, signer.signerAccountId(chain))
     }
 
     suspend fun createMulti(
@@ -63,13 +65,14 @@ class ExtrinsicBuilderFactory(
         val runtimeVersion = getRuntimeVersion(chain)
         val mortality = mortalityConstructor.constructMortality(chain.id)
 
-        var nonce = rpcCalls.getNonce(chain.id, accountAddress)
+        val baseNonce = rpcCalls.getNonce(chain.id, accountAddress)
+        var nonceOffset = BigInteger.ZERO
 
         return generateSequence {
             val newElement = ExtrinsicBuilder(
                 tip = chain.additional?.defaultTip.orZero(),
                 runtime = runtime,
-                nonce = nonce,
+                nonce = Nonce(baseNonce, nonceOffset),
                 runtimeVersion = runtimeVersion,
                 genesisHash = chain.requireGenesisHash().fromHex(),
                 blockHash = mortality.blockHash.fromHex(),
@@ -79,7 +82,7 @@ class ExtrinsicBuilderFactory(
                 accountId = accountId
             )
 
-            nonce++
+            nonceOffset++
 
             newElement
         }

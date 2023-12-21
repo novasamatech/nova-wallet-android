@@ -77,7 +77,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.Identi
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
-import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
@@ -314,7 +314,7 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         secretStoreV2: SecretStoreV2,
         chainRegistry: ChainRegistry,
-    ) = AccountDetailsInteractor(
+    ) = WalletDetailsInteractor(
         accountRepository,
         secretStoreV2,
         chainRegistry

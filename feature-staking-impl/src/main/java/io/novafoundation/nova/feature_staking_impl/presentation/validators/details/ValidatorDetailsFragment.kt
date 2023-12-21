@@ -131,7 +131,7 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 
         return AlertView(requireContext()).also { alertView ->
             alertView.setStylePreset(style)
-            alertView.setText(alert.descriptionRes)
+            alertView.setMessage(alert.descriptionRes)
 
             alertView.layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).also { params ->
                 params.updateMarginsRelative(start = 16.dp, end = 16.dp, top = 12.dp)

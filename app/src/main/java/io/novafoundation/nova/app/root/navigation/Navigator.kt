@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
@@ -179,7 +179,7 @@ class Navigator(
         val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
             R.id.welcomeFragment -> R.id.action_welcomeFragment_to_mnemonic_nav_graph
             R.id.createAccountFragment -> R.id.action_createAccountFragment_to_mnemonic_nav_graph
-            R.id.accountDetailsFragment -> R.id.action_accountDetailsFragment_to_mnemonic_nav_graph
+            R.id.walletDetailsFragment -> R.id.action_accountDetailsFragment_to_mnemonic_nav_graph
             else -> throw IllegalArgumentException("Unknown current destination to open mnemonic screen: $currentDestinationId")
         }
 
@@ -409,8 +409,8 @@ class Navigator(
         }
     }
 
-    override fun openAccountDetails(metaId: Long) {
-        val extras = AccountDetailsFragment.getBundle(metaId)
+    override fun openWalletDetails(metaId: Long) {
+        val extras = WalletDetailsFragment.getBundle(metaId)
 
         navController?.navigate(R.id.action_open_account_details, extras)
     }

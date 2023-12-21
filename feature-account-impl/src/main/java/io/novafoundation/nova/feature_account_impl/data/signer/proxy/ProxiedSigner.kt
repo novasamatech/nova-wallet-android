@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -13,37 +12,42 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount.ProxyType
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.runtime.ext.commissionAsset
+import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 class ProxiedSignerFactory(
-    private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val proxySigningPresenter: ProxySigningPresenter,
     private val proxyRepository: ProxyRepository,
+    private val rpcCalls: RpcCalls,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
 ) {
 
     fun create(metaAccount: MetaAccount, signerProvider: SignerProvider): ProxiedSigner {
         return ProxiedSigner(
-            metaAccount,
-            chainRegistry,
-            accountRepository,
-            signerProvider,
-            proxySigningPresenter,
-            proxyRepository,
-            proxyExtrinsicValidationEventBus
+            proxiedMetaAccount = metaAccount,
+            chainRegistry = chainRegistry,
+            accountRepository = accountRepository,
+            signerProvider = signerProvider,
+            proxySigningPresenter = proxySigningPresenter,
+            proxyRepository = proxyRepository,
+            rpcCalls = rpcCalls,
+            proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus
         )
     }
 }
@@ -55,8 +59,16 @@ class ProxiedSigner(
     private val signerProvider: SignerProvider,
     private val proxySigningPresenter: ProxySigningPresenter,
     private val proxyRepository: ProxyRepository,
+    private val rpcCalls: RpcCalls,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
-) : Signer {
+) : NovaSigner {
+
+    override suspend fun signerAccountId(chain: Chain): AccountId {
+        val proxyMetaAccount = getProxyMetaAccount()
+        val delegate = createDelegate(proxyMetaAccount)
+
+        return delegate.signerAccountId(chain)
+    }
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         val chain = chainRegistry.getChain(payloadExtrinsic.chainId)
@@ -79,7 +91,7 @@ class ProxiedSigner(
         signingNotSupported()
     }
 
-    private suspend fun createDelegate(proxyMetaAccount: MetaAccount): Signer {
+    private fun createDelegate(proxyMetaAccount: MetaAccount): NovaSigner {
         return signerProvider.signerFor(proxyMetaAccount)
     }
 
@@ -109,19 +121,31 @@ class ProxiedSigner(
     }
 
     private suspend fun modifyPayload(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic, chain: Chain): SignerPayloadExtrinsic {
+        val proxyAccountId = proxyMetaAccount.requireAccountIdIn(chain)
+        val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
+
         val availableProxyTypes = proxyRepository.getDelegatedProxyTypes(
-            payload.chainId,
-            proxiedMetaAccount.getAccountId(chain),
-            proxyMetaAccount.getAccountId(chain)
+            chainId = payload.chainId,
+            proxiedAccountId = proxiedAccountId,
+            proxyAccountId = proxyAccountId
         )
 
         val callInstance = payload.call.toCallInstance() ?: signingNotSupported()
         val module = callInstance.call.module
+
         val proxyType = module.toProxyTypeMatcher()
             .matchToProxyTypes(availableProxyTypes)
             ?: notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
-        return payload.wrapIntoProxyPayload(proxyMetaAccount.getAccountId(chain), proxyType, callInstance)
+        val proxyAddress = proxyMetaAccount.requireAddressIn(chain)
+        val nonce = rpcCalls.getNonce(payload.chainId, proxyAddress)
+
+        return payload.wrapIntoProxyPayload(
+            proxyAccountId = proxyAccountId,
+            proxyType = proxyType,
+            callInstance = callInstance,
+            currentProxyNonce = nonce
+        )
     }
 
     private suspend fun isRootProxiedSigner(): Boolean {
@@ -134,10 +158,6 @@ class ProxiedSigner(
         if (!resume) {
             throw SigningCancelledException()
         }
-    }
-
-    private suspend fun MetaAccount.getAccountId(chain: Chain): ByteArray {
-        return requireAccountIdIn(chain)
     }
 
     private suspend fun getProxyMetaAccount(): MetaAccount {

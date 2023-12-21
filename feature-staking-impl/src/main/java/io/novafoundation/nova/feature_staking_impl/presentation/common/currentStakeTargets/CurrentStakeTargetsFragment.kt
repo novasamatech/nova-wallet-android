@@ -62,7 +62,7 @@ abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> : B
         viewModel.warningFlow.observe {
             if (it != null) {
                 currentValidatorsOversubscribedMessage.makeVisible()
-                currentValidatorsOversubscribedMessage.setText(it)
+                currentValidatorsOversubscribedMessage.setMessage(it)
             } else {
                 currentValidatorsOversubscribedMessage.makeGone()
             }

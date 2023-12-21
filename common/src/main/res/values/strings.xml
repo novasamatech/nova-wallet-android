@@ -4,6 +4,8 @@
     <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn’t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
     <string name="error_not_enough_to_pay_fee_title">Not enough tokens to pay the fee</string>
 
+    <string name="proxied_wallet_details_info_warning">This account has provided access to perform transactions to the following account:</string>
+
     <string name="common_dont_show_again">Do not show this again</string>
 
     <string name="proxy_signing_warning_title">This is Delegating (Proxied) account</string>
@@ -20,7 +22,7 @@
 
     <string name="proxieds_updates_deactivated_title">Access was revoked</string>
 
-    <string name="proxy_wallet_subtitle">%s proxy:</string>
+    <string name="proxy_wallet_type">%s proxy</string>
     <string name="account_proxy_type_any">Any</string>
     <string name="account_proxy_type_non_transfer">Non Transfer</string>
     <string name="account_proxy_type_governance">Governance</string>

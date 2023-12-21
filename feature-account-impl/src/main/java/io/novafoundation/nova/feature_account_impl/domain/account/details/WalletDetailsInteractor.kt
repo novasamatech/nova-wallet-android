@@ -5,24 +5,20 @@ import io.novafoundation.nova.common.data.secrets.v2.entropy
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.list.GroupedList
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain.From
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
-import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-class AccountDetailsInteractor(
+class WalletDetailsInteractor(
     private val accountRepository: AccountRepository,
     private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
@@ -36,28 +32,32 @@ class AccountDetailsInteractor(
         accountRepository.updateMetaAccountName(metaId, newName)
     }
 
-    suspend fun getChainProjections(metaAccount: MetaAccount): GroupedList<From, AccountInChain> = withContext(Dispatchers.Default) {
-        val chains = shownChainsFor(metaAccount.type)
+    suspend fun getChainProjections(
+        metaAccount: MetaAccount,
+        chains: List<Chain>,
+        sorting: Comparator<AccountInChain>
+    ): GroupedList<From, AccountInChain> {
+        return withContext(Dispatchers.Default) {
+            chains.map { chain ->
+                val address = metaAccount.addressIn(chain)
+                val accountId = metaAccount.accountIdIn(chain)
 
-        chains.map { chain ->
-            val address = metaAccount.addressIn(chain)
-            val accountId = metaAccount.accountIdIn(chain)
+                val projection = if (address != null && accountId != null) {
+                    AccountInChain.Projection(address, accountId)
+                } else {
+                    null
+                }
 
-            val projection = if (address != null && accountId != null) {
-                AccountInChain.Projection(address, accountId)
-            } else {
-                null
+                AccountInChain(
+                    chain = chain,
+                    projection = projection,
+                    from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
+                )
             }
-
-            AccountInChain(
-                chain = chain,
-                projection = projection,
-                from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
-            )
+                .sortedWith(sorting)
+                .groupBy(AccountInChain::from)
+                .toSortedMap(compareBy(From::ordering))
         }
-            .sortedWith(accountInChainComparator(metaAccount.type))
-            .groupBy(AccountInChain::from)
-            .toSortedMap(compareBy(From::ordering))
     }
 
     suspend fun availableExportTypes(
@@ -75,29 +75,8 @@ class AccountDetailsInteractor(
         )
     }
 
-    private val AccountInChain.hasChainAccount
-        get() = projection != null
-
-    private fun accountInChainComparator(metaAccountType: LightMetaAccount.Type): Comparator<AccountInChain> {
-        val hasAccountOrdering: Comparator<AccountInChain> = when (metaAccountType) {
-            LightMetaAccount.Type.LEDGER -> compareBy { !it.hasChainAccount }
-            else -> compareBy { it.hasChainAccount }
-        }
-
-        return hasAccountOrdering.then(Chain.defaultComparatorFrom(AccountInChain::chain))
-    }
-
-    private suspend fun shownChainsFor(metaAccountType: LightMetaAccount.Type): List<Chain> {
-        val allChains = chainRegistry.currentChains.first()
-
-        return when (metaAccountType) {
-            LightMetaAccount.Type.LEDGER -> {
-                val ledgerSupportedChainIds = SubstrateApplicationConfig.all().mapToSet { it.chainId }
-
-                allChains.filter { it.id in ledgerSupportedChainIds }
-            }
-            else -> allChains
-        }
+    suspend fun getAllChains(): List<Chain> {
+        return chainRegistry.currentChains.first()
     }
 }
 

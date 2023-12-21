@@ -270,7 +270,7 @@ class DelegateDetailsViewModel(
             is AddDelegationValidationFailure.NoChainAccountFailure -> handleChainAccountNotFound(
                 failure = failure,
                 resourceManager = resourceManager,
-                goToWalletDetails = { router.openAccountDetails(failure.account.id) },
+                goToWalletDetails = { router.openWalletDetails(failure.account.id) },
                 addAccountDescriptionRes = R.string.add_delegation_missing_account_message
             )
         }

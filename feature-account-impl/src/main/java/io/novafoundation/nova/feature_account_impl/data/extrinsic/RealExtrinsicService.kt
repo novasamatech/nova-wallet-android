@@ -22,9 +22,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
-import io.novafoundation.nova.runtime.extrinsic.feeSigner.FeeSigner
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
+import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -202,20 +202,20 @@ class RealExtrinsicService(
 
     private suspend fun buildExtrinsic(
         chain: Chain,
-        accountId: ByteArray,
+        selectedAccountId: ByteArray,
         formExtrinsic: FormExtrinsicWithOrigin,
     ): String {
-        val metaAccount = accountRepository.findMetaAccount(accountId) ?: error("No meta account found accessing ${accountId.toHexString()}")
+        val metaAccount = accountRepository.findMetaAccount(selectedAccountId) ?: error("No meta account found accessing ${selectedAccountId.toHexString()}")
         val signer = signerProvider.signerFor(metaAccount)
 
-        val extrinsicBuilder = extrinsicBuilderFactory.create(chain, signer, accountId)
+        val extrinsicBuilder = extrinsicBuilderFactory.create(chain, signer, selectedAccountId)
 
-        extrinsicBuilder.formExtrinsic(accountId)
+        extrinsicBuilder.formExtrinsic(selectedAccountId)
 
         return extrinsicBuilder.build(useBatchAll = true)
     }
 
-    private suspend fun getFeeSigner(chain: Chain): FeeSigner {
+    private suspend fun getFeeSigner(chain: Chain): NovaSigner {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         return signerProvider.feeSigner(metaAccount, chain)
     }
