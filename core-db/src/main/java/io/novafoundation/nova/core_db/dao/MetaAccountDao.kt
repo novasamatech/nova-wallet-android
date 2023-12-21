@@ -191,17 +191,17 @@ interface MetaAccountDao {
 
     @Query(
         """
-        WITH RECURSIVE Chain AS (
+        WITH RECURSIVE Sequence AS (
             SELECT pa.proxyMetaId
             FROM proxy_accounts pa
             WHERE pa.proxiedMetaId = :proxiedMetaId
             UNION ALL
             SELECT pa.proxyMetaId
             FROM proxy_accounts pa
-            INNER JOIN Chain c ON c.proxyMetaId = pa.proxiedMetaId
+            INNER JOIN Sequence s ON s.proxyMetaId = pa.proxiedMetaId
         )
         SELECT MAX(proxyMetaId) as finalMetaId
-        FROM Chain
+        FROM Sequence
     """
     )
     fun getLastProxyAccountId(proxiedMetaId: Long): Long?
