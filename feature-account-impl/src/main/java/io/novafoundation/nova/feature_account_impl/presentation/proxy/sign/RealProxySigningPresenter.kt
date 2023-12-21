@@ -4,23 +4,16 @@ import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.dialog.dialog
-import io.novafoundation.nova.common.view.dialog.errorDialog
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -77,31 +70,13 @@ class RealProxySigningPresenter(
         )
     }
 
-    override suspend fun notEnoughFee(proxyMetaAccount: MetaAccount, asset: Chain.Asset, availableBalanceToPayFee: BigInteger, fee: Fee) {
+    override suspend fun notEnoughFee(errorMessage: String) = withContext(Dispatchers.Main) {
         suspendCoroutine { continuation ->
-            dialog(contextManager.getApplicationContext()) {
+            dialog(contextManager.getActivity()!!) {
                 setTitle(R.string.error_not_enough_to_pay_fee_title)
-                setMessage(
-                    resourceManager.getString(
-                        R.string.proxy_error_not_enough_to_pay_fee_message,
-                        proxyMetaAccount.name,
-                        asset.amountFromPlanks(fee.amount).formatTokenAmount(asset),
-                        asset.amountFromPlanks(availableBalanceToPayFee).formatTokenAmount(asset),
-                    )
-                )
+                setMessage(errorMessage)
 
-                setPositiveButton(io.novafoundation.nova.common.R.string.common_close, null)
-                setOnDismissListener { continuation.resume(Unit) }
-            }
-        }
-    }
-
-    override suspend fun unsupportedValidationError() {
-        suspendCoroutine { continuation ->
-            dialog(contextManager.getApplicationContext()) {
-                setTitle(R.string.common_unknown_error)
-                setPositiveButton(io.novafoundation.nova.common.R.string.common_close, null)
-                setOnDismissListener { continuation.resume(Unit) }
+                setPositiveButton(io.novafoundation.nova.common.R.string.common_close) { _, _ -> continuation.resume(Unit) }
             }
         }
     }

@@ -33,8 +33,6 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -118,10 +116,6 @@ interface AccountFeatureDependencies {
     fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
 
     fun computationalCache(): ComputationalCache
-
-    fun walletRepository(): WalletRepository
-
-    fun assetSourceRegistry(): AssetSourceRegistry
 
     val systemCallExecutor: SystemCallExecutor
 

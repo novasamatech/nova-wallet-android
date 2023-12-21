@@ -47,6 +47,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -332,4 +333,16 @@ class WalletFeatureModule {
     ): SubstrateRealtimeOperationFetcher.Factory {
         return SubstrateRealtimeOperationFetcherFactory(multiLocationConverterFactory, eventsRepository)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideProxyHaveEnoughFeeValidationFactory(
+        assetSourceRegistry: AssetSourceRegistry,
+        walletRepository: WalletRepository,
+        extrinsicService: ExtrinsicService,
+    ) = ProxyHaveEnoughFeeValidationFactory(
+        assetSourceRegistry,
+        walletRepository,
+        extrinsicService
+    )
 }

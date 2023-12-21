@@ -189,7 +189,8 @@ interface MetaAccountDao {
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)
 
-    @Query("""
+    @Query(
+        """
         WITH RECURSIVE Chain AS (
             SELECT pa.proxyMetaId
             FROM proxy_accounts pa
@@ -201,7 +202,8 @@ interface MetaAccountDao {
         )
         SELECT MAX(proxyMetaId) as finalMetaId
         FROM Chain
-    """)
+    """
+    )
     fun getLastProxyAccountId(proxiedMetaId: Long): Long?
 }
 

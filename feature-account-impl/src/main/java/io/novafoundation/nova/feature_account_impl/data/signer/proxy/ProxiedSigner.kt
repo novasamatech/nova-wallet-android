@@ -5,18 +5,21 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount.ProxyType
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
-import io.novafoundation.nova.feature_account_impl.data.signer.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
-import io.novafoundation.nova.feature_account_impl.data.signer.proxy.validation.ProxiedExtrinsicValidationPayload
-import io.novafoundation.nova.feature_account_impl.data.signer.proxy.validation.ProxiedExtrinsicValidationSystem
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
@@ -29,7 +32,7 @@ class ProxiedSignerFactory(
     private val accountRepository: AccountRepository,
     private val proxySigningPresenter: ProxySigningPresenter,
     private val proxyRepository: ProxyRepository,
-    private val proxiedExtrinsicValidationSystem: ProxiedExtrinsicValidationSystem,
+    private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
 ) {
 
     fun create(metaAccount: MetaAccount, signerProvider: SignerProvider): ProxiedSigner {
@@ -40,7 +43,7 @@ class ProxiedSignerFactory(
             signerProvider,
             proxySigningPresenter,
             proxyRepository,
-            proxiedExtrinsicValidationSystem
+            proxyExtrinsicValidationEventBus
         )
     }
 }
@@ -52,21 +55,23 @@ class ProxiedSigner(
     private val signerProvider: SignerProvider,
     private val proxySigningPresenter: ProxySigningPresenter,
     private val proxyRepository: ProxyRepository,
-    private val proxiedExtrinsicValidationSystem: ProxiedExtrinsicValidationSystem,
+    private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
 ) : Signer {
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
+        val chain = chainRegistry.getChain(payloadExtrinsic.chainId)
         val proxyMetaAccount = getProxyMetaAccount()
 
         acknowledgeProxyOperation(proxyMetaAccount)
 
+        if (isRootProxiedSigner()) {
+            validateExtrinsic(payloadExtrinsic, chain)
+        }
+
         val delegate = createDelegate(proxyMetaAccount)
-        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic)
+        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic, chain)
 
         val signedExtrinsic = delegate.signExtrinsic(modifiedPayload)
-
-        validateExtrinsic(signedExtrinsic)
-
         return signedExtrinsic
     }
 
@@ -78,31 +83,36 @@ class ProxiedSigner(
         return signerProvider.signerFor(proxyMetaAccount)
     }
 
-    private suspend fun validateExtrinsic(signedExtrinsic: SignedExtrinsic) {
-        val validationResult = proxiedExtrinsicValidationSystem.validate(
-            ProxiedExtrinsicValidationPayload(
-                proxiedMetaAccount,
-                chainRegistry.getChain(signedExtrinsic.payload.chainId),
-                signedExtrinsic.payload.call.toCallInstance()!!.call
-            )
+    private suspend fun validateExtrinsic(signedExtrinsic: SignerPayloadExtrinsic, chain: Chain) {
+        val proxyAccount = accountRepository.getLastProxyAccountFor(proxiedMetaAccount.id) ?: throw IllegalStateException("Proxy account is not found")
+        val proxyAccountId = proxyAccount.accountIdIn(chain) ?: throw IllegalStateException("Proxy account is not found")
+
+        val callInstance = signedExtrinsic.call.toCallInstance() ?: signingNotSupported()
+
+        val validationPayload = ProxiedExtrinsicValidationPayload(
+            proxyAccount,
+            proxyAccountId,
+            ChainWithAsset(chain, chain.commissionAsset),
+            callInstance.call
         )
 
-        val validationStatus = validationResult.getOrNull()
-        if (validationStatus is ValidationStatus.NotValid) {
-            when (val reason = validationStatus.reason) {
-                is ProxyNotEnoughFee -> proxySigningPresenter.notEnoughFee(reason.proxyMetaAccount, reason.availableBalanceToPayFee, reason.fee)
-                else -> proxySigningPresenter.unsupportedValidationError()
-            }
+        val requestBusPayload = ProxyExtrinsicValidationRequestBus.Request(validationPayload)
+        val validationResponse = proxyExtrinsicValidationEventBus.handle(requestBusPayload)
+
+        val validationStatus = validationResponse.validationResult.getOrNull()
+        if (validationStatus is ValidationStatus.NotValid && validationStatus.reason is ProxyNotEnoughFee) {
+            val reason = validationStatus.reason as ProxyNotEnoughFee
+            proxySigningPresenter.notEnoughFee(reason.errorMessage)
 
             throw SigningCancelledException()
         }
     }
 
-    private suspend fun modifyPayload(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic): SignerPayloadExtrinsic {
+    private suspend fun modifyPayload(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic, chain: Chain): SignerPayloadExtrinsic {
         val availableProxyTypes = proxyRepository.getDelegatedProxyTypes(
             payload.chainId,
-            proxiedMetaAccount.getAccountId(payload.chainId),
-            proxyMetaAccount.getAccountId(payload.chainId)
+            proxiedMetaAccount.getAccountId(chain),
+            proxyMetaAccount.getAccountId(chain)
         )
 
         val callInstance = payload.call.toCallInstance() ?: signingNotSupported()
@@ -111,7 +121,12 @@ class ProxiedSigner(
             .matchToProxyTypes(availableProxyTypes)
             ?: notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
-        return payload.wrapIntoProxyPayload(proxyMetaAccount.getAccountId(payload.chainId), proxyType, callInstance)
+        return payload.wrapIntoProxyPayload(proxyMetaAccount.getAccountId(chain), proxyType, callInstance)
+    }
+
+    private suspend fun isRootProxiedSigner(): Boolean {
+        val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
+        return selectedMetaAccount.id == proxiedMetaAccount.id
     }
 
     private suspend fun acknowledgeProxyOperation(proxyMetaAccount: MetaAccount) {
@@ -121,8 +136,7 @@ class ProxiedSigner(
         }
     }
 
-    private suspend fun MetaAccount.getAccountId(chainId: ChainId): ByteArray {
-        val chain = chainRegistry.getChain(chainId)
+    private suspend fun MetaAccount.getAccountId(chain: Chain): ByteArray {
         return requireAccountIdIn(chain)
     }
 
