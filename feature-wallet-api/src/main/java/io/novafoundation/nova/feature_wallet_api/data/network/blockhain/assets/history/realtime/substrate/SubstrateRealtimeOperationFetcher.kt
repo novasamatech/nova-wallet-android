@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Extractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Factory
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 
 interface SubstrateRealtimeOperationFetcher {
 
@@ -17,7 +17,7 @@ interface SubstrateRealtimeOperationFetcher {
     interface Extractor {
 
         suspend fun extractRealtimeHistoryUpdates(
-            extrinsic: ExtrinsicWithEvents,
+            extrinsicVisit: ExtrinsicVisit,
             chain: Chain,
             chainAsset: Chain.Asset
         ): RealtimeHistoryUpdate.Type?

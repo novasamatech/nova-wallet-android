@@ -128,9 +128,7 @@ class MoonbeamCrowdloanTermsViewModel(
     private fun loadFee() = launch {
         feeLoaderMixin.loadFee(
             coroutineScope = this,
-            feeConstructor = {
-                interactor.calculateTermsFee()
-            },
+            feeConstructor = { interactor.calculateTermsFee() },
             onRetryCancelled = ::backClicked
         )
     }

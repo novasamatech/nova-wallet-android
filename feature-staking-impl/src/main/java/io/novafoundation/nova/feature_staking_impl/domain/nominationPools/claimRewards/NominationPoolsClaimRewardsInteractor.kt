@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimRewards
 
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.NominationPoolBondExtraSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.bondExtra
@@ -22,9 +25,9 @@ interface NominationPoolsClaimRewardsInteractor {
 
     fun pendingRewardsFlow(): Flow<Balance>
 
-    suspend fun estimateFee(shouldRestake: Boolean): Balance
+    suspend fun estimateFee(shouldRestake: Boolean): Fee
 
-    suspend fun claimRewards(shouldRestake: Boolean): Result<String>
+    suspend fun claimRewards(shouldRestake: Boolean): Result<ExtrinsicSubmission>
 }
 
 class RealNominationPoolsClaimRewardsInteractor(
@@ -43,17 +46,17 @@ class RealNominationPoolsClaimRewardsInteractor(
             }
     }
 
-    override suspend fun estimateFee(shouldRestake: Boolean): Balance {
+    override suspend fun estimateFee(shouldRestake: Boolean): Fee {
         return withContext(Dispatchers.IO) {
-            extrinsicService.estimateFee(stakingSharedState.chain()) {
+            extrinsicService.estimateFee(stakingSharedState.chain(), TransactionOrigin.SelectedWallet) {
                 claimRewards(shouldRestake)
             }
         }
     }
 
-    override suspend fun claimRewards(shouldRestake: Boolean): Result<String> {
+    override suspend fun claimRewards(shouldRestake: Boolean): Result<ExtrinsicSubmission> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsicWithSelectedWallet(stakingSharedState.chain()) {
+            extrinsicService.submitExtrinsic(stakingSharedState.chain(), TransactionOrigin.SelectedWallet) {
                 claimRewards(shouldRestake)
             }
         }

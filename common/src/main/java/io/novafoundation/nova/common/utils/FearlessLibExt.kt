@@ -25,9 +25,11 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytesOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
@@ -35,6 +37,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.fullName
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Event
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.FunctionArgument
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
@@ -49,13 +52,11 @@ import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import org.web3j.crypto.Sign
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import org.web3j.crypto.Sign
 
 typealias PalletName = String
 
@@ -231,6 +232,8 @@ fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERS
 
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
+fun RuntimeMetadata.proxy() = module(Modules.PROXY)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -279,6 +282,8 @@ fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boole
 fun GenericCall.Instance.instanceOf(moduleName: String, vararg callNames: String): Boolean = moduleName == module.name && function.name in callNames
 
 fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
+
+fun GenericEvent.Instance.instanceOf(event: Event): Boolean = event.index == this.event.index
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 

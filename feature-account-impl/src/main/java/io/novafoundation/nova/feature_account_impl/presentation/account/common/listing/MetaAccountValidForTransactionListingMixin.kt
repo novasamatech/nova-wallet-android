@@ -81,7 +81,8 @@ private class MetaAccountValidForTransactionListingMixin(
             picture = icon,
             chainIconUrl = null,
             updateIndicator = false,
-            subtitleIconRes = if (chainAddress == null) R.drawable.ic_warning_filled else null
+            subtitleIconRes = if (chainAddress == null) R.drawable.ic_warning_filled else null,
+            isEditable = false
         )
     }
 

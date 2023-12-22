@@ -127,7 +127,7 @@ class ExternaSignViewModel(
     }
 
     private fun maybeLoadFee() {
-        originFeeMixin?.loadFeeV2(
+        originFeeMixin?.loadFee(
             coroutineScope = this,
             feeConstructor = { interactor.calculateFee() },
             onRetryCancelled = {}

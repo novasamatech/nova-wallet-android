@@ -128,7 +128,7 @@ class ConfirmChangeValidatorsViewModel(
     private fun loadFee() {
         feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
-            feeConstructor = { changeValidatorsInteractor.estimateFee(prepareNominations()) },
+            feeConstructor = { changeValidatorsInteractor.estimateFee(prepareNominations(), stashFlow.first()) },
             onRetryCancelled = ::backClicked
         )
     }
@@ -155,7 +155,7 @@ class ConfirmChangeValidatorsViewModel(
 
     private fun sendTransaction() = launch {
         val setupResult = changeValidatorsInteractor.changeValidators(
-            controllerAddress = controllerAddressFlow.first(),
+            stakingState = stashFlow.first(),
             validatorAccountIds = prepareNominations(),
         )
 

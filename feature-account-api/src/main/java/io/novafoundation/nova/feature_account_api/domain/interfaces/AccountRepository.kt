@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -37,9 +38,9 @@ interface AccountRepository {
 
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
-    suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
+    suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount?
 
-    suspend fun accountNameFor(accountId: AccountId): String?
+    suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
     suspend fun allMetaAccounts(): List<MetaAccount>
 
@@ -121,7 +122,7 @@ interface AccountRepository {
         password: String
     ): String
 
-    suspend fun isAccountExists(accountId: AccountId): Boolean
+    suspend fun isAccountExists(accountId: AccountId, chainId: ChainId): Boolean
 
     suspend fun getLastProxyAccountFor(proxiedMetaId: Long): MetaAccount?
 }

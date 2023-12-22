@@ -177,7 +177,7 @@ class SetControllerViewModel(
     private fun loadFee() {
         feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
-            feeConstructor = { interactor.estimateFee(controllerAddress()) },
+            feeConstructor = { interactor.estimateFee(controllerAddress(), accountStakingFlow.first()) },
             onRetryCancelled = ::backClicked
         )
     }

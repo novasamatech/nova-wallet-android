@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common
 
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -25,7 +26,7 @@ class RealStartMultiStakingInteractor(
 
     override suspend fun calculateFee(selection: StartMultiStakingSelection): Fee {
         return withContext(Dispatchers.IO) {
-            extrinsicService.estimateFeeV2(selection.stakingOption.chain) {
+            extrinsicService.estimateFee(selection.stakingOption.chain, TransactionOrigin.SelectedWallet) {
                 startStaking(selection)
             }
         }
@@ -33,9 +34,9 @@ class RealStartMultiStakingInteractor(
 
     override suspend fun startStaking(selection: StartMultiStakingSelection): Result<ExtrinsicStatus.InBlock> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(selection.stakingOption.chain) {
+            extrinsicService.submitAndWatchExtrinsic(selection.stakingOption.chain, TransactionOrigin.SelectedWallet) {
                 startStaking(selection)
-            }
+            }.awaitInBlock()
         }
     }
 
