@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
@@ -117,23 +118,23 @@ class NftHolder(
                 itemNftIssuance.text = content.data.issuance
                 itemNftTitle.text = content.data.title
 
-                val price = content.data.price
-
-                if (price != null) {
-                    itemNftPriceFiat.makeVisible()
-                    itemNftPriceToken.makeVisible()
-                    itemNftPricePlaceholder.makeGone()
-
-                    itemNftPriceToken.text = price.token
-                    itemNftPriceFiat.text = price.fiat
-                } else {
-                    itemNftPriceFiat.makeGone()
-                    itemNftPriceToken.makeGone()
-                    itemNftPricePlaceholder.makeVisible()
-                }
+                setPrice(content)
             }
         }
 
         setOnClickListener { itemHandler.itemClicked(item) }
+    }
+
+    private fun View.setPrice(content: LoadingState.Loaded<NftListItem.Content>) {
+        val price = content.data.price
+
+        itemNftPriceToken.setVisible(price != null)
+        itemNftPriceFiat.setVisible(price != null)
+        itemNftPricePlaceholder.setVisible(price == null)
+
+       if (price != null) {
+           itemNftPriceToken.text = price.amountInfo
+           itemNftPriceFiat.text = price.fiat
+       }
     }
 }
