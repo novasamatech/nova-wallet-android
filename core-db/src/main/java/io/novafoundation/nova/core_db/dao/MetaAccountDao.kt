@@ -191,6 +191,9 @@ interface MetaAccountDao {
 
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)
+
+    @Query("DELETE FROM meta_accounts WHERE status = :status ")
+    fun removeMetaAccountsByStatus(status: MetaAccountLocal.Status)
 }
 
 class MetaAccountWithBalanceLocal(

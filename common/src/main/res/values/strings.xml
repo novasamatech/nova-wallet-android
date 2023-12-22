@@ -17,7 +17,7 @@
     <string name="delegated_accounts_fragment_explanation">Nova Wallet automatically adds delegated authorities (Proxy) to a separate category for you. You can always manage wallets in Settings.</string>
     <string name="proxy_about">What is a Proxy?</string>
 
-    <string name="proxieds_updates_deactivated_title">Access was revoked</string>
+    <string name="proxieds_updates_deactivated_title">No longer valid</string>
 
     <string name="proxy_wallet_type">%s proxy</string>
     <string name="account_proxy_type_any">Any</string>

@@ -124,4 +124,6 @@ interface AccountRepository {
     ): String
 
     suspend fun isAccountExists(accountId: AccountId): Boolean
+
+    suspend fun removeDeactivatedMetaAccounts()
 }

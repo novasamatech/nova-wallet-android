@@ -281,6 +281,10 @@ class AccountDataSourceImpl(
         return metaAccountDao.hasMetaAccounts()
     }
 
+    override fun removeDeactivatedMetaAccounts() {
+        metaAccountDao.removeMetaAccountsByStatus(MetaAccountLocal.Status.DEACTIVATED)
+    }
+
     private inline fun async(crossinline action: suspend () -> Unit) {
         GlobalScope.launch(Dispatchers.Default) {
             action()
