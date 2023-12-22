@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.mappers
 
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -29,7 +30,7 @@ fun nftIssuance(
         NftLocal.IssuanceType.LIMITED -> {
             val myEditionInt = issuanceMyEdition?.toIntOrNull()
 
-            if (issuanceTotal != null && myEditionInt != null) {
+            if (issuanceTotal != null && issuanceTotal.isZero && myEditionInt != null) {
                 Nft.Issuance.Limited(max = issuanceTotal.toInt(), edition = myEditionInt)
             } else {
                 Nft.Issuance.Unlimited
