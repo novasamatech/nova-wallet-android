@@ -200,13 +200,11 @@ class AddAccountsModule {
         accountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2,
-        ledgerRepository: LedgerRepository,
         proxySyncService: ProxySyncService,
     ): LedgerAddAccountRepository = RealLedgerAddAccountRepository(
         accountDao,
         chainRegistry,
         secretStoreV2,
-        ledgerRepository,
         proxySyncService
     )
 

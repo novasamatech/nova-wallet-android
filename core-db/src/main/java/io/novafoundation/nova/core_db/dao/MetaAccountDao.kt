@@ -110,6 +110,9 @@ interface MetaAccountDao {
     @Transaction
     suspend fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
 
+    @Query("SELECT * FROM meta_accounts WHERE status = :status")
+    fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<MetaAccountLocal>
+
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
 

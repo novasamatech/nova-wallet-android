@@ -130,7 +130,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
             RuntimeApi::class,
             CurrencyFeatureApi::class,
             DbApi::class,
-            LedgerFeatureApi::class,
             VersionsFeatureApi::class,
             Web3NamesApi::class
         ]

@@ -9,5 +9,4 @@ interface LedgerRepository {
         chainId: ChainId
     ): String
 
-    fun derivationPathSecretKey(chainId: ChainId): String
 }

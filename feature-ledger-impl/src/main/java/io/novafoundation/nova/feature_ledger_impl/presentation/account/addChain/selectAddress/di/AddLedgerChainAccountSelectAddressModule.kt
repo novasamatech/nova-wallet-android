@@ -28,9 +28,8 @@ class AddLedgerChainAccountSelectAddressModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        ledgerAddAccountRepository: LedgerAddAccountRepository,
-        repository: LedgerRepository
-    ): AddLedgerChainAccountInteractor = RealAddLedgerChainAccountInteractor(ledgerAddAccountRepository, repository)
+        ledgerAddAccountRepository: LedgerAddAccountRepository
+    ): AddLedgerChainAccountInteractor = RealAddLedgerChainAccountInteractor(ledgerAddAccountRepository)
 
     @Provides
     @ScreenScope

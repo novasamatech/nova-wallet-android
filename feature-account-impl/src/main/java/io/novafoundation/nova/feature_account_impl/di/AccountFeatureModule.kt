@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.utils.DEFAULT_DERIVATION_PATH
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.AccountDao
@@ -145,7 +146,8 @@ class AccountFeatureModule {
         metaAccountDao: MetaAccountDao,
         @OnChainIdentity identityProvider: IdentityProvider,
         metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-        proxiedAddAccountRepository: ProxiedAddAccountRepository
+        proxiedAddAccountRepository: ProxiedAddAccountRepository,
+        rootScope: RootScope
     ): ProxySyncService = RealProxySyncService(
         chainRegistry,
         proxyRepository,
@@ -153,7 +155,8 @@ class AccountFeatureModule {
         metaAccountDao,
         identityProvider,
         metaAccountsUpdatesRegistry,
-        proxiedAddAccountRepository
+        proxiedAddAccountRepository,
+        rootScope
     )
 
     @Provides

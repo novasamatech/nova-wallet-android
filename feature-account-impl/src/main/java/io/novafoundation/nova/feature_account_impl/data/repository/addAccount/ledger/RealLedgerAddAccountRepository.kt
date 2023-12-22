@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -15,7 +16,6 @@ class RealLedgerAddAccountRepository(
     private val accountDao: MetaAccountDao,
     private val chainRegistry: ChainRegistry,
     private val secretStoreV2: SecretStoreV2,
-    private val ledgerRepository: LedgerRepository,
     private val proxySyncService: ProxySyncService,
 ) : LedgerAddAccountRepository(proxySyncService) {
 
@@ -56,7 +56,7 @@ class RealLedgerAddAccountRepository(
         }
 
         payload.ledgerChainAccounts.onEach { (chainId, ledgerAccount) ->
-            val derivationPathKey = ledgerRepository.derivationPathSecretKey(chainId)
+            val derivationPathKey = LedgerDerivationPath.derivationPathSecretKey(chainId)
             secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, ledgerAccount.derivationPath)
         }
 
@@ -76,7 +76,7 @@ class RealLedgerAddAccountRepository(
 
         accountDao.insertChainAccount(chainAccount)
 
-        val derivationPathKey = ledgerRepository.derivationPathSecretKey(payload.chainId)
+        val derivationPathKey = LedgerDerivationPath.derivationPathSecretKey(payload.chainId)
         secretStoreV2.putAdditionalMetaAccountSecret(payload.metaId, derivationPathKey, payload.ledgerChainAccount.derivationPath)
 
         return payload.metaId

@@ -22,6 +22,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -118,8 +119,6 @@ interface AccountFeatureDependencies {
 
     fun computationalCache(): ComputationalCache
 
-    val ledgerRepository: LedgerRepository
-
     val systemCallExecutor: SystemCallExecutor
 
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
@@ -144,4 +143,6 @@ interface AccountFeatureDependencies {
     val extrinsicSplitter: ExtrinsicSplitter
 
     val gasPriceProviderFactory: GasPriceProviderFactory
+
+    val rootScope: RootScope
 }

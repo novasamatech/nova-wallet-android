@@ -4,6 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
@@ -25,6 +26,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findChains
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RealProxySyncService(
     private val chainRegistry: ChainRegistry,
@@ -33,10 +36,17 @@ class RealProxySyncService(
     private val accountDao: MetaAccountDao,
     private val identityProvider: IdentityProvider,
     private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-    private val proxiedAddAccountRepository: ProxiedAddAccountRepository
+    private val proxiedAddAccountRepository: ProxiedAddAccountRepository,
+    private val rootScope: RootScope
 ) : ProxySyncService {
 
-    override suspend fun startSyncing() {
+    override fun startSyncing() {
+        rootScope.launch(Dispatchers.Default) {
+            startSyncInternal()
+        }
+    }
+
+    private suspend fun startSyncInternal() {
         val metaAccounts = getMetaAccounts()
         if (metaAccounts.isEmpty()) return
 
@@ -53,7 +63,7 @@ class RealProxySyncService(
             val notAddedProxies = filterNotAddedProxieds(proxiedsWithProxies, oldProxies)
 
             val identitiesByChain = notAddedProxies.loadProxiedIdentities()
-            val proxiedsToMetaId = notAddedProxies.map {
+            val addedProxiedsIds = notAddedProxies.map {
                 val identity = identitiesByChain[it.proxied.chainId]?.get(it.proxied.accountId.intoKey())
 
                 val proxiedMetaId = proxiedAddAccountRepository.addAccount(Payload(it, identity))
@@ -64,16 +74,11 @@ class RealProxySyncService(
             val deactivatedMetaAccountIds = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
             accountDao.changeAccountsStatus(deactivatedMetaAccountIds, MetaAccountLocal.Status.DEACTIVATED)
 
-            val changedMetaIds = proxiedsToMetaId.map { it.second } + deactivatedMetaAccountIds
+            val changedMetaIds = addedProxiedsIds.map { it.second } + deactivatedMetaAccountIds
             metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
         }.onFailure {
             Log.e(LOG_TAG, "Failed to sync proxy delegators", it)
         }
-    }
-
-
-    override suspend fun syncForMetaAccount(metaAccount: MetaAccount) {
-        TODO("provide updater to sync proxy delegators for new added accounts")
     }
 
     private suspend fun filterNotAddedProxieds(
@@ -85,12 +90,14 @@ class RealProxySyncService(
     }
 
     private suspend fun getDeactivatedMetaIds(
-        proxiedsWithProxies: List<ProxiedWithProxy>,
+        onChainProxies: List<ProxiedWithProxy>,
         oldProxies: List<ProxyAccountLocal>
     ): List<Long> {
-        val newIdentifiers = proxiedsWithProxies.map { it.toLocalIdentifier() }.toSet()
-        return oldProxies.filter { it.identifier !in newIdentifiers }
+        val newIdentifiers = onChainProxies.map { it.toLocalIdentifier() }.toSet()
+        val accountsToDeactivate = oldProxies.filter { it.identifier !in newIdentifiers }
             .map { it.proxiedMetaId }
+
+        return accountsToDeactivate.filterAlreadyDeactivatedMetaAccounts()
     }
 
     private suspend fun getProxiedsToRemove(
@@ -141,12 +148,20 @@ class RealProxySyncService(
             }
     }
 
+
+    private suspend fun List<Long>.filterAlreadyDeactivatedMetaAccounts(): List<Long> {
+        val alreadyDeactivatedMetaAccountIds = accountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.DEACTIVATED)
+            .mapToSet { it.id }
+
+        return this - alreadyDeactivatedMetaAccountIds
+    }
+
     private fun ProxiedWithProxy.toLocalIdentifier(): String {
         return ProxyAccountLocal.makeIdentifier(
-            proxy.metaId,
-            proxied.chainId,
-            proxied.accountId,
-            proxy.proxyType
+            proxyMetaId = proxy.metaId,
+            chainId = proxied.chainId,
+            proxiedAccountId = proxied.accountId,
+            proxyType = proxy.proxyType
         )
     }
 }

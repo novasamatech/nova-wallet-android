@@ -10,8 +10,7 @@ interface AddLedgerChainAccountInteractor {
 }
 
 class RealAddLedgerChainAccountInteractor(
-    private val ledgerAddAccountRepository: LedgerAddAccountRepository,
-    private val ledgerRepository: LedgerRepository,
+    private val ledgerAddAccountRepository: LedgerAddAccountRepository
 ) : AddLedgerChainAccountInteractor {
 
     override suspend fun addChainAccount(metaId: Long, chainId: String, account: LedgerSubstrateAccount): Result<Unit> = kotlin.runCatching {

@@ -111,7 +111,7 @@ class RootViewModel(
     }
 
     private fun syncProxies() {
-        launch(Dispatchers.Default) { interactor.syncProxies() }
+        interactor.syncProxies()
     }
 
     private fun handleUpdatesSideEffect(sideEffect: Updater.SideEffect) {

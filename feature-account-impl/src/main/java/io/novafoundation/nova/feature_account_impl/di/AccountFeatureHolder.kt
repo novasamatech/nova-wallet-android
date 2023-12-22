@@ -34,7 +34,6 @@ class AccountFeatureHolder @Inject constructor(
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
-            .ledgerFeatureApi(getFeature(LedgerFeatureApi::class.java))
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
             .web3NamesApi(getFeature(Web3NamesApi::class.java))
             .build()
