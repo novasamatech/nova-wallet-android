@@ -61,6 +61,7 @@ private class MetaAccountWithBalanceListingMixin(
             title = metaAccount.name,
             subtitle = mapSubtitle(this),
             isSelected = isMetaAccountSelected(metaAccount),
+            isEditable = metaAccount.isEditable(),
             isClickable = true,
             picture = walletUiUseCase.walletIcon(metaAccount),
             chainIconUrl = proxyChain?.icon,
@@ -94,6 +95,18 @@ private class MetaAccountWithBalanceListingMixin(
             proxyFormatter.makeAccountDrawable(proxyMetaAccount),
             proxy
         )
+    }
+
+    private fun MetaAccount.isEditable(): Boolean {
+        return when (type) {
+            LightMetaAccount.Type.SECRETS,
+            LightMetaAccount.Type.WATCH_ONLY,
+            LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER,
+            LightMetaAccount.Type.POLKADOT_VAULT -> true
+
+            LightMetaAccount.Type.PROXIED -> false
+        }
     }
 
     private fun MetaAccountWithTotalBalance.formattedTotalBalance(): String {

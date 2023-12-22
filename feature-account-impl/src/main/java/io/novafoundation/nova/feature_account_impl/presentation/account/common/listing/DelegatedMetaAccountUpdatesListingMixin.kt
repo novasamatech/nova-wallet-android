@@ -77,9 +77,10 @@ private class DelegatedMetaAccountUpdatesListingMixin(
             isClickable = true,
             picture = if (isEnabled) walletIcon else walletIcon.withAlphaDrawable(ICON_ALPHA),
             chainIconUrl = proxiedWithProxy.chain.icon,
-            chainIconOpacity = ICON_ALPHA,
+            updateIndicator = false,
             subtitleIconRes = null,
-            updateIndicator = false
+            chainIconOpacity = ICON_ALPHA,
+            isEditable = false
         )
     }
 
