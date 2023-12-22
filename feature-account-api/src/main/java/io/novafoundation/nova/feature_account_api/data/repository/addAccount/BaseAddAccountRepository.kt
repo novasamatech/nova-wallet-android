@@ -6,11 +6,11 @@ abstract class BaseAddAccountRepository<T>(
     private val proxySyncService: ProxySyncService
 ) : AddAccountRepository<T> {
 
-    override final suspend fun addAccount(payload: T): Long {
+    final override suspend fun addAccount(payload: T): Long {
         val metaId = addAccountInternal(payload)
         proxySyncService.startSyncing()
         return metaId
     }
 
-    abstract protected suspend fun addAccountInternal(payload: T): Long
+    protected abstract suspend fun addAccountInternal(payload: T): Long
 }

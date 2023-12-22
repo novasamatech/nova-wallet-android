@@ -224,7 +224,7 @@ class AccountDataSourceImpl(
         secretStoreV2.clearSecrets(metaId, chainAccountIds)
     }
 
-    //TODO move it to SecretsAddAccountRepository
+    // TODO move it to SecretsAddAccountRepository
     @Deprecated("Use SecretsAddAccountRepository instead")
     override suspend fun insertMetaAccountFromSecrets(
         name: String,
@@ -254,7 +254,7 @@ class AccountDataSourceImpl(
         metaId
     }
 
-    //TODO move it to SecretsAddAccountRepository
+    // TODO move it to SecretsAddAccountRepository
     @Deprecated("Use SecretsAddAccountRepository instead")
     override suspend fun insertChainAccount(
         metaId: Long,

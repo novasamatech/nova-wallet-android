@@ -148,7 +148,6 @@ class RealProxySyncService(
             }
     }
 
-
     private suspend fun List<Long>.filterAlreadyDeactivatedMetaAccounts(): List<Long> {
         val alreadyDeactivatedMetaAccountIds = accountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.DEACTIVATED)
             .mapToSet { it.id }

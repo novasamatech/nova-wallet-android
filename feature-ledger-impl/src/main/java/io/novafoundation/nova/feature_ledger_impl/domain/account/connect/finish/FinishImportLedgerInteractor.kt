@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_ledger_impl.domain.account.connect.finish
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
-import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface FinishImportLedgerInteractor {
@@ -22,7 +21,8 @@ class RealFinishImportLedgerInteractor(
     override suspend fun createWallet(name: String, ledgerChainAccounts: Map<ChainId, LedgerSubstrateAccount>) = runCatching {
         val metaId = ledgerAddAccountRepository.addAccount(
             LedgerAddAccountRepository.Payload.MetaAccount(
-                name, ledgerChainAccounts
+                name,
+                ledgerChainAccounts
             )
         )
 

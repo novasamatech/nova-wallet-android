@@ -8,5 +8,4 @@ interface LedgerRepository {
         metaId: Long,
         chainId: ChainId
     ): String
-
 }

@@ -558,7 +558,6 @@ fun <T> Flow<List<T>>.filterList(condition: (T) -> Boolean): Flow<List<T>> {
 }
 
 fun <T, R> Flow<T>.mapWithInitial(transform: (initial: T, new: T?) -> R): Flow<R> {
-
     var initial: T? = null
     return transform {
         if (initial == null) {

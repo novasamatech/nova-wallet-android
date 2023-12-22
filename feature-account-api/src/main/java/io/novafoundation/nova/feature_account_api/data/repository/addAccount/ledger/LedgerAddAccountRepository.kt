@@ -1,13 +1,8 @@
 package io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger
 
-import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.BaseAddAccountRepository
-import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
-import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 abstract class LedgerAddAccountRepository(
@@ -26,5 +21,4 @@ abstract class LedgerAddAccountRepository(
             val ledgerChainAccount: LedgerSubstrateAccount
         ) : Payload
     }
-
 }
