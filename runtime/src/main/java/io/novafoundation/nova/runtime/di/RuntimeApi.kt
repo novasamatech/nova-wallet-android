@@ -9,6 +9,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -83,4 +84,6 @@ interface RuntimeApi {
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val multiLocationConverterFactory: MultiLocationConverterFactory
+
+    val extrinsicWalk: ExtrinsicWalk
 }
