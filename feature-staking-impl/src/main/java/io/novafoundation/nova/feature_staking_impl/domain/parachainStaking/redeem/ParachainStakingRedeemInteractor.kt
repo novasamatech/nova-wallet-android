@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rede
 
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeBonded
@@ -21,7 +23,7 @@ import java.math.BigInteger
 
 interface ParachainStakingRedeemInteractor {
 
-    suspend fun estimateFee(delegatorState: DelegatorState): BigInteger
+    suspend fun estimateFee(delegatorState: DelegatorState): Fee
 
     suspend fun redeemableAmount(delegatorState: DelegatorState): BigInteger
 
@@ -34,8 +36,8 @@ class RealParachainStakingRedeemInteractor(
     private val delegatorStateRepository: DelegatorStateRepository,
 ) : ParachainStakingRedeemInteractor {
 
-    override suspend fun estimateFee(delegatorState: DelegatorState): BigInteger = withContext(Dispatchers.Default) {
-        extrinsicService.estimateFee(delegatorState.chain) {
+    override suspend fun estimateFee(delegatorState: DelegatorState): Fee = withContext(Dispatchers.Default) {
+        extrinsicService.estimateFee(delegatorState.chain, TransactionOrigin.SelectedWallet) {
             redeem(delegatorState)
         }
     }
@@ -47,11 +49,13 @@ class RealParachainStakingRedeemInteractor(
     }
 
     override suspend fun redeem(delegatorState: DelegatorState): Result<RedeemConsequences> = withContext(Dispatchers.Default) {
-        extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(delegatorState.chain) {
+        extrinsicService.submitAndWatchExtrinsic(delegatorState.chain, TransactionOrigin.SelectedWallet) {
             redeem(delegatorState)
-        }.map {
-            RedeemConsequences(willKillStash = delegatorState.activeBonded.isZero)
         }
+            .awaitInBlock()
+            .map {
+                RedeemConsequences(willKillStash = delegatorState.activeBonded.isZero)
+            }
     }
 
     private suspend fun ExtrinsicBuilder.redeem(delegatorState: DelegatorState) {

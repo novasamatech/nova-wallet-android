@@ -166,7 +166,7 @@ class RevokeDelegationConfirmViewModel(
     }
 
     private fun loadFee() = launch {
-        originFeeMixin.loadFeeV2(
+        originFeeMixin.loadFee(
             coroutineScope = coroutineScope,
             feeConstructor = { interactor.calculateFee(payload.trackIds) },
             onRetryCancelled = {}

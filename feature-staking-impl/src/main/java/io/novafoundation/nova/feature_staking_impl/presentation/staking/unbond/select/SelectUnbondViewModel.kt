@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import kotlin.time.ExperimentalTime
 
 class SelectUnbondViewModel(
     private val router: StakingRouter,
@@ -82,7 +81,6 @@ class SelectUnbondViewModel(
         router.back()
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun listenFee() {
         amountMixin.backPressuredAmount
             .onEach { loadFee(it) }

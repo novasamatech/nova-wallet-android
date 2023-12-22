@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contribute
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -79,14 +81,14 @@ class CrowdloanContributeInteractor(
         contribution: BigDecimal,
         bonusPayload: BonusPayload?,
         customizationPayload: Parcelable?,
-    ) = formingSubmission(
+    ): Fee = formingSubmission(
         crowdloan = crowdloan,
         contribution = contribution,
         bonusPayload = bonusPayload,
         customizationPayload = customizationPayload,
         toCalculateFee = true
     ) { submission, chain, _ ->
-        extrinsicService.estimateFee(chain, submission)
+        extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, submission)
     }
 
     suspend fun contribute(
@@ -99,19 +101,17 @@ class CrowdloanContributeInteractor(
             customContributeManager.getFactoryOrNull(it)?.submitter?.submitOffChain(customizationPayload, bonusPayload, contribution)
         }
 
-        val txHash = formingSubmission(
+        val extrinsicSubmission = formingSubmission(
             crowdloan = crowdloan,
             contribution = contribution,
             bonusPayload = bonusPayload,
             toCalculateFee = false,
             customizationPayload = customizationPayload
         ) { submission, chain, account ->
-            val accountId = account.accountIdIn(chain)!!
-
-            extrinsicService.submitExtrinsicWithAnySuitableWallet(chain, accountId) { submission() }
+            extrinsicService.submitExtrinsic(chain, TransactionOrigin.Wallet(account)) { submission() }
         }.getOrThrow()
 
-        txHash
+        extrinsicSubmission.hash
     }
 
     private suspend fun <T> formingSubmission(

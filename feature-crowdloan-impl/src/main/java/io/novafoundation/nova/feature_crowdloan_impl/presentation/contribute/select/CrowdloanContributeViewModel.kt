@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.hasExtraBonusFlow
@@ -276,7 +275,7 @@ class CrowdloanContributeViewModel(
                     customizationPayload,
                 )
 
-                SimpleFee(InlineFee(fee))
+                SimpleFee(fee)
             },
             onRetryCancelled = ::backClicked
         )

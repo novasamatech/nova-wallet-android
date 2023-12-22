@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rebond
 
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.cancelDelegationRequest
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
@@ -15,7 +17,7 @@ import java.math.BigInteger
 
 interface ParachainStakingRebondInteractor {
 
-    suspend fun estimateFee(collatorId: AccountId): BigInteger
+    suspend fun estimateFee(collatorId: AccountId): Fee
 
     suspend fun rebondAmount(
         delegatorState: DelegatorState,
@@ -31,8 +33,8 @@ class RealParachainStakingRebondInteractor(
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
 ) : ParachainStakingRebondInteractor {
 
-    override suspend fun estimateFee(collatorId: AccountId): BigInteger = withContext(Dispatchers.IO) {
-        extrinsicService.estimateFee(selectedAssetState.chain()) {
+    override suspend fun estimateFee(collatorId: AccountId): Fee = withContext(Dispatchers.IO) {
+        extrinsicService.estimateFee(selectedAssetState.chain(), TransactionOrigin.SelectedWallet) {
             cancelDelegationRequest(collatorId)
         }
     }
@@ -49,8 +51,8 @@ class RealParachainStakingRebondInteractor(
     }
 
     override suspend fun rebond(collatorId: AccountId): Result<*> = withContext(Dispatchers.IO) {
-        extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(selectedAssetState.chain()) {
+        extrinsicService.submitAndWatchExtrinsic(selectedAssetState.chain(), TransactionOrigin.SelectedWallet) {
             cancelDelegationRequest(collatorId)
-        }
+        }.awaitInBlock()
     }
 }

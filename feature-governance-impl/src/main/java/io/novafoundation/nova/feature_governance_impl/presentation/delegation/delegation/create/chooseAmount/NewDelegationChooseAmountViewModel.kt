@@ -32,7 +32,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWithV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -127,7 +127,7 @@ class NewDelegationChooseAmountViewModel(
     }
 
     init {
-        originFeeMixin.connectWithV2(
+        originFeeMixin.connectWith(
             inputSource1 = amountChooserMixin.backPressuredAmount,
             inputSource2 = selectedConvictionFlow,
             scope = this,

@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transform
 import java.math.BigDecimal
-import java.math.BigInteger
 
 sealed class FeeStatus<out F : GenericFee> {
     object Loading : FeeStatus<Nothing>()
@@ -98,13 +97,6 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
     // Additional methods in this interface are only for backward-compatibility to simplify migration of the old code
     interface Presentation : GenericFeeLoaderMixin.Presentation<SimpleFee>, FeeLoaderMixin {
 
-        @Deprecated("Use loadFeeV2")
-        fun loadFee(
-            coroutineScope: CoroutineScope,
-            feeConstructor: suspend (Token) -> BigInteger?,
-            onRetryCancelled: () -> Unit,
-        )
-
         @Deprecated("Use setFee(fee: GenericFee)")
         suspend fun setFee(feeAmount: BigDecimal?)
 
@@ -116,7 +108,7 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
         suspend fun setFee(fee: Fee?) = setFee(fee?.let(::SimpleFee))
 
-        fun loadFeeV2(
+        fun loadFee(
             coroutineScope: CoroutineScope,
             expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> Fee?,
@@ -183,44 +175,6 @@ fun FeeLoaderMixin.Presentation.requireFee(
     }
 }
 
-fun <I> FeeLoaderMixin.Presentation.connectWith(
-    inputSource: Flow<I>,
-    scope: CoroutineScope,
-    feeConstructor: suspend Token.(input: I) -> BigInteger,
-    onRetryCancelled: () -> Unit = {}
-) {
-    inputSource.onEach { input ->
-        loadFee(
-            coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input) },
-            onRetryCancelled = onRetryCancelled
-        )
-    }
-        .inBackground()
-        .launchIn(scope)
-}
-
-fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
-    inputSource1: Flow<I1>,
-    inputSource2: Flow<I2>,
-    scope: CoroutineScope,
-    feeConstructor: suspend Token.(input1: I1, input2: I2) -> BigInteger?,
-    onRetryCancelled: () -> Unit = {}
-) {
-    combine(
-        inputSource1,
-        inputSource2
-    ) { input1, input2 ->
-        loadFee(
-            coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input1, input2) },
-            onRetryCancelled = onRetryCancelled
-        )
-    }
-        .inBackground()
-        .launchIn(scope)
-}
-
 fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
     inputSource1: Flow<I1>,
     inputSource2: Flow<I2>,
@@ -237,7 +191,7 @@ fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
         inputSource3,
         inputSource4
     ) { input1, input2, input3, input4 ->
-        loadFeeV2(
+        loadFee(
             coroutineScope = scope,
             expectedChain = expectedChain?.invoke(input1, input2, input3, input4),
             feeConstructor = { feeConstructor(it, input1, input2, input3, input4) },
@@ -248,14 +202,14 @@ fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
         .launchIn(scope)
 }
 
-fun <I> FeeLoaderMixin.Presentation.connectWithV2(
+fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource: Flow<I>,
     scope: CoroutineScope,
     feeConstructor: suspend Token.(input: I) -> Fee,
     onRetryCancelled: () -> Unit = {}
 ) {
     inputSource.onEach { input ->
-        loadFeeV2(
+        this.loadFee(
             coroutineScope = scope,
             feeConstructor = { feeConstructor(it, input) },
             onRetryCancelled = onRetryCancelled
@@ -265,7 +219,7 @@ fun <I> FeeLoaderMixin.Presentation.connectWithV2(
         .launchIn(scope)
 }
 
-fun <I1, I2> FeeLoaderMixin.Presentation.connectWithV2(
+fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
     inputSource1: Flow<I1>,
     inputSource2: Flow<I2>,
     scope: CoroutineScope,
@@ -276,7 +230,7 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWithV2(
         inputSource1,
         inputSource2
     ) { input1, input2 ->
-        loadFeeV2(
+        this.loadFee(
             coroutineScope = scope,
             feeConstructor = { feeConstructor(it, input1, input2) },
             onRetryCancelled = onRetryCancelled

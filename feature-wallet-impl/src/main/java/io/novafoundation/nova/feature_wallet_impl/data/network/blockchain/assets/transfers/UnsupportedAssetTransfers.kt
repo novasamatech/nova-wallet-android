@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
@@ -16,7 +17,7 @@ open class UnsupportedAssetTransfers : AssetTransfers {
         throw UnsupportedOperationException("Unsupported")
     }
 
-    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<String> {
+    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<ExtrinsicSubmission> {
         return Result.failure(UnsupportedOperationException("Unsupported"))
     }
 
