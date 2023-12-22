@@ -33,7 +33,7 @@ fun ResourceManager.formatIssuance(issuance: Nft.Issuance): String {
 fun ResourceManager.formatNftPrice(price: Nft.Price?, priceToken: Token?): NftPriceModel? {
     if (price == null || priceToken == null) return null
 
-    return when(price) {
+    return when (price) {
         is Nft.Price.Fungible -> {
             val units = price.units.format()
             val amountModel = mapAmountToAmountModel(price.totalPrice, priceToken)

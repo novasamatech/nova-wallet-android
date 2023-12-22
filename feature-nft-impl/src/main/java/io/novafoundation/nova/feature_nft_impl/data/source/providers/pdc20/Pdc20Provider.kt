@@ -26,7 +26,7 @@ class Pdc20Provider(
     private val nftDao: NftDao,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-): NftProvider {
+) : NftProvider {
 
     override val requireFullChainSync: Boolean = false
 

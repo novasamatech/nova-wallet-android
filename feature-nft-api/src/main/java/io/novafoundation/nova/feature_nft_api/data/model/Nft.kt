@@ -26,16 +26,14 @@ class Nft(
             val media: String?,
         ) : Details()
 
-
-
         object Loadable : Details()
     }
 
     sealed class Price {
 
-        class NonFungible(val nftPrice: BigInteger): Price()
+        class NonFungible(val nftPrice: BigInteger) : Price()
 
-        class Fungible(val units: BigInteger, val totalPrice: Balance): Price()
+        class Fungible(val units: BigInteger, val totalPrice: Balance) : Price()
     }
 
     sealed class Issuance {
@@ -44,7 +42,7 @@ class Nft(
 
         class Limited(val max: Int, val edition: Int) : Issuance()
 
-        class Fungible(val myAmount: BigInteger, val totalSupply: BigInteger): Issuance()
+        class Fungible(val myAmount: BigInteger, val totalSupply: BigInteger) : Issuance()
     }
 
     sealed class Type(val key: Key) {

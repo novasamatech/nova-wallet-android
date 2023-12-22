@@ -129,5 +129,4 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
     private fun PriceSectionView.setPriceOrHide(maybePrice: NftPriceModel?) = letOrHide(maybePrice) { price ->
         setPrice(price.amountInfo, price.fiat)
     }
-
 }

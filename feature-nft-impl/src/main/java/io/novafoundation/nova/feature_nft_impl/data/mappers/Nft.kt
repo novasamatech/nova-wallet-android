@@ -23,7 +23,7 @@ fun nftIssuance(
     issuanceMyEdition: String?,
     issuanceMyAmount: BigInteger?
 ): Nft.Issuance {
-    return when(typeLocal) {
+    return when (typeLocal) {
         NftLocal.IssuanceType.UNLIMITED -> Nft.Issuance.Unlimited
 
         NftLocal.IssuanceType.LIMITED -> {

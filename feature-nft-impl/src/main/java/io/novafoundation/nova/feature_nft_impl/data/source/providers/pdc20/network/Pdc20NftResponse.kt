@@ -4,14 +4,14 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class Pdc20NftResponse(
-   val userTokenBalances: List<Pdc20NftRemote>,
-   val listings: List<Pdc20Listing>
+    val userTokenBalances: List<Pdc20NftRemote>,
+    val listings: List<Pdc20Listing>
 )
 
 class Pdc20NftRemote(
     val balance: String,
     val address: PdcAddress,
-    val token:Token
+    val token: Token
 ) {
 
     class Token(
