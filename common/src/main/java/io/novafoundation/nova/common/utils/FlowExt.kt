@@ -551,24 +551,6 @@ fun <T> firstNonEmpty(
         }
     }
 
-fun <T> Flow<List<T>>.filterList(condition: (T) -> Boolean): Flow<List<T>> {
-    return this.map {
-        it.filter { condition(it) }
-    }
-}
-
-fun <T, R> Flow<T>.mapWithInitial(transform: (initial: T, new: T?) -> R): Flow<R> {
-    var initial: T? = null
-    return transform {
-        if (initial == null) {
-            initial = it
-            emit(transform(it, null))
-        } else {
-            emit(transform(initial!!, it))
-        }
-    }
-}
-
 fun <T> Flow<T>.observeInLifecycle(
     lifecycleCoroutineScope: LifecycleCoroutineScope,
     observer: FlowCollector<T>,

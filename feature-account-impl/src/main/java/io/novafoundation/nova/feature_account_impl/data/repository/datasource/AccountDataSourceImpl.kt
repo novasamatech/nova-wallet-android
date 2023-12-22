@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapChainAccountFromLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToLightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
@@ -149,11 +148,6 @@ class AccountDataSourceImpl(
 
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
         return metaAccountDao.getMetaAccounts().map(::mapMetaAccountLocalToLightMetaAccount)
-    }
-
-    override fun allChainAccountsFlow(): Flow<List<MetaAccount.ChainAccount>> {
-        return metaAccountDao.observeChainAccounts()
-            .mapList { mapChainAccountFromLocal(it) }
     }
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {

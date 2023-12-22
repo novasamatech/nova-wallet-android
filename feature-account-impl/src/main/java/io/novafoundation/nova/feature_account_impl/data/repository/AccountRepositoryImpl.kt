@@ -136,10 +136,6 @@ class AccountRepositoryImpl(
         return accountDataSource.allLightMetaAccounts()
     }
 
-    override fun allChainAccountsFlow(): Flow<List<MetaAccount.ChainAccount>> {
-        return accountDataSource.allChainAccountsFlow()
-    }
-
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
         return accountDataSource.allMetaAccountsFlow()
     }

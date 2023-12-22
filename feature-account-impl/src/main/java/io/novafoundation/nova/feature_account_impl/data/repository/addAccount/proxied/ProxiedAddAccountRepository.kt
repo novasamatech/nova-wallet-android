@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 /**
  * It's important to extends ProxiedAddAccountRepository from AddAccountRepository instead of BaseAddAccountRepository
- * since we not need to sync proxy accounts for this case
+ * since we don't need to sync proxy accounts for this case
  */
 class ProxiedAddAccountRepository(
     private val accountDao: MetaAccountDao,

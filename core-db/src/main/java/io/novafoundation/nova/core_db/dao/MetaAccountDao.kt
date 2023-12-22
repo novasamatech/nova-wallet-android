@@ -126,9 +126,6 @@ interface MetaAccountDao {
     @Query(META_ACCOUNT_WITH_BALANCE_QUERY)
     fun metaAccountWithBalanceFlow(metaId: Long): Flow<List<MetaAccountWithBalanceLocal>>
 
-    @Query("SELECT * FROM chain_accounts")
-    fun observeChainAccounts(): Flow<List<ChainAccountLocal>>
-
     @Query("SELECT * FROM proxy_accounts")
     suspend fun getAllProxyAccounts(): List<ProxyAccountLocal>
 

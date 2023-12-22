@@ -97,7 +97,7 @@ class RealProxySyncService(
         val accountsToDeactivate = oldProxies.filter { it.identifier !in newIdentifiers }
             .map { it.proxiedMetaId }
 
-        return accountsToDeactivate.filterAlreadyDeactivatedMetaAccounts()
+        return accountsToDeactivate.takeNotYetDeactivatedMetaAccounts()
     }
 
     private suspend fun getProxiedsToRemove(
@@ -148,7 +148,7 @@ class RealProxySyncService(
             }
     }
 
-    private suspend fun List<Long>.filterAlreadyDeactivatedMetaAccounts(): List<Long> {
+    private suspend fun List<Long>.takeNotYetDeactivatedMetaAccounts(): List<Long> {
         val alreadyDeactivatedMetaAccountIds = accountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.DEACTIVATED)
             .mapToSet { it.id }
 
