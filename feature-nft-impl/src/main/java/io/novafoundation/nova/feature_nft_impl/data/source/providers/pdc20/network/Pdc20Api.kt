@@ -12,5 +12,4 @@ interface Pdc20Api {
 
     @POST("https://squid.subsquid.io/dot-ordinals/graphql")
     suspend fun getNfts(@Body request: Pdc20Request): SubQueryResponse<Pdc20NftResponse>
-
 }

@@ -132,9 +132,9 @@ class NftHolder(
         itemNftPriceFiat.setVisible(price != null)
         itemNftPricePlaceholder.setVisible(price == null)
 
-       if (price != null) {
-           itemNftPriceToken.text = price.amountInfo
-           itemNftPriceFiat.text = price.fiat
-       }
+        if (price != null) {
+            itemNftPriceToken.text = price.amountInfo
+            itemNftPriceFiat.text = price.fiat
+        }
     }
 }
