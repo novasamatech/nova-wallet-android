@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.sha256
 import io.novafoundation.nova.core.model.CryptoType
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -38,7 +40,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.math.BigInteger
 
 class VerificationError : Exception()
 
@@ -105,10 +106,10 @@ class MoonbeamCrowdloanInteractor(
         }
     }
 
-    suspend fun calculateTermsFee(): BigInteger = withContext(Dispatchers.Default) {
+    suspend fun calculateTermsFee(): Fee = withContext(Dispatchers.Default) {
         val chain = selectedChainAssetState.chain()
 
-        extrinsicService.estimateFee(chain) {
+        extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             systemRemark(fakeRemark())
         }
     }
@@ -132,9 +133,10 @@ class MoonbeamCrowdloanInteractor(
             val agreeRemarkRequest = AgreeRemarkRequest(currentAddress, signedHash)
             val remark = httpExceptionHandler.wrap { moonbeamApi.agreeRemark(parachainMetadata, agreeRemarkRequest) }.remark
 
-            val finalizedStatus = extrinsicService.submitAndWatchExtrinsicAnySuitableWallet(chain, metaAccount.accountIdIn(chain)!!) {
+            val finalizedStatus = extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
                 systemRemark(remark.encodeToByteArray())
             }
+                .getOrThrow()
                 .filterIsInstance<ExtrinsicStatus.Finalized>()
                 .first()
 

@@ -108,7 +108,8 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
             Mode.EDIT -> {
                 itemAccountArrow.visibility = View.INVISIBLE
 
-                itemAccountDelete.visibility = View.VISIBLE
+                itemAccountDelete.isVisible = accountModel.isEditable
+
                 itemAccountDelete.setOnClickListener { handler?.deleteClicked(accountModel) }
                 itemAccountDelete.setImageResource(R.drawable.ic_delete_symbol)
 

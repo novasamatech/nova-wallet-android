@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import kotlinx.coroutines.flow.Flow
@@ -39,9 +40,10 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun getSelectedMetaAccount(): MetaAccount
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
-    suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
 
-    suspend fun accountNameFor(accountId: AccountId): String?
+    suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount?
+
+    suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
     suspend fun allMetaAccounts(): List<MetaAccount>
 
@@ -63,7 +65,7 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun getSelectedLanguage(): Language
     suspend fun changeSelectedLanguage(language: Language)
 
-    suspend fun accountExists(accountId: AccountId): Boolean
+    suspend fun accountExists(accountId: AccountId, chainId: ChainId): Boolean
     suspend fun getMetaAccount(metaId: Long): MetaAccount
 
     fun metaAccountFlow(metaId: Long): Flow<MetaAccount>

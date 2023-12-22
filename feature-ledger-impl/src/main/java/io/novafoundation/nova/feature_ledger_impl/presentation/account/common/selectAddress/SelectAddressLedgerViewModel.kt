@@ -159,7 +159,8 @@ abstract class SelectAddressLedgerViewModel(
                 picture = addressModel.image,
                 chainIconUrl = null,
                 updateIndicator = false,
-                subtitleIconRes = null
+                subtitleIconRes = null,
+                isEditable = false
             )
         }
     }

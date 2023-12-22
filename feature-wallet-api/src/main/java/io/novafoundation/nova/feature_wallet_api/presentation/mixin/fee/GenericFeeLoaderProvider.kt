@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class FeeLoaderProviderFactory(
     private val resourceManager: ResourceManager,
@@ -46,20 +45,6 @@ private class FeeLoaderProvider(
     configuration: GenericFeeLoaderMixin.Configuration<SimpleFee>,
     tokenFlow: Flow<Token?>,
 ) : GenericFeeLoaderProvider<SimpleFee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation {
-
-    override fun loadFee(
-        coroutineScope: CoroutineScope,
-        feeConstructor: suspend (Token) -> BigInteger?,
-        onRetryCancelled: () -> Unit,
-    ) {
-        coroutineScope.launch {
-            loadFeeSuspending(
-                retryScope = coroutineScope,
-                feeConstructor = { token -> feeConstructor(token)?.let { SimpleFee(InlineFee(it)) } },
-                onRetryCancelled = onRetryCancelled
-            )
-        }
-    }
 
     override suspend fun setFee(feeAmount: BigDecimal?) {
         val fee = feeAmount?.let {

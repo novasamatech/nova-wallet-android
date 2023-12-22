@@ -40,7 +40,7 @@ class RealSwapTransactionHistoryRepository(
         val localOperation = with(swapArgs) {
             OperationLocal.manualSwap(
                 hash = txSubmission.hash,
-                originAddress = chain.addressOf(txSubmission.origin),
+                originAddress = chain.addressOf(txSubmission.submissionOrigin.requestedOrigin),
                 assetId = chainAsset.localId,
                 fee = feeAsset.withAmountLocal(fee.networkFee.amount),
                 amountIn = assetIn.withAmountLocal(swapLimit.expectedAmountIn),

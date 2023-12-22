@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_api.domain.model.relaychain
 
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -53,3 +54,7 @@ sealed class StakingState(
         ) : Stash(chain, chainAsset, accountId, controllerId, stashId)
     }
 }
+
+fun StakingState.Stash.stashTransactionOrigin(): TransactionOrigin = TransactionOrigin.WalletWithAccount(stashId)
+
+fun StakingState.Stash.controllerTransactionOrigin(): TransactionOrigin = TransactionOrigin.WalletWithAccount(controllerId)

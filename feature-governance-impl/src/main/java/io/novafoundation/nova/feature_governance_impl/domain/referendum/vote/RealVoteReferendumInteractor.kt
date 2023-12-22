@@ -3,7 +3,10 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
@@ -68,14 +71,14 @@ class RealVoteReferendumInteractor(
         }
     }
 
-    override suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Balance {
+    override suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Fee {
         val governanceOption = selectedChainState.selectedOption()
         val chain = governanceOption.assetWithChain.chain
 
         val vote = AyeVote(amount, conviction) // vote direction does not influence fee estimation
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
 
-        return extrinsicService.estimateFee(chain) {
+        return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             with(governanceSource.convictionVoting) {
                 vote(referendumId, vote)
             }
@@ -85,11 +88,11 @@ class RealVoteReferendumInteractor(
     override suspend fun vote(
         vote: AccountVote.Standard,
         referendumId: ReferendumId,
-    ): Result<String> {
+    ): Result<ExtrinsicSubmission> {
         val governanceSelectedOption = selectedChainState.selectedOption()
         val governanceSource = governanceSourceRegistry.sourceFor(governanceSelectedOption)
 
-        return extrinsicService.submitExtrinsicWithSelectedWallet(governanceSelectedOption.assetWithChain.chain) {
+        return extrinsicService.submitExtrinsic(governanceSelectedOption.assetWithChain.chain, TransactionOrigin.SelectedWallet) {
             with(governanceSource.convictionVoting) {
                 vote(referendumId, vote)
             }

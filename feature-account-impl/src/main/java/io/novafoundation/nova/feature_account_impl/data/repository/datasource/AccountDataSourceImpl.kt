@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.mi
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -133,13 +134,13 @@ class AccountDataSourceImpl(
 
     override fun selectedMetaAccountFlow(): Flow<MetaAccount> = selectedMetaAccountFlow
 
-    override suspend fun findMetaAccount(accountId: ByteArray): MetaAccount? {
-        return metaAccountDao.getMetaAccountInfo(accountId)
+    override suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount? {
+        return metaAccountDao.getMetaAccountInfo(accountId, chainId)
             ?.let(::mapMetaAccountLocalToMetaAccount)
     }
 
-    override suspend fun accountNameFor(accountId: AccountId): String? {
-        return metaAccountDao.metaAccountNameFor(accountId)
+    override suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String? {
+        return metaAccountDao.metaAccountNameFor(accountId, chainId)
     }
 
     override suspend fun allMetaAccounts(): List<MetaAccount> {
@@ -196,8 +197,8 @@ class AccountDataSourceImpl(
         preferences.saveCurrentLanguage(language.iso)
     }
 
-    override suspend fun accountExists(accountId: AccountId): Boolean {
-        return metaAccountDao.isMetaAccountExists(accountId)
+    override suspend fun accountExists(accountId: AccountId, chainId: ChainId): Boolean {
+        return metaAccountDao.isMetaAccountExists(accountId, chainId)
     }
 
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {

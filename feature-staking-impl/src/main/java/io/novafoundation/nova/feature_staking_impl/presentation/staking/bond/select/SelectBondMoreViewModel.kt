@@ -96,7 +96,7 @@ class SelectBondMoreViewModel(
             feeConstructor = { token ->
                 val amountInPlanks = token.planksFromAmount(amount)
 
-                bondMoreInteractor.estimateFee(amountInPlanks)
+                bondMoreInteractor.estimateFee(amountInPlanks, accountStakingFlow.first())
             },
             onRetryCancelled = ::backClicked
         )

@@ -9,19 +9,48 @@ import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import kotlinx.coroutines.flow.Flow
-import java.math.BigInteger
 
-typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: AccountId) -> Unit
+typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: SubmissionOrigin) -> Unit
 
-typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: AccountId) -> Unit
+typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: SubmissionOrigin) -> Unit
 typealias FormMultiExtrinsic = suspend CallBuilder.() -> Unit
 
-typealias ExtrinsicHash = String
+class SubmissionOrigin(
+    /**
+     * Origin that was originally requested to sign the transaction
+     */
+    val requestedOrigin: AccountId,
 
-class ExtrinsicSubmission(val hash: String, val origin: AccountId)
+    /**
+     * Origin that was actually used to sign the transaction.
+     * It might differ from [requestedOrigin] if [Signer] modified the origin, for example in the case of Proxied wallet
+     */
+    val actualOrigin: AccountId
+) {
+
+    companion object {
+
+        fun singleOrigin(origin: AccountId) = SubmissionOrigin(origin, origin)
+    }
+}
+
+class ExtrinsicSubmission(val hash: String, val submissionOrigin: SubmissionOrigin)
 
 interface ExtrinsicService {
+
+    suspend fun submitExtrinsic(
+        chain: Chain,
+        origin: TransactionOrigin,
+        formExtrinsic: FormExtrinsicWithOrigin,
+    ): Result<ExtrinsicSubmission>
+
+    suspend fun submitAndWatchExtrinsic(
+        chain: Chain,
+        origin: TransactionOrigin,
+        formExtrinsic: FormExtrinsicWithOrigin,
+    ): Result<Flow<ExtrinsicStatus>>
 
     suspend fun submitMultiExtrinsicAwaitingInclusion(
         chain: Chain,
@@ -29,53 +58,21 @@ interface ExtrinsicService {
         formExtrinsic: FormMultiExtrinsicWithOrigin,
     ): RetriableMultiResult<ExtrinsicStatus.InBlock>
 
-    @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated("Use submitExtrinsicWithSelectedWalletV2 instead")
-    suspend fun submitExtrinsicWithSelectedWallet(
-        chain: Chain,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<ExtrinsicHash> = submitExtrinsicWithSelectedWalletV2(chain, formExtrinsic)
-        .map { it.hash }
-
-    suspend fun submitExtrinsicWithSelectedWalletV2(
-        chain: Chain,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<ExtrinsicSubmission>
-
-    suspend fun submitAndWatchExtrinsicWithSelectedWallet(
-        chain: Chain,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Flow<ExtrinsicStatus>
-
-    suspend fun submitExtrinsicWithAnySuitableWallet(
-        chain: Chain,
-        accountId: ByteArray,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<ExtrinsicHash>
-
-    suspend fun submitAndWatchExtrinsicAnySuitableWallet(
-        chain: Chain,
-        accountId: ByteArray,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Flow<ExtrinsicStatus>
-
     suspend fun paymentInfo(
         chain: Chain,
+        origin: TransactionOrigin,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): FeeResponse
 
     suspend fun estimateFee(
         chain: Chain,
-        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
-    ): BigInteger
-
-    suspend fun estimateFeeV2(
-        chain: Chain,
+        origin: TransactionOrigin,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Fee
 
     suspend fun estimateMultiFee(
         chain: Chain,
+        origin: TransactionOrigin,
         formExtrinsic: FormMultiExtrinsic,
     ): Fee
 

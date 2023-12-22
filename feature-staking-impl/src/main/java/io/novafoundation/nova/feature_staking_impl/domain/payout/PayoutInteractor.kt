@@ -25,7 +25,7 @@ class PayoutInteractor(
 
     suspend fun estimatePayoutFee(payouts: List<Payout>): Fee {
         return withContext(Dispatchers.IO) {
-            extrinsicService.estimateMultiFee(stakingSharedState.chain()) {
+            extrinsicService.estimateMultiFee(stakingSharedState.chain(), TransactionOrigin.SelectedWallet) {
                 payoutMultiple(payouts)
             }
         }

@@ -18,32 +18,30 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 /**
- * Fetch meta account where
- * accountId = meta.substrateAccountId
- * or hex(accountId) = meta.ethereumAddress
- * or there is a child chain account which have child.accountId = accountId
+ * Fetch meta account where either
+ * 1. chain account for specified chain is present and its accountId matches
+ * 2. chain account for specified is missing but one of base accountIds matches
+ *
+ * Note that if both chain account and base accounts are present than we should filter out entries where chain account matches but base accounts does not
  */
 @Language("RoomSql")
 private const val FIND_BY_ADDRESS_WHERE_CLAUSE = """
-        WHERE substrateAccountId = :accountId
-        OR ethereumAddress = :accountId
-        OR  id = (
-            SELECT id FROM meta_accounts AS m
-                INNER JOIN chain_accounts as c ON m.id = c.metaId
-                WHERE  c.accountId = :accountId
-            )
-        ORDER BY (CASE WHEN isSelected THEN 0 ELSE 1 END)
+    LEFT JOIN chain_accounts as c ON m.id = c.metaId
+    WHERE
+    (c.chainId = :chainId  AND c.accountId IS NOT NULL AND c.accountId = :accountId)
+    OR (c.accountId IS NULL AND (substrateAccountId = :accountId OR ethereumAddress = :accountId))
+    ORDER BY (CASE WHEN isSelected THEN 0 ELSE 1 END)
     """
 
 @Language("RoomSql")
 private const val FIND_ACCOUNT_BY_ADDRESS_QUERY = """
-            SELECT * FROM meta_accounts 
+            SELECT * FROM meta_accounts as m
             $FIND_BY_ADDRESS_WHERE_CLAUSE
 """
 
 @Language("RoomSql")
 private const val FIND_NAME_BY_ADDRESS_QUERY = """
-            SELECT name FROM meta_accounts 
+            SELECT name FROM meta_accounts as m
             $FIND_BY_ADDRESS_WHERE_CLAUSE
 """
 
@@ -153,14 +151,14 @@ interface MetaAccountDao {
     fun metaAccountInfoFlow(metaId: Long): Flow<RelationJoinedMetaAccountInfo?>
 
     @Query("SELECT EXISTS ($FIND_ACCOUNT_BY_ADDRESS_QUERY)")
-    fun isMetaAccountExists(accountId: AccountId): Boolean
+    fun isMetaAccountExists(accountId: AccountId, chainId: String): Boolean
 
     @Query(FIND_ACCOUNT_BY_ADDRESS_QUERY)
     @Transaction
-    fun getMetaAccountInfo(accountId: AccountId): RelationJoinedMetaAccountInfo?
+    fun getMetaAccountInfo(accountId: AccountId, chainId: String): RelationJoinedMetaAccountInfo?
 
     @Query(FIND_NAME_BY_ADDRESS_QUERY)
-    fun metaAccountNameFor(accountId: AccountId): String?
+    fun metaAccountNameFor(accountId: AccountId, chainId: String): String?
 
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
     suspend fun updateName(metaId: Long, newName: String)

@@ -135,7 +135,7 @@ class ConfirmPayoutViewModel(
     }
 
     private fun loadFee() {
-        feeLoaderMixin.loadFeeV2(
+        feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
             feeConstructor = {
                 payoutInteractor.estimatePayoutFee(payouts)

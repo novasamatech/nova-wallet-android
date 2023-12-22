@@ -110,7 +110,7 @@ class ConfirmRebondViewModel(
             feeConstructor = { token ->
                 val amountInPlanks = token.planksFromAmount(payload.amount)
 
-                rebondInteractor.estimateFee(amountInPlanks)
+                rebondInteractor.estimateFee(amountInPlanks, accountStakingFlow.first())
             },
             onRetryCancelled = ::backClicked
         )

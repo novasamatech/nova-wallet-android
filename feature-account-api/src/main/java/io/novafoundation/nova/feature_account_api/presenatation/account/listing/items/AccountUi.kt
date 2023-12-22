@@ -7,6 +7,7 @@ class AccountUi(
     val title: CharSequence,
     val subtitle: CharSequence,
     val isSelected: Boolean,
+    val isEditable: Boolean,
     val isClickable: Boolean,
     val picture: Drawable,
     val chainIconUrl: String?,

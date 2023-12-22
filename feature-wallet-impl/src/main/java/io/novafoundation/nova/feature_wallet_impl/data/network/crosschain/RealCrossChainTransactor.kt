@@ -5,7 +5,9 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -68,7 +70,7 @@ class RealCrossChainTransactor(
     }
 
     override suspend fun estimateOriginFee(configuration: CrossChainTransferConfiguration, transfer: AssetTransfer): Fee {
-        return extrinsicService.estimateFeeV2(transfer.originChain) {
+        return extrinsicService.estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet) {
             crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
         }
     }
@@ -77,8 +79,8 @@ class RealCrossChainTransactor(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransfer,
         crossChainFee: BigInteger
-    ): Result<*> {
-        return extrinsicService.submitExtrinsicWithSelectedWallet(transfer.originChain) {
+    ): Result<ExtrinsicSubmission> {
+        return extrinsicService.submitExtrinsic(transfer.originChain, TransactionOrigin.SelectedWallet) {
             crossChainTransfer(configuration, transfer, crossChainFee)
         }
     }
