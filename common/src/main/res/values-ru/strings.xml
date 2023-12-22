@@ -597,6 +597,8 @@
     <string name="network_status_connecting">Подключение…</string>
     <string name="nft_collection">Коллекция</string>
     <string name="nft_created_by">Создатель</string>
+    <string name="nft_fungile_price" formatted="false">%s за %s</string>
+    <string name="nft_issuance_fungible_format" formatted="false">%s единиц из %s</string>
     <string name="nft_issuance_limited_format" formatted="false">#%s Издание из %s</string>
     <string name="nft_issuance_unlimited">Неограниченная серия</string>
     <string name="nft_owned_by">Владелец</string>

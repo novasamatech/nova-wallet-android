@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
                 android:textColor="@color/text_primary"
-                tools:text="10 Units of 1000" />
+                tools:text="10 DOT" />
 
             <TextView
                 android:id="@+id/itemNftPriceFiat"
