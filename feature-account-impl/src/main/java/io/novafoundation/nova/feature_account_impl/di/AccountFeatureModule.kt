@@ -55,7 +55,6 @@ import io.novafoundation.nova.feature_account_impl.data.network.blockchain.Accou
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
-import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealProxyRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource

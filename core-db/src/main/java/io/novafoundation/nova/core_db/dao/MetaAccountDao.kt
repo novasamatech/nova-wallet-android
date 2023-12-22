@@ -103,9 +103,6 @@ interface MetaAccountDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertProxy(proxyLocal: ProxyAccountLocal)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProxies(proxiesLocal: List<ProxyAccountLocal>)
-
     @Query("SELECT * FROM meta_accounts")
     fun getMetaAccounts(): List<MetaAccountLocal>
 
@@ -127,6 +124,9 @@ interface MetaAccountDao {
 
     @Query(META_ACCOUNT_WITH_BALANCE_QUERY)
     fun metaAccountWithBalanceFlow(metaId: Long): Flow<List<MetaAccountWithBalanceLocal>>
+
+    @Query("SELECT * FROM chain_accounts")
+    fun observeChainAccounts(): Flow<List<ChainAccountLocal>>
 
     @Query("SELECT * FROM proxy_accounts")
     suspend fun getAllProxyAccounts(): List<ProxyAccountLocal>

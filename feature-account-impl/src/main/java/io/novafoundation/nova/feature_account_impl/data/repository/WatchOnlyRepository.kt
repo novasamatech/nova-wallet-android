@@ -14,62 +14,12 @@ class WatchWalletSuggestion(
 
 interface WatchOnlyRepository {
 
-    suspend fun changeWatchChainAccount(
-        metaId: Long,
-        chainId: ChainId,
-        accountId: AccountId
-    )
-
-    suspend fun addWatchWallet(
-        name: String,
-        substrateAccountId: AccountId,
-        ethereumAccountId: AccountId?
-    ): Long
-
     suspend fun watchWalletSuggestions(): List<WatchWalletSuggestion>
 }
 
 class RealWatchOnlyRepository(
     private val accountDao: MetaAccountDao
 ) : WatchOnlyRepository {
-
-    override suspend fun changeWatchChainAccount(
-        metaId: Long,
-        chainId: ChainId,
-        accountId: AccountId
-    ) {
-        val chainAccount = ChainAccountLocal(
-            metaId = metaId,
-            chainId = chainId,
-            accountId = accountId,
-            cryptoType = null,
-            publicKey = null
-        )
-
-        accountDao.insertChainAccount(chainAccount)
-    }
-
-    override suspend fun addWatchWallet(
-        name: String,
-        substrateAccountId: AccountId,
-        ethereumAccountId: AccountId?
-    ): Long {
-        val metaAccount = MetaAccountLocal(
-            substratePublicKey = null,
-            substrateCryptoType = null,
-            substrateAccountId = substrateAccountId,
-            ethereumPublicKey = null,
-            ethereumAddress = ethereumAccountId,
-            name = name,
-            parentMetaId = null,
-            isSelected = false,
-            position = accountDao.nextAccountPosition(),
-            type = MetaAccountLocal.Type.WATCH_ONLY,
-            status = MetaAccountLocal.Status.ACTIVE
-        )
-
-        return accountDao.insertMetaAccount(metaAccount)
-    }
 
     override suspend fun watchWalletSuggestions(): List<WatchWalletSuggestion> {
         return listOf(

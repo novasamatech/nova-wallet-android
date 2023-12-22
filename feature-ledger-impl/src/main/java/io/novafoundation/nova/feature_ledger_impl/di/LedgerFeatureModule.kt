@@ -10,7 +10,7 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
-import io.novafoundation.nova.feature_ledger_impl.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.data.repository.RealLedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.RealSelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor

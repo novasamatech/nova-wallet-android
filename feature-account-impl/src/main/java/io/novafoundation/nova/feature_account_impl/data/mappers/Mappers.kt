@@ -119,13 +119,7 @@ fun mapMetaAccountLocalToMetaAccount(
     val chainAccounts = joinedMetaAccountInfo.chainAccounts.associateBy(
         keySelector = ChainAccountLocal::chainId,
         valueTransform = {
-            MetaAccount.ChainAccount(
-                metaId = joinedMetaAccountInfo.metaAccount.id,
-                publicKey = it.publicKey,
-                chainId = it.chainId,
-                accountId = it.accountId,
-                cryptoType = it.cryptoType
-            )
+            mapChainAccountFromLocal(it)
         }
     ).filterNotNull()
 
@@ -166,6 +160,18 @@ fun mapMetaAccountLocalToLightMetaAccount(
             name = name,
             type = mapMetaAccountTypeFromLocal(type),
             status = mapMetaAccountStateFromLocal(status)
+        )
+    }
+}
+
+fun mapChainAccountFromLocal(chainAccountLocal: ChainAccountLocal): MetaAccount.ChainAccount {
+    return with(chainAccountLocal) {
+        MetaAccount.ChainAccount(
+            metaId = metaId,
+            publicKey = publicKey,
+            chainId = chainId,
+            accountId = accountId,
+            cryptoType = cryptoType
         )
     }
 }
