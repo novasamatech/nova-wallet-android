@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmT
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -74,6 +75,8 @@ interface AccountFeatureApi {
     fun onChainIdentityProvider(): IdentityProvider
 
     fun proxySyncService(): ProxySyncService
+
+    fun ledgerAddAccountRepository(): LedgerAddAccountRepository
 
     val evmTransactionService: EvmTransactionService
 

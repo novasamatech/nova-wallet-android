@@ -20,8 +20,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
  */
 class ProxiedAddAccountRepository(
     private val accountDao: MetaAccountDao,
-    private val chainRegistry: ChainRegistry,
-    private val proxySyncService: ProxySyncService,
+    private val chainRegistry: ChainRegistry
 ) : AddAccountRepository<ProxiedAddAccountRepository.Payload> {
 
     class Payload(

@@ -1,3 +1,8 @@
 package io.novafoundation.nova.feature_ledger_api.di
 
-interface LedgerFeatureApi
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
+
+interface LedgerFeatureApi {
+
+    val ledgerRepository: LedgerRepository
+}

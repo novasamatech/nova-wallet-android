@@ -56,10 +56,8 @@ class LedgerFeatureModule {
     @Provides
     @FeatureScope
     fun provideRepository(
-        metaAccountDao: MetaAccountDao,
-        chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2
-    ): LedgerRepository = RealLedgerRepository(metaAccountDao, chainRegistry, secretStoreV2)
+    ): LedgerRepository = RealLedgerRepository(secretStoreV2)
 
     @Provides
     fun provideLedgerMessagePresentable(): LedgerMessagePresentable = SingleSheetLedgerMessagePresentable()

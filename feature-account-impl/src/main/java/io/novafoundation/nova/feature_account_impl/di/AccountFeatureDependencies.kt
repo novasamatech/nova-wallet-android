@@ -32,6 +32,7 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
@@ -116,6 +117,8 @@ interface AccountFeatureDependencies {
     fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
 
     fun computationalCache(): ComputationalCache
+
+    val ledgerRepository: LedgerRepository
 
     val systemCallExecutor: SystemCallExecutor
 

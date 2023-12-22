@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.AddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.RealAddLedgerChainAccountInteractor
@@ -27,8 +28,9 @@ class AddLedgerChainAccountSelectAddressModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
+        ledgerAddAccountRepository: LedgerAddAccountRepository,
         repository: LedgerRepository
-    ): AddLedgerChainAccountInteractor = RealAddLedgerChainAccountInteractor(repository)
+    ): AddLedgerChainAccountInteractor = RealAddLedgerChainAccountInteractor(ledgerAddAccountRepository, repository)
 
     @Provides
     @ScreenScope

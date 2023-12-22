@@ -75,6 +75,10 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -113,7 +117,8 @@ import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
         ProxySigningModule::class,
         ParitySignerModule::class,
         IdentityProviderModule::class,
-        AdvancedEncryptionStoreModule::class
+        AdvancedEncryptionStoreModule::class,
+        AddAccountsModule::class
     ]
 )
 class AccountFeatureModule {
@@ -139,14 +144,16 @@ class AccountFeatureModule {
         accounRepository: AccountRepository,
         metaAccountDao: MetaAccountDao,
         @OnChainIdentity identityProvider: IdentityProvider,
-        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository: ProxiedAddAccountRepository
     ): ProxySyncService = RealProxySyncService(
         chainRegistry,
         proxyRepository,
         accounRepository,
         metaAccountDao,
         identityProvider,
-        metaAccountsUpdatesRegistry
+        metaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository
     )
 
     @Provides
@@ -327,24 +334,17 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAddAccountRepository(
-        accountDataSource: AccountDataSource,
-        accountSecretsFactory: AccountSecretsFactory,
-        jsonSeedDecoder: JsonSeedDecoder,
-        chainRegistry: ChainRegistry,
-    ) = AddAccountRepository(
-        accountDataSource,
-        accountSecretsFactory,
-        jsonSeedDecoder,
-        chainRegistry
-    )
-
-    @Provides
-    @FeatureScope
     fun provideAddAccountInteractor(
-        addAccountRepository: AddAccountRepository,
+        mnemonicAddAccountRepository: MnemonicAddAccountRepository,
+        jsonAddAccountRepository: JsonAddAccountRepository,
+        seedAddAccountRepository: SeedAddAccountRepository,
         accountRepository: AccountRepository,
-    ) = AddAccountInteractor(addAccountRepository, accountRepository)
+    ) = AddAccountInteractor(
+        mnemonicAddAccountRepository,
+        jsonAddAccountRepository,
+        seedAddAccountRepository,
+        accountRepository
+    )
 
     @Provides
     @FeatureScope

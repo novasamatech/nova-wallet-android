@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchOnlyRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.change.ChangeWatchAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.change.RealChangeWatchAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -26,9 +27,8 @@ class ChangeWatchAccountModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        watchOnlyRepository: WatchOnlyRepository,
-        accountRepository: AccountRepository
-    ): ChangeWatchAccountInteractor = RealChangeWatchAccountInteractor(accountRepository, watchOnlyRepository)
+        watchOnlyAddAccountRepository: WatchOnlyAddAccountRepository
+    ): ChangeWatchAccountInteractor = RealChangeWatchAccountInteractor(watchOnlyAddAccountRepository)
 
     @Provides
     @IntoMap
