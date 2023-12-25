@@ -18,7 +18,6 @@ class ProxyExtrinsicValidationRequestBusHandler(
     private val scope: RootScope,
     private val proxyProxyExtrinsicValidationRequestBus: ProxyExtrinsicValidationRequestBus,
     private val proxyHaveEnoughFeeValidationFactory: ProxyHaveEnoughFeeValidationFactory,
-    private val walletRepository: WalletRepository,
     private val resourceManager: ResourceManager
 ) : RequestBusHandler {
 
