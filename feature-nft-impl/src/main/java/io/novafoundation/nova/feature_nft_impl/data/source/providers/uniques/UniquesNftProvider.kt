@@ -11,9 +11,11 @@ import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
+import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
@@ -86,8 +88,9 @@ class UniquesNftProvider(
                     instanceId = instanceId.toString(),
                     metadata = metadata,
                     type = NftLocal.Type.UNIQUES,
-                    issuanceTotal = totalIssuances.getValue(collectionId).toInt(),
+                    issuanceTotal = totalIssuances.getValue(collectionId),
                     issuanceMyEdition = instanceId.toString(),
+                    issuanceType = NftLocal.IssuanceType.LIMITED,
                     price = null,
 
                     // to load at full sync
@@ -164,13 +167,13 @@ class UniquesNftProvider(
                 NftDetails(
                     identifier = nftLocal.identifier,
                     chain = chain,
-                    owner = metaAccount.accountIdIn(chain)!!,
+                    owner = metaAccount.requireAccountIdIn(chain),
                     creator = classIssuer,
                     media = nftLocal.media,
                     name = nftLocal.name ?: nftLocal.instanceId!!,
                     description = nftLocal.label,
                     issuance = nftIssuance(nftLocal),
-                    price = nftLocal.price,
+                    price = nftPrice(nftLocal),
                     collection = collection
                 )
             }

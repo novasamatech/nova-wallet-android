@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatNftPrice
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.catch
@@ -76,9 +76,7 @@ class NftDetailsViewModel(
             name = nftDetails.name,
             issuance = resourceManager.formatIssuance(nftDetails.issuance),
             description = nftDetails.description,
-            price = pricedNftDetails.price?.let {
-                mapAmountToAmountModel(it.amount, it.token)
-            },
+            price = resourceManager.formatNftPrice(pricedNftDetails.nftDetails.price, pricedNftDetails.priceToken),
             collection = nftDetails.collection?.let {
                 NftDetailsModel.Collection(
                     name = it.name ?: it.id,
