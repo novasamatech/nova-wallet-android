@@ -28,6 +28,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
+import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
+import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
@@ -145,7 +147,8 @@ class PolkadotExternalSignInteractor(
 
         val chain = signPayload.chainOrNull() ?: return@withContext null
 
-        val extrinsicBuilder = signPayload.toExtrinsicBuilderWithoutCall(forFee = true)
+        val signer = signPayload.feeSigner()
+        val extrinsicBuilder = signPayload.toExtrinsicBuilderWithoutCall(signer)
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val extrinsic = when (val callRepresentation = signPayload.callRepresentation(runtime)) {
@@ -153,7 +156,7 @@ class PolkadotExternalSignInteractor(
             is CallRepresentation.Bytes -> extrinsicBuilder.build(rawCallBytes = callRepresentation.bytes)
         }
 
-        extrinsicService.estimateFee(chain, extrinsic)
+        extrinsicService.estimateFee(chain, extrinsic, signer)
     }
 
     private fun readableBytesContent(signBytesPayload: PolkadotSignPayload.Raw): String {
@@ -183,7 +186,8 @@ class PolkadotExternalSignInteractor(
 
     private suspend fun signExtrinsic(extrinsicPayload: PolkadotSignPayload.Json): String {
         val runtime = chainRegistry.getRuntime(extrinsicPayload.chain().id)
-        val extrinsicBuilder = extrinsicPayload.toExtrinsicBuilderWithoutCall(forFee = false)
+        val signer = resolveWalletSigner()
+        val extrinsicBuilder = extrinsicPayload.toExtrinsicBuilderWithoutCall(signer)
 
         return when (val callRepresentation = extrinsicPayload.callRepresentation(runtime)) {
             is CallRepresentation.Instance -> extrinsicBuilder.call(callRepresentation.call).buildSignature()
@@ -191,20 +195,18 @@ class PolkadotExternalSignInteractor(
         }
     }
 
-    private suspend fun PolkadotSignPayload.Json.toExtrinsicBuilderWithoutCall(
-        forFee: Boolean
-    ): ExtrinsicBuilder {
+    private suspend fun PolkadotSignPayload.Json.feeSigner(): FeeSigner {
+        val chain = chain()
+
+        return signerProvider.feeSigner(resolveMetaAccount(), chain)
+    }
+
+    private suspend fun PolkadotSignPayload.Json.toExtrinsicBuilderWithoutCall(signer: NovaSigner): ExtrinsicBuilder {
         val chain = chain()
         val runtime = chainRegistry.getRuntime(genesisHash)
         val parsedExtrinsic = parseDAppExtrinsic(runtime, this)
 
         val accountId = chain.accountIdOf(address)
-
-        val signer = if (forFee) {
-            signerProvider.feeSigner(resolveMetaAccount(), chain)
-        } else {
-            resolveWalletSigner()
-        }
 
         return with(parsedExtrinsic) {
             ExtrinsicBuilder(

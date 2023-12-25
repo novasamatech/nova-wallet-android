@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +50,8 @@ class NominationPoolsConfirmUnbondViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
+    private val decimalFee = mapFeeFromParcel(payload.fee)
+
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
@@ -66,7 +69,7 @@ class NominationPoolsConfirmUnbondViewModel(
         .shareInBackground()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(payload.fee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee.networkFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -102,7 +105,7 @@ class NominationPoolsConfirmUnbondViewModel(
         val stakedBalance = asset.token.amountFromPlanks(stakedBalance.first())
 
         val payload = NominationPoolsUnbondValidationPayload(
-            fee = payload.fee,
+            fee = decimalFee,
             amount = payload.amount,
             poolMember = poolMemberFlow.first(),
             asset = asset,

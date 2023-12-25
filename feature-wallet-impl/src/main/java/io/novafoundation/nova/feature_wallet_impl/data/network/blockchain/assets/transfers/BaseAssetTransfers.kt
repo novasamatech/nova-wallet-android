@@ -90,7 +90,7 @@ abstract class BaseAssetTransfers(
         recipientCanAcceptTransfer(assetSourceRegistry)
     }
 
-    protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(
+    private fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(
         assetSourceRegistry = assetSourceRegistry,
         fee = { it.originFeeInUsedAsset },
         extraAmount = { it.transfer.amount },

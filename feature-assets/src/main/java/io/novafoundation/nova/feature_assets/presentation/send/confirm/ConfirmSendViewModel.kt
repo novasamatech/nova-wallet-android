@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -47,7 +48,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class ConfirmSendChainsModel(
     val origin: ChainUi,
@@ -75,6 +75,7 @@ class ConfirmSendViewModel(
     Validatable by validationExecutor {
 
     private val originFee = mapFeeFromParcel(transferDraft.originFee)
+    private val crossChainFee = transferDraft.crossChainFee?.let(::mapFeeFromParcel)
 
     private val originChain by lazyAsync { chainRegistry.getChain(transferDraft.origin.chainId) }
     private val originAsset by lazyAsync { chainRegistry.asset(transferDraft.origin.chainId, transferDraft.origin.chainAssetId) }
@@ -185,8 +186,8 @@ class ConfirmSendViewModel(
     }
 
     private fun setInitialState() = launch {
-        originFeeMixin.setFee(originFee.fee)
-        crossChainFeeMixin.setFee(transferDraft.crossChainFee)
+        originFeeMixin.setFee(originFee.networkFee)
+        crossChainFeeMixin.setFee(crossChainFee?.networkFee)
     }
 
     private suspend fun createAddressModel(
@@ -204,8 +205,8 @@ class ConfirmSendViewModel(
 
     private fun performTransfer(
         transfer: WeightedAssetTransfer,
-        originFee: BigDecimal,
-        crossChainFee: BigDecimal?
+        originFee: DecimalFee,
+        crossChainFee: DecimalFee?
     ) = launch {
         sendInteractor.performTransfer(transfer, originFee, crossChainFee)
             .onSuccess {
@@ -246,10 +247,10 @@ class ConfirmSendViewModel(
                 commissionAssetToken = commissionAssetFlow.first().token,
                 decimalFee = originFee,
             ),
-            originFee = originFee.networkFeeDecimalAmount,
+            originFee = originFee,
             originCommissionAsset = commissionAssetFlow.first(),
             originUsedAsset = assetFlow.first(),
-            crossChainFee = transferDraft.crossChainFee
+            crossChainFee = crossChainFee
         )
     }
 

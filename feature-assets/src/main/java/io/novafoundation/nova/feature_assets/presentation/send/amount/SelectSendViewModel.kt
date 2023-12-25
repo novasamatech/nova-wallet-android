@@ -190,8 +190,8 @@ class SelectSendViewModel(
                 assetTransfer = transfer,
                 fee = originFee,
             ),
-            crossChainFee = crossChainFee?.networkFeeDecimalAmount,
-            originFee = originFee.networkFeeDecimalAmount,
+            crossChainFee = crossChainFee,
+            originFee = originFee,
             originCommissionAsset = commissionAssetFlow.first(),
             originUsedAsset = originAssetFlow.first()
         )
@@ -334,7 +334,7 @@ class SelectSendViewModel(
                 chainAssetId = validPayload.transfer.destinationChainAsset.id
             ),
             recipientAddress = validPayload.transfer.recipient,
-            crossChainFee = validPayload.crossChainFee,
+            crossChainFee = validPayload.crossChainFee?.let(::mapFeeToParcel),
             openAssetDetailsOnCompletion = payload is SendPayload.SpecifiedOrigin
         )
 

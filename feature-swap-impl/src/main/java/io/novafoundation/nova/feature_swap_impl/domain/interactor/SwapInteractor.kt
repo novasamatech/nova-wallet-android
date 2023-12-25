@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.incomingCrossChainDirectionsAvailable
+import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -88,20 +89,20 @@ class SwapInteractor(
         return swapService.quote(quoteArgs)
     }
 
-    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs, swapFee: SwapFee): Result<ExtrinsicSubmission> = withContext(Dispatchers.IO) {
+    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs, decimalFee: GenericDecimalFee<SwapFee>): Result<ExtrinsicSubmission> = withContext(Dispatchers.IO) {
         swapService.swap(swapExecuteArgs)
             .onSuccess { submission ->
                 swapTransactionHistoryRepository.insertPendingSwap(
                     chainAsset = swapExecuteArgs.assetIn,
                     swapArgs = swapExecuteArgs,
-                    fee = swapFee,
+                    fee = decimalFee.genericFee,
                     txSubmission = submission
                 )
 
                 swapTransactionHistoryRepository.insertPendingSwap(
                     chainAsset = swapExecuteArgs.assetOut,
                     swapArgs = swapExecuteArgs,
-                    fee = swapFee,
+                    fee = decimalFee.genericFee,
                     txSubmission = submission
                 )
             }
@@ -174,7 +175,7 @@ class SwapInteractor(
         feeAsset: Chain.Asset,
         quoteArgs: SwapQuoteArgs,
         swapQuote: SwapQuote,
-        swapFee: SwapFee
+        swapFee: GenericDecimalFee<SwapFee>
     ): SwapValidationPayload? {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chainIn = chainRegistry.getChain(swapQuote.assetIn.chainId)
@@ -199,7 +200,7 @@ class SwapInteractor(
             ),
             slippage = quoteArgs.slippage,
             feeAsset = walletRepository.getAsset(metaAccount.id, feeAsset) ?: return null,
-            swapFee = swapFee,
+            decimalFee = swapFee,
             swapQuote = swapQuote,
             swapQuoteArgs = quoteArgs,
             swapExecuteArgs = executeArgs

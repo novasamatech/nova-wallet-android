@@ -7,17 +7,18 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
+import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.TooSmallRemainingBalance
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.AmountOutIsTooLowToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.FeeChangeDetected
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InsufficientBalance
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.AmountOutIsTooLowToStayAboveED
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NotEnoughLiquidity
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NonPositiveAmount
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NewRateExceededSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InvalidSlippage
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NewRateExceededSlippage
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NonPositiveAmount
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NotEnoughFunds
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NotEnoughLiquidity
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.TooSmallRemainingBalance
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
@@ -28,9 +29,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatT
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CoroutineScope
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlinx.coroutines.CoroutineScope
 
 fun CoroutineScope.mapSwapValidationFailureToUI(
     resourceManager: ResourceManager,
@@ -85,7 +86,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             message = resourceManager.getString(
                 R.string.swap_failure_too_small_remaining_balance_with_buy_ed_message,
                 reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
-                reason.fee.amount.formatPlanks(reason.feeAsset),
+                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset),
                 reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
                 reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
                 reason.nativeAsset.symbol,
@@ -101,7 +102,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             message = resourceManager.getString(
                 R.string.swap_failure_insufficient_balance_message,
                 reason.maxSwapAmount.formatPlanks(reason.assetIn),
-                reason.fee.amount.formatPlanks(reason.feeAsset)
+                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset)
             ),
             resourceManager = resourceManager,
             positiveButtonClick = amountInSwapMaxAction
@@ -112,7 +113,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             message = resourceManager.getString(
                 R.string.swap_failure_insufficient_balance_with_buy_ed_message,
                 reason.maxSwapAmount.formatPlanks(reason.assetIn),
-                reason.fee.amount.formatPlanks(reason.feeAsset),
+                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset),
                 reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
                 reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
                 reason.nativeAsset.symbol
@@ -126,7 +127,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             resourceManager.getString(
                 R.string.swap_failure_balance_not_consider_consumers,
                 reason.existentialDeposit.formatPlanks(reason.nativeAsset),
-                reason.swapFee.networkFee.amount.formatPlanks(reason.feeAsset)
+                reason.swapFee.networkFee.amountByRequestedAccount.formatPlanks(reason.feeAsset)
             )
         ).asDefault()
 

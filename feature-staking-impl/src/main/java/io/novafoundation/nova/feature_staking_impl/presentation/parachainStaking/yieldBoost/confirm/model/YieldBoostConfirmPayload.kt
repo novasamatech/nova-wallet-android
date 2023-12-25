@@ -3,15 +3,15 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import android.os.Parcelable
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostConfiguration
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.CollatorParcelModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
 import kotlinx.android.parcel.Parcelize
-import java.math.BigDecimal
 import java.math.BigInteger
 
 @Parcelize
 class YieldBoostConfirmPayload(
     val collator: CollatorParcelModel,
     val configurationParcel: YieldBoostConfigurationParcel,
-    val fee: BigDecimal,
+    val fee: FeeParcelModel,
 ) : Parcelable
 
 sealed class YieldBoostConfigurationParcel(open val collatorIdHex: String) : Parcelable {

@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedFeeS
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySignerFactory
-import io.novafoundation.nova.runtime.extrinsic.signer.DefaultFeeSigner
+import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -33,13 +33,13 @@ internal class RealSignerProvider(
         }
     }
 
-    override fun feeSigner(metaAccount: MetaAccount, chain: Chain): NovaSigner {
+    override fun feeSigner(metaAccount: MetaAccount, chain: Chain): FeeSigner {
         return when (metaAccount.type) {
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.WATCH_ONLY,
             LightMetaAccount.Type.PARITY_SIGNER,
             LightMetaAccount.Type.POLKADOT_VAULT,
-            LightMetaAccount.Type.LEDGER -> DefaultFeeSigner(chain)
+            LightMetaAccount.Type.LEDGER -> DefaultFeeSigner(metaAccount, chain)
 
             LightMetaAccount.Type.PROXIED -> proxiedFeeSignerFactory.create(metaAccount, chain, this)
         }

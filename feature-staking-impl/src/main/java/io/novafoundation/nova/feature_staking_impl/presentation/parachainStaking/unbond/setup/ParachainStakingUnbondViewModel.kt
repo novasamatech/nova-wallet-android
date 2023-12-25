@@ -36,7 +36,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModel
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
@@ -206,31 +209,31 @@ class ParachainStakingUnbondViewModel(
         }
     }
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val payload = ParachainStakingUnbondValidationPayload(
-                amount = amountChooserMixin.amount.first(),
-                fee = fee,
-                asset = assetFlow.first(),
-                collator = selectedCollatorFlow.first()
-            )
+    private fun maybeGoToNext() = launch {
+        validationInProgress.value = true
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { parachainStakingUnbondValidationFailure(it, resourceManager) },
-                autoFixPayload = ::parachainStakingUnbondPayloadAutoFix,
-                progressConsumer = validationInProgress.progressConsumer()
-            ) { fixedPayload ->
-                validationInProgress.value = false
+        val payload = ParachainStakingUnbondValidationPayload(
+            amount = amountChooserMixin.amount.first(),
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            asset = assetFlow.first(),
+            collator = selectedCollatorFlow.first()
+        )
 
-                goToNextStep(fee = fee, amount = fixedPayload.amount, collator = fixedPayload.collator)
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { parachainStakingUnbondValidationFailure(it, resourceManager) },
+            autoFixPayload = ::parachainStakingUnbondPayloadAutoFix,
+            progressConsumer = validationInProgress.progressConsumer()
+        ) { fixedPayload ->
+            validationInProgress.value = false
+
+            goToNextStep(fee = fixedPayload.fee, amount = fixedPayload.amount, collator = fixedPayload.collator)
         }
     }
 
     private fun goToNextStep(
-        fee: BigDecimal,
+        fee: DecimalFee,
         amount: BigDecimal,
         collator: Collator,
     ) = launch {
@@ -238,15 +241,10 @@ class ParachainStakingUnbondViewModel(
             ParachainStakingUnbondConfirmPayload(
                 collator = mapCollatorToCollatorParcelModel(collator),
                 amount = amount,
-                fee = fee
+                fee = mapFeeToParcel(fee)
             )
         }
 
         router.openConfirmUnbond(payload)
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 }

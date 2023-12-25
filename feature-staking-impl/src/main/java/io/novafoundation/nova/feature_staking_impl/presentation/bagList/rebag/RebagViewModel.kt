@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.mo
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanksRange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
@@ -111,8 +112,12 @@ class RebagViewModel(
 
     private fun rebagIfValid() {
         launch {
-            val fee = originFeeMixin.awaitFee()
-            val validationPayload = RebagValidationPayload(fee, stashAsset.first())
+            _showNextProgress.value = true
+
+            val validationPayload = RebagValidationPayload(
+                fee = originFeeMixin.awaitDecimalFee(),
+                asset = stashAsset.first()
+            )
 
             validationExecutor.requireValid(
                 validationSystem = validationSystem,

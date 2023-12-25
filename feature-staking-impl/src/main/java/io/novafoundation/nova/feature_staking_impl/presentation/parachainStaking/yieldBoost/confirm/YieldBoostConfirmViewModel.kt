@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -68,6 +69,8 @@ class YieldBoostConfirmViewModel(
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
+
+    private val decimalFee = mapFeeFromParcel(payload.fee)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -138,14 +141,14 @@ class YieldBoostConfirmViewModel(
     }
 
     private fun setInitialFee() = launch {
-        feeLoaderMixin.setFee(payload.fee)
+        feeLoaderMixin.setFee(decimalFee.networkFee)
     }
 
     private fun sendTransactionIfValid() = launch {
         val payload = YieldBoostValidationPayload(
             collator = collator(),
             configuration = yieldBoostConfiguration(),
-            fee = payload.fee,
+            fee = decimalFee,
             activeTasks = activeTasksFlow.first(),
             asset = assetFlow.first()
         )

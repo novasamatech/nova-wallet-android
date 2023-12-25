@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
+import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -16,7 +17,7 @@ interface InsufficientBalanceToStayAboveEDError {
 
 class EnoughBalanceToStayAboveEDValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val fee: AmountProducer<P>,
+    private val fee: FeeProducer<P>,
     private val balance: AmountProducer<P>,
     private val chainWithAsset: (P) -> ChainWithAsset,
     private val error: (P, BigDecimal) -> E
@@ -26,7 +27,7 @@ class EnoughBalanceToStayAboveEDValidation<P, E>(
         val chain = chainWithAsset(value).chain
         val asset = chainWithAsset(value).asset
         val existentialDeposit = assetSourceRegistry.existentialDeposit(chain, asset)
-        return validOrError(balance(value) - fee(value) >= existentialDeposit) {
+        return validOrError(balance(value) - fee(value).networkFeeByRequestedAccountOrZero >= existentialDeposit) {
             error(value, existentialDeposit)
         }
     }
@@ -35,7 +36,7 @@ class EnoughBalanceToStayAboveEDValidation<P, E>(
 class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry: AssetSourceRegistry) {
 
     fun <P, E> create(
-        fee: AmountProducer<P>,
+        fee: FeeProducer<P>,
         balance: AmountProducer<P>,
         chainWithAsset: (P) -> ChainWithAsset,
         error: (P, BigDecimal) -> E
@@ -52,7 +53,7 @@ class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry:
 
 context(ValidationSystemBuilder<P, E>)
 fun <P, E> EnoughTotalToStayAboveEDValidationFactory.validate(
-    fee: AmountProducer<P>,
+    fee: FeeProducer<P>,
     balance: AmountProducer<P>,
     chainWithAsset: (P) -> ChainWithAsset,
     error: (P, BigDecimal) -> E

@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
@@ -48,7 +50,8 @@ private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
     private val computationalCache: ComputationalCache,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val accountRepository: AccountRepository,
 ) : SwapService {
 
     override suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean = withContext(Dispatchers.Default) {
@@ -56,8 +59,11 @@ internal class RealSwapService(
 
         val exchange = exchanges(computationScope).getValue(asset.chainId)
         val isCustomFeeToken = !asset.isCommissionAsset
+        val currentMetaAccount = accountRepository.getSelectedMetaAccount()
 
-        isCustomFeeToken && exchange.canPayFeeInNonUtilityToken(asset)
+        // TODO we disable custom fee tokens payment for account types where current account is not the one who pays fees (e.g. it is proxied).
+        // This restriction can be removed once we consider all corner-cases
+        isCustomFeeToken && exchange.canPayFeeInNonUtilityToken(asset) && currentMetaAccount.type.requestedAccountPaysFees()
     }
 
     override suspend fun assetsAvailableForSwap(

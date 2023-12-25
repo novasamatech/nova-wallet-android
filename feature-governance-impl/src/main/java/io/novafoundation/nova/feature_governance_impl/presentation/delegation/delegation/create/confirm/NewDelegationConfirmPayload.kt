@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import android.os.Parcelable
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.android.parcel.Parcelize
@@ -15,7 +16,7 @@ class NewDelegationConfirmPayload(
     @Suppress("CanBeParameter") val trackIdsRaw: List<BigInteger>,
     val amount: BigDecimal,
     val conviction: Conviction,
-    val fee: BigDecimal,
+    val fee: FeeParcelModel,
     val isEditMode: Boolean,
 ) : Parcelable {
 

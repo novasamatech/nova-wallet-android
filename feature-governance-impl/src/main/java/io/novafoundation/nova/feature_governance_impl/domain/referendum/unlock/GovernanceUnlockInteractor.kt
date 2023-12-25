@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.zero
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
@@ -81,10 +80,10 @@ class RealGovernanceUnlockInteractor(
 ) : GovernanceUnlockInteractor {
 
     override suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee {
-        if (claimable == null) return Fee.zero()
-
         val governanceSelectedOption = selectedAssetState.selectedOption()
         val chain = governanceSelectedOption.assetWithChain.chain
+
+        if (claimable == null) return extrinsicService.zeroFee(chain, TransactionOrigin.SelectedWallet)
 
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val origin = metaAccount.accountIdIn(chain)!!

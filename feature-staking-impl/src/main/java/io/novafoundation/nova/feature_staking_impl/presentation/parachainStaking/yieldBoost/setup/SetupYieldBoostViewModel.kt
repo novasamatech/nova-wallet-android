@@ -53,7 +53,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -330,37 +333,37 @@ class SetupYieldBoostViewModel(
         selectedCollatorFlow.emit(mostRelevantCollator.collator)
     }
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val payload = YieldBoostValidationPayload(
-                collator = selectedCollatorFlow.first(),
-                configuration = modifiedYieldBoostConfiguration.first(),
-                fee = fee,
-                activeTasks = activeTasksFlow.first(),
-                asset = assetFlow.first()
-            )
+    private fun maybeGoToNext() = launch {
+        validationInProgressFlow.value = true
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { yieldBoostValidationFailure(it, resourceManager) },
-                progressConsumer = validationInProgressFlow.progressConsumer()
-            ) {
-                validationInProgressFlow.value = false
+        val payload = YieldBoostValidationPayload(
+            collator = selectedCollatorFlow.first(),
+            configuration = modifiedYieldBoostConfiguration.first(),
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            activeTasks = activeTasksFlow.first(),
+            asset = assetFlow.first()
+        )
 
-                goToNextStep(fee = it.fee, collator = it.collator, configuration = it.configuration)
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { yieldBoostValidationFailure(it, resourceManager) },
+            progressConsumer = validationInProgressFlow.progressConsumer()
+        ) {
+            validationInProgressFlow.value = false
+
+            goToNextStep(fee = it.fee, collator = it.collator, configuration = it.configuration)
         }
     }
 
     private fun goToNextStep(
-        fee: BigDecimal,
+        fee: DecimalFee,
         configuration: YieldBoostConfiguration,
         collator: Collator,
     ) = launch {
         val payload = withContext(Dispatchers.Default) {
             YieldBoostConfirmPayload(
-                fee = fee,
+                fee = mapFeeToParcel(fee),
                 configurationParcel = YieldBoostConfigurationParcel(configuration),
                 collator = mapCollatorToCollatorParcelModel(collator)
             )
@@ -368,11 +371,6 @@ class SetupYieldBoostViewModel(
 
         router.openConfirmYieldBoost(payload)
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 
     private fun constructActiveConfiguration(tasks: List<YieldBoostTask>, collator: Collator): YieldBoostConfiguration {
         val collatorId = collator.accountId()

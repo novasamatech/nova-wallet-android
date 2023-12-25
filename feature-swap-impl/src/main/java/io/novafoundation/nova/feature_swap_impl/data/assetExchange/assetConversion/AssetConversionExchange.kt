@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.InlineFee
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
@@ -165,6 +165,9 @@ private class AssetConversionExchange(
         }
     }
 
+    // TODO we purposefully do not `nativeTokenFee.amountByRequestedAccount`
+    // since we have disabled fee payment in custom tokens for accounts where difference matters
+    // We should adapt it if we decide to remove the restriction
     private suspend fun calculateCustomTokenFee(
         nativeTokenFee: Fee,
         nativeAsset: Asset,
@@ -197,7 +200,7 @@ private class AssetConversionExchange(
         }
 
         return AssetExchangeFee(
-            networkFee = InlineFee(toBuyNativeFee),
+            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin),
             minimumBalanceBuyIn = minimumBalanceBuyIn
         )
     }

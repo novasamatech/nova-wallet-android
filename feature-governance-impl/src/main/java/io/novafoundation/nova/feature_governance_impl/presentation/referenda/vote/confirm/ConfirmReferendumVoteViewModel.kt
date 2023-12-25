@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import io.novafoundation.nova.runtime.state.chain
@@ -120,6 +121,8 @@ class ConfirmReferendumVoteViewModel(
     }
         .shareInBackground()
 
+    private val decimalFee = mapFeeFromParcel(payload.fee)
+
     init {
         setFee()
     }
@@ -139,7 +142,7 @@ class ConfirmReferendumVoteViewModel(
             asset = assetFlow.first(),
             trackVoting = voteAssistant.trackVoting,
             voteAmount = payload.vote.amount,
-            fee = payload.fee
+            fee = decimalFee
         )
 
         validationExecutor.requireValid(
@@ -157,7 +160,7 @@ class ConfirmReferendumVoteViewModel(
     }
 
     private fun setFee() = launch {
-        originFeeMixin.setFee(payload.fee)
+        originFeeMixin.setFee(decimalFee.networkFee)
     }
 
     private fun performVote() = launch {

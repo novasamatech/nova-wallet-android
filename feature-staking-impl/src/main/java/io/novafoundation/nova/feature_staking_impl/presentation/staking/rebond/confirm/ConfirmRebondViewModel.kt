@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.rebondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -116,22 +116,22 @@ class ConfirmRebondViewModel(
         )
     }
 
-    private fun maybeGoToNext() = feeLoaderMixin.requireFee(this) { fee ->
-        launch {
-            val payload = RebondValidationPayload(
-                fee = fee,
-                rebondAmount = payload.amount,
-                controllerAsset = assetFlow.first()
-            )
+    private fun maybeGoToNext() = launch {
+        _showNextProgress.value = true
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { rebondValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer(),
-                block = ::sendTransaction
-            )
-        }
+        val payload = RebondValidationPayload(
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            rebondAmount = payload.amount,
+            controllerAsset = assetFlow.first()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { rebondValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer(),
+            block = ::sendTransaction
+        )
     }
 
     private fun sendTransaction(validPayload: RebondValidationPayload) = launch {

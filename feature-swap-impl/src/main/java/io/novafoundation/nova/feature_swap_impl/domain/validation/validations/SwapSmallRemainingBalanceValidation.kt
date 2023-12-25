@@ -39,12 +39,12 @@ class SwapSmallRemainingBalanceValidation(
                 TooSmallRemainingBalance.NeedsToBuyMainAssetED(
                     feeChainAsset,
                     chainAssetIn,
-                    value.swapFee.minimumBalanceBuyIn.requireNativeAsset(),
+                    value.decimalFee.genericFee.minimumBalanceBuyIn.requireNativeAsset(),
                     assetInExistentialDeposit,
-                    toBuyAmountToKeepEDInCommissionAsset = value.swapFee.minimumBalanceBuyIn.nativeMinimumBalance,
+                    toBuyAmountToKeepEDInCommissionAsset = value.decimalFee.genericFee.minimumBalanceBuyIn.nativeMinimumBalance,
                     toSellAmountToKeepEDUsingAssetIn = toBuyAmountToKeepEDInFeeAsset,
                     remainingBalance,
-                    value.swapFee.networkFee
+                    value.decimalFee.networkFee
                 ).validationError()
             }
         }

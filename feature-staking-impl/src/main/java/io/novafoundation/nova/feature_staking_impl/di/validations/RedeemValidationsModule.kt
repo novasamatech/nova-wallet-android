@@ -16,7 +16,7 @@ class RedeemValidationsModule {
     fun provideFeeValidation() = RedeemFeeValidation(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
-        errorProducer = { _, _ -> RedeemValidationFailure.CANNOT_PAY_FEES }
+        errorProducer = {  RedeemValidationFailure.CANNOT_PAY_FEES }
     )
 
     @FeatureScope

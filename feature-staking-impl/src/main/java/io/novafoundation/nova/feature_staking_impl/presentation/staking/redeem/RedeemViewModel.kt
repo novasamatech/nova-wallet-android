@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.reedeem.Re
 import io.novafoundation.nova.feature_staking_impl.domain.validations.reedeem.RedeemValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -28,7 +29,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class RedeemViewModel(
     private val router: StakingRouter,
@@ -98,28 +98,23 @@ class RedeemViewModel(
         )
     }
 
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
+    private fun maybeGoToNext() = launch {
+        _showNextProgress.value = true
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val asset = assetFlow.first()
+        val asset = assetFlow.first()
 
-            val validationPayload = RedeemValidationPayload(
-                fee = fee,
-                asset = asset
-            )
+        val validationPayload = RedeemValidationPayload(
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            asset = asset
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = validationPayload,
-                validationFailureTransformer = { redeemValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                sendTransaction(it)
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = validationPayload,
+            validationFailureTransformer = { redeemValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            sendTransaction(it)
         }
     }
 

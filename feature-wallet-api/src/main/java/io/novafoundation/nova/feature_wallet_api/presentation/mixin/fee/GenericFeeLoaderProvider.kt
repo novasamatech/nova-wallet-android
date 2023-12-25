@@ -5,11 +5,9 @@ import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.firstNotNull
-import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 class FeeLoaderProviderFactory(
     private val resourceManager: ResourceManager,
@@ -44,33 +41,7 @@ private class FeeLoaderProvider(
     resourceManager: ResourceManager,
     configuration: GenericFeeLoaderMixin.Configuration<SimpleFee>,
     tokenFlow: Flow<Token?>,
-) : GenericFeeLoaderProvider<SimpleFee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation {
-
-    override suspend fun setFee(feeAmount: BigDecimal?) {
-        val fee = feeAmount?.let {
-            val token = tokenFlow.firstNotNull()
-            InlineFee(token.planksFromAmount(feeAmount))
-        }
-
-        setFee(fee)
-    }
-
-    override fun requireFee(
-        block: (BigDecimal) -> Unit,
-        onError: (title: String, message: String) -> Unit,
-    ) {
-        val feeStatus = feeLiveData.value
-
-        if (feeStatus is FeeStatus.Loaded) {
-            block(feeStatus.feeModel.decimalFee.decimalAmount)
-        } else {
-            onError(
-                resourceManager.getString(R.string.fee_not_yet_loaded_title),
-                resourceManager.getString(R.string.fee_not_yet_loaded_message)
-            )
-        }
-    }
-}
+) : GenericFeeLoaderProvider<SimpleFee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation
 
 private open class GenericFeeLoaderProvider<F : GenericFee>(
     protected val resourceManager: ResourceManager,

@@ -40,12 +40,20 @@ class RealProxySyncService(
         val metaAccounts = getMetaAccounts()
         if (metaAccounts.isEmpty()) return
 
+        Log.d("RX", "Started syncing proxies")
+
         runCatching {
             val supportedProxyChains = getSupportedProxyChains()
+            Log.d("RX", "Proxy chains: ${supportedProxyChains.joinToString { it.name }}")
+
             val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
 
             val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
-                proxyRepository.getAllProxiesForMetaAccounts(chain.id, accountIds)
+                Log.d("RX", "Started syncing proxies for ${chain.name}")
+
+                proxyRepository.getAllProxiesForMetaAccounts(chain.id, accountIds).also {
+                    Log.d("RX", "Done syncing for ${chain.name}")
+                }
             }
 
             val oldProxies = accountDao.getAllProxyAccounts()
@@ -100,7 +108,7 @@ class RealProxySyncService(
             .map { it.proxiedMetaId }
     }
 
-    private suspend fun getProxiedsToRemove(
+    private suspend fun getPedsToRemove(
         oldProxies: List<ProxyAccountLocal>,
         proxiedsMetaAccounts: List<MetaAccountLocal>
     ): List<Long> {

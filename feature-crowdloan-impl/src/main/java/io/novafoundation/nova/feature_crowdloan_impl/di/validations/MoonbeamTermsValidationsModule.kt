@@ -19,7 +19,7 @@ class MoonbeamTermsValidationsModule {
     fun provideFeesValidation(): MoonbeamTermsValidation = MoonbeamTermsFeeValidation(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
-        errorProducer = { _, _ -> MoonbeamTermsValidationFailure.CANNOT_PAY_FEES }
+        errorProducer = { MoonbeamTermsValidationFailure.CANNOT_PAY_FEES }
     )
 
     @Provides

@@ -39,6 +39,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -281,47 +283,42 @@ class CrowdloanContributeViewModel(
         )
     }
 
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
+    private fun maybeGoToNext() = launch {
+        _showNextProgress.value = true
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val contributionAmount = parsedAmountFlow.firstOrNull() ?: return@launch
+        val contributionAmount = parsedAmountFlow.firstOrNull() ?: return@launch
 
-            val customizationPayload = customizationConfiguration.first()?.let {
-                val (_, customViewState) = it
+        val customizationPayload = customizationConfiguration.first()?.let {
+            val (_, customViewState) = it
 
-                customViewState.customizationPayloadFlow.first()
-            }
+            customViewState.customizationPayloadFlow.first()
+        }
 
-            val validationPayload = ContributeValidationPayload(
-                crowdloan = crowdloanFlow.first(),
-                customizationPayload = customizationPayload,
-                fee = fee,
-                asset = assetFlow.first(),
-                bonusPayload = router.latestCustomBonus,
-                contributionAmount = contributionAmount
-            )
+        val validationPayload = ContributeValidationPayload(
+            crowdloan = crowdloanFlow.first(),
+            customizationPayload = customizationPayload,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            asset = assetFlow.first(),
+            bonusPayload = router.latestCustomBonus,
+            contributionAmount = contributionAmount
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = customizedValidationSystem.first(),
-                payload = validationPayload,
-                validationFailureTransformerCustom = { status, actions ->
-                    contributeValidationFailure(
-                        reason = status.reason,
-                        validationFlowActions = actions,
-                        resourceManager = resourceManager,
-                        onOpenCustomContribute = ::bonusClicked
-                    )
-                },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                _showNextProgress.value = false
+        validationExecutor.requireValid(
+            validationSystem = customizedValidationSystem.first(),
+            payload = validationPayload,
+            validationFailureTransformerCustom = { status, actions ->
+                contributeValidationFailure(
+                    reason = status.reason,
+                    validationFlowActions = actions,
+                    resourceManager = resourceManager,
+                    onOpenCustomContribute = ::bonusClicked
+                )
+            },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            _showNextProgress.value = false
 
-                openConfirmScreen(it, customizationPayload)
-            }
+            openConfirmScreen(it, customizationPayload)
         }
     }
 
@@ -331,7 +328,7 @@ class CrowdloanContributeViewModel(
     ) = launch {
         val confirmContributePayload = ConfirmContributePayload(
             paraId = payload.paraId,
-            fee = validationPayload.fee,
+            fee = mapFeeToParcel(validationPayload.fee),
             amount = validationPayload.contributionAmount,
             estimatedRewardDisplay = estimatedRewardFlow.first(),
             bonusPayload = router.latestCustomBonus,
