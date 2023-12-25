@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExt
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus.ValidationResponse
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.proxyHasEnoughFeeValidation
 import kotlinx.coroutines.flow.launchIn
