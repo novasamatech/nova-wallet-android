@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount.ProxyType
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
@@ -37,7 +36,7 @@ class ProxiedSignerFactory(
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
 ) {
 
-    fun create(metaAccount: MetaAccount, signerProvider: SignerProvider): ProxiedSigner {
+    fun create(metaAccount: MetaAccount, signerProvider: SignerProvider, isRoot: Boolean): ProxiedSigner {
         return ProxiedSigner(
             proxiedMetaAccount = metaAccount,
             chainRegistry = chainRegistry,
@@ -46,7 +45,8 @@ class ProxiedSignerFactory(
             proxySigningPresenter = proxySigningPresenter,
             proxyRepository = proxyRepository,
             rpcCalls = rpcCalls,
-            proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus
+            proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus,
+            isRootProxied = isRoot
         )
     }
 }
@@ -59,7 +59,8 @@ class ProxiedSigner(
     private val proxySigningPresenter: ProxySigningPresenter,
     private val proxyRepository: ProxyRepository,
     private val rpcCalls: RpcCalls,
-    private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
+    private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
+    private val isRootProxied: Boolean
 ) : NovaSigner {
 
     override suspend fun signerAccountId(chain: Chain): AccountId {
@@ -75,7 +76,7 @@ class ProxiedSigner(
 
         acknowledgeProxyOperation(proxyMetaAccount)
 
-        if (isRootProxiedSigner()) {
+        if (isRootProxied) {
             validateExtrinsic(payloadExtrinsic, chain)
         }
 
@@ -91,14 +92,14 @@ class ProxiedSigner(
     }
 
     private fun createDelegate(proxyMetaAccount: MetaAccount): NovaSigner {
-        return signerProvider.signerFor(proxyMetaAccount)
+        return signerProvider.nestedSignerFor(proxyMetaAccount)
     }
 
-    private suspend fun validateExtrinsic(signedExtrinsic: SignerPayloadExtrinsic, chain: Chain) {
-        val proxyAccount = accountRepository.getLastProxyAccountFor(proxiedMetaAccount.id) ?: throw IllegalStateException("Proxy account is not found")
-        val proxyAccountId = proxyAccount.accountIdIn(chain) ?: throw IllegalStateException("Proxy account is not found")
+    private suspend fun validateExtrinsic(extrinsicPayload: SignerPayloadExtrinsic, chain: Chain) {
+        val proxyAccountId = signerAccountId(chain)
+        val proxyAccount = accountRepository.findMetaAccount(proxyAccountId, chain.id) ?: throw IllegalStateException("Proxy account is not found")
 
-        val callInstance = signedExtrinsic.call.toCallInstance() ?: signingNotSupported()
+        val callInstance = extrinsicPayload.call.toCallInstance() ?: signingNotSupported()
 
         val validationPayload = ProxiedExtrinsicValidationPayload(
             proxyAccount,
@@ -113,7 +114,7 @@ class ProxiedSigner(
         val validationStatus = validationResponse.validationResult.getOrNull()
         if (validationStatus is ValidationStatus.NotValid && validationStatus.reason is ProxyNotEnoughFee) {
             val reason = validationStatus.reason as ProxyNotEnoughFee
-            proxySigningPresenter.notEnoughFee(reason.errorMessage)
+            proxySigningPresenter.notEnoughFee(reason.metaAccount, reason.asset, reason.availableBalance, reason.fee)
 
             throw SigningCancelledException()
         }
@@ -145,11 +146,6 @@ class ProxiedSigner(
             callInstance = callInstance,
             currentProxyNonce = nonce
         )
-    }
-
-    private suspend fun isRootProxiedSigner(): Boolean {
-        val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
-        return selectedMetaAccount.id == proxiedMetaAccount.id
     }
 
     private suspend fun acknowledgeProxyOperation(proxyMetaAccount: MetaAccount) {

@@ -100,7 +100,7 @@ internal class RealEvmTransactionService(
         val ethereumChainId = chain.addressPrefix.toLong()
         val encodedTx = TransactionEncoder.encode(txForSign, ethereumChainId)
 
-        val signer = signerProvider.signerFor(metaAccount)
+        val signer = signerProvider.rootSignerFor(metaAccount)
         val accountId = metaAccount.requireAccountIdIn(chain)
 
         val signerPayload = SignerPayloadRaw(encodedTx, accountId)

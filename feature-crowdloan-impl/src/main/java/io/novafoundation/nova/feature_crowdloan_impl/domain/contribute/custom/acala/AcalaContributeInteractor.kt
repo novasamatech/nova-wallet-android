@@ -42,7 +42,7 @@ class AcalaContributeInteractor(
     ): Result<Unit> = runCatching {
         httpExceptionHandler.wrap {
             val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
-            val signer = signerProvider.signerFor(selectedMetaAccount)
+            val signer = signerProvider.rootSignerFor(selectedMetaAccount)
 
             val (chain, chainAsset) = selectedAssetState.chainAndAsset()
 

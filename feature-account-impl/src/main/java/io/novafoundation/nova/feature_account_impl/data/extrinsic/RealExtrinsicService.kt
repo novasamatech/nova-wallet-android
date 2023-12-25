@@ -144,7 +144,7 @@ class RealExtrinsicService(
         formExtrinsic: FormMultiExtrinsicWithOrigin,
     ): List<String> {
         val metaAccount = accountRepository.requireMetaAccountFor(origin, chain.id)
-        val signer = signerProvider.signerFor(metaAccount)
+        val signer = signerProvider.rootSignerFor(metaAccount)
 
         val requestedOrigin = metaAccount.requireAccountIdIn(chain)
         val actualOrigin = signer.signerAccountId(chain)
@@ -186,7 +186,7 @@ class RealExtrinsicService(
         metaAccount: MetaAccount,
         formExtrinsic: FormExtrinsicWithOrigin,
     ): SubmissionRaw {
-        val signer = signerProvider.signerFor(metaAccount)
+        val signer = signerProvider.rootSignerFor(metaAccount)
 
         val requestedOrigin = metaAccount.requireAccountIdIn(chain)
         val actualOrigin = signer.signerAccountId(chain)

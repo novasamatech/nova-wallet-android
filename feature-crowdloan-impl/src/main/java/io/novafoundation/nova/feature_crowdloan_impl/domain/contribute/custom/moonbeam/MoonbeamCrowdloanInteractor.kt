@@ -125,7 +125,7 @@ class MoonbeamCrowdloanInteractor(
             val legalText = httpExceptionHandler.wrap { moonbeamApi.getLegalText() }
             val legalHash = legalText.encodeToByteArray().sha256().toHexString(withPrefix = false)
 
-            val signer = signerProvider.signerFor(metaAccount)
+            val signer = signerProvider.rootSignerFor(metaAccount)
             val signerPayload = SignerPayloadRaw.fromUtf8(legalHash, accountId)
 
             val signedHash = signer.signRaw(signerPayload).asHexString()
