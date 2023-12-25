@@ -61,9 +61,9 @@ class ProxyHaveEnoughFeeValidation<P, E>(
         val asset = walletRepository.getAsset(proxyAccountId(value), chainAsset)!!
         val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, asset.token.configuration)
         val transferable = asset.transferableInPlanks
-        val availableBalanceToPayFee = (asset.balanceCountedTowardsEDInPlanks - existentialDeposit).atLeastZero()
+        val balanceWithoutEd = (asset.balanceCountedTowardsEDInPlanks - existentialDeposit).atLeastZero()
 
-        return validOrError(transferable >= fee.amount && availableBalanceToPayFee >= fee.amount) {
+        return validOrError(transferable >= fee.amount && balanceWithoutEd >= fee.amount) {
             proxyNotEnoughFee(value, transferable, fee)
         }
     }
