@@ -27,14 +27,30 @@ data class NftLocal(
     val media: String? = null,
     // --- !metadata fields ---
 
-    val issuanceTotal: Int? = null,
+    val issuanceType: IssuanceType,
+    val issuanceTotal: BigInteger? = null,
     val issuanceMyEdition: String? = null,
+    val issuanceMyAmount: BigInteger? = null,
 
     val price: BigInteger? = null,
+    // use null to indicate non-fungible price
+    val pricedUnits: BigInteger? = null
 ) : Identifiable {
 
     enum class Type {
-        UNIQUES, RMRK1, RMRK2
+        UNIQUES, RMRK1, RMRK2, PDC20
+    }
+
+    enum class IssuanceType {
+
+        // issuanceMyEdition: optional
+        UNLIMITED,
+
+        // issuanceMyEdition + issuanceTotal
+        LIMITED,
+
+        // issuanceTotal + issuanceFungible
+        FUNGIBLE
     }
 
     override fun equals(other: Any?): Boolean {

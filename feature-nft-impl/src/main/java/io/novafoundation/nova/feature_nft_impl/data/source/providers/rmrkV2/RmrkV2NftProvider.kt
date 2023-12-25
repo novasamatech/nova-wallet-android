@@ -51,6 +51,7 @@ class RmrkV2NftProvider(
                 type = NftLocal.Type.RMRK2,
                 issuanceMyEdition = it.edition,
                 wholeDetailsLoaded = false,
+                issuanceType = NftLocal.IssuanceType.LIMITED
             )
         }
 
@@ -72,7 +73,7 @@ class RmrkV2NftProvider(
 
             local.copy(
                 media = image,
-                issuanceTotal = collection.max,
+                issuanceTotal = collection.max?.toBigInteger(),
                 name = metadata?.name ?: local.name,
                 label = metadata?.description ?: local.label,
                 wholeDetailsLoaded = true
