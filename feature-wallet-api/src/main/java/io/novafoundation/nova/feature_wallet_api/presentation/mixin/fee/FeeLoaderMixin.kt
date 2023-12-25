@@ -88,8 +88,6 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
     interface Presentation : GenericFeeLoaderMixin.Presentation<SimpleFee>, FeeLoaderMixin {
 
-        suspend fun setFee(fee: Fee?) = setFee(fee?.let(::SimpleFee))
-
         fun loadFee(
             coroutineScope: CoroutineScope,
             expectedChain: ChainId? = null,

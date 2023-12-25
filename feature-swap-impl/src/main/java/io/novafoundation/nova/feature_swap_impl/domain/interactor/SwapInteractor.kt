@@ -89,7 +89,10 @@ class SwapInteractor(
         return swapService.quote(quoteArgs)
     }
 
-    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs, decimalFee: GenericDecimalFee<SwapFee>): Result<ExtrinsicSubmission> = withContext(Dispatchers.IO) {
+    suspend fun executeSwap(
+        swapExecuteArgs: SwapExecuteArgs,
+        decimalFee: GenericDecimalFee<SwapFee>
+    ): Result<ExtrinsicSubmission> = withContext(Dispatchers.IO) {
         swapService.swap(swapExecuteArgs)
             .onSuccess { submission ->
                 swapTransactionHistoryRepository.insertPendingSwap(

@@ -141,7 +141,7 @@ class YieldBoostConfirmViewModel(
     }
 
     private fun setInitialFee() = launch {
-        feeLoaderMixin.setFee(decimalFee.networkFee)
+        feeLoaderMixin.setFee(decimalFee.genericFee)
     }
 
     private fun sendTransactionIfValid() = launch {

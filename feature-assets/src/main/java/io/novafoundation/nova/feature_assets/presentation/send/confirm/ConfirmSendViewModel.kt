@@ -186,8 +186,8 @@ class ConfirmSendViewModel(
     }
 
     private fun setInitialState() = launch {
-        originFeeMixin.setFee(originFee.networkFee)
-        crossChainFeeMixin.setFee(crossChainFee?.networkFee)
+        originFeeMixin.setFee(originFee.genericFee)
+        crossChainFeeMixin.setFee(crossChainFee?.genericFee)
     }
 
     private suspend fun createAddressModel(

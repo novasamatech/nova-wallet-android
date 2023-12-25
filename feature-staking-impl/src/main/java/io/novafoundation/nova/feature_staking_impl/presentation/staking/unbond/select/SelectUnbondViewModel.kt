@@ -126,7 +126,6 @@ class SelectUnbondViewModel(
         }
     }
 
-
     private fun openConfirm(validationPayload: UnbondValidationPayload) {
         val confirmUnbondPayload = ConfirmUnbondPayload(
             amount = validationPayload.amount,

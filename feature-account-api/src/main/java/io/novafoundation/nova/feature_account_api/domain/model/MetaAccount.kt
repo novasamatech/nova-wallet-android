@@ -200,7 +200,7 @@ fun LightMetaAccount.Type.asPolkadotVaultVariantOrThrow(): PolkadotVaultVariant 
 }
 
 fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
-    return when(this) {
+    return when (this) {
         LightMetaAccount.Type.SECRETS,
         LightMetaAccount.Type.WATCH_ONLY,
         LightMetaAccount.Type.PARITY_SIGNER,

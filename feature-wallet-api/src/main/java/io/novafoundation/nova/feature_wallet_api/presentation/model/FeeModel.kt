@@ -21,9 +21,6 @@ class GenericDecimalFee<F : GenericFee>(
     val networkFeeDecimalAmount: BigDecimal
 ) {
 
-    @Deprecated("This field has unclear semantics in a case of custom fee structure", replaceWith = ReplaceWith("networkFeeDecimalAmount"))
-    val decimalAmount: BigDecimal = networkFeeDecimalAmount
-
     val networkFee: Fee = genericFee.networkFee
 }
 

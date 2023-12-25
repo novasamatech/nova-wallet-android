@@ -28,7 +28,6 @@ class SubstrateFee(
     override val submissionOrigin: SubmissionOrigin
 ) : Fee
 
-
 val Fee.requestedAccountPaysFees: Boolean
     get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)
 

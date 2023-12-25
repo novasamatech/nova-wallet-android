@@ -22,7 +22,7 @@ interface NotEnoughToPayFeesError {
 
 typealias EnoughAmountToTransferValidation<P, E> = EnoughAmountToTransferValidationGeneric<P, E, SimpleFee>
 
-class EnoughAmountToTransferValidationGeneric<P, E, F: GenericFee>(
+class EnoughAmountToTransferValidationGeneric<P, E, F : GenericFee>(
     private val feeExtractor: GenericFeeProducer<F, P>,
     private val availableBalanceProducer: AmountProducer<P>,
     private val errorProducer: (ErrorContext<P>) -> E,
@@ -74,7 +74,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalance(
     )
 )
 
-fun <P, E, F: GenericFee> ValidationSystemBuilder<P, E>.sufficientBalanceGeneric(
+fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.sufficientBalanceGeneric(
     fee: GenericFeeProducer<F, P> = { null },
     amount: AmountProducer<P> = { BigDecimal.ZERO },
     available: AmountProducer<P>,

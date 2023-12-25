@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccount
@@ -103,16 +103,16 @@ fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.checkForFeeChanges(
     )
 )
 
-fun <T : GenericFee> CoroutineScope.handleFeeSpikeDetected(
-    error: FeeChangeDetectedFailure<T>,
+fun <F : GenericFee> CoroutineScope.handleFeeSpikeDetected(
+    error: FeeChangeDetectedFailure<F>,
     resourceManager: ResourceManager,
-    feeLoaderMixin: FeeLoaderMixin.Presentation,
+    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<F>,
     actions: ValidationFlowActions<*>
 ): TransformedFailure? = handleFeeSpikeDetected(
     error = error,
     resourceManager = resourceManager,
     actions = actions,
-    setFee = { feeLoaderMixin.setFee(it.newFee.networkFee) }
+    setFee = { feeLoaderMixin.setFee(it.newFee.genericFee) }
 )
 
 fun <T : GenericFee> CoroutineScope.handleFeeSpikeDetected(

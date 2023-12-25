@@ -80,7 +80,7 @@ class ConfirmUnbondViewModel(
         .shareInBackground()
 
     val feeStatusLiveData = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee.networkFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee.genericFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }

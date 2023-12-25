@@ -160,7 +160,7 @@ class ConfirmReferendumVoteViewModel(
     }
 
     private fun setFee() = launch {
-        originFeeMixin.setFee(decimalFee.networkFee)
+        originFeeMixin.setFee(decimalFee.genericFee)
     }
 
     private fun performVote() = launch {

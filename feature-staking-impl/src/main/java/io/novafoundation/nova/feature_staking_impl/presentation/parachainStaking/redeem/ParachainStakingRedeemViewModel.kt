@@ -123,7 +123,6 @@ class ParachainStakingRedeemViewModel(
         }
     }
 
-
     private fun sendTransaction() = launch {
         interactor.redeem(delegatorState.first())
             .onFailure(::showError)
