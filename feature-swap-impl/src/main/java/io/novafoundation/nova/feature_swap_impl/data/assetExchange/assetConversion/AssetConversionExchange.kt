@@ -165,8 +165,8 @@ private class AssetConversionExchange(
         }
     }
 
-    // TODO we purposefully do not `nativeTokenFee.amountByRequestedAccount`
-    // since we have disabled fee payment in custom tokens for accounts where difference matters
+    // TODO we purposefully do not use `nativeTokenFee.amountByRequestedAccount`
+    // since we have disabled fee payment in custom tokens for accounts where the difference matters (e.g. proxy)
     // We should adapt it if we decide to remove the restriction
     private suspend fun calculateCustomTokenFee(
         nativeTokenFee: Fee,
