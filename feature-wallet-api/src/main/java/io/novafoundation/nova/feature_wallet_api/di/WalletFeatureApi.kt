@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
@@ -43,6 +44,8 @@ interface WalletFeatureApi {
     fun coingeckoApi(): CoingeckoApi
 
     fun enoughTotalToStayAboveEDValidationFactory(): EnoughTotalToStayAboveEDValidationFactory
+
+    fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
 
     val phishingValidationFactory: PhishingValidationFactory
 

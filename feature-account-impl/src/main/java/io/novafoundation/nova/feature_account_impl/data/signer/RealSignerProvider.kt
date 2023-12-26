@@ -22,15 +22,12 @@ internal class RealSignerProvider(
     private val ledgerSignerFactory: LedgerSignerFactory,
 ) : SignerProvider {
 
-    override fun signerFor(metaAccount: MetaAccount): NovaSigner {
-        return when (metaAccount.type) {
-            LightMetaAccount.Type.SECRETS -> secretsSignerFactory.create(metaAccount)
-            LightMetaAccount.Type.WATCH_ONLY -> watchOnlySigner.create(metaAccount)
-            LightMetaAccount.Type.PARITY_SIGNER -> polkadotVaultSignerFactory.createParitySigner(metaAccount)
-            LightMetaAccount.Type.POLKADOT_VAULT -> polkadotVaultSignerFactory.createPolkadotVault(metaAccount)
-            LightMetaAccount.Type.LEDGER -> ledgerSignerFactory.create(metaAccount)
-            LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount, this)
-        }
+    override fun rootSignerFor(metaAccount: MetaAccount): NovaSigner {
+        return signerFor(metaAccount, isRoot = true)
+    }
+
+    override fun nestedSignerFor(metaAccount: MetaAccount): NovaSigner {
+        return signerFor(metaAccount, isRoot = false)
     }
 
     override fun feeSigner(metaAccount: MetaAccount, chain: Chain): NovaSigner {
@@ -42,6 +39,17 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.LEDGER -> DefaultFeeSigner(chain)
 
             LightMetaAccount.Type.PROXIED -> proxiedFeeSignerFactory.create(metaAccount, chain, this)
+        }
+    }
+
+    private fun signerFor(metaAccount: MetaAccount, isRoot: Boolean): NovaSigner {
+        return when (metaAccount.type) {
+            LightMetaAccount.Type.SECRETS -> secretsSignerFactory.create(metaAccount)
+            LightMetaAccount.Type.WATCH_ONLY -> watchOnlySigner.create(metaAccount)
+            LightMetaAccount.Type.PARITY_SIGNER -> polkadotVaultSignerFactory.createParitySigner(metaAccount)
+            LightMetaAccount.Type.POLKADOT_VAULT -> polkadotVaultSignerFactory.createPolkadotVault(metaAccount)
+            LightMetaAccount.Type.LEDGER -> ledgerSignerFactory.create(metaAccount)
+            LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount, this, isRoot)
         }
     }
 }

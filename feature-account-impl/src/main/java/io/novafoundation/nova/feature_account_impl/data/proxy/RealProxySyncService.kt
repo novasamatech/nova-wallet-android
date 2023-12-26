@@ -26,6 +26,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findChains
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.withTimeoutOrNull
+
+private const val SYNC_TIMEOUT = 10_000L // 10 seconds
 
 class RealProxySyncService(
     private val chainRegistry: ChainRegistry,
@@ -45,7 +48,9 @@ class RealProxySyncService(
             val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
 
             val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
-                proxyRepository.getAllProxiesForMetaAccounts(chain.id, accountIds)
+                withTimeoutOrNull(SYNC_TIMEOUT) {
+                    proxyRepository.getAllProxiesForMetaAccounts(chain.id, accountIds)
+                } ?: emptyList()
             }
 
             val oldProxies = accountDao.getAllProxyAccounts()

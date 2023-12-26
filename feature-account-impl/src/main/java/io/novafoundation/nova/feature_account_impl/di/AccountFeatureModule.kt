@@ -65,7 +65,7 @@ import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFa
 import io.novafoundation.nova.feature_account_impl.di.modules.AdvancedEncryptionStoreModule
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
-import io.novafoundation.nova.feature_account_impl.di.modules.SignersModule
+import io.novafoundation.nova.feature_account_impl.di.modules.signers.SignersModule
 import io.novafoundation.nova.feature_account_impl.di.modules.WatchOnlyModule
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInteractorImpl
