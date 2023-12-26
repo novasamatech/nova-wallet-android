@@ -74,7 +74,7 @@ class NodeAutobalancerTest : CoroutineTest() {
         Chain.Node(unformattedUrl = it.toString(), name = it.toString(), chainId = "test", orderId = 0)
     }
 
-    private fun nodeFlow() = autobalancer.balancingNodeFlow(
+    private fun nodeFlow() = autobalancer.connectionUrlFlow(
         chainId = "test",
         changeConnectionEventFlow = stateFlow,
         availableNodesFlow = nodesFlow
