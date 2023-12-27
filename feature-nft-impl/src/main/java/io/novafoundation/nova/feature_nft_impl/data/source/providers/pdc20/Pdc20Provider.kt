@@ -65,7 +65,7 @@ class Pdc20Provider(
             )
         }
 
-        nftDao.insertNftsDiff(NftLocal.Type.PDC20, metaAccount.id, toSave, forceOverwrite)
+        nftDao.insertNftsDiff(NftLocal.Type.RMRK2, metaAccount.id, toSave, forceOverwrite)
     }
 
     override suspend fun nftFullSync(nft: Nft) {

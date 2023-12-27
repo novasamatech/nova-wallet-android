@@ -57,7 +57,7 @@ class Nft(
 
         object Rmrk2 : Type(Key.RMRKV2)
 
-        object Pdc20 : Type(Key.PDC20)
+        object Pdc20 : Type(Key.RMRKV2)
     }
 }
 
