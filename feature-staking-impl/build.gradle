@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://api.subquery.network/sq/nova-wallet/subquery-staking__bm92Y\""
+        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://api.subquery.network/sq/nova-wallet/subquery-staking\""
     }
 
     buildTypes {
