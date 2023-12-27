@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <string name="nft_issuance_fungible_format">%s units of %s</string>
-
-    <string name="nft_fungile_price">%s for %s</string>
 
     <string name="deep_linking_chain_id_is_not_found">Chain is not found</string>
     <string name="deep_linking_governance_type_is_not_specified">Governance type is not specified</string>

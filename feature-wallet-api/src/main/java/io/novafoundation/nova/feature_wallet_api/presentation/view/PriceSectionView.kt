@@ -2,10 +2,11 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.section.SectionView
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.section_price.view.sectionPriceFiat
 import kotlinx.android.synthetic.main.section_price.view.sectionPriceToken
 import kotlinx.android.synthetic.main.section_price.view.sectionTitle
@@ -20,9 +21,9 @@ class PriceSectionView @JvmOverloads constructor(
         attrs?.let(::applyAttrs)
     }
 
-    fun setPrice(token: String, fiat: String?) {
-        sectionPriceToken.text = token
-        sectionPriceFiat.setTextOrHide(fiat)
+    fun setPrice(amountModel: AmountModel) {
+        sectionPriceToken.text = amountModel.token
+        sectionPriceFiat.text = amountModel.fiat
     }
 
     fun setTitle(title: String) {
@@ -33,4 +34,10 @@ class PriceSectionView @JvmOverloads constructor(
         val title = it.getString(R.styleable.PriceSectionView_sectionTitle)
         title?.let(::setTitle)
     }
+}
+
+fun PriceSectionView.setPriceOrHide(amountModel: AmountModel?) = if (amountModel != null) {
+    setPrice(amountModel)
+} else {
+    makeGone()
 }

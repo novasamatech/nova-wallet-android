@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.domain.nft.details
 
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Price
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -17,7 +18,12 @@ class NftDetailsInteractor(
             tokenRepository.observeToken(nftDetails.chain.utilityAsset).map { token ->
                 PricedNftDetails(
                     nftDetails = nftDetails,
-                    priceToken = token
+                    price = nftDetails.price?.let {
+                        Price(
+                            amount = it,
+                            token = token
+                        )
+                    }
                 )
             }
         }

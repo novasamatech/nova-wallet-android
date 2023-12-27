@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1
 
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.core_db.dao.NftDao
-import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -50,7 +49,7 @@ class RmrkV1NftProvider(
                 media = nftLocal.media,
                 name = nftLocal.name!!,
                 description = nftLocal.label,
-                issuance = nftIssuance(NftLocal.IssuanceType.LIMITED, nftLocal.issuanceTotal, nftLocal.issuanceMyEdition, nftLocal.issuanceMyAmount),
+                issuance = nftIssuance(nftLocal),
                 price = nftPrice(nftLocal),
                 collection = null
             )
