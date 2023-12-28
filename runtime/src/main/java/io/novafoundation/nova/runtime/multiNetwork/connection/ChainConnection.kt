@@ -87,11 +87,12 @@ class ChainConnection internal constructor(
 
     private val availableNodes = MutableStateFlow(chain.nodes)
 
-    private val currentNode = nodeAutobalancer.balancingNodeFlow(
+    private val currentUrl = nodeAutobalancer.connectionUrlFlow(
         chainId = chain.id,
         changeConnectionEventFlow = nodeChangeSignal,
         availableNodesFlow = availableNodes,
-    ).shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
+    )
+        .shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
     suspend fun setup() {
         socketService.setInterceptor(this)
@@ -109,11 +110,11 @@ class ChainConnection internal constructor(
     }
 
     private suspend fun observeCurrentNode() {
-        val firstNodeUrl = currentNode.first()?.unformattedUrl?.let(connectionSecrets::saturateUrl) ?: return
+        val firstNodeUrl = currentUrl.first()?.saturatedUrl ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
 
-        currentNode
-            .mapNotNull { node -> node?.unformattedUrl?.let(connectionSecrets::saturateUrl) }
+        currentUrl
+            .mapNotNull { it?.saturatedUrl }
             .filter { nodeUrl -> actualUrl() != nodeUrl }
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
             .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
