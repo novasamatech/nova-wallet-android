@@ -60,7 +60,7 @@ class RealProxySyncService(
             val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
                 withTimeoutOrNull(SYNC_TIMEOUT) {
                     proxyRepository.getAllProxiesForMetaAccounts(chain.id, accountIds)
-                } ?: emptyList()
+                }.orEmpty()
             }
 
             val oldProxies = accountDao.getAllProxyAccounts()

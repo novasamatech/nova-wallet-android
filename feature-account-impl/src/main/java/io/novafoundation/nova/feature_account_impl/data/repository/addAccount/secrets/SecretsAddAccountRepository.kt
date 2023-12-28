@@ -3,10 +3,10 @@ package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.s
 import android.database.sqlite.SQLiteConstraintException
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -66,6 +66,7 @@ abstract class SecretsAddAccountRepository<T>(
         )
 
         return transformingInsertionErrors {
+            @Suppress("DEPRECATION")
             accountDataSource.insertMetaAccountFromSecrets(
                 name = addAccountType.name,
                 substrateCryptoType = substrateCryptoType,
@@ -90,6 +91,7 @@ abstract class SecretsAddAccountRepository<T>(
         )
 
         transformingInsertionErrors {
+            @Suppress("DEPRECATION")
             accountDataSource.insertChainAccount(
                 metaId = addAccountType.metaId,
                 chain = chain,

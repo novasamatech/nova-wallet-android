@@ -74,6 +74,8 @@ interface AccountDataSource : SecretStoreV1 {
     /**
      * @return id of inserted meta account
      */
+    // TODO move it to SecretsAddAccountRepository
+    @Deprecated("Use SecretsAddAccountRepository instead")
     suspend fun insertMetaAccountFromSecrets(
         name: String,
         substrateCryptoType: CryptoType,
@@ -83,6 +85,8 @@ interface AccountDataSource : SecretStoreV1 {
     /**
      * @return id of inserted meta account
      */
+    // TODO move it to SecretsAddAccountRepository
+    @Deprecated("Use SecretsAddAccountRepository instead")
     suspend fun insertChainAccount(
         metaId: Long,
         chain: Chain,
