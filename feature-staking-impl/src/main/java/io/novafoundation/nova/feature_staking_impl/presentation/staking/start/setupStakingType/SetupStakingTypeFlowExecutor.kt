@@ -55,8 +55,9 @@ class SetupDirectStakingFlowExecutor(
         setupStakingSharedState.set(
             SetupStakingProcess.ReadyToSubmit(
                 activeStake = selectionStore.getCurrentSelection()?.selection?.stake.orZero(),
-                validators = selectionStore.getValidatorsOrEmpty(),
-                selectionMethod = SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM
+                newValidators = selectionStore.getValidatorsOrEmpty(),
+                selectionMethod = SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM,
+                currentlySelectedValidators = emptyList()
             )
         )
         router.openSelectCustomValidators()

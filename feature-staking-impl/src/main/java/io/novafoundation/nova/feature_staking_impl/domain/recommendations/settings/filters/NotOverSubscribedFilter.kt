@@ -6,7 +6,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 object NotOverSubscribedFilter : RecommendationFilter {
 
     override fun shouldInclude(model: Validator): Boolean {
-        // inactive validators are considered as non-oversubscribed
-        return model.electedInfo?.isOversubscribed ?: true
+        val isOversubscribed = model.electedInfo?.isOversubscribed
+
+        return if (isOversubscribed != null) {
+            !isOversubscribed
+        } else {
+            true // inactive validators are considered as non-oversubscribed
+        }
     }
 }

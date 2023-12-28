@@ -13,13 +13,13 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.getSelectedValidatorsOrEmpty
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.reset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class Texts(
@@ -41,32 +41,31 @@ class StartChangeValidatorsViewModel(
 
     private val maxValidatorsPerNominator = flowOf {
         interactor.maxValidatorsPerNominator(setupStakingSharedState.activeStake())
-    }.share()
+    }.shareInBackground()
 
     val validatorsLoading = MutableStateFlow(true)
 
-    val customValidatorsTexts = setupStakingSharedState.setupStakingProcess.transform {
-        when {
-            it is SetupStakingProcess.ReadyToSubmit && it.validators.isNotEmpty() -> emit(
-                Texts(
-                    toolbarTitle = resourceManager.getString(R.string.staking_change_validators),
-                    selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
-                    selectManuallyBadge = resourceManager.getString(
-                        R.string.staking_max_format,
-                        it.validators.size,
-                        maxValidatorsPerNominator.first()
-                    )
+    val customValidatorsTexts = setupStakingSharedState.setupStakingProcess.map {
+        val selectedValidators = it.getSelectedValidatorsOrEmpty()
+
+        if (selectedValidators.isNotEmpty()) {
+            Texts(
+                toolbarTitle = resourceManager.getString(R.string.staking_change_validators),
+                selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
+                selectManuallyBadge = resourceManager.getString(
+                    R.string.staking_max_format,
+                    selectedValidators.size,
+                    maxValidatorsPerNominator.first()
                 )
             )
-            else -> emit(
-                Texts(
-                    toolbarTitle = resourceManager.getString(R.string.staking_set_validators),
-                    selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
-                    selectManuallyBadge = null
-                )
+        } else {
+            Texts(
+                toolbarTitle = resourceManager.getString(R.string.staking_set_validators),
+                selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
+                selectManuallyBadge = null
             )
         }
-    }
+    }.shareInBackground()
 
     init {
         launch {

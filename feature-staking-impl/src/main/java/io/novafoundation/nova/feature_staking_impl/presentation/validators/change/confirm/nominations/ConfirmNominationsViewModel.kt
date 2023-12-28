@@ -36,7 +36,7 @@ class ConfirmNominationsViewModel(
 
     private val currentSetupStakingProcess = sharedStateSetup.get<SetupStakingProcess.ReadyToSubmit>()
 
-    private val validators = currentSetupStakingProcess.validators
+    private val validators = currentSetupStakingProcess.newValidators
 
     val selectedValidatorsLiveData = liveData(Dispatchers.Default) {
         emit(convertToModels(validators, tokenUseCase.currentToken()))
