@@ -99,17 +99,17 @@ interface MetaAccountDao {
     suspend fun insertChainAccounts(chainAccounts: List<ChainAccountLocal>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProxy(proxyLocal: ProxyAccountLocal)
+    suspend fun insertProxy(proxyLocal: ProxyAccountLocal)
 
     @Query("SELECT * FROM meta_accounts")
-    fun getMetaAccounts(): List<MetaAccountLocal>
+    suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
     @Query("SELECT * FROM meta_accounts")
     @Transaction
     suspend fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
 
-    @Query("SELECT * FROM meta_accounts WHERE status = :status")
-    fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<MetaAccountLocal>
+    @Query("SELECT id FROM meta_accounts WHERE status = :status")
+    suspend fun getMetaAccountIdsByStatus(status: MetaAccountLocal.Status): List<Long>
 
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
@@ -126,8 +126,8 @@ interface MetaAccountDao {
     @Query(META_ACCOUNT_WITH_BALANCE_QUERY)
     fun metaAccountWithBalanceFlow(metaId: Long): Flow<List<MetaAccountWithBalanceLocal>>
 
-    @Query("SELECT * FROM proxy_accounts")
-    suspend fun getAllProxyAccounts(): List<ProxyAccountLocal>
+    @Query("SELECT * FROM proxy_accounts WHERE chainId = :chainId")
+    suspend fun getProxyAccounts(chainId: String): List<ProxyAccountLocal>
 
     @Query("UPDATE meta_accounts SET isSelected = (id = :metaId)")
     suspend fun selectMetaAccount(metaId: Long)
