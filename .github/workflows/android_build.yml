@@ -44,6 +44,8 @@ on:
         required: true
       INFURA_API_KEY:
         required: true
+      DWELLIR_API_KEY:
+        required: true
       WALLET_CONNECT_PROJECT_ID:
         required: true
       # Special secrets for signing:
@@ -81,6 +83,7 @@ env:
   EHTERSCAN_API_KEY_MOONRIVER: ${{ secrets.EHTERSCAN_API_KEY_MOONRIVER }}
   EHTERSCAN_API_KEY_ETHEREUM: ${{ secrets.EHTERSCAN_API_KEY_ETHEREUM }}
   INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+  DWELLIR_API_KEY: ${{ secrets.DWELLIR_API_KEY }}
   WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
 
   CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
@@ -123,7 +126,7 @@ jobs:
           fileName: ${{ inputs.keystore-file-name }}
           fileDir: './app/'
           encodedString: ${{ env.CI_GITHUB_KEYSTORE_KEY_FILE }}
-      
+
       - name: 🔐 Getting market sign key
         if: ${{ startsWith(inputs.keystore-file-name, 'market_key.jks') }}
         uses: timheuer/base64-to-file@v1.1
