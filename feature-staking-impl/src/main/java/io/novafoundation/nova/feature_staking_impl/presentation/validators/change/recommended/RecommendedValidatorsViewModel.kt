@@ -13,13 +13,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.retractRecommended
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setRecommendedValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
@@ -70,7 +69,7 @@ class RecommendedValidatorsViewModel(
     }.inBackground().share()
 
     fun backClicked() {
-        retractRecommended()
+        sharedStateSetup.retractRecommended()
 
         router.back()
     }
@@ -97,14 +96,6 @@ class RecommendedValidatorsViewModel(
 
         return validators.map {
             mapValidatorToValidatorModel(chain, it, addressIconGenerator, token)
-        }
-    }
-
-    private fun retractRecommended() = sharedStateSetup.mutate {
-        if (it is ReadyToSubmit && it.selectionMethod == SelectionMethod.RECOMMENDED) {
-            it.previous()
-        } else {
-            it
         }
     }
 }

@@ -33,9 +33,10 @@ class DirectConfirmMultiStakingType(
     override suspend fun onStakingTypeDetailsClicked() {
         // act as an adapter between new flow and legacy logic
         val reviewValidatorsState = ReadyToSubmit(
-            validators = selection.validators,
+            newValidators = selection.validators,
             selectionMethod = ReadyToSubmit.SelectionMethod.RECOMMENDED,
             activeStake = selection.stake,
+            currentlySelectedValidators = emptyList()
         )
         setupStakingSharedState.set(reviewValidatorsState)
 
