@@ -15,7 +15,7 @@ abstract class BaseExternalSignInteractor(
     protected suspend fun resolveWalletSigner(): NovaSigner {
         val metaAccount = resolveMetaAccount()
 
-        return signerProvider.signerFor(metaAccount)
+        return signerProvider.rootSignerFor(metaAccount)
     }
 
     protected suspend fun resolveMetaAccount(): MetaAccount {

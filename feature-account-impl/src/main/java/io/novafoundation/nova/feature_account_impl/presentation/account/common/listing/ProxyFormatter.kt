@@ -44,7 +44,7 @@ class ProxyFormatter(
     fun mapProxyTypeToString(type: ProxyAccount.ProxyType): String {
         val proxyType = when (type) {
             ProxyAccount.ProxyType.Any -> resourceManager.getString(R.string.account_proxy_type_any)
-            ProxyAccount.ProxyType.NonTransfer -> resourceManager.getString(R.string.account_proxy_type_any)
+            ProxyAccount.ProxyType.NonTransfer -> resourceManager.getString(R.string.account_proxy_type_non_transfer)
             ProxyAccount.ProxyType.Governance -> resourceManager.getString(R.string.account_proxy_type_governance)
             ProxyAccount.ProxyType.Staking -> resourceManager.getString(R.string.account_proxy_type_staking)
             ProxyAccount.ProxyType.IdentityJudgement -> resourceManager.getString(R.string.account_proxy_type_identity_judgement)
