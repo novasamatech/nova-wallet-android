@@ -20,7 +20,7 @@ sealed class SetupStakingProcess {
     class ChoosingValidators(
         val currentlySelectedValidators: List<Validator>,
         val activeStake: Balance,
-    ): SetupStakingProcess() {
+    ) : SetupStakingProcess() {
 
         fun next(
             newValidators: List<Validator>,
