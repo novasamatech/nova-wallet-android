@@ -112,7 +112,7 @@ class ExternaSignViewModel(
             autoFixPayload = ::autoFixPayload,
             progressConsumer = _performingOperationInProgress.progressConsumer()
         ) {
-            performOperation(it.decimalFee?.fee)
+            performOperation(it.decimalFee?.networkFee)
         }
     }
 

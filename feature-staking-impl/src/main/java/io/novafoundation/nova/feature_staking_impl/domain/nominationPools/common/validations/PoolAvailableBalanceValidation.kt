@@ -3,18 +3,21 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.commo
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.isTrueOrWarning
+import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeProducer
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -28,7 +31,7 @@ class PoolAvailableBalanceValidationFactory(
     context(ValidationSystemBuilder<P, E>)
     fun <P, E> enoughAvailableBalanceToStake(
         asset: (P) -> Asset,
-        fee: (P) -> Balance,
+        fee: FeeProducer<P>,
         amount: (P) -> BigDecimal,
         error: (PoolAvailableBalanceValidation.ValidationError.Context) -> E
     ) {
@@ -47,7 +50,7 @@ class PoolAvailableBalanceValidationFactory(
 class PoolAvailableBalanceValidation<P, E>(
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val asset: (P) -> Asset,
-    private val fee: (P) -> Balance,
+    private val fee: FeeProducer<P>,
     private val amount: (P) -> BigDecimal,
     private val error: (ValidationError.Context) -> E
 ) : Validation<P, E> {
@@ -69,7 +72,7 @@ class PoolAvailableBalanceValidation<P, E>(
         val asset = asset(value)
         val chainAsset = asset.token.configuration
 
-        val fee = fee(value)
+        val fee = fee(value)?.networkFee?.amountByRequestedAccount.orZero()
         val availableBalance = poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
         val maxToStake = poolsAvailableBalanceResolver.maximumBalanceToStake(asset, fee)
         val enteredAmount = chainAsset.planksFromAmount(amount(value))

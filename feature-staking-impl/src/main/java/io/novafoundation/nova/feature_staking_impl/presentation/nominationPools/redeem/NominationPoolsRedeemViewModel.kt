@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -102,11 +103,11 @@ class NominationPoolsRedeemViewModel(
     }
 
     private fun redeemIfValid() = launch {
-        val asset = assetFlow.first()
+        _showNextProgress.value = true
 
         val payload = NominationPoolsRedeemValidationPayload(
-            fee = feeLoaderMixin.awaitFee(),
-            asset = asset,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            asset = assetFlow.first(),
             chain = stakingSharedState.chain()
         )
 

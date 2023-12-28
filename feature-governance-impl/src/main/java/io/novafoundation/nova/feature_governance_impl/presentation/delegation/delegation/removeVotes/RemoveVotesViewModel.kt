@@ -27,8 +27,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.track.formatT
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.Flow
@@ -103,18 +103,21 @@ class RemoveVotesViewModel(
         externalActions.showExternalActions(type, governanceSharedState.chain())
     }
 
-    private fun removeVotesIfValid(): Unit = originFeeMixin.requireFee(viewModel = this) { fee ->
-        launch {
-            val validationPayload = RemoveVotesValidationPayload(fee, assetFlow.first())
+    private fun removeVotesIfValid() = launch {
+        _showNextProgress.value = true
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = validationPayload,
-                progressConsumer = _showNextProgress.progressConsumer(),
-                validationFailureTransformer = { handleRemoveVotesValidationFailure(it, resourceManager) }
-            ) {
-                removeVotes()
-            }
+        val validationPayload = RemoveVotesValidationPayload(
+            fee = originFeeMixin.awaitDecimalFee(),
+            asset = assetFlow.first()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = validationPayload,
+            progressConsumer = _showNextProgress.progressConsumer(),
+            validationFailureTransformer = { handleRemoveVotesValidationFailure(it, resourceManager) }
+        ) {
+            removeVotes()
         }
     }
 

@@ -37,7 +37,7 @@ private fun NominationPoolsBondMoreValidationSystemBuilder.poolIsNotDestroying(f
 private fun NominationPoolsBondMoreValidationSystemBuilder.enoughAvailableToStakeInPool(factory: PoolAvailableBalanceValidationFactory) {
     factory.enoughAvailableBalanceToStake(
         asset = { it.asset },
-        fee = { it.fee.fee.amount },
+        fee = { it.fee },
         amount = { it.amount },
         error = NominationPoolsBondMoreValidationFailure::NotEnoughToBond
     )

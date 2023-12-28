@@ -9,6 +9,6 @@ fun ValidationSystem.Companion.parachainStakingRedeem(): ParachainStakingRedeemV
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
-        error = { _, _ -> ParachainStakingRedeemValidationFailure.NotEnoughBalanceToPayFees }
+        error = { ParachainStakingRedeemValidationFailure.NotEnoughBalanceToPayFees }
     )
 }

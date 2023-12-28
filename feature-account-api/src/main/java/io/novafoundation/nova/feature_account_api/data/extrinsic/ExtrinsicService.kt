@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
+import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -70,11 +71,17 @@ interface ExtrinsicService {
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Fee
 
+    suspend fun zeroFee(chain: Chain, origin: TransactionOrigin): Fee
+
     suspend fun estimateMultiFee(
         chain: Chain,
         origin: TransactionOrigin,
         formExtrinsic: FormMultiExtrinsic,
     ): Fee
 
-    suspend fun estimateFee(chain: Chain, extrinsic: String): Fee
+    suspend fun estimateFee(
+        chain: Chain,
+        extrinsic: String,
+        usedSigner: FeeSigner
+    ): Fee
 }

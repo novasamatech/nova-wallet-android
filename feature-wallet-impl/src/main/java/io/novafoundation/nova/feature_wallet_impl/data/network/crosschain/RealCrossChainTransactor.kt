@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -23,6 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
@@ -65,7 +65,7 @@ class RealCrossChainTransactor(
         doNotCrossExistentialDeposit(
             assetSourceRegistry = assetSourceRegistry,
             fee = { it.originFeeInUsedAsset },
-            extraAmount = { it.transfer.amount + it.crossChainFee.orZero() }
+            extraAmount = { it.transfer.amount + it.crossChainFee.networkFeeByRequestedAccountOrZero }
         )
     }
 

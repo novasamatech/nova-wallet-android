@@ -55,6 +55,7 @@ class RealProxySyncService(
 
         runCatching {
             val supportedProxyChains = getSupportedProxyChains()
+
             val chainsToAccountIds = supportedProxyChains.associateWith { chain -> chain.getAvailableAccountIds(metaAccounts) }
 
             val proxiedsWithProxies = chainsToAccountIds.flatMap { (chain, accountIds) ->
@@ -105,7 +106,7 @@ class RealProxySyncService(
         return accountsToDeactivate.takeNotYetDeactivatedMetaAccounts()
     }
 
-    private suspend fun getProxiedsToRemove(
+    private suspend fun getPedsToRemove(
         oldProxies: List<ProxyAccountLocal>,
         proxiedsMetaAccounts: List<MetaAccountLocal>
     ): List<Long> {

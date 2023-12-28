@@ -85,6 +85,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedDecimalFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -773,7 +774,7 @@ class SwapMainSettingsViewModel(
             feeAsset = swapSettings.feeAsset ?: return null,
             quoteArgs = quotingState.quoteArgs,
             swapQuote = quotingState.value,
-            swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return null
+            swapFee = feeMixin.loadedDecimalFeeOrNullFlow().first() ?: return null
         )
     }
 
@@ -814,7 +815,7 @@ class SwapMainSettingsViewModel(
             feeAsset = validPayload.feeAsset.token.configuration.fullId.toAssetPayload(),
             rate = validPayload.swapQuote.swapRate(),
             slippage = validPayload.slippage.value,
-            swapFee = swapConfirmationPayloadFormatter.mapFeeToModel(validPayload.swapFee)
+            swapFee = swapConfirmationPayloadFormatter.mapFeeToModel(validPayload.decimalFee)
         )
 
         swapRouter.openSwapConfirmation(payload)

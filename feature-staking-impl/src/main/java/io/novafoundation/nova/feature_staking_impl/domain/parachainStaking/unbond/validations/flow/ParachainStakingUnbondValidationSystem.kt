@@ -28,6 +28,6 @@ fun ValidationSystem.Companion.parachainStakingUnbond(
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
-        error = { _, _ -> ParachainStakingUnbondValidationFailure.NotEnoughBalanceToPayFees }
+        error = { ParachainStakingUnbondValidationFailure.NotEnoughBalanceToPayFees }
     )
 }

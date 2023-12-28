@@ -21,7 +21,7 @@ private fun BondMoreValidationSystemBuilder.enoughToPayFees() {
     sufficientBalance(
         fee = { it.fee },
         available = { it.stashAsset.transferable },
-        error = { _, _ -> BondMoreValidationFailure.NOT_ENOUGH_TO_PAY_FEES }
+        error = { BondMoreValidationFailure.NOT_ENOUGH_TO_PAY_FEES }
     )
 }
 
@@ -30,7 +30,7 @@ private fun BondMoreValidationSystemBuilder.enoughStakeable() {
         fee = { it.fee },
         available = { it.stashAsset.stakeable },
         amount = { it.amount },
-        error = { _, _ -> BondMoreValidationFailure.NOT_ENOUGH_STAKEABLE }
+        error = { BondMoreValidationFailure.NOT_ENOUGH_STAKEABLE }
     )
 }
 

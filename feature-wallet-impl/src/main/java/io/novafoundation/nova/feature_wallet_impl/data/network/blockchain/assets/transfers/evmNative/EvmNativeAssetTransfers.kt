@@ -53,7 +53,7 @@ class EvmNativeAssetTransfers(
         return evmTransactionService.transact(
             chainId = transfer.originChain.id,
             fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT,
-            presetFee = transfer.decimalFee.fee,
+            presetFee = transfer.decimalFee.networkFee,
         ) {
             nativeTransfer(transfer)
         }

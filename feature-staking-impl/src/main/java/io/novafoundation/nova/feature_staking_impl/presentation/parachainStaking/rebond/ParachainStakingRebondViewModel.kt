@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -36,7 +37,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 class ParachainStakingRebondViewModel(
     private val router: ParachainStakingRouter,
@@ -125,21 +125,21 @@ class ParachainStakingRebondViewModel(
         router.openCollatorDetails(StakeTargetDetailsPayload.parachain(parcel, collatorsUseCase))
     }
 
-    private fun sendTransactionIfValid() = requireFee { fee ->
-        launch {
-            val payload = ParachainStakingRebondValidationPayload(
-                fee = fee,
-                asset = assetFlow.first()
-            )
+    private fun sendTransactionIfValid() = launch {
+        _showNextProgress.value = true
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { parachainStakingRebondValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                sendTransaction()
-            }
+        val payload = ParachainStakingRebondValidationPayload(
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            asset = assetFlow.first()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { parachainStakingRebondValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            sendTransaction()
         }
     }
 
@@ -154,9 +154,4 @@ class ParachainStakingRebondViewModel(
 
         _showNextProgress.value = false
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 }

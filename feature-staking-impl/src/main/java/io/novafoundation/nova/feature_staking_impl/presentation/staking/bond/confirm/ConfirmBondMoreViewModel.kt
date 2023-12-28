@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.bon
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -48,6 +49,8 @@ class ConfirmBondMoreViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
+    private val decimalFee = mapFeeFromParcel(payload.fee)
+
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
@@ -68,7 +71,7 @@ class ConfirmBondMoreViewModel(
         .shareInBackground()
 
     val feeStatusFlow = stashAssetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(payload.fee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee.genericFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -94,7 +97,7 @@ class ConfirmBondMoreViewModel(
     private fun maybeGoToNext() = launch {
         val payload = BondMoreValidationPayload(
             stashAddress = payload.stashAddress,
-            fee = payload.fee,
+            fee = decimalFee,
             amount = payload.amount,
             stashAsset = stashAssetFlow.first()
         )

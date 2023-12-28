@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModelOf
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -104,22 +104,20 @@ class CustomRebondViewModel(
         )
     }
 
-    private fun maybeGoToNext() = feeLoaderMixin.requireFee(this) { fee ->
-        launch {
-            val payload = RebondValidationPayload(
-                fee = fee,
-                rebondAmount = amountChooserMixin.amount.first(),
-                controllerAsset = assetFlow.first()
-            )
+    private fun maybeGoToNext() = launch {
+        val payload = RebondValidationPayload(
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            rebondAmount = amountChooserMixin.amount.first(),
+            controllerAsset = assetFlow.first()
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { rebondValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer(),
-                block = ::openConfirm
-            )
-        }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { rebondValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer(),
+            block = ::openConfirm
+        )
     }
 
     private fun openConfirm(validPayload: RebondValidationPayload) {

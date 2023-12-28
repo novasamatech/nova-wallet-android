@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDete
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -68,8 +69,8 @@ sealed class AssetTransferValidationFailure {
 
 data class AssetTransferPayload(
     val transfer: WeightedAssetTransfer,
-    val originFee: BigDecimal,
-    val crossChainFee: BigDecimal?,
+    val originFee: DecimalFee,
+    val crossChainFee: DecimalFee?,
     val originCommissionAsset: Asset,
     val originUsedAsset: Asset
 )
@@ -80,11 +81,11 @@ val AssetTransferPayload.isSendingCommissionAsset
 val AssetTransferPayload.isReceivingCommissionAsset
     get() = transfer.destinationChainAsset == transfer.destinationChain.commissionAsset
 
-val AssetTransferPayload.originFeeInUsedAsset: BigDecimal
+val AssetTransferPayload.originFeeInUsedAsset: DecimalFee?
     get() = if (isSendingCommissionAsset) {
         originFee
     } else {
-        BigDecimal.ZERO
+        null
     }
 
 val AssetTransferPayload.receivingAmountInCommissionAsset: BigInteger

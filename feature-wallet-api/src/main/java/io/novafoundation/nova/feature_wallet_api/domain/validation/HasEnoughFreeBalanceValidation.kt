@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.validation.isTrueOrError
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
@@ -22,13 +23,13 @@ interface NotEnoughFreeBalanceError {
 
 class HasEnoughFreeBalanceValidation<P, E>(
     private val asset: (P) -> Asset,
-    private val fee: AmountProducer<P>,
+    private val fee: FeeProducer<P>,
     private val requestedAmount: AmountProducer<P>,
     private val error: HasEnoughFreeBalanceErrorProducer<E>
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
-        val freeBalanceAfterFees = asset(value).free - fee(value)
+        val freeBalanceAfterFees = asset(value).free - fee(value).networkFeeByRequestedAccountOrZero
 
         return (freeBalanceAfterFees >= requestedAmount(value)) isTrueOrError {
             error(asset(value).token.configuration, freeBalanceAfterFees)
@@ -38,7 +39,7 @@ class HasEnoughFreeBalanceValidation<P, E>(
 
 fun <P, E> ValidationSystemBuilder<P, E>.hasEnoughFreeBalance(
     asset: (P) -> Asset,
-    fee: AmountProducer<P>,
+    fee: FeeProducer<P>,
     requestedAmount: AmountProducer<P>,
     error: HasEnoughFreeBalanceErrorProducer<E>
 ) {

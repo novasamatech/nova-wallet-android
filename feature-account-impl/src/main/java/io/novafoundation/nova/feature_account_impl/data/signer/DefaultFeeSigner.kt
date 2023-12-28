@@ -1,12 +1,16 @@
-package io.novafoundation.nova.runtime.extrinsic.signer
+package io.novafoundation.nova.feature_account_impl.data.signer
 
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.ethereum.EthereumKeypairFactory
 import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.SubstrateKeypairFactory
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
@@ -15,20 +19,31 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 private val FAKE_CRYPTO_TYPE = EncryptionType.ECDSA
 
-class DefaultFeeSigner(private val chain: Chain) : NovaSigner {
+class DefaultFeeSigner(
+    private val realMetaAccount: MetaAccount,
+    private val chain: Chain
+) : FeeSigner {
 
-    private val keypair = generateFakeKeyPair()
+    private val fakeKeyPair = generateFakeKeyPair()
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
-        val signer = KeyPairSigner(keypair, multiChainEncryption())
+        val signer = KeyPairSigner(fakeKeyPair, multiChainEncryption())
 
         return signer.signExtrinsic(payloadExtrinsic)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
-        val signer = KeyPairSigner(keypair, multiChainEncryption())
+        val signer = KeyPairSigner(fakeKeyPair, multiChainEncryption())
 
         return signer.signRaw(payload)
+    }
+
+    override suspend fun actualFeeSignerId(chain: Chain): AccountId {
+        return requestedFeeSignerId(chain)
+    }
+
+    override suspend fun requestedFeeSignerId(chain: Chain): AccountId {
+        return realMetaAccount.requireAccountIdIn(chain)
     }
 
     override suspend fun signerAccountId(chain: Chain): ByteArray {
@@ -36,7 +51,7 @@ class DefaultFeeSigner(private val chain: Chain) : NovaSigner {
             "Signer was created for the different chain, expected ${this.chain.name}, got ${chain.name}"
         }
 
-        return chain.accountIdOf(keypair.publicKey)
+        return chain.accountIdOf(fakeKeyPair.publicKey)
     }
 
     private fun multiChainEncryption() = if (chain.isEthereumBased) {
