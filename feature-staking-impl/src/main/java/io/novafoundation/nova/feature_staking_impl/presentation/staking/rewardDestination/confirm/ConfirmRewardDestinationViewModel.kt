@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.rewardDestinationValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
@@ -52,6 +53,8 @@ class ConfirmRewardDestinationViewModel(
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
+
+    private val decimalFee = mapFeeFromParcel(payload.fee)
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -78,7 +81,7 @@ class ConfirmRewardDestinationViewModel(
         .shareInBackground()
 
     val feeStatusFlow = controllerAssetFlow.map {
-        FeeStatus.Loaded(mapFeeToFeeModel(payload.fee, it.token))
+        FeeStatus.Loaded(mapFeeToFeeModel(decimalFee.genericFee, it.token))
     }
         .shareInBackground()
 
@@ -128,7 +131,7 @@ class ConfirmRewardDestinationViewModel(
 
         val payload = RewardDestinationValidationPayload(
             availableControllerBalance = controllerAsset.transferable,
-            fee = payload.fee,
+            fee = decimalFee,
             stashState = stashState
         )
 

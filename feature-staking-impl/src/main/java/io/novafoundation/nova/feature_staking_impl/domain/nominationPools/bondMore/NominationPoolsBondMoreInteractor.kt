@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore
 
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.bondExtra
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.nominationPools
@@ -11,9 +14,9 @@ import kotlinx.coroutines.withContext
 
 interface NominationPoolsBondMoreInteractor {
 
-    suspend fun estimateFee(bondMoreAmount: Balance): Balance
+    suspend fun estimateFee(bondMoreAmount: Balance): Fee
 
-    suspend fun bondMore(bondMoreAmount: Balance): Result<String>
+    suspend fun bondMore(bondMoreAmount: Balance): Result<ExtrinsicSubmission>
 }
 
 class RealNominationPoolsBondMoreInteractor(
@@ -21,17 +24,17 @@ class RealNominationPoolsBondMoreInteractor(
     private val stakingSharedState: StakingSharedState,
 ) : NominationPoolsBondMoreInteractor {
 
-    override suspend fun estimateFee(bondMoreAmount: Balance): Balance {
+    override suspend fun estimateFee(bondMoreAmount: Balance): Fee {
         return withContext(Dispatchers.IO) {
-            extrinsicService.estimateFee(stakingSharedState.chain()) {
+            extrinsicService.estimateFee(stakingSharedState.chain(), TransactionOrigin.SelectedWallet) {
                 nominationPools.bondExtra(bondMoreAmount)
             }
         }
     }
 
-    override suspend fun bondMore(bondMoreAmount: Balance): Result<String> {
+    override suspend fun bondMore(bondMoreAmount: Balance): Result<ExtrinsicSubmission> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsicWithSelectedWallet(stakingSharedState.chain()) {
+            extrinsicService.submitExtrinsic(stakingSharedState.chain(), TransactionOrigin.SelectedWallet) {
                 nominationPools.bondExtra(bondMoreAmount)
             }
         }

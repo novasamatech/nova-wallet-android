@@ -43,7 +43,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
@@ -263,34 +266,34 @@ class StartParachainStakingViewModel(
             .launchIn(this)
     }
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val collator = selectedCollatorFlow.first() ?: return@launch
-            val amount = amountChooserMixin.amount.first()
+    private fun maybeGoToNext() = launch {
+        validationInProgress.value = true
 
-            val payload = StartParachainStakingValidationPayload(
-                amount = amount,
-                fee = fee,
-                asset = assetFlow.first(),
-                collator = collator,
-                delegatorState = currentDelegatorStateFlow.first(),
-            )
+        val collator = selectedCollatorFlow.first() ?: return@launch
+        val amount = amountChooserMixin.amount.first()
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-                progressConsumer = validationInProgress.progressConsumer()
-            ) {
-                validationInProgress.value = false
+        val payload = StartParachainStakingValidationPayload(
+            amount = amount,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            asset = assetFlow.first(),
+            collator = collator,
+            delegatorState = currentDelegatorStateFlow.first(),
+        )
 
-                goToNextStep(fee = fee, amount = amount, collator = collator)
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+            progressConsumer = validationInProgress.progressConsumer()
+        ) {
+            validationInProgress.value = false
+
+            goToNextStep(fee = it.fee, amount = amount, collator = collator)
         }
     }
 
     private fun goToNextStep(
-        fee: BigDecimal,
+        fee: DecimalFee,
         amount: BigDecimal,
         collator: Collator,
     ) = launch {
@@ -298,16 +301,11 @@ class StartParachainStakingViewModel(
             ConfirmStartParachainStakingPayload(
                 collator = mapCollatorToCollatorParcelModel(collator),
                 amount = amount,
-                fee = fee,
+                fee = mapFeeToParcel(fee),
                 flowMode = payload.flowMode
             )
         }
 
         router.openConfirmStartStaking(payload)
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 }

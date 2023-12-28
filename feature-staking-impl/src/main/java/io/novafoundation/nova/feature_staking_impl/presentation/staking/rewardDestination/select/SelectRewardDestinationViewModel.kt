@@ -25,6 +25,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDes
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.RewardDestinationParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
@@ -35,7 +38,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class SelectRewardDestinationViewModel(
     private val router: StakingRouter,
@@ -111,35 +113,32 @@ class SelectRewardDestinationViewModel(
         )
     }
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val payload = RewardDestinationValidationPayload(
-                availableControllerBalance = controllerAssetFlow.first().transferable,
-                fee = fee,
-                stashState = stashStateFlow.first()
-            )
+    private fun maybeGoToNext() = launch {
+        _showNextProgress.value = true
 
-            val rewardDestination = rewardDestinationModelFlow.first()
+        val payload = RewardDestinationValidationPayload(
+            availableControllerBalance = controllerAssetFlow.first().transferable,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            stashState = stashStateFlow.first()
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { rewardDestinationValidationFailure(resourceManager, it) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                _showNextProgress.value = false
+        val rewardDestination = rewardDestinationModelFlow.first()
 
-                goToNextStep(rewardDestination, it.fee)
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { rewardDestinationValidationFailure(resourceManager, it) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            _showNextProgress.value = false
+
+            goToNextStep(rewardDestination, it.fee)
         }
     }
 
-    private fun goToNextStep(
-        rewardDestination: RewardDestinationModel,
-        fee: BigDecimal
-    ) {
+    private fun goToNextStep(rewardDestination: RewardDestinationModel, fee: DecimalFee) {
         val payload = ConfirmRewardDestinationPayload(
-            fee = fee,
+            fee = mapFeeToParcel(fee),
             rewardDestination = mapRewardDestinationModelToRewardDestinationParcelModel(rewardDestination)
         )
 
@@ -152,11 +151,6 @@ class SelectRewardDestinationViewModel(
             is RewardDestinationModel.Payout -> RewardDestinationParcelModel.Payout(rewardDestination.destination.address)
         }
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 
     private suspend fun rewardCalculator() = rewardCalculator.await()
 }

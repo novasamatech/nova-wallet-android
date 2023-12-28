@@ -19,7 +19,7 @@ class AccountRequiredValidation<P, E>(
         val accountAddress = accountAddressExtractor(value)
         val chain = sharedState.chain()
 
-        return if (accountRepository.isAccountExists(chain.accountIdOf(accountAddress))) {
+        return if (accountRepository.isAccountExists(chain.accountIdOf(accountAddress), chain.id)) {
             ValidationStatus.Valid()
         } else {
             ValidationStatus.NotValid(DefaultFailureLevel.ERROR, errorProducer(accountAddress))

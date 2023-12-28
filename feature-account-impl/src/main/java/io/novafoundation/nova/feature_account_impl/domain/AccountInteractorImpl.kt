@@ -179,4 +179,8 @@ class AccountInteractorImpl(
         val chain = chainRegistry.getChain(chainId)
         return metaAccount.addressIn(chain)
     }
+
+    override suspend fun removeDeactivatedMetaAccounts() {
+        accountRepository.removeDeactivatedMetaAccounts()
+    }
 }

@@ -40,7 +40,7 @@ private fun StartParachainStakingValidationSystemBuilder.enoughToPayFees() {
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
-        error = { _, _ -> StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
+        error = { StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
     )
 }
 
@@ -49,7 +49,7 @@ private fun StartParachainStakingValidationSystemBuilder.enoughStakeable() {
         fee = { it.fee },
         available = { it.stakeableAmount() },
         amount = { it.amount },
-        error = { _, _ -> StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
+        error = { StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees }
     )
 }
 

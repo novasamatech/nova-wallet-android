@@ -30,8 +30,8 @@ class SettingsNavigator(
         args = PincodeFragment.getPinCodeBundle(PinCodeAction.Change)
     )
 
-    override fun openAccountDetails(metaId: Long) {
-        delegate.openAccountDetails(metaId)
+    override fun openWalletDetails(metaId: Long) {
+        delegate.openWalletDetails(metaId)
     }
 
     override fun openSwitchWallet() {

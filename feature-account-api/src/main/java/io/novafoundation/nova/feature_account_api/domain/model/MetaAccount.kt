@@ -29,9 +29,14 @@ interface LightMetaAccount {
     val isSelected: Boolean
     val name: String
     val type: Type
+    val status: LightMetaAccount.Status
 
     enum class Type {
-        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT
+        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT, PROXIED
+    }
+
+    enum class Status {
+        ACTIVE, DEACTIVATED
     }
 }
 
@@ -45,6 +50,7 @@ fun LightMetaAccount(
     isSelected: Boolean,
     name: String,
     type: LightMetaAccount.Type,
+    status: LightMetaAccount.Status
 ) = object : LightMetaAccount {
     override val id: Long = id
     override val substratePublicKey: ByteArray? = substratePublicKey
@@ -55,11 +61,13 @@ fun LightMetaAccount(
     override val isSelected: Boolean = isSelected
     override val name: String = name
     override val type: LightMetaAccount.Type = type
+    override val status: LightMetaAccount.Status = status
 }
 
 class MetaAccount(
     override val id: Long,
     val chainAccounts: Map<ChainId, ChainAccount>,
+    val proxy: ProxyAccount?,
     override val substratePublicKey: ByteArray?,
     override val substrateCryptoType: CryptoType?,
     override val substrateAccountId: ByteArray?,
@@ -68,6 +76,7 @@ class MetaAccount(
     override val isSelected: Boolean,
     override val name: String,
     override val type: LightMetaAccount.Type,
+    override val status: LightMetaAccount.Status
 ) : LightMetaAccount {
 
     class ChainAccount(
@@ -141,6 +150,7 @@ fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
                 MultiChainEncryption.substrateFrom(cryptoType)
             }
         }
+
         chain.isEthereumBased -> MultiChainEncryption.Ethereum
         else -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
     }
@@ -175,10 +185,6 @@ private fun MultiChainEncryption.Companion.substrateFrom(cryptoType: CryptoType)
 
 fun MetaAccount.chainAccountFor(chainId: ChainId) = chainAccounts.getValue(chainId)
 
-fun LightMetaAccount.Type.isPolkadotVaultLike(): Boolean {
-    return asPolkadotVaultVariantOrNull() != null
-}
-
 fun LightMetaAccount.Type.asPolkadotVaultVariantOrNull(): PolkadotVaultVariant? {
     return when (this) {
         LightMetaAccount.Type.PARITY_SIGNER -> PolkadotVaultVariant.PARITY_SIGNER
@@ -190,5 +196,17 @@ fun LightMetaAccount.Type.asPolkadotVaultVariantOrNull(): PolkadotVaultVariant? 
 fun LightMetaAccount.Type.asPolkadotVaultVariantOrThrow(): PolkadotVaultVariant {
     return requireNotNull(asPolkadotVaultVariantOrNull()) {
         "Not a Polkadot Vault compatible account type"
+    }
+}
+
+fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
+    return when (this) {
+        LightMetaAccount.Type.SECRETS,
+        LightMetaAccount.Type.WATCH_ONLY,
+        LightMetaAccount.Type.PARITY_SIGNER,
+        LightMetaAccount.Type.LEDGER,
+        LightMetaAccount.Type.POLKADOT_VAULT -> true
+
+        LightMetaAccount.Type.PROXIED -> false
     }
 }

@@ -7,6 +7,7 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
 import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
+import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
@@ -43,7 +44,8 @@ class RootViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val deepLinkHandler: DeepLinkHandler,
     private val automaticInteractionGate: AutomaticInteractionGate,
-    private val rootScope: RootScope
+    private val rootScope: RootScope,
+    private val compoundRequestBusHandler: CompoundRequestBusHandler
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -62,17 +64,25 @@ class RootViewModel(
 
         checkForUpdates()
 
+        syncProxies()
+
         syncCurrencies()
 
         syncWalletConnectSessions()
 
         updatePhishingAddresses()
 
+        obserBusEvents()
+
         walletConnectService.onPairErrorLiveData.observeForever {
             showError(it.peekContent())
         }
 
         subscribeDeepLinkCallback()
+    }
+
+    private fun obserBusEvents() {
+        compoundRequestBusHandler.observe()
     }
 
     private fun subscribeDeepLinkCallback() {
@@ -105,6 +115,10 @@ class RootViewModel(
 
     private fun syncCurrencies() {
         launch { currencyInteractor.syncCurrencies() }
+    }
+
+    private fun syncProxies() {
+        interactor.syncProxies()
     }
 
     private fun handleUpdatesSideEffect(sideEffect: Updater.SideEffect) {

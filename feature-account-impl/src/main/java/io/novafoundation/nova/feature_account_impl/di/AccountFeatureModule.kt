@@ -13,10 +13,12 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.utils.DEFAULT_DERIVATION_PATH
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.AccountDao
@@ -25,7 +27,10 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -49,9 +54,10 @@ import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.Rea
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
+import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
-import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.RealProxyRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
@@ -59,7 +65,7 @@ import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFa
 import io.novafoundation.nova.feature_account_impl.di.modules.AdvancedEncryptionStoreModule
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
-import io.novafoundation.nova.feature_account_impl.di.modules.SignersModule
+import io.novafoundation.nova.feature_account_impl.di.modules.signers.SignersModule
 import io.novafoundation.nova.feature_account_impl.di.modules.WatchOnlyModule
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInteractorImpl
@@ -67,13 +73,25 @@ import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
-import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
+import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.language.RealLanguageUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
@@ -94,9 +112,52 @@ import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 
 @Module(
-    includes = [SignersModule::class, WatchOnlyModule::class, ParitySignerModule::class, IdentityProviderModule::class, AdvancedEncryptionStoreModule::class]
+    includes = [
+        SignersModule::class,
+        WatchOnlyModule::class,
+        ProxySigningModule::class,
+        ParitySignerModule::class,
+        IdentityProviderModule::class,
+        AdvancedEncryptionStoreModule::class,
+        AddAccountsModule::class
+    ]
 )
 class AccountFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideMetaAccountsUpdatesRegistry(
+        preferences: Preferences
+    ): MetaAccountsUpdatesRegistry = RealMetaAccountsUpdatesRegistry(preferences)
+
+    @Provides
+    @FeatureScope
+    fun provideProxyRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): ProxyRepository = RealProxyRepository(storageDataSource, chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideProxySyncService(
+        chainRegistry: ChainRegistry,
+        proxyRepository: ProxyRepository,
+        accounRepository: AccountRepository,
+        metaAccountDao: MetaAccountDao,
+        @OnChainIdentity identityProvider: IdentityProvider,
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository: ProxiedAddAccountRepository,
+        rootScope: RootScope
+    ): ProxySyncService = RealProxySyncService(
+        chainRegistry,
+        proxyRepository,
+        accounRepository,
+        metaAccountDao,
+        identityProvider,
+        metaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository,
+        rootScope
+    )
 
     @Provides
     @FeatureScope
@@ -239,12 +300,14 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         addressIconGenerator: AddressIconGenerator,
         walletUiUseCase: WalletUiUseCase,
-        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
+        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
     ) = SelectedAccountUseCase(
         accountRepository = accountRepository,
         walletUiUseCase = walletUiUseCase,
         addressIconGenerator = addressIconGenerator,
-        polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider
+        polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
+        metaAccountsUpdatesRegistry = metaAccountsUpdatesRegistry
     )
 
     @Provides
@@ -260,7 +323,7 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         secretStoreV2: SecretStoreV2,
         chainRegistry: ChainRegistry,
-    ) = AccountDetailsInteractor(
+    ) = WalletDetailsInteractor(
         accountRepository,
         secretStoreV2,
         chainRegistry
@@ -274,24 +337,17 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAddAccountRepository(
-        accountDataSource: AccountDataSource,
-        accountSecretsFactory: AccountSecretsFactory,
-        jsonSeedDecoder: JsonSeedDecoder,
-        chainRegistry: ChainRegistry,
-    ) = AddAccountRepository(
-        accountDataSource,
-        accountSecretsFactory,
-        jsonSeedDecoder,
-        chainRegistry
-    )
-
-    @Provides
-    @FeatureScope
     fun provideAddAccountInteractor(
-        addAccountRepository: AddAccountRepository,
+        mnemonicAddAccountRepository: MnemonicAddAccountRepository,
+        jsonAddAccountRepository: JsonAddAccountRepository,
+        seedAddAccountRepository: SeedAddAccountRepository,
         accountRepository: AccountRepository,
-    ) = AddAccountInteractor(addAccountRepository, accountRepository)
+    ) = AddAccountInteractor(
+        mnemonicAddAccountRepository,
+        jsonAddAccountRepository,
+        seedAddAccountRepository,
+        accountRepository
+    )
 
     @Provides
     @FeatureScope
@@ -351,17 +407,36 @@ class AccountFeatureModule {
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
         currencyRepository: CurrencyRepository,
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
     ): MetaAccountGroupingInteractor {
-        return MetaAccountGroupingInteractorImpl(chainRegistry, accountRepository, currencyRepository)
+        return MetaAccountGroupingInteractorImpl(chainRegistry, accountRepository, currencyRepository, metaAccountsUpdatesRegistry)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideProxyFormatter(
+        walletUseCase: WalletUiUseCase,
+        resourceManager: ResourceManager
+    ) = ProxyFormatter(walletUseCase, resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun provideDelegatedMetaAccountUpdatesListingMixinFactory(
+        walletUseCase: WalletUiUseCase,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+        proxyFormatter: ProxyFormatter,
+        resourceManager: ResourceManager
+    ) = DelegatedMetaAccountUpdatesListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, proxyFormatter, resourceManager)
 
     @Provides
     @FeatureScope
     fun provideAccountListingMixinFactory(
         walletUseCase: WalletUiUseCase,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+        proxyFormatter: ProxyFormatter,
         accountTypePresentationMapper: MetaAccountTypePresentationMapper,
-    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, accountTypePresentationMapper)
+        resourceManager: ResourceManager
+    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, accountTypePresentationMapper, proxyFormatter, resourceManager)
 
     @Provides
     @FeatureScope
@@ -425,4 +500,10 @@ class AccountFeatureModule {
     fun provideBiometricServiceFactory(accountRepository: AccountRepository): BiometricServiceFactory {
         return RealBiometricServiceFactory(accountRepository)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideSigningNotSupportedPresentable(
+        contextManager: ContextManager
+    ): SigningNotSupportedPresentable = RealSigningNotSupportedPresentable(contextManager)
 }

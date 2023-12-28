@@ -20,11 +20,12 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 sealed class SubmitActionState {
     object Loading : SubmitActionState()
@@ -93,13 +94,15 @@ class MoonbeamCrowdloanTermsViewModel(
         openBrowserEvent.value = Event(interactor.getTermsLink())
     }
 
-    fun submitClicked() = requireFee { fee ->
+    fun submitClicked() = launch {
         submittingInProgressFlow.value = true
+
+        val fee = feeLoaderMixin.awaitDecimalFee()
 
         submitAfterValidation(fee)
     }
 
-    private fun submitAfterValidation(fee: BigDecimal) = launch {
+    private fun submitAfterValidation(fee: DecimalFee) = launch {
         val validationPayload = MoonbeamTermsPayload(
             fee = fee,
             asset = assetUseCase.getCurrentAsset()
@@ -128,15 +131,8 @@ class MoonbeamCrowdloanTermsViewModel(
     private fun loadFee() = launch {
         feeLoaderMixin.loadFee(
             coroutineScope = this,
-            feeConstructor = {
-                interactor.calculateTermsFee()
-            },
+            feeConstructor = { interactor.calculateTermsFee() },
             onRetryCancelled = ::backClicked
         )
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 }

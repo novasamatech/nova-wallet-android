@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayO
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
+import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl
@@ -59,7 +60,8 @@ abstract class BaseStorageQueryContext(
     override suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V>
+        binding: DynamicInstanceBinderWithKey<K, V>,
+        recover: (exception: Exception, rawValue: String?) -> Unit
     ): Map<K, V> {
         val prefix = storageKey(runtime, *prefixArgs)
 
@@ -69,14 +71,16 @@ abstract class BaseStorageQueryContext(
             entries = entries,
             storageEntry = this,
             keyExtractor = keyExtractor,
-            binding = binding
+            binding = binding,
+            recover = recover
         )
     }
 
     override suspend fun <K, V> StorageEntry.entries(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V>
+        binding: DynamicInstanceBinderWithKey<K, V>,
+        recover: (exception: Exception, rawValue: String?) -> Unit
     ): Map<K, V> {
         val entries = queryKeys(storageKeys(runtime, keysArguments), at)
 
@@ -84,7 +88,8 @@ abstract class BaseStorageQueryContext(
             entries = entries,
             storageEntry = this,
             keyExtractor = keyExtractor,
-            binding = binding
+            binding = binding,
+            recover = recover
         )
     }
 
@@ -237,6 +242,7 @@ abstract class BaseStorageQueryContext(
         storageEntry: StorageEntry,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>,
+        recover: (exception: Exception, rawValue: String?) -> Unit = { exception, _ -> throw exception }
     ): Map<K, V> {
         val returnType = storageEntry.type.value ?: incompatible()
 
@@ -244,10 +250,14 @@ abstract class BaseStorageQueryContext(
             val keyComponents = ComponentHolder(storageEntry.splitKey(runtime, key))
 
             keyExtractor(keyComponents)
-        }.mapValues { (key, value) ->
-            val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
-
-            binding(decoded, key)
+        }.mapValuesNotNull { (key, value) ->
+            try {
+                val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
+                binding(decoded, key)
+            } catch (e: Exception) {
+                recover(e, value)
+                null
+            }
         }
     }
 

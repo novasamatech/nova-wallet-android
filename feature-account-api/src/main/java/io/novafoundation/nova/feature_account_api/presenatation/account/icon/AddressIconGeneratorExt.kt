@@ -126,7 +126,7 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
     chain: Chain,
     accountId: AccountId,
     addressDisplayUseCase: AddressDisplayUseCase,
-) = createAccountAddressModel(chain, accountId, addressDisplayUseCase.invoke(accountId))
+) = createAccountAddressModel(chain, accountId, addressDisplayUseCase.invoke(accountId, chain.id))
 
 suspend fun AddressIconGenerator.createIdentityAddressModel(
     chain: Chain,

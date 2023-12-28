@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.validation
 
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -8,4 +9,6 @@ typealias AmountProducer<P> = suspend (P) -> BigDecimal
 
 typealias PlanksProducer<P> = suspend (P) -> BigInteger
 
-typealias TokenProducer<P> = suspend (P) -> Token
+typealias FeeProducer<P> = suspend (P) -> DecimalFee?
+
+typealias GenericFeeProducer<F, P> = suspend (P) -> GenericDecimalFee<F>?

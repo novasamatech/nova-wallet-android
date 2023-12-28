@@ -7,10 +7,11 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.assetConversion
 import io.novafoundation.nova.common.utils.mutableMultiMapOf
 import io.novafoundation.nova.common.utils.put
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.InlineFee
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
@@ -112,16 +113,17 @@ private class AssetConversionExchange(
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
-        val nativeAssetFee = extrinsicService.estimateFeeV2(chain) {
-            executeSwap(args, origin = chain.emptyAccountId())
+        val nativeAssetFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+            executeSwap(args, sendTo = chain.emptyAccountId())
         }
 
         return convertNativeFeeToPayingTokenFee(nativeAssetFee, args)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
-        return extrinsicService.submitExtrinsicWithSelectedWalletV2(chain) { origin ->
-            executeSwap(args, origin)
+        return extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) { submissionOrigin ->
+            // Send swapped funds to the requested origin since it the account doing the swap
+            executeSwap(args, sendTo = submissionOrigin.requestedOrigin)
         }
     }
 
@@ -163,6 +165,9 @@ private class AssetConversionExchange(
         }
     }
 
+    // TODO we purposefully do not use `nativeTokenFee.amountByRequestedAccount`
+    // since we have disabled fee payment in custom tokens for accounts where the difference matters (e.g. proxy)
+    // We should adapt it if we decide to remove the restriction
     private suspend fun calculateCustomTokenFee(
         nativeTokenFee: Fee,
         nativeAsset: Asset,
@@ -195,7 +200,7 @@ private class AssetConversionExchange(
         }
 
         return AssetExchangeFee(
-            networkFee = InlineFee(toBuyNativeFee),
+            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin),
             minimumBalanceBuyIn = minimumBalanceBuyIn
         )
     }
@@ -211,7 +216,7 @@ private class AssetConversionExchange(
         return requireNotNull(quotedAmount)
     }
 
-    private suspend fun ExtrinsicBuilder.executeSwap(swapExecuteArgs: SwapExecuteArgs, origin: AccountId) {
+    private suspend fun ExtrinsicBuilder.executeSwap(swapExecuteArgs: SwapExecuteArgs, sendTo: AccountId) {
         val path = listOf(swapExecuteArgs.assetIn, swapExecuteArgs.assetOut)
             .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset) }
 
@@ -225,7 +230,7 @@ private class AssetConversionExchange(
                     "path" to path,
                     "amount_in" to swapLimit.expectedAmountIn,
                     "amount_out_min" to swapLimit.amountOutMin,
-                    "send_to" to origin,
+                    "send_to" to sendTo,
                     "keep_alive" to keepAlive
                 )
             )
@@ -237,7 +242,7 @@ private class AssetConversionExchange(
                     "path" to path,
                     "amount_out" to swapLimit.expectedAmountOut,
                     "amount_in_max" to swapLimit.amountInMax,
-                    "send_to" to origin,
+                    "send_to" to sendTo,
                     "keep_alive" to keepAlive
                 )
             )

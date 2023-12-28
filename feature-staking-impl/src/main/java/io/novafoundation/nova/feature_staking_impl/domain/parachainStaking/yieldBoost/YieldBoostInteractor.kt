@@ -2,8 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yiel
 
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.OptimalAutomationRequest
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTask
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
@@ -23,7 +25,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.math.BigInteger
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -41,7 +42,7 @@ interface YieldBoostInteractor {
     suspend fun calculateFee(
         configuration: YieldBoostConfiguration,
         activeTasks: List<YieldBoostTask>,
-    ): BigInteger
+    ): Fee
 
     suspend fun setYieldBoost(
         configuration: YieldBoostConfiguration,
@@ -63,10 +64,10 @@ class RealYieldBoostInteractor(
     override suspend fun calculateFee(
         configuration: YieldBoostConfiguration,
         activeTasks: List<YieldBoostTask>
-    ): BigInteger {
+    ): Fee {
         val chain = singleAssetSharedState.chain()
 
-        return extrinsicService.estimateFee(chain) {
+        return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             setYieldBoost(chain, activeTasks, configuration)
         }
     }
@@ -74,9 +75,9 @@ class RealYieldBoostInteractor(
     override suspend fun setYieldBoost(configuration: YieldBoostConfiguration, activeTasks: List<YieldBoostTask>): Result<ExtrinsicStatus.InBlock> {
         val chain = singleAssetSharedState.chain()
 
-        return extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) {
+        return extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
             setYieldBoost(chain, activeTasks, configuration)
-        }
+        }.awaitInBlock()
     }
 
     override suspend fun optimalYieldBoostParameters(delegatorState: DelegatorState, collatorId: AccountId): YieldBoostParameters {

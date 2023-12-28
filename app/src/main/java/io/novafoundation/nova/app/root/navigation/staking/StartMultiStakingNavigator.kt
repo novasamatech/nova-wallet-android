@@ -58,6 +58,6 @@ class StartMultiStakingNavigator(
     }
 
     override fun goToWalletDetails(metaId: Long) {
-        commonNavigationHolder.openAccountDetails(metaId)
+        commonNavigationHolder.openWalletDetails(metaId)
     }
 }

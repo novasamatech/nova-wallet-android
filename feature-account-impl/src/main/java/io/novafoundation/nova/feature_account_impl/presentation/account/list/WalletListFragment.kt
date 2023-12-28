@@ -6,20 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_impl.R
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_wallet_list.walletListBarAction
 import kotlinx.android.synthetic.main.fragment_wallet_list.walletListContent
 import kotlinx.android.synthetic.main.fragment_wallet_list.walletListTitle
 
 abstract class WalletListFragment<T : WalletListViewModel> :
     BaseBottomSheetFragment<T>(),
-    AccountsAdapter.AccountItemHandler {
+    AccountHolder.AccountItemHandler {
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        AccountsAdapter(this, initialMode = viewModel.mode)
+        AccountsAdapter(this, imageLoader, initialMode = viewModel.mode, chainBorderColor = R.color.bottom_sheet_background)
     }
 
     override fun onCreateView(

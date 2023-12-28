@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.validation.validations
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validOrError
+import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NotEnoughFunds
@@ -24,7 +25,7 @@ class EnoughNativeAssetBalanceToPayFeeConsideringEDValidation(
         if (feeChainAsset.isCommissionAsset) {
             val chain = chainRegistry.getChain(feeChainAsset.chainId)
             val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, feeChainAsset)
-            return validOrError(value.feeAsset.balanceCountedTowardsEDInPlanks - value.swapFee.networkFee.amount >= existentialDeposit) {
+            return validOrError(value.feeAsset.balanceCountedTowardsEDInPlanks - value.decimalFee.networkFee.amountByRequestedAccount >= existentialDeposit) {
                 NotEnoughFunds.ToPayFeeAndStayAboveED(value.feeAsset.token.configuration)
             }
         }

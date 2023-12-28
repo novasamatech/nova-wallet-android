@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.wallet
 
 import android.graphics.drawable.Drawable
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +20,7 @@ interface WalletUiUseCase {
 
     suspend fun selectedWalletUi(): WalletModel
 
-    suspend fun walletIcon(metaAccount: MetaAccount, transparentBackground: Boolean = true): Drawable
+    suspend fun walletIcon(metaAccount: MetaAccount, iconSize: Int = AddressIconGenerator.SIZE_MEDIUM, transparentBackground: Boolean = true): Drawable
 
     suspend fun walletUiFor(metaAccount: MetaAccount): WalletModel
 }

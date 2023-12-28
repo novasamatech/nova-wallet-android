@@ -85,7 +85,7 @@
         app:exitAnim="@anim/fragment_close_exit"
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_open_exit"
-        app:popUpTo="@+id/accountDetailsFragment" />
+        app:popUpTo="@+id/walletDetailsFragment" />
 
     <action
         android:id="@+id/action_export_seed"
@@ -113,7 +113,7 @@
 
     <action
         android:id="@+id/action_open_account_details"
-        app:destination="@id/accountDetailsFragment"
+        app:destination="@id/walletDetailsFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -423,10 +423,26 @@
     <include app:graph="@navigation/start_staking_nav_graph" />
 
     <dialog
+        android:id="@+id/delegatedAccountUpdatesFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.DelegatedAccountUpdatesBottomSheet"
+        android:label="DelegatedAccountUpdatesBottomSheet"
+        tools:layout="@layout/bottom_sheet_delegated_account_updates" />
+
+    <dialog
         android:id="@+id/switchWalletFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.SwitchWalletFragment"
         android:label="SwitchWalletFragment"
-        tools:layout="@layout/bottom_sheet_dynamic_list" />
+        tools:layout="@layout/bottom_sheet_dynamic_list">
+
+        <action
+            android:id="@+id/action_switchWalletFragment_to_delegatedAccountUpdates"
+            app:destination="@id/delegatedAccountUpdatesFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </dialog>
 
     <dialog
         android:id="@+id/selectAddressFragment"
@@ -491,10 +507,10 @@
         tools:layout="@layout/fragment_languages" />
 
     <fragment
-        android:id="@+id/accountDetailsFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.details.AccountDetailsFragment"
-        android:label="AccountDetailsFragment"
-        tools:layout="@layout/fragment_account_details">
+        android:id="@+id/walletDetailsFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment"
+        android:label="WalletDetailsFragment"
+        tools:layout="@layout/fragment_wallet_details">
 
 
         <action

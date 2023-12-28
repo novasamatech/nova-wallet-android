@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers
 
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
@@ -47,16 +49,14 @@ abstract class BaseAssetTransfers(
      */
     protected abstract suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>>
 
-    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<String> {
-        val senderAccountId = transfer.sender.accountIdIn(transfer.originChain)!!
-
-        return extrinsicService.submitExtrinsicWithAnySuitableWallet(transfer.originChain, senderAccountId) {
+    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<ExtrinsicSubmission> {
+        return extrinsicService.submitExtrinsic(transfer.originChain, transfer.sender.intoOrigin()) {
             transfer(transfer)
         }
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): Fee {
-        return extrinsicService.estimateFeeV2(transfer.originChain) {
+        return extrinsicService.estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet) {
             transfer(transfer)
         }
     }
@@ -90,7 +90,7 @@ abstract class BaseAssetTransfers(
         recipientCanAcceptTransfer(assetSourceRegistry)
     }
 
-    protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(
+    private fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(
         assetSourceRegistry = assetSourceRegistry,
         fee = { it.originFeeInUsedAsset },
         extraAmount = { it.transfer.amount },

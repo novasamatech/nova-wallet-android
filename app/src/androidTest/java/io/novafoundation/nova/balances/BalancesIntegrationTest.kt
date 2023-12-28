@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.system
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.runtime.BuildConfig.TEST_CHAINS_URL
@@ -122,7 +123,7 @@ class BalancesIntegrationTest(
     private suspend fun testFeeLoadingAsync(chain: Chain) {
         return coroutineScope {
             withTimeout(80.seconds) {
-                extrinsicService.estimateFee(chain) {
+                extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
                     systemRemark(byteArrayOf(0))
 
                     val haveBatch = runtime.metadata.hasModule("Utility")

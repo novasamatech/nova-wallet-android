@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redee
 
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -25,13 +27,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
-import java.math.BigInteger
 
 interface NominationPoolsRedeemInteractor {
 
     fun redeemAmountFlow(poolMember: PoolMember, computationScope: CoroutineScope): Flow<Balance>
 
-    suspend fun estimateFee(poolMember: PoolMember): BigInteger
+    suspend fun estimateFee(poolMember: PoolMember): Fee
 
     suspend fun redeem(poolMember: PoolMember): Result<RedeemConsequences>
 }
@@ -58,9 +59,9 @@ class RealNominationPoolsRedeemInteractor(
         }
     }
 
-    override suspend fun estimateFee(poolMember: PoolMember): BigInteger {
+    override suspend fun estimateFee(poolMember: PoolMember): Fee {
         return withContext(Dispatchers.IO) {
-            extrinsicService.estimateFee(stakingSharedState.chain()) {
+            extrinsicService.estimateFee(stakingSharedState.chain(), TransactionOrigin.SelectedWallet) {
                 redeem(poolMember)
             }
         }
@@ -71,7 +72,7 @@ class RealNominationPoolsRedeemInteractor(
             val chain = stakingSharedState.chain()
             val activeEra = stakingRepository.getActiveEraIndex(chain.id)
 
-            extrinsicService.submitExtrinsicWithSelectedWalletV2(chain) {
+            extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) {
                 redeem(poolMember)
             }.map {
                 val totalAfterRedeem = poolMember.totalPointsAfterRedeemAt(activeEra)

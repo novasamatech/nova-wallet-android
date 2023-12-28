@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn’t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
+    <string name="error_not_enough_to_pay_fee_title">Not enough tokens to pay the fee</string>
+
+    <string name="proxied_wallet_details_info_warning">This account has provided access to perform transactions to the following account:</string>
+
+    <string name="common_dont_show_again">Do not show this again</string>
+
+    <string name="proxy_signing_warning_title">This is Delegating (Proxied) account</string>
+    <string name="proxy_signing_warning_message">Transaction will be initiated by %s as a delegated account. Network fee will be paid by delegated account.</string>
+
+    <string name="proxy_signing_not_enough_permission_title">Oops! Not enough permission</string>
+    <string name="proxy_signing_not_enough_permission_message">%1$s delegated %2$s only for %3$s</string>
+
+    <string name="proxy_signing_is_not_supported_message">Proxied wallets does not support signing arbitrary messages — only transactions</string>
+
+    <string name="delegated_accounts_fragment_title">Delegated accounts update</string>
+    <string name="delegated_accounts_fragment_explanation">Nova Wallet automatically adds delegated authorities (Proxy) to a separate category for you. You can always manage wallets in Settings.</string>
+    <string name="proxy_about">What is a Proxy?</string>
+
+    <string name="proxieds_updates_deactivated_title">No longer valid</string>
+
+    <string name="proxy_wallet_type">%s proxy</string>
+    <string name="account_proxy_type_any">Any</string>
+    <string name="account_proxy_type_non_transfer">Non Transfer</string>
+    <string name="account_proxy_type_governance">Governance</string>
+    <string name="account_proxy_type_staking">Staking</string>
+    <string name="account_proxy_type_identity_judgement">Identity Judgement</string>
+    <string name="account_proxy_type_cancel_proxy">Cancel Proxy</string>
+    <string name="account_proxy_type_auction">Auction</string>
+    <string name="account_proxy_type_nomination_pools">Nomination Pools</string>
+
+    <string name="account_proxieds">Delegated to you (Proxieds)</string>
+
     <string name="deep_linking_chain_id_is_not_found">Chain is not found</string>
     <string name="deep_linking_governance_type_is_not_specified">Governance type is not specified</string>
     <string name="deep_linking_governance_type_is_not_supported">Governance type is not supported</string>

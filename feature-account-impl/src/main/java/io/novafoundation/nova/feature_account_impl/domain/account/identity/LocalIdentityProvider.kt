@@ -13,7 +13,7 @@ class LocalIdentityProvider(
 ) : IdentityProvider {
 
     override suspend fun identityFor(accountId: AccountId, chainId: ChainId): Identity? = withContext(Dispatchers.IO) {
-        val name = accountRepository.accountNameFor(accountId)
+        val name = accountRepository.accountNameFor(accountId, chainId)
 
         name?.let(::Identity)
     }

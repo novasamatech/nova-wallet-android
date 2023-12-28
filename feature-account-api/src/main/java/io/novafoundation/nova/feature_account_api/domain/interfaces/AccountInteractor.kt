@@ -57,4 +57,6 @@ interface AccountInteractor {
     suspend fun deleteNode(nodeId: Int)
 
     suspend fun getChainAddress(metaId: Long, chainId: ChainId): String?
+
+    suspend fun removeDeactivatedMetaAccounts()
 }

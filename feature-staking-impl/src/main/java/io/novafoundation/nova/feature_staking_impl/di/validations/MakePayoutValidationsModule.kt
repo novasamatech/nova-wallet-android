@@ -22,14 +22,14 @@ class MakePayoutValidationsModule {
         return EnoughAmountToTransferValidation(
             feeExtractor = { it.fee },
             availableBalanceProducer = { it.asset.transferable },
-            errorProducer = { _, _ -> PayoutValidationFailure.CannotPayFee }
+            errorProducer = { PayoutValidationFailure.CannotPayFee }
         )
     }
 
     @FeatureScope
     @Provides
     fun provideProfitableValidation() = ProfitablePayoutValidation(
-        fee = { fee },
+        fee = { it.fee },
         amount = { totalReward },
         error = { PayoutValidationFailure.UnprofitablePayout }
     )

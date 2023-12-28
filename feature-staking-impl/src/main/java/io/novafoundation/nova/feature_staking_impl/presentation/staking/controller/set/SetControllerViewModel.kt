@@ -35,7 +35,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.controller
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
@@ -177,7 +178,7 @@ class SetControllerViewModel(
     private fun loadFee() {
         feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
-            feeConstructor = { interactor.estimateFee(controllerAddress()) },
+            feeConstructor = { interactor.estimateFee(controllerAddress(), accountStakingFlow.first()) },
             onRetryCancelled = ::backClicked
         )
     }
@@ -199,34 +200,34 @@ class SetControllerViewModel(
 
     private suspend fun controllerAddress() = accountStakingFlow.first().controllerAddress
 
-    private fun maybeGoToConfirm() = feeLoaderMixin.requireFee(this) { fee ->
-        launch {
-            val controllerAddress = getNewControllerAddress()
+    private fun maybeGoToConfirm() = launch {
+        validationInProgress.value = true
 
-            val payload = SetControllerValidationPayload(
-                stashAddress = stashAddress(),
-                controllerAddress = controllerAddress,
-                fee = fee,
-                transferable = assetFlow.first().transferable
-            )
+        val controllerAddress = getNewControllerAddress()
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                progressConsumer = validationInProgress.progressConsumer(),
-                validationFailureTransformer = { bondSetControllerValidationFailure(it, resourceManager) }
-            ) {
-                validationInProgress.value = false
+        val payload = SetControllerValidationPayload(
+            stashAddress = stashAddress(),
+            controllerAddress = controllerAddress,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            transferable = assetFlow.first().transferable
+        )
 
-                openConfirm(
-                    ConfirmSetControllerPayload(
-                        fee = fee,
-                        stashAddress = payload.stashAddress,
-                        controllerAddress = payload.controllerAddress,
-                        transferable = payload.transferable
-                    )
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            progressConsumer = validationInProgress.progressConsumer(),
+            validationFailureTransformer = { bondSetControllerValidationFailure(it, resourceManager) }
+        ) {
+            validationInProgress.value = false
+
+            openConfirm(
+                ConfirmSetControllerPayload(
+                    fee = mapFeeToParcel(it.fee),
+                    stashAddress = payload.stashAddress,
+                    controllerAddress = payload.controllerAddress,
+                    transferable = payload.transferable
                 )
-            }
+            )
         }
     }
 

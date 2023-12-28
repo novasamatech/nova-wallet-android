@@ -5,7 +5,10 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -54,6 +57,8 @@ interface AccountFeatureApi {
 
     fun encryptionDefaults(): EncryptionDefaults
 
+    fun proxyExtrinsicValidationRequestBus(): ProxyExtrinsicValidationRequestBus
+
     val addressInputMixinFactory: AddressInputMixinFactory
 
     val walletUiUseCase: WalletUiUseCase
@@ -71,6 +76,10 @@ interface AccountFeatureApi {
 
     @OnChainIdentity
     fun onChainIdentityProvider(): IdentityProvider
+
+    fun proxySyncService(): ProxySyncService
+
+    fun ledgerAddAccountRepository(): LedgerAddAccountRepository
 
     val evmTransactionService: EvmTransactionService
 

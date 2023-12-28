@@ -116,12 +116,12 @@ class AccountRepositoryImpl(
         return accountDataSource.selectedMetaAccountFlow()
     }
 
-    override suspend fun findMetaAccount(accountId: ByteArray): MetaAccount? {
-        return accountDataSource.findMetaAccount(accountId)
+    override suspend fun findMetaAccount(accountId: ByteArray, chainId: String): MetaAccount? {
+        return accountDataSource.findMetaAccount(accountId, chainId)
     }
 
-    override suspend fun accountNameFor(accountId: AccountId): String? {
-        return accountDataSource.accountNameFor(accountId)
+    override suspend fun accountNameFor(accountId: AccountId, chainId: String): String? {
+        return accountDataSource.accountNameFor(accountId, chainId)
     }
 
     override suspend fun allMetaAccounts(): List<MetaAccount> {
@@ -138,6 +138,10 @@ class AccountRepositoryImpl(
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
         return accountDataSource.allMetaAccountsFlow()
+    }
+
+    override fun activeMetaAccountsFlow(): Flow<List<MetaAccount>> {
+        return accountDataSource.activeMetaAccountsFlow()
     }
 
     override fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
@@ -247,8 +251,12 @@ class AccountRepositoryImpl(
         }
     }
 
-    override suspend fun isAccountExists(accountId: AccountId): Boolean {
-        return accountDataSource.accountExists(accountId)
+    override suspend fun isAccountExists(accountId: AccountId, chainId: String): Boolean {
+        return accountDataSource.accountExists(accountId, chainId)
+    }
+
+    override suspend fun removeDeactivatedMetaAccounts() {
+        accountDataSource.removeDeactivatedMetaAccounts()
     }
 
     override fun nodesFlow(): Flow<List<Node>> {

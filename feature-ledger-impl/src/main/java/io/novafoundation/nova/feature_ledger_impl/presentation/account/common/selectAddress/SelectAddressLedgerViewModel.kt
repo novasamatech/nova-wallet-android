@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
@@ -157,7 +157,10 @@ abstract class SelectAddressLedgerViewModel(
                 isSelected = false,
                 isClickable = true,
                 picture = addressModel.image,
-                subtitleIconRes = null
+                chainIconUrl = null,
+                updateIndicator = false,
+                subtitleIconRes = null,
+                isEditable = false
             )
         }
     }

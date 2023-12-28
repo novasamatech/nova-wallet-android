@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.mapPendingPayoutParcelToPayout
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -101,22 +101,26 @@ class ConfirmPayoutViewModel(
         router.back()
     }
 
-    private fun sendTransactionIfValid() = feeLoaderMixin.requireFee(this) { fee ->
-        launch {
-            val asset = assetFlow.first()
-            val accountAddress = stakingStateFlow.first().accountAddress
-            val amount = asset.token.configuration.amountFromPlanks(payload.totalRewardInPlanks)
+    private fun sendTransactionIfValid() = launch {
+        val asset = assetFlow.first()
+        val accountAddress = stakingStateFlow.first().accountAddress
+        val amount = asset.token.configuration.amountFromPlanks(payload.totalRewardInPlanks)
 
-            val makePayoutPayload = MakePayoutPayload(accountAddress, fee, amount, asset, payouts)
+        val makePayoutPayload = MakePayoutPayload(
+            originAddress = accountAddress,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            totalReward = amount,
+            asset = asset,
+            payouts = payouts
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = makePayoutPayload,
-                validationFailureTransformer = ::payloadValidationFailure,
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                sendTransaction(makePayoutPayload)
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = makePayoutPayload,
+            validationFailureTransformer = ::payloadValidationFailure,
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            sendTransaction(makePayoutPayload)
         }
     }
 
@@ -135,7 +139,7 @@ class ConfirmPayoutViewModel(
     }
 
     private fun loadFee() {
-        feeLoaderMixin.loadFeeV2(
+        feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
             feeConstructor = {
                 payoutInteractor.estimatePayoutFee(payouts)

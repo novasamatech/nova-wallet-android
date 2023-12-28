@@ -26,7 +26,7 @@ class UnbondValidationsModule {
     fun provideFeeValidation() = UnbondFeeValidation(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
-        errorProducer = { _, _ -> UnbondValidationFailure.CannotPayFees }
+        errorProducer = { UnbondValidationFailure.CannotPayFees }
     )
 
     @FeatureScope

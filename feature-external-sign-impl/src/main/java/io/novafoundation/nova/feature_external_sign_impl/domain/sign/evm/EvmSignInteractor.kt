@@ -13,10 +13,10 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.zero
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionDecoder
+import java.math.BigInteger
 
 class EvmSignInteractorFactory(
     private val chainRegistry: ChainRegistry,
@@ -118,7 +119,7 @@ class EvmSignInteractor(
         if (payload is ConfirmTx) {
             checkForSimpleFeeChanges(
                 calculateFee = { calculateFee() },
-                currentFee = { it.decimalFee!!.decimalAmount },
+                currentFee = { it.decimalFee },
                 chainAsset = { it.token!!.configuration },
                 error = ConfirmDAppOperationValidationFailure::FeeSpikeDetected
             )
@@ -159,9 +160,11 @@ class EvmSignInteractor(
     }
 
     override suspend fun calculateFee(): Fee = withContext(Dispatchers.Default) {
-        if (payload !is ConfirmTx) return@withContext Fee.zero()
+        if (payload !is ConfirmTx) return@withContext zeroFee()
 
-        val api = ethereumApi() ?: return@withContext Fee.zero()
+        resolveWalletSigner()
+
+        val api = ethereumApi() ?: return@withContext zeroFee()
 
         val tx = api.formTransaction(payload.transaction, feeOverride = null)
         mostRecentFormedTx.emit(tx)
@@ -193,6 +196,10 @@ class EvmSignInteractor(
 
     override suspend fun shutdown() {
         ethereumApi()?.shutdown()
+    }
+
+    private fun zeroFee(): Fee {
+        return EvmFee(gasLimit = BigInteger.ZERO, gasPrice = BigInteger.ZERO, submissionOrigin())
     }
 
     private suspend fun confirmTx(basedOn: EvmTransaction, upToDateFee: Fee?, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response {
@@ -314,7 +321,9 @@ class EvmSignInteractor(
         )
     }
 
-    private fun RawTransaction.fee(): Fee = EvmFee(gasLimit = gasLimit, gasPrice = gasPrice)
+    private fun RawTransaction.fee(): Fee = EvmFee(gasLimit = gasLimit, gasPrice = gasPrice, submissionOrigin = submissionOrigin())
+
+    private fun submissionOrigin() = SubmissionOrigin.singleOrigin(originAccountId())
 
     private fun originAccountId() = payload.originAddress.asEthereumAddress().toAccountId().value
 

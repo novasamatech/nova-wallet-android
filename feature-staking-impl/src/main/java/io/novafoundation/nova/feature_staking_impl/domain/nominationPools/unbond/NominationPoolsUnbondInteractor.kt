@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond
 
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -28,9 +31,9 @@ interface NominationPoolsUnbondInteractor {
 
     fun poolMemberStateFlow(computationScope: CoroutineScope): Flow<PoolMemberState>
 
-    suspend fun estimateFee(poolMember: PoolMember, amount: Balance): Balance
+    suspend fun estimateFee(poolMember: PoolMember, amount: Balance): Fee
 
-    suspend fun unbond(poolMember: PoolMember, amount: Balance): Result<String>
+    suspend fun unbond(poolMember: PoolMember, amount: Balance): Result<ExtrinsicSubmission>
 }
 
 class RealNominationPoolsUnbondInteractor(
@@ -55,21 +58,21 @@ class RealNominationPoolsUnbondInteractor(
             }
     }
 
-    override suspend fun estimateFee(poolMember: PoolMember, amount: Balance): Balance {
+    override suspend fun estimateFee(poolMember: PoolMember, amount: Balance): Fee {
         return withContext(Dispatchers.IO) {
             val chain = stakingSharedState.chain()
 
-            extrinsicService.estimateFee(chain) {
+            extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
                 nominationPools.unbond(poolMember, amount, chain.id)
             }
         }
     }
 
-    override suspend fun unbond(poolMember: PoolMember, amount: Balance): Result<String> {
+    override suspend fun unbond(poolMember: PoolMember, amount: Balance): Result<ExtrinsicSubmission> {
         return withContext(Dispatchers.IO) {
             val chain = stakingSharedState.chain()
 
-            extrinsicService.submitExtrinsicWithSelectedWallet(stakingSharedState.chain()) {
+            extrinsicService.submitExtrinsic(stakingSharedState.chain(), TransactionOrigin.SelectedWallet) {
                 nominationPools.unbond(poolMember, amount, chain.id)
             }
         }

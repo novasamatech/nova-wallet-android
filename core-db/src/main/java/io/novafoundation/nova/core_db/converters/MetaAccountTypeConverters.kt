@@ -1,7 +1,7 @@
 package io.novafoundation.nova.core_db.converters
 
 import androidx.room.TypeConverter
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
 class MetaAccountTypeConverters {
 

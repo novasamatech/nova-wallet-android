@@ -32,11 +32,13 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openSwitchWallet()
 
+    fun openDelegatedAccountsUpdates()
+
     fun openNodes()
 
     fun openAddAccount(payload: AddAccountPayload)
 
-    fun openAccountDetails(metaId: Long)
+    fun openWalletDetails(metaId: Long)
 
     fun openNodeDetails(nodeId: Int)
 

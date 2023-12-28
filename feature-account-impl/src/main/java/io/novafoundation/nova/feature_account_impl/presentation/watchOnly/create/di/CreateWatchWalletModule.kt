@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchOnlyRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.create.CreateWatchWalletInteractor
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.create.RealCreateWatchWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -26,8 +27,9 @@ class CreateWatchWalletModule {
     @ScreenScope
     fun provideInteractor(
         watchOnlyRepository: WatchOnlyRepository,
+        watchOnlyAddAccountRepository: WatchOnlyAddAccountRepository,
         accountRepository: AccountRepository
-    ): CreateWatchWalletInteractor = RealCreateWatchWalletInteractor(watchOnlyRepository, accountRepository)
+    ): CreateWatchWalletInteractor = RealCreateWatchWalletInteractor(watchOnlyRepository, watchOnlyAddAccountRepository, accountRepository)
 
     @Provides
     @IntoMap

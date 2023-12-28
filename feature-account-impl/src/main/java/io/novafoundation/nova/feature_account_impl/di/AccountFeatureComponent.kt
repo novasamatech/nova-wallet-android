@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.di.DelegatedAccountUpdatesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
@@ -76,6 +77,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun selectWalletComponentFactory(): SelectWalletComponent.Factory
 
     fun selectAddressComponentFactory(): SelectAddressComponent.Factory
+
+    fun delegatedAccountUpdatesFactory(): DelegatedAccountUpdatesComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
 
