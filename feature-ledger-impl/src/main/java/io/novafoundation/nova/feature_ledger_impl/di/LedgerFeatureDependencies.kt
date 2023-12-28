@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -60,4 +61,6 @@ interface LedgerFeatureDependencies {
     val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 
     val selectedAccountUseCase: SelectedAccountUseCase
+
+    val ledgerAddAccountRepository: LedgerAddAccountRepository
 }

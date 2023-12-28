@@ -7,9 +7,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.common.utils.SharedState
-import io.novafoundation.nova.core_db.dao.MetaAccountDao
-import io.novafoundation.nova.feature_account_impl.data.repository.ParitySignerRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.RealParitySignerRepository
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
@@ -23,12 +20,6 @@ class ParitySignerModule {
     fun provideReadOnlySharedState(
         mutableSharedState: MutableSharedState<SignerPayloadExtrinsic>
     ): SharedState<SignerPayloadExtrinsic> = mutableSharedState
-
-    @Provides
-    @FeatureScope
-    fun provideRepository(
-        accountDao: MetaAccountDao
-    ): ParitySignerRepository = RealParitySignerRepository(accountDao)
 
     @Provides
     @FeatureScope

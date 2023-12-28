@@ -255,6 +255,10 @@ class AccountRepositoryImpl(
         return accountDataSource.accountExists(accountId, chainId)
     }
 
+    override suspend fun removeDeactivatedMetaAccounts() {
+        accountDataSource.removeDeactivatedMetaAccounts()
+    }
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }

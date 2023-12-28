@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.ParitySignerRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish.FinishImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish.RealFinishImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -25,9 +25,9 @@ class FinishImportParitySignerModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        paritySignerRepository: ParitySignerRepository,
+        paritySignerAddAccountRepository: ParitySignerAddAccountRepository,
         accountRepository: AccountRepository
-    ): FinishImportParitySignerInteractor = RealFinishImportParitySignerInteractor(paritySignerRepository, accountRepository)
+    ): FinishImportParitySignerInteractor = RealFinishImportParitySignerInteractor(paritySignerAddAccountRepository, accountRepository)
 
     @Provides
     @IntoMap

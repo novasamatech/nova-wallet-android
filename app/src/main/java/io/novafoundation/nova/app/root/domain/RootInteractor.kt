@@ -33,7 +33,7 @@ class RootInteractor(
         return accountRepository.isCodeSet()
     }
 
-    suspend fun syncProxies() {
+    fun syncProxies() {
         proxySyncService.startSyncing()
     }
 }

@@ -101,15 +101,15 @@ interface MetaAccountDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertProxy(proxyLocal: ProxyAccountLocal)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProxies(proxiesLocal: List<ProxyAccountLocal>)
-
     @Query("SELECT * FROM meta_accounts")
     fun getMetaAccounts(): List<MetaAccountLocal>
 
     @Query("SELECT * FROM meta_accounts")
     @Transaction
     suspend fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
+
+    @Query("SELECT * FROM meta_accounts WHERE status = :status")
+    fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<MetaAccountLocal>
 
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
@@ -186,6 +186,9 @@ interface MetaAccountDao {
 
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)
+
+    @Query("DELETE FROM meta_accounts WHERE status = :status ")
+    fun removeMetaAccountsByStatus(status: MetaAccountLocal.Status)
 }
 
 class MetaAccountWithBalanceLocal(

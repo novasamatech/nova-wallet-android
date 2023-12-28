@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.utils.DEFAULT_DERIVATION_PATH
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.AccountDao
@@ -55,7 +56,6 @@ import io.novafoundation.nova.feature_account_impl.data.network.blockchain.Accou
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
-import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealProxyRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
@@ -76,6 +76,10 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -114,7 +118,8 @@ import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
         ProxySigningModule::class,
         ParitySignerModule::class,
         IdentityProviderModule::class,
-        AdvancedEncryptionStoreModule::class
+        AdvancedEncryptionStoreModule::class,
+        AddAccountsModule::class
     ]
 )
 class AccountFeatureModule {
@@ -140,14 +145,18 @@ class AccountFeatureModule {
         accounRepository: AccountRepository,
         metaAccountDao: MetaAccountDao,
         @OnChainIdentity identityProvider: IdentityProvider,
-        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository: ProxiedAddAccountRepository,
+        rootScope: RootScope
     ): ProxySyncService = RealProxySyncService(
         chainRegistry,
         proxyRepository,
         accounRepository,
         metaAccountDao,
         identityProvider,
-        metaAccountsUpdatesRegistry
+        metaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository,
+        rootScope
     )
 
     @Provides
@@ -328,24 +337,17 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAddAccountRepository(
-        accountDataSource: AccountDataSource,
-        accountSecretsFactory: AccountSecretsFactory,
-        jsonSeedDecoder: JsonSeedDecoder,
-        chainRegistry: ChainRegistry,
-    ) = AddAccountRepository(
-        accountDataSource,
-        accountSecretsFactory,
-        jsonSeedDecoder,
-        chainRegistry
-    )
-
-    @Provides
-    @FeatureScope
     fun provideAddAccountInteractor(
-        addAccountRepository: AddAccountRepository,
+        mnemonicAddAccountRepository: MnemonicAddAccountRepository,
+        jsonAddAccountRepository: JsonAddAccountRepository,
+        seedAddAccountRepository: SeedAddAccountRepository,
         accountRepository: AccountRepository,
-    ) = AddAccountInteractor(addAccountRepository, accountRepository)
+    ) = AddAccountInteractor(
+        mnemonicAddAccountRepository,
+        jsonAddAccountRepository,
+        seedAddAccountRepository,
+        accountRepository
+    )
 
     @Provides
     @FeatureScope
