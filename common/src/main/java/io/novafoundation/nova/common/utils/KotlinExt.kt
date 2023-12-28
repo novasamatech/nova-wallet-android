@@ -336,10 +336,18 @@ fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
  * @return formatted string
  */
 fun String.formatNamed(values: Map<String, String>): String {
+    return formatNamed(values, onUnknownSecret = { "null" })
+}
+
+fun String.formatNamedOrThrow(values: Map<String, String>): String {
+    return formatNamed(values, onUnknownSecret = { throw IllegalArgumentException("Unknown secret: $it") })
+}
+
+fun String.formatNamed(values: Map<String, String>, onUnknownSecret: (secretName: String) -> String): String {
     return NAMED_PATTERN_REGEX.replace(this) { matchResult ->
         val argumentName = matchResult.groupValues.second()
 
-        values[argumentName] ?: "null"
+        values[argumentName] ?: onUnknownSecret(argumentName)
     }
 }
 

@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.RoundRobinStrategy
 import io.novafoundation.nova.test_shared.CoroutineTest
@@ -37,10 +38,11 @@ class NodeAutobalancerTest : CoroutineTest() {
 
     private val nodesFlow = MutableStateFlow(Chain.Nodes(nodeSelectionStrategy, nodes))
     private val stateFlow = singleReplaySharedFlow<Unit>()
+    private val connectionSecrets = ConnectionSecrets(emptyMap())
 
     @Before
     fun setup() {
-        autobalancer = NodeAutobalancer(strategyProvider)
+        autobalancer = NodeAutobalancer(strategyProvider, connectionSecrets)
         whenever(strategyProvider.strategyFlowFor(any(), nodeSelectionStrategy))
             .thenReturn(flowOf(RoundRobinStrategy()))
     }
@@ -74,7 +76,7 @@ class NodeAutobalancerTest : CoroutineTest() {
         Chain.Node(unformattedUrl = it.toString(), name = it.toString(), chainId = "test", orderId = 0)
     }
 
-    private fun nodeFlow() = autobalancer.balancingNodeFlow(
+    private fun nodeFlow() = autobalancer.connectionUrlFlow(
         chainId = "test",
         changeConnectionEventFlow = stateFlow,
         availableNodesFlow = nodesFlow

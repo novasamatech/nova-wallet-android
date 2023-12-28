@@ -7,11 +7,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
+import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategy
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.generateNodeIterator
-import io.novafoundation.nova.runtime.multiNetwork.connection.saturateUrl
+import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrls
 import io.reactivex.Flowable
 import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import okhttp3.Call
@@ -131,7 +132,7 @@ class BalancingHttpWeb3jService(
         retriableProcessResponse: (okhttp3.Response) -> T,
         nonRetriableProcessResponse: (T) -> Unit
     ) {
-        val url = nodeSwitcher.getCurrentNodeUrl()
+        val url = nodeSwitcher.getCurrentNodeUrl() ?: return
 
         val call = createHttpCall(payload, url)
         future.call = call
@@ -256,48 +257,43 @@ private class NodeSwitcher(
     private var balanceStrategy: AutoBalanceStrategy = initialStrategy
 
     @Volatile
-    private var nodeIterator = initialStrategy.generateNodeIterator(initialNodes)
+    private var nodeIterator: Iterator<NodeWithSaturatedUrl>? = null
 
     @Volatile
-    private var currentNodeUrl = nodeIterator.nextValidNodeUrl()
+    private var currentNodeUrl: String? = null
+
+    init {
+        updateNodes(initialNodes, initialStrategy)
+    }
 
     @Synchronized
     fun updateNodes(nodes: List<Chain.Node>, strategy: AutoBalanceStrategy) {
+        val saturatedNodes = nodes.saturateNodeUrls(connectionSecrets)
+        if (saturatedNodes.isEmpty()) return
+
         availableNodes = nodes
         balanceStrategy = strategy
 
-        nodeIterator = balanceStrategy.generateNodeIterator(nodes)
+        nodeIterator = balanceStrategy.generateNodeIterator(saturatedNodes)
 
         // we do not update currentNode since we want to be lazy here - only update node if it is failing
     }
 
     @Synchronized
-    fun getCurrentNodeUrl(): String {
+    fun getCurrentNodeUrl(): String? {
         return currentNodeUrl
     }
 
     @Suppress
     fun markCurrentNodeNotAccessible() {
-        currentNodeUrl = nodeIterator.nextValidNodeUrl()
-    }
-
-    private fun Iterator<Chain.Node>.nextValidNodeUrl(): String {
-        while (true) {
-            val candidateNode = next()
-
-            val formattedUrl = connectionSecrets.saturateUrl(candidateNode.unformattedUrl)
-
-            if (formattedUrl != null) {
-                return formattedUrl
-            }
-        }
+        currentNodeUrl = nodeIterator?.next()?.saturatedUrl
     }
 }
 
 private fun <T> NodeSwitcher.makeRetryingRequest(request: (url: String) -> T): T {
-    while (true) {
-        val url = getCurrentNodeUrl()
+    val url = getCurrentNodeUrl() ?: error("No url present to make a request")
 
+    while (true) {
         try {
             return request(url)
         } catch (e: Throwable) {
