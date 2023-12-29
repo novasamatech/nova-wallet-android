@@ -28,8 +28,6 @@ import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-private const val SYNC_TIMEOUT = 10_000L // 10 seconds
-
 class RealProxySyncService(
     private val chainRegistry: ChainRegistry,
     private val proxyRepository: ProxyRepository,
