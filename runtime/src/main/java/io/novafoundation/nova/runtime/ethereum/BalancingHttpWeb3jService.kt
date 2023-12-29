@@ -58,6 +58,7 @@ class BalancingHttpWeb3jService(
         val payload: String = objectMapper.writeValueAsString(request)
 
         val result = nodeSwitcher.makeRetryingRequest { url ->
+            Log.d("RX", "Found url for ${request.method} (${request.id}): $url")
             val call = createHttpCall(payload, url)
 
             call.execute().parseSingleResponse(responseType)
@@ -132,6 +133,8 @@ class BalancingHttpWeb3jService(
         retriableProcessResponse: (okhttp3.Response) -> T,
         nonRetriableProcessResponse: (T) -> Unit
     ) {
+        Log.d("RX", "Current node url: ${nodeSwitcher.getCurrentNodeUrl()}")
+
         val url = nodeSwitcher.getCurrentNodeUrl() ?: return
 
         val call = createHttpCall(payload, url)
@@ -275,8 +278,7 @@ private class NodeSwitcher(
         balanceStrategy = strategy
 
         nodeIterator = balanceStrategy.generateNodeIterator(saturatedNodes)
-
-        // we do not update currentNode since we want to be lazy here - only update node if it is failing
+        selectNextNode()
     }
 
     @Synchronized
@@ -286,6 +288,10 @@ private class NodeSwitcher(
 
     @Suppress
     fun markCurrentNodeNotAccessible() {
+        selectNextNode()
+    }
+
+    private fun selectNextNode() {
         currentNodeUrl = nodeIterator?.next()?.saturatedUrl
     }
 }
