@@ -35,7 +35,8 @@ class DelegatedMetaAccountUpdatesListingMixinFactory(
     }
 }
 
-private const val ICON_ALPHA = 0.56f
+private const val DISABLED_ICON_ALPHA = 0.56f
+private const val ENABLED_ICON_ALPHA = 1.0f
 
 private class DelegatedMetaAccountUpdatesListingMixin(
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
@@ -75,11 +76,11 @@ private class DelegatedMetaAccountUpdatesListingMixin(
             subtitle = if (isEnabled) subtitle else subtitle.toSpannable(colorSpan(secondaryColor)),
             isSelected = false,
             isClickable = true,
-            picture = if (isEnabled) walletIcon else walletIcon.withAlphaDrawable(ICON_ALPHA),
+            picture = if (isEnabled) walletIcon else walletIcon.withAlphaDrawable(DISABLED_ICON_ALPHA),
             chainIconUrl = proxiedWithProxy.chain.icon,
             updateIndicator = false,
             subtitleIconRes = null,
-            chainIconOpacity = ICON_ALPHA,
+            chainIconOpacity = if (isEnabled) ENABLED_ICON_ALPHA else DISABLED_ICON_ALPHA,
             isEditable = false
         )
     }
@@ -92,7 +93,7 @@ private class DelegatedMetaAccountUpdatesListingMixin(
         val proxyIcon = proxyFormatter.makeAccountDrawable(proxiedWithProxy.proxy)
         return proxyFormatter.mapProxyMetaAccountSubtitle(
             proxiedWithProxy.proxy.name,
-            if (isEnabled) proxyIcon else proxyIcon.withAlphaDrawable(ICON_ALPHA),
+            if (isEnabled) proxyIcon else proxyIcon.withAlphaDrawable(DISABLED_ICON_ALPHA),
             proxy
         )
     }
