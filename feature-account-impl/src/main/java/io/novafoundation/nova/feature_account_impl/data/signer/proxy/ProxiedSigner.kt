@@ -33,7 +33,8 @@ class ProxiedSignerFactory(
     private val proxySigningPresenter: ProxySigningPresenter,
     private val proxyRepository: ProxyRepository,
     private val rpcCalls: RpcCalls,
-    private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
+    private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
+    private val proxyCallFilterFactory: ProxyCallFilterFactory
 ) {
 
     fun create(metaAccount: MetaAccount, signerProvider: SignerProvider, isRoot: Boolean): ProxiedSigner {
@@ -46,7 +47,8 @@ class ProxiedSignerFactory(
             proxyRepository = proxyRepository,
             rpcCalls = rpcCalls,
             proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus,
-            isRootProxied = isRoot
+            isRootProxied = isRoot,
+            proxyCallFilterFactory = proxyCallFilterFactory
         )
     }
 }
@@ -60,7 +62,8 @@ class ProxiedSigner(
     private val proxyRepository: ProxyRepository,
     private val rpcCalls: RpcCalls,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
-    private val isRootProxied: Boolean
+    private val isRootProxied: Boolean,
+    private val proxyCallFilterFactory: ProxyCallFilterFactory
 ) : NovaSigner {
 
     override suspend fun signerAccountId(chain: Chain): AccountId {
@@ -131,10 +134,8 @@ class ProxiedSigner(
         )
 
         val callInstance = payload.call.toCallInstance() ?: signingNotSupported()
-        val module = callInstance.call.module
 
-        val proxyType = module.toProxyTypeMatcher()
-            .matchToProxyTypes(availableProxyTypes)
+        val proxyType = proxyCallFilterFactory.getFirstMatchedTypeOrNull(callInstance.call, availableProxyTypes)
             ?: notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
         val proxyAddress = proxyMetaAccount.requireAddressIn(chain)
