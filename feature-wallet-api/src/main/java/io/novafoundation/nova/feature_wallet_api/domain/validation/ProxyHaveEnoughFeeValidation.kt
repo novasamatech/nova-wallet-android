@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.validation
 
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
@@ -67,8 +68,8 @@ class ProxyHaveEnoughFeeValidation<P, E>(
 
         val existentialDeposit = assetBalanceSource.existentialDeposit(chain, chainAsset)
         val transferable = asset.transferableMode.calculateTransferable(accountData.free, accountData.frozen, accountData.reserved)
-        val balanceCalculatedTowardsEd = asset.edCountingMode.calculateBalanceCountedTowardsEd(accountData.free, accountData.reserved)
-        val balanceWithoutEd = balanceCalculatedTowardsEd - existentialDeposit
+        val balanceCountedTowardsEd = asset.edCountingMode.calculateBalanceCountedTowardsEd(accountData.free, accountData.reserved)
+        val balanceWithoutEd = (balanceCountedTowardsEd - existentialDeposit).atLeastZero()
 
         return validOrError(transferable >= fee.amount && balanceWithoutEd >= fee.amount) {
             proxyNotEnoughFee(value, transferable, fee)
