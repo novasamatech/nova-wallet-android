@@ -23,6 +23,8 @@ class UnsupportedAssetBalance : AssetBalance {
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset) = unsupported()
 
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
+
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
 
     override suspend fun startSyncingBalance(

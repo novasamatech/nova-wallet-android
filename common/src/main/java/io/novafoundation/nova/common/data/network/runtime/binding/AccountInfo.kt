@@ -8,12 +8,30 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigInteger
 
-class AccountData(
+open class AccountBalance(
     val free: BigInteger,
     val reserved: BigInteger,
-    val frozen: BigInteger,
+    val frozen: BigInteger
+) {
+
+    companion object {
+
+        fun empty(): AccountBalance {
+            return AccountBalance(
+                free = BigInteger.ZERO,
+                reserved = BigInteger.ZERO,
+                frozen = BigInteger.ZERO,
+            )
+        }
+    }
+}
+
+class AccountData(
+    free: BigInteger,
+    reserved: BigInteger,
+    frozen: BigInteger,
     val flags: AccountDataFlags,
-)
+) : AccountBalance(free, reserved, frozen)
 
 @JvmInline
 value class AccountDataFlags(val value: BigInteger) {
