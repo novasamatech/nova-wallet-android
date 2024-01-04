@@ -189,6 +189,23 @@ interface MetaAccountDao {
 
     @Query("DELETE FROM meta_accounts WHERE status = :status ")
     fun removeMetaAccountsByStatus(status: MetaAccountLocal.Status)
+
+    @Query(
+        """
+        WITH RECURSIVE Sequence AS (
+            SELECT pa.proxyMetaId
+            FROM proxy_accounts pa
+            WHERE pa.proxiedMetaId = :proxiedMetaId
+            UNION ALL
+            SELECT pa.proxyMetaId
+            FROM proxy_accounts pa
+            INNER JOIN Sequence s ON s.proxyMetaId = pa.proxiedMetaId
+        )
+        SELECT MAX(proxyMetaId) as finalMetaId
+        FROM Sequence
+    """
+    )
+    fun getFinalProxyMetaIdOrNull(proxiedMetaId: Long): Long?
 }
 
 class MetaAccountWithBalanceLocal(

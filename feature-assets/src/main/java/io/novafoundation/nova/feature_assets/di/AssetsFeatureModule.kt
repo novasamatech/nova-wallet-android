@@ -11,6 +11,7 @@ import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
+import io.novafoundation.nova.feature_assets.data.network.BalanceUpdateScope
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
@@ -117,12 +118,20 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideBalanceUpdateScope(
+        accountRepository: AccountRepository
+    ): BalanceUpdateScope {
+        return BalanceUpdateScope(accountRepository)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideBalancesUpdateSystem(
         chainRegistry: ChainRegistry,
         paymentUpdaterFactory: PaymentUpdaterFactory,
         balanceLocksUpdater: BalanceLocksUpdaterFactory,
         pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
-        accountUpdateScope: AccountUpdateScope,
+        balanceUpdateScope: BalanceUpdateScope,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ): BalancesUpdateSystem {
         return BalancesUpdateSystem(
@@ -130,7 +139,7 @@ class AssetsFeatureModule {
             paymentUpdaterFactory = paymentUpdaterFactory,
             balanceLocksUpdater = balanceLocksUpdater,
             pooledBalanceUpdaterFactory = pooledBalanceUpdaterFactory,
-            accountUpdateScope = accountUpdateScope,
+            balanceUpdateScope = balanceUpdateScope,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
         )
     }

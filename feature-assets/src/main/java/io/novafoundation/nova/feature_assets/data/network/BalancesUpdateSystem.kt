@@ -32,15 +32,17 @@ class BalancesUpdateSystem(
     private val paymentUpdaterFactory: PaymentUpdaterFactory,
     private val balanceLocksUpdater: BalanceLocksUpdaterFactory,
     private val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
-    private val accountUpdateScope: AccountUpdateScope,
+    private val balanceUpdateScope: BalanceUpdateScope,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
     override fun start(): Flow<Updater.SideEffect> {
-        return accountUpdateScope.invalidationFlow().flatMapLatest { metaAccount ->
-            chainRegistry.currentChains.transformLatestDiffed { chain ->
-                emitAll(balancesSync(chain, metaAccount))
-            }
+        return balanceUpdateScope.invalidationFlow().flatMapLatest { metaAccounts ->
+            metaAccounts.map { metaAccount ->
+                chainRegistry.currentChains.transformLatestDiffed { chain ->
+                    emitAll(balancesSync(chain, metaAccount))
+                }
+            }.mergeIfMultiple()
         }.flowOn(Dispatchers.Default)
     }
 

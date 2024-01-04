@@ -276,6 +276,11 @@ class AccountDataSourceImpl(
         metaAccountDao.removeMetaAccountsByStatus(MetaAccountLocal.Status.DEACTIVATED)
     }
 
+    override suspend fun getFinalProxyForAccountOrNull(metaId: Long): MetaAccount? {
+        val proxyMetaAccountId = metaAccountDao.getFinalProxyMetaIdOrNull(metaId)
+        return proxyMetaAccountId?.let { getMetaAccount(it) }
+    }
+
     private inline fun async(crossinline action: suspend () -> Unit) {
         GlobalScope.launch(Dispatchers.Default) {
             action()

@@ -257,6 +257,10 @@ class AccountRepositoryImpl(
         accountDataSource.removeDeactivatedMetaAccounts()
     }
 
+    override suspend fun getFinalProxyForAccountOrNull(metaId: Long): MetaAccount? {
+        return accountDataSource.getFinalProxyForAccountOrNull(metaId)
+    }
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }
