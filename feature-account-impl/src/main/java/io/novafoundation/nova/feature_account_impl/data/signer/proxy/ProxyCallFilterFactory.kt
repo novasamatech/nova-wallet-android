@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.CallFilter
-import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.CompoundCallFilter
+import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.AnyOfCallFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.EverythingFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.WhiteListFilter
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
@@ -15,7 +15,7 @@ class ProxyCallFilterFactory {
             ProxyAccount.ProxyType.Any,
             is ProxyAccount.ProxyType.Other -> EverythingFilter()
 
-            ProxyAccount.ProxyType.NonTransfer -> CompoundCallFilter(
+            ProxyAccount.ProxyType.NonTransfer -> AnyOfCallFilter(
                 WhiteListFilter(Modules.SYSTEM),
                 WhiteListFilter(Modules.SCHEDULER),
                 WhiteListFilter(Modules.BABE),
@@ -46,7 +46,7 @@ class ProxyCallFilterFactory {
                 WhiteListFilter(Modules.FAST_UNSTAKE)
             )
 
-            ProxyAccount.ProxyType.Governance -> CompoundCallFilter(
+            ProxyAccount.ProxyType.Governance -> AnyOfCallFilter(
                 WhiteListFilter(Modules.TREASURY),
                 WhiteListFilter(Modules.BOUNTIES),
                 WhiteListFilter(Modules.UTILITY),
@@ -56,7 +56,7 @@ class ProxyCallFilterFactory {
                 WhiteListFilter(Modules.WHITELIST)
             )
 
-            ProxyAccount.ProxyType.Staking -> CompoundCallFilter(
+            ProxyAccount.ProxyType.Staking -> AnyOfCallFilter(
                 WhiteListFilter(Modules.STAKING),
                 WhiteListFilter(Modules.SESSION),
                 WhiteListFilter(Modules.UTILITY),
@@ -65,19 +65,19 @@ class ProxyCallFilterFactory {
                 WhiteListFilter(Modules.NOMINATION_POOLS)
             )
 
-            ProxyAccount.ProxyType.NominationPools -> CompoundCallFilter(
+            ProxyAccount.ProxyType.NominationPools -> AnyOfCallFilter(
                 WhiteListFilter(Modules.NOMINATION_POOLS),
                 WhiteListFilter(Modules.UTILITY)
             )
 
-            ProxyAccount.ProxyType.IdentityJudgement -> CompoundCallFilter(
+            ProxyAccount.ProxyType.IdentityJudgement -> AnyOfCallFilter(
                 WhiteListFilter(Modules.IDENTITY, listOf("provide_judgement")),
                 WhiteListFilter(Modules.UTILITY)
             )
 
             ProxyAccount.ProxyType.CancelProxy -> WhiteListFilter(Modules.PROXY, listOf("reject_announcement"))
 
-            ProxyAccount.ProxyType.Auction -> CompoundCallFilter(
+            ProxyAccount.ProxyType.Auction -> AnyOfCallFilter(
                 WhiteListFilter(Modules.AUCTIONS),
                 WhiteListFilter(Modules.CROWDLOAN),
                 WhiteListFilter(Modules.REGISTRAR),
