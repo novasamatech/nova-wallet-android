@@ -369,4 +369,15 @@ object Modules {
     const val PROXY = "Proxy"
 
     const val AUCTIONS = "auctions"
+
+    const val INDICES = "Indices"
+    const val GRANDPA = "Grandpa"
+    const val IM_ONLINE = "ImOnline"
+    const val BOUNTIES = "Bounties"
+    const val CHILD_BOUNTIES = "ChildBounties"
+    const val WHITELIST = "Whitelist"
+    const val CLAIMS = "Claims"
+    const val MULTISIG = "Multisig"
+    const val REGISTRAR = "Registrar"
+    const val FAST_UNSTAKE = "FastUnstake"
 }
