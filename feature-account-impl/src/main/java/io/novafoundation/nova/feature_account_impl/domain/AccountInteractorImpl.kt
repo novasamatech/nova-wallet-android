@@ -182,5 +182,12 @@ class AccountInteractorImpl(
 
     override suspend fun removeDeactivatedMetaAccounts() {
         accountRepository.removeDeactivatedMetaAccounts()
+
+        if (!accountRepository.isAccountSelected()) {
+            val metaAccounts = getMetaAccounts()
+            if (metaAccounts.isNotEmpty()) {
+                accountRepository.selectMetaAccount(metaAccounts.first().id)
+            }
+        }
     }
 }
