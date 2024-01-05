@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidato
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.ChangeStackingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess

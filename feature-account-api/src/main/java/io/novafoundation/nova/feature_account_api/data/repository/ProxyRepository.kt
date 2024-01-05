@@ -11,4 +11,6 @@ interface ProxyRepository {
     suspend fun getAllProxiesForMetaAccounts(chainId: ChainId, metaAccountIds: List<MetaAccountId>): List<ProxiedWithProxy>
 
     suspend fun getDelegatedProxyTypes(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyAccount.ProxyType>
+
+    suspend fun getProxiesQuantity(chainId: ChainId, proxiedAccountId: AccountId): Int
 }

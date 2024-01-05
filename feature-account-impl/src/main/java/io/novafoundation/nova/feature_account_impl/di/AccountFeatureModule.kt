@@ -75,6 +75,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryp
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.proxy.AddProxyInteractor
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
@@ -82,6 +83,8 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.se
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.domain.proxy.RealAddProxyInteractor
+import io.novafoundation.nova.feature_account_impl.domain.proxy.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
@@ -506,4 +509,18 @@ class AccountFeatureModule {
     fun provideSigningNotSupportedPresentable(
         contextManager: ContextManager
     ): SigningNotSupportedPresentable = RealSigningNotSupportedPresentable(contextManager)
+
+    @Provides
+    @FeatureScope
+    fun provideProxyDepositCalculator(
+        chainRegistry: ChainRegistry
+    ) = ProxyDepositCalculator(chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideAddProxyInteractor(
+        extrinsicService: ExtrinsicService,
+        proxyRepository: ProxyRepository,
+        proxyDepositCalculator: ProxyDepositCalculator
+    ): AddProxyInteractor = RealAddProxyInteractor(extrinsicService, proxyDepositCalculator, proxyRepository)
 }

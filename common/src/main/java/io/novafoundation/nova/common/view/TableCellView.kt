@@ -256,9 +256,9 @@ open class TableCellView @JvmOverloads constructor(
 
         val titleIconStart = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconStart)
         titleIconStart?.let {
-            val titleIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconTint)
+            val titleIconStartTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconStartTint)
 
-            setTitleIconStart(titleIconStart, titleIconTint)
+            setTitleIconStart(titleIconStart, titleIconStartTint)
         }
 
         val titleTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleValueTextAppearance)

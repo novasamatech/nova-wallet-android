@@ -64,7 +64,6 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         selectSendOriginChain.setOnClickListener { viewModel.originChainClicked() }
         selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
 
-        selectWallet.background = getRoundedCornerDrawable(cornerSizeDp = 8).withRippleMask(getRippleMask(cornerSizeDp = 8))
         selectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
 
         selectSendCrossChainFee.makeGone() // gone inititally

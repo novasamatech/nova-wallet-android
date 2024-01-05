@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -25,6 +26,7 @@ class StakingFeatureHolder @Inject constructor(
     private val nominationPoolsRouter: NominationPoolsRouter,
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingDashboardRouter: StakingDashboardRouter,
+    private val selectAddressCommunicator: SelectAddressCommunicator,
     private val selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
 ) : FeatureApiHolder(featureContainer) {
@@ -45,6 +47,7 @@ class StakingFeatureHolder @Inject constructor(
                 parachainStaking = parachainStakingRouter,
                 selectCollatorInterScreenCommunicator = selectCollatorInterScreenCommunicator,
                 selectCollatorSettingsInterScreenCommunicator = selectCollatorSettingsInterScreenCommunicator,
+                selectAddressCommunicator = selectAddressCommunicator,
                 nominationPoolsRouter = nominationPoolsRouter,
                 startMultiStakingRouter = startMultiStakingRouter,
                 stakingDashboardRouter = stakingDashboardRouter,

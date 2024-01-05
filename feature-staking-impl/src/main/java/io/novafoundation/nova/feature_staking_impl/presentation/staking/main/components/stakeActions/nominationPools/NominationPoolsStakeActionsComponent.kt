@@ -7,8 +7,11 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_ADD_PROXY
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_PROXIES
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
@@ -19,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.addStakingProxy
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.bondMore
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +49,7 @@ class NominationPoolsStakeActionsComponentFactory(
 
 private open class NominationPoolsStakeActionsComponent(
     nominationPoolSharedComputation: NominationPoolSharedComputation,
-    stakingOption: StakingOption,
+    private val stakingOption: StakingOption,
     private val router: NominationPoolsRouter,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
@@ -75,6 +79,8 @@ private open class NominationPoolsStakeActionsComponent(
         when (action.id) {
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openSetupBondMore()
             SYSTEM_MANAGE_STAKING_UNBOND -> router.openSetupUnbond()
+            SYSTEM_ADD_PROXY -> router.openSetStakingProxy()
+            SYSTEM_MANAGE_PROXIES -> TODO()
         }
     }
 
@@ -86,8 +92,12 @@ private open class NominationPoolsStakeActionsComponent(
         }
     }
 
-    private fun availablePoolMemberActions(): List<ManageStakeAction> = listOf(
-        ManageStakeAction.bondMore(resourceManager),
-        ManageStakeAction.unbond(resourceManager)
-    )
+    private fun availablePoolMemberActions(): List<ManageStakeAction> = buildList {
+        add(ManageStakeAction.bondMore(resourceManager))
+        add(ManageStakeAction.unbond(resourceManager))
+
+        if (stakingOption.chain.supportProxy) {
+            add(ManageStakeAction.addStakingProxy(resourceManager))
+        }
+    }
 }

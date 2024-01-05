@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="staking_action_your_proxies">Your delegations</string>
+    <string name="staking_action_add_proxy">Add delegated authority (Proxy)</string>
+
+    <string name="set_staking_proxy_address_description">Give authority to</string>
+    <string name="common_proxy_deposit">Proxy deposit</string>
+    <string name="fragment_set_staking_proxy_title">Add delegation for %s staking</string>
+
+    <string name="common_enter_address">Enter address…</string>
     <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn’t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
     <string name="error_not_enough_to_pay_fee_title">Not enough tokens to pay the fee</string>
 

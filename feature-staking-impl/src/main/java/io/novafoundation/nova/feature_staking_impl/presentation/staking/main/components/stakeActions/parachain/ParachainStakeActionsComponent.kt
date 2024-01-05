@@ -11,9 +11,12 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_ADD_PROXY
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_PROXIES
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
@@ -28,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.addStakingProxy
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.bondMore
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
 import kotlinx.coroutines.CoroutineScope
@@ -94,6 +98,8 @@ internal open class ParachainStakeActionsComponent(
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking(StartParachainStakingMode.BOND_MORE)
             SYSTEM_MANAGE_STAKING_UNBOND -> openUnbondIfValid()
+            SYSTEM_ADD_PROXY -> router.openSetStakingProxy()
+            SYSTEM_MANAGE_PROXIES -> TODO()
         }
     }
 
@@ -111,6 +117,10 @@ internal open class ParachainStakeActionsComponent(
 
         val collatorsCount = delegatorState.delegations.size.format()
         add(ManageStakeAction.collators(resourceManager, collatorsCount))
+
+        if (stakingOption.chain.supportProxy) {
+            add(ManageStakeAction.addStakingProxy(resourceManager)) //TODO: handle case when proxy is already set
+        }
     }
 
     private fun openUnbondIfValid() = launch {

@@ -21,4 +21,6 @@ interface NominationPoolsRouter : ReturnableRouter {
     fun returnToStakingMain()
 
     fun returnToMain()
+
+    fun openSetStakingProxy()
 }

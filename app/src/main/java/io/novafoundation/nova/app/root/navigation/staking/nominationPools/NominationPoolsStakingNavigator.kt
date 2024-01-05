@@ -38,4 +38,8 @@ class NominationPoolsStakingNavigator(
     override fun returnToMain() {
         commonNavigator.returnToMain()
     }
+
+    override fun openSetStakingProxy() {
+        performNavigation(R.id.action_open_setStakingProxyFragment)
+    }
 }

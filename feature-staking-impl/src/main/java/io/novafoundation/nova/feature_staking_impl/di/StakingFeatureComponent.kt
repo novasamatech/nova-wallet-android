@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -56,8 +57,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.di.SelectPoolComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.di.ConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di.ConfirmSetControllerComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.set.di.SetControllerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.di.ConfirmSetControllerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.set.di.SetControllerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.di.SetStakingProxyComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.di.ConfirmRebondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom.di.CustomRebondComponent
@@ -165,6 +167,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun setControllerFactory(): SetControllerComponent.Factory
 
+    fun setStakingProxyFactory(): SetStakingProxyComponent.Factory
+
     fun confirmSetControllerFactory(): ConfirmSetControllerComponent.Factory
 
     fun rebondCustomFactory(): CustomRebondComponent.Factory
@@ -226,6 +230,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance parachainStaking: ParachainStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+            @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
 
             @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 

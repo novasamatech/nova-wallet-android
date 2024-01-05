@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations
 
-import io.novafoundation.nova.feature_account_api.domain.validation.notSystemAccount
+import io.novafoundation.nova.feature_account_api.domain.validation.proxy.notSystemAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -103,10 +103,11 @@ fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = suffi
     error = { AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
 )
 
-fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() = notSystemAccount(
-    accountId = { it.transfer.recipientOrNull() },
-    error = { AssetTransferValidationFailure.RecipientIsSystemAccount }
-)
+fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() =
+    io.novafoundation.nova.feature_account_api.domain.validation.proxy.notSystemAccount(
+        accountId = { it.transfer.recipientOrNull() },
+        error = { AssetTransferValidationFailure.RecipientIsSystemAccount }
+    )
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
     return existentialDeposit(transfer.originChain, transfer.originChainAsset)

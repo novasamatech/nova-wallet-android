@@ -72,4 +72,8 @@ class ParachainStakingNavigator(
         actionId = R.id.action_setupYieldBoostFragment_to_yieldBoostConfirmFragment,
         args = YieldBoostConfirmFragment.getBundle(payload)
     )
+
+    override fun openSetStakingProxy() {
+        performNavigation(R.id.action_open_setStakingProxyFragment)
+    }
 }
