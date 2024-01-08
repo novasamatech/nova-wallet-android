@@ -28,10 +28,10 @@ import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
-import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.proxy.sync.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
@@ -54,10 +54,8 @@ import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.Rea
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
-import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.RealProxyRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
@@ -75,16 +73,13 @@ import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryp
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
-import io.novafoundation.nova.feature_account_api.domain.proxy.AddProxyInteractor
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.proxy.sync.RealProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.domain.proxy.RealAddProxyInteractor
-import io.novafoundation.nova.feature_account_impl.domain.proxy.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
@@ -100,6 +95,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.R
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
@@ -132,35 +128,6 @@ class AccountFeatureModule {
     fun provideMetaAccountsUpdatesRegistry(
         preferences: Preferences
     ): MetaAccountsUpdatesRegistry = RealMetaAccountsUpdatesRegistry(preferences)
-
-    @Provides
-    @FeatureScope
-    fun provideProxyRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-        chainRegistry: ChainRegistry
-    ): ProxyRepository = RealProxyRepository(storageDataSource, chainRegistry)
-
-    @Provides
-    @FeatureScope
-    fun provideProxySyncService(
-        chainRegistry: ChainRegistry,
-        proxyRepository: ProxyRepository,
-        accounRepository: AccountRepository,
-        metaAccountDao: MetaAccountDao,
-        @OnChainIdentity identityProvider: IdentityProvider,
-        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-        proxiedAddAccountRepository: ProxiedAddAccountRepository,
-        rootScope: RootScope
-    ): ProxySyncService = RealProxySyncService(
-        chainRegistry,
-        proxyRepository,
-        accounRepository,
-        metaAccountDao,
-        identityProvider,
-        metaAccountsUpdatesRegistry,
-        proxiedAddAccountRepository,
-        rootScope
-    )
 
     @Provides
     @FeatureScope
@@ -512,15 +479,23 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideProxyDepositCalculator(
-        chainRegistry: ChainRegistry
-    ) = ProxyDepositCalculator(chainRegistry)
-
-    @Provides
-    @FeatureScope
-    fun provideAddProxyInteractor(
-        extrinsicService: ExtrinsicService,
-        proxyRepository: ProxyRepository,
-        proxyDepositCalculator: ProxyDepositCalculator
-    ): AddProxyInteractor = RealAddProxyInteractor(extrinsicService, proxyDepositCalculator, proxyRepository)
+    fun provideProxySyncService(
+        chainRegistry: ChainRegistry,
+        getProxyRepository: GetProxyRepository,
+        accounRepository: AccountRepository,
+        metaAccountDao: MetaAccountDao,
+        @OnChainIdentity identityProvider: IdentityProvider,
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository: ProxiedAddAccountRepository,
+        rootScope: RootScope
+    ): ProxySyncService = RealProxySyncService(
+        chainRegistry,
+        getProxyRepository,
+        accounRepository,
+        metaAccountDao,
+        identityProvider,
+        metaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository,
+        rootScope
+    )
 }

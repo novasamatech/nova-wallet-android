@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.s
 
 import android.database.sqlite.SQLiteConstraintException
 import io.novafoundation.nova.core.model.CryptoType
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.BaseAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.proxy.sync.ProxySyncService
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType

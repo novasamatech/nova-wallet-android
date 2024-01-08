@@ -6,24 +6,19 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.feature_account_api.domain.proxy.AddProxyInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModel
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -31,7 +26,6 @@ import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import io.novafoundation.nova.runtime.state.selectedChainFlow
-import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,7 +46,7 @@ class SetStakingProxyViewModel(
     private val assetUseCase: ArbitraryAssetUseCase,
     private val resourceManager: ResourceManager,
     private val selectAddressRequester: SelectAddressForTransactionRequester,
-    private val addProxyInteractor: AddProxyInteractor,
+    private val addStakingProxyRepository: AddStakingProxyRepository,
     private val validationExecutor: ValidationExecutor,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
@@ -98,7 +92,7 @@ class SetStakingProxyViewModel(
             val metaAccount = accountRepository.getSelectedMetaAccount()
             val chain = selectedAssetState.chain()
             val accountId = metaAccount.requireAccountIdIn(chain)
-            val deposit = addProxyInteractor.calculateDepositForAddProxy(chain, accountId)
+            val deposit = addStakingProxyRepository.calculateDepositForAddProxy(chain, accountId)
             mapAmountToAmountModel(deposit, asset)
         }
         .shareInBackground()
@@ -147,7 +141,7 @@ class SetStakingProxyViewModel(
             } else {
                 feeMixin.loadFee(
                     coroutineScope = this,
-                    feeConstructor = { addProxyInteractor.estimateFee(chain, accountId, ProxyAccount.ProxyType.Staking) },
+                    feeConstructor = { addStakingProxyRepository.estimateFee(chain, accountId) },
                     onRetryCancelled = {}
                 )
             }

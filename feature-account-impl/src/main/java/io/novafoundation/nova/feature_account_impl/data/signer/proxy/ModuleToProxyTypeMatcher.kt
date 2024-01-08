@@ -1,29 +1,29 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 
 class ModuleToProxyTypeMatcher(private val module: String) {
 
-    fun matchToProxyTypes(proxyTypes: List<ProxyAccount.ProxyType>): ProxyAccount.ProxyType? {
+    fun matchToProxyTypes(proxyTypes: List<ProxyType>): ProxyType? {
         if (proxyTypes.isEmpty()) return null
 
         return proxyTypes.firstOrNull { getModulesSupportedByProxyType(it).isSupporting(module) }
     }
 
-    private fun getModulesSupportedByProxyType(proxyType: ProxyAccount.ProxyType): SupportedModules {
+    private fun getModulesSupportedByProxyType(proxyType: ProxyType): SupportedModules {
         return when (proxyType) {
-            ProxyAccount.ProxyType.Any,
-            is ProxyAccount.ProxyType.Other -> SupportedModules.AnyModule
+            ProxyType.Any,
+            is ProxyType.Other -> SupportedModules.AnyModule
 
-            ProxyAccount.ProxyType.NonTransfer -> SupportedModules.SpeificModules(Modules.STAKING, Modules.REFERENDA, Modules.NOMINATION_POOLS)
-            ProxyAccount.ProxyType.Governance -> SupportedModules.SpeificModules(Modules.REFERENDA)
-            ProxyAccount.ProxyType.Staking -> SupportedModules.SpeificModules(Modules.STAKING)
-            ProxyAccount.ProxyType.IdentityJudgement -> SupportedModules.SpeificModules(Modules.IDENTITY)
-            ProxyAccount.ProxyType.CancelProxy -> SupportedModules.SpeificModules(Modules.PROXY)
-            ProxyAccount.ProxyType.Auction -> SupportedModules.SpeificModules(Modules.AUCTIONS)
-            ProxyAccount.ProxyType.NominationPools -> SupportedModules.SpeificModules(Modules.NOMINATION_POOLS)
+            ProxyType.NonTransfer -> SupportedModules.SpeificModules(Modules.STAKING, Modules.REFERENDA, Modules.NOMINATION_POOLS)
+            ProxyType.Governance -> SupportedModules.SpeificModules(Modules.REFERENDA)
+            ProxyType.Staking -> SupportedModules.SpeificModules(Modules.STAKING)
+            ProxyType.IdentityJudgement -> SupportedModules.SpeificModules(Modules.IDENTITY)
+            ProxyType.CancelProxy -> SupportedModules.SpeificModules(Modules.PROXY)
+            ProxyType.Auction -> SupportedModules.SpeificModules(Modules.AUCTIONS)
+            ProxyType.NominationPools -> SupportedModules.SpeificModules(Modules.NOMINATION_POOLS)
         }
     }
 }

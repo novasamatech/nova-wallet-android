@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
@@ -17,7 +17,7 @@ import java.math.BigInteger
 fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
     proxyAccountId: AccountId,
     currentProxyNonce: BigInteger,
-    proxyType: ProxyAccount.ProxyType,
+    proxyType: ProxyType,
     callInstance: CallRepresentation.Instance
 ): SignerPayloadExtrinsic {
     val proxiedAccountId = accountId

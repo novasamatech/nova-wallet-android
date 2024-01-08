@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets
 
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.proxy.sync.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource

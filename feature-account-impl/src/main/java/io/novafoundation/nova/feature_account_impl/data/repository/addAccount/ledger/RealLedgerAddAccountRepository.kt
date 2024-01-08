@@ -5,8 +5,10 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.proxy.sync.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository.Payload
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -16,7 +18,7 @@ class RealLedgerAddAccountRepository(
     private val chainRegistry: ChainRegistry,
     private val secretStoreV2: SecretStoreV2,
     private val proxySyncService: ProxySyncService,
-) : LedgerAddAccountRepository(proxySyncService) {
+) : BaseAddAccountRepository<Payload>(proxySyncService), LedgerAddAccountRepository {
 
     override suspend fun addAccountInternal(payload: Payload): Long {
         return when (payload) {

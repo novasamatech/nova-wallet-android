@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.proxy.AddProxyInteractor
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -34,6 +33,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -127,8 +128,6 @@ interface StakingFeatureDependencies {
 
     fun addressInputMixinFactory(): AddressInputMixinFactory
 
-    fun addProxyInteractor(): AddProxyInteractor
-
     val amountChooserMixinFactory: AmountChooserMixin.Factory
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
@@ -169,4 +168,8 @@ interface StakingFeatureDependencies {
     val externalBalanceDao: ExternalBalanceDao
 
     val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val proxyDepositCalculator: ProxyDepositCalculator
+
+    val getProxyRepository: GetProxyRepository
 }

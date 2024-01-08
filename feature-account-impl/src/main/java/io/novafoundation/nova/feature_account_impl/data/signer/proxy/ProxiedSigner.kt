@@ -5,16 +5,16 @@ import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
-import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount.ProxyType
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -31,7 +31,7 @@ class ProxiedSignerFactory(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val proxySigningPresenter: ProxySigningPresenter,
-    private val proxyRepository: ProxyRepository,
+    private val getProxyRepository: GetProxyRepository,
     private val rpcCalls: RpcCalls,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus
 ) {
@@ -43,7 +43,7 @@ class ProxiedSignerFactory(
             accountRepository = accountRepository,
             signerProvider = signerProvider,
             proxySigningPresenter = proxySigningPresenter,
-            proxyRepository = proxyRepository,
+            getProxyRepository = getProxyRepository,
             rpcCalls = rpcCalls,
             proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus,
             isRootProxied = isRoot
@@ -57,7 +57,7 @@ class ProxiedSigner(
     private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
     private val proxySigningPresenter: ProxySigningPresenter,
-    private val proxyRepository: ProxyRepository,
+    private val getProxyRepository: GetProxyRepository,
     private val rpcCalls: RpcCalls,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
     private val isRootProxied: Boolean
@@ -124,7 +124,7 @@ class ProxiedSigner(
         val proxyAccountId = proxyMetaAccount.requireAccountIdIn(chain)
         val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
 
-        val availableProxyTypes = proxyRepository.getDelegatedProxyTypes(
+        val availableProxyTypes = getProxyRepository.getDelegatedProxyTypes(
             chainId = payload.chainId,
             proxiedAccountId = proxiedAccountId,
             proxyAccountId = proxyAccountId
