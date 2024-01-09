@@ -74,7 +74,7 @@ fun AddStakingProxyValidationSystemBuilder.enoughBalanceToPayDeposit(
     error = { payload, maxUsable ->
         AddStakingProxyValidationFailure.NotEnoughBalanceToReserveDeposit(
             chainAsset = payload.asset.token.configuration,
-            maxUsable = maxUsable,
+            availableBalance = maxUsable,
             deposit = payload.depositWithQuantity.deposit
         )
     },

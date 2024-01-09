@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.data.proxy.sync
+package io.novafoundation.nova.feature_account_impl.data.proxy
 
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -13,7 +13,7 @@ import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_proxy_api.data.model.ProxiedWithProxy
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
-import io.novafoundation.nova.feature_account_api.data.proxy.sync.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -25,7 +25,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findChains
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -139,12 +138,6 @@ class RealProxySyncService(
 
     private suspend fun getSupportedProxyChains(): List<Chain> {
         return chainRegistry.findChains { it.supportProxy }
-    }
-
-    private fun Chain.getAvailableAccountIds2(metaAccounts: List<MetaAccount>): List<AccountId> {
-        return metaAccounts.mapNotNull { metaAccount ->
-            metaAccount.accountIdIn(chain = this)
-        }
     }
 
     private fun Chain.getAvailableAccountIds(metaAccounts: List<MetaAccount>): GroupedList<AccountIdKey, MetaAccount> {

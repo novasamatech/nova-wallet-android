@@ -5,7 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.app.root.di.busHandler.RequestBusHandlerModule
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_account_api.data.proxy.sync.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository

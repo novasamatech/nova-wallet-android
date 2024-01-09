@@ -94,5 +94,5 @@ interface StakingRouter {
 
     fun finishRedeemFlow(redeemConsequences: RedeemConsequences)
 
-    fun openSetStakingProxy()
+    fun openAddStakingProxy()
 }

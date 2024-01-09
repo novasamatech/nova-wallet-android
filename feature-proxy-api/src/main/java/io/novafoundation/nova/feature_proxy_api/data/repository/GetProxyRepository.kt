@@ -15,5 +15,5 @@ interface GetProxyRepository {
 
     suspend fun getProxiesQuantity(chainId: ChainId, proxiedAccountId: AccountId): Int
 
-    suspend fun getProxDeposit(chainId: ChainId, proxiedAccountId: AccountId): BigInteger
+    suspend fun getProxyDeposit(chainId: ChainId, proxiedAccountId: AccountId): BigInteger
 }

@@ -21,13 +21,12 @@ class EnoughAmountToPayProxyDepositValidation<P, E>(
 
     override suspend fun validate(value: P): ValidationStatus<E> {
         val availableBalance = availableBalance(value)
-        val currentDeposit = proxyRepository.getProxDeposit(chain(value).id, accountId(value))
+        val currentDeposit = proxyRepository.getProxyDeposit(chain(value).id, accountId(value))
 
         val deltaDeposit = (newDeposit(value) - currentDeposit).atLeastZero()
 
         return validOrError(deltaDeposit <= availableBalance) {
-            val maxUsable = availableBalance - deltaDeposit
-            error(value, maxUsable)
+            error(value, availableBalance)
         }
     }
 }

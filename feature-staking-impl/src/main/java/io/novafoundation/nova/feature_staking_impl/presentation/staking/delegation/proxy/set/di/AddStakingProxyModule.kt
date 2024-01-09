@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
@@ -42,7 +43,8 @@ class AddStakingProxyModule {
         addStakingProxyRepository: AddStakingProxyRepository,
         validationExecutor: ValidationExecutor,
         addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
-        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor
     ): ViewModel {
         return AddStakingProxyViewModel(
             addressInputMixinFactory = addressInputMixinFactory,
@@ -57,7 +59,8 @@ class AddStakingProxyModule {
             addStakingProxyRepository = addStakingProxyRepository,
             validationExecutor = validationExecutor,
             addStakingProxyValidationSystem = addStakingProxyValidationSystem,
-            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
+            metaAccountGroupingInteractor = metaAccountGroupingInteractor
         )
     }
 

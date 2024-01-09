@@ -124,7 +124,7 @@ private class RelaychainStakeActionsComponent(
             SYSTEM_MANAGE_CONTROLLER -> router.openControllerAccount()
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentValidators()
             SYSTEM_MANAGE_REWARD_DESTINATION -> router.openChangeRewardDestination()
-            SYSTEM_ADD_PROXY -> router.openSetStakingProxy()
+            SYSTEM_ADD_PROXY -> router.openAddStakingProxy()
             SYSTEM_MANAGE_PROXIES -> TODO()
         }
     }

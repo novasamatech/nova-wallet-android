@@ -223,7 +223,7 @@ class RelayStakingNavigator(
         }
     }
 
-    override fun openSetStakingProxy() {
-        performNavigation(R.id.action_open_setStakingProxyFragment)
+    override fun openAddStakingProxy() {
+        performNavigation(R.id.action_open_addStakingProxyFragment)
     }
 }

@@ -19,13 +19,13 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_set_staking_proxy.setStakingProxyAddress
-import kotlinx.android.synthetic.main.fragment_set_staking_proxy.addStakingProxyButton
-import kotlinx.android.synthetic.main.fragment_set_staking_proxy.setStakingProxyContainer
-import kotlinx.android.synthetic.main.fragment_set_staking_proxy.addStakingProxyDeposit
-import kotlinx.android.synthetic.main.fragment_set_staking_proxy.addStakingProxyFee
-import kotlinx.android.synthetic.main.fragment_set_staking_proxy.addStakingProxyTitle
-import kotlinx.android.synthetic.main.fragment_set_staking_proxy.addStakingProxySelectWallet
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.setStakingProxyAddress
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addStakingProxyButton
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.setStakingProxyContainer
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addStakingProxyDeposit
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addStakingProxyFee
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addStakingProxyTitle
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addStakingProxySelectWallet
 
 class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
 
@@ -34,7 +34,7 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        return inflater.inflate(R.layout.fragment_set_staking_proxy, container, false)
+        return inflater.inflate(R.layout.fragment_add_staking_proxy, container, false)
     }
 
     override fun initViews() {

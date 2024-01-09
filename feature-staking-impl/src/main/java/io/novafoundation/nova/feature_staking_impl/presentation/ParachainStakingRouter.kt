@@ -38,7 +38,7 @@ interface ParachainStakingRouter {
     fun openSetupYieldBoost()
     fun openConfirmYieldBoost(payload: YieldBoostConfirmPayload)
 
-    fun openSetStakingProxy()
+    fun openAddStakingProxy()
 }
 
 fun ParachainStakingRouter.openStartStaking(flowMode: StartParachainStakingMode) = openStartStaking(StartParachainStakingPayload(flowMode))

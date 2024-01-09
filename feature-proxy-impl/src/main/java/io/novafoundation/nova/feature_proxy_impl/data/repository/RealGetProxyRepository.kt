@@ -65,7 +65,7 @@ class RealGetProxyRepository(
         return proxied.proxies.size
     }
 
-    override suspend fun getProxDeposit(chainId: ChainId, proxiedAccountId: AccountId): BigInteger {
+    override suspend fun getProxyDeposit(chainId: ChainId, proxiedAccountId: AccountId): BigInteger {
         val proxied = getAllProxiesFor(chainId, proxiedAccountId)
 
         return proxied.deposit

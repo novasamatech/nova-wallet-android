@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.CallFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.AnyOfCallFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.EverythingFilter

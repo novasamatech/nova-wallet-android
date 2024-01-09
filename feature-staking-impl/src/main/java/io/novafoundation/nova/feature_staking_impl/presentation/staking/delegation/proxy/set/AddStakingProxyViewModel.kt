@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressRequester
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapAddStakingProxyValidationFailureToUi
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.filter.MetaAccountFilter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
@@ -61,6 +63,7 @@ class AddStakingProxyViewModel(
     private val validationExecutor: ValidationExecutor,
     private val addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExternalActions by externalActions,
@@ -98,7 +101,12 @@ class AddStakingProxyViewModel(
         )
     }
 
-    val isSelectAddressAvailable = flowOf { true }
+    val isSelectAddressAvailable = flowOf {
+        val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = selectedAssetState.chain()
+        val filter = metaAccountsFilter(chain, selectedMetaAccount.requireAccountIdIn(chain))
+        metaAccountGroupingInteractor.hasAvailableMetaAccountsForChain(selectedAssetState.chainId(), filter)
+    }
         .shareInBackground()
 
     private val proxyDeposit: Flow<ProxyDepositWithQuantity> = flowOf {
@@ -150,7 +158,7 @@ class AddStakingProxyViewModel(
             val chain = selectedAssetState.chain()
             val proxiedAccountId = metaAccount.requireAccountIdIn(chain)
             val selectedAddress = addressInputMixin.inputFlow.value
-            val filter = filterMetaAccountsWithSameAccountId(chain, proxiedAccountId)
+            val filter = getMetaAccountsFilterPayload(chain, proxiedAccountId)
             val request = SelectAddressRequester.Request(chain.id, selectedAddress, filter)
             selectAddressRequester.openRequest(request)
         }
@@ -210,11 +218,17 @@ class AddStakingProxyViewModel(
         }
     }
 
-    private suspend fun filterMetaAccountsWithSameAccountId(chain: Chain, accountId: AccountId): SelectAddressRequester.Request.Filter {
+    private suspend fun getMetaAccountsFilterPayload(chain: Chain, accountId: AccountId): SelectAddressRequester.Request.Filter.ExcludeMetaIds {
         val filteredMetaAccounts = accountRepository.activeMetaAccounts()
             .filter { it.accountIdIn(chain)?.intoKey() == accountId.intoKey() }
             .map { it.id }
 
         return SelectAddressRequester.Request.Filter.ExcludeMetaIds(filteredMetaAccounts)
+    }
+
+    private suspend fun metaAccountsFilter(chain: Chain, accountId: AccountId): MetaAccountFilter {
+        val metaAccountsFilterPayload = getMetaAccountsFilterPayload(chain, accountId)
+
+        return MetaAccountFilter(MetaAccountFilter.Mode.EXCLUDE, metaAccountsFilterPayload.metaIds)
     }
 }

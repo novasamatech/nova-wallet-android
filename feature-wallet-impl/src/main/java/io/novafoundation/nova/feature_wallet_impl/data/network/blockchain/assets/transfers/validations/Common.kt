@@ -103,11 +103,10 @@ fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = suffi
     error = { AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
 )
 
-fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() =
-    notSystemAccount(
-        accountId = { it.transfer.recipientOrNull() },
-        error = { AssetTransferValidationFailure.RecipientIsSystemAccount }
-    )
+fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() = notSystemAccount(
+    accountId = { it.transfer.recipientOrNull() },
+    error = { AssetTransferValidationFailure.RecipientIsSystemAccount }
+)
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
     return existentialDeposit(transfer.originChain, transfer.originChainAsset)

@@ -9,7 +9,7 @@
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/addControllerToolbar"
+        android:id="@+id/setControllerToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"

@@ -26,6 +26,7 @@ import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -175,4 +176,6 @@ interface StakingFeatureDependencies {
     val getProxyRepository: GetProxyRepository
 
     val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
 }

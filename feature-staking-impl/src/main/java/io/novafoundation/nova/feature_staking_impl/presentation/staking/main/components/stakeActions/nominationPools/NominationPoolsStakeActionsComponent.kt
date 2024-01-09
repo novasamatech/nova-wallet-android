@@ -46,7 +46,7 @@ class NominationPoolsStakeActionsComponentFactory(
 
 private open class NominationPoolsStakeActionsComponent(
     nominationPoolSharedComputation: NominationPoolSharedComputation,
-    private val stakingOption: StakingOption,
+    stakingOption: StakingOption,
     private val router: NominationPoolsRouter,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
@@ -87,8 +87,8 @@ private open class NominationPoolsStakeActionsComponent(
         }
     }
 
-    private fun availablePoolMemberActions(): List<ManageStakeAction> = buildList {
-        add(ManageStakeAction.bondMore(resourceManager))
-        add(ManageStakeAction.unbond(resourceManager))
-    }
+    private fun availablePoolMemberActions(): List<ManageStakeAction> = listOf(
+        ManageStakeAction.bondMore(resourceManager),
+        ManageStakeAction.unbond(resourceManager)
+    )
 }

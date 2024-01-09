@@ -98,7 +98,7 @@ internal open class ParachainStakeActionsComponent(
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking(StartParachainStakingMode.BOND_MORE)
             SYSTEM_MANAGE_STAKING_UNBOND -> openUnbondIfValid()
-            SYSTEM_ADD_PROXY -> router.openSetStakingProxy()
+            SYSTEM_ADD_PROXY -> router.openAddStakingProxy()
             SYSTEM_MANAGE_PROXIES -> TODO()
         }
     }

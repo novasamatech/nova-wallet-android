@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-class MaximumProxiesNotReachedValidator<P, E>(
+class MaximumProxiesNotReachedValidation<P, E>(
     private val chain: (P) -> Chain,
     private val accountId: (P) -> AccountId,
     private val newProxiedQuantity: (P) -> Int,
@@ -20,7 +20,7 @@ class MaximumProxiesNotReachedValidator<P, E>(
         val newProxiesQuantity = newProxiedQuantity(value)
         val maximumProxiesQuantiy = proxyRepository.getProxiesQuantity(chain(value).id, accountId(value))
 
-        return validOrError(newProxiesQuantity <= newProxiesQuantity) {
+        return validOrError(newProxiesQuantity <= maximumProxiesQuantiy) {
             error(value, maximumProxiesQuantiy)
         }
     }
@@ -34,7 +34,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.maximumProxiesNotReached(
     proxyRepository: GetProxyRepository
 ) {
     validate(
-        MaximumProxiesNotReachedValidator(
+        MaximumProxiesNotReachedValidation(
             chain = chain,
             accountId = accountId,
             newProxiedQuantity = newProxiedQuantity,

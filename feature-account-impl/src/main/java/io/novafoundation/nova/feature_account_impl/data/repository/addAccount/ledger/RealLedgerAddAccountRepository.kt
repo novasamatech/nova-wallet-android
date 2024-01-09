@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
-import io.novafoundation.nova.feature_account_api.data.proxy.sync.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository.Payload
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
