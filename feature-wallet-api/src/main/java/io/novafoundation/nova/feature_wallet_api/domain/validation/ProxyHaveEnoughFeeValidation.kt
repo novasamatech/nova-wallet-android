@@ -10,9 +10,10 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateBalanceCountedTowardsEd
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -59,9 +60,16 @@ class ProxyHaveEnoughFeeValidation<P, E>(
         val chainAsset = chainWithAsset(value).asset
         val fee = calculateFee(metaAccount(value), chain, call(value))
         val asset = walletRepository.getAsset(proxyAccountId(value), chainAsset)!!
-        val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, asset.token.configuration)
-        val transferable = asset.transferableInPlanks
-        val balanceWithoutEd = (asset.balanceCountedTowardsEDInPlanks - existentialDeposit).atLeastZero()
+
+        val assetSource = assetSourceRegistry.sourceFor(chainAsset)
+        val assetBalanceSource = assetSource.balance
+
+        val accountData = assetBalanceSource.queryAccountBalance(chain, chainAsset, proxyAccountId(value))
+
+        val existentialDeposit = assetBalanceSource.existentialDeposit(chain, chainAsset)
+        val transferable = asset.transferableMode.calculateTransferable(accountData.free, accountData.frozen, accountData.reserved)
+        val balanceCountedTowardsEd = asset.edCountingMode.calculateBalanceCountedTowardsEd(accountData.free, accountData.reserved)
+        val balanceWithoutEd = (balanceCountedTowardsEd - existentialDeposit).atLeastZero()
 
         return validOrError(transferable >= fee.amount && balanceWithoutEd >= fee.amount) {
             proxyNotEnoughFee(value, transferable, fee)

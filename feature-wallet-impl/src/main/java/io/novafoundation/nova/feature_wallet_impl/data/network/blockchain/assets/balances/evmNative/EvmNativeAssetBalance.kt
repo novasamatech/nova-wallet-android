@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmNative
 
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -49,10 +50,19 @@ class EvmNativeAssetBalance(
         return BigInteger.ZERO
     }
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
         val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
 
-        return ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
+        val balance = ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
+        return AccountBalance(
+            free = balance,
+            reserved = BigInteger.ZERO,
+            frozen = BigInteger.ZERO,
+        )
+    }
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(

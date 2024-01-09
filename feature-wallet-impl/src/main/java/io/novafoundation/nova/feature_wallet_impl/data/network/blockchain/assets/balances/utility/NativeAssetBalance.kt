@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility
 
 import android.util.Log
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.decodeValue
@@ -64,10 +65,14 @@ class NativeAssetBalance(
         return runtime.metadata.balances().numberConstant("ExistentialDeposit", runtime)
     }
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val accountInfo = substrateRemoteSource.getAccountInfo(chain.id, accountId)
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
+        return substrateRemoteSource.getAccountInfo(chain.id, accountId).data
+    }
 
-        return accountInfo.data.free + accountInfo.data.reserved
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        val accountData = queryAccountBalance(chain, chainAsset, accountId)
+
+        return accountData.free + accountData.reserved
     }
 
     override suspend fun startSyncingBalance(
