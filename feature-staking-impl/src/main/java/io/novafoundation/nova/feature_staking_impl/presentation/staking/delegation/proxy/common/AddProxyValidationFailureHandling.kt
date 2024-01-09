@@ -4,7 +4,11 @@ import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure
-import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure.*
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure.NotEnoughBalanceToReserveDeposit
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure.InvalidAddress
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure.MaximumProxiesReached
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure.NotEnoughToPayFee
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure.NotEnoughToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
