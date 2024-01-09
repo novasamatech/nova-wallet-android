@@ -47,6 +47,8 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun allMetaAccounts(): List<MetaAccount>
 
+    suspend fun activeMetaAccounts(): List<MetaAccount>
+
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>

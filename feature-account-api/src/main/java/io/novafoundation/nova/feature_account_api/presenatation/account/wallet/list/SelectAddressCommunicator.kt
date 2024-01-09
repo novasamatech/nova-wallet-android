@@ -6,22 +6,29 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
-interface SelectAddressForTransactionRequester :
-    InterScreenRequester<SelectAddressForTransactionRequester.Request, SelectAddressForTransactionResponder.Response> {
+interface SelectAddressRequester : InterScreenRequester<SelectAddressRequester.Request, SelectAddressResponder.Response> {
 
     @Parcelize
     class Request(
-        val fromChainId: ChainId,
-        val destinationChainId: ChainId,
-        val selectedAddress: String?
-    ) : Parcelable
+        val chainId: ChainId,
+        val selectedAddress: String?,
+        val filter: Filter
+    ) : Parcelable {
+
+        sealed interface Filter : Parcelable {
+            @Parcelize
+            object Empty : Filter
+
+            @Parcelize
+            class ExcludeMetaIds(val metaIds: List<Long>) : Filter
+        }
+    }
 }
 
-interface SelectAddressForTransactionResponder :
-    InterScreenResponder<SelectAddressForTransactionRequester.Request, SelectAddressForTransactionResponder.Response> {
+interface SelectAddressResponder : InterScreenResponder<SelectAddressRequester.Request, SelectAddressResponder.Response> {
 
     @Parcelize
     class Response(val selectedAddress: String) : Parcelable
 }
 
-interface SelectAddressCommunicator : SelectAddressForTransactionRequester, SelectAddressForTransactionResponder
+interface SelectAddressCommunicator : SelectAddressRequester, SelectAddressResponder

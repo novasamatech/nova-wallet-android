@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
@@ -50,6 +51,7 @@ class SelectSendModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         addressInputMixinFactory: AddressInputMixinFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
+        accountRepository: AccountRepository
     ): ViewModel {
         return SelectSendViewModel(
             chainRegistry = chainRegistry,
@@ -68,7 +70,8 @@ class SelectSendModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             selectedAccountUseCase = selectedAccountUseCase,
             addressInputMixinFactory = addressInputMixinFactory,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            accountRepository = accountRepository
         )
     }
 

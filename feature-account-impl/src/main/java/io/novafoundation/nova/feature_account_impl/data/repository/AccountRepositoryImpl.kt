@@ -126,6 +126,10 @@ class AccountRepositoryImpl(
         return accountDataSource.allMetaAccounts()
     }
 
+    override suspend fun activeMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.activeMetaAccounts()
+    }
+
     override suspend fun hasMetaAccounts(): Boolean {
         return accountDataSource.hasMetaAccounts()
     }

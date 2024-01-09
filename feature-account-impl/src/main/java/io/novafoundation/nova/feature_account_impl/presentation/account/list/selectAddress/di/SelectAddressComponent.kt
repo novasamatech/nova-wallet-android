@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressRequester
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressFragment
 
 @Subcomponent(
@@ -20,7 +20,7 @@ interface SelectAddressComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance request: SelectAddressForTransactionRequester.Request
+            @BindsInstance request: SelectAddressRequester.Request
         ): SelectAddressComponent
     }
 

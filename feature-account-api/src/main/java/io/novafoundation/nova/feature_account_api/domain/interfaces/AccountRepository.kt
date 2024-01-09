@@ -44,6 +44,8 @@ interface AccountRepository {
 
     suspend fun allMetaAccounts(): List<MetaAccount>
 
+    suspend fun activeMetaAccounts(): List<MetaAccount>
+
     suspend fun hasMetaAccounts(): Boolean
 
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>

@@ -40,7 +40,7 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
         setStakingProxyContainer.applyStatusBarInsets()
         addStakingProxyButton.prepareForProgress(this)
 
-        addStakingProxySelectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
+        addStakingProxySelectWallet.setOnClickListener { viewModel.selectAuthorityWallet() }
         addStakingProxyButton.setOnClickListener { viewModel.onConfirmClick() }
     }
 
