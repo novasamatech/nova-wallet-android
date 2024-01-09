@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.DefaultMutableSharedState
-import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
@@ -23,14 +23,13 @@ import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSi
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySignerFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module(includes = [ProxiedSignerModule::class])
 class SignersModule {
 
     @Provides
     @FeatureScope
-    fun provideSignSharedState(): MutableSharedState<SignerPayloadExtrinsic> = DefaultMutableSharedState()
+    fun provideSignSharedState(): SigningSharedState = DefaultMutableSharedState()
 
     @Provides
     @FeatureScope
@@ -55,7 +54,7 @@ class SignersModule {
     @Provides
     @FeatureScope
     fun providePolkadotVaultVariantSignerFactory(
-        signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
+        signingSharedState: SigningSharedState,
         communicator: PolkadotVaultVariantSignCommunicator,
         resourceManager: ResourceManager,
         polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
@@ -71,7 +70,7 @@ class SignersModule {
     @Provides
     @FeatureScope
     fun provideLedgerSignerFactory(
-        signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
+        signingSharedState: SigningSharedState,
         communicator: LedgerSignCommunicator,
         resourceManager: ResourceManager,
         signingNotSupportedPresentable: SigningNotSupportedPresentable

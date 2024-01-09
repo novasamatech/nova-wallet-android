@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.data.signer.paritySigner
 
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.MutableSharedState
+import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
@@ -16,7 +16,7 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtr
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 class PolkadotVaultVariantSignerFactory(
-    private val signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
+    private val signingSharedState: SigningSharedState,
     private val signFlowRequester: PolkadotVaultVariantSignCommunicator,
     private val resourceManager: ResourceManager,
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
@@ -47,7 +47,7 @@ class PolkadotVaultVariantSignerFactory(
 }
 
 abstract class PolkadotVaultVariantSigner(
-    signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
+    signingSharedState: SigningSharedState,
     metaAccount: MetaAccount,
     private val signFlowRequester: PolkadotVaultVariantSignCommunicator,
     private val resourceManager: ResourceManager,
@@ -77,7 +77,7 @@ abstract class PolkadotVaultVariantSigner(
 }
 
 class ParitySignerSigner(
-    signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
+    signingSharedState: SigningSharedState,
     metaAccount: MetaAccount,
     signFlowRequester: PolkadotVaultVariantSignCommunicator,
     resourceManager: ResourceManager,
@@ -94,7 +94,7 @@ class ParitySignerSigner(
 )
 
 class PolkadotVaultSigner(
-    signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
+    signingSharedState: SigningSharedState,
     metaAccount: MetaAccount,
     signFlowRequester: PolkadotVaultVariantSignCommunicator,
     resourceManager: ResourceManager,

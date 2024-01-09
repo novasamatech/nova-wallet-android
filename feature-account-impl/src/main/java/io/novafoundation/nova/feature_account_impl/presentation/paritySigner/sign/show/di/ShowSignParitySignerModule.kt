@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
+import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -39,7 +40,7 @@ class ShowSignParitySignerModule {
     @ViewModelKey(ShowSignParitySignerViewModel::class)
     fun provideViewModel(
         interactor: ShowSignParitySignerInteractor,
-        signSharedState: SharedState<SignerPayloadExtrinsic>,
+        signSharedState: SharedState<SeparateFlowSignerState>,
         qrCodeGenerator: QrCodeGenerator,
         communicator: PolkadotVaultVariantSignCommunicator,
         payload: ShowSignParitySignerPayload,
