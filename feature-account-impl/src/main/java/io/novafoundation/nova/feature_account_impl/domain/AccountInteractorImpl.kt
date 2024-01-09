@@ -6,6 +6,7 @@ import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
@@ -184,6 +185,16 @@ class AccountInteractorImpl(
         accountRepository.removeDeactivatedMetaAccounts()
 
         if (!accountRepository.isAccountSelected()) {
+            val metaAccounts = getMetaAccounts()
+            if (metaAccounts.isNotEmpty()) {
+                accountRepository.selectMetaAccount(metaAccounts.first().id)
+            }
+        }
+    }
+
+    override suspend fun switchToNotDeactivatedAccountIfNeeded() {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        if (metaAccount.status == LightMetaAccount.Status.DEACTIVATED) {
             val metaAccounts = getMetaAccounts()
             if (metaAccounts.isNotEmpty()) {
                 accountRepository.selectMetaAccount(metaAccounts.first().id)

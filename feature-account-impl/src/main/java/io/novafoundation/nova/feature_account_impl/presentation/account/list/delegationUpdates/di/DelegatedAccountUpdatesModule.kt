@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.DelegatedAccountUpdatesViewModel
@@ -23,11 +24,13 @@ class DelegatedAccountUpdatesModule {
         delegatedMetaAccountUpdatesListingMixinFactory: DelegatedMetaAccountUpdatesListingMixinFactory,
         accountRouter: AccountRouter,
         appLinksProvider: AppLinksProvider,
+        accountInteractor: AccountInteractor
     ): ViewModel {
         return DelegatedAccountUpdatesViewModel(
             delegatedMetaAccountUpdatesListingMixinFactory,
             accountRouter,
-            appLinksProvider
+            appLinksProvider,
+            accountInteractor
         )
     }
 

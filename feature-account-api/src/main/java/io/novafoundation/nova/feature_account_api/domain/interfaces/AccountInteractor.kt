@@ -59,4 +59,6 @@ interface AccountInteractor {
     suspend fun getChainAddress(metaId: Long, chainId: ChainId): String?
 
     suspend fun removeDeactivatedMetaAccounts()
+
+    suspend fun switchToNotDeactivatedAccountIfNeeded()
 }
