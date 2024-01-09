@@ -81,7 +81,6 @@ interface AccountFeatureApi {
 
     fun ledgerAddAccountRepository(): LedgerAddAccountRepository
 
-
     val evmTransactionService: EvmTransactionService
 
     val identityMixinFactory: IdentityMixin.Factory

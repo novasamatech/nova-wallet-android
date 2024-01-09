@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressRequester
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -504,7 +503,6 @@ class SelectSendViewModel(
             }
         }
     }
-
 
     private suspend fun getMetaAccountsFilterPayload(origin: Chain, desination: Chain): SelectAddressRequester.Request.Filter {
         val isCrossChain = origin.id != desination.id

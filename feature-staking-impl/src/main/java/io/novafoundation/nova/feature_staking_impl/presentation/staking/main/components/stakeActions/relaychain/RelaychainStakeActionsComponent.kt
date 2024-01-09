@@ -145,7 +145,7 @@ private class RelaychainStakeActionsComponent(
         add(ManageStakeAction.Companion::controller)
 
         if (stakingOption.chain.supportProxy) {
-            add(ManageStakeAction.Companion::addStakingProxy) //TODO: handle case when proxy is already set
+            add(ManageStakeAction.Companion::addStakingProxy) // TODO: handle case when proxy is already set
         }
     }.map { it.invoke(resourceManager) }
 }

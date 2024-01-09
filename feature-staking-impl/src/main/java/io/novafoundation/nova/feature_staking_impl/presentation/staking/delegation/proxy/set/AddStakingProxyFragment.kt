@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
@@ -42,6 +43,7 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
 
         addStakingProxySelectWallet.setOnClickListener { viewModel.selectAuthorityWallet() }
         addStakingProxyButton.setOnClickListener { viewModel.onConfirmClick() }
+        addStakingProxyDeposit.setOnClickListener { viewModel.showProxyDepositDescription() }
     }
 
     override fun inject() {
@@ -57,6 +59,7 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
     override fun subscribe(viewModel: AddStakingProxyViewModel) {
         setupExternalActions(viewModel)
         observeValidations(viewModel)
+        observeDescription(viewModel)
 
         setupAddressInput(viewModel.addressInputMixin, setStakingProxyAddress)
         setupExternalAccounts(viewModel.addressInputMixin, setStakingProxyAddress)

@@ -119,7 +119,7 @@ internal open class ParachainStakeActionsComponent(
         add(ManageStakeAction.collators(resourceManager, collatorsCount))
 
         if (stakingOption.chain.supportProxy) {
-            add(ManageStakeAction.addStakingProxy(resourceManager)) //TODO: handle case when proxy is already set
+            add(ManageStakeAction.addStakingProxy(resourceManager)) // TODO: handle case when proxy is already set
         }
     }
 

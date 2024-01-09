@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegat
 
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationFailure.*

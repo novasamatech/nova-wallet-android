@@ -20,7 +20,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 
-
 private class OnChainProxiedModel(
     val proxies: List<OnChainProxyModel>,
     val deposit: BigInteger

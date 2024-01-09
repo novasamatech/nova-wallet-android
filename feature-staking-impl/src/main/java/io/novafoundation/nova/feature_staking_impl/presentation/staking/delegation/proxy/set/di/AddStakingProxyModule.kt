@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -40,7 +41,8 @@ class AddStakingProxyModule {
         selectAddressCommunicator: SelectAddressCommunicator,
         addStakingProxyRepository: AddStakingProxyRepository,
         validationExecutor: ValidationExecutor,
-        addStakingProxyValidationSystem: AddStakingProxyValidationSystem
+        addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
     ): ViewModel {
         return AddStakingProxyViewModel(
             addressInputMixinFactory = addressInputMixinFactory,
@@ -54,7 +56,8 @@ class AddStakingProxyModule {
             selectAddressRequester = selectAddressCommunicator,
             addStakingProxyRepository = addStakingProxyRepository,
             validationExecutor = validationExecutor,
-            addStakingProxyValidationSystem = addStakingProxyValidationSystem
+            addStakingProxyValidationSystem = addStakingProxyValidationSystem,
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
         )
     }
 

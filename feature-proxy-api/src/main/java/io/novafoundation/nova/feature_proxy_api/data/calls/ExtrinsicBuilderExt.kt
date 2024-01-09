@@ -8,7 +8,6 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEn
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
-
 fun ExtrinsicBuilder.addProxyCall(proxyAccountId: AccountId, proxyType: ProxyType): ExtrinsicBuilder {
     return call(
         Modules.PROXY,

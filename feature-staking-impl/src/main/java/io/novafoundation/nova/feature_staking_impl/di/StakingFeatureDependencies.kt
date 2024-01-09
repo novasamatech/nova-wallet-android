@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
@@ -172,4 +173,6 @@ interface StakingFeatureDependencies {
     val proxyDepositCalculator: ProxyDepositCalculator
 
     val getProxyRepository: GetProxyRepository
+
+    val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
 }

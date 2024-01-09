@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="add_proxy_deposit_description_title">Proxy deposit</string>
+    <string name="add_proxy_deposit_description_message">The deposit stays reserved on your account until the proxy is removed.</string>
+
     <string name="add_proxy_maximum_reached_error_title">Maximum number of proxies has been reached</string>
     <string name="add_proxy_maximum_reached_error_message">You have reached the limit of %s added proxies in %s. Remove proxies to add new ones.</string>
 
