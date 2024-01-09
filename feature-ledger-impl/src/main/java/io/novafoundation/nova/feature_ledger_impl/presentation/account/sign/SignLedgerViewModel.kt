@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.sign
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
@@ -9,7 +8,7 @@ import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
@@ -30,7 +29,6 @@ import io.novafoundation.nova.runtime.extrinsic.closeToExpire
 import io.novafoundation.nova.runtime.extrinsic.remainingTime
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -51,9 +49,8 @@ class SignLedgerViewModel(
     private val selectLedgerPayload: SelectLedgerPayload,
     private val router: LedgerRouter,
     private val resourceManager: ResourceManager,
-    private val signPayloadState: SharedState<SignerPayloadExtrinsic>,
+    private val signPayloadState: SigningSharedState,
     private val extrinsicValidityUseCase: ExtrinsicValidityUseCase,
-    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val request: SignInterScreenCommunicator.Request,
     private val responder: SignInterScreenResponder,
     private val interactor: SignLedgerInteractor,
@@ -74,7 +71,7 @@ class SignLedgerViewModel(
 ) {
 
     private val validityPeriod = flowOf {
-        extrinsicValidityUseCase.extrinsicValidityPeriod(signPayloadState.getOrThrow())
+        extrinsicValidityUseCase.extrinsicValidityPeriod(signPayloadState.getOrThrow().extrinsic)
     }.shareInBackground()
 
     private var signingJob: Deferred<SignatureWrapper>? = null
@@ -105,6 +102,7 @@ class SignLedgerViewModel(
 
     override suspend fun verifyConnection(device: LedgerDevice) {
         val validityPeriod = validityPeriod.first()
+        val signState = signPayloadState.getOrThrow()
 
         ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
             title = resourceManager.getString(R.string.ledger_review_approve_title),
@@ -118,21 +116,21 @@ class SignLedgerViewModel(
             )
         ).event()
 
-        val selectedMetaAccount = selectedAccountUseCase.getSelectedMetaAccount()
+        val signingMetaAccount = signState.metaAccount
 
         signingJob?.cancel()
         signingJob = async {
             substrateApplication.getSignature(
                 device = device,
-                metaId = selectedMetaAccount.id,
+                metaId = signingMetaAccount.id,
                 chainId = selectLedgerPayload.chainId,
-                payload = signPayloadState.getOrThrow()
+                payload = signState.extrinsic
             )
         }
 
         val signature = signingJob!!.await()
 
-        if (interactor.verifySignature(signPayloadState.getOrThrow(), signature)) {
+        if (interactor.verifySignature(signState, signature)) {
             responder.respond(request.signed(signature))
             hideBottomSheet()
             router.finishSignFlow()
