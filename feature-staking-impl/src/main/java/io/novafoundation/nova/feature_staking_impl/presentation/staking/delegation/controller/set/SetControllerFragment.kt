@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.fragment_set_controller_account.setControl
 import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerController
 import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerStash
 import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerSwitchToStashWarning
-import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerToolbar
+import kotlinx.android.synthetic.main.fragment_set_controller_account.addControllerToolbar
 
 class SetControllerFragment : BaseFragment<SetControllerViewModel>() {
 
@@ -43,7 +43,7 @@ class SetControllerFragment : BaseFragment<SetControllerViewModel>() {
         setControllerController.setOnClickListener { viewModel.controllerClicked() }
 
         setControllerAdvertisement.setOnLearnMoreClickedListener { viewModel.onMoreClicked() }
-        setControllerToolbar.setHomeButtonListener { viewModel.backClicked() }
+        addControllerToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         setControllerController.setActionTint(R.color.icon_secondary)
     }

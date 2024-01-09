@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.Parachai
 import io.novafoundation.nova.feature_staking_impl.di.staking.stakingTypeDetails.StakingTypeDetailsModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StartMultiStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
+import io.novafoundation.nova.feature_staking_impl.di.validations.AddStakingProxyValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -60,7 +61,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.con
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.di.ConfirmSetControllerComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.set.di.SetControllerComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.di.SetStakingProxyComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.di.AddStakingProxyComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.di.ConfirmRebondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom.di.CustomRebondComponent
@@ -98,7 +99,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         NominationPoolModule::class,
         StakingDashboardModule::class,
         StartMultiStakingModule::class,
-        StakingTypeDetailsModule::class
+        StakingTypeDetailsModule::class,
+        AddStakingProxyValidationsModule::class
     ]
 )
 @FeatureScope
@@ -168,7 +170,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun setControllerFactory(): SetControllerComponent.Factory
 
-    fun setStakingProxyFactory(): SetStakingProxyComponent.Factory
+    fun setStakingProxyFactory(): AddStakingProxyComponent.Factory
 
     fun confirmSetControllerFactory(): ConfirmSetControllerComponent.Factory
 

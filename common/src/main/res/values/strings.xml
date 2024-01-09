@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="add_proxy_maximum_reached_error_title">Maximum number of proxies has been reached</string>
+    <string name="add_proxy_maximum_reached_error_message">You have reached the limit of %s added proxies in %s. Remove proxies to add new ones.</string>
+
+    <string name="common_invalid_address_title">Invalid address</string>
+    <string name="common_invalid_address_message">An address must be a valid for %s</string>
+
+    <string name="common_error_not_enough_tokens">Not enough tokens</string>
+    <string name="staking_not_enough_balance_to_pay_proxy_deposit_message">You don’t have enough balance for proxy deposit of %s. Available balance: %s</string>
+
     <string name="staking_action_your_proxies">Your delegations</string>
     <string name="staking_action_add_proxy">Add delegated authority (Proxy)</string>
 

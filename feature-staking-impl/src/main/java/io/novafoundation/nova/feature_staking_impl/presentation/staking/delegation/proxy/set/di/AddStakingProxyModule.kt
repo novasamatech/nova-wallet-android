@@ -16,17 +16,18 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.SetStakingProxyViewModel
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationSystem
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.AddStakingProxyViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 
 @Module(includes = [ViewModelModule::class])
-class SetStakingProxyModule {
+class AddStakingProxyModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(SetStakingProxyViewModel::class)
+    @ViewModelKey(AddStakingProxyViewModel::class)
     fun provideViewModel(
         addressInputMixinFactory: AddressInputMixinFactory,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
@@ -38,9 +39,10 @@ class SetStakingProxyModule {
         resourceManager: ResourceManager,
         selectAddressCommunicator: SelectAddressCommunicator,
         addStakingProxyRepository: AddStakingProxyRepository,
-        validationExecutor: ValidationExecutor
+        validationExecutor: ValidationExecutor,
+        addStakingProxyValidationSystem: AddStakingProxyValidationSystem
     ): ViewModel {
-        return SetStakingProxyViewModel(
+        return AddStakingProxyViewModel(
             addressInputMixinFactory = addressInputMixinFactory,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             selectedAssetState = selectedAssetState,
@@ -51,7 +53,8 @@ class SetStakingProxyModule {
             resourceManager = resourceManager,
             selectAddressRequester = selectAddressCommunicator,
             addStakingProxyRepository = addStakingProxyRepository,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            addStakingProxyValidationSystem = addStakingProxyValidationSystem
         )
     }
 
@@ -59,7 +62,7 @@ class SetStakingProxyModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): SetStakingProxyViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(SetStakingProxyViewModel::class.java)
+    ): AddStakingProxyViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(AddStakingProxyViewModel::class.java)
     }
 }

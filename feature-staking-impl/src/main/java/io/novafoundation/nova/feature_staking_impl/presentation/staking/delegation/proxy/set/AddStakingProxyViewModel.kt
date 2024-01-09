@@ -6,16 +6,22 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
 import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationSystem
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapAddStakingProxyValidationFailureToUi
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -30,13 +36,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class SetStakingProxyViewModel(
+class AddStakingProxyViewModel(
     addressInputMixinFactory: AddressInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
@@ -48,6 +55,7 @@ class SetStakingProxyViewModel(
     private val selectAddressRequester: SelectAddressForTransactionRequester,
     private val addStakingProxyRepository: AddStakingProxyRepository,
     private val validationExecutor: ValidationExecutor,
+    private val addStakingProxyValidationSystem: AddStakingProxyValidationSystem
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -76,34 +84,37 @@ class SetStakingProxyViewModel(
             accountIdentifierProvider = web3nIdentifiers(
                 destinationChainFlow = selectedAssetState.assetWithChain,
                 inputSpecProvider = inputSpec,
-                coroutineScope = this@SetStakingProxyViewModel,
+                coroutineScope = this@AddStakingProxyViewModel,
             ),
-            errorDisplayer = this@SetStakingProxyViewModel::showError,
-            showAccountEvent = this@SetStakingProxyViewModel::showAccountDetails,
-            coroutineScope = this@SetStakingProxyViewModel,
+            errorDisplayer = this@AddStakingProxyViewModel::showError,
+            showAccountEvent = this@AddStakingProxyViewModel::showAccountDetails,
+            coroutineScope = this@AddStakingProxyViewModel,
         )
     }
 
     val isSelectAddressAvailable = flowOf { true }
         .shareInBackground()
 
-    val proxyDeposit: Flow<AmountModel> = selectedAssetFlow
-        .map { asset ->
-            val metaAccount = accountRepository.getSelectedMetaAccount()
-            val chain = selectedAssetState.chain()
-            val accountId = metaAccount.requireAccountIdIn(chain)
-            val deposit = addStakingProxyRepository.calculateDepositForAddProxy(chain, accountId)
-            mapAmountToAmountModel(deposit, asset)
-        }
+    private val proxyDeposit: Flow<ProxyDepositWithQuantity> = flowOf {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = selectedAssetState.chain()
+        val accountId = metaAccount.requireAccountIdIn(chain)
+        addStakingProxyRepository.calculateDepositForAddProxy(chain, accountId)
+    }
+        .shareInBackground()
+
+    val proxyDepositModel: Flow<AmountModel> = combine(proxyDeposit, selectedAssetFlow) { depositwithQuantity, asset ->
+        mapAmountToAmountModel(depositwithQuantity.deposit, asset)
+    }
         .shareInBackground()
 
     val feeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
 
-    private val validationProgressFlow = MutableStateFlow(false)
+    private val _validationProgressFlow = MutableStateFlow(false)
 
     val continueButtonState = combine(
         addressInputMixin.inputFlow,
-        validationProgressFlow
+        _validationProgressFlow
     ) { addressInput, validationInProgress ->
         when {
             validationInProgress -> DescriptiveButtonState.Loading
@@ -127,24 +138,42 @@ class SetStakingProxyViewModel(
         }
     }
 
-    fun onConfirmClick() {
+    fun onConfirmClick() = launch {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = selectedAssetState.chain()
+        val validationPayload = AddStakingProxyValidationPayload(
+            chain = chain,
+            asset = selectedAssetFlow.first(),
+            address = addressInputMixin.inputFlow.value,
+            proxiedAccountId = metaAccount.requireAccountIdIn(chain),
+            fee = feeMixin.awaitDecimalFee(),
+            depositWithQuantity = proxyDeposit.first()
+        )
 
+        validationExecutor.requireValid(
+            validationSystem = addStakingProxyValidationSystem,
+            payload = validationPayload,
+            validationFailureTransformer = { mapAddStakingProxyValidationFailureToUi(resourceManager, it) },
+            progressConsumer = _validationProgressFlow.progressConsumer()
+        ) {
+            openConfirmScreen()
+        }
+    }
+
+    private fun openConfirmScreen() {
+        TODO()
     }
 
     private fun runFeeUpdate() {
         addressInputMixin.inputFlow.onEach {
+            val metaAccount = accountRepository.getSelectedMetaAccount()
             val chain = selectedAssetState.chain()
-            val accountId = chain.accountIdOrNull(it)
 
-            if (accountId == null) {
-                feeMixin.setFee(null)
-            } else {
-                feeMixin.loadFee(
-                    coroutineScope = this,
-                    feeConstructor = { addStakingProxyRepository.estimateFee(chain, accountId) },
-                    onRetryCancelled = {}
-                )
-            }
+            feeMixin.loadFee(
+                coroutineScope = this,
+                feeConstructor = { addStakingProxyRepository.estimateFee(chain, metaAccount.requireAccountIdIn(chain)) },
+                onRetryCancelled = {}
+            )
         }.launchIn(this)
     }
 

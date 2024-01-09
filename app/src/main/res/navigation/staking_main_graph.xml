@@ -39,7 +39,7 @@
 
     <fragment
         android:id="@+id/setStakingProxyFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.SetStakingProxyFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.AddStakingProxyFragment"
         android:label="StakingFragment" />
 
     <fragment

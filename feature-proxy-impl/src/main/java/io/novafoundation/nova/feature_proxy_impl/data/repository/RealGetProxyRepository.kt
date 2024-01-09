@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_proxy_impl.data.repository
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
@@ -19,6 +20,12 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 
+
+private class OnChainProxiedModel(
+    val proxies: List<OnChainProxyModel>,
+    val deposit: BigInteger
+)
+
 private class OnChainProxyModel(
     val accountId: AccountIdKey,
     val proxyType: String,
@@ -34,8 +41,8 @@ class RealGetProxyRepository(
         val delegatorToProxies = receiveAllProxies(chainId)
 
         return delegatorToProxies
-            .mapNotNull { (delegator, proxies) ->
-                val notDelayedProxies = proxies.filter { it.delay == BigInteger.ZERO }
+            .mapNotNull { (delegator, proxied) ->
+                val notDelayedProxies = proxied.proxies.filter { it.delay == BigInteger.ZERO }
                 val matchedProxies = matchProxiesToAccountsAndMap(notDelayedProxies, accountIds)
 
                 if (matchedProxies.isEmpty()) return@mapNotNull null
@@ -47,19 +54,25 @@ class RealGetProxyRepository(
     }
 
     override suspend fun getDelegatedProxyTypes(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyType> {
-        val proxies = getAllProxiesFor(chainId, proxiedAccountId)
+        val proxied = getAllProxiesFor(chainId, proxiedAccountId)
 
-        return proxies.filter { it.accountId == proxyAccountId.intoKey() }
+        return proxied.proxies.filter { it.accountId == proxyAccountId.intoKey() }
             .map { ProxyType.fromString(it.proxyType) }
     }
 
     override suspend fun getProxiesQuantity(chainId: ChainId, proxiedAccountId: AccountId): Int {
-        val proxies = getAllProxiesFor(chainId, proxiedAccountId)
+        val proxied = getAllProxiesFor(chainId, proxiedAccountId)
 
-        return proxies.size
+        return proxied.proxies.size
     }
 
-    private suspend fun getAllProxiesFor(chainId: ChainId, accountId: AccountId): List<OnChainProxyModel> {
+    override suspend fun getProxDeposit(chainId: ChainId, proxiedAccountId: AccountId): BigInteger {
+        val proxied = getAllProxiesFor(chainId, proxiedAccountId)
+
+        return proxied.deposit
+    }
+
+    private suspend fun getAllProxiesFor(chainId: ChainId, accountId: AccountId): OnChainProxiedModel {
         return remoteSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
@@ -72,7 +85,7 @@ class RealGetProxyRepository(
         }
     }
 
-    private suspend fun receiveAllProxies(chainId: ChainId): Map<AccountIdKey, List<OnChainProxyModel>> {
+    private suspend fun receiveAllProxies(chainId: ChainId): Map<AccountIdKey, OnChainProxiedModel> {
         return remoteSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
@@ -88,21 +101,24 @@ class RealGetProxyRepository(
         }
     }
 
-    private fun bindProxyAccounts(dynamicInstance: Any?): List<OnChainProxyModel> {
+    private fun bindProxyAccounts(dynamicInstance: Any?): OnChainProxiedModel {
         val root = dynamicInstance.castToList()
         val proxies = root[0].castToList()
 
-        return proxies.map {
-            val proxy = it.castToStruct()
-            val proxyAccountId: ByteArray = proxy.getTyped("delegate")
-            val proxyType = proxy.get<Any?>("proxyType").castToDictEnum()
-            val delay = proxy.getTyped<BigInteger>("delay")
-            OnChainProxyModel(
-                proxyAccountId.intoKey(),
-                proxyType.name,
-                delay
-            )
-        }
+        return OnChainProxiedModel(
+            proxies = proxies.map {
+                val proxy = it.castToStruct()
+                val proxyAccountId: ByteArray = proxy.getTyped("delegate")
+                val proxyType = proxy.get<Any?>("proxyType").castToDictEnum()
+                val delay = proxy.getTyped<BigInteger>("delay")
+                OnChainProxyModel(
+                    proxyAccountId.intoKey(),
+                    proxyType.name,
+                    delay
+                )
+            },
+            deposit = root[1].cast()
+        )
     }
 
     private fun mapToProxiedWithProxies(
