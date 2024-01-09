@@ -187,7 +187,6 @@ class AddStakingProxyViewModel(
     }
 
     private fun openConfirmScreen() {
-        TODO()
     }
 
     private fun subscribeOnSelectAddress() {

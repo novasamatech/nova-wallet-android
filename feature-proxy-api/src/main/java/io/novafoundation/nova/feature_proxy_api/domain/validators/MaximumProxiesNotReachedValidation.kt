@@ -18,7 +18,7 @@ class MaximumProxiesNotReachedValidation<P, E>(
 
     override suspend fun validate(value: P): ValidationStatus<E> {
         val newProxiesQuantity = newProxiedQuantity(value)
-        val maximumProxiesQuantiy = proxyRepository.getProxiesQuantity(chain(value).id, accountId(value))
+        val maximumProxiesQuantiy = proxyRepository.maxProxiesQuantity(chain(value))
 
         return validOrError(newProxiesQuantity <= maximumProxiesQuantiy) {
             error(value, maximumProxiesQuantiy)

@@ -8,12 +8,16 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.common.utils.proxy
 import io.novafoundation.nova.feature_proxy_api.data.model.ProxiedWithProxy
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_api.domain.model.fromString
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -71,6 +75,12 @@ class RealGetProxyRepository(
         return proxied.deposit
     }
 
+    override suspend fun maxProxiesQuantity(chain: Chain): Int {
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val constantQuery = runtime.metadata.proxy()
+        return constantQuery.numberConstant("MaxProxies", runtime).toInt()
+    }
+
     private suspend fun getAllProxiesFor(chainId: ChainId, accountId: AccountId): OnChainProxiedModel {
         return remoteSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
@@ -101,6 +111,8 @@ class RealGetProxyRepository(
     }
 
     private fun bindProxyAccounts(dynamicInstance: Any?): OnChainProxiedModel {
+        if (dynamicInstance == null) return OnChainProxiedModel(emptyList(), BigInteger.ZERO)
+
         val root = dynamicInstance.castToList()
         val proxies = root[0].castToList()
 
