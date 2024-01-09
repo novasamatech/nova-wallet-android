@@ -6,8 +6,10 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.append
 import io.novafoundation.nova.common.utils.appendEnd
 import io.novafoundation.nova.common.utils.appendSpace
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
+import io.novafoundation.nova.common.utils.splitCamelCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -49,7 +51,7 @@ class ProxyFormatter(
             ProxyAccount.ProxyType.CancelProxy -> resourceManager.getString(R.string.account_proxy_type_cancel_proxy)
             ProxyAccount.ProxyType.Auction -> resourceManager.getString(R.string.account_proxy_type_auction)
             ProxyAccount.ProxyType.NominationPools -> resourceManager.getString(R.string.account_proxy_type_nomination_pools)
-            is ProxyAccount.ProxyType.Other -> type.name
+            is ProxyAccount.ProxyType.Other -> type.name.splitCamelCase().joinToString(separator = " ") { it.capitalize() }
         }
 
         return resourceManager.getString(R.string.proxy_wallet_type, proxyType)
