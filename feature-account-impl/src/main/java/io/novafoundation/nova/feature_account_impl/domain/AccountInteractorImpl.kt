@@ -194,11 +194,11 @@ class AccountInteractorImpl(
 
     override suspend fun switchToNotDeactivatedAccountIfNeeded() {
         val metaAccount = accountRepository.getSelectedMetaAccount()
-        if (metaAccount.status == LightMetaAccount.Status.DEACTIVATED) {
-            val metaAccounts = getMetaAccounts()
-            if (metaAccounts.isNotEmpty()) {
-                accountRepository.selectMetaAccount(metaAccounts.first().id)
-            }
+        if (metaAccount.status != LightMetaAccount.Status.DEACTIVATED) return
+
+        val metaAccounts = accountRepository.getActiveMetaAccounts()
+        if (metaAccounts.isNotEmpty()) {
+            accountRepository.selectMetaAccount(metaAccounts.first().id)
         }
     }
 }

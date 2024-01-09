@@ -125,4 +125,6 @@ interface AccountRepository {
     suspend fun isAccountExists(accountId: AccountId, chainId: ChainId): Boolean
 
     suspend fun removeDeactivatedMetaAccounts()
+
+    suspend fun getActiveMetaAccounts(): List<MetaAccount>
 }

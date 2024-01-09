@@ -257,6 +257,10 @@ class AccountRepositoryImpl(
         accountDataSource.removeDeactivatedMetaAccounts()
     }
 
+    override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.getActiveMetaAccounts()
+    }
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }
