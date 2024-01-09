@@ -6,10 +6,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.append
 import io.novafoundation.nova.common.utils.appendEnd
 import io.novafoundation.nova.common.utils.appendSpace
-import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
-import io.novafoundation.nova.common.utils.splitCamelCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
