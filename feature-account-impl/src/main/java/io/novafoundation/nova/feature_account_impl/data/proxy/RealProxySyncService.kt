@@ -36,7 +36,8 @@ class RealProxySyncService(
     private val identityProvider: IdentityProvider,
     private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
     private val proxiedAddAccountRepository: ProxiedAddAccountRepository,
-    private val rootScope: RootScope
+    private val rootScope: RootScope,
+    private val shouldSyncWatchOnlyProxies: Boolean
 ) : ProxySyncService {
 
     override fun startSyncing() {
@@ -116,8 +117,9 @@ class RealProxySyncService(
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.PARITY_SIGNER,
             LightMetaAccount.Type.LEDGER,
-            LightMetaAccount.Type.POLKADOT_VAULT,
-            LightMetaAccount.Type.WATCH_ONLY -> true
+            LightMetaAccount.Type.POLKADOT_VAULT -> true
+
+            LightMetaAccount.Type.WATCH_ONLY -> shouldSyncWatchOnlyProxies
 
             LightMetaAccount.Type.PROXIED -> false
         }
