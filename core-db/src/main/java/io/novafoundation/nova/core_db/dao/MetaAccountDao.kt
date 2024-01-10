@@ -104,10 +104,6 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
-    @Query("SELECT * FROM meta_accounts")
-    @Transaction
-    suspend fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
-
     @Query("SELECT * FROM meta_accounts WHERE status = :status")
     @Transaction
     suspend fun getMetaAccountsInfoByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
@@ -185,8 +181,8 @@ interface MetaAccountDao {
         return metaId
     }
 
-    @Query("SELECT EXISTS(SELECT * FROM meta_accounts)")
-    suspend fun hasMetaAccounts(): Boolean
+    @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE status = :status)")
+    suspend fun hasMetaAccountsByStatus(status: MetaAccountLocal.Status): Boolean
 
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)
