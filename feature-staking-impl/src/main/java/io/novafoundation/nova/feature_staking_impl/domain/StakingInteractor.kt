@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
@@ -49,9 +50,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -293,10 +294,10 @@ class StakingInteractor(
         val chainAsset = stakingSharedState.chainAsset()
         val chainId = chainAsset.chainId
 
-        combineTransform(
+        combineToPair(
             stakingSharedComputation.activeEraInfo(chainId, scope),
             walletRepository.assetFlow(state.accountId, chainAsset)
-        ) { activeEraInfo, asset ->
+        ).flatMapLatest { (activeEraInfo, asset) ->
             val activeStake = asset.bondedInPlanks
 
             val rewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
@@ -308,14 +309,12 @@ class StakingInteractor(
                 activeStake = activeStake
             )
 
-            val summary = flow { statusResolver(statusResolutionContext) }.map { status ->
+            flow { statusResolver(statusResolutionContext) }.map { status ->
                 StakeSummary(
                     status = status,
                     activeStake = activeStake
                 )
             }
-
-            emitAll(summary)
         }
     }
 
