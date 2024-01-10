@@ -25,8 +25,8 @@ class AccountInteractorImpl(
     private val accountRepository: AccountRepository,
 ) : AccountInteractor {
 
-    override suspend fun getMetaAccounts(): List<MetaAccount> {
-        return accountRepository.allMetaAccounts()
+    override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
+        return accountRepository.getActiveMetaAccounts()
     }
 
     override suspend fun generateMnemonic(): Mnemonic {
@@ -73,7 +73,7 @@ class AccountInteractorImpl(
     override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
         accountRepository.deleteAccount(metaId)
         if (!accountRepository.isAccountSelected()) {
-            val metaAccounts = getMetaAccounts()
+            val metaAccounts = getActiveMetaAccounts()
             if (metaAccounts.isNotEmpty()) {
                 accountRepository.selectMetaAccount(metaAccounts.first().id)
             }
@@ -185,7 +185,7 @@ class AccountInteractorImpl(
         accountRepository.removeDeactivatedMetaAccounts()
 
         if (!accountRepository.isAccountSelected()) {
-            val metaAccounts = getMetaAccounts()
+            val metaAccounts = getActiveMetaAccounts()
             if (metaAccounts.isNotEmpty()) {
                 accountRepository.selectMetaAccount(metaAccounts.first().id)
             }

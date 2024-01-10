@@ -108,7 +108,7 @@ class RealProxySyncService(
     }
 
     private suspend fun getMetaAccounts(): List<MetaAccount> {
-        return accountRepository.allMetaAccounts()
+        return accountRepository.getActiveMetaAccounts()
             .filter { it.isAllowedToSyncProxy() }
     }
 
