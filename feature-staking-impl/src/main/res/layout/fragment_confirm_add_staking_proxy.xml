@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/confirmAddStakingProxyContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/confirmAddStakingProxyToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/staking_add_proxy_confirmation_title" />
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/confirmAddStakingProxyToolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                tools:orientation="vertical">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/confirmAddStakingProxyNetwork"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_network" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/confirmAddStakingProxyWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/add_proxy_confirmation_delegating_wallet" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/confirmAddStakingProxyProxiedAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueEndIcon="@drawable/ic_info"
+                    app:title="@string/add_proxy_confirmation_delegating_account" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/confirmAddStakingProxyDeposit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_proxy_deposit"
+                    app:titleIcon="@drawable/ic_info"
+                    app:titleIconStart="@drawable/ic_lock"
+                    app:titleIconStartTint="@color/icon_secondary" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/confirmAddStakingProxyNetworkFee"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:dividerVisible="false"
+                    app:title="@string/network_fee" />
+
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                tools:orientation="vertical">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValue="@string/proxy_access_type_staking_operations"
+                    app:title="@string/add_proxy_confirmation_grant_access_type" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/confirmAddStakingProxyDelegationAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:dividerVisible="false"
+                    app:primaryValueEndIcon="@drawable/ic_info"
+                    app:title="@string/add_proxy_confirmation_delegate_to" />
+
+            </io.novafoundation.nova.common.view.TableView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/confirmAddStakingProxyButton"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/common_confirm"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

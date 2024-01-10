@@ -22,12 +22,16 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationSystem
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.launchProxyDepositDescription
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapAddStakingProxyValidationFailureToUi
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.confirm.ConfirmAddStakingProxyPayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.filter.MetaAccountFilter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -64,6 +68,7 @@ class AddStakingProxyViewModel(
     private val addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+    private val stakingRouter: StakingRouter
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExternalActions by externalActions,
@@ -146,10 +151,7 @@ class AddStakingProxyViewModel(
     }
 
     fun showProxyDepositDescription() {
-        descriptionBottomSheetLauncher.launchDescriptionBottomSheet(
-            titleRes = R.string.add_proxy_deposit_description_title,
-            descriptionRes = R.string.add_proxy_deposit_description_message
-        )
+        descriptionBottomSheetLauncher.launchProxyDepositDescription()
     }
 
     fun selectAuthorityWallet() {
@@ -170,7 +172,7 @@ class AddStakingProxyViewModel(
         val validationPayload = AddStakingProxyValidationPayload(
             chain = chain,
             asset = selectedAssetFlow.first(),
-            address = addressInputMixin.inputFlow.value,
+            proxyAddress = addressInputMixin.inputFlow.value,
             proxiedAccountId = metaAccount.requireAccountIdIn(chain),
             fee = feeMixin.awaitDecimalFee(),
             depositWithQuantity = proxyDeposit.first()
@@ -182,11 +184,20 @@ class AddStakingProxyViewModel(
             validationFailureTransformer = { mapAddStakingProxyValidationFailureToUi(resourceManager, it) },
             progressConsumer = _validationProgressFlow.progressConsumer()
         ) {
-            openConfirmScreen()
+            openConfirmScreen(it)
         }
     }
 
-    private fun openConfirmScreen() {
+    private fun openConfirmScreen(validationPayload: AddStakingProxyValidationPayload) {
+        val screenPayload = validationPayload.run {
+            ConfirmAddStakingProxyPayload(
+                fee = mapFeeToParcel(validationPayload.fee),
+                proxyAddress = proxyAddress,
+                newProxyDeposit = depositWithQuantity.deposit,
+                newProxyQuantity = depositWithQuantity.quantity
+            )
+        }
+        stakingRouter.openConfirmAddStakingProxy(screenPayload)
     }
 
     private fun subscribeOnSelectAddress() {

@@ -40,7 +40,22 @@
     <fragment
         android:id="@+id/addStakingProxyFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.AddStakingProxyFragment"
-        android:label="StakingFragment" />
+        android:label="StakingFragment">
+
+        <action
+            android:id="@+id/action_addStakingProxyFragment_to_confirmAddStakingProxyFragment"
+            app:destination="@id/confirmAddStakingProxyFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmAddStakingProxyFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.confirm.ConfirmAddStakingProxyFragment"
+        android:label="StakingFragment"/>
 
     <fragment
         android:id="@+id/stakingFragment"

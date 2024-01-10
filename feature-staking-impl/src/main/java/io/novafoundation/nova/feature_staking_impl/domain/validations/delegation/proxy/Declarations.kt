@@ -17,7 +17,7 @@ typealias AddStakingProxyValidationSystem = ValidationSystem<AddStakingProxyVali
 typealias AddStakingProxyValidationSystemBuilder = ValidationSystemBuilder<AddStakingProxyValidationPayload, AddStakingProxyValidationFailure>
 
 fun AddStakingProxyValidationSystemBuilder.validAddress() = validAddress(
-    address = { it.address },
+    address = { it.proxyAddress },
     chain = { it.chain },
     error = { AddStakingProxyValidationFailure.InvalidAddress(it.chain) }
 )

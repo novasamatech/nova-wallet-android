@@ -92,6 +92,7 @@
         <attr name="titleIconStartTint" format="color" />
         <attr name="primaryValueIconTint" format="color" />
         <attr name="titleEllipsisable" format="boolean" />
+        <attr name="primaryValue" format="string" />
     </declare-styleable>
 
     <declare-styleable name="TableView">
