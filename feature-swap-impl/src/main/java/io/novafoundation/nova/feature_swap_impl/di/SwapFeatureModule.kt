@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.HydraDxOmnipoolExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
@@ -64,15 +65,31 @@ class SwapFeatureModule {
         )
     }
 
+    @Provides
+    @FeatureScope
+    fun provideHydraDxExchangeFactory(
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): HydraDxOmnipoolExchangeFactory {
+        return HydraDxOmnipoolExchangeFactory(remoteStorageSource, chainRegistry)
+    }
+
     @FeatureScope
     @Provides
     fun provideSwapService(
         assetConversionExchangeFactory: AssetConversionExchangeFactory,
+        hydraDxOmnipoolExchangeFactory: HydraDxOmnipoolExchangeFactory,
         computationalCache: ComputationalCache,
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository
     ): SwapService {
-        return RealSwapService(assetConversionExchangeFactory, computationalCache, chainRegistry, accountRepository)
+        return RealSwapService(
+            assetConversionFactory = assetConversionExchangeFactory,
+            hydraDxOmnipoolFactory = hydraDxOmnipoolExchangeFactory,
+            computationalCache = computationalCache,
+            chainRegistry = chainRegistry,
+            accountRepository = accountRepository
+        )
     }
 
     @Provides

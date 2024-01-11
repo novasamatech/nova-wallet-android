@@ -186,7 +186,7 @@ data class Chain(
     }
 
     enum class Swap {
-        ASSET_CONVERSION
+        ASSET_CONVERSION, HYDRA_DX
     }
 
     enum class ConnectionState {

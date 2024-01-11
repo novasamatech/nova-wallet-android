@@ -22,8 +22,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.api.assetConversionOrNull
-import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.api.pools
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -36,9 +34,7 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.assetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
@@ -62,9 +58,7 @@ class AssetConversionExchangeFactory(
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetExchange.Factory {
 
-    override suspend fun create(chainId: ChainId, coroutineScope: CoroutineScope): AssetExchange? {
-        val chain = chainRegistry.getChainOrNull(chainId) ?: return null
-
+    override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
         val converter = multiLocationConverterFactory.default(chain, coroutineScope)
 
         return AssetConversionExchange(

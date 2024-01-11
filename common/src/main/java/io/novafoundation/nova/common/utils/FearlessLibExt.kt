@@ -233,6 +233,8 @@ fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_PO
 
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
 
+fun RuntimeMetadata.omnipoolOrNull() = moduleOrNull(Modules.OMNIPOOL)
+
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
@@ -383,4 +385,6 @@ object Modules {
     const val MULTISIG = "Multisig"
     const val REGISTRAR = "Registrar"
     const val FAST_UNSTAKE = "FastUnstake"
+
+    const val OMNIPOOL = "Omnipool"
 }

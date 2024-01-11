@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 
@@ -18,7 +17,7 @@ interface AssetExchange {
 
     interface Factory {
 
-        suspend fun create(chainId: ChainId, coroutineScope: CoroutineScope): AssetExchange?
+        suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange?
     }
 
     /**
