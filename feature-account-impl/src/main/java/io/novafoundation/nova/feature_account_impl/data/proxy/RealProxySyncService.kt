@@ -26,6 +26,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class RealProxySyncService(
@@ -40,10 +43,22 @@ class RealProxySyncService(
     private val shouldSyncWatchOnlyProxies: Boolean
 ) : ProxySyncService {
 
+    override fun proxySyncTrigger(): Flow<*> {
+        return chainRegistry.currentChains.map { chains ->
+            chains
+                .filter(Chain::supportProxy)
+                .map(Chain::id)
+        }.distinctUntilChanged()
+    }
+
     override fun startSyncing() {
         rootScope.launch(Dispatchers.Default) {
             startSyncInternal()
         }
+    }
+
+    override suspend fun startSyncingSuspend() {
+        startSyncInternal()
     }
 
     private suspend fun startSyncInternal() = runCatching {
@@ -51,6 +66,8 @@ class RealProxySyncService(
         if (metaAccounts.isEmpty()) return@runCatching
 
         val supportedProxyChains = getSupportedProxyChains()
+
+        Log.d(LOG_TAG, "Starting syncing proxies in ${supportedProxyChains.size} chains")
 
         supportedProxyChains.forEach { chain ->
             syncChainProxies(chain, metaAccounts)
