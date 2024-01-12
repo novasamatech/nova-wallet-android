@@ -90,23 +90,18 @@ class ConfirmRemoveStakingProxyViewModel(
         loadFee()
     }
 
-    private fun loadFee() {
-        launch {
-            val metaAccount = selectedMetaAccountFlow.first()
-            val chain = selectedAssetState.chain()
-            val proxiedAccountId = metaAccount.requireAccountIdIn(chain)
+    fun backClicked() {
+        router.back()
+    }
 
-            feeMixin.loadFee(
-                this,
-                chain.id,
-                feeConstructor = { removeStakingProxyInteractor.estimateFee(chain, proxiedAccountId) },
-                onRetryCancelled = ::backClicked
-            )
+    fun proxiedAccountClicked() {
+        launch {
+            showExternalActions(proxiedAccountModel.first().address)
         }
     }
 
-    fun backClicked() {
-        router.back()
+    fun proxyAccountClicked() {
+        showExternalActions(payload.proxyAddress)
     }
 
     fun confirmClicked() = launch {
@@ -130,6 +125,21 @@ class ConfirmRemoveStakingProxyViewModel(
         }
     }
 
+    private fun loadFee() {
+        launch {
+            val metaAccount = selectedMetaAccountFlow.first()
+            val chain = selectedAssetState.chain()
+            val proxiedAccountId = metaAccount.requireAccountIdIn(chain)
+
+            feeMixin.loadFee(
+                this,
+                chain.id,
+                feeConstructor = { removeStakingProxyInteractor.estimateFee(chain, proxiedAccountId) },
+                onRetryCancelled = ::backClicked
+            )
+        }
+    }
+
     private fun sendTransaction(chain: Chain, proxiedAccount: AccountId, proxyAccount: AccountId) = launch {
         val result = removeStakingProxyInteractor.removeProxy(chain, proxiedAccount, proxyAccount)
 
@@ -144,16 +154,6 @@ class ConfirmRemoveStakingProxyViewModel(
         chain = chain,
         address = address,
     )
-
-    fun proxiedAccountClicked() {
-        launch {
-            showExternalActions(proxiedAccountModel.first().address)
-        }
-    }
-
-    fun proxyAccountClicked() {
-        showExternalActions(payload.proxyAddress)
-    }
 
     private fun showExternalActions(address: String) = launch {
         externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
