@@ -79,6 +79,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.StakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rebond.RebondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rewardDestination.ChangeRewardDestinationInteractor
@@ -620,4 +621,14 @@ class StakingFeatureModule {
             getProxyRepository
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingProxyListInteractor(
+        accountRepository: AccountRepository,
+        getProxyRepository: GetProxyRepository
+    ) = StakingProxyListInteractor(
+        accountRepository,
+        getProxyRepository
+    )
 }

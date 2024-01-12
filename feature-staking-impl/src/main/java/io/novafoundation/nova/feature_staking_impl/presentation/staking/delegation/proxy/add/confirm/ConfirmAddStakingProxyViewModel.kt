@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.confirm
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel

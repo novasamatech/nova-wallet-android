@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+
+    <!--<string name="delegation_add_delegation">Add delegation</string>-->
+    <string name="common_add_delegation">Add delegation</string>
+
+    <string name="staking_proxies_group_title">Delegated authorities (proxy)</string>
+    <string name="common_proxy_rewoke_access">Revoke access</string>
+
     <string name="proxy_access_type_staking_operations">Staking operations</string>
 
     <string name="add_proxy_confirmation_delegating_wallet">Delegating wallet</string>
@@ -586,8 +593,6 @@
     <string name="delegation_delegate_filter_all">All accounts</string>
     <string name="delegation_delegate_filter_organizations">Organizations</string>
     <string name="delegation_delegate_filter_individuals">Individuals</string>
-
-    <string name="delegation_add_delegation">Add delegation</string>
 
     <string name="delegation_delegate_type_organization">Organization</string>
     <string name="delegation_delegate_type_individual">Individual</string>

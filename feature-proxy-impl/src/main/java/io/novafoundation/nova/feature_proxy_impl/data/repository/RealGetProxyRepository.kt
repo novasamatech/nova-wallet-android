@@ -23,6 +23,9 @@ import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 
 private class OnChainProxiedModel(
     val proxies: List<OnChainProxyModel>,
@@ -37,11 +40,11 @@ private class OnChainProxyModel(
 
 class RealGetProxyRepository(
     private val remoteSource: StorageDataSource,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
 ) : GetProxyRepository {
 
     override suspend fun getAllProxiesForAccounts(chainId: ChainId, accountIds: Set<AccountIdKey>): List<ProxiedWithProxy> {
-        val delegatorToProxies = receiveAllProxies(chainId)
+        val delegatorToProxies = receiveAllProxiesInChain(chainId)
 
         return delegatorToProxies
             .mapNotNull { (delegator, proxied) ->
@@ -81,6 +84,25 @@ class RealGetProxyRepository(
         return constantQuery.numberConstant("MaxProxies", runtime).toInt()
     }
 
+    override fun proxiesByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<List<ProxiedWithProxy.Proxy>> {
+        return remoteSource.subscribe(chain.id) {
+            runtime.metadata.module(Modules.PROXY)
+                .storage("Proxies")
+                .observe(
+                    accountId,
+                    binding = { bindProxyAccounts(it) }
+                )
+        }.map {
+            it.proxies.filter { it.proxyType == proxyType.name }
+                .map { ProxiedWithProxy.Proxy(it.accountId.value, it.proxyType) }
+        }
+    }
+
+    override fun proxiesQuantityByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<Int> {
+        return proxiesByTypeFlow(chain, accountId, proxyType)
+            .map { it.size }
+    }
+
     private suspend fun getAllProxiesFor(chainId: ChainId, accountId: AccountId): OnChainProxiedModel {
         return remoteSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
@@ -94,7 +116,7 @@ class RealGetProxyRepository(
         }
     }
 
-    private suspend fun receiveAllProxies(chainId: ChainId): Map<AccountIdKey, OnChainProxiedModel> {
+    private suspend fun receiveAllProxiesInChain(chainId: ChainId): Map<AccountIdKey, OnChainProxiedModel> {
         return remoteSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")

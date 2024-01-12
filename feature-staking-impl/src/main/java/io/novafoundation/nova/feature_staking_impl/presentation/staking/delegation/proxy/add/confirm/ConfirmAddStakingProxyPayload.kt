@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.confirm
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance

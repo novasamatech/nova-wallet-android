@@ -5,6 +5,8 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -66,11 +68,15 @@ class RelaychainModule {
         resourceManager: ResourceManager,
         stakeActionsValidations: Map<@JvmSuppressWildcards String, StakeActionsValidationSystem>,
         router: StakingRouter,
+        accountRepository: AccountRepository,
+        getProxyRepository: GetProxyRepository
     ) = RelaychainStakeActionsComponentFactory(
         stakingSharedComputation = stakingSharedComputation,
         resourceManager = resourceManager,
         stakeActionsValidations = stakeActionsValidations,
-        router = router
+        router = router,
+        accountRepository = accountRepository,
+        getProxyRepository = getProxyRepository
     )
 
     @Provides

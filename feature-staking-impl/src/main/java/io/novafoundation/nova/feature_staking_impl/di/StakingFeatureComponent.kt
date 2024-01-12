@@ -61,8 +61,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.con
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.di.ConfirmSetControllerComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.set.di.SetControllerComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.confirm.di.ConfirmAddStakingProxyComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.di.AddStakingProxyComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.di.ConfirmAddStakingProxyComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.set.di.AddStakingProxyComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.di.StakingProxyListComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.di.ConfirmRebondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom.di.CustomRebondComponent
@@ -172,6 +173,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun setControllerFactory(): SetControllerComponent.Factory
 
     fun setStakingProxyFactory(): AddStakingProxyComponent.Factory
+
+    fun stakingProxyListFactory(): StakingProxyListComponent.Factory
 
     fun confirmSetControllerFactory(): ConfirmSetControllerComponent.Factory
 
