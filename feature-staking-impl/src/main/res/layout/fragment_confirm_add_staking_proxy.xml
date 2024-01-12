@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     app:dividerVisible="false"
                     app:primaryValueEndIcon="@drawable/ic_info"
-                    app:title="@string/add_proxy_confirmation_delegate_to" />
+                    app:title="@string/remove_proxy_confirmation_revoke_for" />
 
             </io.novafoundation.nova.common.view.TableView>
 
