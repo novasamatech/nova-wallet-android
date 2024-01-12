@@ -97,7 +97,9 @@ class RuntimeSyncService(
         cancelExistingSync(chainId)
 
         syncingChains[chainId] = launch(syncDispatcher) {
-            sync(chainId, forceFullSync)
+            runCatching { sync(chainId, forceFullSync) }
+
+            syncFinished(chainId)
         }
     }
 
@@ -137,8 +139,6 @@ class RuntimeSyncService(
                 types.md5()
             }
         }
-
-        syncFinished(chainId)
 
         _syncStatusFlow.emit(
             SyncResult(
