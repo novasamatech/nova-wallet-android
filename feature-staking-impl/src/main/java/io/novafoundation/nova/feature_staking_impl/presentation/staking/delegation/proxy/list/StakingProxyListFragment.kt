@@ -40,7 +40,6 @@ class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel>(), Stak
     override fun initViews() {
         stakingProxyListToolbar.applyStatusBarInsets()
         stakingProxyListToolbar.setHomeButtonListener { viewModel.backClicked() }
-        stakingProxyListAddProxyButton.prepareForProgress(this)
 
         stakingProxyListAddProxyButton.setOnClickListener { viewModel.addProxyClicked() }
 
@@ -74,13 +73,13 @@ class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel>(), Stak
     }
 
     override fun onProxyClick(item: StakingProxyRvItem) {
-        viewModel.proxiClicked(item)
+        viewModel.proxyClicked(item)
     }
 
     private fun rewokeAccessExternalAction(payload: ExternalActions.Payload): List<ExternalActionModel> {
         return listOf(
             ExternalActionModel(
-                R.drawable.ic_delete_symbol,
+                R.drawable.ic_delete,
                 getString(R.string.common_proxy_rewoke_access),
                 onClick = { viewModel.rewokeAccess(payload) }
             )

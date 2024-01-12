@@ -55,7 +55,7 @@ class StakingProxyListViewModel(
         stakingRouter.openAddStakingProxy()
     }
 
-    fun proxiClicked(item: StakingProxyRvItem) {
+    fun proxyClicked(item: StakingProxyRvItem) {
         launch {
             val chain = selectedAssetState.chain()
             externalActions.showAddressActions(item.accountAddress, chain)
