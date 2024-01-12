@@ -23,7 +23,7 @@ class CustomizableExternalActionsSheet(
         super.onCreate(savedInstanceState)
 
         additionalOptions.forEach { externalActionModel ->
-            textItem(externalActionModel.iconRes, externalActionModel.title) {
+            textItem(externalActionModel.iconRes, externalActionModel.title, showArrow = true) {
                 externalActionModel.onClick()
             }
         }
