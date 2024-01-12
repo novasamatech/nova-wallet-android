@@ -17,9 +17,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notS
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -123,15 +123,21 @@ class RealProxySigningPresenter(
         proxyMetaAccount: MetaAccount,
         proxyTypes: List<ProxyAccount.ProxyType>
     ): CharSequence {
-        val subtitle = resourceManager.getString(R.string.proxy_signing_not_enough_permission_message)
         val primaryColor = resourceManager.getColor(R.color.text_primary)
 
         val proxiedName = proxiedMetaAccount.name.toSpannable(colorSpan(primaryColor))
         val proxyName = proxyMetaAccount.name.toSpannable(colorSpan(primaryColor))
 
-        val proxyTypesBuffer = SpannableStringBuilder()
-        val proxyTypesCharSequence = proxyTypes.joinTo(proxyTypesBuffer) { it.name.toSpannable(colorSpan(primaryColor)) }
+        return if (proxyTypes.isNotEmpty()) {
+            val subtitle = resourceManager.getString(R.string.proxy_signing_not_enough_permission_message)
 
-        return SpannableFormatter.format(subtitle, proxiedName, proxyName, proxyTypesCharSequence)
+            val proxyTypesBuffer = SpannableStringBuilder()
+            val proxyTypesCharSequence = proxyTypes.joinTo(proxyTypesBuffer) { it.name.toSpannable(colorSpan(primaryColor)) }
+
+            SpannableFormatter.format(subtitle, proxiedName, proxyName, proxyTypesCharSequence)
+        } else {
+            val subtitle = resourceManager.getString(R.string.proxy_signing_none_permissions_message)
+            SpannableFormatter.format(subtitle, proxiedName, proxyName)
+        }
     }
 }
