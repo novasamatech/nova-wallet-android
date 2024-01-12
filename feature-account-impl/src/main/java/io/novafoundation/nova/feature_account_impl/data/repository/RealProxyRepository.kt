@@ -15,10 +15,10 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.mapProxyTypeToSt
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import java.math.BigInteger
 
 private class OnChainProxyModel(
     val accountId: AccountIdKey,
@@ -82,6 +82,8 @@ class RealProxyRepository(
     }
 
     private fun bindProxyAccounts(dynamicInstance: Any?): List<OnChainProxyModel> {
+        if (dynamicInstance == null) return emptyList()
+
         val root = dynamicInstance.castToList()
         val proxies = root[0].castToList()
 

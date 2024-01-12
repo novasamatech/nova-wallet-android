@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_buy_impl.domain.providers.ExternalProvider
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapLatest
 
 class RootInteractor(
     private val updateSystem: BalancesUpdateSystem,
@@ -33,7 +34,9 @@ class RootInteractor(
         return accountRepository.isCodeSet()
     }
 
-    fun syncProxies() {
-        proxySyncService.startSyncing()
+    fun syncProxies(): Flow<*> {
+        return proxySyncService.proxySyncTrigger().mapLatest {
+            proxySyncService.startSyncingSuspend()
+        }
     }
 }
