@@ -76,7 +76,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValue="@string/proxy_access_type_staking_operations"
-                    app:title="@string/add_proxy_confirmation_grant_access_type" />
+                    app:title="@string/remove_proxy_confirmation_revoke_access_type" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/confirmRemoveStakingProxyDelegationAccount"
@@ -84,7 +84,7 @@
                     android:layout_height="wrap_content"
                     app:dividerVisible="false"
                     app:primaryValueEndIcon="@drawable/ic_info"
-                    app:title="@string/add_proxy_confirmation_delegate_to" />
+                    app:title="@string/remove_proxy_confirmation_revoke_for" />
 
             </io.novafoundation.nova.common.view.TableView>
 
