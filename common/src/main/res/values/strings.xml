@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="remove_proxy_title">Revoke access</string>
+
     <!--<string name="delegation_add_delegation">Add delegation</string>-->
     <string name="common_add_delegation">Add delegation</string>
 

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy
+package io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder

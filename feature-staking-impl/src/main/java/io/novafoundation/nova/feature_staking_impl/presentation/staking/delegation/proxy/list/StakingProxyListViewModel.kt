@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_BIG
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.pro
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyGroupRvItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyRvItem
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.ConfirmRemoveStakingProxyPayload
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -62,7 +64,9 @@ class StakingProxyListViewModel(
         }
     }
 
-    fun rewokeAccess(payload: ExternalActions.Payload) {
+    fun rewokeAccess(externalActionPayload: ExternalActions.Payload) {
+        val payload = ConfirmRemoveStakingProxyPayload(externalActionPayload.requireAddress())
+        stakingRouter.openConfirmRemoveStakingProxy(payload)
     }
 
     private suspend fun mapToProxyList(proxies: List<StakingProxyAccount>): List<Any> {
@@ -84,4 +88,6 @@ class StakingProxyListViewModel(
             addAll(proxyRvItems)
         }
     }
+
+    private fun ExternalActions.Payload.requireAddress() = type.castOrNull<ExternalActions.Type.Address>()!!.address!!
 }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.di
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -11,39 +11,39 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
-import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RemoveStakingProxyInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.remove.RemoveStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.ConfirmRemoveStakingProxyPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.ConfirmRemoveStakingProxyViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 
 @Module(includes = [ViewModelModule::class])
-class ConfirmAddStakingProxyModule {
+class ConfirmRemoveStakingProxyModule {
     @Provides
     @IntoMap
-    @ViewModelKey(ConfirmAddStakingProxyViewModel::class)
+    @ViewModelKey(ConfirmRemoveStakingProxyViewModel::class)
     fun provideViewModule(
         router: StakingRouter,
         addressIconGenerator: AddressIconGenerator,
-        payload: ConfirmAddStakingProxyPayload,
+        payload: ConfirmRemoveStakingProxyPayload,
         accountRepository: AccountRepository,
         resourceManager: ResourceManager,
         externalActions: ExternalActions.Presentation,
         validationExecutor: ValidationExecutor,
         selectedAssetState: AnySelectedAssetOptionSharedState,
         assetUseCase: ArbitraryAssetUseCase,
-        addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
-        addStakingProxyRepository: AddStakingProxyRepository,
         walletUiUseCase: WalletUiUseCase,
-        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        removeStakingProxyInteractor: RemoveStakingProxyInteractor,
+        removeStakingProxyValidationSystem: RemoveStakingProxyValidationSystem,
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory
     ): ViewModel {
-        return ConfirmAddStakingProxyViewModel(
+        return ConfirmRemoveStakingProxyViewModel(
             router = router,
             addressIconGenerator = addressIconGenerator,
             payload = payload,
@@ -53,10 +53,10 @@ class ConfirmAddStakingProxyModule {
             validationExecutor = validationExecutor,
             selectedAssetState = selectedAssetState,
             assetUseCase = assetUseCase,
-            addStakingProxyValidationSystem = addStakingProxyValidationSystem,
-            addStakingProxyRepository = addStakingProxyRepository,
             walletUiUseCase = walletUiUseCase,
-            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
+            removeStakingProxyInteractor = removeStakingProxyInteractor,
+            removeStakingProxyValidationSystem = removeStakingProxyValidationSystem,
+            feeLoaderMixinFactory = feeLoaderMixinFactory
         )
     }
 
@@ -64,7 +64,7 @@ class ConfirmAddStakingProxyModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): ConfirmAddStakingProxyViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmAddStakingProxyViewModel::class.java)
+    ): ConfirmRemoveStakingProxyViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmRemoveStakingProxyViewModel::class.java)
     }
 }
