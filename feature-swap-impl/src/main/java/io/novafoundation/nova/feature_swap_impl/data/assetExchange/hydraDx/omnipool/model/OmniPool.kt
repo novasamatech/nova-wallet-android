@@ -105,8 +105,3 @@ fun OmniPool.calculateInGivenOut(
 }
 
 private fun Double.deductFraction(perbill: Perbill): Double = this - this * perbill.value
-
-//
-// private val INTEGER_FLOOR_MATH_CONTEXT = MathContext(0, RoundingMode.FLOOR)
-//
-// private fun BigDecimal.floorToInteger() = round(INTEGER_FLOOR_MATH_CONTEXT)
