@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
@@ -118,6 +119,7 @@ private class HydraDxOmnipoolExchange(
         val omniPoolTokenIdOut = args.tokenOut.configuration.requireOmniPoolTokenId(runtime)
 
         val quote = omniPool.quote(omniPoolTokenIdIn, omniPoolTokenIdOut, args.amount, args.swapDirection)
+            ?: throw SwapQuoteException.NotEnoughLiquidity
 
         return AssetExchangeQuote(quote)
     }

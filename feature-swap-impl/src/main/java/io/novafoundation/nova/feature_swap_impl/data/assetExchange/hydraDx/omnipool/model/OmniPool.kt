@@ -25,7 +25,7 @@ fun OmniPool.quote(
     assetIdOut: OmniPoolTokenId,
     amount: Balance,
     direction: SwapDirection
-): Balance {
+): Balance? {
     return when(direction) {
         SwapDirection.SPECIFIED_IN -> calculateOutGivenIn(assetIdIn, assetIdOut, amount)
         SwapDirection.SPECIFIED_OUT -> calculateInGivenOut(assetIdIn, assetIdOut, amount)
@@ -40,14 +40,14 @@ fun OmniPool.calculateOutGivenIn(
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 
+    // TODO take fees into account
+    val protocolFee = Perbill.zero()
+    val assetFee =  Perbill.zero()
+
     val inHubReserve = tokenInState.hubReserve.toDouble()
     val inReserve = tokenInState.balance.toDouble()
 
     val inAmount = amountIn.toDouble()
-
-    // TODO take fees into account
-    val protocolFee = Perbill.zero()
-    val assetFee =  Perbill.zero()
 
     val deltaHubReserveIn = inAmount * inHubReserve / (inReserve + inAmount)
 
@@ -68,9 +68,36 @@ fun OmniPool.calculateInGivenOut(
     assetIdIn: OmniPoolTokenId,
     assetIdOut: OmniPoolTokenId,
     amountOut: Balance
-): Balance {
-    // TODO
-    return BigInteger.ZERO
+): Balance? {
+    val tokenInState = tokens.getValue(assetIdIn)
+    val tokenOutState = tokens.getValue(assetIdOut)
+
+    // TODO take fees into account
+    val protocolFee = Perbill.zero()
+    val assetFee =  Perbill.zero()
+
+    val outHubReserve = tokenOutState.hubReserve.toDouble()
+    val outReserve = tokenOutState.balance.toDouble()
+
+    val outAmount = amountOut.toDouble()
+
+    val outReserveNoFee = outReserve.deductFraction(assetFee)
+
+    val deltaHubReserveOut = outHubReserve * outAmount / (outReserveNoFee - outAmount) + 1
+
+    val deltaHubReserveIn = deltaHubReserveOut / (1.0 - protocolFee.value)
+
+    val inHubReserveHp = tokenInState.hubReserve.toDouble()
+
+    if (deltaHubReserveIn >= inHubReserveHp) {
+        return null
+    }
+
+    val inReserveHp = tokenInState.balance.toDouble()
+
+    val deltaReserveIn = inReserveHp * deltaHubReserveIn / (inHubReserveHp - deltaHubReserveIn) + 1
+
+    return deltaReserveIn.takeIf { it >= 0 }?.toBigDecimal()?.toBigInteger()
 }
 
 
