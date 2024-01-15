@@ -132,8 +132,8 @@ private class AssetConversionExchange(
 
     override fun runSubscriptions(chain: Chain): Flow<ReQuoteTrigger> {
         return chainStateRepository.currentBlockNumberFlow(chain.id)
-            .map { ReQuoteTrigger }
             .drop(1) // skip immediate value from the cache to not perform double-quote on chain change
+            .map { ReQuoteTrigger }
     }
 
     private suspend fun constructAllAvailableDirections(pools: List<Pair<MultiLocation, MultiLocation>>): MultiMap<FullChainAssetId, FullChainAssetId> {

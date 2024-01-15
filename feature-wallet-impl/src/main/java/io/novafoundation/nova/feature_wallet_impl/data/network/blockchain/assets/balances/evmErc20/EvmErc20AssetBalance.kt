@@ -79,13 +79,13 @@ class EvmErc20AssetBalance(
         )
     }
 
-    override fun subscribeAccountBalance(
+    override suspend fun subscribeTransferableAccountBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
         sharedSubscriptionBuilder: SharedRequestsBuilder
-    ) {
-        error("Not yet needed")
+    ): Flow<Balance> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {

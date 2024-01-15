@@ -11,6 +11,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
@@ -71,17 +74,19 @@ class OrmlAssetBalance(
         )
     }
 
-    override suspend fun subscribeAccountBalance(
+    override suspend fun subscribeTransferableAccountBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
         sharedSubscriptionBuilder: SharedRequestsBuilder
-    ): Flow<AccountBalance> {
+    ): Flow<Balance> {
         return remoteStorageSource.subscribe(chain.id, sharedSubscriptionBuilder) {
             metadata.tokens().storage("Accounts").observe(
                 accountId, chainAsset.ormlCurrencyId(runtime),
                 binding = ::bindOrmlAccountBalanceOrEmpty
-            )
+            ).map {
+               Asset.TransferableMode.REGULAR.calculateTransferable(it)
+            }
         }
     }
 

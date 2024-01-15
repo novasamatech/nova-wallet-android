@@ -11,6 +11,11 @@ import java.math.BigDecimal
 @JvmInline
 value class Perbill(val value: Double) : Comparable<Perbill> {
 
+    companion object {
+
+        fun zero() = Perbill(0.0)
+    }
+
     override fun compareTo(other: Perbill): Int {
         return value.compareTo(other.value)
     }

@@ -70,9 +70,18 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideHydraDxExchangeFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+        assetSourceRegistry: AssetSourceRegistry,
+        extrinsicService: ExtrinsicService,
         chainRegistry: ChainRegistry
     ): HydraDxOmnipoolExchangeFactory {
-        return HydraDxOmnipoolExchangeFactory(remoteStorageSource, chainRegistry)
+        return HydraDxOmnipoolExchangeFactory(
+            remoteStorageSource = remoteStorageSource,
+            chainRegistry = chainRegistry,
+            sharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
+            assetSourceRegistry = assetSourceRegistry,
+            extrinsicService = extrinsicService
+        )
     }
 
     @FeatureScope

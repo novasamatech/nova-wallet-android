@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import java.math.BigInteger
 
 @JvmInline
@@ -22,5 +23,7 @@ value class Tradeability(val value: BigInteger) {
 }
 
 fun bindTradeability(value: Any?): Tradeability {
-    return Tradeability(bindNumber(value))
+    val asStruct = value.castToStruct()
+
+    return Tradeability(bindNumber(asStruct["bits"]))
 }

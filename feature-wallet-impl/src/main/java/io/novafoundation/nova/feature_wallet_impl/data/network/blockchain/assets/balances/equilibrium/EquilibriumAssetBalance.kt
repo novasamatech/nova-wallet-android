@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindEquilibriumBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -131,13 +132,13 @@ class EquilibriumAssetBalance(
         )
     }
 
-    override fun subscribeAccountBalance(
+    override suspend fun subscribeTransferableAccountBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
         sharedSubscriptionBuilder: SharedRequestsBuilder
-    ) {
-        error("Not yet needed")
+    ): Flow<Balance> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {

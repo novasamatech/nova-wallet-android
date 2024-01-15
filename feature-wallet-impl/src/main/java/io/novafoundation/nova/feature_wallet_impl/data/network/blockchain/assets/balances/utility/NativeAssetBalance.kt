@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.decodeValue
@@ -16,6 +17,8 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
@@ -82,9 +85,11 @@ class NativeAssetBalance(
         sharedSubscriptionBuilder: SharedRequestsBuilder
     ): Flow<Balance> {
         return remoteStorage.subscribe(chain.id, sharedSubscriptionBuilder) {
-            metadata.system.account.observe(accountId)
-                .map {
-                }
+            metadata.system.account.observe(accountId).map {
+                val accountInfo = it ?: AccountInfo.empty()
+
+                accountInfo.transferableBalance()
+            }
         }
     }
 
@@ -123,4 +128,15 @@ class NativeAssetBalance(
                 }
             }
     }
+
+    private fun AccountInfo.transferableBalance(): Balance {
+        return transferableMode.calculateTransferable(data)
+    }
+
+    private val AccountInfo.transferableMode: Asset.TransferableMode
+        get() = if (data.flags.holdsAndFreezesEnabled()) {
+            Asset.TransferableMode.HOLDS_AND_FREEZES
+        } else {
+            Asset.TransferableMode.REGULAR
+        }
 }

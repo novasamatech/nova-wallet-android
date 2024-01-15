@@ -17,9 +17,9 @@ fun bindOmnipoolAssetState(decoded: Any?, tokenId: OmniPoolTokenId): OmnipoolAss
 
     return OmnipoolAssetState(
         tokenId = tokenId,
-        hubReserve = bindNumber(struct["hub_reserve"]),
+        hubReserve = bindNumber(struct["hubReserve"]),
         shares = bindNumber(struct["shares"]),
-        protocolShares = bindNumber(struct["protocol_shares"]),
+        protocolShares = bindNumber(struct["protocolShares"]),
         tradeability = bindTradeability(struct["tradable"])
     )
 }
