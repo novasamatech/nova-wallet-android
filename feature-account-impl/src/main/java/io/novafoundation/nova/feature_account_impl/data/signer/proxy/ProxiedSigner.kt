@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
@@ -13,8 +15,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount.Prox
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -79,12 +79,18 @@ class ProxiedSigner(
 
         acknowledgeProxyOperation(proxyMetaAccount)
 
+        // TODO this wont use the actual payload for fee validation when multiple nested proxies are used
+        // We need to design a universal solution
+        // We actually can use `signedExtrinsic.payload` to access actual payload but in this case validation will happen only after signing
+        // which will have bad UX with Vault and Ledger.
+        // As an option we could separate signing and wrapping step specifically for such nested signers and use only the wrapping step before fee validation
+        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic, chain)
+
         if (isRootProxied) {
-            validateExtrinsic(payloadExtrinsic, chain)
+            validateExtrinsic(modifiedPayload, chain)
         }
 
         val delegate = createDelegate(proxyMetaAccount)
-        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic, chain)
 
         val signedExtrinsic = delegate.signExtrinsic(modifiedPayload)
         return signedExtrinsic
