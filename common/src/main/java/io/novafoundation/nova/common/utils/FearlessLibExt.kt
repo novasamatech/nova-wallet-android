@@ -305,6 +305,9 @@ fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().valu
 fun AccountId.ethereumAccountIdToAddress(withChecksum: Boolean = true) = asEthereumAccountId().toAddress(withChecksum).value
 
 fun emptyEthereumAccountId() = ByteArray(20) { 1 }
+
+fun emptySubstrateAccountId() = ByteArray(32)
+
 fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 
 val SignerPayloadExtrinsic.chainId: String
