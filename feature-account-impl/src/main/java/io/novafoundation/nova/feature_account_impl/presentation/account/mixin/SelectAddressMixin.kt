@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.mixin
 
-import io.novafoundation.nova.common.utils.Filter
-import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.toRequestFilter
