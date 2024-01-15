@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculat
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_impl.data.common.RealProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_impl.data.repository.RealGetProxyRepository
+import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -18,10 +19,12 @@ class ProxyFeatureModule {
     @Provides
     @FeatureScope
     fun provideProxyRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        @Named(REMOTE_STORAGE_SOURCE) remoteSource: StorageDataSource,
+        @Named(LOCAL_STORAGE_SOURCE) localSource: StorageDataSource,
         chainRegistry: ChainRegistry
     ): GetProxyRepository = RealGetProxyRepository(
-        storageDataSource,
+        remoteSource = remoteSource,
+        localSource = localSource,
         chainRegistry
     )
 
