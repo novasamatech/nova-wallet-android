@@ -852,8 +852,8 @@
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Неподдерживаемый тип стейкинга</string>
     <string name="sr25519_selection_subtitle">sr25519 (рекомендованный)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    <string name="stacking_no_access_to_controller_account_message">Добавьте учетную запись контроллера в устройство.</string>
-    <string name="stacking_no_access_to_controller_account_title">Нет доступа к учетной записи контроллера</string>
+    <string name="staking_no_access_to_controller_account_message">Добавьте учетную запись контроллера в устройство.</string>
+    <string name="staking_no_access_to_controller_account_title">Нет доступа к учетной записи контроллера</string>
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_active_delegators">Активные делегаторы</string>
     <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
