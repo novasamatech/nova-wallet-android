@@ -12,5 +12,5 @@ interface ProxyDepositCalculator {
 
     suspend fun getDepositConstants(chain: Chain): DepositBaseAndFactor
 
-    fun calculateProxyDeposit(baseAndFactor: DepositBaseAndFactor, proxiesCount: Int): BigInteger
+    fun calculateProxyDepositForQuantity(baseAndFactor: DepositBaseAndFactor, proxiesCount: Int): BigInteger
 }

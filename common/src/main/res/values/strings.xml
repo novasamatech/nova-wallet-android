@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="invalid_proxy_address_title">Invalid proxy address</string>
+    <string name="invalid_proxy_address_message">Proxy address should be a valid %s address</string>
+
     <string name="add_proxy_deposit_description_title">Proxy deposit</string>
     <string name="add_proxy_deposit_description_message">The deposit stays reserved on your account until the proxy is removed.</string>
 
     <string name="add_proxy_maximum_reached_error_title">Maximum number of proxies has been reached</string>
     <string name="add_proxy_maximum_reached_error_message">You have reached the limit of %s added proxies in %s. Remove proxies to add new ones.</string>
-
-    <string name="common_invalid_address_title">Invalid address</string>
-    <string name="common_invalid_address_message">An address must be a valid for %s</string>
 
     <string name="common_error_not_enough_tokens">Not enough tokens</string>
     <string name="staking_not_enough_balance_to_pay_proxy_deposit_message">You don’t have enough balance for proxy deposit of %s. Available balance: %s</string>

@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupExternalAccounts
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.setupYourWalletsBtn
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -63,13 +64,10 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
 
         setupAddressInput(viewModel.addressInputMixin, setStakingProxyAddress)
         setupExternalAccounts(viewModel.addressInputMixin, setStakingProxyAddress)
+        setupYourWalletsBtn(addStakingProxySelectWallet, viewModel.selectAddressMixin)
 
         viewModel.titleFlow.observe {
             addStakingProxyTitle.text = it
-        }
-
-        viewModel.isSelectAddressAvailable.observe {
-            addStakingProxySelectWallet.isInvisible = !it
         }
 
         viewModel.proxyDepositModel.observe {

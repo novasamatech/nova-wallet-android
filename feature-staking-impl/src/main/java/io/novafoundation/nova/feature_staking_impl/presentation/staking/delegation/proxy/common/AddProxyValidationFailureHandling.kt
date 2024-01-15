@@ -25,8 +25,8 @@ fun mapAddStakingProxyValidationFailureToUi(
                 failure.availableBalance.formatPlanks(failure.chainAsset)
             )
 
-        is InvalidAddress -> resourceManager.getString(R.string.common_invalid_address_title) to
-            resourceManager.getString(R.string.common_invalid_address_message, failure.chain.name)
+        is InvalidAddress -> resourceManager.getString(R.string.invalid_proxy_address_title) to
+            resourceManager.getString(R.string.invalid_proxy_address_message, failure.chain.name)
 
         is MaximumProxiesReached -> resourceManager.getString(R.string.add_proxy_maximum_reached_error_title) to
             resourceManager.getString(R.string.add_proxy_maximum_reached_error_message, failure.max, failure.chain.name)

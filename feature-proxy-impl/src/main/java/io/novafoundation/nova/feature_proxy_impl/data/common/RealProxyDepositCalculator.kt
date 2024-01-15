@@ -22,7 +22,7 @@ class RealProxyDepositCalculator(
         )
     }
 
-    override fun calculateProxyDeposit(baseAndFactor: DepositBaseAndFactor, proxiesCount: Int): BigInteger {
+    override fun calculateProxyDepositForQuantity(baseAndFactor: DepositBaseAndFactor, proxiesCount: Int): BigInteger {
         return if (proxiesCount == 0) {
             BigInteger.ZERO
         } else {

@@ -70,7 +70,7 @@ fun AddStakingProxyValidationSystemBuilder.enoughBalanceToPayDeposit(
     chain = { it.chain },
     accountId = { it.proxiedAccountId },
     newDeposit = { it.depositWithQuantity.deposit },
-    availableBalance = { it.asset.freeInPlanks },
+    availableBalance = { it.asset.freeInPlanks - it.asset.frozenInPlanks },
     error = { payload, maxUsable ->
         AddStakingProxyValidationFailure.NotEnoughBalanceToReserveDeposit(
             chainAsset = payload.asset.token.configuration,
@@ -78,5 +78,6 @@ fun AddStakingProxyValidationSystemBuilder.enoughBalanceToPayDeposit(
             deposit = payload.depositWithQuantity.deposit
         )
     },
-    proxyRepository = proxyRepository
+    proxyRepository = proxyRepository,
+    feeReceiver = { it.fee.networkFee.amount }
 )

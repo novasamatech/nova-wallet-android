@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_wallet_api.domain.filter
+package io.novafoundation.nova.feature_account_api.domain.filter
 
 import io.novafoundation.nova.common.utils.Filter
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 
-class MetaAccountFilter(private val mode: Mode, private val metaIds: List<Long>) : Filter<MetaAccount> {
+class MetaAccountFilter(val mode: Mode, val metaIds: List<Long>) : Filter<MetaAccount> {
 
     enum class Mode {
         INCLUDE,
