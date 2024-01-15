@@ -5,16 +5,18 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 class OmnipoolAssetState(
+    val tokenId: OmniPoolTokenId,
     val hubReserve: Balance,
     val shares: Balance,
     val protocolShares: Balance,
     val tradeability: Tradeability
 )
 
-fun bindOmnipoolAssetState(decoded: Any?): OmnipoolAssetState {
+fun bindOmnipoolAssetState(decoded: Any?, tokenId: OmniPoolTokenId): OmnipoolAssetState {
     val struct = decoded.castToStruct()
 
     return OmnipoolAssetState(
+        tokenId = tokenId,
         hubReserve = bindNumber(struct["hub_reserve"]),
         shares = bindNumber(struct["shares"]),
         protocolShares = bindNumber(struct["protocol_shares"]),

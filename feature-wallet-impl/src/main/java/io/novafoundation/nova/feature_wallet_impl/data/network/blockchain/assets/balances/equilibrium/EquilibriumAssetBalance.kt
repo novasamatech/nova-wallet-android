@@ -131,6 +131,15 @@ class EquilibriumAssetBalance(
         )
     }
 
+    override fun subscribeAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        sharedSubscriptionBuilder: SharedRequestsBuilder
+    ) {
+        error("Not yet needed")
+    }
+
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
         val accountBalance = queryAccountBalance(chain, chainAsset, accountId)
         return accountBalance.free + accountBalance.reserved

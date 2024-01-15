@@ -15,7 +15,13 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 fun bindOrmlAccountData(scale: String, runtime: RuntimeSnapshot): AccountBalance {
     val type = runtime.metadata.tokens().storage("Accounts").returnType()
 
-    val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
+    val dynamicInstance = type.fromHexOrNull(runtime, scale)
+
+    return bindOrmlAccountData(dynamicInstance)
+}
+
+fun bindOrmlAccountData(decoded: Any?): AccountBalance {
+    val dynamicInstance = decoded.cast<Struct.Instance>()
 
     return AccountBalance(
         free = bindNumber(dynamicInstance["free"]),

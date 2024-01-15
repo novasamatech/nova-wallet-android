@@ -113,7 +113,13 @@ fun bindNonce(dynamicInstance: Any?): BigInteger {
 fun bindAccountInfo(scale: String, runtime: RuntimeSnapshot): AccountInfo {
     val type = runtime.metadata.system().storage("Account").returnType()
 
-    val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
+    val dynamicInstance = type.fromHexOrNull(runtime, scale)
+
+    return bindAccountInfo(dynamicInstance)
+}
+
+fun bindAccountInfo(decoded: Any?): AccountInfo {
+    val dynamicInstance = decoded.cast<Struct.Instance>()
 
     return AccountInfo(
         consumers = dynamicInstance.getTyped<BigInteger?>("consumers").orZero(),

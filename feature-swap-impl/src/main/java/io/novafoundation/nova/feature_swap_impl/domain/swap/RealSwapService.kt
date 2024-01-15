@@ -12,9 +12,11 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.toPercent
+import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
+import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
@@ -120,6 +122,13 @@ internal class RealSwapService(
         val computationScope = CoroutineScope(coroutineContext)
         val exchanges = exchanges(computationScope)
         return exchanges[chainId]?.slippageConfig()
+    }
+
+    override fun runSubscriptions(chainIn: Chain): Flow<ReQuoteTrigger> {
+        return withFlowScope { scope ->
+            val exchanges = exchanges(scope)
+            exchanges.getValue(chainIn.id).runSubscriptions(chainIn)
+        }
     }
 
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {

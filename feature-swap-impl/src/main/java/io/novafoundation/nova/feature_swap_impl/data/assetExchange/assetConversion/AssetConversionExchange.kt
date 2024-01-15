@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConvers
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMap
-import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.assetConversion
 import io.novafoundation.nova.common.utils.mutableMultiMapOf
 import io.novafoundation.nova.common.utils.put
@@ -13,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
+import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
@@ -32,7 +32,6 @@ import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.assetTxPayment
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
@@ -40,6 +39,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.Multi
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -48,15 +48,18 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 
 class AssetConversionExchangeFactory(
-    private val chainRegistry: ChainRegistry,
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val remoteStorageSource: StorageDataSource,
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
     private val extrinsicService: ExtrinsicService,
     private val assetSourceRegistry: AssetSourceRegistry,
-) : AssetExchange.Factory {
+    private val chainStateRepository: ChainStateRepository,
+    ) : AssetExchange.Factory {
 
     override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
         val converter = multiLocationConverterFactory.default(chain, coroutineScope)
@@ -67,7 +70,8 @@ class AssetConversionExchangeFactory(
             remoteStorageSource = remoteStorageSource,
             multiChainRuntimeCallsApi = runtimeCallsApi,
             extrinsicService = extrinsicService,
-            assetSourceRegistry = assetSourceRegistry
+            assetSourceRegistry = assetSourceRegistry,
+            chainStateRepository = chainStateRepository
         )
     }
 }
@@ -79,6 +83,7 @@ private class AssetConversionExchange(
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val extrinsicService: ExtrinsicService,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange {
 
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
@@ -122,14 +127,13 @@ private class AssetConversionExchange(
     }
 
     override suspend fun slippageConfig(): SlippageConfig {
-        return SlippageConfig(
-            defaultSlippage = Percent(0.5),
-            slippageTips = listOf(Percent(0.1), Percent(0.5), Percent(1.0)),
-            minAvailableSlippage = Percent(0.01),
-            maxAvailableSlippage = Percent(50.0),
-            smallSlippage = Percent(0.05),
-            bigSlippage = Percent(1.0)
-        )
+        return SlippageConfig.default()
+    }
+
+    override fun runSubscriptions(chain: Chain): Flow<ReQuoteTrigger> {
+        return chainStateRepository.currentBlockNumberFlow(chain.id)
+            .map { ReQuoteTrigger }
+            .drop(1) // skip immediate value from the cache to not perform double-quote on chain change
     }
 
     private suspend fun constructAllAvailableDirections(pools: List<Pair<MultiLocation, MultiLocation>>): MultiMap<FullChainAssetId, FullChainAssetId> {

@@ -19,6 +19,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -68,6 +69,20 @@ class OrmlAssetBalance(
             keyBuilder = { it.ormlBalanceKey(accountId, chainAsset) },
             binding = { scale, runtime -> bindOrmlAccountBalanceOrEmpty(scale, runtime) }
         )
+    }
+
+    override suspend fun subscribeAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        sharedSubscriptionBuilder: SharedRequestsBuilder
+    ): Flow<AccountBalance> {
+        return remoteStorageSource.subscribe(chain.id, sharedSubscriptionBuilder) {
+            metadata.tokens().storage("Accounts").observe(
+                accountId, chainAsset.ormlCurrencyId(runtime),
+                binding = ::bindOrmlAccountBalanceOrEmpty
+            )
+        }
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
@@ -121,5 +136,9 @@ class OrmlAssetBalance(
 
     private fun bindOrmlAccountBalanceOrEmpty(scale: String?, runtime: RuntimeSnapshot): AccountBalance {
         return scale?.let { bindOrmlAccountData(it, runtime) } ?: AccountBalance.empty()
+    }
+
+    private fun bindOrmlAccountBalanceOrEmpty(decoded: Any?): AccountBalance {
+        return decoded?.let { bindOrmlAccountData(decoded) } ?: AccountBalance.empty()
     }
 }

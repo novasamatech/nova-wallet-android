@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDef
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
@@ -22,6 +23,10 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.runtime.storage.typed.account
+import io.novafoundation.nova.runtime.storage.typed.system
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
@@ -34,6 +39,7 @@ class NativeAssetBalance(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
     private val substrateRemoteSource: SubstrateRemoteSource,
+    private val remoteStorage: StorageDataSource,
     private val lockDao: LockDao
 ) : AssetBalance {
 
@@ -67,6 +73,19 @@ class NativeAssetBalance(
 
     override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
         return substrateRemoteSource.getAccountInfo(chain.id, accountId).data
+    }
+
+    override suspend fun subscribeTransferableAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        sharedSubscriptionBuilder: SharedRequestsBuilder
+    ): Flow<Balance> {
+        return remoteStorage.subscribe(chain.id, sharedSubscriptionBuilder) {
+            metadata.system.account.observe(accountId)
+                .map {
+                }
+        }
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {

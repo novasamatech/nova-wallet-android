@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
+import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 
 interface AssetExchange {
 
@@ -37,6 +39,8 @@ interface AssetExchange {
     suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission>
 
     suspend fun slippageConfig(): SlippageConfig
+
+    fun runSubscriptions(chain: Chain): Flow<ReQuoteTrigger>
 }
 
 class AssetExchangeQuote(

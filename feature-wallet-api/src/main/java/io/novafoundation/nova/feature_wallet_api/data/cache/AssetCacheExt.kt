@@ -61,6 +61,7 @@ private fun nativeBalanceUpdater(accountInfo: AccountInfo) = { asset: AssetLocal
     )
 }
 
+
 fun bindAccountInfoOrDefault(hex: String?, runtime: RuntimeSnapshot): AccountInfo {
     return hex?.let { bindAccountInfo(it, runtime) } ?: AccountInfo.empty()
 }

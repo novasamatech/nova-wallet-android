@@ -54,9 +54,10 @@ class SwapFeatureModule {
         extrinsicService: ExtrinsicService,
         assetSourceRegistry: AssetSourceRegistry,
         multiLocationConverterFactory: MultiLocationConverterFactory,
+        chainStateRepository: ChainStateRepository
     ): AssetConversionExchangeFactory {
         return AssetConversionExchangeFactory(
-            chainRegistry = chainRegistry,
+            chainStateRepository = chainStateRepository,
             remoteStorageSource = remoteStorageSource,
             runtimeCallsApi = runtimeCallsApi,
             extrinsicService = extrinsicService,

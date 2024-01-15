@@ -42,6 +42,13 @@ interface AssetBalance {
         accountId: AccountId
     ): AccountBalance
 
+    suspend fun subscribeTransferableAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        sharedSubscriptionBuilder: SharedRequestsBuilder,
+    ): Flow<AccountBalance>
+
     suspend fun queryTotalBalance(
         chain: Chain,
         chainAsset: Chain.Asset,

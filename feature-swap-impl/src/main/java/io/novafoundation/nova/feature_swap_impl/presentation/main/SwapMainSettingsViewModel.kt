@@ -106,7 +106,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
@@ -613,7 +612,7 @@ class SwapMainSettingsViewModel(
     private fun setupQuoting() {
         setupPerSwapSettingQuoting()
 
-        setupPerBlockQuoting()
+        setupSubscriptionQuoting()
     }
 
     private fun setupPerSwapSettingQuoting() {
@@ -621,13 +620,11 @@ class SwapMainSettingsViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun setupPerBlockQuoting() {
-        swapSettings.map { it.assetIn?.chainId }
-            .distinctUntilChanged()
-            .flatMapLatest { chainId ->
-                if (chainId == null) return@flatMapLatest emptyFlow()
-
-                swapInteractor.blockNumberUpdates(chainId)
+    private fun setupSubscriptionQuoting() {
+        swapSettings.mapNotNull { it.assetIn?.chainId }
+            .flatMapLatest {
+                val chain = chainRegistry.getChain(it)
+                swapInteractor.runSubscriptions(chain)
             }.onEach {
                 val currentSwapSettings = swapSettings.first()
 

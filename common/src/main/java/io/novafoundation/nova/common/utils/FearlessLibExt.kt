@@ -235,6 +235,8 @@ fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERS
 
 fun RuntimeMetadata.omnipoolOrNull() = moduleOrNull(Modules.OMNIPOOL)
 
+fun RuntimeMetadata.omnipool() = module(Modules.OMNIPOOL)
+
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
