@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
-import io.novafoundation.nova.feature_account_api.domain.filter.MetaAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -230,11 +230,10 @@ class AddStakingProxyViewModel(
         return SelectAddressRequester.Request.Filter.ExcludeMetaIds(filteredMetaAccounts)
     }
 
-    private suspend fun metaAccountsFilter(chain: Chain, accountId: AccountId): MetaAccountFilter {
+    private suspend fun metaAccountsFilter(chain: Chain, accountId: AccountId): SelectAddressAccountFilter {
         val metaAccountsFilterPayload = getMetaAccountsFilterPayload(chain, accountId)
 
-        return MetaAccountFilter(
-            MetaAccountFilter.Mode.EXCLUDE,
+        return SelectAddressAccountFilter.ExcludeMetaAccounts(
             metaAccountsFilterPayload.metaIds
         )
     }

@@ -17,15 +17,13 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.domain.filter.MetaAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.toMetaAccountsFilter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
@@ -502,19 +500,18 @@ class SelectSendViewModel(
         }
     }
 
-    private suspend fun getMetaAccountsFilter(origin: Chain, desination: Chain): Filter<MetaAccount> {
+    private suspend fun getMetaAccountsFilter(origin: Chain, desination: Chain): SelectAddressAccountFilter {
         val isCrossChain = origin.id != desination.id
 
         return if (isCrossChain) {
-            EverythingFilter()
+            SelectAddressAccountFilter.Everything()
         } else {
             val destinationAccountId = selectedAccount.first().requireAccountIdIn(desination)
             val notOriginMetaAccounts = accountRepository.activeMetaAccounts()
                 .filter { it.accountIdIn(origin)?.intoKey() == destinationAccountId.intoKey() }
                 .map { it.id }
 
-            MetaAccountFilter(
-                MetaAccountFilter.Mode.EXCLUDE,
+            SelectAddressAccountFilter.ExcludeMetaAccounts(
                 notOriginMetaAccounts
             )
         }

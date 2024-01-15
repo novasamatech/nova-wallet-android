@@ -2,17 +2,22 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAdd
 
 import io.novafoundation.nova.common.utils.EverythingFilter
 import io.novafoundation.nova.common.utils.Filter
-import io.novafoundation.nova.feature_account_api.domain.filter.MetaAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester.Request
 
-fun SelectAddressRequester.Request.Filter.toMetaAccountsFilter(): Filter<MetaAccount> {
+fun Request.Filter.toMetaAccountsFilter(): SelectAddressAccountFilter {
     return when (this) {
-        is SelectAddressRequester.Request.Filter.Everything -> EverythingFilter()
+        is Request.Filter.Everything -> SelectAddressAccountFilter.Everything()
 
-        is SelectAddressRequester.Request.Filter.ExcludeMetaIds -> MetaAccountFilter(
-            MetaAccountFilter.Mode.EXCLUDE,
-            this.metaIds
-        )
+        is Request.Filter.ExcludeMetaIds -> SelectAddressAccountFilter.ExcludeMetaAccounts(this.metaIds)
+    }
+}
+
+fun SelectAddressAccountFilter.toRequestFilter(): Request.Filter {
+    return when (this) {
+        is SelectAddressAccountFilter.Everything -> Request.Filter.Everything
+
+        is SelectAddressAccountFilter.ExcludeMetaAccounts -> Request.Filter.ExcludeMetaIds(this.metaIds)
     }
 }

@@ -1,15 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.mixin
 
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.Filter
-import io.novafoundation.nova.feature_account_api.domain.filter.MetaAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.toRequestFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -57,16 +54,8 @@ class RealSelectAddressMixin(
 
     override suspend fun openSelectAddress(selectedAddress: String?) {
         val payload = payloadFlow.first()
-        val metaAccountFilter = getMetaAccountsFilterPayload(payload.filter)
+        val metaAccountFilter = payload.filter.toRequestFilter()
         val request = SelectAddressRequester.Request(payload.chain.id, selectedAddress, metaAccountFilter)
         selectAddressRequester.openRequest(request)
-    }
-
-    private suspend fun getMetaAccountsFilterPayload(filter: Filter<MetaAccount>): SelectAddressRequester.Request.Filter {
-        return if (filter is MetaAccountFilter && filter.mode == MetaAccountFilter.Mode.EXCLUDE) {
-            SelectAddressRequester.Request.Filter.ExcludeMetaIds(filter.metaIds)
-        } else {
-            SelectAddressRequester.Request.Filter.Everything
-        }
     }
 }
