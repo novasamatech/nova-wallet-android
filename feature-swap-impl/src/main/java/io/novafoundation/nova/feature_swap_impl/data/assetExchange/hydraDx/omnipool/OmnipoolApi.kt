@@ -31,7 +31,3 @@ val OmnipoolApi.assets: QueryableStorageEntry1<OmniPoolTokenId, OmnipoolAssetSta
         name = "Assets",
         binding = ::bindOmnipoolAssetState,
     )
-
-
-
-

@@ -59,7 +59,7 @@ class AssetConversionExchangeFactory(
     private val extrinsicService: ExtrinsicService,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
-    ) : AssetExchange.Factory {
+) : AssetExchange.Factory {
 
     override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
         val converter = multiLocationConverterFactory.default(chain, coroutineScope)

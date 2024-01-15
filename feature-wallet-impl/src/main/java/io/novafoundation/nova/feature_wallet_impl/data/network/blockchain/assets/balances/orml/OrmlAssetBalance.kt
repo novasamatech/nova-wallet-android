@@ -82,10 +82,11 @@ class OrmlAssetBalance(
     ): Flow<Balance> {
         return remoteStorageSource.subscribe(chain.id, sharedSubscriptionBuilder) {
             metadata.tokens().storage("Accounts").observe(
-                accountId, chainAsset.ormlCurrencyId(runtime),
+                accountId,
+                chainAsset.ormlCurrencyId(runtime),
                 binding = ::bindOrmlAccountBalanceOrEmpty
             ).map {
-               Asset.TransferableMode.REGULAR.calculateTransferable(it)
+                Asset.TransferableMode.REGULAR.calculateTransferable(it)
             }
         }
     }

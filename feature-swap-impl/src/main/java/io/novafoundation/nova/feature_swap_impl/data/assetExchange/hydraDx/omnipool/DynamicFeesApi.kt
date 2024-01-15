@@ -26,7 +26,3 @@ val DynamicFeesApi.assetFee: QueryableStorageEntry1<OmniPoolTokenId, DynamicFee>
         name = "AssetFee",
         binding = { decoded, _ -> bindDynamicFee(decoded) },
     )
-
-
-
-

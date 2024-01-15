@@ -8,10 +8,10 @@ import java.math.BigInteger
 value class Tradeability(val value: BigInteger) {
 
     companion object {
-        /// Asset is allowed to be sold into omnipool
+        // / Asset is allowed to be sold into omnipool
         val SELL = 0b0000_0001.toBigInteger()
 
-        /// Asset is allowed to be bought into omnipool
+        // / Asset is allowed to be bought into omnipool
         val BUY = 0b0000_0010.toBigInteger()
     }
 

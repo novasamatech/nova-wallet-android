@@ -32,7 +32,7 @@ fun OmniPool.quote(
     amount: Balance,
     direction: SwapDirection
 ): Balance? {
-    return when(direction) {
+    return when (direction) {
         SwapDirection.SPECIFIED_IN -> calculateOutGivenIn(assetIdIn, assetIdOut, amount)
         SwapDirection.SPECIFIED_OUT -> calculateInGivenOut(assetIdIn, assetIdOut, amount)
     }
@@ -47,7 +47,7 @@ fun OmniPool.calculateOutGivenIn(
     val tokenOutState = tokens.getValue(assetIdOut)
 
     val protocolFee = tokenOutState.fees.protocolFee
-    val assetFee =  tokenOutState.fees.assetFee
+    val assetFee = tokenOutState.fees.assetFee
 
     val inHubReserve = tokenInState.hubReserve.toDouble()
     val inReserve = tokenInState.balance.toDouble()
@@ -78,7 +78,7 @@ fun OmniPool.calculateInGivenOut(
     val tokenOutState = tokens.getValue(assetIdOut)
 
     val protocolFee = tokenInState.fees.protocolFee
-    val assetFee =  tokenInState.fees.assetFee
+    val assetFee = tokenInState.fees.assetFee
 
     val outHubReserve = tokenOutState.hubReserve.toDouble()
     val outReserve = tokenOutState.balance.toDouble()
@@ -104,10 +104,9 @@ fun OmniPool.calculateInGivenOut(
     return deltaReserveIn.takeIf { it >= 0 }?.toBigDecimal()?.toBigInteger()
 }
 
-
 private fun Double.deductFraction(perbill: Perbill): Double = this - this * perbill.value
 
 //
-//private val INTEGER_FLOOR_MATH_CONTEXT = MathContext(0, RoundingMode.FLOOR)
+// private val INTEGER_FLOOR_MATH_CONTEXT = MathContext(0, RoundingMode.FLOOR)
 //
-//private fun BigDecimal.floorToInteger() = round(INTEGER_FLOOR_MATH_CONTEXT)
+// private fun BigDecimal.floorToInteger() = round(INTEGER_FLOOR_MATH_CONTEXT)
