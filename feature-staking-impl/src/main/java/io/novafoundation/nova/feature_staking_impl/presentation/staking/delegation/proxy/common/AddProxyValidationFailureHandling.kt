@@ -35,7 +35,7 @@ fun mapAddStakingProxyValidationFailureToUi(
 
         is NotEnoughToStayAboveED -> handleInsufficientBalanceCommission(failure, resourceManager)
 
-        AddStakingProxyValidationFailure.AlreadyDelegated -> resourceManager.getString(R.string.duplicate_proxy_type_title) to
-            resourceManager.getString(R.string.duplicate_proxy_type_message)
+        is AddStakingProxyValidationFailure.AlreadyDelegated -> resourceManager.getString(R.string.duplicate_proxy_type_title) to
+            resourceManager.getString(R.string.duplicate_proxy_type_message, failure.address)
     }
 }

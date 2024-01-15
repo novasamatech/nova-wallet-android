@@ -26,5 +26,5 @@ sealed interface AddStakingProxyValidationFailure {
 
     class MaximumProxiesReached(val chain: Chain, val max: Int) : AddStakingProxyValidationFailure
 
-    object AlreadyDelegated : AddStakingProxyValidationFailure
+    class AlreadyDelegated(val address: String) : AddStakingProxyValidationFailure
 }

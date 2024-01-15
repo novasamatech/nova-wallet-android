@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
     <string name="duplicate_proxy_type_title">Delegation already exists</string>
-    <string name="duplicate_proxy_type_message">You are already delegating to this account</string>
+    <string name="duplicate_proxy_type_message">You are already delegating to this account: %s</string>
 
     <string name="invalid_proxy_address_title">Invalid proxy address</string>
     <string name="invalid_proxy_address_message">Proxy address should be a valid %s address</string>
