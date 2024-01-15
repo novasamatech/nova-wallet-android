@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omni
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMap
+import io.novafoundation.nova.common.utils.dynamicFees
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.numberConstant
@@ -24,10 +25,13 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPool
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPoolFees
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPoolToken
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPoolTokenId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmnipoolAssetState
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.feeParamsConstant
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.quote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -150,10 +154,10 @@ private class HydraDxOmnipoolExchange(
             val pooledAssets = pooledOnChainAssetIdsState.first()
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
 
-            val omniPoolState = pooledAssets.map { (onChainId, _) ->
+            val omniPoolStateFlow = pooledAssets.map { (onChainId, _) ->
                 remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
                     metadata.omnipool.assets.observeNonNull(onChainId).map {
-                        it.tokenId to it
+                        onChainId to it
                     }
                 }
             }
@@ -161,7 +165,7 @@ private class HydraDxOmnipoolExchange(
 
             val poolAccountId = poolAccountId()
 
-            val omniPoolBalances = pooledAssets.map { (omniPoolTokenId, chainAssetId) ->
+            val omniPoolBalancesFlow = pooledAssets.map { (omniPoolTokenId, chainAssetId) ->
                 val chainAsset = chain.assetsById.getValue(chainAssetId.assetId)
                 val assetSource = assetSourceRegistry.sourceFor(chainAsset)
                 assetSource.balance.subscribeTransferableAccountBalance(chain, chainAsset, poolAccountId, subscriptionBuilder).map {
@@ -170,28 +174,55 @@ private class HydraDxOmnipoolExchange(
             }
                 .toMultiSubscription(pooledAssets.size)
 
+            val feesFlow = pooledAssets.map { (omniPoolTokenId, _) ->
+                remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
+                    metadata.dynamicFeesApi.assetFee.observe(omniPoolTokenId).map {
+                        omniPoolTokenId to it
+                    }
+                }
+            }.toMultiSubscription(pooledAssets.size)
+
+            val defaultFees = getDefaultFees()
+
             subscriptionBuilder.subscribe(scope)
 
-
-            combine(omniPoolState, omniPoolBalances, ::createOmniPool)
-                .onEach { omniPoolFlow.emit(it) }
+            combine(omniPoolStateFlow, omniPoolBalancesFlow, feesFlow) { poolState, poolBalances, fees ->
+                createOmniPool(poolState, poolBalances, fees, defaultFees)
+            }
+                .onEach(omniPoolFlow::emit)
                 .map { ReQuoteTrigger }
         }
+    }
+
+    private suspend fun getDefaultFees(): OmniPoolFees {
+        val runtime = chainRegistry.getRuntime(chain.id)
+
+        val assetFeeParams = runtime.metadata.dynamicFees().feeParamsConstant("AssetFeeParameters", runtime)
+        val protocolFeeParams = runtime.metadata.dynamicFees().feeParamsConstant("ProtocolFeeParameters", runtime)
+
+        return OmniPoolFees(
+            protocolFee = protocolFeeParams.minFee,
+            assetFee = assetFeeParams.minFee
+        )
     }
 
     private fun createOmniPool(
         poolAssetStates: Map<OmniPoolTokenId, OmnipoolAssetState>,
         poolBalances: Map<OmniPoolTokenId, Balance>,
+        fees: Map<OmniPoolTokenId, DynamicFee?>,
+        defaultFees: OmniPoolFees,
     ): OmniPool {
         val tokensState = poolAssetStates.mapValues { (tokenId, poolAssetState) ->
             val assetBalance = poolBalances[tokenId].orZero()
+            val tokenFees = fees[tokenId]?.let { OmniPoolFees(it.protocolFee, it.assetFee) } ?: defaultFees
 
             OmniPoolToken(
                 hubReserve = poolAssetState.hubReserve,
                 shares = poolAssetState.shares,
                 protocolShares = poolAssetState.protocolShares,
                 tradeability = poolAssetState.tradeability,
-                balance = assetBalance
+                balance = assetBalance,
+                fees = tokenFees
             )
         }
 
@@ -250,7 +281,7 @@ private class HydraDxOmnipoolExchange(
         val assetIdIn = args.assetIn.requireOmniPoolTokenId(runtime)
         val assetIdOut = args.assetOut.requireOmniPoolTokenId(runtime)
 
-        when(val limit = args.swapLimit) {
+        when (val limit = args.swapLimit) {
             is SwapLimit.SpecifiedIn -> sell(
                 assetIdIn = assetIdIn,
                 assetIdOut = assetIdOut,

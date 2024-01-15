@@ -12,12 +12,18 @@ class OmniPool(
     val tokens: Map<OmniPoolTokenId, OmniPoolToken>,
 )
 
+class OmniPoolFees(
+    val protocolFee: Perbill,
+    val assetFee: Perbill
+)
+
 class OmniPoolToken(
     val hubReserve: Balance,
     val shares: Balance,
     val protocolShares: Balance,
     val tradeability: Tradeability,
-    val balance: Balance
+    val balance: Balance,
+    val fees: OmniPoolFees
 )
 
 fun OmniPool.quote(
@@ -40,9 +46,8 @@ fun OmniPool.calculateOutGivenIn(
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 
-    // TODO take fees into account
-    val protocolFee = Perbill.zero()
-    val assetFee =  Perbill.zero()
+    val protocolFee = tokenOutState.fees.protocolFee
+    val assetFee =  tokenOutState.fees.assetFee
 
     val inHubReserve = tokenInState.hubReserve.toDouble()
     val inReserve = tokenInState.balance.toDouble()
@@ -72,9 +77,8 @@ fun OmniPool.calculateInGivenOut(
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 
-    // TODO take fees into account
-    val protocolFee = Perbill.zero()
-    val assetFee =  Perbill.zero()
+    val protocolFee = tokenInState.fees.protocolFee
+    val assetFee =  tokenInState.fees.assetFee
 
     val outHubReserve = tokenOutState.hubReserve.toDouble()
     val outReserve = tokenOutState.balance.toDouble()
