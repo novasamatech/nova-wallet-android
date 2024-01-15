@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.enoughBalanceToPayDeposit
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.maximumProxies
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.stakingTypeIsNotDuplication
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.sufficientBalanceToPayFee
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.sufficientBalanceToStayAboveEd
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.validAddress
@@ -27,6 +28,8 @@ class AddStakingProxyValidationsModule {
         sufficientBalanceToPayFee()
 
         sufficientBalanceToStayAboveEd(enoughTotalToStayAboveEDValidationFactory)
+
+        stakingTypeIsNotDuplication(getProxyRepository)
 
         maximumProxies(getProxyRepository)
 

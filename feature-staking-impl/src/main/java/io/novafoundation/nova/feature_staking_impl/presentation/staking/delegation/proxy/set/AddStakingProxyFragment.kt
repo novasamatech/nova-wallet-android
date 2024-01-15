@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addProxyToolbar
 import kotlinx.android.synthetic.main.fragment_add_staking_proxy.setStakingProxyAddress
 import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addStakingProxyButton
 import kotlinx.android.synthetic.main.fragment_add_staking_proxy.setStakingProxyContainer
@@ -39,6 +40,7 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
 
     override fun initViews() {
         setStakingProxyContainer.applyStatusBarInsets()
+        addProxyToolbar.setHomeButtonListener { viewModel.backClicked() }
         addStakingProxyButton.prepareForProgress(this)
 
         addStakingProxySelectWallet.setOnClickListener { viewModel.selectAuthorityWallet() }
