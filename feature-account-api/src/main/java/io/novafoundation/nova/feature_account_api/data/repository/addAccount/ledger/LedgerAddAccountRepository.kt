@@ -1,13 +1,10 @@
 package io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger
 
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.BaseAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-abstract class LedgerAddAccountRepository(
-    private val proxySyncService: ProxySyncService,
-) : BaseAddAccountRepository<LedgerAddAccountRepository.Payload>(proxySyncService) {
+interface LedgerAddAccountRepository : AddAccountRepository<LedgerAddAccountRepository.Payload> {
 
     sealed interface Payload {
         class MetaAccount(

@@ -19,8 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.con
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMorePayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.ConfirmSetControllerFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
@@ -221,5 +221,9 @@ class RelayStakingNavigator(
         } else {
             returnToStakingMain()
         }
+    }
+
+    override fun openAddStakingProxy() {
+        performNavigation(R.id.action_open_addStakingProxyFragment)
     }
 }

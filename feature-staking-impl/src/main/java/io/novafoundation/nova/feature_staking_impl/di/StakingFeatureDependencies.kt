@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
@@ -25,13 +26,18 @@ import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -123,6 +129,8 @@ interface StakingFeatureDependencies {
 
     fun enoughTotalToStayAboveEDValidationFactory(): EnoughTotalToStayAboveEDValidationFactory
 
+    fun addressInputMixinFactory(): AddressInputMixinFactory
+
     val amountChooserMixinFactory: AmountChooserMixin.Factory
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
@@ -163,4 +171,14 @@ interface StakingFeatureDependencies {
     val externalBalanceDao: ExternalBalanceDao
 
     val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val proxyDepositCalculator: ProxyDepositCalculator
+
+    val getProxyRepository: GetProxyRepository
+
+    val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
 }

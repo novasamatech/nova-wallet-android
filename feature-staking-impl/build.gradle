@@ -46,6 +46,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-ledger-api')
     implementation project(':feature-dapp-api')
+    implementation project(':feature-proxy-api')
     implementation project(':runtime')
 
     implementation kotlinDep

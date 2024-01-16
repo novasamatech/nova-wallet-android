@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
@@ -93,4 +93,6 @@ interface StakingRouter {
     fun finishSetupPoolFlow()
 
     fun finishRedeemFlow(redeemConsequences: RedeemConsequences)
+
+    fun openAddStakingProxy()
 }

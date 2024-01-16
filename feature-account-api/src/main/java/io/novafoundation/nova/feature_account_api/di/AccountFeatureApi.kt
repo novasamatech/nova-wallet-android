@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.language.Languag
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
@@ -90,4 +91,6 @@ interface AccountFeatureApi {
     val selectWalletMixinFactory: SelectWalletMixin.Factory
 
     val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
 }

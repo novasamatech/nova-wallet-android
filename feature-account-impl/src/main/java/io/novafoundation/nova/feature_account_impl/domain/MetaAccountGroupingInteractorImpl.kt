@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_account_impl.domain
 
 import io.novafoundation.nova.common.list.GroupedList
+import io.novafoundation.nova.common.utils.Filter
 import io.novafoundation.nova.common.utils.amountFromPlanks
+import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.removed
 import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -14,7 +15,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedAndProxyMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -63,10 +63,10 @@ class MetaAccountGroupingInteractorImpl(
         }
     }
 
-    override fun getMetaAccountsForTransaction(fromId: ChainId, destinationId: ChainId): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>> = flowOf {
-        val fromChain = chainRegistry.getChain(fromId)
-        val destinationChain = chainRegistry.getChain(destinationId)
-        getValidMetaAccountsForTransaction(fromChain, destinationChain)
+    override fun getMetaAccountsWithFilter(
+        metaAccountFilter: Filter<MetaAccount>
+    ): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>> = flowOf {
+        getValidMetaAccountsForTransaction(metaAccountFilter)
             .groupBy(MetaAccount::type)
             .toSortedMap(metaAccountTypeComparator())
     }
@@ -92,11 +92,13 @@ class MetaAccountGroupingInteractorImpl(
         }
     }
 
-    override suspend fun hasAvailableMetaAccountsForDestination(fromId: ChainId, destinationId: ChainId): Boolean {
-        val fromChain = chainRegistry.getChain(fromId)
-        val destinationChain = chainRegistry.getChain(destinationId)
-        return getValidMetaAccountsForTransaction(fromChain, destinationChain)
-            .any { it.hasAccountIn(destinationChain) }
+    override suspend fun hasAvailableMetaAccountsForChain(
+        chainId: ChainId,
+        metaAccountFilter: Filter<MetaAccount>
+    ): Boolean {
+        val chain = chainRegistry.getChain(chainId)
+        return getValidMetaAccountsForTransaction(metaAccountFilter)
+            .any { it.hasAccountIn(chain) }
     }
 
     private suspend fun metaAccountWithTotalBalance(
@@ -125,11 +127,9 @@ class MetaAccountGroupingInteractorImpl(
         )
     }
 
-    private suspend fun getValidMetaAccountsForTransaction(from: Chain, destination: Chain): List<MetaAccount> {
-        val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
-        val fromChainAddress = selectedMetaAccount.addressIn(from)
+    private suspend fun getValidMetaAccountsForTransaction(metaAccountFilter: Filter<MetaAccount>): List<MetaAccount> {
         return accountRepository.allMetaAccounts()
-            .removed { fromChainAddress == it.addressIn(destination) }
+            .applyFilter(metaAccountFilter)
             .filter {
                 when (it.type) {
                     LightMetaAccount.Type.SECRETS,

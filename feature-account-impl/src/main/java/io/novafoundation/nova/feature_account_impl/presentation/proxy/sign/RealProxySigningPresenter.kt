@@ -10,10 +10,10 @@ import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -54,7 +54,7 @@ class RealProxySigningPresenter(
     override suspend fun notEnoughPermission(
         proxiedMetaAccount: MetaAccount,
         proxyMetaAccount: MetaAccount,
-        proxyTypes: List<ProxyAccount.ProxyType>
+        proxyTypes: List<ProxyType>
     ) = withContext(Dispatchers.Main) {
         suspendCoroutine { continuation ->
             ProxySignNotEnoughPermissionBottomSheet(
@@ -121,7 +121,7 @@ class RealProxySigningPresenter(
     private fun formatNotEnoughPermissionWarning(
         proxiedMetaAccount: MetaAccount,
         proxyMetaAccount: MetaAccount,
-        proxyTypes: List<ProxyAccount.ProxyType>
+        proxyTypes: List<ProxyType>
     ): CharSequence {
         val subtitle = resourceManager.getString(R.string.proxy_signing_not_enough_permission_message)
         val primaryColor = resourceManager.getColor(R.color.text_primary)

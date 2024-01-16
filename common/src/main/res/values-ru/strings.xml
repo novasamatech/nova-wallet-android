@@ -536,7 +536,6 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Сеть: %s\nМнемоника: %s</string>
     <string name="fee_not_yet_loaded_message">Подождите, пока будет рассчитана комиссия</string>
     <string name="fee_not_yet_loaded_title">Расчет комиссии в процессе</string>
-    <string name="fragment_swap_main_settings_button_text">Выберите токен для получения</string>
     <string name="fragment_swap_main_settings_details_title">Детали обмена</string>
     <string name="fragment_swap_main_settings_max_button">Макс:</string>
     <string name="fragment_swap_main_settings_pay_title">Вы платите</string>

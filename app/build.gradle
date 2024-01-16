@@ -210,6 +210,9 @@ dependencies {
     implementation project(':feature-wallet-connect-api')
     implementation project(':feature-wallet-connect-impl')
 
+    implementation project(':feature-proxy-api')
+    implementation project(':feature-proxy-impl')
+
     implementation project(':feature-settings-api')
     implementation project(':feature-settings-impl')
 

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
