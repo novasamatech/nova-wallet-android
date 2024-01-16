@@ -268,6 +268,7 @@ private class HydraDxOmnipoolExchange(
     private val SwapExecuteArgs.usedFeeAsset: Chain.Asset
         get() = customFeeAsset ?: chain.utilityAsset
 
+    // This will most probably slightly over-estimate the fee since Hydra runtime uses not only Omni-pool to convert native fee
     private suspend fun convertNativeFeeToAssetFee(
         nativeFeeAmount: Balance,
         targetAsset: Chain.Asset
