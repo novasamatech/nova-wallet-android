@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payloa
 import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
@@ -73,6 +74,7 @@ class SwapFeatureModule {
         sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         assetSourceRegistry: AssetSourceRegistry,
         extrinsicService: ExtrinsicService,
+        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         chainRegistry: ChainRegistry
     ): HydraDxOmnipoolExchangeFactory {
         return HydraDxOmnipoolExchangeFactory(
@@ -80,7 +82,8 @@ class SwapFeatureModule {
             chainRegistry = chainRegistry,
             sharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
             assetSourceRegistry = assetSourceRegistry,
-            extrinsicService = extrinsicService
+            extrinsicService = extrinsicService,
+            hydraDxAssetIdConverter = hydraDxAssetIdConverter
         )
     }
 
