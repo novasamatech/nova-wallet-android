@@ -5,6 +5,7 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.hasProvidersFor
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
@@ -122,8 +123,8 @@ class SwapInteractor(
         return swapService.slippageConfig(chainId)
     }
 
-    fun runSubscriptions(chainIn: Chain): Flow<ReQuoteTrigger> {
-        return swapService.runSubscriptions(chainIn)
+    fun runSubscriptions(chainIn: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
+        return swapService.runSubscriptions(chainIn, metaAccount)
     }
 
     private fun buyAvailable(chainAssetFlow: Flow<Chain.Asset?>): Flow<Boolean> {

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -40,7 +41,7 @@ interface AssetExchange {
 
     suspend fun slippageConfig(): SlippageConfig
 
-    fun runSubscriptions(chain: Chain): Flow<ReQuoteTrigger>
+    fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 }
 
 class AssetExchangeQuote(

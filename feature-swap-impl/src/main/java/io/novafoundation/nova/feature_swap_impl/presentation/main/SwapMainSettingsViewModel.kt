@@ -628,7 +628,7 @@ class SwapMainSettingsViewModel(
             .flatMapLatest { chainId ->
                 val chain = chainRegistry.getChain(chainId)
 
-                swapInteractor.runSubscriptions(chain)
+                swapInteractor.runSubscriptions(chain, selectedAccountUseCase.getSelectedMetaAccount())
                     .catch { Log.e(this@SwapMainSettingsViewModel.LOG_TAG, "Failure during subscriptions run", it) }
             }.onEach {
                 Log.d("Swap", "ReQuote triggered from subscription")
