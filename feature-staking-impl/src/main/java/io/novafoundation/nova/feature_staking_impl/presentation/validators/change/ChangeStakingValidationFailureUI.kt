@@ -11,8 +11,8 @@ fun mapAddEvmTokensValidationFailureToUI(
 ): TitleAndMessage {
     return when (failure) {
         ChangeStackingValidationFailure.NO_ACCESS_TO_CONTROLLER_ACCOUNT -> {
-            resourceManager.getString(R.string.stacking_no_access_to_controller_account_title) to
-                resourceManager.getString(R.string.stacking_no_access_to_controller_account_message)
+            resourceManager.getString(R.string.staking_no_access_to_controller_account_title) to
+                resourceManager.getString(R.string.staking_no_access_to_controller_account_message)
         }
     }
 }
