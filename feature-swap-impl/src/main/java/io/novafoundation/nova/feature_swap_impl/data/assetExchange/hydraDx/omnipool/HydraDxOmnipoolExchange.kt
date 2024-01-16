@@ -71,7 +71,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.runningFold
 import java.math.BigInteger
 
-
 class HydraDxOmnipoolExchangeFactory(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,

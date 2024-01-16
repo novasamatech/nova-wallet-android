@@ -69,7 +69,6 @@ fun List<GenericEvent.Instance>.findLastEvent(module: String, event: String): Ge
     return findLast { it.instanceOf(module, event) }
 }
 
-
 fun List<GenericEvent.Instance>.hasEvent(module: String, event: String): Boolean {
     return any { it.instanceOf(module, event) }
 }

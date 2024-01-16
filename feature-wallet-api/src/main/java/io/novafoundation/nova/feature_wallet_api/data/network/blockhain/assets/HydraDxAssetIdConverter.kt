@@ -20,11 +20,10 @@ fun HydraDxAssetIdConverter.isSystemAsset(assetId: HydraDxAssetId): Boolean {
     return assetId == systemAssetId
 }
 
-
 suspend fun HydraDxAssetIdConverter.toOnChainIdOrThrow(chainAsset: Chain.Asset): HydraDxAssetId {
     return requireNotNull(toOnChainIdOrNull(chainAsset))
 }
 
-suspend fun HydraDxAssetIdConverter.toChainAssetOrThrow(chain: Chain, onChainId: HydraDxAssetId):  Chain.Asset {
+suspend fun HydraDxAssetIdConverter.toChainAssetOrThrow(chain: Chain, onChainId: HydraDxAssetId): Chain.Asset {
     return requireNotNull(toChainAssetOrNull(chain, onChainId))
 }

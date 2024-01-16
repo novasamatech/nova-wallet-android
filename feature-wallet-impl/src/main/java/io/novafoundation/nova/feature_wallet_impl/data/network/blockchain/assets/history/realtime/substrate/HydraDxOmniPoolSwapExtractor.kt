@@ -65,7 +65,7 @@ class HydraDxOmniPoolSwapExtractor(
             call.function.name == "sell" -> {
                 SwapArgs(
                     assetIn = bindNumber(call.arguments["asset_in"]),
-                    assetOut =  bindNumber(call.arguments["asset_out"]),
+                    assetOut = bindNumber(call.arguments["asset_out"]),
                     amountIn = bindNumber(call.arguments["amount"]),
                     amountOut = bindNumber(call.arguments["min_buy_amount"])
                 )
@@ -74,7 +74,7 @@ class HydraDxOmniPoolSwapExtractor(
             call.function.name == "buy" -> {
                 SwapArgs(
                     assetIn = bindNumber(call.arguments["asset_in"]),
-                    assetOut =  bindNumber(call.arguments["asset_out"]),
+                    assetOut = bindNumber(call.arguments["asset_out"]),
                     amountIn = bindNumber(call.arguments["max_sell_amount"]),
                     amountOut = bindNumber(call.arguments["amount"])
                 )
