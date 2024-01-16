@@ -248,6 +248,8 @@ fun RuntimeMetadata.dynamicFees() = module(Modules.DYNAMIC_FEES)
 
 fun RuntimeMetadata.multiTransactionPayment() = module(Modules.MULTI_TRANSACTION_PAYMENT)
 
+fun RuntimeMetadata.referralsOrNull() = moduleOrNull(Modules.REFERRALS)
+
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
@@ -404,4 +406,6 @@ object Modules {
     const val DYNAMIC_FEES = "DynamicFees"
 
     const val MULTI_TRANSACTION_PAYMENT = "MultiTransactionPayment"
+
+    const val REFERRALS = "Referrals"
 }

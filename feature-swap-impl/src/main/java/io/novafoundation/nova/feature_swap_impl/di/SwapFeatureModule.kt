@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxNovaReferral
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.RealHydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.HydraDxOmnipoolExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
@@ -49,7 +51,6 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun provideAssetConversionExchangeFactory(
-        chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         runtimeCallsApi: MultiChainRuntimeCallsApi,
         extrinsicService: ExtrinsicService,
@@ -69,12 +70,19 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideHydraDxNovaReferral(): HydraDxNovaReferral {
+        return RealHydraDxNovaReferral()
+    }
+
+    @Provides
+    @FeatureScope
     fun provideHydraDxExchangeFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         assetSourceRegistry: AssetSourceRegistry,
         extrinsicService: ExtrinsicService,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+        hydraDxNovaReferral: HydraDxNovaReferral,
         chainRegistry: ChainRegistry
     ): HydraDxOmnipoolExchangeFactory {
         return HydraDxOmnipoolExchangeFactory(
@@ -83,7 +91,8 @@ class SwapFeatureModule {
             sharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
             assetSourceRegistry = assetSourceRegistry,
             extrinsicService = extrinsicService,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter
+            hydraDxAssetIdConverter = hydraDxAssetIdConverter,
+            hydraDxNovaReferral = hydraDxNovaReferral
         )
     }
 

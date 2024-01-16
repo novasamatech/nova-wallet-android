@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.acceptedCurrencies
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.accountCurrencyMap
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.multiTransactionPayment
@@ -41,11 +42,14 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnip
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmnipoolAssetState
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.feeParamsConstant
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.quote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSystemAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -66,6 +70,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.runningFold
@@ -78,6 +83,7 @@ class HydraDxOmnipoolExchangeFactory(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val hydraDxNovaReferral: HydraDxNovaReferral,
 ) : AssetExchange.Factory {
 
     override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
@@ -88,7 +94,8 @@ class HydraDxOmnipoolExchangeFactory(
             storageSharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
             assetSourceRegistry = assetSourceRegistry,
             extrinsicService = extrinsicService,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter
+            hydraDxAssetIdConverter = hydraDxAssetIdConverter,
+            hydraDxNovaReferral = hydraDxNovaReferral
         )
     }
 }
@@ -101,6 +108,7 @@ private class HydraDxOmnipoolExchange(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val hydraDxNovaReferral: HydraDxNovaReferral,
 ) : AssetExchange {
 
     private val pooledOnChainAssetIdsState: MutableSharedFlow<List<RemoteAndLocalId>> = singleReplaySharedFlow()
@@ -108,6 +116,8 @@ private class HydraDxOmnipoolExchange(
     private val omniPoolFlow: MutableSharedFlow<OmniPool> = singleReplaySharedFlow()
 
     private val currentPaymentAsset: MutableSharedFlow<OmniPoolTokenId> = singleReplaySharedFlow()
+
+    private val userReferralState: MutableSharedFlow<ReferralState> = singleReplaySharedFlow()
 
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
         val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)
@@ -246,6 +256,10 @@ private class HydraDxOmnipoolExchange(
                 metadata.multiTransactionPayment.accountCurrencyMap.observe(userAccountId)
             }
 
+            val userReferral = subscribeUserReferral(userAccountId, subscriptionBuilder).onEach {
+                userReferralState.emit(it)
+            }
+
             subscriptionBuilder.subscribe(scope)
 
             val poolStateUpdates = combine(omniPoolStateFlow, omniPoolBalancesFlow, feesFlow) { poolState, poolBalances, fees ->
@@ -258,7 +272,7 @@ private class HydraDxOmnipoolExchange(
                 currentPaymentAsset.emit(feePaymentAsset)
             }
 
-            combine(poolStateUpdates, feeCurrencyUpdates) { _, _ ->
+            combine(poolStateUpdates, feeCurrencyUpdates, userReferral) { _, _, _ ->
                 ReQuoteTrigger
             }
         }
@@ -266,6 +280,24 @@ private class HydraDxOmnipoolExchange(
 
     private val SwapExecuteArgs.usedFeeAsset: Chain.Asset
         get() = customFeeAsset ?: chain.utilityAsset
+
+    @Suppress("IfThenToElvis")
+    private suspend fun subscribeUserReferral(
+        userAccountId: AccountId,
+        subscriptionBuilder: StorageSharedRequestsBuilder
+    ): Flow<ReferralState> {
+        return remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
+            val referralsModule = metadata.referralsOrNull
+
+            if (referralsModule != null) {
+                referralsModule.linkedAccounts.observe(userAccountId).map { linkedAccount ->
+                    if (linkedAccount != null) ReferralState.SET else ReferralState.NOT_SET
+                }
+            } else {
+                flowOf(ReferralState.NOT_AVAILABLE)
+            }
+        }
+    }
 
     // This will most probably slightly over-estimate the fee since Hydra runtime uses not only Omni-pool to convert native fee
     private suspend fun convertNativeFeeToAssetFee(
@@ -362,6 +394,8 @@ private class HydraDxOmnipoolExchange(
     }
 
     private suspend fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs) {
+        maybeSetReferral()
+
         val assetIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.assetIn)
         val assetIdOut = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.assetOut)
 
@@ -381,9 +415,29 @@ private class HydraDxOmnipoolExchange(
         }
     }
 
+    private suspend fun ExtrinsicBuilder.maybeSetReferral() {
+        val referralState = userReferralState.first()
+
+        if (referralState == ReferralState.NOT_SET) {
+            val novaReferralCode = hydraDxNovaReferral.getNovaReferralCode()
+
+            linkCode(novaReferralCode)
+        }
+    }
+
+    private fun ExtrinsicBuilder.linkCode(referralCode: String) {
+        call(
+            moduleName = Modules.REFERRALS,
+            callName = "link_code",
+            arguments = mapOf(
+                "code" to referralCode.encodeToByteArray()
+            )
+        )
+    }
+
     private fun ExtrinsicBuilder.setFeeCurrency(onChainId: OmniPoolTokenId) {
         call(
-            moduleName = "MultiTransactionPayment",
+            moduleName = Modules.MULTI_TRANSACTION_PAYMENT,
             callName = "set_currency",
             arguments = mapOf(
                 "currency" to onChainId
@@ -425,6 +479,10 @@ private class HydraDxOmnipoolExchange(
                 "max_sell_amount" to maxSellAmount
             )
         )
+    }
+
+    private enum class ReferralState {
+        SET, NOT_SET, NOT_AVAILABLE
     }
 }
 
