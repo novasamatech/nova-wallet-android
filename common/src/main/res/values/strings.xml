@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <!--<string name="stacking_no_access_to_controller_account_title">No access to controller account</string>-->
     <string name="staking_no_access_to_controller_account_title">No access to controller account</string>
-
-    <!--<string name="stacking_no_access_to_controller_account_message">Add your controller account in device.</string>-->
     <string name="staking_no_access_to_controller_account_message">Add your controller account in device.</string>
 
-    <!--<string name="staking_story_staking_page_1">Staking is an option to earn passive income by locking your tokens in the network. Staking rewards are allocated every era (6 hours on Kusama and 24 hours on Polkadot). You can stake as long as you wish, and for unstaking your tokens you need to wait for the unstacking period to end, making your tokens available to be redeemed.</string>-->
     <string name="staking_story_staking_page_1">Staking is an option to earn passive income by locking your tokens in the network. Staking rewards are allocated every era (6 hours on Kusama and 24 hours on Polkadot). You can stake as long as you wish, and for unstaking your tokens you need to wait for the unstaking period to end, making your tokens available to be redeemed.</string>
 
     <string name="proxy_signing_none_permissions_message">%1$s has not delegated %2$s</string>
