@@ -85,7 +85,7 @@ class HydraDxOmniPoolSwapExtractor(
     }
 
     private suspend fun ExtrinsicVisit.extractFee(chain: Chain): ChainAssetWithAmount {
-        val feeDepositEvent = events.findLastEvent(Modules.CURRENCIES, "Deposited") ?: return nativeFee(chain)
+        val feeDepositEvent = rootExtrinsic.events.findLastEvent(Modules.CURRENCIES, "Deposited") ?: return nativeFee(chain)
 
         val (currencyIdRaw, _, amountRaw) = feeDepositEvent.arguments
         val currencyId = bindNumber(currencyIdRaw)
@@ -96,7 +96,7 @@ class HydraDxOmniPoolSwapExtractor(
     }
 
     private fun ExtrinsicVisit.nativeFee(chain: Chain): ChainAssetWithAmount {
-        return ChainAssetWithAmount(chain.utilityAsset, events.requireNativeFee())
+        return ChainAssetWithAmount(chain.utilityAsset, rootExtrinsic.events.requireNativeFee())
     }
 
     private fun GenericCall.Instance.isSwap(): Boolean {

@@ -8,6 +8,6 @@ interface HydraDxNovaReferral {
 class RealHydraDxNovaReferral : HydraDxNovaReferral {
 
     override fun getNovaReferralCode(): String {
-       return "NOVA"
+        return "NOVA"
     }
 }

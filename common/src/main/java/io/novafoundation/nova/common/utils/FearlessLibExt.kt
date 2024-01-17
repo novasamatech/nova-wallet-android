@@ -254,6 +254,8 @@ fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
 
+fun RuntimeMetadata.utility() = module(Modules.UTILITY)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
