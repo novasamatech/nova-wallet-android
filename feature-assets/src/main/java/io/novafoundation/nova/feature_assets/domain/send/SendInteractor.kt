@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.InlineFee
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
@@ -14,13 +17,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.implementations.transfer
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 class SendInteractor(
     private val walletRepository: WalletRepository,
@@ -78,25 +80,29 @@ class SendInteractor(
             crossChainFee.reserve.orZero() + crossChainFee.destination.orZero()
         }
 
-        InlineFee(feePlanks)
+        val submissionOriginId = transfer.sender.requireAccountIdIn(transfer.originChain)
+        val submissionOrigin = SubmissionOrigin.singleOrigin(submissionOriginId) // cross-chain fee is always paid by requested account id
+
+        SubstrateFee(feePlanks, submissionOrigin)
     } else {
         null
     }
 
     suspend fun performTransfer(
         transfer: WeightedAssetTransfer,
-        originFee: BigDecimal,
-        crossChainFee: BigDecimal?,
+        originFee: DecimalFee,
+        crossChainFee: DecimalFee?,
     ): Result<*> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
-            val crossChainFeePlanks = transfer.originChainAsset.planksFromAmount(crossChainFee!!)
+            val crossChainFeePlanks = crossChainFee!!.networkFee.amountByRequestedAccount
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
             crossChainTransactor.performTransfer(config, transfer, crossChainFeePlanks)
         } else {
             getAssetTransfers(transfer).performTransfer(transfer)
-                .onSuccess { hash ->
-                    walletRepository.insertPendingTransfer(hash, transfer, originFee)
+                .onSuccess { submission ->
+                    // Insert used fee regardless of who paid it
+                    walletRepository.insertPendingTransfer(submission.hash, transfer, originFee.networkFeeDecimalAmount)
                 }
         }
     }

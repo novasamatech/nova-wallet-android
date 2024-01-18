@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -55,7 +56,7 @@ class StatemineAssetBalance(
         return queryAssetDetails(chainAsset).minimumBalance
     }
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
         val statemineType = chainAsset.requireStatemine()
 
         val assetAccount = remoteStorage.query(chain.id) {
@@ -68,7 +69,21 @@ class StatemineAssetBalance(
             )
         }
 
-        return assetAccount.balance
+        val frozenBalance = if (assetAccount.isBalanceFrozen) {
+            assetAccount.balance
+        } else {
+            BigInteger.ZERO
+        }
+
+        return AccountBalance(
+            free = assetAccount.balance,
+            reserved = BigInteger.ZERO,
+            frozen = frozenBalance
+        )
+    }
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(

@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond
 
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.scheduleBondLess
@@ -20,7 +22,7 @@ import java.math.BigInteger
 
 interface ParachainStakingUnbondInteractor {
 
-    suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): BigInteger
+    suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee
 
     suspend fun unbond(amount: BigInteger, collator: AccountId): Result<*>
 
@@ -37,10 +39,10 @@ class RealParachainStakingUnbondInteractor(
     private val collatorsUseCase: CollatorsUseCase,
 ) : ParachainStakingUnbondInteractor {
 
-    override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): BigInteger {
+    override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee {
         val chain = selectedAssetSharedState.chain()
 
-        return extrinsicService.estimateFee(chain) {
+        return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             unbond(amount, collatorId)
         }
     }
@@ -48,9 +50,9 @@ class RealParachainStakingUnbondInteractor(
     override suspend fun unbond(amount: BigInteger, collator: AccountId): Result<*> = withContext(Dispatchers.IO) {
         val chain = selectedAssetSharedState.chain()
 
-        extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) {
+        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
             unbond(amount, collator)
-        }
+        }.awaitInBlock()
     }
 
     override suspend fun canUnbond(fromCollator: AccountId, delegatorState: DelegatorState): Boolean = withContext(Dispatchers.IO) {

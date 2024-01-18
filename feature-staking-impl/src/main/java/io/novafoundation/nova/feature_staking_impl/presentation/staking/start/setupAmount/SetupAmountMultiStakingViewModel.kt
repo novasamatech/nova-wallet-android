@@ -29,7 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWithV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.Dispatchers
@@ -190,7 +190,7 @@ class SetupAmountMultiStakingViewModel(
     }
 
     private fun runFeeUpdates() {
-        feeLoaderMixin.connectWithV2(
+        feeLoaderMixin.connectWith(
             inputSource = currentSelectionFlow
                 .filterNotNull()
                 .debounce(DEBOUNCE_RATE_MILLIS.milliseconds),

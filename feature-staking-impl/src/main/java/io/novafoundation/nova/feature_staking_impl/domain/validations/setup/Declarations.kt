@@ -29,6 +29,6 @@ private fun SetupStakingValidationSystemBuilder.enoughToPayFee() {
     sufficientBalance(
         fee = { it.maxFee },
         available = { it.controllerAsset.transferable },
-        error = { _, _ -> SetupStakingValidationFailure.CannotPayFee }
+        error = { SetupStakingValidationFailure.CannotPayFee }
     )
 }

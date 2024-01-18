@@ -7,13 +7,15 @@ import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core.model.Node.NetworkType
 import io.novafoundation.nova.core_db.dao.MetaAccountWithBalanceLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.JoinedMetaAccountInfo
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
+import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
@@ -42,11 +44,13 @@ fun mapCryptoTypeToCryptoTypeModel(
             R.string.sr25519_selection_subtitle
         )
         }"
+
         CryptoType.ED25519 -> "${resourceManager.getString(R.string.ed25519_selection_title)} ${
         resourceManager.getString(
             R.string.ed25519_selection_subtitle
         )
         }"
+
         CryptoType.ECDSA -> "${resourceManager.getString(R.string.ecdsa_selection_title)} ${
         resourceManager.getString(
             R.string.ecdsa_selection_subtitle
@@ -92,6 +96,7 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
         MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
         MetaAccountLocal.Type.LEDGER -> LightMetaAccount.Type.LEDGER
         MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
+        MetaAccountLocal.Type.PROXIED -> LightMetaAccount.Type.PROXIED
     }
 }
 
@@ -114,20 +119,19 @@ fun mapMetaAccountLocalToMetaAccount(
     val chainAccounts = joinedMetaAccountInfo.chainAccounts.associateBy(
         keySelector = ChainAccountLocal::chainId,
         valueTransform = {
-            MetaAccount.ChainAccount(
-                metaId = joinedMetaAccountInfo.metaAccount.id,
-                publicKey = it.publicKey,
-                chainId = it.chainId,
-                accountId = it.accountId,
-                cryptoType = it.cryptoType
-            )
+            mapChainAccountFromLocal(it)
         }
     ).filterNotNull()
+
+    val proxyAccount = joinedMetaAccountInfo.proxyAccountLocal?.let {
+        mapProxyAccountFromLocal(it)
+    }
 
     return with(joinedMetaAccountInfo.metaAccount) {
         MetaAccount(
             id = id,
             chainAccounts = chainAccounts,
+            proxy = proxyAccount,
             substratePublicKey = substratePublicKey,
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substrateAccountId,
@@ -135,7 +139,8 @@ fun mapMetaAccountLocalToMetaAccount(
             ethereumPublicKey = ethereumPublicKey,
             isSelected = isSelected,
             name = name,
-            type = mapMetaAccountTypeFromLocal(type)
+            type = mapMetaAccountTypeFromLocal(type),
+            status = mapMetaAccountStateFromLocal(status)
         )
     }
 }
@@ -153,7 +158,31 @@ fun mapMetaAccountLocalToLightMetaAccount(
             ethereumPublicKey = ethereumPublicKey,
             isSelected = isSelected,
             name = name,
-            type = mapMetaAccountTypeFromLocal(type)
+            type = mapMetaAccountTypeFromLocal(type),
+            status = mapMetaAccountStateFromLocal(status)
+        )
+    }
+}
+
+fun mapChainAccountFromLocal(chainAccountLocal: ChainAccountLocal): MetaAccount.ChainAccount {
+    return with(chainAccountLocal) {
+        MetaAccount.ChainAccount(
+            metaId = metaId,
+            publicKey = publicKey,
+            chainId = chainId,
+            accountId = accountId,
+            cryptoType = cryptoType
+        )
+    }
+}
+
+fun mapProxyAccountFromLocal(proxyAccountLocal: ProxyAccountLocal): ProxyAccount {
+    return with(proxyAccountLocal) {
+        ProxyAccount(
+            metaId = proxyMetaId,
+            chainId = chainId,
+            proxiedAccountId = proxiedAccountId,
+            proxyType = mapProxyTypeToString(proxyType)
         )
     }
 }
@@ -168,6 +197,7 @@ fun mapAddAccountPayloadToAddAccountType(
 
             AddAccountType.MetaAccount(accountNameState.value)
         }
+
         is AddAccountPayload.ChainAccount -> AddAccountType.ChainAccount(payload.chainId, payload.metaId)
     }
 }
@@ -175,4 +205,25 @@ fun mapAddAccountPayloadToAddAccountType(
 fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
     null -> AccountNameChooserMixin.State.NoInput
     else -> AccountNameChooserMixin.State.Input(name)
+}
+
+fun mapProxyTypeToString(proxyType: String): ProxyAccount.ProxyType {
+    return when (proxyType) {
+        "Any" -> ProxyAccount.ProxyType.Any
+        "NonTransfer" -> ProxyAccount.ProxyType.NonTransfer
+        "Governance" -> ProxyAccount.ProxyType.Governance
+        "Staking" -> ProxyAccount.ProxyType.Staking
+        "IdentityJudgement" -> ProxyAccount.ProxyType.IdentityJudgement
+        "CancelProxy" -> ProxyAccount.ProxyType.CancelProxy
+        "Auction" -> ProxyAccount.ProxyType.Auction
+        "NominationPools" -> ProxyAccount.ProxyType.NominationPools
+        else -> ProxyAccount.ProxyType.Other(proxyType)
+    }
+}
+
+private fun mapMetaAccountStateFromLocal(local: MetaAccountLocal.Status): LightMetaAccount.Status {
+    return when (local) {
+        MetaAccountLocal.Status.ACTIVE -> LightMetaAccount.Status.ACTIVE
+        MetaAccountLocal.Status.DEACTIVATED -> LightMetaAccount.Status.DEACTIVATED
+    }
 }

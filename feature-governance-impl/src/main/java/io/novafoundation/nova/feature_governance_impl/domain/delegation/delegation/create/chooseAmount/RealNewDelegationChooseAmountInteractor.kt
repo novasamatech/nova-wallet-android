@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegat
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -54,11 +56,11 @@ class RealNewDelegationChooseAmountInteractor(
         delegate: AccountId,
         tracks: Collection<TrackId>,
         shouldRemoveOtherTracks: Boolean,
-    ): Balance {
+    ): Fee {
         val (chain, governanceSource) = useSelectedGovernance()
         val origin = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
-        return extrinsicService.estimateMultiFee(chain) {
+        return extrinsicService.estimateMultiFee(chain, TransactionOrigin.SelectedWallet) {
             delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }
@@ -72,8 +74,17 @@ class RealNewDelegationChooseAmountInteractor(
     ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         val (chain, governanceSource) = useSelectedGovernance()
 
-        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(chain) { origin ->
-            delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
+        return extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) { origin ->
+            delegate(
+                governanceSource = governanceSource,
+                amount = amount,
+                conviction = conviction,
+                delegate = delegate,
+                user = origin.requestedOrigin,
+                chain = chain,
+                tracks = tracks,
+                shouldRemoveOtherTracks = shouldRemoveOtherTracks
+            )
         }
     }
 

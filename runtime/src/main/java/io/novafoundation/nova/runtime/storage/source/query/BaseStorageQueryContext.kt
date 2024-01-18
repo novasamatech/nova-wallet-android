@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayO
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
-import io.novafoundation.nova.common.utils.splitKeyToComponents
+import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl
@@ -60,7 +60,8 @@ abstract class BaseStorageQueryContext(
     override suspend fun <K, V> StorageEntry.entries(
         vararg prefixArgs: Any?,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V>
+        binding: DynamicInstanceBinderWithKey<K, V>,
+        recover: (exception: Exception, rawValue: String?) -> Unit
     ): Map<K, V> {
         val prefix = storageKey(runtime, *prefixArgs)
 
@@ -70,14 +71,16 @@ abstract class BaseStorageQueryContext(
             entries = entries,
             storageEntry = this,
             keyExtractor = keyExtractor,
-            binding = binding
+            binding = binding,
+            recover = recover
         )
     }
 
     override suspend fun <K, V> StorageEntry.entries(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V>
+        binding: DynamicInstanceBinderWithKey<K, V>,
+        recover: (exception: Exception, rawValue: String?) -> Unit
     ): Map<K, V> {
         val entries = queryKeys(storageKeys(runtime, keysArguments), at)
 
@@ -85,7 +88,8 @@ abstract class BaseStorageQueryContext(
             entries = entries,
             storageEntry = this,
             keyExtractor = keyExtractor,
-            binding = binding
+            binding = binding,
+            recover = recover
         )
     }
 
@@ -189,22 +193,23 @@ abstract class BaseStorageQueryContext(
         }
     }
 
-    override suspend fun multi(
+    @Suppress("OVERRIDE_DEPRECATION", "OverridingDeprecatedMember")
+    override suspend fun multiInternal(
         builderBlock: MultiQueryBuilder.() -> Unit
-    ): Map<StorageEntry, Map<StorageKeyComponents, Any?>> {
-        val keysByStorageEntry = MultiQueryBuilderImpl(runtime).apply(builderBlock).build()
+    ): MultiQueryBuilder.Result {
+        val builder = MultiQueryBuilderImpl(runtime).apply(builderBlock)
 
-        val keys = keysByStorageEntry.flatMap { (_, keys) -> keys }
+        val keys = builder.keys().flatMap { (_, keys) -> keys }
         val values = queryKeys(keys, at)
 
-        return keysByStorageEntry.mapValues { (storageEntry, keys) ->
-            val valueType = storageEntry.type.value!!
-
+        val delegate = builder.descriptors().mapValues { (descriptor, keys) ->
             keys.associateBy(
-                keySelector = { key -> storageEntry.splitKeyToComponents(runtime, key) },
-                valueTransform = { key -> values[key]?.let { valueType.fromHex(runtime, it) } }
+                keySelector = { key -> descriptor.parseKey(key) },
+                valueTransform = { key -> descriptor.parseValue(values[key]) }
             )
         }
+
+        return MultiQueryResult(delegate)
     }
 
     override suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V {
@@ -237,6 +242,7 @@ abstract class BaseStorageQueryContext(
         storageEntry: StorageEntry,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>,
+        recover: (exception: Exception, rawValue: String?) -> Unit = { exception, _ -> throw exception }
     ): Map<K, V> {
         val returnType = storageEntry.type.value ?: incompatible()
 
@@ -244,10 +250,22 @@ abstract class BaseStorageQueryContext(
             val keyComponents = ComponentHolder(storageEntry.splitKey(runtime, key))
 
             keyExtractor(keyComponents)
-        }.mapValues { (key, value) ->
-            val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
+        }.mapValuesNotNull { (key, value) ->
+            try {
+                val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
+                binding(decoded, key)
+            } catch (e: Exception) {
+                recover(e, value)
+                null
+            }
+        }
+    }
 
-            binding(decoded, key)
+    @JvmInline
+    private value class MultiQueryResult(val delegate: Map<MultiQueryBuilder.Descriptor<*, *>, Map<Any?, Any?>>) : MultiQueryBuilder.Result {
+        @Suppress("UNCHECKED_CAST")
+        override fun <K, V> get(descriptor: MultiQueryBuilder.Descriptor<K, V>): Map<K, V> {
+            return delegate.getValue(descriptor) as Map<K, V>
         }
     }
 }

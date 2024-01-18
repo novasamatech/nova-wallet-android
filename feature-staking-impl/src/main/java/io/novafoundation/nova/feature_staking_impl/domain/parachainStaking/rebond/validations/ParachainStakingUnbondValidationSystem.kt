@@ -9,6 +9,6 @@ fun ValidationSystem.Companion.parachainStakingRebond(): ParachainStakingRebondV
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
-        error = { _, _ -> ParachainStakingRebondValidationFailure.NotEnoughBalanceToPayFees }
+        error = { ParachainStakingRebondValidationFailure.NotEnoughBalanceToPayFees }
     )
 }

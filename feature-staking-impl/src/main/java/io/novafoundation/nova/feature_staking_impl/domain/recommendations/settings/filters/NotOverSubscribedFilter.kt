@@ -3,18 +3,15 @@ package io.novafoundation.nova.feature_staking_impl.domain.recommendations.setti
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationFilter
 
-class NotOverSubscribedFilter(
-    private val maxSubscribers: Int
-) : RecommendationFilter {
+object NotOverSubscribedFilter : RecommendationFilter {
 
     override fun shouldInclude(model: Validator): Boolean {
-        val electedInfo = model.electedInfo
+        val isOversubscribed = model.electedInfo?.isOversubscribed
 
-        return if (electedInfo != null) {
-            electedInfo.nominatorStakes.size < maxSubscribers
+        return if (isOversubscribed != null) {
+            !isOversubscribed
         } else {
-            // inactive validators are considered as non-oversubscribed
-            true
+            true // inactive validators are considered as non-oversubscribed
         }
     }
 }

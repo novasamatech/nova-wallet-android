@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -79,7 +79,10 @@ private class MetaAccountValidForTransactionListingMixin(
             isSelected = isSelected,
             isClickable = chainAddress != null,
             picture = icon,
-            subtitleIconRes = if (chainAddress == null) R.drawable.ic_warning_filled else null
+            chainIconUrl = null,
+            updateIndicator = false,
+            subtitleIconRes = if (chainAddress == null) R.drawable.ic_warning_filled else null,
+            isEditable = false
         )
     }
 

@@ -90,6 +90,8 @@ class StatelessAddressIconGenerator(
         val sizeInPx = resourceManager.measureInPx(sizeInDp)
         val backgroundColor = resourceManager.getColor(backgroundColorRes)
 
-        iconGenerator.getSvgImage(accountId, sizeInPx, backgroundColor = backgroundColor)
+        val drawable = iconGenerator.getSvgImage(accountId, sizeInPx, backgroundColor = backgroundColor)
+        drawable.setBounds(0, 0, sizeInPx, sizeInPx)
+        drawable
     }
 }

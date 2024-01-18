@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances
 
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -34,6 +35,12 @@ interface AssetBalance {
         chain: Chain,
         chainAsset: Chain.Asset
     ): BigInteger
+
+    suspend fun queryAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId
+    ): AccountBalance
 
     suspend fun queryTotalBalance(
         chain: Chain,

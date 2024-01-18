@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForSimpleFeeChanges
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
@@ -72,7 +73,7 @@ fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
 
 fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
     assetSourceRegistry: AssetSourceRegistry,
-    fee: AmountProducer<AssetTransferPayload>,
+    fee: FeeProducer<AssetTransferPayload>,
     extraAmount: AmountProducer<AssetTransferPayload>,
 ) = doNotCrossExistentialDeposit(
     countableTowardsEdBalance = { it.originUsedAsset.balanceCountedTowardsED() },
@@ -86,11 +87,11 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
     available = { it.originCommissionAsset.transferable },
     amount = { it.sendingAmountInCommissionAsset },
     fee = { it.originFee },
-    error = { payload, availableToPayFees ->
+    error = { context ->
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
-            chainAsset = payload.transfer.originChain.commissionAsset,
-            fee = payload.originFee,
-            maxUsable = availableToPayFees
+            chainAsset = context.payload.transfer.originChain.commissionAsset,
+            fee = context.fee,
+            maxUsable = context.availableToPayFees
         )
     }
 )
@@ -98,8 +99,8 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
 fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
     available = { it.originUsedAsset.transferable },
     amount = { it.transfer.amount },
-    fee = { BigDecimal.ZERO },
-    error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
+    fee = { null },
+    error = { AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
 )
 
 fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() = notSystemAccount(

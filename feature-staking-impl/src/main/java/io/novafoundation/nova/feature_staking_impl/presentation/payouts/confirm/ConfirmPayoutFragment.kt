@@ -66,6 +66,7 @@ class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel>() {
     }
 
     override fun subscribe(viewModel: ConfirmPayoutViewModel) {
+        observeRetries(viewModel.partialRetriableMixin)
         setupExternalActions(viewModel)
         observeValidations(viewModel)
         observeRetries(viewModel)

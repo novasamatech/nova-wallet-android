@@ -132,7 +132,7 @@ class WalletRepositoryImpl(
 
     override fun assetFlow(accountId: AccountId, chainAsset: Chain.Asset): Flow<Asset> {
         return flow {
-            val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
+            val metaAccount = accountRepository.findMetaAccountOrThrow(accountId, chainAsset.chainId)
 
             emitAll(assetFlow(metaAccount.id, chainAsset))
         }
@@ -237,7 +237,7 @@ class WalletRepositoryImpl(
     }
 
     private suspend fun getAsset(accountId: AccountId, chainId: String, assetId: Int) = withContext(Dispatchers.Default) {
-        val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
+        val metaAccount = accountRepository.findMetaAccountOrThrow(accountId, chainId)
 
         assetCache.getAssetWithToken(metaAccount.id, chainId, assetId)
     }

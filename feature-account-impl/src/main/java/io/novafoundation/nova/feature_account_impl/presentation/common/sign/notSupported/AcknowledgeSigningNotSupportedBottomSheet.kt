@@ -19,8 +19,8 @@ class AcknowledgeSigningNotSupportedBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title.setText(R.string.account_parity_signer_not_supported_title)
-        subtitle.text = payload.message
+        titleView.setText(R.string.account_parity_signer_not_supported_title)
+        subtitleView.text = payload.message
 
         applySolidIconStyle(payload.iconRes)
     }

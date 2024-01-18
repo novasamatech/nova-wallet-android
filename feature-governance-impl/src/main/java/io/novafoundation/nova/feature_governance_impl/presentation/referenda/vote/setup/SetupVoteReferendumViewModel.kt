@@ -33,8 +33,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -156,7 +158,6 @@ class SetupVoteReferendumViewModel(
 
     private fun openConfirmIfValid(voteType: VoteType) = launch {
         validatingVoteType.value = voteType
-        val fee = originFeeMixin.awaitFee()
         val voteAssistant = voteAssistantFlow.first()
 
         val payload = VoteReferendumValidationPayload(
@@ -164,7 +165,7 @@ class SetupVoteReferendumViewModel(
             asset = selectedAsset.first(),
             trackVoting = voteAssistant.trackVoting,
             voteAmount = amountChooserMixin.amount.first(),
-            fee = fee
+            fee = originFeeMixin.awaitDecimalFee()
         )
 
         validationExecutor.requireValid(
@@ -184,7 +185,7 @@ class SetupVoteReferendumViewModel(
 
         val confirmPayload = ConfirmVoteReferendumPayload(
             _referendumId = payload._referendumId,
-            fee = validationPayload.fee,
+            fee = mapFeeToParcel(validationPayload.fee),
             vote = AccountVoteParcelModel(
                 amount = validationPayload.voteAmount,
                 conviction = conviction,

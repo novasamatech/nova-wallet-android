@@ -4,11 +4,11 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -37,17 +37,15 @@ interface AccountRepository {
 
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
-    suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
+    suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount?
 
-    suspend fun accountNameFor(accountId: AccountId): String?
+    suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun allMetaAccounts(): List<MetaAccount>
-
-    suspend fun hasMetaAccounts(): Boolean
-
-    suspend fun allLightMetaAccounts(): List<LightMetaAccount>
+    suspend fun hasActiveMetaAccounts(): Boolean
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
+
+    fun activeMetaAccountsFlow(): Flow<List<MetaAccount>>
 
     fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
 
@@ -119,5 +117,9 @@ interface AccountRepository {
         password: String
     ): String
 
-    suspend fun isAccountExists(accountId: AccountId): Boolean
+    suspend fun isAccountExists(accountId: AccountId, chainId: ChainId): Boolean
+
+    suspend fun removeDeactivatedMetaAccounts()
+
+    suspend fun getActiveMetaAccounts(): List<MetaAccount>
 }

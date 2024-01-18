@@ -1,8 +1,10 @@
 package io.novafoundation.nova.runtime.multiNetwork.runtime.repository
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
 import java.math.BigInteger
@@ -30,21 +32,43 @@ fun ExtrinsicWithEvents.status(): ExtrinsicStatus? {
     }
 }
 
-fun ExtrinsicWithEvents.nativeFee(): BigInteger? {
+fun ExtrinsicWithEvents.isSuccess(): Boolean {
+    val status = requireNotNull(status()) {
+        "Not able to identify extrinsic status"
+    }
+
+    return status == ExtrinsicStatus.SUCCESS
+}
+
+fun Extrinsic.DecodedInstance.signer(): AccountId {
+    val accountIdentifier = requireNotNull(signature?.accountIdentifier) {
+        "Extrinsic is unsigned"
+    }
+
+    return bindAccountIdentifier(accountIdentifier)
+}
+
+fun List<GenericEvent.Instance>.nativeFee(): BigInteger? {
     val event = findEvent(Modules.TRANSACTION_PAYMENT, "TransactionFeePaid") ?: return null
     val (_, actualFee, tip) = event.arguments
 
     return bindNumber(actualFee) + bindNumber(tip)
 }
 
-fun ExtrinsicWithEvents.findEvent(module: String, event: String): GenericEvent.Instance? {
-    return events.find { it.instanceOf(module, event) }
+fun List<GenericEvent.Instance>.requireNativeFee(): BigInteger {
+    return requireNotNull(nativeFee()) {
+        "No native fee event found"
+    }
 }
 
-fun ExtrinsicWithEvents.hasEvent(module: String, event: String): Boolean {
-    return events.any { it.instanceOf(module, event) }
+fun List<GenericEvent.Instance>.findEvent(module: String, event: String): GenericEvent.Instance? {
+    return find { it.instanceOf(module, event) }
 }
 
-fun ExtrinsicWithEvents.findAllEvents(module: String, event: String): List<GenericEvent.Instance> {
-    return events.filter { it.instanceOf(module, event) }
+fun List<GenericEvent.Instance>.hasEvent(module: String, event: String): Boolean {
+    return any { it.instanceOf(module, event) }
+}
+
+fun List<GenericEvent.Instance>.findAllOfType(module: String, event: String): List<GenericEvent.Instance> {
+    return filter { it.instanceOf(module, event) }
 }

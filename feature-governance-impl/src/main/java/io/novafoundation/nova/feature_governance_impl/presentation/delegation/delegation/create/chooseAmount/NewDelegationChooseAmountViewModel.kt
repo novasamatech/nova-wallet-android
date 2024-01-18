@@ -31,8 +31,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -156,10 +158,10 @@ class NewDelegationChooseAmountViewModel(
 
     private fun openConfirmIfValid() = launch {
         validationInProgressFlow.value = true
-        val fee = originFeeMixin.awaitFee()
+
         val payload = ChooseDelegationAmountValidationPayload(
             asset = selectedAsset.first(),
-            fee = fee,
+            fee = originFeeMixin.awaitDecimalFee(),
             amount = amountChooserMixin.amount.first(),
             delegate = payload.delegate
         )
@@ -182,7 +184,7 @@ class NewDelegationChooseAmountViewModel(
             trackIdsRaw = payload.trackIdsRaw,
             amount = validationPayload.amount,
             conviction = selectedConvictionFlow.first(),
-            fee = validationPayload.fee,
+            fee = mapFeeToParcel(validationPayload.fee),
             isEditMode = payload.isEditMode
         )
 

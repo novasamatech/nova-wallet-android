@@ -82,7 +82,7 @@ private class NominationPoolStakingProperties(
 
         poolAvailableBalanceValidationFactory.enoughAvailableBalanceToStake(
             asset = { it.asset },
-            fee = { it.fee.fee.amount },
+            fee = { it.fee },
             amount = { it.selection.stakeAmount() },
             error = StartMultiStakingValidationFailure::PoolAvailableBalance
         )

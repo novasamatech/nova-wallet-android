@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
@@ -21,6 +23,7 @@ import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -61,11 +64,17 @@ interface RootDependencies {
 
     fun rootScope(): RootScope
 
+    fun proxySyncService(): ProxySyncService
+
     fun governanceStateUpdater(): MutableGovernanceState
 
     fun dappMetadataRepository(): DAppMetadataRepository
 
     fun encryptionDefaults(): EncryptionDefaults
+
+    fun proxyExtrinsicValidationRequestBus(): ProxyExtrinsicValidationRequestBus
+
+    fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
 
     val systemCallExecutor: SystemCallExecutor
 

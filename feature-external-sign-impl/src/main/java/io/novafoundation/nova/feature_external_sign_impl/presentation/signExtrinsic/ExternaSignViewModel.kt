@@ -112,7 +112,7 @@ class ExternaSignViewModel(
             autoFixPayload = ::autoFixPayload,
             progressConsumer = _performingOperationInProgress.progressConsumer()
         ) {
-            performOperation(it.decimalFee?.fee)
+            performOperation(it.decimalFee?.networkFee)
         }
     }
 
@@ -127,7 +127,7 @@ class ExternaSignViewModel(
     }
 
     private fun maybeLoadFee() {
-        originFeeMixin?.loadFeeV2(
+        originFeeMixin?.loadFee(
             coroutineScope = this,
             feeConstructor = { interactor.calculateFee() },
             onRetryCancelled = {}

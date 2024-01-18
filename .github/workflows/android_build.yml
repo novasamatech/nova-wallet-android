@@ -126,7 +126,7 @@ jobs:
           fileName: ${{ inputs.keystore-file-name }}
           fileDir: './app/'
           encodedString: ${{ env.CI_GITHUB_KEYSTORE_KEY_FILE }}
-      
+
       - name: 🔐 Getting market sign key
         if: ${{ startsWith(inputs.keystore-file-name, 'market_key.jks') }}
         uses: timheuer/base64-to-file@v1.1

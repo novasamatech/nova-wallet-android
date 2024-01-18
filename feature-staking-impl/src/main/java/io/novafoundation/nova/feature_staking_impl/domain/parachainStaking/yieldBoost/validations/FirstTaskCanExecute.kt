@@ -20,7 +20,7 @@ class FirstTaskCanExecute(
         val token = value.asset.token
 
         val balanceBeforeTransaction = value.asset.transferable
-        val balanceAfterTransaction = balanceBeforeTransaction - value.fee
+        val balanceAfterTransaction = balanceBeforeTransaction - value.fee.networkFeeDecimalAmount
 
         val chainId = value.asset.token.configuration.chainId
 
@@ -32,7 +32,7 @@ class FirstTaskCanExecute(
         return when {
             taskExecutionFee > balanceAfterTransaction -> YieldBoostValidationFailure.FirstTaskCannotExecute(
                 minimumBalanceRequired = taskExecutionFee,
-                networkFee = value.fee,
+                networkFee = value.fee.networkFeeDecimalAmount,
                 availableBalanceBeforeFees = balanceBeforeTransaction,
                 type = EXECUTION_FEE,
                 chainAsset = token.configuration
@@ -40,7 +40,7 @@ class FirstTaskCanExecute(
 
             threshold > balanceAfterTransaction -> YieldBoostValidationFailure.FirstTaskCannotExecute(
                 minimumBalanceRequired = threshold,
-                networkFee = value.fee,
+                networkFee = value.fee.networkFeeDecimalAmount,
                 availableBalanceBeforeFees = balanceBeforeTransaction,
                 type = THRESHOLD,
                 chainAsset = token.configuration

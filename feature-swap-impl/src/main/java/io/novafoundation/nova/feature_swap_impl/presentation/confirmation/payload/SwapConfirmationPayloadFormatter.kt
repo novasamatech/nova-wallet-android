@@ -1,13 +1,15 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload
 
 import io.novafoundation.nova.common.utils.asPercent
-import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
 import io.novafoundation.nova.feature_swap_api.presentation.model.mapToModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
@@ -53,11 +55,14 @@ class SwapConfirmationPayloadFormatter(
 
             SwapConfirmationPayload.FeeDetails.MinimumBalanceBuyIn.NoBuyInNeeded -> MinimumBalanceBuyIn.NoBuyInNeeded
         }
-        return SwapFee(InlineFee(model.amount), minimumBalanceBuyIn)
+
+        val decimalFee = mapFeeFromParcel(model.networkFee)
+
+        return SwapFee(decimalFee.networkFee, minimumBalanceBuyIn)
     }
 
-    fun mapFeeToModel(swapFee: SwapFee): SwapConfirmationPayload.FeeDetails {
-        val minimumBalanceBuyIn = when (val minimumBalanceBuyIn = swapFee.minimumBalanceBuyIn) {
+    fun mapFeeToModel(swapFee: GenericDecimalFee<SwapFee>): SwapConfirmationPayload.FeeDetails {
+        val minimumBalanceBuyIn = when (val minimumBalanceBuyIn = swapFee.genericFee.minimumBalanceBuyIn) {
             is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> {
                 val nativeAsset = minimumBalanceBuyIn.nativeAsset.fullId.toAssetPayload()
                 val commissionAsset = minimumBalanceBuyIn.commissionAsset.fullId.toAssetPayload()
@@ -71,6 +76,6 @@ class SwapConfirmationPayloadFormatter(
 
             MinimumBalanceBuyIn.NoBuyInNeeded -> SwapConfirmationPayload.FeeDetails.MinimumBalanceBuyIn.NoBuyInNeeded
         }
-        return SwapConfirmationPayload.FeeDetails(swapFee.networkFee.amount, minimumBalanceBuyIn)
+        return SwapConfirmationPayload.FeeDetails(mapFeeToParcel(swapFee), minimumBalanceBuyIn)
     }
 }

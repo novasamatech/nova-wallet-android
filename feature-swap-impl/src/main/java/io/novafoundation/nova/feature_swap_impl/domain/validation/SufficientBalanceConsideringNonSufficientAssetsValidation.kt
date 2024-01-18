@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validOrError
+import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSelfSufficientAsset
@@ -21,7 +22,7 @@ class SufficientBalanceConsideringNonSufficientAssetsValidation(
 
         if (!isSelfSufficientAssetOut && assetIn.token.configuration.isCommissionAsset) {
             val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(value.detailedAssetIn.chain, assetIn.token.configuration)
-            val fee = value.swapFee.networkFee.amount
+            val fee = value.decimalFee.networkFee.amountByRequestedAccount
 
             return validOrError(assetIn.balanceCountedTowardsEDInPlanks - existentialDeposit >= amount + fee) {
                 SwapValidationFailure.InsufficientBalance.BalanceNotConsiderInsufficientReceiveAsset(

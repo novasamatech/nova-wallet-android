@@ -206,7 +206,7 @@ class SettingsViewModel(
     fun accountActionsClicked() = launch {
         val selectedWalletId = selectedAccountUseCase.getSelectedMetaAccount().id
 
-        router.openAccountDetails(selectedWalletId)
+        router.openWalletDetails(selectedWalletId)
     }
 
     fun selectedWalletClicked() {

@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.RootViewModel
 import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
@@ -52,7 +53,8 @@ class RootActivityModule {
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
         deepLinkHandler: RootDeepLinkHandler,
         automaticInteractionGate: AutomaticInteractionGate,
-        rootScope: RootScope
+        rootScope: RootScope,
+        compoundRequestBusHandler: CompoundRequestBusHandler
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -69,7 +71,8 @@ class RootActivityModule {
             walletConnectSessionsUseCase,
             deepLinkHandler,
             automaticInteractionGate,
-            rootScope
+            rootScope,
+            compoundRequestBusHandler
         )
     }
 

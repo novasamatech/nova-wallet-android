@@ -170,6 +170,47 @@ fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
 
+/**
+ * Given a list finds a partition point in O(log2(N)) given that there is only a single partition point present.
+ * That is, there is only a single place in the whole array where the value of [partition] changes from false to true
+ *
+ * @return index of the first element where invocation of [partition] returns true. Returns null in case there is no such elements in the list
+ */
+inline fun <T> List<T>.findPartitionPoint(partition: (T) -> Boolean): Int? {
+    if (isEmpty()) return null
+
+    var lowIdx = 0
+    var highIdx = size - 1
+
+    while (highIdx - lowIdx > 1) {
+        val midIdx = (lowIdx + highIdx) / 2
+
+        val midValue = get(midIdx)
+        val isPartitionTrue = partition(midValue)
+
+        if (isPartitionTrue) {
+            highIdx = midIdx
+        } else {
+            lowIdx = midIdx + 1
+        }
+    }
+
+    val isLowTrue = partition(get(lowIdx))
+    if (isLowTrue) return lowIdx
+
+    val isHighTrue = partition(get(highIdx))
+    if (isHighTrue) return highIdx
+
+    return null
+}
+
+/**
+ * @see [findPartitionPoint]
+ */
+fun List<Boolean>.findPartitionPoint(): Int? {
+    return findPartitionPoint { it }
+}
+
 fun <T> Result<T>.mapFailure(transform: (Throwable) -> Throwable): Result<T> {
     return when {
         isFailure -> Result.failure(transform(requireException()))
@@ -356,6 +397,8 @@ inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fo
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
 fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
+
+fun <T> List<T>.indexOfOrNull(value: T) = indexOf(value).takeIf { it >= 0 }
 
 @Suppress("IfThenToElvis")
 fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {

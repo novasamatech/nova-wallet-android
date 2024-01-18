@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModelOf
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -31,7 +33,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import kotlin.time.ExperimentalTime
 
 class SelectUnbondViewModel(
     private val router: StakingRouter,
@@ -82,7 +83,6 @@ class SelectUnbondViewModel(
         router.back()
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun listenFee() {
         amountMixin.backPressuredAmount
             .onEach { loadFee(it) }
@@ -102,39 +102,34 @@ class SelectUnbondViewModel(
         )
     }
 
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
+    private fun maybeGoToNext() = launch {
+        _showNextProgress.value = true
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val asset = assetFlow.first()
+        val asset = assetFlow.first()
 
-            val payload = UnbondValidationPayload(
-                stash = accountStakingFlow.first(),
-                asset = asset,
-                fee = fee,
-                amount = amountMixin.amount.first(),
-            )
+        val payload = UnbondValidationPayload(
+            stash = accountStakingFlow.first(),
+            asset = asset,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            amount = amountMixin.amount.first(),
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformerCustom = { status, flowActions -> unbondValidationFailure(status, flowActions, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) { correctPayload ->
-                _showNextProgress.value = false
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformerCustom = { status, flowActions -> unbondValidationFailure(status, flowActions, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) { correctPayload ->
+            _showNextProgress.value = false
 
-                openConfirm(correctPayload)
-            }
+            openConfirm(correctPayload)
         }
     }
 
     private fun openConfirm(validationPayload: UnbondValidationPayload) {
         val confirmUnbondPayload = ConfirmUnbondPayload(
             amount = validationPayload.amount,
-            fee = validationPayload.fee
+            fee = mapFeeToParcel(validationPayload.fee)
         )
 
         router.openConfirmUnbond(confirmUnbondPayload)

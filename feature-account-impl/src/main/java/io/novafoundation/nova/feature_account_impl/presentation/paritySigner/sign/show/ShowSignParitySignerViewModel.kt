@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.mediatorLiveData
 import io.novafoundation.nova.common.utils.updateFrom
+import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
@@ -28,7 +29,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 class ShowSignParitySignerViewModel(
     private val router: AccountRouter,
     private val interactor: ShowSignParitySignerInteractor,
-    private val signSharedState: SharedState<SignerPayloadExtrinsic>,
+    private val signSharedState: SharedState<SeparateFlowSignerState>,
     private val qrCodeGenerator: QrCodeGenerator,
     private val responder: PolkadotVaultVariantSignCommunicator,
     private val payload: ShowSignParitySignerPayload,
@@ -59,7 +59,7 @@ class ShowSignParitySignerViewModel(
 
     val chain = flowOf {
         val signPayload = signSharedState.getOrThrow()
-        val chainId = signPayload.genesisHash.toHexString()
+        val chainId = signPayload.extrinsic.genesisHash.toHexString()
 
         chainRegistry.getChain(chainId)
     }.shareInBackground()
@@ -67,7 +67,7 @@ class ShowSignParitySignerViewModel(
     val qrCodeSequence = flowOf {
         val signPayload = signSharedState.getOrThrow()
 
-        val frames = interactor.qrCodeContent(signPayload).frames
+        val frames = interactor.qrCodeContent(signPayload.extrinsic).frames
 
         frames.map { qrCodeGenerator.generateQrBitmap(it) }
             .cycleMultiple()
@@ -76,11 +76,11 @@ class ShowSignParitySignerViewModel(
     val addressModel = chain.map { chain ->
         val signPayload = signSharedState.getOrThrow()
 
-        addressIconGenerator.createAccountAddressModel(chain, signPayload.accountId, addressDisplayUseCase)
+        addressIconGenerator.createAccountAddressModel(chain, signPayload.extrinsic.accountId, addressDisplayUseCase)
     }.shareInBackground()
 
     val validityPeriod = flowOf {
-        extrinsicValidityUseCase.extrinsicValidityPeriod(signSharedState.getOrThrow())
+        extrinsicValidityUseCase.extrinsicValidityPeriod(signSharedState.getOrThrow().extrinsic)
     }.shareInBackground()
 
     val title = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_title, payload.polkadotVaultVariant)

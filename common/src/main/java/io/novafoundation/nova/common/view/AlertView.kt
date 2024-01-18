@@ -3,20 +3,22 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.LinearLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_alert.view.alertIcon
 import kotlinx.android.synthetic.main.view_alert.view.alertMessage
+import kotlinx.android.synthetic.main.view_alert.view.alertSubMessage
 
 typealias SimpleAlertModel = String
 
@@ -24,7 +26,7 @@ class AlertView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
+) : ConstraintLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     enum class StylePreset {
         WARNING, ERROR, INFO
@@ -34,8 +36,6 @@ class AlertView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_alert, this)
-
-        orientation = HORIZONTAL
 
         updatePadding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 10.dp)
 
@@ -51,16 +51,20 @@ class AlertView @JvmOverloads constructor(
         setStyle(styleFromPreset(preset))
     }
 
-    fun setText(text: String) {
+    fun setMessage(text: String) {
         alertMessage.text = text
     }
 
-    fun setText(@StringRes textRes: Int) {
+    fun setMessage(@StringRes textRes: Int) {
         alertMessage.setText(textRes)
     }
 
+    fun setSubMessage(text: CharSequence?) {
+        alertSubMessage.setTextOrHide(text)
+    }
+
     fun setModel(maybeModel: SimpleAlertModel?) = letOrHide(maybeModel) { model ->
-        setText(model)
+        setMessage(model)
     }
 
     private fun setStyleBackground(@ColorRes colorRes: Int) {
@@ -83,7 +87,7 @@ class AlertView @JvmOverloads constructor(
         setStyle(Style(iconRes, backgroundColorRes, iconTintRes))
 
         val text = it.getString(R.styleable.AlertView_android_text)
-        text?.let(::setText)
+        text?.let(::setMessage)
     }
 
     private fun styleFromPreset(preset: StylePreset) = when (preset) {
@@ -93,4 +97,4 @@ class AlertView @JvmOverloads constructor(
     }
 }
 
-fun AlertView.setTextOrHide(text: String?) = letOrHide(text, ::setText)
+fun AlertView.setMessageOrHide(text: String?) = letOrHide(text, ::setMessage)

@@ -109,6 +109,15 @@
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Наборы ключей».</font> Выберите свой набор ключей, сеть, а затем учетную запись, которую вы хотите добавить в Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
     <string name="account_private_key">Приватный ключ</string>
+    <string name="account_proxieds">Делегировано вам (проксированные)</string>
+    <string name="account_proxy_type_any">Любые действия</string>
+    <string name="account_proxy_type_auction">Аукционы</string>
+    <string name="account_proxy_type_cancel_proxy">Отмена прокси</string>
+    <string name="account_proxy_type_governance">Демократия</string>
+    <string name="account_proxy_type_identity_judgement">Идентификация личности</string>
+    <string name="account_proxy_type_nomination_pools">Пулы номинаций</string>
+    <string name="account_proxy_type_non_transfer">Не переводы</string>
+    <string name="account_proxy_type_staking">Стейкинг</string>
     <string name="account_restore_account">У меня уже есть аккаунт</string>
     <string name="account_seed_hex_symbols">64 шест. символа</string>
     <string name="account_select_hardware_wallet">Выберите аппаратный кошелёк</string>
@@ -232,6 +241,7 @@
     <string name="common_disabled">Отключен</string>
     <string name="common_disconnect">Отключить</string>
     <string name="common_done">Готово</string>
+    <string name="common_dont_show_again">Больше не показывать это</string>
     <string name="common_edit">Редактировать</string>
     <string name="common_element_and_more_format" formatted="false">%s (и еще %s)</string>
     <string name="common_email_chooser_title">Выберите приложение для работы с почтой</string>
@@ -482,6 +492,8 @@
     <string name="delegate_search_hint">Поиск по адресу или имени</string>
     <string name="delegate_search_placeholder_empty">Недопустимый формат адреса. Убедитесь, что адрес принадлежит правильной сети</string>
     <string name="delegate_search_result_count">результаты поиска: %d</string>
+    <string name="delegated_accounts_fragment_explanation">Nova Wallet автоматически добавляет делегированные аккаунты (Прокси) в отдельную категорию для вас. Вы всегда можете управлять кошельками в Настройках.</string>
+    <string name="delegated_accounts_fragment_title">Обновление делегированных аккаунтов</string>
     <string name="delegation_add_delegation">Добавить делегацию</string>
     <string name="delegation_all_votes">Голоса за все время</string>
     <string name="delegation_delegate">Делегат</string>
@@ -526,6 +538,7 @@
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (альтернативный)</string>
     <string name="ed25519_selection_title">Edwards</string>
+    <string name="error_not_enough_to_pay_fee_title">Недостаточно токенов для оплаты комиссии</string>
     <string name="ethereum_contract">Контракт</string>
     <string name="ethereum_contract_call">Вызов контракта</string>
     <string name="ethereum_function">Функция</string>
@@ -536,7 +549,6 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Сеть: %s\nМнемоника: %s</string>
     <string name="fee_not_yet_loaded_message">Подождите, пока будет рассчитана комиссия</string>
     <string name="fee_not_yet_loaded_title">Расчет комиссии в процессе</string>
-    <string name="fragment_swap_main_settings_button_text">Выберите токен для получения</string>
     <string name="fragment_swap_main_settings_details_title">Детали обмена</string>
     <string name="fragment_swap_main_settings_max_button">Макс:</string>
     <string name="fragment_swap_main_settings_pay_title">Вы платите</string>
@@ -597,6 +609,8 @@
     <string name="network_status_connecting">Подключение…</string>
     <string name="nft_collection">Коллекция</string>
     <string name="nft_created_by">Создатель</string>
+    <string name="nft_fungile_price" formatted="false">%s за %s</string>
+    <string name="nft_issuance_fungible_format" formatted="false">%s единиц из %s</string>
     <string name="nft_issuance_limited_format" formatted="false">#%s Издание из %s</string>
     <string name="nft_issuance_unlimited">Неограниченная серия</string>
     <string name="nft_owned_by">Владелец</string>
@@ -653,6 +667,17 @@
     <string name="profile_settings_pin_code_verification_title">Подтверждение с PIN</string>
     <string name="profile_settings_safe_mode_title">Безопасный режим</string>
     <string name="profile_settings_title">Настройки</string>
+    <string name="proxied_wallet_details_info_warning">Этот аккаунт предоставил доступ для выполнения транзакций следующему аккаунту:</string>
+    <string name="proxieds_updates_deactivated_title">Более не действительны</string>
+    <string name="proxy_about">Что такое прокси?</string>
+    <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Делегированный аккаунт %s не имеет достаточного баланса для оплаты сетевой комиссии %s. Доступный баланс для оплаты комиссии: %s</string>
+    <string name="proxy_signing_is_not_supported_message">Проксированные кошельки не поддерживают подпись произвольных сообщений - только транзакций</string>
+    <string name="proxy_signing_none_permissions_message">%1$s не делегировал прав %2$s</string>
+    <string name="proxy_signing_not_enough_permission_message">%1$s делегировал %2$s только для %3$s</string>
+    <string name="proxy_signing_not_enough_permission_title">Упс! Недостаточно разрешений</string>
+    <string name="proxy_signing_warning_message">Транзакция будет инициирована %s как делегированным аккаунтом. Сетевая комиссия будет оплачена делегированным аккаунтом.</string>
+    <string name="proxy_signing_warning_title">Это делегирующий (проксированный) аккаунт</string>
+    <string name="proxy_wallet_type">%s</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
     <string name="recover_json_upload">Загрузите файл</string>
     <string name="recovery_json">JSON для восстановления</string>
@@ -827,8 +852,8 @@
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Неподдерживаемый тип стейкинга</string>
     <string name="sr25519_selection_subtitle">sr25519 (рекомендованный)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    <string name="stacking_no_access_to_controller_account_message">Добавьте учетную запись контроллера в устройство.</string>
-    <string name="stacking_no_access_to_controller_account_title">Нет доступа к учетной записи контроллера</string>
+    <string name="staking_no_access_to_controller_account_message">Добавьте учетную запись контроллера в устройство.</string>
+    <string name="staking_no_access_to_controller_account_title">Нет доступа к учетной записи контроллера</string>
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_active_delegators">Активные делегаторы</string>
     <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>

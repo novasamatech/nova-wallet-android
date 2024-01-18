@@ -28,16 +28,16 @@ class SwapFeeSufficientBalanceValidation : SwapValidation {
             val toBuyAmountToKeepEDInFeeAsset = value.toBuyAmountToKeepMainEDInFeeAsset
 
             return if (toBuyAmountToKeepEDInFeeAsset.isZero) {
-                InsufficientBalance.NoNeedsToBuyMainAssetED(chainAssetIn, feeAsset, maxAmountToSwap, value.swapFee.networkFee).validationError()
+                InsufficientBalance.NoNeedsToBuyMainAssetED(chainAssetIn, feeAsset, maxAmountToSwap, value.decimalFee.networkFee).validationError()
             } else {
                 InsufficientBalance.NeedsToBuyMainAssetED(
                     value.feeAsset.token.configuration,
                     chainAssetIn,
-                    value.swapFee.minimumBalanceBuyIn.requireNativeAsset(),
-                    toBuyAmountToKeepEDInCommissionAsset = value.swapFee.minimumBalanceBuyIn.nativeMinimumBalance,
+                    value.decimalFee.genericFee.minimumBalanceBuyIn.requireNativeAsset(),
+                    toBuyAmountToKeepEDInCommissionAsset = value.decimalFee.genericFee.minimumBalanceBuyIn.nativeMinimumBalance,
                     toSellAmountToKeepEDUsingAssetIn = toBuyAmountToKeepEDInFeeAsset,
                     maxAmountToSwap,
-                    value.swapFee.networkFee
+                    value.decimalFee.networkFee
                 ).validationError()
             }
         }

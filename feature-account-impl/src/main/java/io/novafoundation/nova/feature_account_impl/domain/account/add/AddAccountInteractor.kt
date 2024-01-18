@@ -3,11 +3,15 @@ package io.novafoundation.nova.feature_account_impl.domain.account.add
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
-import io.novafoundation.nova.feature_account_impl.data.repository.AddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 
 class AddAccountInteractor(
-    private val addAccountRepository: AddAccountRepository,
+    private val mnemonicAddAccountRepository: MnemonicAddAccountRepository,
+    private val jsonAddAccountRepository: JsonAddAccountRepository,
+    private val seedAddAccountRepository: SeedAddAccountRepository,
     private val accountRepository: AccountRepository,
 ) {
 
@@ -17,10 +21,12 @@ class AddAccountInteractor(
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
-            addAccountRepository.addFromMnemonic(
-                mnemonic,
-                advancedEncryption,
-                addAccountType
+            mnemonicAddAccountRepository.addAccount(
+                MnemonicAddAccountRepository.Payload(
+                    mnemonic,
+                    advancedEncryption,
+                    addAccountType
+                )
             )
         }
     }
@@ -31,10 +37,12 @@ class AddAccountInteractor(
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
-            addAccountRepository.addFromMnemonic(
-                mnemonic,
-                advancedEncryption,
-                addAccountType
+            mnemonicAddAccountRepository.addAccount(
+                MnemonicAddAccountRepository.Payload(
+                    mnemonic,
+                    advancedEncryption,
+                    addAccountType
+                )
             )
         }
     }
@@ -45,10 +53,12 @@ class AddAccountInteractor(
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
-            addAccountRepository.addFromSeed(
-                seed,
-                advancedEncryption,
-                addAccountType
+            seedAddAccountRepository.addAccount(
+                SeedAddAccountRepository.Payload(
+                    seed,
+                    advancedEncryption,
+                    addAccountType
+                )
             )
         }
     }
@@ -59,10 +69,12 @@ class AddAccountInteractor(
         addAccountType: AddAccountType
     ): Result<Unit> {
         return addAccount(addAccountType) {
-            addAccountRepository.addFromJson(
-                json = json,
-                password = password,
-                addAccountType = addAccountType
+            jsonAddAccountRepository.addAccount(
+                JsonAddAccountRepository.Payload(
+                    json = json,
+                    password = password,
+                    addAccountType = addAccountType
+                )
             )
         }
     }
@@ -77,7 +89,7 @@ class AddAccountInteractor(
 
     suspend fun extractJsonMetadata(json: String): Result<ImportJsonMetaData> {
         return runCatching {
-            addAccountRepository.extractJsonMetadata(json)
+            jsonAddAccountRepository.extractJsonMetadata(json)
         }
     }
 }

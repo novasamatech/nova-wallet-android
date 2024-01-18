@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import kotlinx.coroutines.flow.Flow
@@ -39,15 +40,16 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun getSelectedMetaAccount(): MetaAccount
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
-    suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
 
-    suspend fun accountNameFor(accountId: AccountId): String?
+    suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount?
 
-    suspend fun allMetaAccounts(): List<MetaAccount>
+    suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
+
+    fun activeMetaAccountsFlow(): Flow<List<MetaAccount>>
 
     fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
 
@@ -59,7 +61,7 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun getSelectedLanguage(): Language
     suspend fun changeSelectedLanguage(language: Language)
 
-    suspend fun accountExists(accountId: AccountId): Boolean
+    suspend fun accountExists(accountId: AccountId, chainId: ChainId): Boolean
     suspend fun getMetaAccount(metaId: Long): MetaAccount
 
     fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
@@ -70,6 +72,8 @@ interface AccountDataSource : SecretStoreV1 {
     /**
      * @return id of inserted meta account
      */
+    // TODO move it to SecretsAddAccountRepository
+    @Deprecated("Use SecretsAddAccountRepository instead")
     suspend fun insertMetaAccountFromSecrets(
         name: String,
         substrateCryptoType: CryptoType,
@@ -79,6 +83,8 @@ interface AccountDataSource : SecretStoreV1 {
     /**
      * @return id of inserted meta account
      */
+    // TODO move it to SecretsAddAccountRepository
+    @Deprecated("Use SecretsAddAccountRepository instead")
     suspend fun insertChainAccount(
         metaId: Long,
         chain: Chain,
@@ -86,5 +92,9 @@ interface AccountDataSource : SecretStoreV1 {
         secrets: EncodableStruct<ChainAccountSecrets>
     )
 
-    suspend fun hasMetaAccounts(): Boolean
+    suspend fun hasActiveMetaAccounts(): Boolean
+
+    fun removeDeactivatedMetaAccounts()
+
+    suspend fun getActiveMetaAccounts(): List<MetaAccount>
 }

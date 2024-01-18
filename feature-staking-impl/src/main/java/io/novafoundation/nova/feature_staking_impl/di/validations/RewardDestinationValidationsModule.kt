@@ -19,7 +19,7 @@ class RewardDestinationValidationsModule {
     fun provideFeeValidation() = RewardDestinationFeeValidation(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.availableControllerBalance },
-        errorProducer = { _, _ -> RewardDestinationValidationFailure.CannotPayFees }
+        errorProducer = { RewardDestinationValidationFailure.CannotPayFees }
     )
 
     @Provides

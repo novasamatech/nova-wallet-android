@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -48,11 +49,11 @@ class EvmNativeAssetTransfers(
         }
     }
 
-    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<String> {
+    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<ExtrinsicSubmission> {
         return evmTransactionService.transact(
             chainId = transfer.originChain.id,
             fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT,
-            presetFee = transfer.decimalFee.fee,
+            presetFee = transfer.decimalFee.networkFee,
         ) {
             nativeTransfer(transfer)
         }

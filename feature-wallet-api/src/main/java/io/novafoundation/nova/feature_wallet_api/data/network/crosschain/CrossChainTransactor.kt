@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.crosschain
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
@@ -19,5 +20,5 @@ interface CrossChainTransactor {
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransfer,
         crossChainFee: BigInteger,
-    ): Result<*>
+    ): Result<ExtrinsicSubmission>
 }

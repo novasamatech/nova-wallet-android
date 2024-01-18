@@ -47,7 +47,7 @@ interface StakingRepository {
 
     fun stakingStoriesFlow(): Flow<List<StakingStory>>
 
-    suspend fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger>
+    fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger>
 
     suspend fun ledger(chainId: ChainId, accountId: AccountId): StakingLedger?
 

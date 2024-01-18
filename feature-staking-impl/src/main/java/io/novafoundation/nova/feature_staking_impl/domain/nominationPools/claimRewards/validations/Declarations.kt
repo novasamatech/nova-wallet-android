@@ -41,11 +41,11 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.enoughToPayFees()
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
-        error = { payload, leftForFees ->
+        error = { context ->
             NominationPoolsClaimRewardsValidationFailure.NotEnoughBalanceToPayFees(
-                chainAsset = payload.asset.token.configuration,
-                maxUsable = leftForFees,
-                fee = payload.fee
+                chainAsset = context.payload.asset.token.configuration,
+                maxUsable = context.availableToPayFees,
+                fee = context.fee
             )
         }
     )
@@ -54,7 +54,7 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.enoughToPayFees()
 private fun NominationPoolsClaimRewardsValidationSystemBuilder.profitableClaim() {
     profitableAction(
         amount = { pendingRewards },
-        fee = { fee },
+        fee = { it.fee },
         error = { NominationPoolsClaimRewardsValidationFailure.NonProfitableClaim }
     )
 }

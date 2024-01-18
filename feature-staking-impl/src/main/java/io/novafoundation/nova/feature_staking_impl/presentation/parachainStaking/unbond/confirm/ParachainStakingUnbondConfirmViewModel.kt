@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -65,6 +66,8 @@ class ParachainStakingUnbondConfirmViewModel(
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
+
+    private val decimalFee = mapFeeFromParcel(payload.fee)
 
     val hintsMixin = hintsMixinFactory.create(coroutineScope = this)
 
@@ -125,13 +128,13 @@ class ParachainStakingUnbondConfirmViewModel(
     }
 
     private fun setInitialFee() = launch {
-        feeLoaderMixin.setFee(payload.fee)
+        feeLoaderMixin.setFee(decimalFee.genericFee)
     }
 
     private fun sendTransactionIfValid() = launch {
         val payload = ParachainStakingUnbondValidationPayload(
             amount = payload.amount,
-            fee = payload.fee,
+            fee = decimalFee,
             collator = collator(),
             asset = assetFlow.first()
         )

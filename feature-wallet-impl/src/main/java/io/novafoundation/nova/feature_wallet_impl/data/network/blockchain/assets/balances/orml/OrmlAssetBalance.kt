@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml
 
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -61,14 +62,18 @@ class OrmlAssetBalance(
         return chainAsset.requireOrml().existentialDeposit
     }
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val ormlAccountData = remoteStorageSource.query(
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
+        return remoteStorageSource.query(
             chainId = chain.id,
             keyBuilder = { it.ormlBalanceKey(accountId, chainAsset) },
-            binding = { scale, runtime -> bindOrmlAccountDataOrEmpty(scale, runtime) }
+            binding = { scale, runtime -> bindOrmlAccountBalanceOrEmpty(scale, runtime) }
         )
+    }
 
-        return ormlAccountData.free + ormlAccountData.reserved
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        val accountBalance = queryAccountBalance(chain, chainAsset, accountId)
+
+        return accountBalance.free + accountBalance.reserved
     }
 
     override suspend fun startSyncingBalance(
@@ -82,7 +87,7 @@ class OrmlAssetBalance(
 
         return subscriptionBuilder.subscribe(runtime.ormlBalanceKey(accountId, chainAsset))
             .map {
-                val ormlAccountData = bindOrmlAccountDataOrEmpty(it.value, runtime)
+                val ormlAccountData = bindOrmlAccountBalanceOrEmpty(it.value, runtime)
 
                 val assetChanged = updateAssetBalance(metaAccount.id, chainAsset, ormlAccountData)
 
@@ -97,7 +102,7 @@ class OrmlAssetBalance(
     private suspend fun updateAssetBalance(
         metaId: Long,
         chainAsset: Chain.Asset,
-        ormlAccountData: OrmlAccountData
+        ormlAccountData: AccountBalance
     ) = assetCache.updateAsset(metaId, chainAsset) { local ->
         with(ormlAccountData) {
             local.copy(
@@ -114,7 +119,7 @@ class OrmlAssetBalance(
         return metadata.tokens().storage("Accounts").storageKey(this, accountId, chainAsset.ormlCurrencyId(this))
     }
 
-    private fun bindOrmlAccountDataOrEmpty(scale: String?, runtime: RuntimeSnapshot): OrmlAccountData {
-        return scale?.let { bindOrmlAccountData(it, runtime) } ?: OrmlAccountData.empty()
+    private fun bindOrmlAccountBalanceOrEmpty(scale: String?, runtime: RuntimeSnapshot): AccountBalance {
+        return scale?.let { bindOrmlAccountData(it, runtime) } ?: AccountBalance.empty()
     }
 }

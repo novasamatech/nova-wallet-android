@@ -14,10 +14,10 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
@@ -44,19 +44,19 @@ class EquilibriumAssetHistory(
     private inner class TransferExtractor : SubstrateRealtimeOperationFetcher.Extractor {
 
         override suspend fun extractRealtimeHistoryUpdates(
-            extrinsic: ExtrinsicWithEvents,
+            extrinsicVisit: ExtrinsicVisit,
             chain: Chain,
             chainAsset: Chain.Asset
         ): RealtimeHistoryUpdate.Type? {
             val runtime = chainRegistry.getRuntime(chain.id)
 
-            val call = extrinsic.extrinsic.call
+            val call = extrinsicVisit.call
             if (!call.isTransfer(runtime)) return null
 
             val amount = bindNumber(call.arguments["value"])
 
             return RealtimeHistoryUpdate.Type.Transfer(
-                senderId = bindAccountIdentifier(extrinsic.extrinsic.signature!!.accountIdentifier),
+                senderId = extrinsicVisit.origin,
                 recipientId = bindAccountIdentifier(call.arguments["to"]),
                 amountInPlanks = amount,
                 chainAsset = chainAsset,

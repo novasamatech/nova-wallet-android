@@ -1,15 +1,18 @@
 package io.novafoundation.nova.feature_account_impl.data.ethereum.transaction
 
 import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.common.utils.toEcdsaSignatureData
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionBuilding
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
-import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionHash
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
@@ -18,10 +21,9 @@ import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import org.web3j.crypto.RawTransaction
@@ -49,7 +51,7 @@ internal class RealEvmTransactionService(
         val web3Api = chainRegistry.getCallEthereumApiOrThrow(chainId)
         val chain = chainRegistry.getChain(chainId)
 
-        val submittingMetaAccount = findMetaAccountFor(origin)
+        val submittingMetaAccount = accountRepository.requireMetaAccountFor(origin, chainId)
         val submittingAddress = submittingMetaAccount.requireAddressIn(chain)
 
         val txBuilder = EvmTransactionBuilder().apply(building)
@@ -58,7 +60,7 @@ internal class RealEvmTransactionService(
         val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
         val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-        return EvmFee(gasLimit, gasPrice)
+        return EvmFee(gasLimit, gasPrice, SubmissionOrigin.singleOrigin(submittingMetaAccount.requireAccountIdIn(chain)))
     }
 
     override suspend fun transact(
@@ -67,10 +69,11 @@ internal class RealEvmTransactionService(
         origin: TransactionOrigin,
         fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
-    ): Result<TransactionHash> = runCatching {
+    ): Result<ExtrinsicSubmission> = runCatching {
         val chain = chainRegistry.getChain(chainId)
-        val submittingMetaAccount = findMetaAccountFor(origin)
+        val submittingMetaAccount = accountRepository.requireMetaAccountFor(origin, chainId)
         val submittingAddress = submittingMetaAccount.requireAddressIn(chain)
+        val submittingAccountId = submittingMetaAccount.requireAccountIdIn(chain)
 
         val web3Api = chainRegistry.getCallEthereumApiOrThrow(chainId)
         val txBuilder = EvmTransactionBuilder().apply(building)
@@ -80,7 +83,7 @@ internal class RealEvmTransactionService(
             val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
             val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-            EvmFee(gasLimit, gasPrice)
+            EvmFee(gasLimit, gasPrice, SubmissionOrigin.singleOrigin(submittingAccountId))
         }
 
         val nonce = web3Api.getNonce(submittingAddress)
@@ -88,28 +91,24 @@ internal class RealEvmTransactionService(
         val txForSign = txBuilder.buildForSign(nonce = nonce, gasPrice = evmFee.gasPrice, gasLimit = evmFee.gasLimit)
         val toSubmit = signTransaction(txForSign, submittingMetaAccount, chain)
 
-        web3Api.sendTransaction(toSubmit)
+        val txHash = web3Api.sendTransaction(toSubmit)
+
+        ExtrinsicSubmission(hash = txHash, submissionOrigin = SubmissionOrigin.singleOrigin(submittingAccountId))
     }
 
     private suspend fun signTransaction(txForSign: RawTransaction, metaAccount: MetaAccount, chain: Chain): String {
         val ethereumChainId = chain.addressPrefix.toLong()
         val encodedTx = TransactionEncoder.encode(txForSign, ethereumChainId)
 
-        val signer = signerProvider.signerFor(metaAccount)
+        val signer = signerProvider.rootSignerFor(metaAccount)
         val accountId = metaAccount.requireAccountIdIn(chain)
 
         val signerPayload = SignerPayloadRaw(encodedTx, accountId)
-        val signatureData = signer.signRaw(signerPayload).toSignatureData()
+        val signatureData = signer.signRaw(signerPayload).toEcdsaSignatureData()
 
         val eip155SignatureData: Sign.SignatureData = TransactionEncoder.createEip155SignatureData(signatureData, ethereumChainId)
 
         return txForSign.encodeWith(eip155SignatureData).toHexString(withPrefix = true)
-    }
-
-    private suspend fun findMetaAccountFor(origin: TransactionOrigin): MetaAccount {
-        return when (origin) {
-            TransactionOrigin.SelectedWallet -> accountRepository.getSelectedMetaAccount()
-        }
     }
 
     private suspend fun Web3Api.getNonce(address: String): BigInteger {
@@ -122,12 +121,6 @@ internal class RealEvmTransactionService(
         ethEstimateGas(tx).sendSuspend().amountUsed
     } catch (rpcException: EvmRpcException) {
         default
-    }
-
-    private fun SignatureWrapper.toSignatureData(): Sign.SignatureData {
-        require(this is SignatureWrapper.Ecdsa)
-
-        return Sign.SignatureData(v, r, s)
     }
 
     private fun RawTransaction.encodeWith(signatureData: Sign.SignatureData): ByteArray {

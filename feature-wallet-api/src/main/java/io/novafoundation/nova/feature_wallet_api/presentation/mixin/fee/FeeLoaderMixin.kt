@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asFlow
-import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.inBackground
@@ -23,8 +22,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transform
-import java.math.BigDecimal
-import java.math.BigInteger
 
 sealed class FeeStatus<out F : GenericFee> {
     object Loading : FeeStatus<Nothing>()
@@ -76,12 +73,6 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
         suspend fun setFee(fee: F?)
 
         fun invalidateFee()
-
-        @Deprecated(
-            message = "Use `awaitDecimalFee` instead since it holds more information about fee",
-            replaceWith = ReplaceWith("awaitDecimalFee().decimalAmount")
-        )
-        suspend fun awaitFee(): BigDecimal = awaitDecimalFee().decimalAmount
     }
 
     interface Factory {
@@ -95,28 +86,9 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
 interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
-    // Additional methods in this interface are only for backward-compatibility to simplify migration of the old code
     interface Presentation : GenericFeeLoaderMixin.Presentation<SimpleFee>, FeeLoaderMixin {
 
-        @Deprecated("Use loadFeeV2")
         fun loadFee(
-            coroutineScope: CoroutineScope,
-            feeConstructor: suspend (Token) -> BigInteger?,
-            onRetryCancelled: () -> Unit,
-        )
-
-        @Deprecated("Use setFee(fee: GenericFee)")
-        suspend fun setFee(feeAmount: BigDecimal?)
-
-        @Deprecated("Use awaitFee()")
-        fun requireFee(
-            block: (BigDecimal) -> Unit,
-            onError: (title: String, message: String) -> Unit,
-        )
-
-        suspend fun setFee(fee: Fee?) = setFee(fee?.let(::SimpleFee))
-
-        fun loadFeeV2(
             coroutineScope: CoroutineScope,
             expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> Fee?,
@@ -157,69 +129,27 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeOrNullFlow(): Flow<F?> {
     }
 }
 
+fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedDecimalFeeOrNullFlow(): Flow<GenericDecimalFee<F>?> {
+    return feeLiveData.asFlow().map {
+        it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel?.decimalFee
+    }
+}
+
 fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeModelOrNullFlow(): Flow<GenericFeeModel<F>?> {
     return feeLiveData
         .asFlow()
         .map { it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel }
 }
 
-fun <F : GenericFee> GenericFeeLoaderMixin<F>.getFeeOrNull(): F? {
+fun <F : GenericFee> GenericFeeLoaderMixin<F>.getDecimalFeeOrNull(): GenericDecimalFee<F>? {
     return feeLiveData.value
         .castOrNull<FeeStatus.Loaded<F>>()
         ?.feeModel
         ?.decimalFee
-        ?.genericFee
 }
 
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
-
-fun FeeLoaderMixin.Presentation.requireFee(
-    viewModel: BaseViewModel,
-    block: (BigDecimal) -> Unit,
-) {
-    requireFee(block) { title, message ->
-        viewModel.showError(title, message)
-    }
-}
-
-fun <I> FeeLoaderMixin.Presentation.connectWith(
-    inputSource: Flow<I>,
-    scope: CoroutineScope,
-    feeConstructor: suspend Token.(input: I) -> BigInteger,
-    onRetryCancelled: () -> Unit = {}
-) {
-    inputSource.onEach { input ->
-        loadFee(
-            coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input) },
-            onRetryCancelled = onRetryCancelled
-        )
-    }
-        .inBackground()
-        .launchIn(scope)
-}
-
-fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
-    inputSource1: Flow<I1>,
-    inputSource2: Flow<I2>,
-    scope: CoroutineScope,
-    feeConstructor: suspend Token.(input1: I1, input2: I2) -> BigInteger?,
-    onRetryCancelled: () -> Unit = {}
-) {
-    combine(
-        inputSource1,
-        inputSource2
-    ) { input1, input2 ->
-        loadFee(
-            coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input1, input2) },
-            onRetryCancelled = onRetryCancelled
-        )
-    }
-        .inBackground()
-        .launchIn(scope)
-}
 
 fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
     inputSource1: Flow<I1>,
@@ -237,7 +167,7 @@ fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
         inputSource3,
         inputSource4
     ) { input1, input2, input3, input4 ->
-        loadFeeV2(
+        loadFee(
             coroutineScope = scope,
             expectedChain = expectedChain?.invoke(input1, input2, input3, input4),
             feeConstructor = { feeConstructor(it, input1, input2, input3, input4) },
@@ -248,16 +178,37 @@ fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
         .launchIn(scope)
 }
 
-fun <I> FeeLoaderMixin.Presentation.connectWithV2(
+fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource: Flow<I>,
     scope: CoroutineScope,
     feeConstructor: suspend Token.(input: I) -> Fee,
     onRetryCancelled: () -> Unit = {}
 ) {
     inputSource.onEach { input ->
-        loadFeeV2(
+        this.loadFee(
             coroutineScope = scope,
             feeConstructor = { feeConstructor(it, input) },
+            onRetryCancelled = onRetryCancelled
+        )
+    }
+        .inBackground()
+        .launchIn(scope)
+}
+
+fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
+    inputSource1: Flow<I1>,
+    inputSource2: Flow<I2>,
+    scope: CoroutineScope,
+    feeConstructor: suspend Token.(input1: I1, input2: I2) -> Fee,
+    onRetryCancelled: () -> Unit = {}
+) {
+    combine(
+        inputSource1,
+        inputSource2
+    ) { input1, input2 ->
+        this.loadFee(
+            coroutineScope = scope,
+            feeConstructor = { feeConstructor(it, input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
     }

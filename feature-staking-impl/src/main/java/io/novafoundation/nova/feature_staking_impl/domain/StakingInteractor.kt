@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
-import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
@@ -10,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
-import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
@@ -18,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.fullId
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
-import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
@@ -41,6 +38,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chain
@@ -52,9 +50,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -89,8 +87,8 @@ class StakingInteractor(
 
             val payouts = payoutRepository.calculateUnpaidPayouts(currentStakingState)
 
-            val allValidatorAddresses = payouts.map(Payout::validatorAddress).distinct()
-            val identityMapping = identityRepository.getIdentitiesFromAddresses(currentStakingState.chain, allValidatorAddresses)
+            val allValidatorStashes = payouts.map { it.validatorStash.value }.distinct()
+            val identityMapping = identityRepository.getIdentitiesFromIds(allValidatorStashes, chainId)
 
             val pendingPayouts = payouts.map {
                 val erasLeft = remainingEras(createdAtEra = it.era, activeEraIndex, historyDepth)
@@ -100,9 +98,12 @@ class StakingInteractor(
                 val leftTime = calculator.calculateTillEraSet(destinationEra = it.era + historyDepth + ERA_OFFSET).toLong()
                 val currentTimestamp = System.currentTimeMillis()
                 with(it) {
-                    val validatorIdentity = identityMapping[validatorAddress]
+                    val validatorIdentity = identityMapping[validatorStash]
 
-                    val validatorInfo = PendingPayout.ValidatorInfo(validatorAddress, validatorIdentity?.display)
+                    val validatorInfo = PendingPayout.ValidatorInfo(
+                        address = currentStakingState.chain.addressOf(validatorStash.value),
+                        identityName = validatorIdentity?.display
+                    )
 
                     PendingPayout(
                         validatorInfo = validatorInfo,
@@ -110,7 +111,8 @@ class StakingInteractor(
                         amountInPlanks = amount,
                         timeLeft = leftTime,
                         timeLeftCalculatedAt = currentTimestamp,
-                        closeToExpire = closeToExpire
+                        closeToExpire = closeToExpire,
+                        pagesToClaim = pagesToClaim
                     )
                 }
             }.sortedBy { it.era }
@@ -227,7 +229,7 @@ class StakingInteractor(
     suspend fun getAccountProjectionsInSelectedChains() = withContext(Dispatchers.Default) {
         val chain = stakingSharedState.chain()
 
-        accountRepository.allMetaAccounts().mapNotNull {
+        accountRepository.getActiveMetaAccounts().mapNotNull {
             mapAccountToStakingAccount(chain, it)
         }
     }
@@ -262,7 +264,7 @@ class StakingInteractor(
         stakingConstantsRepository.maxValidatorsPerNominator(stakingSharedState.chainId(), stake)
     }
 
-    suspend fun maxRewardedNominators(): Int = withContext(Dispatchers.Default) {
+    suspend fun maxRewardedNominators(): Int? = withContext(Dispatchers.Default) {
         stakingConstantsRepository.maxRewardedNominatorPerValidator(stakingSharedState.chainId())
     }
 
@@ -292,10 +294,10 @@ class StakingInteractor(
         val chainAsset = stakingSharedState.chainAsset()
         val chainId = chainAsset.chainId
 
-        combineTransform(
+        combineToPair(
             stakingSharedComputation.activeEraInfo(chainId, scope),
             walletRepository.assetFlow(state.accountId, chainAsset)
-        ) { activeEraInfo, asset ->
+        ).flatMapLatest { (activeEraInfo, asset) ->
             val activeStake = asset.bondedInPlanks
 
             val rewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
@@ -307,14 +309,12 @@ class StakingInteractor(
                 activeStake = activeStake
             )
 
-            val summary = flow { statusResolver(statusResolutionContext) }.map { status ->
+            flow { statusResolver(statusResolutionContext) }.map { status ->
                 StakeSummary(
                     status = status,
                     activeStake = activeStake
                 )
             }
-
-            emitAll(summary)
         }
     }
 
@@ -327,13 +327,14 @@ class StakingInteractor(
     private suspend fun activeNominators(chainId: ChainId, exposures: Collection<Exposure>): Int {
         val activeNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
-        return exposures.fold(mutableSetOf<AccountIdKey>()) { acc, exposure ->
-            acc += exposure.others.sortedByDescending(IndividualExposure::value)
-                .take(activeNominatorsPerValidator)
-                .map { it.who.intoKey() }
-
-            acc
-        }.size
+        return exposures.fold(0) { acc, exposure ->
+            val othersSize = exposure.others.size
+            acc + if (activeNominatorsPerValidator != null) {
+                othersSize.coerceAtMost(activeNominatorsPerValidator)
+            } else {
+                othersSize
+            }
+        }
     }
 
     private fun totalStake(exposures: Collection<Exposure>): BigInteger {
@@ -350,7 +351,7 @@ class StakingInteractor(
     private class StatusResolutionContext(
         val activeEraInfo: ActiveEraInfo,
         val asset: Asset,
-        val rewardedNominatorsPerValidator: Int,
+        val rewardedNominatorsPerValidator: Int?,
         val activeStake: Balance,
     )
 }

@@ -45,7 +45,7 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun finishUnlockFlow(shouldCloseLocksScreen: Boolean)
 
-    fun openAccountDetails(id: Long)
+    fun openWalletDetails(id: Long)
 
     fun openAddDelegation()
 

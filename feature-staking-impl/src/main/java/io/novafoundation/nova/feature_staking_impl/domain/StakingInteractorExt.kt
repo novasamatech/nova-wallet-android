@@ -24,7 +24,7 @@ val NominationStatus.isOversubscribed: Boolean
 fun nominationStatus(
     stashId: AccountId,
     exposures: Collection<Exposure>,
-    rewardedNominatorsPerValidator: Int
+    rewardedNominatorsPerValidator: Int?
 ): NominationStatus {
     val comparator = { accountId: IndividualExposure ->
         accountId.who.contentEquals(stashId)
@@ -37,7 +37,9 @@ fun nominationStatus(
         return NominationStatus.NOT_PRESENT
     }
 
-    val willBeRewarded = validatorsWithOurStake.any { it.willAccountBeRewarded(stashId, rewardedNominatorsPerValidator) }
+    val willBeRewarded = rewardedNominatorsPerValidator == null || validatorsWithOurStake.any {
+        it.willAccountBeRewarded(stashId, rewardedNominatorsPerValidator)
+    }
 
     return if (willBeRewarded) NominationStatus.ACTIVE else NominationStatus.OVERSUBSCRIBED
 }
@@ -63,7 +65,6 @@ fun minimumStake(
     exposures: Collection<Exposure>,
     minimumNominatorBond: BigInteger,
     bagListLocator: BagListLocator?,
-    maxNominatorsInValidator: Int,
     bagListScoreConverter: BagListScoreConverter,
     bagListSize: BigInteger?,
     maxElectingVoters: BigInteger?
