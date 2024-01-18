@@ -26,9 +26,9 @@ import java.math.BigInteger
  */
 @Language("RoomSql")
 private const val FIND_BY_ADDRESS_WHERE_CLAUSE = """
-    LEFT JOIN chain_accounts as c ON m.id = c.metaId
+    LEFT JOIN chain_accounts as c ON m.id = c.metaId AND c.chainId = :chainId
     WHERE
-    (c.chainId = :chainId  AND c.accountId IS NOT NULL AND c.accountId = :accountId)
+    (c.accountId IS NOT NULL AND c.accountId = :accountId)
     OR (c.accountId IS NULL AND (substrateAccountId = :accountId OR ethereumAddress = :accountId))
     ORDER BY (CASE WHEN isSelected THEN 0 ELSE 1 END)
     """
