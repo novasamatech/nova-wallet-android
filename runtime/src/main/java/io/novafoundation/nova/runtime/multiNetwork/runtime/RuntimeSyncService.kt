@@ -97,12 +97,13 @@ class RuntimeSyncService(
         cancelExistingSync(chainId)
 
         syncingChains[chainId] = launch(syncDispatcher) {
-            runCatching {
-                val syncResult = sync(chainId, forceFullSync)
-                syncResult?.let { _syncStatusFlow.emit(it) }
-            }
+            val syncResult = runCatching {
+                sync(chainId, forceFullSync)
+            }.getOrNull()
 
             syncFinished(chainId)
+
+            syncResult?.let { _syncStatusFlow.emit(it) }
         }
     }
 

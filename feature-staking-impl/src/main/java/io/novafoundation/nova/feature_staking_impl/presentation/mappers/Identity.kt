@@ -16,24 +16,24 @@ fun mapIdentityToIdentityParcelModel(identity: OnChainIdentity): IdentityParcelM
             )
         }
 
-        IdentityParcelModel(display, legal, web, riot, email, pgpFingerprint, image, twitter, childInfo)
+        IdentityParcelModel(display, legal, web, matrix, email, pgpFingerprint, image, twitter, childInfo)
     }
 }
 
 fun mapIdentityParcelModelToIdentity(identity: IdentityParcelModel): OnChainIdentity {
     return with(identity) {
         if (childInfo != null) {
-            val parent = RootIdentity(childInfo.parentSeparateDisplay, legal, web, riot, email, pgpFingerprint, image, twitter)
+            val parent = RootIdentity(childInfo.parentSeparateDisplay, legal, web, matrix, email, pgpFingerprint, image, twitter)
 
             ChildIdentity(childInfo.childName, parent)
         } else {
-            RootIdentity(display, legal, web, riot, email, pgpFingerprint, image, twitter)
+            RootIdentity(display, legal, web, matrix, email, pgpFingerprint, image, twitter)
         }
     }
 }
 
 fun mapIdentityParcelModelToIdentityModel(identity: IdentityParcelModel): IdentityModel {
     return with(identity) {
-        IdentityModel(display, legal, web, riot, email, image, twitter)
+        IdentityModel(display, legal, web, matrix, email, image, twitter)
     }
 }
