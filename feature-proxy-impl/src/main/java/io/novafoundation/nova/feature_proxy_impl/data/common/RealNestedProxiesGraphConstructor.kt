@@ -35,9 +35,11 @@ class RealNestedProxiesGraphConstructor(
 
     fun fillNodes(nodes: List<Node>) {
         for (node in nodes) {
-            val nestedNodes = proxyToProxieds[node.accountId] ?: continue
+            val onChainNestedNodes = proxyToProxieds[node.accountId] ?: continue
 
-            for (proxiedNode in nestedNodes) {
+            val resultNestedNodes = mutableListOf<Node>()
+
+            for (proxiedNode in onChainNestedNodes) {
                 // If we have an account in full node path we skip it to avoid cycles
                 if (node.hasInPath(proxiedNode.accountId)) continue
 
@@ -47,10 +49,11 @@ class RealNestedProxiesGraphConstructor(
 
                 val nestedNodePath = node.path + mapOf(node.accountId to node.permissionType)
                 val nestedNode = proxiedNode.copy(path = nestedNodePath)
-                node.addNested(nestedNode)
+                resultNestedNodes.add(nestedNode)
             }
 
-            if (node.nestedNodes.isNotEmpty()) {
+            if (resultNestedNodes.isNotEmpty()) {
+                node.setNested(resultNestedNodes)
                 fillNodes(node.nestedNodes)
             }
         }

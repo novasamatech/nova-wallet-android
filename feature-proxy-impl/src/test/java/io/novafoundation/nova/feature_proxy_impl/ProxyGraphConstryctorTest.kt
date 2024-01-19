@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_proxy_api.data.model.ProxyPermission
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_impl.data.common.RealNestedProxiesGraphConstructor
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class ProxyGraphConstryctorTest {
@@ -152,6 +153,56 @@ class ProxyGraphConstryctorTest {
         )
     }
 
+
+    @Test
+    fun cyclical_with_two_accounts_in_permission_chain() {
+        val engine = RealNestedProxiesGraphConstructor(
+            startAccountIds = keysOf("Account_1", "Account_2"),
+            permissions = listOf(
+                makePermission(from = "Account_3", to = "Account_2", ProxyType.Any),
+                makePermission(from = "Account_2", to = "Account_1", ProxyType.Any),
+                makePermission(from = "Account_1", to = "Account_3", ProxyType.Any),
+                makePermission(from = "Account_3", to = "Account_1", ProxyType.Any),
+            )
+        )
+
+        val result = engine.build()
+
+        assertEquals(
+            result,
+            listOf(
+                makeNode(
+                    accountId = "Account_1",
+                    nestedNodes = mutableListOf(
+                        makeNode(
+                            accountId = "Account_2",
+                            nestedNodes = makeSingleNode(
+                                accountId = "Account_3",
+                                path = pathWithAny("Account_1", "Account_2")
+                            ),
+                            path = pathWithAny("Account_1")
+                        ),
+                        makeNode(
+                            accountId = "Account_3",
+                            path = pathWithAny("Account_1")
+                        )
+                    )
+                ),
+                makeNode(
+                    accountId = "Account_2",
+                    nestedNodes = makeSingleNode(
+                        accountId = "Account_3",
+                        nestedNodes = makeSingleNode(
+                            accountId = "Account_1",
+                            path = pathWithAny("Account_2", "Account_3")
+                        ),
+                        path = pathWithAny("Account_2")
+                    )
+                )
+            )
+        )
+    }
+
     private fun keysOf(vararg values: String): Set<AccountIdKey> {
         return values.toList()
             .mapToSet { it.intoKey() }
@@ -168,7 +219,7 @@ class ProxyGraphConstryctorTest {
     private fun makeSingleNode(
         accountId: String,
         permissionType: ProxyType = ProxyType.Any,
-        nestedNodes: MutableList<Node> = mutableListOf(),
+        nestedNodes: List<Node> = listOf(),
         path: Map<AccountIdKey, ProxyType> = mapOf()
     ): MutableList<Node> {
         return mutableListOf(makeNode(accountId, permissionType, nestedNodes, path))
@@ -177,7 +228,7 @@ class ProxyGraphConstryctorTest {
     private fun makeNode(
         accountId: String,
         permissionType: ProxyType = ProxyType.Any,
-        nestedNodes: MutableList<Node> = mutableListOf(),
+        nestedNodes: List<Node> = listOf(),
         path: Map<AccountIdKey, ProxyType> = mapOf()
     ): Node {
         return Node(accountId.intoKey(), permissionType, nestedNodes, path)

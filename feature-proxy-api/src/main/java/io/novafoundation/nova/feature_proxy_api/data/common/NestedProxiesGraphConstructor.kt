@@ -14,15 +14,15 @@ interface NestedProxiesGraphConstructor {
     data class Node(
         val accountId: AccountIdKey,
         val permissionType: ProxyType,
-        val nestedNodes: MutableList<Node>,
+        var nestedNodes: List<Node>,
         val path: Map<AccountIdKey, ProxyType>
     ) {
         fun hasInPath(otherAccountId: AccountIdKey): Boolean {
             return path.contains(otherAccountId) || accountId == otherAccountId
         }
 
-        fun addNested(node: Node) {
-            nestedNodes.add(node)
+        fun setNested(nodes: List<Node>) {
+            nestedNodes = nodes
         }
 
         fun flatten(): List<Node> {
