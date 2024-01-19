@@ -29,7 +29,7 @@ class StakingProxyListInteractor(
                 }
 
             proxies.map { proxy ->
-                val proxyAccountId = proxy.accountId
+                val proxyAccountId = proxy.proxyAccountId
                 StakingProxyAccount(
                     accountIdToMetaAccount[proxyAccountId],
                     proxyAccountId.value
