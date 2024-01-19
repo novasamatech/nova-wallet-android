@@ -15,20 +15,25 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 
 @UseCaseBinding
-fun bindIdentity(dynamic: Any?,): OnChainIdentity? {
+fun bindIdentity(dynamic: Any?): OnChainIdentity? {
     if (dynamic == null) return null
 
     val decoded = dynamic.castToStruct()
 
-    val identityInfo = decoded.get<Struct.Instance>("info") ?: incompatible()
+    val identityInfo = decoded.get<Struct.Instance>("registration")
+        ?.get<Struct.Instance>("info")
+        ?: decoded.get<Struct.Instance>("info") ?: incompatible()
 
     val pgpFingerprint = identityInfo.get<ByteArray?>("pgpFingerprint")
+
+    val matrix = bindIdentityData(identityInfo, "riot", onIncompatibleField = null)
+        ?: bindIdentityData(identityInfo, "matrix", onIncompatibleField = null)
 
     return RootIdentity(
         display = bindIdentityData(identityInfo, "display"),
         legal = bindIdentityData(identityInfo, "legal"),
         web = bindIdentityData(identityInfo, "web"),
-        riot = bindIdentityData(identityInfo, "riot"),
+        matrix = matrix,
         email = bindIdentityData(identityInfo, "email"),
         pgpFingerprint = pgpFingerprint?.toHexString(withPrefix = true),
         image = bindIdentityData(identityInfo, "image"),
@@ -51,8 +56,14 @@ fun bindSuperOf(decoded: Any?): SuperOf? {
 }
 
 @HelperBinding
-fun bindIdentityData(identityInfo: Struct.Instance, field: String): String? {
-    val value = identityInfo.get<Any?>(field) ?: incompatible()
+fun bindIdentityData(
+    identityInfo: Struct.Instance,
+    field: String,
+    onIncompatibleField: (() -> Unit)? = { incompatible() }
+): String? {
+    val value = identityInfo.get<Any?>(field)
+        ?: onIncompatibleField?.invoke()
+        ?: return null
 
     return bindData(value).asString()
 }
