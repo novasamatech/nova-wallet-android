@@ -163,7 +163,18 @@ interface MetaAccountDao {
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
     suspend fun updateName(metaId: Long, newName: String)
 
-    @Query("DELETE FROM meta_accounts WHERE id = :metaId OR parentMetaId = :metaId")
+    @Query(
+        """
+        WITH RECURSIVE accounts_to_delete AS (
+            SELECT id, parentMetaId FROM meta_accounts WHERE id = :metaId
+            UNION ALL
+            SELECT m.id, m.parentMetaId
+            FROM meta_accounts m
+            JOIN accounts_to_delete r ON m.parentMetaId = r.id
+        )
+        DELETE FROM meta_accounts WHERE id IN (SELECT id FROM accounts_to_delete)
+    """
+    )
     suspend fun delete(metaId: Long)
 
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")

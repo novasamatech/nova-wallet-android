@@ -10,10 +10,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.proxy
-import io.novafoundation.nova.feature_proxy_api.data.model.ProxiedWithProxy
+import io.novafoundation.nova.feature_proxy_api.data.common.NestedProxiesGraphConstructor
+import io.novafoundation.nova.feature_proxy_api.data.model.ProxyPermission
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_api.domain.model.fromString
+import io.novafoundation.nova.feature_proxy_impl.data.common.RealNestedProxiesGraphConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -43,19 +45,23 @@ class RealGetProxyRepository(
     private val chainRegistry: ChainRegistry,
 ) : GetProxyRepository {
 
-    override suspend fun getAllProxiesForAccounts(chainId: ChainId, accountIds: Set<AccountIdKey>): List<ProxiedWithProxy> {
+    override suspend fun findAllProxiedsForAccounts(chainId: ChainId, accountIds: Set<AccountIdKey>): List<NestedProxiesGraphConstructor.Node> {
         val delegatorToProxies = receiveAllProxiesInChain(chainId)
+        val proxyPermissions = delegatorToProxies
+            .flatMap { (delegator, proxied) ->
+                val notDelayedProxies = proxied.proxies.filter { it.delay == BigInteger.ZERO }
 
-        return delegatorToProxies.mapNotNull { (delegator, proxied) ->
-            val notDelayedProxies = proxied.proxies.filter { it.delay == BigInteger.ZERO }
-            val matchedProxies = matchProxiesToAccountsAndMap(notDelayedProxies, accountIds)
+                notDelayedProxies.map { proxy ->
+                    ProxyPermission(
+                        proxiedAccountId = delegator,
+                        proxyAccountId = proxy.accountId,
+                        proxyType = ProxyType.fromString(proxy.proxyType)
+                    )
+                }
+            }
 
-            if (matchedProxies.isEmpty()) return@mapNotNull null
-
-            delegator to matchedProxies
-        }.flatMap { (delegator, proxies) ->
-            proxies.map { proxy -> mapToProxiedWithProxies(chainId, delegator, proxy) }
-        }
+        return RealNestedProxiesGraphConstructor(accountIds, proxyPermissions)
+            .build()
     }
 
     override suspend fun getDelegatedProxyTypesRemote(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyType> {
@@ -85,7 +91,7 @@ class RealGetProxyRepository(
         return constantQuery.numberConstant("MaxProxies", runtime).toInt()
     }
 
-    override fun proxiesByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<List<ProxiedWithProxy.Proxy>> {
+    override fun proxiesByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<List<ProxyPermission>> {
         return localSource.subscribe(chain.id) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
@@ -93,9 +99,10 @@ class RealGetProxyRepository(
                     accountId,
                     binding = { bindProxyAccounts(it) }
                 )
-        }.map {
-            it.proxies.filter { it.proxyType == proxyType.name }
-                .map { ProxiedWithProxy.Proxy(it.accountId.value, it.proxyType) }
+        }.map { proxied ->
+            proxied.proxies
+                .filter { it.proxyType == proxyType.name }
+                .map { ProxyPermission(accountId.intoKey(), it.accountId, ProxyType.fromString(it.proxyType)) }
         }
     }
 
@@ -162,33 +169,5 @@ class RealGetProxyRepository(
             },
             deposit = root[1].cast()
         )
-    }
-
-    private fun mapToProxiedWithProxies(
-        chainId: ChainId,
-        delegator: AccountIdKey,
-        proxy: ProxiedWithProxy.Proxy
-    ): ProxiedWithProxy {
-        return ProxiedWithProxy(
-            proxied = ProxiedWithProxy.Proxied(
-                accountId = delegator.value,
-                chainId = chainId
-            ),
-            proxy = proxy
-        )
-    }
-
-    private fun matchProxiesToAccountsAndMap(
-        proxies: List<OnChainProxyModel>,
-        accountIdToMetaAccounts: Set<AccountIdKey>
-    ): List<ProxiedWithProxy.Proxy> {
-        return proxies.filter {
-            accountIdToMetaAccounts.contains(it.accountId)
-        }.map { onChainProxy ->
-            ProxiedWithProxy.Proxy(
-                accountId = onChainProxy.accountId.value,
-                proxyType = onChainProxy.proxyType
-            )
-        }
     }
 }

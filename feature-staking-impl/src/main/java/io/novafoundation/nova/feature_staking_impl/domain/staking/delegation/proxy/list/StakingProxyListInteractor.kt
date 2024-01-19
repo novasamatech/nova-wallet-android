@@ -31,8 +31,8 @@ class StakingProxyListInteractor(
             proxies.map { proxy ->
                 val proxyAccountId = proxy.accountId
                 StakingProxyAccount(
-                    accountIdToMetaAccount[proxyAccountId.intoKey()],
-                    proxyAccountId
+                    accountIdToMetaAccount[proxyAccountId],
+                    proxyAccountId.value
                 )
             }
         }
