@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindData
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStructOrNull
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
@@ -18,11 +19,9 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 fun bindIdentity(dynamic: Any?): OnChainIdentity? {
     if (dynamic == null) return null
 
-    val decoded = dynamic.castToStruct()
+    val decoded = dynamic.castIdentityLegacy() ?: dynamic.castToIdentity()
 
-    val identityInfo = decoded.get<Struct.Instance>("registration")
-        ?.get<Struct.Instance>("info")
-        ?: decoded.get<Struct.Instance>("info") ?: incompatible()
+    val identityInfo = decoded.get<Struct.Instance>("info") ?: incompatible()
 
     val pgpFingerprint = identityInfo.get<ByteArray?>("pgpFingerprint")
 
@@ -39,6 +38,16 @@ fun bindIdentity(dynamic: Any?): OnChainIdentity? {
         image = bindIdentityData(identityInfo, "image"),
         twitter = bindIdentityData(identityInfo, "twitter")
     )
+}
+
+private fun Any?.castIdentityLegacy(): Struct.Instance? {
+    return this.castToStructOrNull()
+}
+
+private fun Any?.castToIdentity(): Struct.Instance {
+    return this.castToList()
+        .first()
+        .castToStruct()
 }
 
 @UseCaseBinding
