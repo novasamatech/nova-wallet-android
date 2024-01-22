@@ -145,9 +145,10 @@ class ConfirmRemoveStakingProxyViewModel(
 
         validationProgressFlow.value = false
 
-        if (result.isSuccess) {
+        result.onSuccess {
             router.returnToStakingMain()
         }
+            .onFailure(::showError)
     }
 
     private suspend fun generateAccountAddressModel(chain: Chain, address: String) = addressIconGenerator.createAccountAddressModel(
