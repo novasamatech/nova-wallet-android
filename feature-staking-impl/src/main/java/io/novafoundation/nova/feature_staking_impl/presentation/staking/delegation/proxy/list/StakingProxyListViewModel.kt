@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.RealStakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.StakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.model.StakingProxyAccount
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
