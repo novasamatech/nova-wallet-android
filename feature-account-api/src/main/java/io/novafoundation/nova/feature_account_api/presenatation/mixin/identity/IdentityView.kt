@@ -29,7 +29,7 @@ class IdentityView @JvmOverloads constructor(
         viewIdentityLegalName.showValueOrHide(legal)
         viewIdentityEmail.showValueOrHide(email)
         viewIdentityTwitter.showValueOrHide(twitter)
-        viewIdentityElementName.showValueOrHide(riot)
+        viewIdentityElementName.showValueOrHide(matrix)
         viewIdentityWeb.showValueOrHide(web)
     }
 

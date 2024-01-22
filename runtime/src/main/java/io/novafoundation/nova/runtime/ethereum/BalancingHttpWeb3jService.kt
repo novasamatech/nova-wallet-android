@@ -275,8 +275,7 @@ private class NodeSwitcher(
         balanceStrategy = strategy
 
         nodeIterator = balanceStrategy.generateNodeIterator(saturatedNodes)
-
-        // we do not update currentNode since we want to be lazy here - only update node if it is failing
+        selectNextNode()
     }
 
     @Synchronized
@@ -286,6 +285,10 @@ private class NodeSwitcher(
 
     @Suppress
     fun markCurrentNodeNotAccessible() {
+        selectNextNode()
+    }
+
+    private fun selectNextNode() {
         currentNodeUrl = nodeIterator?.next()?.saturatedUrl
     }
 }

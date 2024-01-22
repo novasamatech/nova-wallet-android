@@ -142,8 +142,9 @@ class AccountDataSourceImpl(
         return metaAccountDao.metaAccountNameFor(accountId, chainId)
     }
 
-    override suspend fun allMetaAccounts(): List<MetaAccount> {
-        return metaAccountDao.getJoinedMetaAccountsInfo().map(::mapMetaAccountLocalToMetaAccount)
+    override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
+        return metaAccountDao.getMetaAccountsInfoByStatus(MetaAccountLocal.Status.ACTIVE)
+            .map(::mapMetaAccountLocalToMetaAccount)
     }
 
     override suspend fun activeMetaAccounts(): List<MetaAccount> {
@@ -273,8 +274,8 @@ class AccountDataSourceImpl(
         secretStoreV2.putChainAccountSecrets(metaId, accountId, secrets)
     }
 
-    override suspend fun hasMetaAccounts(): Boolean {
-        return metaAccountDao.hasMetaAccounts()
+    override suspend fun hasActiveMetaAccounts(): Boolean {
+        return metaAccountDao.hasMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
     }
 
     override fun removeDeactivatedMetaAccounts() {
