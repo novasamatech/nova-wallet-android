@@ -77,10 +77,11 @@ fun ManageStakeAction.Companion.addStakingProxy(resourceManager: ResourceManager
     )
 }
 
-fun ManageStakeAction.Companion.stakingProxies(resourceManager: ResourceManager): ManageStakeAction {
+fun ManageStakeAction.Companion.stakingProxies(resourceManager: ResourceManager, delegations: String): ManageStakeAction {
     return ManageStakeAction(
         id = SYSTEM_MANAGE_PROXIES,
         label = resourceManager.getString(R.string.staking_action_your_proxies),
-        iconRes = R.drawable.ic_people_outline
+        iconRes = R.drawable.ic_delegate_outline,
+        badge = delegations
     )
 }

@@ -4,6 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -30,13 +34,16 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.controller
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.payouts
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.rewardDestination
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.stakingProxies
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.validators
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class RelaychainStakeActionsComponentFactory(
@@ -44,6 +51,8 @@ class RelaychainStakeActionsComponentFactory(
     private val resourceManager: ResourceManager,
     private val stakeActionsValidations: Map<String, StakeActionsValidationSystem>,
     private val router: StakingRouter,
+    private val accountRepository: AccountRepository,
+    private val getProxyRepository: GetProxyRepository
 ) {
 
     fun create(
@@ -55,7 +64,9 @@ class RelaychainStakeActionsComponentFactory(
         router = router,
         stakeActionsValidations = stakeActionsValidations,
         stakingOption = stakingOption,
-        hostContext = hostContext
+        hostContext = hostContext,
+        accountRepository = accountRepository,
+        getProxyRepository = getProxyRepository
     )
 }
 
@@ -64,23 +75,35 @@ private class RelaychainStakeActionsComponent(
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
     private val stakeActionsValidations: Map<String, StakeActionsValidationSystem>,
-
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
+    private val accountRepository: AccountRepository,
+    private val getProxyRepository: GetProxyRepository
 ) : StakeActionsComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
     override val events = MutableLiveData<Event<StakeActionsEvent>>()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val stakingProxiesQuantity = accountRepository.selectedMetaAccountFlow()
+        .flatMapLatest { metaAccount ->
+            val chain = stakingOption.assetWithChain.chain
+            val accountId = metaAccount.requireAccountIdIn(chain)
+            getProxyRepository.proxiesQuantityByTypeFlow(chain, accountId, ProxyType.Staking)
+        }
+
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
         assetWithChain = stakingOption.assetWithChain,
         scope = hostContext.scope
     )
 
-    override val state = selectedAccountStakingStateFlow.transformLatest { stakingState ->
+    override val state = combineTransform(
+        selectedAccountStakingStateFlow,
+        stakingProxiesQuantity
+    ) { stakingState, proxiesQuantity ->
         if (stakingState is StakingState.Stash) {
-            emit(StakeActionsState(availableActionsFor(stakingState)))
+            emit(StakeActionsState(availableActionsFor(stakingState, proxiesQuantity)))
         } else {
             emit(null)
         }
@@ -125,27 +148,35 @@ private class RelaychainStakeActionsComponent(
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentValidators()
             SYSTEM_MANAGE_REWARD_DESTINATION -> router.openChangeRewardDestination()
             SYSTEM_ADD_PROXY -> router.openAddStakingProxy()
-            SYSTEM_MANAGE_PROXIES -> TODO()
+            SYSTEM_MANAGE_PROXIES -> router.openStakingProxyList()
         }
     }
 
-    private fun availableActionsFor(stakingState: StakingState.Stash): List<ManageStakeAction> = buildList {
-        add(ManageStakeAction.Companion::bondMore)
-        add(ManageStakeAction.Companion::unbond)
-        add(ManageStakeAction.Companion::rewardDestination)
+    private fun availableActionsFor(stakingState: StakingState.Stash, proxiesQuantity: Int): List<ManageStakeAction> = buildList {
+        add(ManageStakeAction.bondMore(resourceManager))
+        add(ManageStakeAction.unbond(resourceManager))
+        add(ManageStakeAction.rewardDestination(resourceManager))
 
         if (stakingState !is StakingState.Stash.None) {
-            add(ManageStakeAction.Companion::payouts)
+            add(ManageStakeAction.payouts(resourceManager))
         }
 
         if (stakingState !is StakingState.Stash.Validator) {
-            add(ManageStakeAction.Companion::validators)
+            add(ManageStakeAction.validators(resourceManager))
         }
-
-        add(ManageStakeAction.Companion::controller)
 
         if (stakingOption.chain.supportProxy) {
-            add(ManageStakeAction.Companion::addStakingProxy) // TODO: handle case when proxy is already set
+            add(proxiesAction(proxiesQuantity))
         }
-    }.map { it.invoke(resourceManager) }
+
+        add(ManageStakeAction.controller(resourceManager))
+    }
+
+    private fun proxiesAction(proxiesQuantity: Int): ManageStakeAction {
+        return if (proxiesQuantity == 0) {
+            ManageStakeAction.addStakingProxy(resourceManager)
+        } else {
+            ManageStakeAction.stakingProxies(resourceManager, proxiesQuantity.toString())
+        }
+    }
 }

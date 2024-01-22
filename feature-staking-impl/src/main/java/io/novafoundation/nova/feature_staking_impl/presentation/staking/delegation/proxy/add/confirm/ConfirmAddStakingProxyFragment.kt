@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.confirm
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm
 
 import android.os.Bundle
 import android.view.LayoutInflater

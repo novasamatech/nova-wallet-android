@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.di
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.set.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.pro
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.AddStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.set.AddStakingProxyViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.set.AddStakingProxyViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState

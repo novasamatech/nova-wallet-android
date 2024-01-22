@@ -7,6 +7,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.flow.Flow
 
 interface GetProxyRepository {
 
@@ -19,4 +20,8 @@ interface GetProxyRepository {
     suspend fun getProxyDeposit(chainId: ChainId, proxiedAccountId: AccountId): BigInteger
 
     suspend fun maxProxiesQuantity(chain: Chain): Int
+
+    fun proxiesByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<List<ProxiedWithProxy.Proxy>>
+
+    fun proxiesQuantityByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<Int>
 }
