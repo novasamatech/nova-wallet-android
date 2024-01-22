@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list
+package io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.navigation.InterScreenRequester
@@ -17,7 +17,7 @@ interface SelectAddressRequester : InterScreenRequester<SelectAddressRequester.R
 
         sealed interface Filter : Parcelable {
             @Parcelize
-            object Empty : Filter
+            object Everything : Filter
 
             @Parcelize
             class ExcludeMetaIds(val metaIds: List<Long>) : Filter
