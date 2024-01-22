@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
@@ -178,4 +179,6 @@ interface StakingFeatureDependencies {
     val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
 
     val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
 }

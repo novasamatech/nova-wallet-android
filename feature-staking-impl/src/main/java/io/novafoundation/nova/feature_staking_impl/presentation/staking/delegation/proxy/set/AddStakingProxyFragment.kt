@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isInvisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -14,11 +13,13 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupExternalAccounts
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.setupYourWalletsBtn
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addProxyToolbar
 import kotlinx.android.synthetic.main.fragment_add_staking_proxy.setStakingProxyAddress
 import kotlinx.android.synthetic.main.fragment_add_staking_proxy.addStakingProxyButton
 import kotlinx.android.synthetic.main.fragment_add_staking_proxy.setStakingProxyContainer
@@ -39,6 +40,7 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
 
     override fun initViews() {
         setStakingProxyContainer.applyStatusBarInsets()
+        addProxyToolbar.setHomeButtonListener { viewModel.backClicked() }
         addStakingProxyButton.prepareForProgress(this)
 
         addStakingProxySelectWallet.setOnClickListener { viewModel.selectAuthorityWallet() }
@@ -63,13 +65,10 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
 
         setupAddressInput(viewModel.addressInputMixin, setStakingProxyAddress)
         setupExternalAccounts(viewModel.addressInputMixin, setStakingProxyAddress)
+        setupYourWalletsBtn(addStakingProxySelectWallet, viewModel.selectAddressMixin)
 
         viewModel.titleFlow.observe {
             addStakingProxyTitle.text = it
-        }
-
-        viewModel.isSelectAddressAvailable.observe {
-            addStakingProxySelectWallet.isInvisible = !it
         }
 
         viewModel.proxyDepositModel.observe {
