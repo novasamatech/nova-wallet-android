@@ -90,8 +90,8 @@ fun AddStakingProxyValidationSystemBuilder.stakingTypeIsNotDuplication(
 ) = proxyIsNotDuplicationForAccount(
     chain = { it.chain },
     proxiedAccountId = { it.proxiedAccountId },
-    proxyAccountId = { it.chain.accountIdOf(it.address) },
+    proxyAccountId = { it.chain.accountIdOf(it.proxyAddress) },
     proxyType = { ProxyType.Staking },
-    error = { payload -> AddStakingProxyValidationFailure.AlreadyDelegated(payload.address) },
+    error = { payload -> AddStakingProxyValidationFailure.AlreadyDelegated(payload.proxyAddress) },
     proxyRepository = proxyRepository
 )
