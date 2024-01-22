@@ -4,6 +4,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class StakingProxyAccount(
-    val metaAccount: MetaAccount?,
+    val accountName: String,
     val proxyAccountId: AccountId
 )

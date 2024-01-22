@@ -25,6 +25,8 @@ import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -113,6 +115,9 @@ interface StakingFeatureDependencies {
 
     @Named(LOCAL_STORAGE_SOURCE)
     fun localStorageSource(): StorageDataSource
+
+    @LocalIdentity
+    fun localIdentity(): IdentityProvider
 
     fun chainRegistry(): ChainRegistry
 
