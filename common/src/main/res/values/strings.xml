@@ -47,7 +47,6 @@
 
     <string name="proxy_signing_none_permissions_message">%1$s has not delegated %2$s</string>
 
-    <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn\'t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
     <string name="error_not_enough_to_pay_fee_title">Not enough tokens to pay the fee</string>
 
     <string name="proxied_wallet_details_info_warning">This account granted access to perform transactions to the following account:</string>

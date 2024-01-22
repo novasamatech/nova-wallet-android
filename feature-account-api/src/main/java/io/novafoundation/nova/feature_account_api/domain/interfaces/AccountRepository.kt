@@ -4,6 +4,7 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
@@ -42,8 +43,6 @@ interface AccountRepository {
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
     suspend fun activeMetaAccounts(): List<MetaAccount>
-
-    suspend fun hasMetaAccounts(): Boolean
 
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
