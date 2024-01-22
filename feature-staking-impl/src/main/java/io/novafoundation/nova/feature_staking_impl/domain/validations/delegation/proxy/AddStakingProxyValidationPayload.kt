@@ -10,7 +10,7 @@ class AddStakingProxyValidationPayload(
     val chain: Chain,
     val asset: Asset,
     val proxiedAccountId: AccountId,
-    val address: String,
+    val proxyAddress: String,
     val fee: DecimalFee,
     val depositWithQuantity: ProxyDepositWithQuantity
 )

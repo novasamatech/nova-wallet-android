@@ -20,7 +20,7 @@ typealias AddStakingProxyValidationSystem = ValidationSystem<AddStakingProxyVali
 typealias AddStakingProxyValidationSystemBuilder = ValidationSystemBuilder<AddStakingProxyValidationPayload, AddStakingProxyValidationFailure>
 
 fun AddStakingProxyValidationSystemBuilder.validAddress() = validAddress(
-    address = { it.address },
+    address = { it.proxyAddress },
     chain = { it.chain },
     error = { AddStakingProxyValidationFailure.InvalidAddress(it.chain) }
 )
@@ -90,8 +90,8 @@ fun AddStakingProxyValidationSystemBuilder.stakingTypeIsNotDuplication(
 ) = proxyIsNotDuplicationForAccount(
     chain = { it.chain },
     proxiedAccountId = { it.proxiedAccountId },
-    proxyAccountId = { it.chain.accountIdOf(it.address) },
+    proxyAccountId = { it.chain.accountIdOf(it.proxyAddress) },
     proxyType = { ProxyType.Staking },
-    error = { payload -> AddStakingProxyValidationFailure.AlreadyDelegated(payload.address) },
+    error = { payload -> AddStakingProxyValidationFailure.AlreadyDelegated(payload.proxyAddress) },
     proxyRepository = proxyRepository
 )

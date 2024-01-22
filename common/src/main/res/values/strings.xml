@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="proxy_access_type_staking_operations">Staking operations</string>
+
+    <string name="add_proxy_confirmation_delegating_wallet">Delegating wallet</string>
+    <string name="add_proxy_confirmation_delegating_account">Delegating account</string>
+    <string name="add_proxy_confirmation_grant_access_type">Grant access type</string>
+    <string name="add_proxy_confirmation_delegate_to">Delegate to</string>
+
+    <string name="staking_add_proxy_confirmation_title">Add delegation</string>
+
     <string name="duplicate_proxy_type_title">Delegation already exists</string>
     <string name="duplicate_proxy_type_message">You are already delegating to this account: %s</string>
 
