@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.collators.FixedKnownNovaCollators
+import io.novafoundation.nova.feature_staking_impl.data.collators.KnownNovaCollators
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RealRoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
@@ -145,10 +147,15 @@ class ParachainStakingModule {
 
     @Provides
     @FeatureScope
+    fun provideKnownNovaCollators(): KnownNovaCollators = FixedKnownNovaCollators()
+
+    @Provides
+    @FeatureScope
     fun provideCollatorRecommendatorFactory(
         collatorProvider: CollatorProvider,
-        computationalCache: ComputationalCache
-    ) = CollatorRecommendatorFactory(collatorProvider, computationalCache)
+        computationalCache: ComputationalCache,
+        knownNovaCollators: KnownNovaCollators
+    ) = CollatorRecommendatorFactory(collatorProvider, computationalCache, knownNovaCollators)
 
     @Provides
     @FeatureScope
