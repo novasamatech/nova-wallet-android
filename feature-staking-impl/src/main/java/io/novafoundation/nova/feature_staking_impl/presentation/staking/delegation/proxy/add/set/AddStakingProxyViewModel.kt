@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddr
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
-import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.launchProxyDepositDescription
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapAddStakingProxyValidationFailureToUi
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyPayload
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
@@ -69,7 +70,8 @@ class AddStakingProxyViewModel(
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val stakingRouter: StakingRouter,
-    private val selectAddressMixinFactory: SelectAddressMixin.Factory
+    private val selectAddressMixinFactory: SelectAddressMixin.Factory,
+    private val getProxyRepository: GetProxyRepository
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExternalActions by externalActions,
@@ -124,16 +126,16 @@ class AddStakingProxyViewModel(
     }
         .shareInBackground()
 
-    private val proxyDeposit: Flow<ProxyDepositWithQuantity> = flowOf {
+    private val proxyDepositDelta: Flow<Balance> = flowOf {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = selectedAssetState.chain()
         val accountId = metaAccount.requireAccountIdIn(chain)
-        addStakingProxyInteractor.calculateDepositForAddProxy(chain, accountId)
+        addStakingProxyInteractor.calculateDeltaDepositForAddProxy(chain, accountId)
     }
         .shareInBackground()
 
-    val proxyDepositModel: Flow<AmountModel> = combine(proxyDeposit, selectedAssetFlow) { depositwithQuantity, asset ->
-        mapAmountToAmountModel(depositwithQuantity.deposit, asset)
+    val proxyDepositModel: Flow<AmountModel> = combine(proxyDepositDelta, selectedAssetFlow) { depositDelta, asset ->
+        mapAmountToAmountModel(depositDelta, asset)
     }
         .shareInBackground()
 
@@ -176,13 +178,15 @@ class AddStakingProxyViewModel(
     fun onConfirmClick() = launch {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = selectedAssetState.chain()
+        val proxiedAccountId = metaAccount.requireAccountIdIn(chain)
         val validationPayload = AddStakingProxyValidationPayload(
             chain = chain,
             asset = selectedAssetFlow.first(),
             proxyAddress = addressInputMixin.inputFlow.value,
             proxiedAccountId = metaAccount.requireAccountIdIn(chain),
             fee = feeMixin.awaitDecimalFee(),
-            depositWithQuantity = proxyDeposit.first()
+            deltaDeposit = proxyDepositDelta.first(),
+            currentQuantity = getProxyRepository.getProxiesQuantity(chain.id, proxiedAccountId)
         )
 
         validationExecutor.requireValid(
@@ -200,8 +204,8 @@ class AddStakingProxyViewModel(
             ConfirmAddStakingProxyPayload(
                 fee = mapFeeToParcel(validationPayload.fee),
                 proxyAddress = proxyAddress,
-                newProxyDeposit = depositWithQuantity.deposit,
-                newProxyQuantity = depositWithQuantity.quantity
+                deltaDeposit = deltaDeposit,
+                currentQuantity = currentQuantity
             )
         }
         stakingRouter.openConfirmAddStakingProxy(screenPayload)

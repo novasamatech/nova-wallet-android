@@ -98,6 +98,7 @@ data class Asset(
     val transferable = token.amountFromPlanks(transferableInPlanks)
 
     val free = token.amountFromPlanks(freeInPlanks)
+    val frozen = token.amountFromPlanks(frozenInPlanks)
 
     // TODO move to runtime storage
     val bonded = token.amountFromPlanks(bondedInPlanks)

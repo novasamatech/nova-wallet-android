@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
@@ -618,12 +619,14 @@ class StakingFeatureModule {
     fun provideAddProxyRepository(
         extrinsicService: ExtrinsicService,
         proxyDepositCalculator: ProxyDepositCalculator,
-        getProxyRepository: GetProxyRepository
+        getProxyRepository: GetProxyRepository,
+        proxyConstantsRepository: ProxyConstantsRepository
     ): AddStakingProxyInteractor {
         return RealAddStakingProxyInteractor(
             extrinsicService,
             proxyDepositCalculator,
-            getProxyRepository
+            getProxyRepository,
+            proxyConstantsRepository
         )
     }
 

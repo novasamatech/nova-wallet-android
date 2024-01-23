@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddr
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationSystem
@@ -48,7 +49,8 @@ class AddStakingProxyModule {
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         stakingRouter: StakingRouter,
-        selectAddressMixinFactory: SelectAddressMixin.Factory
+        selectAddressMixinFactory: SelectAddressMixin.Factory,
+        getProxyRepository: GetProxyRepository
     ): ViewModel {
         return AddStakingProxyViewModel(
             addressInputMixinFactory = addressInputMixinFactory,
@@ -65,7 +67,8 @@ class AddStakingProxyModule {
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             stakingRouter = stakingRouter,
-            selectAddressMixinFactory = selectAddressMixinFactory
+            selectAddressMixinFactory = selectAddressMixinFactory,
+            getProxyRepository = getProxyRepository
         )
     }
 

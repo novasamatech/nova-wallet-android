@@ -33,7 +33,7 @@ fun RemoveStakingProxyValidationSystemBuilder.sufficientBalanceToPayFee() {
         error = { context ->
             RemoveStakingProxyValidationFailure.NotEnoughToPayFee(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }

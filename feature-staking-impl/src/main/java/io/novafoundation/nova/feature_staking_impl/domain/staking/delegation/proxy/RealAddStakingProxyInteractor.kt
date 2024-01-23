@@ -7,8 +7,9 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_proxy_api.data.calls.addProxyCall
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
-import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
+import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -18,7 +19,8 @@ import kotlinx.coroutines.withContext
 class RealAddStakingProxyInteractor(
     private val extrinsicService: ExtrinsicService,
     private val proxyDepositCalculator: ProxyDepositCalculator,
-    private val getProxyRepository: GetProxyRepository
+    private val getProxyRepository: GetProxyRepository,
+    private val proxyConstantsRepository: ProxyConstantsRepository
 ) : AddStakingProxyInteractor {
 
     override suspend fun estimateFee(chain: Chain, proxiedAccountId: AccountId): Fee {
@@ -37,11 +39,11 @@ class RealAddStakingProxyInteractor(
         }
     }
 
-    override suspend fun calculateDepositForAddProxy(chain: Chain, accountId: AccountId): ProxyDepositWithQuantity {
-        val depositConstants = proxyDepositCalculator.getDepositConstants(chain)
+    override suspend fun calculateDeltaDepositForAddProxy(chain: Chain, accountId: AccountId): Balance {
+        val depositConstants = proxyConstantsRepository.getDepositConstants(chain.id)
         val currentProxiesCount = getProxyRepository.getProxiesQuantity(chain.id, accountId)
-        val newQuantity = currentProxiesCount + 1
-        val deposit = proxyDepositCalculator.calculateProxyDepositForQuantity(depositConstants, newQuantity)
-        return ProxyDepositWithQuantity(deposit, newQuantity)
+        val oldDeposit = proxyDepositCalculator.calculateProxyDepositForQuantity(depositConstants, currentProxiesCount)
+        val newDeposit = proxyDepositCalculator.calculateProxyDepositForQuantity(depositConstants, currentProxiesCount + 1)
+        return newDeposit - oldDeposit
     }
 }

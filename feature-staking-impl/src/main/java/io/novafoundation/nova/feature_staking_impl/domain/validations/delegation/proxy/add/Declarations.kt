@@ -4,10 +4,11 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
-import io.novafoundation.nova.feature_proxy_api.domain.validators.enoughBalanceToPayProxyDeposit
 import io.novafoundation.nova.feature_proxy_api.domain.validators.maximumProxiesNotReached
 import io.novafoundation.nova.feature_proxy_api.domain.validators.proxyIsNotDuplicationForAccount
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
@@ -46,7 +47,7 @@ fun AddStakingProxyValidationSystemBuilder.sufficientBalanceToPayFee() =
         error = { context ->
             AddStakingProxyValidationFailure.NotEnoughToPayFee(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }
@@ -57,7 +58,7 @@ fun AddStakingProxyValidationSystemBuilder.maximumProxies(
 ) = maximumProxiesNotReached(
     chain = { it.chain },
     accountId = { it.proxiedAccountId },
-    newProxiedQuantity = { it.depositWithQuantity.quantity },
+    newProxiedQuantity = { it.currentQuantity + 1 },
     error = { payload, max ->
         AddStakingProxyValidationFailure.MaximumProxiesReached(
             chain = payload.chain,
@@ -67,22 +68,18 @@ fun AddStakingProxyValidationSystemBuilder.maximumProxies(
     proxyRepository = proxyRepository
 )
 
-fun AddStakingProxyValidationSystemBuilder.enoughBalanceToPayDeposit(
-    proxyRepository: GetProxyRepository
-) = enoughBalanceToPayProxyDeposit(
-    chain = { it.chain },
-    accountId = { it.proxiedAccountId },
-    newDeposit = { it.depositWithQuantity.deposit },
-    availableBalance = { it.asset.freeInPlanks - it.asset.frozenInPlanks },
-    error = { payload, maxUsable ->
+fun AddStakingProxyValidationSystemBuilder.enoughBalanceToPayDepositAndFee() = sufficientBalance(
+    fee = { it.fee },
+    amount = { it.asset.token.configuration.amountFromPlanks(it.deltaDeposit) },
+    available = { it.asset.free - it.asset.frozen },
+    error = {
+        val chainAsset = it.payload.asset.token.configuration
         AddStakingProxyValidationFailure.NotEnoughBalanceToReserveDeposit(
-            chainAsset = payload.asset.token.configuration,
-            availableBalance = maxUsable,
-            deposit = payload.depositWithQuantity.deposit
+            chainAsset = chainAsset,
+            availableBalance = chainAsset.planksFromAmount(it.maxUsable),
+            deposit = it.payload.deltaDeposit
         )
-    },
-    proxyRepository = proxyRepository,
-    feeReceiver = { it.fee.networkFee.amount }
+    }
 )
 
 fun AddStakingProxyValidationSystemBuilder.stakingTypeIsNotDuplication(
