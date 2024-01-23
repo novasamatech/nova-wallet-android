@@ -147,7 +147,7 @@ class RealWalletConnectSessionInteractor(
             walletConnectPairingRepository.allPairingAccountsFlow()
         ) { activeSessions, pairingAccounts ->
             val metaAccounts = if (metaId == null) {
-                accountRepository.allMetaAccounts()
+                accountRepository.getActiveMetaAccounts()
             } else {
                 listOf(accountRepository.getMetaAccount(metaId))
             }

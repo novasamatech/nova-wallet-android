@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
@@ -119,6 +120,8 @@ class RootViewModel(
 
     private fun syncProxies() {
         interactor.syncProxies()
+            .inBackground()
+            .launchIn(rootScope)
     }
 
     private fun handleUpdatesSideEffect(sideEffect: Updater.SideEffect) {

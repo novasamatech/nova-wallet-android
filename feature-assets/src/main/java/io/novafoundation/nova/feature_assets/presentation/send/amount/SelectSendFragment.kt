@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -16,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.removeInputKeyboardCallback
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupExternalAccounts
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.setupYourWalletsBtn
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -91,6 +91,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         setupAmountChooser(viewModel.amountChooserMixin, selectSendAmount)
         setupAddressInput(viewModel.addressInputMixin, selectSendRecipient)
         setupExternalAccounts(viewModel.addressInputMixin, selectSendRecipient)
+        setupYourWalletsBtn(selectWallet, viewModel.selectAddressMixin)
 
         viewModel.chooseDestinationChain.awaitableActionLiveData.observeEvent {
             removeInputKeyboardCallback(selectSendRecipient)
@@ -102,10 +103,6 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
             )
             crossChainDestinationBottomSheet.setOnDismissListener { addInputKeyboardCallback(viewModel.addressInputMixin, selectSendRecipient) }
             crossChainDestinationBottomSheet.show()
-        }
-
-        viewModel.isSelectAddressAvailable.observe {
-            selectWallet.isInvisible = !it
         }
 
         viewModel.transferDirectionModel.observe {

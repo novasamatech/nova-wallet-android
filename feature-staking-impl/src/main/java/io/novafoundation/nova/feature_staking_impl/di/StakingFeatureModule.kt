@@ -16,6 +16,8 @@ import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -23,7 +25,7 @@ import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculat
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -33,7 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQuer
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
-import io.novafoundation.nova.feature_staking_impl.data.proxy.RealAddStakingProxyRepository
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
@@ -79,6 +81,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.RealStakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.StakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RealRemoveStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RemoveStakingProxyInteractor
@@ -616,8 +619,8 @@ class StakingFeatureModule {
         extrinsicService: ExtrinsicService,
         proxyDepositCalculator: ProxyDepositCalculator,
         getProxyRepository: GetProxyRepository
-    ): AddStakingProxyRepository {
-        return RealAddStakingProxyRepository(
+    ): AddStakingProxyInteractor {
+        return RealAddStakingProxyInteractor(
             extrinsicService,
             proxyDepositCalculator,
             getProxyRepository
@@ -627,11 +630,11 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideStakingProxyListInteractor(
-        accountRepository: AccountRepository,
-        getProxyRepository: GetProxyRepository
-    ) = StakingProxyListInteractor(
-        accountRepository,
-        getProxyRepository
+        getProxyRepository: GetProxyRepository,
+        @LocalIdentity identityProvider: IdentityProvider
+    ): StakingProxyListInteractor = RealStakingProxyListInteractor(
+        getProxyRepository,
+        identityProvider
     )
 
     @Provides

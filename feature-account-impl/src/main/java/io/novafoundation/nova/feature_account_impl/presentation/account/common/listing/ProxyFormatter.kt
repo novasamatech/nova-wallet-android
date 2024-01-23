@@ -52,7 +52,7 @@ class ProxyFormatter(
             ProxyType.CancelProxy -> resourceManager.getString(R.string.account_proxy_type_cancel_proxy)
             ProxyType.Auction -> resourceManager.getString(R.string.account_proxy_type_auction)
             ProxyType.NominationPools -> resourceManager.getString(R.string.account_proxy_type_nomination_pools)
-            is ProxyType.Other -> type.name.splitCamelCase().joinToString { it.capitalize() }
+            is ProxyType.Other -> type.name.splitCamelCase().joinToString(separator = " ") { it.capitalize() }
         }
 
         return resourceManager.getString(R.string.proxy_wallet_type, proxyType)

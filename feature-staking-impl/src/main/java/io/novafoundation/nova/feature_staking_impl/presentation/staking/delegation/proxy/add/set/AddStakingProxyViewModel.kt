@@ -9,15 +9,17 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressRequester
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
-import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationPayload
@@ -27,7 +29,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapAddStakingProxyValidationFailureToUi
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyPayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.filter.MetaAccountFilter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
@@ -62,13 +63,13 @@ class AddStakingProxyViewModel(
     private val accountRepository: AccountRepository,
     private val assetUseCase: ArbitraryAssetUseCase,
     private val resourceManager: ResourceManager,
-    private val selectAddressRequester: SelectAddressRequester,
-    private val addStakingProxyRepository: AddStakingProxyRepository,
+    private val addStakingProxyInteractor: AddStakingProxyInteractor,
     private val validationExecutor: ValidationExecutor,
     private val addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-    private val stakingRouter: StakingRouter
+    private val stakingRouter: StakingRouter,
+    private val selectAddressMixinFactory: SelectAddressMixin.Factory
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExternalActions by externalActions,
@@ -83,6 +84,15 @@ class AddStakingProxyViewModel(
     private val selectedAssetFlow = selectedAssetState.selectedAssetFlow()
         .flatMapLatest { assetUseCase.assetFlow(it) }
         .shareInBackground()
+
+    private val selectAddressPayloadFlow = flowOf {
+        val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = selectedAssetState.chain()
+        val filter = metaAccountsFilter(chain, selectedMetaAccount.requireAccountIdIn(chain))
+        SelectAddressMixin.Payload(chain, filter)
+    }
+
+    val selectAddressMixin = selectAddressMixinFactory.create(this, selectAddressPayloadFlow, ::onAddressSelect)
 
     val titleFlow = selectedAssetFlow.map {
         resourceManager.getString(R.string.fragment_set_staking_proxy_title, it.token.configuration.symbol)
@@ -118,7 +128,7 @@ class AddStakingProxyViewModel(
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = selectedAssetState.chain()
         val accountId = metaAccount.requireAccountIdIn(chain)
-        addStakingProxyRepository.calculateDepositForAddProxy(chain, accountId)
+        addStakingProxyInteractor.calculateDepositForAddProxy(chain, accountId)
     }
         .shareInBackground()
 
@@ -146,8 +156,10 @@ class AddStakingProxyViewModel(
 
     init {
         runFeeUpdate()
+    }
 
-        subscribeOnSelectAddress()
+    fun backClicked() {
+        stakingRouter.back()
     }
 
     fun showProxyDepositDescription() {
@@ -156,13 +168,8 @@ class AddStakingProxyViewModel(
 
     fun selectAuthorityWallet() {
         launch {
-            val metaAccount = accountRepository.getSelectedMetaAccount()
-            val chain = selectedAssetState.chain()
-            val proxiedAccountId = metaAccount.requireAccountIdIn(chain)
             val selectedAddress = addressInputMixin.inputFlow.value
-            val filter = getMetaAccountsFilterPayload(chain, proxiedAccountId)
-            val request = SelectAddressRequester.Request(chain.id, selectedAddress, filter)
-            selectAddressRequester.openRequest(request)
+            selectAddressMixin.openSelectAddress(selectedAddress)
         }
     }
 
@@ -200,12 +207,8 @@ class AddStakingProxyViewModel(
         stakingRouter.openConfirmAddStakingProxy(screenPayload)
     }
 
-    private fun subscribeOnSelectAddress() {
-        selectAddressRequester.responseFlow
-            .onEach {
-                addressInputMixin.inputFlow.value = it.selectedAddress
-            }
-            .launchIn(this)
+    private fun onAddressSelect(address: String) {
+        addressInputMixin.inputFlow.value = address
     }
 
     private fun runFeeUpdate() {
@@ -215,7 +218,7 @@ class AddStakingProxyViewModel(
 
             feeMixin.loadFee(
                 coroutineScope = this,
-                feeConstructor = { addStakingProxyRepository.estimateFee(chain, metaAccount.requireAccountIdIn(chain)) },
+                feeConstructor = { addStakingProxyInteractor.estimateFee(chain, metaAccount.requireAccountIdIn(chain)) },
                 onRetryCancelled = {}
             )
         }.launchIn(this)
@@ -236,9 +239,11 @@ class AddStakingProxyViewModel(
         return SelectAddressRequester.Request.Filter.ExcludeMetaIds(filteredMetaAccounts)
     }
 
-    private suspend fun metaAccountsFilter(chain: Chain, accountId: AccountId): MetaAccountFilter {
+    private suspend fun metaAccountsFilter(chain: Chain, accountId: AccountId): SelectAddressAccountFilter {
         val metaAccountsFilterPayload = getMetaAccountsFilterPayload(chain, accountId)
 
-        return MetaAccountFilter(MetaAccountFilter.Mode.EXCLUDE, metaAccountsFilterPayload.metaIds)
+        return SelectAddressAccountFilter.ExcludeMetaAccounts(
+            metaAccountsFilterPayload.metaIds
+        )
     }
 }

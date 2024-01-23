@@ -79,12 +79,18 @@ class ProxiedSigner(
 
         acknowledgeProxyOperation(proxyMetaAccount)
 
+        // TODO this wont use the actual payload for fee validation when multiple nested proxies are used
+        // We need to design a universal solution
+        // We actually can use `signedExtrinsic.payload` to access actual payload but in this case validation will happen only after signing
+        // which will have bad UX with Vault and Ledger.
+        // As an option we could separate signing and wrapping step specifically for such nested signers and use only the wrapping step before fee validation
+        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic, chain)
+
         if (isRootProxied) {
-            validateExtrinsic(payloadExtrinsic, chain)
+            validateExtrinsic(modifiedPayload, chain)
         }
 
         val delegate = createDelegate(proxyMetaAccount)
-        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic, chain)
 
         val signedExtrinsic = delegate.signExtrinsic(modifiedPayload)
         return signedExtrinsic

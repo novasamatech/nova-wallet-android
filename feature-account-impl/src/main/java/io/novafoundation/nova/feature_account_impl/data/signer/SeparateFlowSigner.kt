@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.data.signer
 
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
-import io.novafoundation.nova.common.utils.MutableSharedState
+import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
+import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenRequester
@@ -13,13 +14,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 abstract class SeparateFlowSigner(
-    private val signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
+    private val signingSharedState: SigningSharedState,
     private val signFlowRequester: SignInterScreenRequester,
-    metaAccount: MetaAccount
+    private val metaAccount: MetaAccount
 ) : LeafSigner(metaAccount) {
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
-        signingSharedState.set(payloadExtrinsic)
+        val payload = SeparateFlowSignerState(payloadExtrinsic, metaAccount)
+
+        signingSharedState.set(payload)
 
         val result = withContext(Dispatchers.Main) {
             try {

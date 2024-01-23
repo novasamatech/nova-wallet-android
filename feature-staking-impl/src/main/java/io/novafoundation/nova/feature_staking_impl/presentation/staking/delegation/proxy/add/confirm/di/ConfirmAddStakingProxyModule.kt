@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyPayload
@@ -39,7 +39,7 @@ class ConfirmAddStakingProxyModule {
         selectedAssetState: AnySelectedAssetOptionSharedState,
         assetUseCase: ArbitraryAssetUseCase,
         addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
-        addStakingProxyRepository: AddStakingProxyRepository,
+        addStakingProxyRepository: AddStakingProxyInteractor,
         walletUiUseCase: WalletUiUseCase,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     ): ViewModel {
@@ -54,7 +54,7 @@ class ConfirmAddStakingProxyModule {
             selectedAssetState = selectedAssetState,
             assetUseCase = assetUseCase,
             addStakingProxyValidationSystem = addStakingProxyValidationSystem,
-            addStakingProxyRepository = addStakingProxyRepository,
+            addStakingProxyInteractor = addStakingProxyRepository,
             walletUiUseCase = walletUiUseCase,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
         )

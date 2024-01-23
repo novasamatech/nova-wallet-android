@@ -97,22 +97,28 @@ class RuntimeSyncService(
         cancelExistingSync(chainId)
 
         syncingChains[chainId] = launch(syncDispatcher) {
-            sync(chainId, forceFullSync)
+            val syncResult = runCatching {
+                sync(chainId, forceFullSync)
+            }.getOrNull()
+
+            syncFinished(chainId)
+
+            syncResult?.let { _syncStatusFlow.emit(it) }
         }
     }
 
     private suspend fun sync(
         chainId: String,
         forceFullSync: Boolean,
-    ) {
+    ): SyncResult? {
         val syncInfo = knownChains[chainId]
 
         if (syncInfo == null) {
             Log.w(LOG_TAG, "Unknown chain with id $chainId requested to be synced")
-            return
+            return null
         }
 
-        val runtimeInfo = chainDao.runtimeInfo(chainId) ?: return
+        val runtimeInfo = chainDao.runtimeInfo(chainId) ?: return null
 
         val shouldSyncMetadata = runtimeInfo.shouldSyncMetadata() || forceFullSync
 
@@ -138,14 +144,10 @@ class RuntimeSyncService(
             }
         }
 
-        syncFinished(chainId)
-
-        _syncStatusFlow.emit(
-            SyncResult(
-                metadataHash = metadataHash,
-                typesHash = typesHash,
-                chainId = chainId
-            )
+        return SyncResult(
+            metadataHash = metadataHash,
+            typesHash = typesHash,
+            chainId = chainId
         )
     }
 

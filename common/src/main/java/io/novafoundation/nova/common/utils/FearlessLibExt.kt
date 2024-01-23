@@ -77,6 +77,9 @@ fun String.isValidSS58Address() = runCatching { toAccountId() }.isSuccess
 fun String.removeHexPrefix() = removePrefix("0x")
 
 fun MetadataFunction.argument(name: String): FunctionArgument = arguments.first { it.name == name }
+
+fun MetadataFunction.argumentType(name: String): RuntimeType<*, *> = requireNotNull(argument(name).type)
+
 fun FunctionArgument.requireActualType() = type?.skipAliases()!!
 
 fun Short.toByteArray(byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
@@ -302,6 +305,9 @@ fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().valu
 fun AccountId.ethereumAccountIdToAddress(withChecksum: Boolean = true) = asEthereumAccountId().toAddress(withChecksum).value
 
 fun emptyEthereumAccountId() = ByteArray(20) { 1 }
+
+fun emptySubstrateAccountId() = ByteArray(32)
+
 fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 
 val SignerPayloadExtrinsic.chainId: String

@@ -8,7 +8,7 @@ class IdentityParcelModel(
     val display: String?,
     val legal: String?,
     val web: String?,
-    val riot: String?,
+    val matrix: String?,
     val email: String?,
     val pgpFingerprint: String?,
     val image: String?,

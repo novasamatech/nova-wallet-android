@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
+import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
@@ -178,7 +179,7 @@ fun Chain.accountIdOrNull(address: String): ByteArray? {
 fun Chain.emptyAccountId() = if (isEthereumBased) {
     emptyEthereumAccountId()
 } else {
-    ByteArray(32)
+    emptySubstrateAccountId()
 }
 
 fun Chain.accountIdOrDefault(maybeAddress: String): ByteArray {
