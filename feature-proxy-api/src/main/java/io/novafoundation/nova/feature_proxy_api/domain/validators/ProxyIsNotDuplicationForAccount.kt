@@ -20,9 +20,9 @@ class ProxyIsNotDuplicationForAccount<P, E>(
 
     override suspend fun validate(value: P): ValidationStatus<E> {
         val chain = chain(value)
-        val proxyTypes = proxyRepository.getDelegatedProxyTypes(chain.id, proxiedAccountId(value), proxyAccountId(value))
+        val proxyTypes = proxyRepository.getDelegatedProxyTypesLocal(chain.id, proxiedAccountId(value), proxyAccountId(value))
 
-        return validOrError(proxyTypes.contains(proxyType(value))) {
+        return validOrError(!proxyTypes.contains(proxyType(value))) {
             error(value)
         }
     }

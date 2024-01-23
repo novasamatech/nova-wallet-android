@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy
+package io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add
 
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset

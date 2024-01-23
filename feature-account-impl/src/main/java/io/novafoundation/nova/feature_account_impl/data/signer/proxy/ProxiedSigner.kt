@@ -133,7 +133,7 @@ class ProxiedSigner(
         val proxyAccountId = proxyMetaAccount.requireAccountIdIn(chain)
         val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
 
-        val availableProxyTypes = getProxyRepository.getDelegatedProxyTypes(
+        val availableProxyTypes = getProxyRepository.getDelegatedProxyTypesRemote(
             chainId = payload.chainId,
             proxiedAccountId = proxiedAccountId,
             proxyAccountId = proxyAccountId

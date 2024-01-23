@@ -24,7 +24,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
 private class OnChainProxiedModel(
@@ -40,40 +39,42 @@ private class OnChainProxyModel(
 
 class RealGetProxyRepository(
     private val remoteSource: StorageDataSource,
+    private val localSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
 ) : GetProxyRepository {
 
     override suspend fun getAllProxiesForAccounts(chainId: ChainId, accountIds: Set<AccountIdKey>): List<ProxiedWithProxy> {
         val delegatorToProxies = receiveAllProxiesInChain(chainId)
 
-        return delegatorToProxies
-            .mapNotNull { (delegator, proxied) ->
-                val notDelayedProxies = proxied.proxies.filter { it.delay == BigInteger.ZERO }
-                val matchedProxies = matchProxiesToAccountsAndMap(notDelayedProxies, accountIds)
+        return delegatorToProxies.mapNotNull { (delegator, proxied) ->
+            val notDelayedProxies = proxied.proxies.filter { it.delay == BigInteger.ZERO }
+            val matchedProxies = matchProxiesToAccountsAndMap(notDelayedProxies, accountIds)
 
-                if (matchedProxies.isEmpty()) return@mapNotNull null
+            if (matchedProxies.isEmpty()) return@mapNotNull null
 
-                delegator to matchedProxies
-            }.flatMap { (delegator, proxies) ->
-                proxies.map { proxy -> mapToProxiedWithProxies(chainId, delegator, proxy) }
-            }
+            delegator to matchedProxies
+        }.flatMap { (delegator, proxies) ->
+            proxies.map { proxy -> mapToProxiedWithProxies(chainId, delegator, proxy) }
+        }
     }
 
-    override suspend fun getDelegatedProxyTypes(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyType> {
-        val proxied = getAllProxiesFor(chainId, proxiedAccountId)
+    override suspend fun getDelegatedProxyTypesRemote(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyType> {
+        return getDelegatedProxyTypes(remoteSource, chainId, proxiedAccountId, proxyAccountId)
+    }
 
-        return proxied.proxies.filter { it.accountId == proxyAccountId.intoKey() }
-            .map { ProxyType.fromString(it.proxyType) }
+    // TODO: use it for staking after merge "add staking proxy" branch
+    override suspend fun getDelegatedProxyTypesLocal(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyType> {
+        return getDelegatedProxyTypes(localSource, chainId, proxiedAccountId, proxyAccountId)
     }
 
     override suspend fun getProxiesQuantity(chainId: ChainId, proxiedAccountId: AccountId): Int {
-        val proxied = getAllProxiesFor(chainId, proxiedAccountId)
+        val proxied = getAllProxiesFor(localSource, chainId, proxiedAccountId)
 
         return proxied.proxies.size
     }
 
     override suspend fun getProxyDeposit(chainId: ChainId, proxiedAccountId: AccountId): BigInteger {
-        val proxied = getAllProxiesFor(chainId, proxiedAccountId)
+        val proxied = getAllProxiesFor(localSource, chainId, proxiedAccountId)
 
         return proxied.deposit
     }
@@ -85,7 +86,7 @@ class RealGetProxyRepository(
     }
 
     override fun proxiesByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<List<ProxiedWithProxy.Proxy>> {
-        return remoteSource.subscribe(chain.id) {
+        return localSource.subscribe(chain.id) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
                 .observe(
@@ -103,15 +104,26 @@ class RealGetProxyRepository(
             .map { it.size }
     }
 
-    private suspend fun getAllProxiesFor(chainId: ChainId, accountId: AccountId): OnChainProxiedModel {
-        return remoteSource.query(chainId) {
+    private suspend fun getDelegatedProxyTypes(
+        storageDataSource: StorageDataSource,
+        chainId: ChainId,
+        proxiedAccountId: AccountId,
+        proxyAccountId: AccountId
+    ): List<ProxyType> {
+        val proxied = getAllProxiesFor(storageDataSource, chainId, proxiedAccountId)
+
+        return proxied.proxies
+            .filter { it.accountId == proxyAccountId.intoKey() }
+            .map { ProxyType.fromString(it.proxyType) }
+    }
+
+    private suspend fun getAllProxiesFor(storageDataSource: StorageDataSource, chainId: ChainId, accountId: AccountId): OnChainProxiedModel {
+        return storageDataSource.query(chainId) {
             runtime.metadata.module(Modules.PROXY)
                 .storage("Proxies")
                 .query(
                     keyArguments = arrayOf(accountId),
-                    binding = { result ->
-                        bindProxyAccounts(result)
-                    }
+                    binding = { result -> bindProxyAccounts(result) }
                 )
         }
     }
@@ -122,9 +134,7 @@ class RealGetProxyRepository(
                 .storage("Proxies")
                 .entries(
                     keyExtractor = { (accountId: AccountId) -> AccountIdKey(accountId) },
-                    binding = { result, _ ->
-                        bindProxyAccounts(result)
-                    },
+                    binding = { result, _ -> bindProxyAccounts(result) },
                     recover = { _, _ ->
                         // Do nothing if entry binding throws an exception
                     }

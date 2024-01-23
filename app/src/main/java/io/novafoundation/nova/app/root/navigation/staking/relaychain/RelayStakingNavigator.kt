@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.ConfirmRemoveStakingProxyFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.ConfirmRemoveStakingProxyPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
@@ -238,5 +240,10 @@ class RelayStakingNavigator(
 
     override fun openStakingProxyList() {
         performNavigation(R.id.action_open_stakingProxyList)
+    }
+
+    override fun openConfirmRemoveStakingProxy(payload: ConfirmRemoveStakingProxyPayload) {
+        val arguments = ConfirmRemoveStakingProxyFragment.getBundle(payload)
+        performNavigation(R.id.action_open_confirmRemoveStakingProxyFragment, arguments)
     }
 }

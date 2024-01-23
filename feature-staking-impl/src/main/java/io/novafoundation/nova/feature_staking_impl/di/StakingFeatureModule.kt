@@ -83,6 +83,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreI
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.RealStakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.StakingProxyListInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RealRemoveStakingProxyInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RemoveStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rebond.RebondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rewardDestination.ChangeRewardDestinationInteractor
@@ -634,4 +636,10 @@ class StakingFeatureModule {
         getProxyRepository,
         identityProvider
     )
+
+    @Provides
+    @FeatureScope
+    fun removeStakingProxyInteractor(
+        extrinsicService: ExtrinsicService
+    ): RemoveStakingProxyInteractor = RealRemoveStakingProxyInteractor(extrinsicService)
 }

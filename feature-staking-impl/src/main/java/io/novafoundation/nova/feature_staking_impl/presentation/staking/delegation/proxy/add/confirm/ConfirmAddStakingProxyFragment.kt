@@ -53,7 +53,7 @@ class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewMo
         confirmAddStakingProxyButton.setOnClickListener { viewModel.confirmClicked() }
         confirmAddStakingProxyButton.prepareForProgress(viewLifecycleOwner)
 
-        confirmAddStakingProxyProxiedAccount.setOnValueClickListener { viewModel.proxiedAccountClicked() }
+        confirmAddStakingProxyProxiedAccount.setOnClickListener { viewModel.proxiedAccountClicked() }
         confirmAddStakingProxyDeposit.setOnClickListener { viewModel.depositClicked() }
         confirmAddStakingProxyDelegationAccount.setOnClickListener { viewModel.proxyAccountClicked() }
     }
