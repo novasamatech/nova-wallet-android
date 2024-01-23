@@ -22,7 +22,7 @@ class ProxyIsNotDuplicationForAccount<P, E>(
         val chain = chain(value)
         val proxyTypes = proxyRepository.getDelegatedProxyTypesLocal(chain.id, proxiedAccountId(value), proxyAccountId(value))
 
-        return validOrError(proxyTypes.contains(proxyType(value))) {
+        return validOrError(!proxyTypes.contains(proxyType(value))) {
             error(value)
         }
     }
