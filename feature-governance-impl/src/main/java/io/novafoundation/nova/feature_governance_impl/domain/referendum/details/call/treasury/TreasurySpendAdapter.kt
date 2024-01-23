@@ -15,7 +15,7 @@ class TreasurySpendAdapter : ReferendumCallAdapter {
         call: GenericCall.Instance,
         context: ReferendumCallParseContext
     ): ReferendumCall? {
-        //TODO: spend call is using MultiLocation now instead of MultiAddress so it throws an exception for now
+        // TODO: spend call is using MultiLocation now instead of MultiAddress so it throws an exception for now
         if (!call.instanceOf(Modules.TREASURY, "spend_local", "spend")) return null
 
         val amount = bindNonce(call.arguments["amount"])
