@@ -28,6 +28,9 @@ fun mapAddStakingProxyValidationFailureToUi(
         is InvalidAddress -> resourceManager.getString(R.string.invalid_proxy_address_title) to
             resourceManager.getString(R.string.invalid_proxy_address_message, failure.chain.name)
 
+        AddStakingProxyValidationFailure.SelfDelegation -> resourceManager.getString(R.string.delegation_error_self_delegate_title) to
+            resourceManager.getString(R.string.delegation_error_self_delegate_message)
+
         is MaximumProxiesReached -> resourceManager.getString(R.string.add_proxy_maximum_reached_error_title) to
             resourceManager.getString(R.string.add_proxy_maximum_reached_error_message, failure.max, failure.chain.name)
 

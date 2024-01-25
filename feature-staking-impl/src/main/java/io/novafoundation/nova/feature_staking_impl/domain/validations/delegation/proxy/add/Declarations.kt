@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.validations.delegatio
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.validation.notSelfAccount
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_api.domain.validators.maximumProxiesNotReached
@@ -91,4 +93,13 @@ fun AddStakingProxyValidationSystemBuilder.stakingTypeIsNotDuplication(
     proxyType = { ProxyType.Staking },
     error = { payload -> AddStakingProxyValidationFailure.AlreadyDelegated(payload.proxyAddress) },
     proxyRepository = proxyRepository
+)
+
+fun AddStakingProxyValidationSystemBuilder.notSelfAccount(
+    accountRepository: AccountRepository
+) = notSelfAccount(
+    chainProvider = { it.chain },
+    accountIdProvider = { it.chain.accountIdOf(it.proxyAddress) },
+    failure = { AddStakingProxyValidationFailure.SelfDelegation },
+    accountRepository = accountRepository
 )
