@@ -17,4 +17,8 @@ operator fun CrossChainFeeModel.plus(other: CrossChainFeeModel) = CrossChainFeeM
     holdingPart = holdingPart + other.holdingPart
 )
 
-fun CrossChainFeeModel?.orZero() = CrossChainFeeModel.zero()
+fun CrossChainFeeModel?.orZero() = if (this == null) {
+    CrossChainFeeModel.zero()
+} else {
+    this
+}

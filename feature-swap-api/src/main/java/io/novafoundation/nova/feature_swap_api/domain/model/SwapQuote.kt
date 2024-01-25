@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
