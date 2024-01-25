@@ -42,7 +42,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 
 // TODO: Currently message doesn't contain setTopic command in the end. It will come with XCMv3 support
-private const val TOPIC_SIZE = 33
+private const val SET_TOPIC_SIZE = 33
 
 class RealCrossChainWeigher(
     private val storageDataSource: StorageDataSource,
@@ -57,15 +57,16 @@ class RealCrossChainWeigher(
         return destinationWeight.max(reserveWeight)
     }
 
-    override suspend fun estimateFee(config: CrossChainTransferConfiguration): CrossChainFeeModel = with(config) {
+    override suspend fun estimateFee(amount: Balance, config: CrossChainTransferConfiguration): CrossChainFeeModel = with(config) {
         // Reserve fee may be zero if xcm transfer doesn't reserve tokens
-        val reserveFeeAmount = calculateFee(reserveFee, reserveChainLocation)
-        val destinationFeeAmount = calculateFee(destinationFee, destinationChainLocation)
+        val reserveFeeAmount = calculateFee(amount, reserveFee, reserveChainLocation)
+        val destinationFeeAmount = calculateFee(amount, destinationFee, destinationChainLocation)
 
         return reserveFeeAmount + destinationFeeAmount
     }
 
     private suspend fun CrossChainTransferConfiguration.calculateFee(
+        amount: Balance,
         feeConfig: CrossChainFeeConfiguration?,
         chainLocation: MultiLocation
     ): CrossChainFeeModel {
@@ -73,14 +74,14 @@ class RealCrossChainWeigher(
             null -> CrossChainFeeModel.zero()
             else -> {
                 val isSendingFromOrigin = originChainId == feeConfig.from.chainId
-                val feeAmount = feeFor(feeConfig)
-                val deliveryFee = deliveryFeeFor(feeConfig, chainLocation, isSendingFromOrigin = isSendingFromOrigin)
+                val feeAmount = feeFor(amount, feeConfig)
+                val deliveryFee = deliveryFeeFor(amount, feeConfig, chainLocation, isSendingFromOrigin = isSendingFromOrigin)
                 feeAmount.orZero() + deliveryFee.orZero()
             }
         }
     }
 
-    private suspend fun CrossChainTransferConfiguration.feeFor(feeConfig: CrossChainFeeConfiguration): CrossChainFeeModel {
+    private suspend fun CrossChainTransferConfiguration.feeFor(amount: Balance, feeConfig: CrossChainFeeConfiguration): CrossChainFeeModel {
         val chain = chainRegistry.getChain(feeConfig.to.chainId)
         val maxWeight = feeConfig.estimatedWeight()
 
@@ -88,7 +89,7 @@ class RealCrossChainWeigher(
             is Mode.Proportional -> CrossChainFeeModel(holdingPart = mode.weightToFee(maxWeight))
 
             Mode.Standard -> {
-                val xcmMessage = xcmMessage(feeConfig.to.xcmFeeType.instructions, chain)
+                val xcmMessage = xcmMessage(feeConfig.to.xcmFeeType.instructions, chain, amount)
 
                 val paymentInfo = extrinsicService.paymentInfo(chain, TransactionOrigin.SelectedWallet) {
                     xcmExecute(xcmMessage, maxWeight)
@@ -102,6 +103,7 @@ class RealCrossChainWeigher(
     }
 
     private suspend fun CrossChainTransferConfiguration.deliveryFeeFor(
+        amount: Balance,
         config: CrossChainFeeConfiguration,
         destinationChainLocation: MultiLocation,
         isSendingFromOrigin: Boolean
@@ -112,31 +114,32 @@ class RealCrossChainWeigher(
 
         val deliveryFeeFactor: BigInteger = queryDeliveryFeeFactor(config.from.chainId, deliveryConfig.factorPallet, destinationChainLocation)
 
-        val xcmMessageSize = getXcmMessageSize(config)
-        val xcmMessageSizeWithTopic = xcmMessageSize + TOPIC_SIZE.toBigInteger()
+        val xcmMessageSize = getXcmMessageSize(amount, config)
+        val xcmMessageSizeWithTopic = xcmMessageSize + SET_TOPIC_SIZE.toBigInteger()
 
         val feeSize = (deliveryConfig.sizeBase + xcmMessageSizeWithTopic * deliveryConfig.sizeFactor)
         val deliveryFee = BigRational.fixedU128(deliveryFeeFactor * feeSize)
 
-        return if (deliveryConfig.alwaysHoldingPays || isSendingFromOrigin) {
-            CrossChainFeeModel(holdingPart = deliveryFee)
-        } else {
+        val isSenderPaysOriginDelivery = !deliveryConfig.alwaysHoldingPays
+        return if (isSenderPaysOriginDelivery && isSendingFromOrigin) {
             CrossChainFeeModel(senderPart = deliveryFee)
+        } else {
+            CrossChainFeeModel(holdingPart = deliveryFee)
         }
     }
 
-    private suspend fun CrossChainTransferConfiguration.getXcmMessageSize(config: CrossChainFeeConfiguration): BigInteger {
-        val destinationChain = chainRegistry.getChain(config.to.chainId)
-        val destinationRuntime = chainRegistry.getRuntime(config.to.chainId)
-        val xcmMessage = xcmMessage(config.to.xcmFeeType.instructions, destinationChain)
+    private suspend fun CrossChainTransferConfiguration.getXcmMessageSize(amount: Balance, config: CrossChainFeeConfiguration): BigInteger {
+        val chain = chainRegistry.getChain(config.to.chainId)
+        val runtime = chainRegistry.getRuntime(config.to.chainId)
+        val xcmMessage = xcmMessage(config.to.xcmFeeType.instructions, chain, amount)
             .toEncodableInstance()
 
-        return destinationRuntime.metadata
-            .module(destinationRuntime.metadata.xcmPalletName())
+        return runtime.metadata
+            .module(runtime.metadata.xcmPalletName())
             .call("execute")
             .argument("message")
             .requireActualType()
-            .bytes(destinationRuntime, xcmMessage)
+            .bytes(runtime, xcmMessage)
             .size.toBigInteger()
     }
 
@@ -178,8 +181,9 @@ class RealCrossChainWeigher(
     private fun CrossChainTransferConfiguration.xcmMessage(
         instructionTypes: List<XCMInstructionType>,
         chain: Chain,
+        amount: Balance
     ): VersionedXcm {
-        val instructions = instructionTypes.mapNotNull { instructionType -> xcmInstruction(instructionType, chain) }
+        val instructions = instructionTypes.mapNotNull { instructionType -> xcmInstruction(instructionType, chain, amount) }
 
         return VersionedXcm.V2(XcmV2(instructions))
     }
@@ -187,37 +191,38 @@ class RealCrossChainWeigher(
     private fun CrossChainTransferConfiguration.xcmInstruction(
         instructionType: XCMInstructionType,
         chain: Chain,
+        amount: Balance
     ): XcmV2Instruction? {
         return when (instructionType) {
-            XCMInstructionType.ReserveAssetDeposited -> reserveAssetDeposited()
+            XCMInstructionType.ReserveAssetDeposited -> reserveAssetDeposited(amount)
             XCMInstructionType.ClearOrigin -> clearOrigin()
-            XCMInstructionType.BuyExecution -> buyExecution()
+            XCMInstructionType.BuyExecution -> buyExecution(amount)
             XCMInstructionType.DepositAsset -> depositAsset(chain)
-            XCMInstructionType.WithdrawAsset -> withdrawAsset()
+            XCMInstructionType.WithdrawAsset -> withdrawAsset(amount)
             XCMInstructionType.DepositReserveAsset -> depositReserveAsset()
-            XCMInstructionType.ReceiveTeleportedAsset -> receiveTeleportedAsset()
+            XCMInstructionType.ReceiveTeleportedAsset -> receiveTeleportedAsset(amount)
             XCMInstructionType.UNKNOWN -> null
         }
     }
 
-    private fun CrossChainTransferConfiguration.reserveAssetDeposited() = XcmV2Instruction.ReserveAssetDeposited(
+    private fun CrossChainTransferConfiguration.reserveAssetDeposited(amount: Balance) = XcmV2Instruction.ReserveAssetDeposited(
         assets = listOf(
-            sendingAssetAmountOf(BigInteger.ZERO)
+            sendingAssetAmountOf(amount)
         )
     )
 
-    private fun CrossChainTransferConfiguration.receiveTeleportedAsset() = XcmV2Instruction.ReceiveTeleportedAsset(
+    private fun CrossChainTransferConfiguration.receiveTeleportedAsset(amount: Balance) = XcmV2Instruction.ReceiveTeleportedAsset(
         assets = listOf(
-            sendingAssetAmountOf(BigInteger.ZERO)
+            sendingAssetAmountOf(amount)
         )
     )
 
     @Suppress("unused")
     private fun CrossChainTransferConfiguration.clearOrigin() = XcmV2Instruction.ClearOrigin
 
-    private fun CrossChainTransferConfiguration.buyExecution(): XcmV2Instruction.BuyExecution {
+    private fun CrossChainTransferConfiguration.buyExecution(amount: Balance): XcmV2Instruction.BuyExecution {
         return XcmV2Instruction.BuyExecution(
-            fees = sendingAssetAmountOf(Balance.ZERO),
+            fees = sendingAssetAmountOf(amount),
             weightLimit = WeightLimit.Unlimited
         )
     }
@@ -231,10 +236,10 @@ class RealCrossChainWeigher(
         )
     }
 
-    private fun CrossChainTransferConfiguration.withdrawAsset(): XcmV2Instruction.WithdrawAsset {
+    private fun CrossChainTransferConfiguration.withdrawAsset(amount: Balance): XcmV2Instruction.WithdrawAsset {
         return XcmV2Instruction.WithdrawAsset(
             assets = listOf(
-                sendingAssetAmountOf(Balance.ZERO)
+                sendingAssetAmountOf(amount)
             )
         )
     }

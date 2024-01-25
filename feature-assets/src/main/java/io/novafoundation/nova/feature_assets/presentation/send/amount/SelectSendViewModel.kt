@@ -33,10 +33,12 @@ import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferV
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
@@ -307,19 +309,19 @@ class SelectSendViewModel(
     }
 
     private fun setupFees() {
-        originFeeMixin.setupFee { transfer ->
+        originFeeMixin.setupFee { planks, transfer ->
             val fee = sendInteractor.getOriginFee(transfer)
             SimpleFee(fee)
         }
 
-        crossChainFeeMixin.setupFee { transfer ->
-            val crossChainFee = sendInteractor.getCrossChainFee(transfer)
+        crossChainFeeMixin.setupFee { planks, transfer ->
+            val crossChainFee = sendInteractor.getCrossChainFee(planks, transfer)
             crossChainFee?.let { SimpleGenericFee(it) }
         }
     }
 
     private fun <T : GenericFee> GenericFeeLoaderMixin.Presentation<T>.setupFee(
-        feeConstructor: suspend Token.(transfer: AssetTransfer) -> T?
+        feeConstructor: suspend Token.(planks: Balance, transfer: AssetTransfer) -> T?
     ) {
         connectWith(
             inputSource1 = originChainWithAsset,
@@ -331,7 +333,8 @@ class SelectSendViewModel(
             feeConstructor = { originChain, destinationChain, addressInput, amount ->
                 val assetTransfer = buildTransfer(origin = originChain, destination = destinationChain, amount = amount, address = addressInput)
 
-                feeConstructor(assetTransfer)
+                val planks = originChain.asset.planksFromAmount(amount)
+                feeConstructor(planks, assetTransfer)
             }
         )
     }

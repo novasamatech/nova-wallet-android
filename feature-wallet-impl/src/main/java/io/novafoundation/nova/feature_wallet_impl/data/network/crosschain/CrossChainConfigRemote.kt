@@ -27,7 +27,7 @@ class DeliveryFeeConfigRemote(
     val factorPallet: String,
     val sizeBase: BigInteger,
     val sizeFactor: BigInteger,
-    val alwaysHoldingPays: Boolean
+    val alwaysHoldingPays: Boolean?
 )
 
 class CrossChainOriginChainRemote(

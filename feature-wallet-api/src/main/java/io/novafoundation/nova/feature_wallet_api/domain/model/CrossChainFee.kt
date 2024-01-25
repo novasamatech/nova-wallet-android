@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.model
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_account_api.data.model.asAmountByRequestedAccount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import java.math.BigInteger
@@ -30,7 +30,7 @@ fun CrossChainFee.Companion.stub() = CrossChainFee(
 )
 
 val CrossChainFee.holdingPartByRequestedAccount
-    get() = holdingPart.amountByRequestedAccount
+    get() = holdingPart.asAmountByRequestedAccount
 
 val CrossChainFee.senderPartByRequestedAccount
-    get() = senderPart.amountByRequestedAccount
+    get() = senderPart.asAmountByRequestedAccount

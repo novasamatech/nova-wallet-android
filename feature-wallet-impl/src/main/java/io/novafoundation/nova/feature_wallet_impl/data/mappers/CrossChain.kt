@@ -68,7 +68,7 @@ fun mapDeliveryFeeConfigFromRemote(config: DeliveryFeeConfigRemote?): DeliveryFe
             factorPallet = config.factorPallet,
             sizeBase = config.sizeBase,
             sizeFactor = config.sizeFactor,
-            alwaysHoldingPays = config.alwaysHoldingPays
+            alwaysHoldingPays = config.alwaysHoldingPays ?: false
         )
 
         else -> throw IllegalArgumentException("Unknown delivery fee config type: ${config.type}")

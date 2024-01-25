@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainGenericFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
@@ -197,11 +198,10 @@ class ConfirmSendViewModel(
     private fun setupFee() = launch {
         originFeeMixin.setFee(originFee.genericFee)
 
-        // Calculate cross-chain fee before confirmation since it can be changed in time
         launch {
             val assetTransfer = buildTransfer()
-
-            val crossChainFee = sendInteractor.getCrossChainFee(assetTransfer)
+            val planks = originAsset().planksFromAmount(assetTransfer.amount)
+            val crossChainFee = sendInteractor.getCrossChainFee(planks, assetTransfer)
             val crossChainGenericFee = crossChainFee?.let { SimpleGenericFee(it) }
 
             crossChainFeeMixin.loadFeeV2Generic(
@@ -247,7 +247,7 @@ class ConfirmSendViewModel(
         originFee: DecimalFee,
         crossChainFee: CrossChainDecimalFee?
     ) = launch {
-        sendInteractor.performTransfer(transfer, originFee, crossChainFee)
+        sendInteractor.performTransfer(transfer, originFee, crossChainFee?.genericFee?.networkFee)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 

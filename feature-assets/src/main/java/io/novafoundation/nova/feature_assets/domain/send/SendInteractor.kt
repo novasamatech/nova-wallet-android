@@ -8,12 +8,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
@@ -71,10 +71,10 @@ class SendInteractor(
         }
     }
 
-    suspend fun getCrossChainFee(transfer: AssetTransfer): CrossChainFee? = withContext(Dispatchers.Default) {
+    suspend fun getCrossChainFee(amount: Balance, transfer: AssetTransfer): CrossChainFee? = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
-            val crossChainFeeModel = crossChainWeigher.estimateFee(config)
+            val crossChainFeeModel = crossChainWeigher.estimateFee(amount, config)
 
             val submissionOriginId = transfer.sender.requireAccountIdIn(transfer.originChain)
             val submissionOrigin = SubmissionOrigin.singleOrigin(submissionOriginId) // cross-chain fee is always paid by requested account id
@@ -88,13 +88,12 @@ class SendInteractor(
     suspend fun performTransfer(
         transfer: WeightedAssetTransfer,
         originFee: DecimalFee,
-        crossChainDecimalFee: CrossChainDecimalFee?,
+        crossChainFee: CrossChainFee?,
     ): Result<*> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
-            val crossChainFee = crossChainDecimalFee!!.genericFee.networkFee
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
-            crossChainTransactor.performTransfer(config, transfer, crossChainFee)
+            crossChainTransactor.performTransfer(config, transfer, crossChainFee!!)
         } else {
             getAssetTransfers(transfer).performTransfer(transfer)
                 .onSuccess { submission ->
