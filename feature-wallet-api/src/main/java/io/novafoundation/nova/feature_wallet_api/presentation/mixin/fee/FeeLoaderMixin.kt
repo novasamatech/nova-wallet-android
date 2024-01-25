@@ -41,6 +41,8 @@ interface GenericFee {
 @JvmInline
 value class SimpleFee(override val networkFee: Fee) : GenericFee
 
+class SimpleGenericFee<T : Fee>(override val networkFee: T) : GenericFee
+
 interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     class Configuration<F : GenericFee>(
@@ -148,17 +150,18 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.getDecimalFeeOrNull(): GenericDeci
         ?.decimalFee
 }
 
+fun <T : GenericFee> FeeLoaderMixin.Factory.createGeneric(assetFlow: Flow<Asset>) = createGeneric<T>(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
 
-fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
+fun <I1, I2, I3, I4, TFee : GenericFee> GenericFeeLoaderMixin.Presentation<TFee>.connectWith(
     inputSource1: Flow<I1>,
     inputSource2: Flow<I2>,
     inputSource3: Flow<I3>,
     inputSource4: Flow<I4>,
     scope: CoroutineScope,
     expectedChain: ((I1, I2, I3, I4) -> ChainId)? = null,
-    feeConstructor: suspend Token.(input1: I1, input2: I2, input3: I3, input4: I4) -> Fee?,
+    feeConstructor: suspend Token.(input1: I1, input2: I2, input3: I3, input4: I4) -> TFee?,
     onRetryCancelled: () -> Unit = {}
 ) {
     combine(
@@ -167,7 +170,7 @@ fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
         inputSource3,
         inputSource4
     ) { input1, input2, input3, input4 ->
-        loadFee(
+        loadFeeV2Generic(
             coroutineScope = scope,
             expectedChain = expectedChain?.invoke(input1, input2, input3, input4),
             feeConstructor = { feeConstructor(it, input1, input2, input3, input4) },

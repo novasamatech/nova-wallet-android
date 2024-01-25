@@ -6,6 +6,7 @@ import java.math.BigInteger
 class CrossChainTransfersConfigRemote(
     val assetsLocation: Map<String, ReserveLocationRemote>,
     val instructions: Map<String, List<String>>,
+    val networkDeliveryFee: Map<String, NetworkDeliveryFeeRemote>,
     val networkBaseWeight: Map<String, BigInteger>,
     val chains: List<CrossChainOriginChainRemote>
 )
@@ -14,6 +15,19 @@ class ReserveLocationRemote(
     val chainId: ChainId,
     val reserveFee: XcmFeeRemote?,
     val multiLocation: JunctionsRemote
+)
+
+class NetworkDeliveryFeeRemote(
+    val toParent: DeliveryFeeConfigRemote?,
+    val toParachain: DeliveryFeeConfigRemote?
+)
+
+class DeliveryFeeConfigRemote(
+    val type: String,
+    val factorPallet: String,
+    val sizeBase: BigInteger,
+    val sizeFactor: BigInteger,
+    val alwaysHoldingPays: Boolean
 )
 
 class CrossChainOriginChainRemote(

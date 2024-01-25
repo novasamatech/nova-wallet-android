@@ -72,6 +72,7 @@ import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
@@ -235,4 +236,6 @@ interface AssetsFeatureDependencies {
     val swapRateFormatter: SwapRateFormatter
 
     val bottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val chainStateRepository: ChainStateRepository
 }

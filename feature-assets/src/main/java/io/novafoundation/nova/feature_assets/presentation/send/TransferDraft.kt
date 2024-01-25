@@ -10,7 +10,6 @@ import java.math.BigDecimal
 class TransferDraft(
     val amount: BigDecimal,
     val originFee: FeeParcelModel,
-    val crossChainFee: FeeParcelModel?,
     val origin: AssetPayload,
     val destination: AssetPayload,
     val recipientAddress: String,

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -80,7 +80,7 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
         }
     }
 
-    private fun CrossChainFee.formatWith(
+    private fun CrossChainFeeModel.formatWith(
         transferringAsset: Chain.Asset
     ): String {
         fun BigInteger?.formatAmount() = this?.let { it.formatPlanks(transferringAsset) }

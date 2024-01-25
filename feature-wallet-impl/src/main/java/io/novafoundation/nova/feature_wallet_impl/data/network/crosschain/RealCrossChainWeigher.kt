@@ -1,27 +1,51 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.utils.BigRational
+import io.novafoundation.nova.common.utils.argument
+import io.novafoundation.nova.common.utils.fixedU128
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.utils.requireActualType
+import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.orZero
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.plus
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.zero
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.accountIdToMultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.weightToFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee.Mode
+import io.novafoundation.nova.feature_wallet_api.domain.model.DeliveryFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Id
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.isHere
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.paraIdOrNull
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytes
+import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+
+// TODO: Currently message doesn't contain setTopic command in the end. It will come with XCMv3 support
+private const val TOPIC_SIZE = 33
 
 class RealCrossChainWeigher(
+    private val storageDataSource: StorageDataSource,
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry
 ) : CrossChainWeigher {
@@ -33,46 +57,122 @@ class RealCrossChainWeigher(
         return destinationWeight.max(reserveWeight)
     }
 
-    override suspend fun estimateFee(transferConfiguration: CrossChainTransferConfiguration): CrossChainFee {
-        val destinationFee = with(transferConfiguration) {
-            feeFor(destinationFee)
-        }
+    override suspend fun estimateFee(config: CrossChainTransferConfiguration): CrossChainFeeModel = with(config) {
+        // Reserve fee may be zero if xcm transfer doesn't reserve tokens
+        val reserveFeeAmount = calculateFee(reserveFee, reserveChainLocation)
+        val destinationFeeAmount = calculateFee(destinationFee, destinationChainLocation)
 
-        val reserveFee = with(transferConfiguration) {
-            reserveFee?.let { feeFor(it) }
-        }
-
-        return CrossChainFee(
-            destination = destinationFee,
-            reserve = reserveFee
-        )
+        return reserveFeeAmount + destinationFeeAmount
     }
 
-    private suspend fun CrossChainTransferConfiguration.feeFor(feeConfig: CrossChainFeeConfiguration): BigInteger? {
-        val chain = chainRegistry.getChain(feeConfig.chainId)
+    private suspend fun CrossChainTransferConfiguration.calculateFee(
+        feeConfig: CrossChainFeeConfiguration?,
+        chainLocation: MultiLocation
+    ): CrossChainFeeModel {
+        return when (feeConfig) {
+            null -> CrossChainFeeModel.zero()
+            else -> {
+                val isSendingFromOrigin = originChainId == feeConfig.from.chainId
+                val feeAmount = feeFor(feeConfig)
+                val deliveryFee = deliveryFeeFor(feeConfig, chainLocation, isSendingFromOrigin = isSendingFromOrigin)
+                feeAmount.orZero() + deliveryFee.orZero()
+            }
+        }
+    }
+
+    private suspend fun CrossChainTransferConfiguration.feeFor(feeConfig: CrossChainFeeConfiguration): CrossChainFeeModel {
+        val chain = chainRegistry.getChain(feeConfig.to.chainId)
         val maxWeight = feeConfig.estimatedWeight()
 
-        return when (val mode = feeConfig.xcmFeeType.mode) {
-            is Mode.Proportional -> mode.weightToFee(maxWeight)
+        return when (val mode = feeConfig.to.xcmFeeType.mode) {
+            is Mode.Proportional -> CrossChainFeeModel(holdingPart = mode.weightToFee(maxWeight))
 
             Mode.Standard -> {
-                val xcmMessage = xcmMessage(feeConfig.xcmFeeType.instructions, chain)
+                val xcmMessage = xcmMessage(feeConfig.to.xcmFeeType.instructions, chain)
 
                 val paymentInfo = extrinsicService.paymentInfo(chain, TransactionOrigin.SelectedWallet) {
                     xcmExecute(xcmMessage, maxWeight)
                 }
 
-                paymentInfo.partialFee
+                CrossChainFeeModel(holdingPart = paymentInfo.partialFee)
             }
 
-            Mode.Unknown -> null
+            Mode.Unknown -> CrossChainFeeModel.zero()
+        }
+    }
+
+    private suspend fun CrossChainTransferConfiguration.deliveryFeeFor(
+        config: CrossChainFeeConfiguration,
+        destinationChainLocation: MultiLocation,
+        isSendingFromOrigin: Boolean
+    ): CrossChainFeeModel {
+        val deliveryFeeConfiguration = config.from.deliveryFeeConfiguration ?: return CrossChainFeeModel.zero()
+
+        val deliveryConfig = deliveryFeeConfiguration.getDeliveryConfig(destinationChainLocation)
+
+        val deliveryFeeFactor: BigInteger = queryDeliveryFeeFactor(config.from.chainId, deliveryConfig.factorPallet, destinationChainLocation)
+
+        val xcmMessageSize = getXcmMessageSize(config)
+        val xcmMessageSizeWithTopic = xcmMessageSize + TOPIC_SIZE.toBigInteger()
+
+        val feeSize = (deliveryConfig.sizeBase + xcmMessageSizeWithTopic * deliveryConfig.sizeFactor)
+        val deliveryFee = BigRational.fixedU128(deliveryFeeFactor * feeSize)
+
+        return if (deliveryConfig.alwaysHoldingPays || isSendingFromOrigin) {
+            CrossChainFeeModel(holdingPart = deliveryFee)
+        } else {
+            CrossChainFeeModel(senderPart = deliveryFee)
+        }
+    }
+
+    private suspend fun CrossChainTransferConfiguration.getXcmMessageSize(config: CrossChainFeeConfiguration): BigInteger {
+        val destinationChain = chainRegistry.getChain(config.to.chainId)
+        val destinationRuntime = chainRegistry.getRuntime(config.to.chainId)
+        val xcmMessage = xcmMessage(config.to.xcmFeeType.instructions, destinationChain)
+            .toEncodableInstance()
+
+        return destinationRuntime.metadata
+            .module(destinationRuntime.metadata.xcmPalletName())
+            .call("execute")
+            .argument("message")
+            .requireActualType()
+            .bytes(destinationRuntime, xcmMessage)
+            .size.toBigInteger()
+    }
+
+    private fun DeliveryFeeConfiguration.getDeliveryConfig(destinationChainLocation: MultiLocation): DeliveryFeeConfiguration.Type.Exponential {
+        val isParent = destinationChainLocation.interior.isHere()
+
+        val configType = when {
+            isParent -> toParent
+            else -> toParachain
+        }
+
+        return configType.asExponentialOrThrow()
+    }
+
+    private fun DeliveryFeeConfiguration.Type?.asExponentialOrThrow(): DeliveryFeeConfiguration.Type.Exponential {
+        return this as? DeliveryFeeConfiguration.Type.Exponential ?: throw IllegalStateException("Unknown delivery fee type")
+    }
+
+    private suspend fun queryDeliveryFeeFactor(
+        chainId: ChainId,
+        pallet: String,
+        destinationMultiLocation: MultiLocation,
+    ): BigInteger {
+        return when {
+            destinationMultiLocation.interior.isHere() -> xcmParentDeliveryFeeFactor(chainId, pallet)
+            else -> {
+                val paraId = destinationMultiLocation.interior.paraIdOrNull() ?: throw IllegalStateException("ParaId must be not null")
+                xcmParachainDeliveryFeeFactor(chainId, pallet, paraId)
+            }
         }
     }
 
     private fun CrossChainFeeConfiguration.estimatedWeight(): Weight {
-        val instructionTypes = xcmFeeType.instructions
+        val instructionTypes = to.xcmFeeType.instructions
 
-        return instructionWeight * instructionTypes.size.toBigInteger()
+        return to.instructionWeight * instructionTypes.size.toBigInteger()
     }
 
     private fun CrossChainTransferConfiguration.xcmMessage(
@@ -156,4 +256,21 @@ class RealCrossChainWeigher(
     }
 
     private fun Chain.emptyBeneficiaryMultiLocation(): MultiLocation = emptyAccountId().accountIdToMultiLocation()
+
+    private suspend fun xcmParachainDeliveryFeeFactor(chainId: ChainId, moduleName: String, paraId: ParaId): BigInteger {
+        return storageDataSource.query(chainId) {
+            runtime.metadata.module(moduleName).storage("DeliveryFeeFactor")
+                .query(
+                    paraId,
+                    binding = ::bindNumber
+                )
+        }
+    }
+
+    private suspend fun xcmParentDeliveryFeeFactor(chainId: ChainId, moduleName: String): BigInteger {
+        return storageDataSource.query(chainId) {
+            runtime.metadata.module(moduleName).storage("UpwardDeliveryFeeFactor")
+                .query(binding = ::bindNumber)
+        }
+    }
 }

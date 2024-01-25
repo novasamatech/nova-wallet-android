@@ -8,11 +8,15 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmDestination
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmTransfer
+import io.novafoundation.nova.feature_wallet_api.domain.model.DeliveryFeeConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.DeliveryFeeConfiguration.Type
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainOriginAssetRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainTransfersConfigRemote
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.DeliveryFeeConfigRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.JunctionsRemote
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.NetworkDeliveryFeeRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.ReserveLocationRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmDestinationRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmFeeRemote
@@ -36,12 +40,39 @@ fun mapCrossChainConfigFromRemote(remote: CrossChainTransfersConfigRemote): Cros
         valueTransform = { it.assets.map(::mapAssetTransfersFromRemote) }
     )
 
+    val networkDeliveryFee = remote.networkDeliveryFee.mapValues { (_, networkDeliveryFeeRemote) ->
+        mapNetworkDeliveryFeeFromRemote(networkDeliveryFeeRemote)
+    }
+
     return CrossChainTransfersConfiguration(
         assetLocations = assetsLocations,
         feeInstructions = feeInstructions,
         instructionBaseWeights = remote.networkBaseWeight,
+        deliveryFeeConfigurations = networkDeliveryFee,
         chains = chains
     )
+}
+
+fun mapNetworkDeliveryFeeFromRemote(networkDeliveryFeeRemote: NetworkDeliveryFeeRemote): DeliveryFeeConfiguration {
+    return DeliveryFeeConfiguration(
+        toParent = mapDeliveryFeeConfigFromRemote(networkDeliveryFeeRemote.toParent),
+        toParachain = mapDeliveryFeeConfigFromRemote(networkDeliveryFeeRemote.toParachain)
+    )
+}
+
+fun mapDeliveryFeeConfigFromRemote(config: DeliveryFeeConfigRemote?): DeliveryFeeConfiguration.Type? {
+    if (config == null) return null
+
+    return when (config.type) {
+        "exponential" -> DeliveryFeeConfiguration.Type.Exponential(
+            factorPallet = config.factorPallet,
+            sizeBase = config.sizeBase,
+            sizeFactor = config.sizeFactor,
+            alwaysHoldingPays = config.alwaysHoldingPays
+        )
+
+        else -> throw IllegalArgumentException("Unknown delivery fee config type: ${config.type}")
+    }
 }
 
 private fun mapReserveLocationFromRemote(reserveLocationRemote: ReserveLocationRemote): ReserveLocation {
@@ -61,6 +92,7 @@ private fun mapAssetTransfersFromRemote(remote: CrossChainOriginAssetRemote): As
 
             AssetLocationPath.Concrete(mapJunctionsRemoteToMultiLocation(junctionsRemote))
         }
+
         else -> throw IllegalArgumentException("Unknown asset type")
     }
 
