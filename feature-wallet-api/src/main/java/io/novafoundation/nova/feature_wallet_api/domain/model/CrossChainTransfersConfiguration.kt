@@ -110,5 +110,4 @@ class CrossChainFeeConfiguration(
         val instructionWeight: Weight,
         val xcmFeeType: XcmFee<List<XCMInstructionType>>
     )
-
 }

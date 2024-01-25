@@ -5,14 +5,12 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainDecimalFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
