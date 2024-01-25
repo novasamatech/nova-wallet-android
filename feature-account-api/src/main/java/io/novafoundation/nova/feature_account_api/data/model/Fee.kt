@@ -32,6 +32,10 @@ val Fee.requestedAccountPaysFees: Boolean
     get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)
 
 val Fee.amountByRequestedAccount: BigInteger
+    get() = amount.asAmountByRequestedAccount
+
+context(Fee)
+val BigInteger.asAmountByRequestedAccount: BigInteger
     get() = if (requestedAccountPaysFees) {
         amount
     } else {
