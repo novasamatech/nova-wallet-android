@@ -75,7 +75,7 @@ fun fontSpan(typeface: Typeface?): CharacterStyle {
     return when {
         typeface == null -> NoOpSpan()
 
-        Build.VERSION.SDK_INT>= Build.VERSION_CODES.P -> typefaceSpanCompatV28(typeface)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> typefaceSpanCompatV28(typeface)
 
         else -> CustomTypefaceSpan(typeface)
     }
@@ -91,7 +91,6 @@ fun CharSequence.formatAsSpannable(vararg args: Any): SpannedString {
 private fun typefaceSpanCompatV28(typeface: Typeface) =
     TypefaceSpan(typeface)
 
-
 private class CustomTypefaceSpan(private val typeface: Typeface?) : MetricAffectingSpan() {
     override fun updateDrawState(paint: TextPaint) {
         paint.typeface = typeface
@@ -102,6 +101,6 @@ private class CustomTypefaceSpan(private val typeface: Typeface?) : MetricAffect
     }
 }
 
-private class NoOpSpan: CharacterStyle() {
+private class NoOpSpan : CharacterStyle() {
     override fun updateDrawState(tp: TextPaint?) {}
 }
