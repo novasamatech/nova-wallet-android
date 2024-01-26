@@ -23,6 +23,7 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytesOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArrayOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
@@ -166,6 +167,10 @@ fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot
 
 fun Constant.asNumber(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
 
+fun Constant.decoded(runtimeSnapshot: RuntimeSnapshot): Any? {
+    return type?.fromByteArrayOrNull(runtimeSnapshot, value)
+}
+
 fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
@@ -232,6 +237,14 @@ fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
 fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
 
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
+
+fun RuntimeMetadata.omnipoolOrNull() = moduleOrNull(Modules.OMNIPOOL)
+
+fun RuntimeMetadata.omnipool() = module(Modules.OMNIPOOL)
+
+fun RuntimeMetadata.dynamicFeesOrNull() = moduleOrNull(Modules.DYNAMIC_FEES)
+
+fun RuntimeMetadata.dynamicFees() = module(Modules.DYNAMIC_FEES)
 
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
@@ -386,4 +399,8 @@ object Modules {
     const val MULTISIG = "Multisig"
     const val REGISTRAR = "Registrar"
     const val FAST_UNSTAKE = "FastUnstake"
+
+    const val OMNIPOOL = "Omnipool"
+
+    const val DYNAMIC_FEES = "DynamicFees"
 }

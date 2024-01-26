@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -38,8 +39,15 @@ class NativeAssetsModule {
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
         substrateRemoteSource: SubstrateRemoteSource,
+        @Named(REMOTE_STORAGE_SOURCE) remoteSource: StorageDataSource,
         lockDao: LockDao
-    ) = NativeAssetBalance(chainRegistry, assetCache, substrateRemoteSource, lockDao)
+    ) = NativeAssetBalance(
+        chainRegistry = chainRegistry,
+        assetCache = assetCache,
+        substrateRemoteSource = substrateRemoteSource,
+        remoteStorage = remoteSource,
+        lockDao = lockDao
+    )
 
     @Provides
     @FeatureScope

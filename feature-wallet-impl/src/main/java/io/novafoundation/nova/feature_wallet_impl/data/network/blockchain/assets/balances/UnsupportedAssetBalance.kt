@@ -4,6 +4,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +25,12 @@ class UnsupportedAssetBalance : AssetBalance {
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset) = unsupported()
 
     override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
+    override suspend fun subscribeTransferableAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        sharedSubscriptionBuilder: SharedRequestsBuilder
+    ): Flow<Balance> = unsupported()
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
 

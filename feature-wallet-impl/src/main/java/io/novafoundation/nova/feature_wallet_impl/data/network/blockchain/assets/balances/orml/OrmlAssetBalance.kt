@@ -11,6 +11,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
@@ -19,6 +22,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -68,6 +72,23 @@ class OrmlAssetBalance(
             keyBuilder = { it.ormlBalanceKey(accountId, chainAsset) },
             binding = { scale, runtime -> bindOrmlAccountBalanceOrEmpty(scale, runtime) }
         )
+    }
+
+    override suspend fun subscribeTransferableAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        sharedSubscriptionBuilder: SharedRequestsBuilder
+    ): Flow<Balance> {
+        return remoteStorageSource.subscribe(chain.id, sharedSubscriptionBuilder) {
+            metadata.tokens().storage("Accounts").observe(
+                accountId,
+                chainAsset.ormlCurrencyId(runtime),
+                binding = ::bindOrmlAccountBalanceOrEmpty
+            ).map {
+                Asset.TransferableMode.REGULAR.calculateTransferable(it)
+            }
+        }
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
@@ -121,5 +142,9 @@ class OrmlAssetBalance(
 
     private fun bindOrmlAccountBalanceOrEmpty(scale: String?, runtime: RuntimeSnapshot): AccountBalance {
         return scale?.let { bindOrmlAccountData(it, runtime) } ?: AccountBalance.empty()
+    }
+
+    private fun bindOrmlAccountBalanceOrEmpty(decoded: Any?): AccountBalance {
+        return decoded?.let { bindOrmlAccountData(decoded) } ?: AccountBalance.empty()
     }
 }

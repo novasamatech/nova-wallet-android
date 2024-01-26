@@ -12,9 +12,11 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.toPercent
+import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
+import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
@@ -25,20 +27,22 @@ import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.HydraDxOmnipoolExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -49,6 +53,7 @@ private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
+    private val hydraDxOmnipoolFactory: HydraDxOmnipoolExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
@@ -119,6 +124,13 @@ internal class RealSwapService(
         return exchanges[chainId]?.slippageConfig()
     }
 
+    override fun runSubscriptions(chainIn: Chain): Flow<ReQuoteTrigger> {
+        return withFlowScope { scope ->
+            val exchanges = exchanges(scope)
+            exchanges.getValue(chainIn.id).runSubscriptions(chainIn)
+        }
+    }
+
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {
         val fiatIn = tokenIn.planksToFiat(amountIn)
         val fiatOut = tokenOut.planksToFiat(amountOut)
@@ -150,7 +162,7 @@ internal class RealSwapService(
                     .catch {
                         emit(emptyMap())
 
-                        Log.d("RealSwapService", "Failed to fetch directions for exchange ${exchange::class} in chain $chainId")
+                        Log.e("RealSwapService", "Failed to fetch directions for exchange ${exchange::class} in chain $chainId", it)
                     }
             }
 
@@ -167,8 +179,20 @@ internal class RealSwapService(
     }
 
     private suspend fun createExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
-        return chainRegistry.findChains { it.swap.isNotEmpty() }
-            .associateBy(Chain::id) { assetConversionFactory.create(it.id, coroutineScope) }
+        return chainRegistry.chainsById.first().mapValues { (_, chain) ->
+            createExchange(coroutineScope, chain)
+        }
             .filterNotNull()
+    }
+
+    // TODO only use flags and do not hardcode genesis hash
+    private suspend fun createExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
+        val factory = when {
+            Chain.Swap.ASSET_CONVERSION in chain.swap -> assetConversionFactory
+            chain.id == Chain.Geneses.HYDRA_DX -> hydraDxOmnipoolFactory
+            else -> null
+        }
+
+        return factory?.create(chain, computationScope)
     }
 }

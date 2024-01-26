@@ -31,6 +31,7 @@ import jp.co.soramitsu.fearless_utils.extensions.toAddress
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHexUntyped
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -299,6 +300,8 @@ object ChainGeneses {
     const val ZEITGEIST = "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060"
 
     const val WESTMINT = "67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9"
+
+    const val HYDRA_DX = "afdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d"
 }
 
 object ChainIds {
@@ -333,6 +336,10 @@ fun Chain.Asset.requireOrml(): Type.Orml {
     require(type is Type.Orml)
 
     return type
+}
+
+fun Chain.Asset.ormlOrNull(): Type.Orml? {
+    return type as? Type.Orml
 }
 
 fun Chain.Asset.requireErc20(): Type.EvmErc20 {
@@ -372,6 +379,11 @@ fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?):
 
         currencyIdScale == asset.type.currencyIdScale
     }
+}
+
+fun Type.Orml.decodeOrNull(runtime: RuntimeSnapshot): Any? {
+    val currencyType = runtime.typeRegistry[currencyIdType] ?: return null
+    return currencyType.fromHexOrNull(runtime, currencyIdScale)
 }
 
 val Chain.Asset.localId: AssetAndChainId

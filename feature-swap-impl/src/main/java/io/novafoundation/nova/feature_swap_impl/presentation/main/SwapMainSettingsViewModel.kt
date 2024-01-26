@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -9,6 +10,7 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.event
@@ -102,11 +104,11 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
@@ -613,7 +615,7 @@ class SwapMainSettingsViewModel(
     private fun setupQuoting() {
         setupPerSwapSettingQuoting()
 
-        setupPerBlockQuoting()
+        setupSubscriptionQuoting()
     }
 
     private fun setupPerSwapSettingQuoting() {
@@ -621,14 +623,16 @@ class SwapMainSettingsViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun setupPerBlockQuoting() {
-        swapSettings.map { it.assetIn?.chainId }
-            .distinctUntilChanged()
+    private fun setupSubscriptionQuoting() {
+        swapSettings.mapNotNull { it.assetIn?.chainId }
             .flatMapLatest { chainId ->
-                if (chainId == null) return@flatMapLatest emptyFlow()
+                val chain = chainRegistry.getChain(chainId)
 
-                swapInteractor.blockNumberUpdates(chainId)
+                swapInteractor.runSubscriptions(chain)
+                    .catch { Log.e(this@SwapMainSettingsViewModel.LOG_TAG, "Failure during subscriptions run", it) }
             }.onEach {
+                Log.d("Swap", "ReQuote triggered from subscription")
+
                 val currentSwapSettings = swapSettings.first()
 
                 performQuote(currentSwapSettings, shouldShowLoading = false)
