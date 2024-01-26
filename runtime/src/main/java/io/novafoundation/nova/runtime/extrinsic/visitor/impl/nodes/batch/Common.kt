@@ -8,7 +8,6 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Generic
 import jp.co.soramitsu.fearless_utils.runtime.metadata.event
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Event
 
-
 internal fun RuntimeSnapshot.batchCompletedEvent(): Event {
     return metadata.utility().event("BatchCompleted")
 }

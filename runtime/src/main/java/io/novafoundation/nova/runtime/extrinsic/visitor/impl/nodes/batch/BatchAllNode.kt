@@ -12,7 +12,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Generic
 internal class BatchAllNode : NestedCallNode {
 
     override fun canVisit(call: GenericCall.Instance): Boolean {
-       return call.module.name == Modules.UTILITY && call.function.name == "batch_all"
+        return call.module.name == Modules.UTILITY && call.function.name == "batch_all"
     }
 
     override fun endExclusiveToSkipInternalEvents(call: GenericCall.Instance, context: EventCountingContext): Int {
@@ -43,7 +43,7 @@ internal class BatchAllNode : NestedCallNode {
 
         if (context.callSucceeded) {
             context.logger.info("BatchAll succeeded")
-        } else  {
+        } else {
             context.logger.info("BatchAll failed")
         }
 
