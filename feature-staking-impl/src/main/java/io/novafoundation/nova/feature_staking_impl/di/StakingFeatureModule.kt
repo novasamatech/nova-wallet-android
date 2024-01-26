@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -620,13 +621,15 @@ class StakingFeatureModule {
         extrinsicService: ExtrinsicService,
         proxyDepositCalculator: ProxyDepositCalculator,
         getProxyRepository: GetProxyRepository,
-        proxyConstantsRepository: ProxyConstantsRepository
+        proxyConstantsRepository: ProxyConstantsRepository,
+        proxySyncService: ProxySyncService
     ): AddStakingProxyInteractor {
         return RealAddStakingProxyInteractor(
             extrinsicService,
             proxyDepositCalculator,
             getProxyRepository,
-            proxyConstantsRepository
+            proxyConstantsRepository,
+            proxySyncService
         )
     }
 
@@ -643,6 +646,10 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun removeStakingProxyInteractor(
-        extrinsicService: ExtrinsicService
-    ): RemoveStakingProxyInteractor = RealRemoveStakingProxyInteractor(extrinsicService)
+        extrinsicService: ExtrinsicService,
+        proxySyncService: ProxySyncService
+    ): RemoveStakingProxyInteractor = RealRemoveStakingProxyInteractor(
+        extrinsicService,
+        proxySyncService
+    )
 }

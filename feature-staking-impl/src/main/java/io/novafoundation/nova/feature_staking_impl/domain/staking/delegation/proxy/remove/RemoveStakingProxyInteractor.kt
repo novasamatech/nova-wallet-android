@@ -1,26 +1,36 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove
 
+import io.novafoundation.nova.common.utils.mapFailure
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_proxy_api.data.calls.removeProxyCall
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.emptyAccountId
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
 interface RemoveStakingProxyInteractor {
 
     suspend fun estimateFee(chain: Chain, proxiedAccountId: AccountId): Fee
 
-    suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicSubmission>
+    suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<Flow<ExtrinsicStatus>>
 }
 
 class RealRemoveStakingProxyInteractor(
-    private val extrinsicService: ExtrinsicService
+    private val extrinsicService: ExtrinsicService,
+    private val proxySyncService: ProxySyncService
 ) : RemoveStakingProxyInteractor {
 
     override suspend fun estimateFee(chain: Chain, proxiedAccountId: AccountId): Fee {
@@ -31,11 +41,16 @@ class RealRemoveStakingProxyInteractor(
         }
     }
 
-    override suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicSubmission> {
-        return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsic(chain, proxiedAccountId.intoOrigin()) {
+    override suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<Flow<ExtrinsicStatus>> {
+        val result = withContext(Dispatchers.IO) {
+            extrinsicService.submitAndWatchExtrinsic(chain, proxiedAccountId.intoOrigin()) {
                 removeProxyCall(proxyAccountId, ProxyType.Staking)
             }
         }
+
+        result.awaitInBlock()
+        proxySyncService.startSyncing()
+
+        return result
     }
 }

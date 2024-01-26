@@ -196,6 +196,7 @@ class AddStakingProxyViewModel(
             progressConsumer = _validationProgressFlow.progressConsumer()
         ) {
             openConfirmScreen(it)
+            _validationProgressFlow.value = false
         }
     }
 
