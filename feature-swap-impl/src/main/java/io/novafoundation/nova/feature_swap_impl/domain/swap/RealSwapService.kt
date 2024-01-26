@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -124,10 +125,10 @@ internal class RealSwapService(
         return exchanges[chainId]?.slippageConfig()
     }
 
-    override fun runSubscriptions(chainIn: Chain): Flow<ReQuoteTrigger> {
+    override fun runSubscriptions(chainIn: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return withFlowScope { scope ->
             val exchanges = exchanges(scope)
-            exchanges.getValue(chainIn.id).runSubscriptions(chainIn)
+            exchanges.getValue(chainIn.id).runSubscriptions(chainIn, metaAccount)
         }
     }
 

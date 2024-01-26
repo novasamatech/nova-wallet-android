@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -130,7 +131,7 @@ private class AssetConversionExchange(
         return SlippageConfig.default()
     }
 
-    override fun runSubscriptions(chain: Chain): Flow<ReQuoteTrigger> {
+    override fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return chainStateRepository.currentBlockNumberFlow(chain.id)
             .drop(1) // skip immediate value from the cache to not perform double-quote on chain change
             .map { ReQuoteTrigger }

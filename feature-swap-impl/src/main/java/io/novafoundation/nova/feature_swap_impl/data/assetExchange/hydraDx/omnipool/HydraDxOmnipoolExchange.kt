@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNu
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.dynamicFees
+import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.numberConstant
@@ -15,9 +16,14 @@ import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -25,6 +31,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.acceptedCurrencies
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.accountCurrencyMap
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.multiTransactionPayment
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPool
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPoolFees
@@ -38,6 +47,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.decodeOrNull
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -95,9 +106,19 @@ private class HydraDxOmnipoolExchange(
 
     private val omniPoolFlow: MutableSharedFlow<OmniPool> = singleReplaySharedFlow()
 
+    private val currentPaymentAsset: MutableSharedFlow<OmniPoolTokenId> = singleReplaySharedFlow()
+
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
-        // TODO HydraDx supports custom token fee payment
-        return false
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val onChainId = asset.requireOmniPoolTokenId(runtime)
+
+        if (onChainId == SYSTEM_ON_CHAIN_ASSET_ID) return true
+
+        val fallbackPrice = remoteStorageSource.query(chain.id) {
+            metadata.multiTransactionPayment.acceptedCurrencies.query(onChainId)
+        }
+
+        return fallbackPrice != null
     }
 
     override suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId> {
@@ -129,16 +150,52 @@ private class HydraDxOmnipoolExchange(
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
-        val fee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+        val feeAsset = args.usedFeeAsset
+        val paymentCurrencyToSet = getPaymentCurrencyToSetIfNeeded(feeAsset)
+
+        val setCurrencyFee = if (paymentCurrencyToSet != null) {
+            extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+                setFeeCurrency(paymentCurrencyToSet)
+            }
+        } else {
+            null
+        }
+
+        val swapFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             executeSwap(args)
         }
 
-        return AssetExchangeFee(networkFee = fee, MinimumBalanceBuyIn.NoBuyInNeeded)
+        val totalNativeFee = swapFee.amount + setCurrencyFee?.amount.orZero()
+
+        val feeAmountInExpectedCurrency = if (!feeAsset.isUtilityAsset) {
+            convertNativeFeeToAssetFee(totalNativeFee, feeAsset)
+        } else {
+            totalNativeFee
+        }
+        val feeInExpectedCurrency = SubstrateFee(
+            amount = feeAmountInExpectedCurrency,
+            submissionOrigin = swapFee.submissionOrigin
+        )
+
+        return AssetExchangeFee(networkFee = feeInExpectedCurrency, MinimumBalanceBuyIn.NoBuyInNeeded)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
-        return extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) {
-            executeSwap(args)
+        val feeAsset = args.usedFeeAsset
+        val paymentCurrencyToSet = getPaymentCurrencyToSetIfNeeded(feeAsset)
+
+        val setCurrencyResult = if (paymentCurrencyToSet != null) {
+            extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
+                setFeeCurrency(paymentCurrencyToSet)
+            }.awaitInBlock() // we need to wait for tx execution for currency update changes to be taken into account by runtime with executing swap itself
+        } else {
+            Result.success(Unit)
+        }
+
+        return setCurrencyResult.flatMap {
+            extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) {
+                executeSwap(args)
+            }
         }
     }
 
@@ -147,7 +204,7 @@ private class HydraDxOmnipoolExchange(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun runSubscriptions(chain: Chain): Flow<ReQuoteTrigger> {
+    override fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         omniPoolFlow.resetReplayCache()
 
         return withFlowScope { scope ->
@@ -184,14 +241,60 @@ private class HydraDxOmnipoolExchange(
 
             val defaultFees = getDefaultFees()
 
+            val userAccountId = metaAccount.requireAccountIdIn(chain)
+
+            val feeCurrency = remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
+                metadata.multiTransactionPayment.accountCurrencyMap.observe(userAccountId)
+            }
+
             subscriptionBuilder.subscribe(scope)
 
-            combine(omniPoolStateFlow, omniPoolBalancesFlow, feesFlow) { poolState, poolBalances, fees ->
+            val poolStateUpdates = combine(omniPoolStateFlow, omniPoolBalancesFlow, feesFlow) { poolState, poolBalances, fees ->
                 createOmniPool(poolState, poolBalances, fees, defaultFees)
             }
                 .onEach(omniPoolFlow::emit)
-                .map { ReQuoteTrigger }
+
+            val feeCurrencyUpdates = feeCurrency.onEach { tokenId ->
+                val feePaymentAsset = tokenId ?: SYSTEM_ON_CHAIN_ASSET_ID
+                currentPaymentAsset.emit(feePaymentAsset)
+            }
+
+            combine(poolStateUpdates, feeCurrencyUpdates) { _, _ ->
+                ReQuoteTrigger
+            }
         }
+    }
+
+    private val SwapExecuteArgs.usedFeeAsset: Chain.Asset
+        get() = customFeeAsset ?: chain.utilityAsset
+
+    // This will most probably slightly over-estimate the fee since Hydra runtime uses not only Omni-pool to convert native fee
+    private suspend fun convertNativeFeeToAssetFee(
+        nativeFeeAmount: Balance,
+        targetAsset: Chain.Asset
+    ): Balance {
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val omniPool = omniPoolFlow.first()
+
+        val omniPoolTokenIdIn = targetAsset.requireOmniPoolTokenId(runtime)
+        val omniPoolTokenIdOut = chain.utilityAsset.requireOmniPoolTokenId(runtime)
+
+        val targetAssetAmount = omniPool.quote(
+            assetIdIn = omniPoolTokenIdIn,
+            assetIdOut = omniPoolTokenIdOut,
+            amount = nativeFeeAmount,
+            direction = SwapDirection.SPECIFIED_OUT
+        )
+
+        return requireNotNull(targetAssetAmount) // we don't expect liquidity run out for fee conversion
+    }
+
+    private suspend fun getPaymentCurrencyToSetIfNeeded(expectedPaymentAsset: Chain.Asset): OmniPoolTokenId? {
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val currencyPaymentTokenId = currentPaymentAsset.first()
+        val expectedPaymentTokenId = expectedPaymentAsset.requireOmniPoolTokenId(runtime)
+
+        return expectedPaymentTokenId.takeIf { currencyPaymentTokenId != expectedPaymentTokenId }
     }
 
     private suspend fun getDefaultFees(): OmniPoolFees {
@@ -295,6 +398,16 @@ private class HydraDxOmnipoolExchange(
                 maxSellAmount = limit.amountInMax
             )
         }
+    }
+
+    private fun ExtrinsicBuilder.setFeeCurrency(onChainId: OmniPoolTokenId) {
+        call(
+            moduleName = "MultiTransactionPayment",
+            callName = "set_currency",
+            arguments = mapOf(
+                "currency" to onChainId
+            )
+        )
     }
 
     private fun ExtrinsicBuilder.sell(
