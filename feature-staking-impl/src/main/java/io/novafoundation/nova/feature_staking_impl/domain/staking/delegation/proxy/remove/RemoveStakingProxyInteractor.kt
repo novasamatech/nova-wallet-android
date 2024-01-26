@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove
 
-import io.novafoundation.nova.common.utils.mapFailure
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
@@ -15,10 +13,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
 interface RemoveStakingProxyInteractor {

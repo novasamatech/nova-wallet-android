@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters
 
-import io.novafoundation.nova.common.utils.proxy
 import io.novafoundation.nova.common.utils.proxyOrNull
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
