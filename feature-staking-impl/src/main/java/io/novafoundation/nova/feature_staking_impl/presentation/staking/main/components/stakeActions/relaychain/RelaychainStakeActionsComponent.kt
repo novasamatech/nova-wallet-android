@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
@@ -40,10 +41,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 class RelaychainStakeActionsComponentFactory(
@@ -88,9 +92,7 @@ private class RelaychainStakeActionsComponent(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val stakingProxiesQuantity = accountRepository.selectedMetaAccountFlow()
         .flatMapLatest { metaAccount ->
-            val chain = stakingOption.assetWithChain.chain
-            val accountId = metaAccount.requireAccountIdIn(chain)
-            getProxyRepository.proxiesQuantityByTypeFlow(chain, accountId, ProxyType.Staking)
+            getProxiesQuantity(metaAccount)
         }
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
@@ -114,6 +116,14 @@ private class RelaychainStakeActionsComponent(
         when (action) {
             is StakeActionsAction.ActionClicked -> manageStakeActionChosen(action.action)
         }
+    }
+
+    private suspend fun getProxiesQuantity(metaAccount: MetaAccount): Flow<Int> {
+        val chain = stakingOption.assetWithChain.chain
+        if (chain.supportProxy.not()) return flowOf(0)
+
+        val accountId = metaAccount.requireAccountIdIn(chain)
+        return getProxyRepository.proxiesQuantityByTypeFlow(chain, accountId, ProxyType.Staking)
     }
 
     private fun manageStakeActionChosen(manageStakeAction: ManageStakeAction) {

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters
 
 import io.novafoundation.nova.common.utils.proxy
+import io.novafoundation.nova.common.utils.proxyOrNull
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -21,6 +22,6 @@ class ProxiesUpdater(
 
     override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: AccountStakingLocal): String? {
         val accountId = scopeValue.accountId
-        return runtime.metadata.proxy().storageOrNull("Proxies")?.storageKey(runtime, accountId)
+        return runtime.metadata.proxyOrNull()?.storageOrNull("Proxies")?.storageKey(runtime, accountId)
     }
 }
