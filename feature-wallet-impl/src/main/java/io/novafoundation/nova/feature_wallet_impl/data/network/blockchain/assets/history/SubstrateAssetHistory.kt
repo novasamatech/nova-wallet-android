@@ -35,7 +35,7 @@ abstract class SubstrateAssetHistory(
     coinPriceRepository: CoinPriceRepository
 ) : BaseAssetHistory(coinPriceRepository) {
 
-    abstract fun realtimeFetcherSources(): List<SubstrateRealtimeOperationFetcher.Factory.Source>
+    abstract fun realtimeFetcherSources(chain: Chain): List<SubstrateRealtimeOperationFetcher.Factory.Source>
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
@@ -43,7 +43,7 @@ abstract class SubstrateAssetHistory(
         blockHash: String,
         accountId: AccountId
     ): List<RealtimeHistoryUpdate> {
-        val sources = realtimeFetcherSources()
+        val sources = realtimeFetcherSources(chain)
         val realtimeOperationFetcher = realtimeOperationFetcherFactory.create(sources)
 
         return realtimeOperationFetcher.extractRealtimeHistoryUpdates(chain, chainAsset, blockHash)

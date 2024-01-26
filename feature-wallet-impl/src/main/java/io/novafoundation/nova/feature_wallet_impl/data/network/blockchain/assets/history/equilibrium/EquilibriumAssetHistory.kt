@@ -30,7 +30,7 @@ class EquilibriumAssetHistory(
     realtimeOperationFetcherFactory: SubstrateRealtimeOperationFetcher.Factory
 ) : SubstrateAssetHistory(walletOperationsApi, cursorStorage, realtimeOperationFetcherFactory, coinPriceRepository) {
 
-    override fun realtimeFetcherSources(): List<Source> {
+    override fun realtimeFetcherSources(chain: Chain): List<Source> {
         return listOf(TransferExtractor().asSource())
     }
 

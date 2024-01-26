@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate
 
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Extractor
@@ -13,6 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepo
 
 internal class SubstrateRealtimeOperationFetcherFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
+    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val eventsRepository: EventsRepository,
     private val extrinsicWalk: ExtrinsicWalk,
 ) : Factory {
@@ -33,11 +35,16 @@ internal class SubstrateRealtimeOperationFetcherFactory(
     private fun Factory.Source.Known.Id.extractor(): Extractor {
         return when (this) {
             Factory.Source.Known.Id.ASSET_CONVERSION_SWAP -> assetConversionSwap()
+            Factory.Source.Known.Id.HYDRA_DX_SWAP -> hydraDxOmniPoolSwap()
         }
     }
 
     private fun assetConversionSwap(): Extractor {
         return AssetConversionSwapExtractor(multiLocationConverterFactory)
+    }
+
+    private fun hydraDxOmniPoolSwap(): Extractor {
+        return HydraDxOmniPoolSwapExtractor(hydraDxAssetIdConverter)
     }
 }
 

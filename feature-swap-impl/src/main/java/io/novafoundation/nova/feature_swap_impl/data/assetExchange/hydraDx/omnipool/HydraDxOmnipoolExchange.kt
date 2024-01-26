@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.dynamicFees
@@ -43,9 +42,11 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnip
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.feeParamsConstant
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.quote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSystemAsset
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
-import io.novafoundation.nova.runtime.ext.decodeOrNull
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -57,7 +58,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -71,14 +71,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.runningFold
 import java.math.BigInteger
 
-private val SYSTEM_ON_CHAIN_ASSET_ID = BigInteger.ZERO
-
 class HydraDxOmnipoolExchangeFactory(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
     private val sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
+    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : AssetExchange.Factory {
 
     override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
@@ -88,7 +87,8 @@ class HydraDxOmnipoolExchangeFactory(
             chain = chain,
             storageSharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
             assetSourceRegistry = assetSourceRegistry,
-            extrinsicService = extrinsicService
+            extrinsicService = extrinsicService,
+            hydraDxAssetIdConverter = hydraDxAssetIdConverter
         )
     }
 }
@@ -100,6 +100,7 @@ private class HydraDxOmnipoolExchange(
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
+    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : AssetExchange {
 
     private val pooledOnChainAssetIdsState: MutableSharedFlow<List<RemoteAndLocalId>> = singleReplaySharedFlow()
@@ -109,10 +110,9 @@ private class HydraDxOmnipoolExchange(
     private val currentPaymentAsset: MutableSharedFlow<OmniPoolTokenId> = singleReplaySharedFlow()
 
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
-        val runtime = chainRegistry.getRuntime(chain.id)
-        val onChainId = asset.requireOmniPoolTokenId(runtime)
+        val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)
 
-        if (onChainId == SYSTEM_ON_CHAIN_ASSET_ID) return true
+        if (hydraDxAssetIdConverter.isSystemAsset(onChainId)) return true
 
         val fallbackPrice = remoteStorageSource.query(chain.id) {
             metadata.multiTransactionPayment.acceptedCurrencies.query(onChainId)
@@ -137,11 +137,10 @@ private class HydraDxOmnipoolExchange(
     }
 
     override suspend fun quote(args: SwapQuoteArgs): AssetExchangeQuote {
-        val runtime = chainRegistry.getRuntime(chain.id)
         val omniPool = omniPoolFlow.first()
 
-        val omniPoolTokenIdIn = args.tokenIn.configuration.requireOmniPoolTokenId(runtime)
-        val omniPoolTokenIdOut = args.tokenOut.configuration.requireOmniPoolTokenId(runtime)
+        val omniPoolTokenIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.tokenIn.configuration)
+        val omniPoolTokenIdOut = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.tokenOut.configuration)
 
         val quote = omniPool.quote(omniPoolTokenIdIn, omniPoolTokenIdOut, args.amount, args.swapDirection)
             ?: throw SwapQuoteException.NotEnoughLiquidity
@@ -255,7 +254,7 @@ private class HydraDxOmnipoolExchange(
                 .onEach(omniPoolFlow::emit)
 
             val feeCurrencyUpdates = feeCurrency.onEach { tokenId ->
-                val feePaymentAsset = tokenId ?: SYSTEM_ON_CHAIN_ASSET_ID
+                val feePaymentAsset = tokenId ?: hydraDxAssetIdConverter.systemAssetId
                 currentPaymentAsset.emit(feePaymentAsset)
             }
 
@@ -273,11 +272,10 @@ private class HydraDxOmnipoolExchange(
         nativeFeeAmount: Balance,
         targetAsset: Chain.Asset
     ): Balance {
-        val runtime = chainRegistry.getRuntime(chain.id)
         val omniPool = omniPoolFlow.first()
 
-        val omniPoolTokenIdIn = targetAsset.requireOmniPoolTokenId(runtime)
-        val omniPoolTokenIdOut = chain.utilityAsset.requireOmniPoolTokenId(runtime)
+        val omniPoolTokenIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(targetAsset)
+        val omniPoolTokenIdOut = hydraDxAssetIdConverter.toOnChainIdOrThrow(chain.utilityAsset)
 
         val targetAssetAmount = omniPool.quote(
             assetIdIn = omniPoolTokenIdIn,
@@ -290,9 +288,8 @@ private class HydraDxOmnipoolExchange(
     }
 
     private suspend fun getPaymentCurrencyToSetIfNeeded(expectedPaymentAsset: Chain.Asset): OmniPoolTokenId? {
-        val runtime = chainRegistry.getRuntime(chain.id)
         val currencyPaymentTokenId = currentPaymentAsset.first()
-        val expectedPaymentTokenId = expectedPaymentAsset.requireOmniPoolTokenId(runtime)
+        val expectedPaymentTokenId = hydraDxAssetIdConverter.toOnChainIdOrThrow(expectedPaymentAsset)
 
         return expectedPaymentTokenId.takeIf { currencyPaymentTokenId != expectedPaymentTokenId }
     }
@@ -355,34 +352,18 @@ private class HydraDxOmnipoolExchange(
     }
 
     private suspend fun matchKnownChainAssetIds(onChainIds: List<OmniPoolTokenId>): List<RemoteAndLocalId> {
-        val runtime = chainRegistry.getRuntime(chain.id)
-        val omniPoolTokenIds = chain.assets.associateBy(
-            keySelector = { it.omniPoolTokenIdOrNull(runtime) },
-            valueTransform = { it.fullId }
-        )
+        val omniPoolTokenIds = hydraDxAssetIdConverter.allOnChainIds(chain)
 
         return onChainIds.mapNotNull { onChainId ->
-            val id = omniPoolTokenIds[onChainId] ?: return@mapNotNull null
+            val asset = omniPoolTokenIds[onChainId] ?: return@mapNotNull null
 
-            onChainId to id
+            onChainId to asset.fullId
         }
     }
 
-    private fun Chain.Asset.omniPoolTokenIdOrNull(runtimeSnapshot: RuntimeSnapshot): OmniPoolTokenId? {
-        return when (val type = type) {
-            is Chain.Asset.Type.Orml -> bindNumberOrNull(type.decodeOrNull(runtimeSnapshot))
-            is Chain.Asset.Type.Native -> SYSTEM_ON_CHAIN_ASSET_ID
-            else -> null
-        }
-    }
-
-    private fun Chain.Asset.requireOmniPoolTokenId(runtimeSnapshot: RuntimeSnapshot): OmniPoolTokenId {
-        return requireNotNull(omniPoolTokenIdOrNull(runtimeSnapshot))
-    }
-
-    private fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs) {
-        val assetIdIn = args.assetIn.requireOmniPoolTokenId(runtime)
-        val assetIdOut = args.assetOut.requireOmniPoolTokenId(runtime)
+    private suspend fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs) {
+        val assetIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.assetIn)
+        val assetIdOut = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.assetOut)
 
         when (val limit = args.swapLimit) {
             is SwapLimit.SpecifiedIn -> sell(

@@ -65,6 +65,15 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
 
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
 
+fun List<Chain.Swap>.assetConversionSupported(): Boolean {
+    return Chain.Swap.ASSET_CONVERSION in this
+}
+
+fun List<Chain.Swap>.hydraDxSupported(): Boolean {
+    // TODO determine hydra availability from flags
+    return true
+}
+
 val Chain.ConnectionState.isFullSync: Boolean
     get() = this == Chain.ConnectionState.FULL_SYNC
 
