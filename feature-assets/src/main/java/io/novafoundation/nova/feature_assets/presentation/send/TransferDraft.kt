@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.send
 
 import android.os.Parcelable
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
