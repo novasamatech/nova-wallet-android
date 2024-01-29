@@ -9,7 +9,6 @@ import java.math.BigDecimal
 @Parcelize
 class TransferDraft(
     val amount: BigDecimal,
-    val originFee: FeeParcelModel,
     val origin: AssetPayload,
     val destination: AssetPayload,
     val recipientAddress: String,

@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
@@ -71,7 +70,7 @@ sealed class AssetTransferValidationFailure {
 data class AssetTransferPayload(
     val transfer: WeightedAssetTransfer,
     val originFee: DecimalFee,
-    val crossChainFee: CrossChainDecimalFee?,
+    val crossChainFee: DecimalFee?,
     val originCommissionAsset: Asset,
     val originUsedAsset: Asset
 )
