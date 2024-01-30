@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
@@ -84,16 +83,13 @@ val AssetTransferPayload.commissionChainAsset: Chain.Asset
     get() = originCommissionAsset.token.configuration
 
 val AssetTransferPayload.originFeeList: List<GenericDecimalFee<GenericFee>>
-    get() = originFee.intoDecimalFeeList(
-        chainAsset = commissionChainAsset,
-        deliveryFeeSubmissionOrigin = SubmissionOrigin.singleOrigin(transfer.senderAccountId())
-    )
+    get() = originFee.intoDecimalFeeList()
 
-val AssetTransferPayload.originFeeListInUsedAsset: List<GenericDecimalFee<GenericFee>>?
+val AssetTransferPayload.originFeeListInUsedAsset: List<GenericDecimalFee<GenericFee>>
     get() = if (isSendingCommissionAsset) {
         originFeeList
     } else {
-        null
+        emptyList()
     }
 
 val AssetTransferPayload.isSendingCommissionAsset

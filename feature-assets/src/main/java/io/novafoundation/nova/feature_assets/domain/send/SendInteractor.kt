@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.senderAccountId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -72,12 +74,17 @@ class SendInteractor(
 
             val originFee = crossChainTransactor.estimateOriginFee(config, transfer)
             val crossChainFeeModel = crossChainWeigher.estimateFee(amount, config)
-            val originFeeWithSenderPart = OriginFee.from(originFee, crossChainFeeModel.senderPart)
+
+            val deliveryPartFee = getDeliveryFee(crossChainFeeModel.senderPart, transfer.senderAccountId())
+            val originFeeWithSenderPart = OriginFee(originFee, deliveryPartFee, transfer.commissionAssetToken.configuration)
 
             TransferFeeModel(originFeeWithSenderPart, crossChainFeeModel.toSubstrateFee(transfer))
         } else {
             val originFee = getAssetTransfers(transfer).calculateFee(transfer)
-            TransferFeeModel(OriginFee.from(originFee, Balance.ZERO), null)
+            TransferFeeModel(
+                OriginFee(originFee, null, transfer.commissionAssetToken.configuration),
+                null
+            )
         }
     }
 
@@ -91,7 +98,7 @@ class SendInteractor(
 
             crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amountByRequestedAccount)
         } else {
-            val networkFee = originFee.networkFeePart(transfer.commissionAssetToken.configuration)
+            val networkFee = originFee.networkFeePart()
 
             getAssetTransfers(transfer).performTransfer(transfer)
                 .onSuccess { submission ->
@@ -117,6 +124,13 @@ class SendInteractor(
         destinationChain = transfer.destinationChain,
         destinationParaId = parachainInfoRepository.paraId(transfer.destinationChain.id)
     )
+
+    private fun getDeliveryFee(amount: Balance, accountId: AccountId): Fee {
+        return SubstrateFee(
+            amount = amount,
+            submissionOrigin = SubmissionOrigin.singleOrigin(accountId)
+        )
+    }
 
     private fun CrossChainFeeModel.toSubstrateFee(transfer: AssetTransfer) = SubstrateFee(
         amount = holdingPart,

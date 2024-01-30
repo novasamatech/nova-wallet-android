@@ -13,8 +13,6 @@ interface Fee {
      * Information about origin that is supposed to send the transaction fee was calculated against
      */
     val submissionOrigin: SubmissionOrigin
-
-    operator fun plus(other: BigInteger): Fee
 }
 
 data class EvmFee(
@@ -23,20 +21,12 @@ data class EvmFee(
     override val submissionOrigin: SubmissionOrigin
 ) : Fee {
     override val amount = gasLimit * gasPrice
-
-    override fun plus(other: BigInteger): Fee {
-        return EvmFee(gasLimit, gasPrice + other, submissionOrigin)
-    }
 }
 
 class SubstrateFee(
     override val amount: BigInteger,
     override val submissionOrigin: SubmissionOrigin
-) : Fee {
-    override fun plus(other: BigInteger): Fee {
-        return SubstrateFee(amount + other, submissionOrigin)
-    }
-}
+) : Fee
 
 val Fee.requestedAccountPaysFees: Boolean
     get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)

@@ -9,12 +9,11 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeListInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeDecimalAmount
-import java.math.BigDecimal
 
 class CrossChainFeeValidation : AssetTransfersValidation {
 
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
-        val originFeeSum = value.originFeeListInUsedAsset?.sumOf { it.networkFeeByRequestedAccount } ?: BigDecimal.ZERO
+        val originFeeSum = value.originFeeListInUsedAsset.sumOf { it.networkFeeByRequestedAccount }
 
         val remainingBalanceAfterTransfer = value.originUsedAsset.transferable - value.transfer.amount - originFeeSum
 

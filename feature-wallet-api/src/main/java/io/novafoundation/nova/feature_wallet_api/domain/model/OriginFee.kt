@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
@@ -15,45 +15,28 @@ typealias OriginDecimalFee = GenericDecimalFee<OriginGenericFee>
 
 data class OriginFee(
     val networkFee: Fee,
-    val deliveryPart: BigInteger
+    val deliveryPart: Fee?,
+    val chainAsset: Chain.Asset
 ) : Fee {
 
-    override val amount: BigInteger = networkFee.amount + deliveryPart
+    override val amount: BigInteger = networkFee.amount + deliveryPart?.amount.orZero()
 
     override val submissionOrigin: SubmissionOrigin = networkFee.submissionOrigin
+}
 
-    override fun plus(other: BigInteger): Fee {
-        return OriginFee(
-            networkFee = networkFee + other,
-            deliveryPart = deliveryPart
-        )
-    }
+fun OriginDecimalFee.networkFeePart(): GenericDecimalFee<GenericFee> {
+    return GenericDecimalFee.from(genericFee.networkFee.networkFee, genericFee.networkFee.chainAsset)
+}
 
-    companion object {
-        fun from(fee: Fee, deliveryPart: BigInteger): OriginFee {
-            return OriginFee(
-                networkFee = fee,
-                deliveryPart = deliveryPart
-            )
-        }
+fun OriginDecimalFee.deliveryFeePart(): GenericDecimalFee<GenericFee>? {
+    return genericFee.networkFee.deliveryPart?.let {
+        GenericDecimalFee.from(genericFee.networkFee.deliveryPart, genericFee.networkFee.chainAsset)
     }
 }
 
-fun OriginDecimalFee.networkFeePart(chainAsset: Chain.Asset): GenericDecimalFee<GenericFee> {
-    return GenericDecimalFee.from(genericFee.networkFee.networkFee, chainAsset)
-}
-
-fun OriginDecimalFee.deliveryFeePart(chainAsset: Chain.Asset, submissionOrigin: SubmissionOrigin): GenericDecimalFee<GenericFee> {
-    val fee = SubstrateFee(
-        amount = genericFee.networkFee.deliveryPart,
-        submissionOrigin = submissionOrigin
-    )
-    return GenericDecimalFee.from(fee, chainAsset)
-}
-
-fun OriginDecimalFee.intoDecimalFeeList(chainAsset: Chain.Asset, deliveryFeeSubmissionOrigin: SubmissionOrigin): List<GenericDecimalFee<GenericFee>> {
-    return listOf(
-        networkFeePart(chainAsset),
-        deliveryFeePart(chainAsset, deliveryFeeSubmissionOrigin)
+fun OriginDecimalFee.intoDecimalFeeList(): List<GenericDecimalFee<GenericFee>> {
+    return listOfNotNull(
+        networkFeePart(),
+        deliveryFeePart()
     )
 }

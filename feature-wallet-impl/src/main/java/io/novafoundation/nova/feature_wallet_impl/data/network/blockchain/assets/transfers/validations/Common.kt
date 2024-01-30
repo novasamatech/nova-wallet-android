@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.commissionChainAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeList
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeListInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
@@ -57,7 +56,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
-        fee = { it.originFee.networkFeePart(it.commissionChainAsset) },
+        fee = { it.originFee.networkFeePart() },
         balance = { it.originCommissionAsset.balanceCountedTowardsED() },
         chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
         error = { payload, _ -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset) }
@@ -82,7 +81,7 @@ fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDepositInUsedAsse
     extraAmount: AmountProducer<AssetTransferPayload>,
 ) = doNotCrossExistentialDepositMultyFee(
     countableTowardsEdBalance = { it.originUsedAsset.balanceCountedTowardsED() },
-    fee = { it.originFeeListInUsedAsset ?: emptyList() },
+    fee = { it.originFeeListInUsedAsset },
     extraAmount = extraAmount,
     existentialDeposit = { assetSourceRegistry.existentialDepositForUsedAsset(it.transfer) },
     error = { remainingAmount, payload -> payload.transfer.originChainAsset.existentialDepositError(remainingAmount) }
