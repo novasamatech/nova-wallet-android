@@ -6,16 +6,18 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidation
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeListInUsedAsset
+import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeDecimalAmount
 
 class CrossChainFeeValidation : AssetTransfersValidation {
 
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
-        val networkFeeInUsedAsset = value.originFeeInUsedAsset.networkFeeByRequestedAccountOrZero
-        val remainingBalanceAfterTransfer = value.originUsedAsset.transferable - value.transfer.amount - networkFeeInUsedAsset
+        val originFeeSum = value.originFeeListInUsedAsset.sumOf { it.networkFeeByRequestedAccount }
 
-        val crossChainFee = value.crossChainFee.networkFeeByRequestedAccountOrZero
+        val remainingBalanceAfterTransfer = value.originUsedAsset.transferable - value.transfer.amount - originFeeSum
+
+        val crossChainFee = value.crossChainFee.networkFeeDecimalAmount
         val remainsEnoughToPayCrossChainFees = remainingBalanceAfterTransfer >= crossChainFee
 
         return remainsEnoughToPayCrossChainFees isTrueOrError {

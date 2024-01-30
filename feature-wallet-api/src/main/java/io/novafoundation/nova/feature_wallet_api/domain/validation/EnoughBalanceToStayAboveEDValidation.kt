@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -15,9 +16,9 @@ interface InsufficientBalanceToStayAboveEDError {
     val asset: Chain.Asset
 }
 
-class EnoughBalanceToStayAboveEDValidation<P, E>(
+class EnoughBalanceToStayAboveEDValidation<P, E, F : GenericFee>(
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val fee: FeeProducer<P>,
+    private val fee: GenericFeeProducer<F, P>,
     private val balance: AmountProducer<P>,
     private val chainWithAsset: (P) -> ChainWithAsset,
     private val error: (P, BigDecimal) -> E
@@ -35,12 +36,12 @@ class EnoughBalanceToStayAboveEDValidation<P, E>(
 
 class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry: AssetSourceRegistry) {
 
-    fun <P, E> create(
-        fee: FeeProducer<P>,
+    fun <P, E, F : GenericFee> create(
+        fee: GenericFeeProducer<F, P>,
         balance: AmountProducer<P>,
         chainWithAsset: (P) -> ChainWithAsset,
         error: (P, BigDecimal) -> E
-    ): EnoughBalanceToStayAboveEDValidation<P, E> {
+    ): EnoughBalanceToStayAboveEDValidation<P, E, F> {
         return EnoughBalanceToStayAboveEDValidation(
             assetSourceRegistry = assetSourceRegistry,
             fee = fee,
@@ -52,8 +53,8 @@ class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry:
 }
 
 context(ValidationSystemBuilder<P, E>)
-fun <P, E> EnoughTotalToStayAboveEDValidationFactory.validate(
-    fee: FeeProducer<P>,
+fun <P, E, F : GenericFee> EnoughTotalToStayAboveEDValidationFactory.validate(
+    fee: GenericFeeProducer<F, P>,
     balance: AmountProducer<P>,
     chainWithAsset: (P) -> ChainWithAsset,
     error: (P, BigDecimal) -> E

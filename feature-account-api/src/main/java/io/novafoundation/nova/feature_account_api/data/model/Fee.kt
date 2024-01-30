@@ -37,7 +37,7 @@ val Fee.amountByRequestedAccount: BigInteger
 context(Fee)
 val BigInteger.asAmountByRequestedAccount: BigInteger
     get() = if (requestedAccountPaysFees) {
-        amount
+        this
     } else {
         BigInteger.ZERO
     }

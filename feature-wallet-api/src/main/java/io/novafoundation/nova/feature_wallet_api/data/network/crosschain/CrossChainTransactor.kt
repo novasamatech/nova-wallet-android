@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFee
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 
 interface CrossChainTransactor {
@@ -19,6 +19,6 @@ interface CrossChainTransactor {
     suspend fun performTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransfer,
-        crossChainFee: CrossChainFee
+        crossChainFee: Balance
     ): Result<ExtrinsicSubmission>
 }
