@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list
 
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
@@ -23,14 +22,14 @@ class RealStakingProxyListInteractor(
     override fun stakingProxyListFlow(chain: Chain, accountId: AccountId): Flow<List<StakingProxyAccount>> {
         return getProxyRepository.proxiesByTypeFlow(chain, accountId, ProxyType.Staking)
             .map { proxies ->
-                val proxiesAccountIds = proxies.map { it.accountId }
+                val proxiesAccountIds = proxies.map { it.proxyAccountId.value }
                 val proxyIdentities = identityProvider.identitiesFor(proxiesAccountIds, chain.id)
                 proxies.map { proxy ->
-                    val proxyAccountId = proxy.accountId
-                    val identity = proxyIdentities[proxyAccountId.intoKey()]
+                    val proxyAccountId = proxy.proxyAccountId
+                    val identity = proxyIdentities[proxyAccountId]
                     StakingProxyAccount(
-                        identity?.name ?: chain.addressOf(proxyAccountId),
-                        proxyAccountId
+                        identity?.name ?: chain.addressOf(proxyAccountId.value),
+                        proxyAccountId.value
                     )
                 }
             }

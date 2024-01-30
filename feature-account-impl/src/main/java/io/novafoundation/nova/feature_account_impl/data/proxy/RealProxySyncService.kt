@@ -197,20 +197,7 @@ class RealProxySyncService(
 
     private suspend fun getMetaAccounts(): List<MetaAccount> {
         return accountRepository.getActiveMetaAccounts()
-            .filter { it.isAllowedToSyncProxy() }
-    }
-
-    private fun MetaAccount.isAllowedToSyncProxy(): Boolean {
-        return when (type) {
-            LightMetaAccount.Type.SECRETS,
-            LightMetaAccount.Type.PARITY_SIGNER,
-            LightMetaAccount.Type.LEDGER,
-            LightMetaAccount.Type.POLKADOT_VAULT -> true
-
-            LightMetaAccount.Type.WATCH_ONLY -> shouldSyncWatchOnlyProxies
-
-            LightMetaAccount.Type.PROXIED -> false
-        }
+            .filter { it.isAllowedToSyncProxy(shouldSyncWatchOnlyProxies) }
     }
 
     private suspend fun getSupportedProxyChains(): List<Chain> {
