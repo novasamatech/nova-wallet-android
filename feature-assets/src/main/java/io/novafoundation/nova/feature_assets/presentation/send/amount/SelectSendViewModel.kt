@@ -33,26 +33,20 @@ import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferV
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainGenericFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -150,9 +144,8 @@ class SelectSendViewModel(
     private val commissionAssetFlow = originChain.flatMapLatest(interactor::commissionAssetFlow)
         .shareInBackground()
 
-    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-    val crossChainFeeMixin: GenericFeeLoaderMixin.Presentation<CrossChainGenericFee> =
-        feeLoaderMixinFactory.createGeneric<CrossChainGenericFee>(originAssetFlow)
+    val originFeeMixin = feeLoaderMixinFactory.createGeneric<OriginGenericFee>(commissionAssetFlow)
+    val crossChainFeeMixin = feeLoaderMixinFactory.create(originAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -309,40 +302,32 @@ class SelectSendViewModel(
     }
 
     private fun setupFees() {
-        originFeeMixin.setupFee { planks, transfer ->
-            val fee = sendInteractor.getOriginFee(transfer)
-            SimpleFee(fee)
+        combine(
+            originChainWithAsset,
+            destinationChainWithAsset,
+            addressInputMixin.inputFlow,
+            amountChooserMixin.backPressuredAmount
+        ) { originAsset, destinationAsset, address, amount ->
+            originFeeMixin.invalidateFee()
+            crossChainFeeMixin.invalidateFee()
+
+            val assetTransfer = buildTransfer(origin = originAsset, destination = destinationAsset, amount = amount, address = address)
+            val planks = originAsset.asset.planksFromAmount(amount)
+
+            val transferFeeModel = sendInteractor.getFee(planks, assetTransfer)
+            val originFee = SimpleGenericFee(transferFeeModel.originFee)
+            val crossChainFee = transferFeeModel.crossChainFee?.let { SimpleFee(it) }
+
+            originFeeMixin.setFee(originFee)
+            crossChainFeeMixin.setFee(crossChainFee)
         }
-
-        crossChainFeeMixin.setupFee { planks, transfer ->
-            val crossChainFee = sendInteractor.getCrossChainFee(planks, transfer)
-            crossChainFee?.let { SimpleGenericFee(it) }
-        }
-    }
-
-    private fun <T : GenericFee> GenericFeeLoaderMixin.Presentation<T>.setupFee(
-        feeConstructor: suspend Token.(planks: Balance, transfer: AssetTransfer) -> T?
-    ) {
-        connectWith(
-            inputSource1 = originChainWithAsset,
-            inputSource2 = destinationChainWithAsset,
-            inputSource3 = addressInputMixin.inputFlow,
-            inputSource4 = amountChooserMixin.backPressuredAmount,
-            scope = viewModelScope,
-            expectedChain = { originChain, _, _, _ -> originChain.chain.id },
-            feeConstructor = { originChain, destinationChain, addressInput, amount ->
-                val assetTransfer = buildTransfer(origin = originChain, destination = destinationChain, amount = amount, address = addressInput)
-
-                val planks = originChain.asset.planksFromAmount(amount)
-                feeConstructor(planks, assetTransfer)
-            }
-        )
+            .inBackground()
+            .launchIn(this)
     }
 
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
-            originFee = mapFeeToParcel(validPayload.transfer.decimalFee),
             origin = AssetPayload(
                 chainId = validPayload.transfer.originChain.id,
                 chainAssetId = validPayload.transfer.originChainAsset.id

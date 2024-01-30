@@ -74,22 +74,9 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
                 destinationParaId = parachainInfoRepository.paraId(destinationChain.id)
             )!!
 
-            val crossChainFee = crossChainWeigher.estimateFee(crossChainTransfer)
+            val crossChainFeeResult = runCatching { crossChainWeigher.estimateFee(BigInteger.ZERO, crossChainTransfer) }
 
-            error(crossChainFee.formatWith(asssetInOrigin))
+            check(crossChainFeeResult.isSuccess)
         }
-    }
-
-    private fun CrossChainFeeModel.formatWith(
-        transferringAsset: Chain.Asset
-    ): String {
-        fun BigInteger?.formatAmount() = this?.let { it.formatPlanks(transferringAsset) }
-
-        return """
-            
-            Destination Fee: ${destination?.formatAmount()}
-            Reserve Fee: ${reserve?.formatAmount()}
-            Total XCM Fee: ${(reserve.orZero() + destination.orZero()).formatAmount()}
-        """.trimIndent()
     }
 }

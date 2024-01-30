@@ -10,10 +10,11 @@ import io.novafoundation.nova.feature_account_api.domain.validation.handleSystem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +23,7 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<AssetTransferValidationFailure>,
     actions: ValidationFlowActions<*>,
-    feeLoaderMixin: FeeLoaderMixin.Presentation,
+    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<OriginGenericFee>,
 ): TransformedFailure? {
     return when (val reason = status.reason) {
         is AssetTransferValidationFailure.DeadRecipient.InCommissionAsset -> Default(
