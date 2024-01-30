@@ -3,13 +3,18 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.intoDecimalFeeList
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -61,19 +66,35 @@ sealed class AssetTransferValidationFailure {
     object RecipientCannotAcceptTransfer : AssetTransferValidationFailure()
 
     class FeeChangeDetected(
-        override val payload: FeeChangeDetectedFailure.Payload<SimpleFee>
-    ) : AssetTransferValidationFailure(), FeeChangeDetectedFailure<SimpleFee>
+        override val payload: FeeChangeDetectedFailure.Payload<OriginGenericFee>
+    ) : AssetTransferValidationFailure(), FeeChangeDetectedFailure<OriginGenericFee>
 
     object RecipientIsSystemAccount : AssetTransferValidationFailure()
 }
 
 data class AssetTransferPayload(
     val transfer: WeightedAssetTransfer,
-    val originFee: DecimalFee,
+    val originFee: OriginDecimalFee,
     val crossChainFee: DecimalFee?,
     val originCommissionAsset: Asset,
     val originUsedAsset: Asset
 )
+
+val AssetTransferPayload.commissionChainAsset: Chain.Asset
+    get() = originCommissionAsset.token.configuration
+
+val AssetTransferPayload.originFeeList: List<GenericDecimalFee<GenericFee>>
+    get() = originFee.intoDecimalFeeList(
+        chainAsset = commissionChainAsset,
+        deliveryFeeSubmissionOrigin = SubmissionOrigin.singleOrigin(transfer.senderAccountId())
+    )
+
+val AssetTransferPayload.originFeeListInUsedAsset: List<GenericDecimalFee<GenericFee>>?
+    get() = if (isSendingCommissionAsset) {
+        originFeeList
+    } else {
+        null
+    }
 
 val AssetTransferPayload.isSendingCommissionAsset
     get() = transfer.originChainAsset == transfer.originChain.commissionAsset
@@ -81,7 +102,7 @@ val AssetTransferPayload.isSendingCommissionAsset
 val AssetTransferPayload.isReceivingCommissionAsset
     get() = transfer.destinationChainAsset == transfer.destinationChain.commissionAsset
 
-val AssetTransferPayload.originFeeInUsedAsset: DecimalFee?
+val AssetTransferPayload.originFeeInUsedAsset: OriginDecimalFee?
     get() = if (isSendingCommissionAsset) {
         originFee
     } else {

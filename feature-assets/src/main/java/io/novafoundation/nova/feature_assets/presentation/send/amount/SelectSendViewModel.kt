@@ -35,15 +35,18 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -141,8 +144,8 @@ class SelectSendViewModel(
     private val commissionAssetFlow = originChain.flatMapLatest(interactor::commissionAssetFlow)
         .shareInBackground()
 
-    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(originAssetFlow)
+    val originFeeMixin = feeLoaderMixinFactory.createGeneric<OriginGenericFee>(commissionAssetFlow)
+    val crossChainFeeMixin = feeLoaderMixinFactory.create(originAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -312,7 +315,7 @@ class SelectSendViewModel(
             val planks = originAsset.asset.planksFromAmount(amount)
 
             val transferFeeModel = sendInteractor.getFee(planks, assetTransfer)
-            val originFee = SimpleFee(transferFeeModel.originFee)
+            val originFee = SimpleGenericFee(transferFeeModel.originFee)
             val crossChainFee = transferFeeModel.crossChainFee?.let { SimpleFee(it) }
 
             originFeeMixin.setFee(originFee)

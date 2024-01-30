@@ -33,12 +33,16 @@ import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferV
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
@@ -97,8 +101,8 @@ class ConfirmSendViewModel(
         .inBackground()
         .share()
 
-    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
+    val originFeeMixin = feeLoaderMixinFactory.createGeneric<OriginGenericFee>(commissionAssetFlow)
+    val crossChainFeeMixin = feeLoaderMixinFactory.create(assetFlow)
 
     val hintsMixin = hintsFactory.create(this)
 
@@ -196,7 +200,7 @@ class ConfirmSendViewModel(
             crossChainFeeMixin.invalidateFee()
 
             val transferFeeModel = sendInteractor.getFee(planks, assetTransfer)
-            val originFee = SimpleFee(transferFeeModel.originFee)
+            val originFee = SimpleGenericFee(transferFeeModel.originFee)
             val crossChainFee = transferFeeModel.crossChainFee?.let { SimpleFee(it) }
 
             originFeeMixin.setFee(originFee)
@@ -235,7 +239,7 @@ class ConfirmSendViewModel(
 
     private fun performTransfer(
         transfer: WeightedAssetTransfer,
-        originFee: DecimalFee,
+        originFee: OriginDecimalFee,
         crossChainFee: DecimalFee?
     ) = launch {
         sendInteractor.performTransfer(transfer, originFee, crossChainFee?.genericFee?.networkFee)
