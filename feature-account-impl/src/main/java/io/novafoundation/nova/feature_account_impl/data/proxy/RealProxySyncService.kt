@@ -73,7 +73,6 @@ class RealProxySyncService(
         Log.d(LOG_TAG, "Started syncing proxies for ${chain.name}")
 
         val availableAccounts = chain.getAvailableMetaAccounts(allMetaAccounts)
-        val availableMetaIds = availableAccounts.map { it.id }
         val availableAccountIds = availableAccounts.mapToSet { it.requireAccountIdIn(chain).intoKey() }
 
         val nodes = getProxyRepository.findAllProxiedsForAccounts(chain.id, availableAccountIds)
@@ -82,8 +81,7 @@ class RealProxySyncService(
         val oldProxies = accountDao.getProxyAccounts(chain.id)
         val identities = identityProvider.identitiesFor(proxiedAccountIds, chain.id)
 
-        val nestedNodes = nodes.flatMap { it.nestedNodes }
-        val result = recursivelyCreateMetaAccounts(chain.id, oldProxies, identities, availableMetaIds, nestedNodes)
+        val result = createMetaAccounts(chain, oldProxies, identities, availableAccounts, nodes)
 
         val deactivatedMetaIds = result.findDeactivated(oldProxies)
         accountDao.changeAccountsStatus(deactivatedMetaIds, MetaAccountLocal.Status.DEACTIVATED)
@@ -96,32 +94,51 @@ class RealProxySyncService(
         Log.d(LOG_TAG, "Finished syncing proxies for ${chain.name}")
     }
 
+    private suspend fun createMetaAccounts(
+        chain: Chain,
+        oldProxies: List<ProxyAccountLocal>,
+        identities: Map<AccountIdKey, Identity?>,
+        maybeProxyMetaAccounts: List<MetaAccount>,
+        startNodes: List<NestedProxiesGraphConstructor.Node>
+    ): CreateMetaAccountsResult {
+        val result = CreateMetaAccountsResult()
+
+        val accountIdToNode = startNodes.associateBy { it.accountId }
+        for (metaAccount in maybeProxyMetaAccounts) {
+            val proxyAccountId = metaAccount.requireAccountIdIn(chain).intoKey()
+            val startNode = accountIdToNode[proxyAccountId] ?: continue // skip adding proxieds for metaAccount if it's not in the tree
+
+            val nestedResult = recursivelyCreateMetaAccounts(chain.id, oldProxies, identities, metaAccount.id, startNode.nestedNodes)
+            result.add(nestedResult)
+        }
+
+        return result
+    }
+
     private suspend fun recursivelyCreateMetaAccounts(
         chainId: ChainId,
         oldProxies: List<ProxyAccountLocal>,
         identities: Map<AccountIdKey, Identity?>,
-        metaIds: List<Long>,
+        proxyMetaId: Long,
         nestedNodes: List<NestedProxiesGraphConstructor.Node>
     ): CreateMetaAccountsResult {
         val result = CreateMetaAccountsResult()
 
-        metaIds.forEach { metaId ->
-            for (node in nestedNodes) {
-                val maybeExistedProxiedMetaId = node.getExistedProxiedMetaId(chainId, oldProxies, metaId)
+        for (node in nestedNodes) {
+            val maybeExistedProxiedMetaId = node.getExistedProxiedMetaId(chainId, oldProxies, proxyMetaId)
 
-                var nextMetaId = if (maybeExistedProxiedMetaId == null) {
-                    val newMetaId = addProxiedAccount(chainId, node, metaId, identities)
-                    result.addedMetaIds.add(newMetaId)
-                    newMetaId
-                } else {
-                    result.alreadyExistedMetaIds.add(maybeExistedProxiedMetaId)
-                    maybeExistedProxiedMetaId
-                }
+            var nextMetaId = if (maybeExistedProxiedMetaId == null) {
+                val newMetaId = addProxiedAccount(chainId, node, proxyMetaId, identities)
+                result.addedMetaIds.add(newMetaId)
+                newMetaId
+            } else {
+                result.alreadyExistedMetaIds.add(maybeExistedProxiedMetaId)
+                maybeExistedProxiedMetaId
+            }
 
-                if (node.nestedNodes.isNotEmpty()) {
-                    val nestedResult = recursivelyCreateMetaAccounts(chainId, oldProxies, identities, listOf(nextMetaId), node.nestedNodes)
-                    result.add(nestedResult)
-                }
+            if (node.nestedNodes.isNotEmpty()) {
+                val nestedResult = recursivelyCreateMetaAccounts(chainId, oldProxies, identities, nextMetaId, node.nestedNodes)
+                result.add(nestedResult)
             }
         }
 
