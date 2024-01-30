@@ -13,10 +13,11 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
-import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -41,12 +42,13 @@ class AddStakingProxyModule {
         assetUseCase: ArbitraryAssetUseCase,
         resourceManager: ResourceManager,
         selectAddressCommunicator: SelectAddressCommunicator,
-        addStakingProxyRepository: AddStakingProxyRepository,
+        addStakingProxyInteractor: AddStakingProxyInteractor,
         validationExecutor: ValidationExecutor,
         addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-        stakingRouter: StakingRouter
+        stakingRouter: StakingRouter,
+        selectAddressMixinFactory: SelectAddressMixin.Factory
     ): ViewModel {
         return AddStakingProxyViewModel(
             addressInputMixinFactory = addressInputMixinFactory,
@@ -57,13 +59,13 @@ class AddStakingProxyModule {
             accountRepository = accountRepository,
             assetUseCase = assetUseCase,
             resourceManager = resourceManager,
-            selectAddressRequester = selectAddressCommunicator,
-            addStakingProxyRepository = addStakingProxyRepository,
+            addStakingProxyInteractor = addStakingProxyInteractor,
             validationExecutor = validationExecutor,
             addStakingProxyValidationSystem = addStakingProxyValidationSystem,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
-            stakingRouter = stakingRouter
+            stakingRouter = stakingRouter,
+            selectAddressMixinFactory = selectAddressMixinFactory
         )
     }
 

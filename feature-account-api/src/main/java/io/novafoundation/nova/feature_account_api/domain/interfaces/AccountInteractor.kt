@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountInteractor {
 
-    suspend fun getMetaAccounts(): List<MetaAccount>
+    suspend fun getActiveMetaAccounts(): List<MetaAccount>
 
     suspend fun generateMnemonic(): Mnemonic
 
@@ -59,4 +59,6 @@ interface AccountInteractor {
     suspend fun getChainAddress(metaId: Long, chainId: ChainId): String?
 
     suspend fun removeDeactivatedMetaAccounts()
+
+    suspend fun switchToNotDeactivatedAccountIfNeeded()
 }

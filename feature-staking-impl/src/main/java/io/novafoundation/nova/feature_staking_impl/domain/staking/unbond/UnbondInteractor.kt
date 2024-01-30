@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 
-import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
@@ -18,8 +18,7 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combineTransform
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
@@ -56,22 +55,17 @@ class UnbondInteractor(
     }
 
     fun unbondingsFlow(stakingState: StakingState.Stash, sharedComputationScope: CoroutineScope): Flow<Unbondings> {
-        return flowOfAll {
-            combineTransform(
-                stakingRepository.ledgerFlow(stakingState),
-                stakingRepository.observeActiveEraIndex(stakingState.chain.id)
-            ) { ledger, activeEraIndex ->
-
-                val unbondingsFlow = stakingSharedComputation.constructUnbondingList(
-                    eraRedeemables = ledger.unlocking,
-                    activeEra = activeEraIndex,
-                    stakingOption = stakingSharedState.selectedOption(),
-                    sharedComputationScope = sharedComputationScope
-                ).map { unbondings ->
-                    Unbondings.from(unbondings, rebondPossible = true)
-                }
-
-                emitAll(unbondingsFlow)
+        return combineToPair(
+            stakingRepository.ledgerFlow(stakingState),
+            stakingRepository.observeActiveEraIndex(stakingState.chain.id)
+        ).flatMapLatest { (ledger, activeEraIndex) ->
+            stakingSharedComputation.constructUnbondingList(
+                eraRedeemables = ledger.unlocking,
+                activeEra = activeEraIndex,
+                stakingOption = stakingSharedState.selectedOption(),
+                sharedComputationScope = sharedComputationScope
+            ).map { unbondings ->
+                Unbondings.from(unbondings, rebondPossible = true)
             }
         }
     }

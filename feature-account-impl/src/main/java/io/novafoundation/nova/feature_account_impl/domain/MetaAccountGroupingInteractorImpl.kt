@@ -54,7 +54,7 @@ class MetaAccountGroupingInteractorImpl(
     override fun metaAccountWithTotalBalanceFlow(metaId: Long): Flow<MetaAccountWithTotalBalance> {
         return combine(
             currencyRepository.observeSelectCurrency(),
-            accountRepository.allMetaAccountsFlow(),
+            accountRepository.activeMetaAccountsFlow(),
             accountRepository.metaAccountFlow(metaId),
             accountRepository.metaAccountBalancesFlow(metaId),
             chainRegistry.chainsById
@@ -76,9 +76,10 @@ class MetaAccountGroupingInteractorImpl(
             metaAccountsUpdatesRegistry.observeUpdates(),
             accountRepository.allMetaAccountsFlow(),
             chainRegistry.chainsById
-        ) { updatedMetaIds, metaAccount, chainsById ->
-            val metaById = metaAccount.associateBy(MetaAccount::id)
-            metaAccount
+        ) { updatedMetaIds, metaAccounts, chainsById ->
+            val metaById = metaAccounts.associateBy(MetaAccount::id)
+
+            metaAccounts
                 .filter { it.type == LightMetaAccount.Type.PROXIED && updatedMetaIds.contains(it.id) }
                 .mapNotNull {
                     ProxiedAndProxyMetaAccount(
@@ -128,7 +129,7 @@ class MetaAccountGroupingInteractorImpl(
     }
 
     private suspend fun getValidMetaAccountsForTransaction(metaAccountFilter: Filter<MetaAccount>): List<MetaAccount> {
-        return accountRepository.allMetaAccounts()
+        return accountRepository.getActiveMetaAccounts()
             .applyFilter(metaAccountFilter)
             .filter {
                 when (it.type) {

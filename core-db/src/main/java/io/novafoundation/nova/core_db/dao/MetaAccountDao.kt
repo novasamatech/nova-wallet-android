@@ -26,9 +26,9 @@ import java.math.BigInteger
  */
 @Language("RoomSql")
 private const val FIND_BY_ADDRESS_WHERE_CLAUSE = """
-    LEFT JOIN chain_accounts as c ON m.id = c.metaId
+    LEFT JOIN chain_accounts as c ON m.id = c.metaId AND c.chainId = :chainId
     WHERE
-    (c.chainId = :chainId  AND c.accountId IS NOT NULL AND c.accountId = :accountId)
+    (c.accountId IS NOT NULL AND c.accountId = :accountId)
     OR (c.accountId IS NULL AND (substrateAccountId = :accountId OR ethereumAddress = :accountId))
     ORDER BY (CASE WHEN isSelected THEN 0 ELSE 1 END)
     """
@@ -104,9 +104,9 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
-    @Query("SELECT * FROM meta_accounts")
+    @Query("SELECT * FROM meta_accounts WHERE status = :status")
     @Transaction
-    suspend fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
+    suspend fun getMetaAccountsInfoByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
 
     @Query("SELECT id FROM meta_accounts WHERE status = :status")
     suspend fun getMetaAccountIdsByStatus(status: MetaAccountLocal.Status): List<Long>
@@ -195,8 +195,8 @@ interface MetaAccountDao {
         return metaId
     }
 
-    @Query("SELECT EXISTS(SELECT * FROM meta_accounts)")
-    suspend fun hasMetaAccounts(): Boolean
+    @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE status = :status)")
+    suspend fun hasMetaAccountsByStatus(status: MetaAccountLocal.Status): Boolean
 
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)

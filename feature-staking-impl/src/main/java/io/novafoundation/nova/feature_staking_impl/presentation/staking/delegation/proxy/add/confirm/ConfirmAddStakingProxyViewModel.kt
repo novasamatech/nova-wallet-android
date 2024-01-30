@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -15,8 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
-import io.novafoundation.nova.feature_staking_api.data.proxy.AddStakingProxyRepository
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -51,7 +51,7 @@ class ConfirmAddStakingProxyViewModel(
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val assetUseCase: ArbitraryAssetUseCase,
     private val addStakingProxyValidationSystem: AddStakingProxyValidationSystem,
-    private val addStakingProxyRepository: AddStakingProxyRepository,
+    private val addStakingProxyInteractor: AddStakingProxyInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
 ) : BaseViewModel(),
@@ -129,7 +129,7 @@ class ConfirmAddStakingProxyViewModel(
     }
 
     private fun sendTransaction(chain: Chain, proxiedAccount: AccountId, proxyAccount: AccountId) = launch {
-        val result = addStakingProxyRepository.addProxy(chain, proxiedAccount, proxyAccount)
+        val result = addStakingProxyInteractor.addProxy(chain, proxiedAccount, proxyAccount)
 
         validationProgressFlow.value = false
 

@@ -26,6 +26,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 private class CreateMetaAccountsResult(
@@ -47,8 +50,17 @@ class RealProxySyncService(
     private val identityProvider: IdentityProvider,
     private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
     private val proxiedAddAccountRepository: ProxiedAddAccountRepository,
-    private val rootScope: RootScope
+    private val rootScope: RootScope,
+    private val shouldSyncWatchOnlyProxies: Boolean
 ) : ProxySyncService {
+
+    override fun proxySyncTrigger(): Flow<*> {
+        return chainRegistry.currentChains.map { chains ->
+            chains
+                .filter(Chain::supportProxy)
+                .map(Chain::id)
+        }.distinctUntilChanged()
+    }
 
     override fun startSyncing() {
         rootScope.launch(Dispatchers.Default) {
@@ -56,11 +68,17 @@ class RealProxySyncService(
         }
     }
 
+    override suspend fun startSyncingSuspend() {
+        startSyncInternal()
+    }
+
     private suspend fun startSyncInternal() = runCatching {
         val metaAccounts = getMetaAccounts()
         if (metaAccounts.isEmpty()) return@runCatching
 
         val supportedProxyChains = getSupportedProxyChains()
+
+        Log.d(LOG_TAG, "Starting syncing proxies in ${supportedProxyChains.size} chains")
 
         supportedProxyChains.forEach { chain ->
             syncChainProxies(chain, metaAccounts)
@@ -178,8 +196,21 @@ class RealProxySyncService(
     }
 
     private suspend fun getMetaAccounts(): List<MetaAccount> {
-        return accountRepository.allMetaAccounts()
+        return accountRepository.getActiveMetaAccounts()
             .filter { it.isAllowedToSyncProxy() }
+    }
+
+    private fun MetaAccount.isAllowedToSyncProxy(): Boolean {
+        return when (type) {
+            LightMetaAccount.Type.SECRETS,
+            LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER,
+            LightMetaAccount.Type.POLKADOT_VAULT -> true
+
+            LightMetaAccount.Type.WATCH_ONLY -> shouldSyncWatchOnlyProxies
+
+            LightMetaAccount.Type.PROXIED -> false
+        }
     }
 
     private suspend fun getSupportedProxyChains(): List<Chain> {

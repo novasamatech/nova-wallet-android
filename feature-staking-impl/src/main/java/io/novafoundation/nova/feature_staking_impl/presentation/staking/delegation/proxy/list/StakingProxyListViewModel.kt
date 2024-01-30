@@ -80,7 +80,7 @@ class StakingProxyListViewModel(
                 StakingProxyRvItem(
                     addressIconGenerator.createAddressIcon(stakingProxyAccount.proxyAccountId, SIZE_BIG),
                     chain.icon,
-                    stakingProxyAccount.metaAccount?.name ?: accountAddress,
+                    stakingProxyAccount.accountName,
                     accountAddress
                 )
             }

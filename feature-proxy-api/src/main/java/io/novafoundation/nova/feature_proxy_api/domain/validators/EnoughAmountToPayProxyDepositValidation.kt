@@ -15,6 +15,7 @@ class EnoughAmountToPayProxyDepositValidation<P, E>(
     private val accountId: (P) -> AccountId,
     private val newDeposit: (P) -> BigInteger,
     private val availableBalance: (P) -> BigInteger,
+    private val feeReceiver: (P) -> BigInteger,
     private val error: (P, BigInteger) -> E,
     private val proxyRepository: GetProxyRepository
 ) : Validation<P, E> {
@@ -24,8 +25,9 @@ class EnoughAmountToPayProxyDepositValidation<P, E>(
         val currentDeposit = proxyRepository.getProxyDeposit(chain(value).id, accountId(value))
 
         val deltaDeposit = (newDeposit(value) - currentDeposit).atLeastZero()
+        val fee = feeReceiver(value)
 
-        return validOrError(deltaDeposit <= availableBalance) {
+        return validOrError(deltaDeposit + fee <= availableBalance) {
             error(value, availableBalance)
         }
     }
@@ -37,7 +39,8 @@ fun <P, E> ValidationSystemBuilder<P, E>.enoughBalanceToPayProxyDeposit(
     newDeposit: (P) -> BigInteger,
     availableBalance: (P) -> BigInteger,
     error: (P, BigInteger) -> E,
-    proxyRepository: GetProxyRepository
+    proxyRepository: GetProxyRepository,
+    feeReceiver: (P) -> BigInteger,
 ) {
     validate(
         EnoughAmountToPayProxyDepositValidation(
@@ -46,7 +49,8 @@ fun <P, E> ValidationSystemBuilder<P, E>.enoughBalanceToPayProxyDeposit(
             newDeposit = newDeposit,
             availableBalance = availableBalance,
             error = error,
-            proxyRepository = proxyRepository
+            proxyRepository = proxyRepository,
+            feeReceiver = feeReceiver,
         )
     )
 }

@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic
 
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.argumentType
+import io.novafoundation.nova.common.utils.democracy
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -8,10 +10,12 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
+import io.novafoundation.nova.runtime.util.constructAccountLookupInstance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 
 fun ExtrinsicBuilder.convictionVotingVote(
     referendumId: ReferendumId,
@@ -70,11 +74,13 @@ fun ExtrinsicBuilder.democracyVote(
 }
 
 fun ExtrinsicBuilder.democracyUnlock(accountId: AccountId): ExtrinsicBuilder {
+    val accountLookupType = runtime.metadata.democracy().call("unlock").argumentType("target")
+
     return call(
         moduleName = Modules.DEMOCRACY,
         callName = "unlock",
         arguments = mapOf(
-            "target" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId)
+            "target" to accountLookupType.constructAccountLookupInstance(accountId)
         )
     )
 }

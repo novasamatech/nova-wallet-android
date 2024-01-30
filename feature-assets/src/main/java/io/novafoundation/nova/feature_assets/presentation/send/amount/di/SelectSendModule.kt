@@ -14,9 +14,9 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -43,7 +43,6 @@ class SelectSendModule {
         initialRecipientAddress: String?,
         validationExecutor: ValidationExecutor,
         resourceManager: ResourceManager,
-        selectAddressRequester: SelectAddressCommunicator,
         externalActions: ExternalActions.Presentation,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -51,7 +50,8 @@ class SelectSendModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         addressInputMixinFactory: AddressInputMixinFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        selectAddressMixinFactory: SelectAddressMixin.Factory
     ): ViewModel {
         return SelectSendViewModel(
             chainRegistry = chainRegistry,
@@ -63,7 +63,6 @@ class SelectSendModule {
             initialRecipientAddress = initialRecipientAddress,
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
-            selectAddressRequester = selectAddressRequester,
             externalActions = externalActions,
             crossChainTransfersUseCase = crossChainTransfersUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
@@ -71,7 +70,8 @@ class SelectSendModule {
             selectedAccountUseCase = selectedAccountUseCase,
             addressInputMixinFactory = addressInputMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            accountRepository = accountRepository
+            accountRepository = accountRepository,
+            selectAddressMixinFactory = selectAddressMixinFactory
         )
     }
 

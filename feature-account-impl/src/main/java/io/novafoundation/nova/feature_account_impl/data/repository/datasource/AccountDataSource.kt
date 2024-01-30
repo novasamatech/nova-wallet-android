@@ -45,8 +45,6 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun allMetaAccounts(): List<MetaAccount>
-
     suspend fun activeMetaAccounts(): List<MetaAccount>
 
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
@@ -96,7 +94,9 @@ interface AccountDataSource : SecretStoreV1 {
         secrets: EncodableStruct<ChainAccountSecrets>
     )
 
-    suspend fun hasMetaAccounts(): Boolean
+    suspend fun hasActiveMetaAccounts(): Boolean
 
     fun removeDeactivatedMetaAccounts()
+
+    suspend fun getActiveMetaAccounts(): List<MetaAccount>
 }

@@ -26,7 +26,7 @@ interface OptionsFilter<T, O> : Filter<T> {
     val options: List<O>
 }
 
-class EmptyFilter<T> : Filter<T> {
+class EverythingFilter<T> : Filter<T> {
 
     override fun shouldInclude(model: T) = true
 }

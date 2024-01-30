@@ -42,13 +42,11 @@ interface AccountRepository {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun allMetaAccounts(): List<MetaAccount>
-
     suspend fun activeMetaAccounts(): List<MetaAccount>
 
-    suspend fun hasMetaAccounts(): Boolean
-
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
+
+    suspend fun hasActiveMetaAccounts(): Boolean
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
@@ -127,4 +125,6 @@ interface AccountRepository {
     suspend fun isAccountExists(accountId: AccountId, chainId: ChainId): Boolean
 
     suspend fun removeDeactivatedMetaAccounts()
+
+    suspend fun getActiveMetaAccounts(): List<MetaAccount>
 }
