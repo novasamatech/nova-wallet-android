@@ -46,7 +46,7 @@ fun OmniPool.calculateOutGivenIn(
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 
-    val protocolFee = tokenOutState.fees.protocolFee
+    val protocolFee = tokenInState.fees.protocolFee
     val assetFee = tokenOutState.fees.assetFee
 
     val inHubReserve = tokenInState.hubReserve.toDouble()
@@ -78,7 +78,7 @@ fun OmniPool.calculateInGivenOut(
     val tokenOutState = tokens.getValue(assetIdOut)
 
     val protocolFee = tokenInState.fees.protocolFee
-    val assetFee = tokenInState.fees.assetFee
+    val assetFee = tokenOutState.fees.assetFee
 
     val outHubReserve = tokenOutState.hubReserve.toDouble()
     val outReserve = tokenOutState.balance.toDouble()
