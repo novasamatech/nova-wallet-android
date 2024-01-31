@@ -113,6 +113,7 @@ class RewardCalculatorFactory(
     private fun InflationConfig.Companion.create(chainId: ChainId, activePublicParachains: Int?): InflationConfig {
         return when (chainId) {
             Chain.Geneses.POLKADOT -> Polkadot(activePublicParachains)
+            Chain.Geneses.JOYSTREAM -> Joystream()
             else -> Default(activePublicParachains)
         }
     }
