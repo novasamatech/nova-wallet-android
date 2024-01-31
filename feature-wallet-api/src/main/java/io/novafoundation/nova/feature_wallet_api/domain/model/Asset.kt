@@ -113,3 +113,7 @@ fun Asset.balanceCountedTowardsED(): BigDecimal {
 fun Asset.transferableReplacingFrozen(newFrozen: Balance): Balance {
     return transferableMode.calculateTransferable(freeInPlanks, newFrozen, reservedInPlanks)
 }
+
+fun Asset.regulatTransferableBalance(): Balance {
+    return Asset.TransferableMode.REGULAR.calculateTransferable(freeInPlanks, frozenInPlanks, reservedInPlanks)
+}

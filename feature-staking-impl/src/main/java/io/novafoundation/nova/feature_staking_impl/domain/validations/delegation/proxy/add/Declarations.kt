@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_proxy_api.domain.validators.proxyIsNotDupl
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.regulatTransferableBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
@@ -60,7 +61,7 @@ fun AddStakingProxyValidationSystemBuilder.maximumProxies(
 ) = maximumProxiesNotReached(
     chain = { it.chain },
     accountId = { it.proxiedAccountId },
-    newProxiedQuantity = { it.currentQuantity + 1 },
+    proxiesQuantity = { it.currentQuantity + 1 },
     error = { payload, max ->
         AddStakingProxyValidationFailure.MaximumProxiesReached(
             chain = payload.chain,
@@ -73,7 +74,7 @@ fun AddStakingProxyValidationSystemBuilder.maximumProxies(
 fun AddStakingProxyValidationSystemBuilder.enoughBalanceToPayDepositAndFee() = sufficientBalance(
     fee = { it.fee },
     amount = { it.asset.token.configuration.amountFromPlanks(it.deltaDeposit) },
-    available = { it.asset.free - it.asset.frozen },
+    available = { it.asset.token.amountFromPlanks(it.asset.regulatTransferableBalance()) },
     error = {
         val chainAsset = it.payload.asset.token.configuration
         AddStakingProxyValidationFailure.NotEnoughBalanceToReserveDeposit(

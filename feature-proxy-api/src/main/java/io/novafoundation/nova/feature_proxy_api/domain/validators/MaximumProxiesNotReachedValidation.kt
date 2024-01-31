@@ -11,13 +11,13 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 class MaximumProxiesNotReachedValidation<P, E>(
     private val chain: (P) -> Chain,
     private val accountId: (P) -> AccountId,
-    private val newProxiedQuantity: (P) -> Int,
+    private val proxiesQuantity: (P) -> Int,
     private val error: (P, Int) -> E,
     private val proxyRepository: GetProxyRepository
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
-        val newProxiesQuantity = newProxiedQuantity(value)
+        val newProxiesQuantity = proxiesQuantity(value)
         val maximumProxiesQuantiy = proxyRepository.maxProxiesQuantity(chain(value))
 
         return validOrError(newProxiesQuantity <= maximumProxiesQuantiy) {
@@ -29,7 +29,7 @@ class MaximumProxiesNotReachedValidation<P, E>(
 fun <P, E> ValidationSystemBuilder<P, E>.maximumProxiesNotReached(
     chain: (P) -> Chain,
     accountId: (P) -> AccountId,
-    newProxiedQuantity: (P) -> Int,
+    proxiesQuantity: (P) -> Int,
     error: (P, Int) -> E,
     proxyRepository: GetProxyRepository
 ) {
@@ -37,7 +37,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.maximumProxiesNotReached(
         MaximumProxiesNotReachedValidation(
             chain = chain,
             accountId = accountId,
-            newProxiedQuantity = newProxiedQuantity,
+            proxiesQuantity = proxiesQuantity,
             error = error,
             proxyRepository = proxyRepository
         )

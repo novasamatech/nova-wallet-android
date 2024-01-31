@@ -5,13 +5,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import kotlinx.coroutines.flow.Flow
 
 interface AddStakingProxyInteractor {
 
     suspend fun estimateFee(chain: Chain, proxiedAccountId: AccountId): Fee
 
-    suspend fun addProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<Flow<ExtrinsicStatus>>
+    suspend fun addProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicStatus.InBlock>
 
     suspend fun calculateDeltaDepositForAddProxy(chain: Chain, accountId: AccountId): Balance
 }

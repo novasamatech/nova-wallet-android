@@ -16,7 +16,6 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class RealAddStakingProxyInteractor(
@@ -35,17 +34,16 @@ class RealAddStakingProxyInteractor(
         }
     }
 
-    override suspend fun addProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<Flow<ExtrinsicStatus>> {
+    override suspend fun addProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicStatus.InBlock> {
         val result = withContext(Dispatchers.IO) {
             extrinsicService.submitAndWatchExtrinsic(chain, proxiedAccountId.intoOrigin()) {
                 addProxyCall(proxyAccountId, ProxyType.Staking)
             }
         }
 
-        result.awaitInBlock()
-        proxySyncService.startSyncing()
-
-        return result
+        return result.awaitInBlock().also {
+            proxySyncService.startSyncing()
+        }
     }
 
     override suspend fun calculateDeltaDepositForAddProxy(chain: Chain, accountId: AccountId): Balance {
