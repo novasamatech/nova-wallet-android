@@ -3,23 +3,23 @@ package io.novafoundation.nova.feature_account_impl.data.proxy
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
-import io.novafoundation.nova.feature_proxy_api.data.model.ProxiedWithProxy
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_proxy_api.data.common.NestedProxiesGraphConstructor
+import io.novafoundation.nova.feature_proxy_api.data.common.getAllAccountIds
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -31,10 +31,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class ProxiedWithProxyMetaAccount(
-    val proxiedWithProxy: ProxiedWithProxy,
-    val proxyMetaAccount: MetaAccount,
-)
+private class CreateMetaAccountsResult(
+    val addedMetaIds: MutableList<Long> = mutableListOf(),
+    val alreadyExistedMetaIds: MutableList<Long> = mutableListOf()
+) {
+
+    fun add(other: CreateMetaAccountsResult) {
+        addedMetaIds.addAll(other.addedMetaIds)
+        alreadyExistedMetaIds.addAll(other.alreadyExistedMetaIds)
+    }
+}
 
 class RealProxySyncService(
     private val chainRegistry: ChainRegistry,
@@ -81,36 +87,24 @@ class RealProxySyncService(
         Log.e(LOG_TAG, "Failed to sync proxy delegators", it)
     }
 
-    private suspend fun syncChainProxies(chain: Chain, metaAccounts: List<MetaAccount>) = runCatching {
+    private suspend fun syncChainProxies(chain: Chain, allMetaAccounts: List<MetaAccount>) = runCatching {
         Log.d(LOG_TAG, "Started syncing proxies for ${chain.name}")
 
-        val availableAccountIdsToMetaAccounts = chain.getAvailableAccountIds(metaAccounts)
-        val availableAccountIds = availableAccountIdsToMetaAccounts.keys
+        val availableAccounts = chain.getAvailableMetaAccounts(allMetaAccounts)
+        val availableAccountIds = availableAccounts.mapToSet { it.requireAccountIdIn(chain).intoKey() }
 
-        val proxiedsWithProxies = getProxyRepository.getAllProxiesForAccounts(chain.id, availableAccountIds)
-            .withProxyMetaAccount(availableAccountIdsToMetaAccounts)
+        val nodes = getProxyRepository.findAllProxiedsForAccounts(chain.id, availableAccountIds)
+        val proxiedAccountIds = NestedProxiesGraphConstructor.Node.getAllAccountIds(nodes)
 
         val oldProxies = accountDao.getProxyAccounts(chain.id)
+        val identities = identityProvider.identitiesFor(proxiedAccountIds, chain.id)
 
-        val notAddedProxies = filterNotAddedProxieds(proxiedsWithProxies, oldProxies)
+        val result = createMetaAccounts(chain, oldProxies, identities, availableAccounts, nodes)
 
-        val identitiesByChain = notAddedProxies.loadProxiedIdentities(chain.id)
-        val addedProxiedsMetaIds = notAddedProxies.map {
-            val identity = identitiesByChain[it.proxiedWithProxy.proxied.accountId.intoKey()]
+        val deactivatedMetaIds = result.findDeactivated(oldProxies)
+        accountDao.changeAccountsStatus(deactivatedMetaIds, MetaAccountLocal.Status.DEACTIVATED)
 
-            proxiedAddAccountRepository.addAccount(
-                ProxiedAddAccountRepository.Payload(
-                    it.proxiedWithProxy,
-                    it.proxyMetaAccount.id,
-                    identity
-                )
-            )
-        }
-
-        val deactivatedMetaAccountIds = getDeactivatedMetaIds(proxiedsWithProxies, oldProxies)
-        accountDao.changeAccountsStatus(deactivatedMetaAccountIds, MetaAccountLocal.Status.DEACTIVATED)
-
-        val changedMetaIds = addedProxiedsMetaIds + deactivatedMetaAccountIds
+        val changedMetaIds = result.addedMetaIds + deactivatedMetaIds
         metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
     }.onFailure {
         Log.e(LOG_TAG, "Failed to sync proxy delegators in chain ${chain.name}", it)
@@ -118,87 +112,114 @@ class RealProxySyncService(
         Log.d(LOG_TAG, "Finished syncing proxies for ${chain.name}")
     }
 
-    private fun filterNotAddedProxieds(
-        proxiedsWithProxies: List<ProxiedWithProxyMetaAccount>,
-        oldProxies: List<ProxyAccountLocal>
-    ): List<ProxiedWithProxyMetaAccount> {
-        val oldIdentifiers = oldProxies.mapToSet { it.identifier }
-        return proxiedsWithProxies.filter { it.toLocalIdentifier() !in oldIdentifiers }
+    private suspend fun createMetaAccounts(
+        chain: Chain,
+        oldProxies: List<ProxyAccountLocal>,
+        identities: Map<AccountIdKey, Identity?>,
+        maybeProxyMetaAccounts: List<MetaAccount>,
+        startNodes: List<NestedProxiesGraphConstructor.Node>
+    ): CreateMetaAccountsResult {
+        val result = CreateMetaAccountsResult()
+
+        val accountIdToNode = startNodes.associateBy { it.accountId }
+        for (metaAccount in maybeProxyMetaAccounts) {
+            val proxyAccountId = metaAccount.requireAccountIdIn(chain).intoKey()
+            val startNode = accountIdToNode[proxyAccountId] ?: continue // skip adding proxieds for metaAccount if it's not in the tree
+
+            val nestedResult = recursivelyCreateMetaAccounts(chain.id, oldProxies, identities, metaAccount.id, startNode.nestedNodes)
+            result.add(nestedResult)
+        }
+
+        return result
     }
 
-    private suspend fun getDeactivatedMetaIds(
-        onChainProxies: List<ProxiedWithProxyMetaAccount>,
-        oldProxies: List<ProxyAccountLocal>
-    ): List<Long> {
-        val newIdentifiers = onChainProxies.mapToSet { it.toLocalIdentifier() }
-        val accountsToDeactivate = oldProxies.filter { it.identifier !in newIdentifiers }
-            .map { it.proxiedMetaId }
+    private suspend fun recursivelyCreateMetaAccounts(
+        chainId: ChainId,
+        oldProxies: List<ProxyAccountLocal>,
+        identities: Map<AccountIdKey, Identity?>,
+        proxyMetaId: Long,
+        nestedNodes: List<NestedProxiesGraphConstructor.Node>
+    ): CreateMetaAccountsResult {
+        val result = CreateMetaAccountsResult()
 
-        return accountsToDeactivate.takeNotYetDeactivatedMetaAccounts()
+        for (node in nestedNodes) {
+            val maybeExistedProxiedMetaId = node.getExistedProxiedMetaId(chainId, oldProxies, proxyMetaId)
+
+            var nextMetaId = if (maybeExistedProxiedMetaId == null) {
+                val newMetaId = addProxiedAccount(chainId, node, proxyMetaId, identities)
+                result.addedMetaIds.add(newMetaId)
+                newMetaId
+            } else {
+                result.alreadyExistedMetaIds.add(maybeExistedProxiedMetaId)
+                maybeExistedProxiedMetaId
+            }
+
+            if (node.nestedNodes.isNotEmpty()) {
+                val nestedResult = recursivelyCreateMetaAccounts(chainId, oldProxies, identities, nextMetaId, node.nestedNodes)
+                result.add(nestedResult)
+            }
+        }
+
+        return result
+    }
+
+    private suspend fun addProxiedAccount(
+        chainId: ChainId,
+        node: NestedProxiesGraphConstructor.Node,
+        metaId: Long,
+        identities: Map<AccountIdKey, Identity?>
+    ) = proxiedAddAccountRepository.addAccount(
+        ProxiedAddAccountRepository.Payload(
+            chainId = chainId,
+            proxiedAccountId = node.accountId.value,
+            proxyType = node.permissionType,
+            proxyMetaId = metaId,
+            identity = identities[node.accountId]
+        )
+    )
+
+    private fun NestedProxiesGraphConstructor.Node.getExistedProxiedMetaId(
+        chainId: ChainId,
+        oldProxies: List<ProxyAccountLocal>,
+        proxyMetaId: Long
+    ): Long? {
+        val oldIdentifiers = oldProxies.associateBy { it.identifier }
+
+        val identifier = ProxyAccountLocal.makeIdentifier(
+            proxyMetaId = proxyMetaId,
+            chainId = chainId,
+            proxiedAccountId = accountId.value,
+            proxyType = permissionType.name
+        )
+
+        return oldIdentifiers[identifier]?.proxiedMetaId
     }
 
     private suspend fun getMetaAccounts(): List<MetaAccount> {
         return accountRepository.getActiveMetaAccounts()
-            .filter { it.isAllowedToSyncProxy() }
-    }
-
-    private fun MetaAccount.isAllowedToSyncProxy(): Boolean {
-        return when (type) {
-            LightMetaAccount.Type.SECRETS,
-            LightMetaAccount.Type.PARITY_SIGNER,
-            LightMetaAccount.Type.LEDGER,
-            LightMetaAccount.Type.POLKADOT_VAULT -> true
-
-            LightMetaAccount.Type.WATCH_ONLY -> shouldSyncWatchOnlyProxies
-
-            LightMetaAccount.Type.PROXIED -> false
-        }
+            .filter { it.isAllowedToSyncProxy(shouldSyncWatchOnlyProxies) }
     }
 
     private suspend fun getSupportedProxyChains(): List<Chain> {
         return chainRegistry.findChains { it.supportProxy }
     }
 
-    private fun Chain.getAvailableAccountIds(metaAccounts: List<MetaAccount>): GroupedList<AccountIdKey, MetaAccount> {
-        return metaAccounts.mapNotNull { metaAccount ->
-            val accountId = metaAccount.accountIdIn(chain = this)
-            accountId?.let {
-                accountId to metaAccount
-            }
-        }.groupBy(
-            keySelector = { it.first.intoKey() },
-            valueTransform = { it.second }
-        )
+    private fun Chain.getAvailableMetaAccounts(metaAccounts: List<MetaAccount>): List<MetaAccount> {
+        return metaAccounts.filter { metaAccount -> metaAccount.hasAccountIn(chain = this) }
     }
 
-    private fun List<ProxiedWithProxy>.withProxyMetaAccount(metaAccounts: GroupedList<AccountIdKey, MetaAccount>): List<ProxiedWithProxyMetaAccount> {
-        return flatMap { proxied ->
-            val proxyAccountId = proxied.proxy.accountId.intoKey()
-            metaAccounts.getValue(proxyAccountId)
-                .map { metaAccount -> ProxiedWithProxyMetaAccount(proxied, metaAccount) }
-        }
-    }
+    private suspend fun CreateMetaAccountsResult.findDeactivated(oldProxies: List<ProxyAccountLocal>): List<Long> {
+        val oldIds = oldProxies.map { it.proxiedMetaId }
+        val deactivated = oldIds - alreadyExistedMetaIds
 
-    private suspend fun List<ProxiedWithProxyMetaAccount>.loadProxiedIdentities(chainId: ChainId): Map<AccountIdKey, Identity?> {
-        val proxiedAccountIds = map { it.proxiedWithProxy.proxied.accountId }
+        val alreadyDeactivatedMetaIdsInCache = accountDao.getMetaAccountIdsByStatus(MetaAccountLocal.Status.DEACTIVATED)
 
-        return identityProvider.identitiesFor(proxiedAccountIds, chainId)
+        return deactivated - alreadyDeactivatedMetaIdsInCache.toSet()
     }
 
     private suspend fun List<Long>.takeNotYetDeactivatedMetaAccounts(): List<Long> {
         val alreadyDeactivatedMetaAccountIds = accountDao.getMetaAccountIdsByStatus(MetaAccountLocal.Status.DEACTIVATED)
 
         return this - alreadyDeactivatedMetaAccountIds.toSet()
-    }
-
-    private fun ProxiedWithProxyMetaAccount.toLocalIdentifier(): String {
-        val proxy = proxiedWithProxy.proxy
-        val proxied = proxiedWithProxy.proxied
-        return ProxyAccountLocal.makeIdentifier(
-            proxyMetaId = proxyMetaAccount.id,
-            chainId = proxied.chainId,
-            proxiedAccountId = proxied.accountId,
-            proxyType = proxy.proxyType
-        )
     }
 }

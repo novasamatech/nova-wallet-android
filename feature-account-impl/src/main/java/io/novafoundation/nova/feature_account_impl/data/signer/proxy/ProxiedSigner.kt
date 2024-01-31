@@ -73,27 +73,30 @@ class ProxiedSigner(
         return delegate.signerAccountId(chain)
     }
 
+    override suspend fun modifyPayload(payloadExtrinsic: SignerPayloadExtrinsic): SignerPayloadExtrinsic {
+        val chain = chainRegistry.getChain(payloadExtrinsic.chainId)
+        val proxyMetaAccount = getProxyMetaAccount()
+        val delegate = createDelegate(proxyMetaAccount)
+        val payload = checkPermissionAndWrap(proxyMetaAccount, payloadExtrinsic, chain)
+        return delegate.modifyPayload(payload)
+    }
+
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         val chain = chainRegistry.getChain(payloadExtrinsic.chainId)
         val proxyMetaAccount = getProxyMetaAccount()
 
-        acknowledgeProxyOperation(proxyMetaAccount)
+        if (isRootProxied) {
+            acknowledgeProxyOperation(proxyMetaAccount)
+        }
 
-        // TODO this wont use the actual payload for fee validation when multiple nested proxies are used
-        // We need to design a universal solution
-        // We actually can use `signedExtrinsic.payload` to access actual payload but in this case validation will happen only after signing
-        // which will have bad UX with Vault and Ledger.
-        // As an option we could separate signing and wrapping step specifically for such nested signers and use only the wrapping step before fee validation
-        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic, chain)
+        val payloadToSign = if (isRootProxied) modifyPayload(payloadExtrinsic) else payloadExtrinsic
 
         if (isRootProxied) {
-            validateExtrinsic(modifiedPayload, chain)
+            validateExtrinsic(payloadToSign, chain)
         }
 
         val delegate = createDelegate(proxyMetaAccount)
-
-        val signedExtrinsic = delegate.signExtrinsic(modifiedPayload)
-        return signedExtrinsic
+        return delegate.signExtrinsic(payloadToSign)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
@@ -129,7 +132,7 @@ class ProxiedSigner(
         }
     }
 
-    private suspend fun modifyPayload(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic, chain: Chain): SignerPayloadExtrinsic {
+    private suspend fun checkPermissionAndWrap(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic, chain: Chain): SignerPayloadExtrinsic {
         val proxyAccountId = proxyMetaAccount.requireAccountIdIn(chain)
         val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
 

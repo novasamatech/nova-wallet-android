@@ -32,8 +32,7 @@ class RealProxiedAddAccountRepository(
         payload: Payload,
         position: Int
     ): MetaAccountLocal {
-        val proxied = payload.proxiedWithProxy.proxied
-        val chain = chainRegistry.getChain(proxied.chainId)
+        val chain = chainRegistry.getChain(payload.chainId)
 
         return MetaAccountLocal(
             substratePublicKey = null,
@@ -41,7 +40,7 @@ class RealProxiedAddAccountRepository(
             substrateAccountId = null,
             ethereumPublicKey = null,
             ethereumAddress = null,
-            name = payload.identity?.name ?: chain.addressOf(proxied.accountId),
+            name = payload.identity?.name ?: chain.addressOf(payload.proxiedAccountId),
             parentMetaId = payload.proxyMetaId,
             isSelected = false,
             position = position,
@@ -51,13 +50,11 @@ class RealProxiedAddAccountRepository(
     }
 
     private fun createChainAccount(proxiedMetaId: Long, payload: Payload): ChainAccountLocal {
-        val proxied = payload.proxiedWithProxy.proxied
-
         return ChainAccountLocal(
             metaId = proxiedMetaId,
-            chainId = proxied.chainId,
+            chainId = payload.chainId,
             publicKey = null,
-            accountId = proxied.accountId,
+            accountId = payload.proxiedAccountId,
             cryptoType = null
         )
     }
@@ -66,15 +63,12 @@ class RealProxiedAddAccountRepository(
         proxiedMetaId: Long,
         payload: Payload
     ): ProxyAccountLocal {
-        val proxied = payload.proxiedWithProxy.proxied
-        val proxy = payload.proxiedWithProxy.proxy
-
         return ProxyAccountLocal(
             proxiedMetaId = proxiedMetaId,
             proxyMetaId = payload.proxyMetaId,
-            chainId = proxied.chainId,
-            proxiedAccountId = proxied.accountId,
-            proxyType = proxy.proxyType
+            chainId = payload.chainId,
+            proxiedAccountId = payload.proxiedAccountId,
+            proxyType = payload.proxyType.name
         )
     }
 }
