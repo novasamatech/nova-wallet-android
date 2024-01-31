@@ -80,8 +80,8 @@ class RewardCalculatorFactory(
     private suspend fun StakingOption.createRelaychainCalculator(
         validators: List<RewardCalculationTarget>,
         totalIssuance: BigInteger
-    ) : RewardCalculator {
-        return when(chain.id) {
+    ): RewardCalculator {
+        return when (chain.id) {
             Chain.Geneses.DOCK -> createDockRewardCalculator(validators, totalIssuance)
 
             else -> {

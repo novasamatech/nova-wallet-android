@@ -30,6 +30,6 @@ fun <T> Constant.decodeAsOrThrow(runtime: RuntimeSnapshot, binding: (Any?) -> T)
     return binding(decodeOrThrow(runtime))
 }
 
-fun Constant.decodeOrThrow(runtime: RuntimeSnapshot): Any?  {
+fun Constant.decodeOrThrow(runtime: RuntimeSnapshot): Any? {
     return requireNotNull(type).fromByteArrayOrIncompatible(value, runtime)
 }

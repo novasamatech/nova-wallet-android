@@ -8,7 +8,7 @@ class DockRewardCalculator(
     private val totalIssuance: BigInteger,
     private val yearlyEmission: BigInteger,
     private val treasuryRewardsPercentage: Perbill,
-): InflationBasedRewardCalculator(validators, totalIssuance) {
+) : InflationBasedRewardCalculator(validators, totalIssuance) {
 
     override fun calculateYearlyInflation(stakedPortion: Double): Double {
         val inflation = yearlyEmission.toDouble() / totalIssuance.toDouble()

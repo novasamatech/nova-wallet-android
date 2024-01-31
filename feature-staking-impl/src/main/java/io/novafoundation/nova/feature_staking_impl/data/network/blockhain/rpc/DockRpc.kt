@@ -15,7 +15,7 @@ interface DockRpc {
 
 class RealDockRpc(
     private val chainRegistry: ChainRegistry,
-): DockRpc {
+) : DockRpc {
 
     override suspend fun stakingRewardYearlyEmission(chainId: ChainId, totalStaked: Balance, totalIssuance: Balance): Balance {
         val request = YearlyEmissionRequest(totalStaked, totalIssuance)
@@ -29,7 +29,7 @@ class RealDockRpc(
 private class YearlyEmissionRequest(
     totalStaked: Balance,
     totalIssuance: Balance
-): RuntimeRequest(
+) : RuntimeRequest(
     method = "staking_rewards_yearlyEmission",
     params = listOf(totalStaked, totalIssuance)
 )

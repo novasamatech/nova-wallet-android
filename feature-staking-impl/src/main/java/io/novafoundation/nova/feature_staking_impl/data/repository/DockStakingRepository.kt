@@ -15,7 +15,7 @@ import java.math.BigInteger
 
 interface DockStakingRepository {
 
-    suspend fun getEarlyEmission(chainId: ChainId,  totalStaked: Balance, totalIssuance: Balance): BigInteger
+    suspend fun getEarlyEmission(chainId: ChainId, totalStaked: Balance, totalIssuance: Balance): BigInteger
 
     suspend fun getTreasuryRewardsPercentage(chainId: ChainId): Percent
 }
@@ -23,9 +23,9 @@ interface DockStakingRepository {
 class RealDockStakingRepository(
     private val dockRpc: DockRpc,
     private val storageDataSource: StorageDataSource,
-): DockStakingRepository {
+) : DockStakingRepository {
 
-    override suspend fun getEarlyEmission(chainId: ChainId,  totalStaked: Balance, totalIssuance: Balance): BigInteger = withContext(Dispatchers.IO) {
+    override suspend fun getEarlyEmission(chainId: ChainId, totalStaked: Balance, totalIssuance: Balance): BigInteger = withContext(Dispatchers.IO) {
         dockRpc.stakingRewardYearlyEmission(chainId, totalStaked, totalIssuance)
     }
 
