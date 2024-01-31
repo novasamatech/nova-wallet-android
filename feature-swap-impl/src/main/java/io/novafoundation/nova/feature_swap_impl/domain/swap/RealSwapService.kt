@@ -31,8 +31,9 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.HydraDxOmnipoolExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
-import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -186,11 +187,10 @@ internal class RealSwapService(
             .filterNotNull()
     }
 
-    // TODO only use flags and do not hardcode genesis hash
     private suspend fun createExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
         val factory = when {
-            Chain.Swap.ASSET_CONVERSION in chain.swap -> assetConversionFactory
-            chain.id == Chain.Geneses.HYDRA_DX -> hydraDxOmnipoolFactory
+            chain.swap.assetConversionSupported() -> assetConversionFactory
+            chain.swap.hydraDxSupported() -> hydraDxOmnipoolFactory
             else -> null
         }
 

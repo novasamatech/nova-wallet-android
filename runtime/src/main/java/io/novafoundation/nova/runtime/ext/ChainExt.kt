@@ -70,8 +70,7 @@ fun List<Chain.Swap>.assetConversionSupported(): Boolean {
 }
 
 fun List<Chain.Swap>.hydraDxSupported(): Boolean {
-    // TODO determine hydra availability from flags
-    return true
+    return Chain.Swap.HYDRA_DX in this
 }
 
 val Chain.ConnectionState.isFullSync: Boolean
