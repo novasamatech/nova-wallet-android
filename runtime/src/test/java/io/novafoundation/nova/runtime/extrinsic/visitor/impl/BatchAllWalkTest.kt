@@ -157,11 +157,11 @@ internal class BatchAllWalkTest {
             addAll(innerBatchEvents)
             add(itemCompleted())
 
-                // second level batch starts
+            run {
                 addAll(innerBatchEvents)
                 add(itemCompleted())
 
-                    // third level batch starts
+                run {
                     addAll(innerBatchEvents)
                     add(itemCompleted())
 
@@ -169,12 +169,11 @@ internal class BatchAllWalkTest {
                     add(itemCompleted())
 
                     add(batchCompleted())
-                    // third level batch ends
-
+                }
                 add(itemCompleted())
-                // second level batch ends
-                add(batchCompleted())
 
+                add(batchCompleted())
+            }
             add(itemCompleted())
 
             addAll(innerBatchEvents)
@@ -227,7 +226,7 @@ internal class BatchAllWalkTest {
             moduleName = Modules.UTILITY,
             callName = "batch_all",
             arguments = mapOf(
-               "calls" to innerCalls.toList()
+                "calls" to innerCalls.toList()
             )
         )
     }
