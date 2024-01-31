@@ -44,7 +44,7 @@ fun AddStakingProxyValidationSystemBuilder.sufficientBalanceToStayAboveEd(
 
 fun AddStakingProxyValidationSystemBuilder.sufficientBalanceToPayFee() =
     sufficientBalance(
-        available = { it.asset.free },
+        available = { it.asset.transferable },
         amount = { BigDecimal.ZERO },
         fee = { it.fee },
         error = { context ->

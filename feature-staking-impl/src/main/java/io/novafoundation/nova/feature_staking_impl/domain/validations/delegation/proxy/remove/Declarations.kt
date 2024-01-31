@@ -27,7 +27,7 @@ fun RemoveStakingProxyValidationSystemBuilder.sufficientBalanceToStayAboveEd(
 
 fun RemoveStakingProxyValidationSystemBuilder.sufficientBalanceToPayFee() {
     return sufficientBalance(
-        available = { it.asset.free },
+        available = { it.asset.transferable },
         amount = { BigDecimal.ZERO },
         fee = { it.fee },
         error = { context ->
