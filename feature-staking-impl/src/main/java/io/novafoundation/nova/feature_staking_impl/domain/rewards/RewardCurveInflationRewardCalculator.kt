@@ -48,6 +48,15 @@ class InflationConfig(
                 )
             }
         )
+
+        // https://github.com/Joystream/joystream/blob/master/runtime/src/lib.rs#L516
+        fun Joystream() = InflationConfig(
+            falloff = 0.05,
+            maxInflation = 0.03,
+            minInflation = 0.007,
+            stakeTarget = 0.5,
+            parachainAdjust = null
+        )
     }
 }
 
