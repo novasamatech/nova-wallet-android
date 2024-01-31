@@ -91,7 +91,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
             chainAsset = context.payload.transfer.originChain.commissionAsset,
             fee = context.fee,
-            maxUsable = context.availableToPayFees
+            maxUsable = context.maxUsable
         )
     }
 )

@@ -12,7 +12,7 @@ fun ValidationSystem.Companion.revokeDelegationValidationSystem(): RevokeDelegat
         error = { context ->
             RevokeDelegationValidationFailure.NotEnoughToPayFees(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }

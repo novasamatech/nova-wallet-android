@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyDepositWithQuantity
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -86,7 +85,7 @@ class ConfirmAddStakingProxyViewModel(
     }
 
     val proxyDeposit = assetFlow.map { asset ->
-        mapAmountToAmountModel(payload.newProxyDeposit, asset)
+        mapAmountToAmountModel(payload.deltaDeposit, asset)
     }
 
     val feeModelFlow = combine(assetFlow, decimalFeeFlow) { asset, decimalFee ->
@@ -112,10 +111,8 @@ class ConfirmAddStakingProxyViewModel(
             proxyAddress = payload.proxyAddress,
             proxiedAccountId = metaAccount.requireAccountIdIn(chain),
             fee = decimalFeeFlow.first(),
-            depositWithQuantity = ProxyDepositWithQuantity(
-                deposit = payload.newProxyDeposit,
-                quantity = payload.newProxyQuantity
-            )
+            deltaDeposit = payload.deltaDeposit,
+            currentQuantity = payload.currentQuantity
         )
 
         validationExecutor.requireValid(

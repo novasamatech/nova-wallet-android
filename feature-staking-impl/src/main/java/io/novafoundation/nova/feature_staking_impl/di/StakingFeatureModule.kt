@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
@@ -618,12 +620,16 @@ class StakingFeatureModule {
     fun provideAddProxyRepository(
         extrinsicService: ExtrinsicService,
         proxyDepositCalculator: ProxyDepositCalculator,
-        getProxyRepository: GetProxyRepository
+        getProxyRepository: GetProxyRepository,
+        proxyConstantsRepository: ProxyConstantsRepository,
+        proxySyncService: ProxySyncService
     ): AddStakingProxyInteractor {
         return RealAddStakingProxyInteractor(
             extrinsicService,
             proxyDepositCalculator,
-            getProxyRepository
+            getProxyRepository,
+            proxyConstantsRepository,
+            proxySyncService
         )
     }
 
@@ -640,6 +646,10 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun removeStakingProxyInteractor(
-        extrinsicService: ExtrinsicService
-    ): RemoveStakingProxyInteractor = RealRemoveStakingProxyInteractor(extrinsicService)
+        extrinsicService: ExtrinsicService,
+        proxySyncService: ProxySyncService
+    ): RemoveStakingProxyInteractor = RealRemoveStakingProxyInteractor(
+        extrinsicService,
+        proxySyncService
+    )
 }

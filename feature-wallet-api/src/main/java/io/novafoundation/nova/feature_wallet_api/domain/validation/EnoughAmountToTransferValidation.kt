@@ -34,7 +34,7 @@ class EnoughAmountToTransferValidationGeneric<P, E, F : GenericFee>(
 
         val payload: P,
 
-        val availableToPayFees: BigDecimal,
+        val maxUsable: BigDecimal,
 
         val fee: BigDecimal,
     )

@@ -9,6 +9,6 @@ import kotlinx.android.parcel.Parcelize
 class ConfirmAddStakingProxyPayload(
     val fee: FeeParcelModel,
     val proxyAddress: String,
-    val newProxyDeposit: Balance,
-    val newProxyQuantity: Int
+    val deltaDeposit: Balance,
+    val currentQuantity: Int
 ) : Parcelable
