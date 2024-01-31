@@ -1,11 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.domain.rewards
 
+import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.common.utils.toPerbill
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
+import io.novafoundation.nova.feature_staking_impl.data.repository.DockStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.data.unwrapNominationPools
@@ -33,6 +36,7 @@ class RewardCalculatorFactory(
     private val totalIssuanceRepository: TotalIssuanceRepository,
     private val shareStakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
     private val parasRepository: ParasRepository,
+    private val dockStakingRepository: DockStakingRepository,
 ) {
 
     suspend fun create(
@@ -67,15 +71,43 @@ class RewardCalculatorFactory(
 
     private suspend fun StakingOption.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
         return when (unwrapNominationPools().stakingType) {
-            RELAYCHAIN, RELAYCHAIN_AURA -> {
+            RELAYCHAIN, RELAYCHAIN_AURA -> createRelaychainCalculator(validators, totalIssuance)
+            ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = assetWithChain.asset)
+            NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+        }
+    }
+
+    private suspend fun StakingOption.createRelaychainCalculator(
+        validators: List<RewardCalculationTarget>,
+        totalIssuance: BigInteger
+    ) : RewardCalculator {
+        return when(chain.id) {
+            Chain.Geneses.DOCK -> createDockRewardCalculator(validators, totalIssuance)
+
+            else -> {
                 val activePublicParachains = parasRepository.activePublicParachains(assetWithChain.chain.id)
                 val inflationConfig = InflationConfig.create(chain.id, activePublicParachains)
 
                 RewardCurveInflationRewardCalculator(validators, totalIssuance, inflationConfig)
             }
-            ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = assetWithChain.asset)
-            NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
+    }
+
+    private suspend fun StakingOption.createDockRewardCalculator(
+        validators: List<RewardCalculationTarget>,
+        totalIssuance: BigInteger
+    ): RewardCalculator {
+        val totalStaked = validators.sumByBigInteger(RewardCalculationTarget::totalStake)
+
+        val yearlyEmission = dockStakingRepository.getEarlyEmission(chain.id, totalStaked, totalIssuance)
+        val treasuryRewardsPercentage = dockStakingRepository.getTreasuryRewardsPercentage(chain.id).toPerbill()
+
+        return DockRewardCalculator(
+            validators = validators,
+            totalIssuance = totalIssuance,
+            yearlyEmission = yearlyEmission,
+            treasuryRewardsPercentage = treasuryRewardsPercentage
+        )
     }
 
     private fun InflationConfig.Companion.create(chainId: ChainId, activePublicParachains: Int?): InflationConfig {

@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.DockStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
@@ -61,6 +62,7 @@ import io.novafoundation.nova.feature_staking_impl.data.validators.FixedKnownNov
 import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
+import io.novafoundation.nova.feature_staking_impl.di.staking.relaychain.dock.DockStakingModule
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
@@ -113,7 +115,7 @@ import javax.inject.Named
 const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
 const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
-@Module(includes = [AssetUseCaseModule::class])
+@Module(includes = [AssetUseCaseModule::class, DockStakingModule::class])
 class StakingFeatureModule {
 
     @Provides
@@ -289,7 +291,14 @@ class StakingFeatureModule {
         totalIssuanceRepository: TotalIssuanceRepository,
         stakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
         parasRepository: ParasRepository,
-    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, stakingSharedComputation, parasRepository)
+        dockStakingRepository: DockStakingRepository
+    ) = RewardCalculatorFactory(
+        stakingRepository = repository,
+        totalIssuanceRepository = totalIssuanceRepository,
+        shareStakingSharedComputation = stakingSharedComputation,
+        parasRepository = parasRepository,
+        dockStakingRepository = dockStakingRepository
+    )
 
     @Provides
     @FeatureScope

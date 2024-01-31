@@ -166,6 +166,8 @@ fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot
 
 fun Constant.asNumber(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
 
+fun Constant.asPerbill(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
+
 fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
@@ -234,6 +236,8 @@ fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_PO
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
 
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
+
+fun RuntimeMetadata.stakingRewards() = module(Modules.STAKING_REWARDS)
 
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
 
@@ -394,4 +398,6 @@ object Modules {
     const val MULTISIG = "Multisig"
     const val REGISTRAR = "Registrar"
     const val FAST_UNSTAKE = "FastUnstake"
+
+    const val STAKING_REWARDS = "StakingRewards"
 }
