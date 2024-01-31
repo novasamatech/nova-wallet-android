@@ -30,7 +30,7 @@ interface ExtrinsicSplitter {
 
 private typealias CallWeightsByType = Map<String, Deferred<Weight>>
 
-private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
+private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.6
 
 internal class RealExtrinsicSplitter(
     private val rpcCalls: RpcCalls,

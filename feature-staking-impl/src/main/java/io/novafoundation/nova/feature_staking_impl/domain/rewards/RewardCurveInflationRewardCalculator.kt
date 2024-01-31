@@ -18,7 +18,8 @@ class InflationConfig(
     )
 
     companion object {
-        // defaults based on Polkadot and Kusama runtime
+
+        // defaults based on Kusama runtime
         fun Default(activePublicParachains: Int?) = InflationConfig(
             falloff = 0.05,
             maxInflation = 0.1,
@@ -29,6 +30,21 @@ class InflationConfig(
                     maxParachains = 60,
                     activePublicParachains = activePublicParachains,
                     parachainReservedSupplyFraction = 0.3
+                )
+            }
+        )
+
+        // Polkadot has different `parachainReservedSupplyFraction`
+        fun Polkadot(activePublicParachains: Int?) = InflationConfig(
+            falloff = 0.05,
+            maxInflation = 0.1,
+            minInflation = 0.025,
+            stakeTarget = 0.75,
+            parachainAdjust = activePublicParachains?.let {
+                ParachainAdjust(
+                    maxParachains = 60,
+                    activePublicParachains = activePublicParachains,
+                    parachainReservedSupplyFraction = 0.2
                 )
             }
         )

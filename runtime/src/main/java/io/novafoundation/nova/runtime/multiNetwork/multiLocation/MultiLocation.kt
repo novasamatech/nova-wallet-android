@@ -75,6 +75,14 @@ fun List<MultiLocation.Junction>.toInterior() = when (size) {
 
 fun MultiLocation.Interior.isHere() = this is MultiLocation.Interior.Here
 
+fun MultiLocation.Interior.paraIdOrNull(): ParaId? {
+    if (this !is MultiLocation.Interior.Junctions) return null
+
+    return junctions.filterIsInstance<MultiLocation.Junction.ParachainId>()
+        .firstOrNull()
+        ?.id
+}
+
 private fun List<MultiLocation.Junction>.sorted(): List<MultiLocation.Junction> {
     return sortedBy(MultiLocation.Junction::order)
 }
