@@ -18,7 +18,7 @@ sealed interface AddStakingProxyValidationFailure {
 
     class NotEnoughBalanceToReserveDeposit(
         val chainAsset: Chain.Asset,
-        val availableBalance: Balance,
+        val maxUsable: Balance,
         val deposit: Balance
     ) : AddStakingProxyValidationFailure
 
