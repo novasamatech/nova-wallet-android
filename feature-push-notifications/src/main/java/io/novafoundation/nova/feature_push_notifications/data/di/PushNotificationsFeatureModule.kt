@@ -1,22 +1,33 @@
 package io.novafoundation.nova.feature_push_notifications.data.di
 
+import android.content.Context
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.data.PushTokenCache
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushTokenCache
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.LocalPushSettingsProvider
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.RemotePushSettingsProvider
+import io.novafoundation.nova.feature_push_notifications.data.data.settings.RealPushSettingsProvider
+import io.novafoundation.nova.feature_push_notifications.data.data.sbscription.PushSubscriptionService
+import io.novafoundation.nova.feature_push_notifications.data.data.sbscription.RealPushSubscriptionService
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealPushNotificationsInteractor
 
 @Module()
 class PushNotificationsFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun providePushTokenCache(
+        context: Context
+    ): GoogleApiAvailabilityProvider {
+        return GoogleApiAvailabilityProvider(context)
+    }
 
     @Provides
     @FeatureScope
@@ -31,33 +42,35 @@ class PushNotificationsFeatureModule {
     fun provideLocalPushSettingsProvider(
         gson: Gson,
         preferences: Preferences
-    ): LocalPushSettingsProvider {
-        return LocalPushSettingsProvider(gson, preferences)
+    ): RealPushSettingsProvider {
+        return RealPushSettingsProvider(gson, preferences)
     }
 
     @Provides
     @FeatureScope
     fun provideRemotePushSettingsProvider(
-        pushTokenCache: PushTokenCache
-    ): RemotePushSettingsProvider {
-        return RemotePushSettingsProvider(pushTokenCache)
+        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+    ): PushSubscriptionService {
+        return RealPushSubscriptionService(googleApiAvailabilityProvider)
     }
 
     @Provides
     @FeatureScope
     fun providePushNotificationsService(
-        localPushSettingsProvider: LocalPushSettingsProvider,
-        remotePushSettingsProvider: RemotePushSettingsProvider,
+        localPushSettingsProvider: RealPushSettingsProvider,
+        pushSubscriptionService: PushSubscriptionService,
         rootScope: RootScope,
         preferences: Preferences,
-        pushTokenCache: PushTokenCache
+        pushTokenCache: PushTokenCache,
+        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
     ): PushNotificationsService {
         return RealPushNotificationsService(
             localPushSettingsProvider,
-            remotePushSettingsProvider,
+            pushSubscriptionService,
             rootScope,
             preferences,
-            pushTokenCache
+            pushTokenCache,
+            googleApiAvailabilityProvider
         )
     }
 

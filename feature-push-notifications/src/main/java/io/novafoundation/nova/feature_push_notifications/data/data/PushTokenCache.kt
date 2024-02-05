@@ -6,20 +6,20 @@ private const val PUSH_TOKEN_KEY = "push_token"
 
 interface PushTokenCache {
 
-    suspend fun getPushToken(): String?
+    fun getPushToken(): String?
 
-    suspend fun updatePushToken(pushToken: String)
+    fun updatePushToken(pushToken: String)
 }
 
 class RealPushTokenCache(
     private val preferences: Preferences
 ) : PushTokenCache {
 
-    override suspend fun getPushToken(): String? {
+    override fun getPushToken(): String? {
         return preferences.getString(PUSH_TOKEN_KEY)
     }
 
-    override suspend fun updatePushToken(pushToken: String) {
+    override fun updatePushToken(pushToken: String) {
         preferences.putString(PUSH_TOKEN_KEY, pushToken)
     }
 }

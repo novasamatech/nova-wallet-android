@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificat
     ]
 )
 @FeatureScope
-interface PushNotificationsFeatureComponent {
+interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
 
     fun getPushNotificationService(): PushNotificationsService
 

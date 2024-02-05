@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -70,6 +71,7 @@ interface RootComponent {
             RuntimeApi::class,
             VersionsFeatureApi::class,
             WalletConnectFeatureApi::class,
+            PushNotificationsFeatureApi::class
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

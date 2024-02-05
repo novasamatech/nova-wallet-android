@@ -2,34 +2,33 @@ package io.novafoundation.nova.feature_push_notifications.data.data
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
-import io.novafoundation.nova.common.utils.formatting.formatDateISO_8601
 import io.novafoundation.nova.common.utils.repeatUntil
-import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.LocalPushSettingsProvider
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushWalletSettings
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.RemotePushSettingsProvider
-import java.util.*
+import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
+import io.novafoundation.nova.feature_push_notifications.data.data.sbscription.PushSubscriptionService
 import kotlinx.coroutines.launch
 
 private const val PREFS_NEED_TO_SYNC_TOKEN = "need_to_sync_token"
 
 interface PushNotificationsService {
+
     fun onTokenUpdated(token: String)
 
     fun isNeedToSyncSettings(): Boolean
 
-    suspend fun onSettingsUpdated(walletSettings: PushWalletSettings)
+    suspend fun onSettingsUpdated(settings: PushSettings): Result<Unit>
 
     suspend fun syncSettings()
 }
 
 class RealPushNotificationsService(
-    private val localPushSettingsProvider: LocalPushSettingsProvider,
-    private val remotePushSettingsProvider: RemotePushSettingsProvider,
+    private val pushSettingsProvider: PushSettingsProvider,
+    private val pushSubscriptionService: PushSubscriptionService,
     private val rootScope: RootScope,
     private val preferences: Preferences,
-    private val pushTokenCache: PushTokenCache
+    private val pushTokenCache: PushTokenCache,
+    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 ) : PushNotificationsService {
 
     init {
@@ -37,33 +36,35 @@ class RealPushNotificationsService(
     }
 
     override fun onTokenUpdated(token: String) {
+        if (!googleApiAvailabilityProvider.isAvailable()) return
+
         rootScope.launch {
             pushTokenCache.updatePushToken(token)
-            updateLocalPushSettings(token)
 
             syncSettings()
         }
     }
 
     override suspend fun syncSettings() {
-        val succesfullSync = repeatUntil(maxTimes = 5) {
-            val result = runCatching {
-                val walletSettings = localPushSettingsProvider.getWalletSettings() ?: return@syncSettings
-                remotePushSettingsProvider.updateWalletSettings(walletSettings)
-            }
+        if (!googleApiAvailabilityProvider.isAvailable()) return
 
-            result.isSuccess
-        }
-
-        setNeedToSyncSettings(!succesfullSync)
+        val pushToken = getPushTokenOrFallback() ?: return
+        syncSettingsInternal(pushToken)
     }
 
-    override suspend fun onSettingsUpdated(walletSettings: PushWalletSettings) {
-        localPushSettingsProvider.updateWalletSettings(walletSettings)
-        remotePushSettingsProvider.updateWalletSettings(walletSettings)
+    override suspend fun onSettingsUpdated(settings: PushSettings): Result<Unit> {
+        if (!googleApiAvailabilityProvider.isAvailable()) return Result.success(Unit)
+
+        return runCatching {
+            val pushToken = getPushTokenOrFallback() ?: throw IllegalStateException("Push token is not set")
+            pushSettingsProvider.updateWalletSettings(settings)
+            pushSubscriptionService.handleSubscription(pushToken, settings)
+        }
     }
 
     override fun isNeedToSyncSettings(): Boolean {
+        if (!googleApiAvailabilityProvider.isAvailable()) return false
+
         return preferences.getBoolean(PREFS_NEED_TO_SYNC_TOKEN, false)
     }
 
@@ -71,9 +72,22 @@ class RealPushNotificationsService(
         preferences.putBoolean(PREFS_NEED_TO_SYNC_TOKEN, needToSync)
     }
 
-    private suspend fun updateLocalPushSettings(token: String) {
-        val walletSettings = localPushSettingsProvider.getWalletSettings()
-            ?: PushWalletSettings.getDefault(token, formatDateISO_8601(Date()))
-        localPushSettingsProvider.updateWalletSettings(walletSettings.copy(pushToken = token))
+    private suspend fun getPushTokenOrFallback(): String? {
+        return pushTokenCache.getPushToken() ?: NovaFirebaseMessagingService.getToken()
+    }
+
+    private suspend fun syncSettingsInternal(token: String) {
+        if (!googleApiAvailabilityProvider.isAvailable()) return
+
+        val succesfullSync = repeatUntil(maxTimes = 5) {
+            val pushSettings = pushSettingsProvider.getPushSettings() ?: PushSettings.getDefault()
+            val result = runCatching {
+                pushSubscriptionService.handleSubscription(token, pushSettings)
+            }
+
+            result.isSuccess
+        }
+
+        setNeedToSyncSettings(!succesfullSync)
     }
 }

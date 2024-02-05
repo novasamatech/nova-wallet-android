@@ -11,7 +11,7 @@ class PushNotificationsFeatureHolder @Inject constructor(
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
-        val dependencies = DaggerPushNotificationsFeatureComponent_PushNotificationsFeatureComponent.builder()
+        val dependencies = DaggerPushNotificationsFeatureComponent_PushNotificationsFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .build()
         return DaggerPushNotificationsFeatureComponent.factory()

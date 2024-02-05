@@ -5,17 +5,17 @@ import io.novafoundation.nova.common.data.storage.Preferences
 
 private const val PUSH_SETTINGS_KEY = "push_settings"
 
-class LocalPushSettingsProvider(
+class RealPushSettingsProvider(
     private val gson: Gson,
     private val prefs: Preferences
 ) : PushSettingsProvider {
 
-    override suspend fun getWalletSettings(): PushWalletSettings? {
+    override suspend fun getPushSettings(): PushSettings? {
         return prefs.getString(PUSH_SETTINGS_KEY)
-            ?.let { gson.fromJson(it, PushWalletSettings::class.java) }
+            ?.let { gson.fromJson(it, PushSettings::class.java) }
     }
 
-    override suspend fun updateWalletSettings(pushWalletSettings: PushWalletSettings) {
+    override suspend fun updateWalletSettings(pushWalletSettings: PushSettings) {
         prefs.putString(PUSH_SETTINGS_KEY, gson.toJson(pushWalletSettings))
     }
 }
