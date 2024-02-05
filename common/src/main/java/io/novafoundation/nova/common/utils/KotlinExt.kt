@@ -455,6 +455,21 @@ inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
 
 fun <T> List<T>.associateWithIndex() = withIndex().associateBy(keySelector = { it.value }, valueTransform = { it.index })
 
+/**
+ * @return true if action returned true at least once, false otherwise
+ */
+inline fun repeatUntil(maxTimes: Int?, action: () -> Boolean): Boolean {
+    var times = 0
+
+    while (maxTimes == null || times < maxTimes) {
+        if (action()) return true
+
+        times++
+    }
+
+    return false
+}
+
 fun Date.atTheBeginningOfTheDay(): Date {
     val calendar = Calendar.getInstance().apply {
         time = this@atTheBeginningOfTheDay

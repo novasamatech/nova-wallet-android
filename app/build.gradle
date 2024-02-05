@@ -219,6 +219,8 @@ dependencies {
     implementation project(":feature-buy-api")
     implementation project(":feature-buy-impl")
 
+    implementation project(':feature-push-notifications')
+
     implementation kotlinDep
 
     implementation biometricDep
@@ -257,6 +259,10 @@ dependencies {
     implementation insetterDep
 
     implementation liveDataKtxDep
+
+    implementation platform(firebaseBomDep)
+    implementation firestoreDep
+    implementation firebaseCloudMessagingDep
 
     implementation walletConnectCoreDep, withoutTransitiveAndroidX
     implementation walletConnectWalletDep, withoutTransitiveAndroidX

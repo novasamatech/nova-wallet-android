@@ -83,6 +83,12 @@ buildscript {
 
         markwonVersion = '4.6.2'
 
+        firebaseBomVersion = '32.7.1'
+
+        firestoreVersion = '24.10.1'
+
+        firebaseCloudMessagingVerion = '23.4.0'
+
         walletConnectCoreVersion = "1.13.0"
         walletConnectWalletVersion = "1.6.0"
 
@@ -196,6 +202,10 @@ buildscript {
         walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"
 
         canonizationJsonDep = "io.github.erdtman:java-json-canonicalization:1.1"
+
+        firebaseBomDep = "com.google.firebase:firebase-bom:$firebaseBomVersion"
+        firestoreDep = "com.google.firebase:firebase-firestore"
+        firebaseCloudMessagingDep = "com.google.firebase:firebase-messaging"
     }
 
     repositories {
