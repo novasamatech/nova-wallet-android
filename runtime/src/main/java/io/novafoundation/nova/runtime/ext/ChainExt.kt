@@ -301,6 +301,8 @@ object ChainGeneses {
     const val ZEITGEIST = "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060"
 
     const val WESTMINT = "67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9"
+
+    const val DOCK = "6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae"
 }
 
 object ChainIds {
