@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_push_notifications.data.data.subscription.
 import io.novafoundation.nova.feature_push_notifications.data.data.subscription.RealPushSubscriptionService
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealPushNotificationsInteractor
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module()
 class PushNotificationsFeatureModule {
@@ -49,9 +50,15 @@ class PushNotificationsFeatureModule {
     @Provides
     @FeatureScope
     fun providePushSubscriptionService(
+        prefs: Preferences,
+        chainRegistry: ChainRegistry,
         googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
     ): PushSubscriptionService {
-        return RealPushSubscriptionService(googleApiAvailabilityProvider)
+        return RealPushSubscriptionService(
+            prefs,
+            chainRegistry,
+            googleApiAvailabilityProvider
+        )
     }
 
     @Provides

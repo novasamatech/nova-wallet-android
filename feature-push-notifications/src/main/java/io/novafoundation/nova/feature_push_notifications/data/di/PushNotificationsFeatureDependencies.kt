@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface PushNotificationsFeatureDependencies {
 
@@ -14,4 +15,6 @@ interface PushNotificationsFeatureDependencies {
     val preferences: Preferences
 
     val context: Context
+
+    val chainRegistry: ChainRegistry
 }
