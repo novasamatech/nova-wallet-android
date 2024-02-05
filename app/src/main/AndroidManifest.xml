@@ -115,6 +115,10 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/android_system_accent" />
 
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+
     </application>
 
 </manifest>

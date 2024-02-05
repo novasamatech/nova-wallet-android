@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.settings
 
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+
 data class PushSettings(
     val appMajorUpdates: Boolean,
     val appCriticalUpdates: Boolean,
@@ -10,31 +12,29 @@ data class PushSettings(
     data class Wallet(
         val baseEthereumAccount: String,
         val baseSubstrateAccount: String,
-        val chainAccounts: Map<String, String>,
+        val chainAccounts: Map<ChainId, String>,
         val notifications: Notifications
     )
 
     data class Notifications(
-        val stakingReward: StakingReward,
-        val transfer: Transfer
+        val stakingReward: ChainFeature,
+        val transfer: ChainFeature
     )
 
-    data class StakingReward(
-        val type: String
-    )
+    sealed class ChainFeature {
 
-    data class Transfer(
-        val type: String,
-        val value: List<String>
-    )
+        object All : ChainFeature()
+
+        data class Concrete(val chainIds: List<String>) : ChainFeature()
+    }
 
     companion object {
 
         fun getDefault(): PushSettings {
             return PushSettings(
-                appMajorUpdates = true,
-                appCriticalUpdates = true,
-                chainReferendums = true,
+                appMajorUpdates = false,
+                appCriticalUpdates = false,
+                chainReferendums = false,
                 wallets = emptyList()
             )
         }

@@ -13,8 +13,8 @@ import io.novafoundation.nova.feature_push_notifications.data.data.PushTokenCach
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushTokenCache
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.RealPushSettingsProvider
-import io.novafoundation.nova.feature_push_notifications.data.data.sbscription.PushSubscriptionService
-import io.novafoundation.nova.feature_push_notifications.data.data.sbscription.RealPushSubscriptionService
+import io.novafoundation.nova.feature_push_notifications.data.data.subscription.PushSubscriptionService
+import io.novafoundation.nova.feature_push_notifications.data.data.subscription.RealPushSubscriptionService
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealPushNotificationsInteractor
 
