@@ -23,7 +23,7 @@ class PushNotificationsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun providePushTokenCache(
+    fun provideGoogleApiAvailabilityProvider(
         context: Context
     ): GoogleApiAvailabilityProvider {
         return GoogleApiAvailabilityProvider(context)
@@ -48,7 +48,7 @@ class PushNotificationsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideRemotePushSettingsProvider(
+    fun providePushSubscriptionService(
         googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
     ): PushSubscriptionService {
         return RealPushSubscriptionService(googleApiAvailabilityProvider)
