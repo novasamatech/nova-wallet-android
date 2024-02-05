@@ -85,10 +85,6 @@ buildscript {
 
         firebaseBomVersion = '32.7.1'
 
-        firestoreVersion = '24.10.1'
-
-        firebaseCloudMessagingVerion = '23.4.0'
-
         walletConnectCoreVersion = "1.13.0"
         walletConnectWalletVersion = "1.6.0"
 
