@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
-import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureComponent
 import kotlinx.coroutines.tasks.await
 
 class NovaFirebaseMessagingService : FirebaseMessagingService() {
@@ -36,13 +35,15 @@ class NovaFirebaseMessagingService : FirebaseMessagingService() {
         fun logToken() {
             if (!BuildConfig.DEBUG) return
 
-            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    return@OnCompleteListener
-                }
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(
+                OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        return@OnCompleteListener
+                    }
 
-                Log.d("NOVA_PUSH_TOKEN", "FCM token: ${task.result}")
-            })
+                    Log.d("NOVA_PUSH_TOKEN", "FCM token: ${task.result}")
+                }
+            )
         }
     }
 }

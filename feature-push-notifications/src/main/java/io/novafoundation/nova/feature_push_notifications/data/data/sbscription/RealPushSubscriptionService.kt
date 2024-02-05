@@ -32,7 +32,6 @@ class RealPushSubscriptionService(
             .await()
     }
 
-
     private suspend fun handleSubscription(subscribe: Boolean, topic: String) {
         if (subscribe) {
             subscribeToTopic(topic)

@@ -215,5 +215,4 @@ interface ComponentHolderModule {
     @ClassKey(PushNotificationsFeatureApi::class)
     @IntoMap
     fun providePushNotificationsFeature(holder: PushNotificationsFeatureHolder): FeatureApiHolder
-
 }
