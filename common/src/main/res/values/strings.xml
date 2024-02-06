@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="staking_set_controller_deprecated_subtitle">Use Proxies to delegate Staking operations to another account</string>
+
     <string name="staking_manage_proxy_requires_stash_title">Select stash account to setup proxy</string>
     <string name="staking_manage_proxy_requires_stash_message">Please switch your wallet to %s to setup a proxy</string>
 
@@ -366,7 +368,6 @@
     <string name="account_polkadot_vault">Polkadot Vault</string>
 
     <string name="staking_set_controller_deprecated_title">Controller Accounts Are Being Deprecated</string>
-    <string name="staking_set_controller_deprecated_subtitle">Network is migrating towards replacing Controllers to Proxies feature. Nova Wallet will support Proxies in future updates</string>
     <string name="staking_set_controller_deprecated_action">Update Controller to Stash</string>
 
     <string name="assets_search_placeholder">No networks or tokens with entered\nname were found</string>
