@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleText="@string/remove_proxy_title" />
+        app:titleText="@string/common_proxy_rewoke_access" />
 
     <ScrollView
         android:layout_width="match_parent"
