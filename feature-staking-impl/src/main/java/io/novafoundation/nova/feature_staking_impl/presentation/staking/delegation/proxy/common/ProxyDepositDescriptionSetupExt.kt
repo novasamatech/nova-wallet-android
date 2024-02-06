@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 
 fun DescriptionBottomSheetLauncher.launchProxyDepositDescription() {
     launchDescriptionBottomSheet(
-        titleRes = R.string.add_proxy_deposit_description_title,
+        titleRes = R.string.common_proxy_deposit,
         descriptionRes = R.string.add_proxy_deposit_description_message
     )
 }
