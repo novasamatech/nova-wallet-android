@@ -19,7 +19,7 @@ class StashOnlyIsAllowedValidation<P, E>(
 
     override suspend fun validate(value: P): ValidationStatus<E> {
         val stakingState = stakingState(value)
-        if (stakingState !is StakingState.Stash) return ValidationStatus.Valid()
+        if (stakingState !is StakingState.Stash) throw IllegalStateException("StashOnlyIsAllowedValidation can be used only for Stash state")
 
         return if (stakingState.accountIsStash()) {
             ValidationStatus.Valid()
