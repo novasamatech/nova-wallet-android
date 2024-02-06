@@ -4,17 +4,17 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.app.root.domain.RootInteractor
+import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.BuyCallbackDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.DAppDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ImportMnemonicDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.StakingDashboardDeepLinkHandler
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -54,13 +54,11 @@ class DeepLinkModule {
     @Provides
     @IntoSet
     fun provideDappDeepLinkHandler(
-        accountRepository: AccountRepository,
         dAppMetadataRepository: DAppMetadataRepository,
         dAppRouter: DAppRouter,
         automaticInteractionGate: AutomaticInteractionGate
     ): DeepLinkHandler {
         return DAppDeepLinkHandler(
-            accountRepository,
             dAppMetadataRepository,
             dAppRouter,
             automaticInteractionGate

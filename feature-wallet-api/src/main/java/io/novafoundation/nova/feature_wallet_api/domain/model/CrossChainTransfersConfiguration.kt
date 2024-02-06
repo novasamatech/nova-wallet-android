@@ -11,6 +11,7 @@ class CrossChainTransfersConfiguration(
     // Reserves locations from the Relaychain point of view
     val assetLocations: Map<String, ReserveLocation>,
     val feeInstructions: Map<String, List<XCMInstructionType>>,
+    val deliveryFeeConfigurations: Map<String, DeliveryFeeConfiguration>,
     val instructionBaseWeights: Map<String, Weight>,
     val chains: Map<ChainId, List<AssetTransfers>>
 ) {
@@ -70,8 +71,27 @@ enum class XCMInstructionType {
     ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset, DepositReserveAsset, ReceiveTeleportedAsset, UNKNOWN
 }
 
+class DeliveryFeeConfiguration(
+    val toParent: Type?,
+    val toParachain: Type?
+) {
+
+    sealed interface Type {
+        class Exponential(
+            val factorPallet: String,
+            val sizeBase: BigInteger,
+            val sizeFactor: BigInteger,
+            val alwaysHoldingPays: Boolean
+        ) : Type
+
+        object Undefined : Type
+    }
+}
+
 class CrossChainTransferConfiguration(
+    val originChainId: ChainId,
     val assetLocation: MultiLocation,
+    val reserveChainLocation: MultiLocation,
     val destinationChainLocation: MultiLocation,
     val destinationFee: CrossChainFeeConfiguration,
     val reserveFee: CrossChainFeeConfiguration?,
@@ -79,7 +99,15 @@ class CrossChainTransferConfiguration(
 )
 
 class CrossChainFeeConfiguration(
-    val chainId: ChainId,
-    val instructionWeight: Weight,
-    val xcmFeeType: XcmFee<List<XCMInstructionType>>
-)
+    val from: From,
+    val to: To
+) {
+
+    class From(val chainId: ChainId, val deliveryFeeConfiguration: DeliveryFeeConfiguration?)
+
+    class To(
+        val chainId: ChainId,
+        val instructionWeight: Weight,
+        val xcmFeeType: XcmFee<List<XCMInstructionType>>
+    )
+}

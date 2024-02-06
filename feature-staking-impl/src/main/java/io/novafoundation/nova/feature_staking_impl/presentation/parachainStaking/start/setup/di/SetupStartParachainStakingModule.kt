@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
@@ -60,6 +61,8 @@ class SetupStartParachainStakingModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
         collatorsUseCase: CollatorsUseCase,
+        selectedAssetState: StakingSharedState,
+        collatorRecommendatorFactory: CollatorRecommendatorFactory,
         payload: StartParachainStakingPayload,
     ): ViewModel {
         return StartParachainStakingViewModel(
@@ -78,6 +81,8 @@ class SetupStartParachainStakingModule {
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             collatorsUseCase = collatorsUseCase,
             hintsMixinFactory = hintsMixinFactory,
+            selectedAssetState = selectedAssetState,
+            collatorRecommendatorFactory = collatorRecommendatorFactory,
             payload = payload
         )
     }

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.preImage
+import io.novafoundation.nova.common.utils.storageOrFallback
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.repository.HexHash
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
@@ -120,18 +121,20 @@ class Gov2PreImageRepository(
     }
 
     private suspend fun StorageQueryContext.fetchPreImageLength(callHash: ByteArray): BigInteger? {
-        return runtime.metadata.preImage().storage("StatusFor").query(
-            callHash,
-            binding = ::bindPreImageLength
-        )
+        return runtime.metadata.preImage().storageOrFallback("RequestStatusFor", "StatusFor")
+            .query(
+                callHash,
+                binding = ::bindPreImageLength
+            )
     }
 
     private suspend fun StorageQueryContext.fetchPreImagesLength(callHashes: Collection<ByteArray>): Map<HexHash, BigInteger?> {
-        return runtime.metadata.preImage().storage("StatusFor").entries(
-            keysArguments = callHashes.wrapSingleArgumentKeys(),
-            keyExtractor = { (callHash: ByteArray) -> callHash.toHexString() },
-            binding = { decoded, _ -> bindPreImageLength(decoded) }
-        )
+        return runtime.metadata.preImage().storageOrFallback("RequestStatusFor", "StatusFor")
+            .entries(
+                keysArguments = callHashes.wrapSingleArgumentKeys(),
+                keyExtractor = { (callHash: ByteArray) -> callHash.toHexString() },
+                binding = { decoded, _ -> bindPreImageLength(decoded) }
+            )
     }
 
     private fun bindPreImageLength(decoded: Any?): BigInteger? = runCatching {

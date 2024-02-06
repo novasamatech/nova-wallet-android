@@ -319,6 +319,14 @@ fun CallRepresentation.toCallInstance(): CallRepresentation.Instance? {
     return (this as? CallRepresentation.Instance)
 }
 
+fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
+    ?: fallbacks.firstOrNull { modules[it] != null }
+        ?.let { modules[it] } ?: throw NoSuchElementException()
+
+fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEntry = storage?.get(name)
+    ?: fallbacks.firstOrNull { storage?.get(it) != null }
+        ?.let { storage?.get(it) } ?: throw NoSuchElementException()
+
 object Modules {
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
