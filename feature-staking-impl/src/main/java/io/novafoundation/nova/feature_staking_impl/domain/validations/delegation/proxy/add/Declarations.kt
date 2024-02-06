@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_proxy_api.domain.validators.proxyIsNotDupl
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.domain.model.regulatTransferableBalance
+import io.novafoundation.nova.feature_wallet_api.domain.model.regularTransferableBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
@@ -44,7 +44,7 @@ fun AddStakingProxyValidationSystemBuilder.sufficientBalanceToStayAboveEd(
 
 fun AddStakingProxyValidationSystemBuilder.sufficientBalanceToPayFee() =
     sufficientBalance(
-        available = { it.asset.free },
+        available = { it.asset.transferable },
         amount = { BigDecimal.ZERO },
         fee = { it.fee },
         error = { context ->
@@ -74,12 +74,12 @@ fun AddStakingProxyValidationSystemBuilder.maximumProxies(
 fun AddStakingProxyValidationSystemBuilder.enoughBalanceToPayDepositAndFee() = sufficientBalance(
     fee = { it.fee },
     amount = { it.asset.token.configuration.amountFromPlanks(it.deltaDeposit) },
-    available = { it.asset.token.amountFromPlanks(it.asset.regulatTransferableBalance()) },
+    available = { it.asset.token.amountFromPlanks(it.asset.regularTransferableBalance()) },
     error = {
         val chainAsset = it.payload.asset.token.configuration
         AddStakingProxyValidationFailure.NotEnoughBalanceToReserveDeposit(
             chainAsset = chainAsset,
-            availableBalance = chainAsset.planksFromAmount(it.maxUsable),
+            maxUsable = chainAsset.planksFromAmount(it.maxUsable),
             deposit = it.payload.deltaDeposit
         )
     }

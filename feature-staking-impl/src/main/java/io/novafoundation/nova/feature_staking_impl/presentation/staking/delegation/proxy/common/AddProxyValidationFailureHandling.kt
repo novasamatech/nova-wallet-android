@@ -22,7 +22,7 @@ fun mapAddStakingProxyValidationFailureToUi(
             resourceManager.getString(
                 R.string.staking_not_enough_balance_to_pay_proxy_deposit_message,
                 failure.deposit.formatPlanks(failure.chainAsset),
-                failure.availableBalance.formatPlanks(failure.chainAsset)
+                failure.maxUsable.formatPlanks(failure.chainAsset)
             )
 
         is InvalidAddress -> resourceManager.getString(R.string.invalid_proxy_address_title) to

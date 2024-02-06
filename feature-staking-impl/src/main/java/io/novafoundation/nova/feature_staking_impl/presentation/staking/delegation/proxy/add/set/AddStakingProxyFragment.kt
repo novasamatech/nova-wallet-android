@@ -39,7 +39,7 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel>() {
     }
 
     override fun initViews() {
-        setStakingProxyContainer.applyStatusBarInsets()
+        setStakingProxyContainer.applyStatusBarInsets(consume = false)
         addProxyToolbar.setHomeButtonListener { viewModel.backClicked() }
         addStakingProxyButton.prepareForProgress(this)
 

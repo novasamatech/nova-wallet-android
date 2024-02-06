@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -33,12 +34,14 @@ import kotlinx.coroutines.launch
 
 private class CreateMetaAccountsResult(
     val addedMetaIds: MutableList<Long> = mutableListOf(),
-    val alreadyExistedMetaIds: MutableList<Long> = mutableListOf()
+    val alreadyExistedMetaIds: MutableList<Long> = mutableListOf(),
+    val shouldBeActivatedMetaIds: MutableList<Long> = mutableListOf()
 ) {
 
     fun add(other: CreateMetaAccountsResult) {
         addedMetaIds.addAll(other.addedMetaIds)
         alreadyExistedMetaIds.addAll(other.alreadyExistedMetaIds)
+        shouldBeActivatedMetaIds.addAll(other.shouldBeActivatedMetaIds)
     }
 }
 
@@ -103,6 +106,7 @@ class RealProxySyncService(
 
         val deactivatedMetaIds = result.findDeactivated(oldProxies)
         accountDao.changeAccountsStatus(deactivatedMetaIds, MetaAccountLocal.Status.DEACTIVATED)
+        accountDao.changeAccountsStatus(result.shouldBeActivatedMetaIds, MetaAccountLocal.Status.ACTIVE)
 
         val changedMetaIds = result.addedMetaIds + deactivatedMetaIds
         metaAccountsUpdatesRegistry.addMetaIds(changedMetaIds)
@@ -150,6 +154,13 @@ class RealProxySyncService(
                 result.addedMetaIds.add(newMetaId)
                 newMetaId
             } else {
+                // An account may be deactivated but not deleted yet in case when we remove a proxy and then add it again
+                // To support this case we should track deactivated accounts and activate them again
+                val existedMetaAccount = accountRepository.getMetaAccount(maybeExistedProxiedMetaId)
+                if (existedMetaAccount.status == LightMetaAccount.Status.DEACTIVATED) {
+                    result.shouldBeActivatedMetaIds.add(maybeExistedProxiedMetaId)
+                }
+
                 result.alreadyExistedMetaIds.add(maybeExistedProxiedMetaId)
                 maybeExistedProxiedMetaId
             }

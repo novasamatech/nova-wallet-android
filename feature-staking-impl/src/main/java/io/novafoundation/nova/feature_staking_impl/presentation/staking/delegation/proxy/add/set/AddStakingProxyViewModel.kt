@@ -170,7 +170,7 @@ class AddStakingProxyViewModel(
 
     fun selectAuthorityWallet() {
         launch {
-            val selectedAddress = addressInputMixin.inputFlow.value
+            val selectedAddress = addressInputMixin.getAddress()
             selectAddressMixin.openSelectAddress(selectedAddress)
         }
     }
@@ -182,7 +182,7 @@ class AddStakingProxyViewModel(
         val validationPayload = AddStakingProxyValidationPayload(
             chain = chain,
             asset = selectedAssetFlow.first(),
-            proxyAddress = addressInputMixin.inputFlow.value,
+            proxyAddress = addressInputMixin.getAddress(),
             proxiedAccountId = metaAccount.requireAccountIdIn(chain),
             fee = feeMixin.awaitDecimalFee(),
             deltaDeposit = proxyDepositDelta.first(),

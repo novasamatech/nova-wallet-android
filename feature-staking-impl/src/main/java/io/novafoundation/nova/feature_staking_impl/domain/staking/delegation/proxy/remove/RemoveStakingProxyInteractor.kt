@@ -35,14 +35,12 @@ class RealRemoveStakingProxyInteractor(
     }
 
     override suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicStatus.InBlock> {
-        val result = withContext(Dispatchers.IO) {
-            extrinsicService.submitAndWatchExtrinsic(chain, proxiedAccountId.intoOrigin()) {
+        return withContext(Dispatchers.Default) {
+            val result = extrinsicService.submitAndWatchExtrinsic(chain, proxiedAccountId.intoOrigin()) {
                 removeProxyCall(proxyAccountId, ProxyType.Staking)
             }
-        }
 
-        return result.awaitInBlock().also {
-            proxySyncService.startSyncing()
+            result.awaitInBlock().also { proxySyncService.startSyncing() }
         }
     }
 }

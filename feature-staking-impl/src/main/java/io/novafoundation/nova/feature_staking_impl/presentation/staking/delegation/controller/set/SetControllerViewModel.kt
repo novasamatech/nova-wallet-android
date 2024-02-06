@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.accountIsStash
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.repository.ControllersDeprecationStage
 import io.novafoundation.nova.feature_staking_impl.data.repository.ControllersDeprecationStage.DEPRECATED
@@ -252,7 +253,7 @@ class SetControllerViewModel(
     }
 
     private fun StakingState.Stash.isUsingCorrectAccountToChangeController(): Boolean {
-        return accountId.contentEquals(stashId)
+        return accountIsStash()
     }
 
     private fun StakingState.Stash.isUsingWrongAccountToChangeController(): Boolean {
@@ -271,6 +272,7 @@ class SetControllerViewModel(
                 imageRes = R.drawable.shield,
                 bannerBackgroundRes = R.drawable.ic_banner_grey_gradient
             )
+
             DEPRECATED -> AdvertisementCardModel(
                 title = resourceManager.getString(R.string.staking_set_controller_deprecated_title),
                 subtitle = resourceManager.getString(R.string.staking_set_controller_deprecated_subtitle),

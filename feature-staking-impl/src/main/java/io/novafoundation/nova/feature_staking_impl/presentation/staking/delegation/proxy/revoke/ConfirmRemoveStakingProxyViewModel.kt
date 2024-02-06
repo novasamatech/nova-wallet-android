@@ -145,9 +145,7 @@ class ConfirmRemoveStakingProxyViewModel(
 
         validationProgressFlow.value = false
 
-        result.onSuccess {
-            router.returnToStakingMain()
-        }
+        result.onSuccess { router.returnToStakingMain() }
             .onFailure(::showError)
     }
 
