@@ -42,6 +42,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         viewAssetsTotalBalanceShimmer.setShimmerVisible(false)
         viewAssetsTotalBalanceTotal.setVisible(true)
         viewAssetsTotalBalanceTotal.text = totalBalance.totalBalanceFiat
+        viewAssetsTotalBalanceTotal.requestLayout() // to fix the issue when elipsing the text is working incorrectly during fast text update
 
         viewAssetsTotalBalanceLockedContainer.setVisible(totalBalance.isBreakdownAbailable)
 
