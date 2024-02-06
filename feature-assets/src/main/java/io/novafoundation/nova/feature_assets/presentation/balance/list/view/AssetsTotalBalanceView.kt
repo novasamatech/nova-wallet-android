@@ -40,7 +40,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
     fun showTotalBalance(totalBalance: TotalBalanceModel) {
         viewAssetsTotalBalanceShimmer.setShimmerVisible(false)
-        viewAssetsTotalBalanceTotal.setVisible(true, falseState = View.INVISIBLE)
+        viewAssetsTotalBalanceTotal.setVisible(true)
         viewAssetsTotalBalanceTotal.text = totalBalance.totalBalanceFiat
 
         viewAssetsTotalBalanceLockedContainer.setVisible(totalBalance.isBreakdownAbailable)
