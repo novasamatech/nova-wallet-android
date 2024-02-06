@@ -4,8 +4,8 @@ import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerValidationFailure
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationPayload
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.state.chain

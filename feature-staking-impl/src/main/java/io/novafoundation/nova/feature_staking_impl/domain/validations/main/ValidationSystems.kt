@@ -11,5 +11,7 @@ const val SYSTEM_MANAGE_PAYOUTS = "ManageStakingPayouts"
 const val SYSTEM_MANAGE_VALIDATORS = "ManageStakingValidators"
 const val SYSTEM_MANAGE_CONTROLLER = "ManageStakingController"
 const val SYSTEM_MANAGE_STAKING_REBAG = "ManageStakingRebag"
+const val SYSTEM_ADD_PROXY = "AddStakingProxy"
+const val SYSTEM_MANAGE_PROXIES = "ManageStakingProxies"
 
 typealias StakeActionsValidationSystem = ValidationSystem<StakeActionsValidationPayload, StakeActionsValidationFailure>

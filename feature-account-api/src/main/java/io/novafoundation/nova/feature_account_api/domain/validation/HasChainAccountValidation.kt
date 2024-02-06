@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PROXIED
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrNull
@@ -32,6 +33,8 @@ interface NoChainAccountFoundError {
         object LedgerNotSupported : AddAccountState()
 
         class PolkadotVaultNotSupported(val variant: PolkadotVaultVariant) : AddAccountState()
+
+        object ProxyAccountNotSupported : AddAccountState()
     }
 }
 
@@ -51,6 +54,10 @@ class HasChainAccountValidation<P, E>(
 
             account.type == LEDGER && !SubstrateApplicationConfig.supports(chain.id) -> {
                 errorProducer(chain, account, AddAccountState.LedgerNotSupported).validationError()
+            }
+
+            account.type == PROXIED -> {
+                errorProducer(chain, account, AddAccountState.ProxyAccountNotSupported).validationError()
             }
 
             polkadotVaultVariant != null && chain.isEthereumBased -> {
@@ -91,9 +98,11 @@ fun handleChainAccountNotFound(
                 customStyle = R.style.AccentNegativeAlertDialogTheme
             )
         )
+
         AddAccountState.LedgerNotSupported -> TransformedFailure.Default(
             resourceManager.getString(R.string.ledger_chain_not_supported, chainName) to null
         )
+
         is AddAccountState.PolkadotVaultNotSupported -> {
             val vaultLabel = resourceManager.polkadotVaultLabelFor(state.variant)
 
@@ -101,5 +110,9 @@ fun handleChainAccountNotFound(
                 resourceManager.getString(R.string.account_parity_signer_chain_not_supported, vaultLabel, chainName) to null
             )
         }
+
+        AddAccountState.ProxyAccountNotSupported -> TransformedFailure.Default(
+            resourceManager.getString(R.string.common_network_not_supported, chainName) to null
+        )
     }
 }

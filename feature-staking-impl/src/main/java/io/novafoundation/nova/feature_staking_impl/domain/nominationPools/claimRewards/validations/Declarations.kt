@@ -44,7 +44,7 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.enoughToPayFees()
         error = { context ->
             NominationPoolsClaimRewardsValidationFailure.NotEnoughBalanceToPayFees(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }

@@ -27,6 +27,9 @@ fun BaseFragment<*>.setupAddressInput(
     mixin.state.observe(::setState)
 }
 
+/**
+ * Make sure that the insets are not consumed by the layer above for this method to work correctly
+ */
 fun BaseFragment<*>.setupExternalAccounts(
     mixin: AddressInputMixin,
     inputField: AddressInputField

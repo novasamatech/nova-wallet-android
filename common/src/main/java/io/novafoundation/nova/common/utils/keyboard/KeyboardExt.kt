@@ -27,6 +27,9 @@ fun View.showSoftKeyboard() {
     inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
 }
 
+/**
+ * Make sure that the insets are not consumed by the layer above for this method to work correctly
+ */
 fun Lifecycle.setKeyboardVisibilityListener(view: View, callback: KeyboardVisibilityCallback?) {
     if (callback == null) {
         ViewCompat.setOnApplyWindowInsetsListener(view, null)

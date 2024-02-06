@@ -494,7 +494,7 @@
     <string name="delegate_search_result_count">результаты поиска: %d</string>
     <string name="delegated_accounts_fragment_explanation">Nova Wallet автоматически добавляет делегированные аккаунты (Прокси) в отдельную категорию для вас. Вы всегда можете управлять кошельками в Настройках.</string>
     <string name="delegated_accounts_fragment_title">Обновление делегированных аккаунтов</string>
-    <string name="delegation_add_delegation">Добавить делегацию</string>
+    <string name="common_add_delegation">Добавить делегацию</string>
     <string name="delegation_all_votes">Голоса за все время</string>
     <string name="delegation_delegate">Делегат</string>
     <string name="delegation_delegate_filter_all">Все аккаунты</string>
