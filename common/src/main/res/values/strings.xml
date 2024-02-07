@@ -4,7 +4,7 @@
     <string name="staking_manage_proxy_requires_stash_title">Select stash account to setup proxy</string>
     <string name="staking_manage_proxy_requires_stash_message">Please switch your wallet to %s to setup a proxy</string>
 
-    <string name="common_network_not_supported">%s not supported</string>
+    <string name="common_network_not_supported">%s is not supported</string>
 
     <string name="remove_proxy_confirmation_revoke_access_type">Revoke access type</string>
     <string name="remove_proxy_confirmation_revoke_for">Revoke for</string>
