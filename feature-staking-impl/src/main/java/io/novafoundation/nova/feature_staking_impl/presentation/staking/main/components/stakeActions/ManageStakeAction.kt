@@ -3,8 +3,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_ADD_PROXY
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_CONTROLLER
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_PAYOUTS
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_PROXIES
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_REWARD_DESTINATION
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
@@ -64,5 +66,22 @@ fun ManageStakeAction.Companion.controller(resourceManager: ResourceManager): Ma
         id = SYSTEM_MANAGE_CONTROLLER,
         label = resourceManager.getString(R.string.staking_controller_account),
         iconRes = R.drawable.ic_people_outline
+    )
+}
+
+fun ManageStakeAction.Companion.addStakingProxy(resourceManager: ResourceManager): ManageStakeAction {
+    return ManageStakeAction(
+        id = SYSTEM_ADD_PROXY,
+        label = resourceManager.getString(R.string.staking_action_add_proxy),
+        iconRes = R.drawable.ic_delegate_outline
+    )
+}
+
+fun ManageStakeAction.Companion.stakingProxies(resourceManager: ResourceManager, delegations: String): ManageStakeAction {
+    return ManageStakeAction(
+        id = SYSTEM_MANAGE_PROXIES,
+        label = resourceManager.getString(R.string.staking_action_your_proxies),
+        iconRes = R.drawable.ic_delegate_outline,
+        badge = delegations
     )
 }

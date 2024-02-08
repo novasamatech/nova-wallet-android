@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:governanceLocksView_icon="@drawable/ic_delegate_outline"
-            app:governanceLocksView_label="@string/delegation_add_delegation" />
+            app:governanceLocksView_label="@string/common_add_delegation" />
 
     </LinearLayout>
 

@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
@@ -56,8 +58,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.di.SelectPoolComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.di.ConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di.ConfirmSetControllerComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.set.di.SetControllerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.di.ConfirmSetControllerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.set.di.SetControllerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.di.ConfirmAddStakingProxyComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.set.di.AddStakingProxyComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.di.StakingProxyListComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.di.ConfirmRemoveStakingProxyComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.di.ConfirmRebondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom.di.CustomRebondComponent
@@ -165,7 +171,15 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun setControllerFactory(): SetControllerComponent.Factory
 
+    fun setStakingProxyFactory(): AddStakingProxyComponent.Factory
+
+    fun stakingProxyListFactory(): StakingProxyListComponent.Factory
+
     fun confirmSetControllerFactory(): ConfirmSetControllerComponent.Factory
+
+    fun confirmAddStakingProxyFactory(): ConfirmAddStakingProxyComponent.Factory
+
+    fun confirmRevokeStakingProxyFactory(): ConfirmRemoveStakingProxyComponent.Factory
 
     fun rebondCustomFactory(): CustomRebondComponent.Factory
 
@@ -226,6 +240,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance parachainStaking: ParachainStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+            @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
 
             @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 
@@ -242,6 +257,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
             DbApi::class,
             RuntimeApi::class,
             AccountFeatureApi::class,
+            ProxyFeatureApi::class,
             WalletFeatureApi::class,
             DAppFeatureApi::class
         ]

@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/delegation_add_delegation" />
+        app:titleText="@string/common_add_delegation" />
 
     <FrameLayout
         android:layout_width="match_parent"

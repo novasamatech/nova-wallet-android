@@ -235,6 +235,8 @@ fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERS
 
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
+fun RuntimeMetadata.proxyOrNull() = moduleOrNull(Modules.PROXY)
+
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
 
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
