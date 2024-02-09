@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddFungibleNfts_54_55 = object : Migration(54, 55) {
+val AddFungibleNfts_55_56 = object : Migration(55, 56) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP INDEX IF EXISTS `index_nfts_metaId`")
