@@ -203,6 +203,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_pushNotificationsWelcome"
+        app:destination="@id/pushNotificationsWelcomeFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -830,32 +838,6 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment"
         android:label="AssetSwapFlowFragment" />
 
-    <include app:graph="@navigation/start_swap_nav_graph" />
-
-    <include app:graph="@navigation/manage_tokens_graph" />
-
-    <include app:graph="@navigation/sign_parity_signer_graph" />
-
-    <include app:graph="@navigation/sign_ledger_nav_graph" />
-
-    <include app:graph="@navigation/add_ledger_chain_account_graph" />
-
-    <include app:graph="@navigation/referendum_details_graph" />
-
-    <include app:graph="@navigation/referendum_unlock_graph" />
-
-    <include app:graph="@navigation/delegation_nav_graph" />
-
-    <include app:graph="@navigation/your_delegations_nav_graph" />
-
-    <include app:graph="@navigation/referenda_search_graph" />
-
-    <include app:graph="@navigation/wallet_connect_nav_graph" />
-
-    <include app:graph="@navigation/external_sign_graph" />
-
-    <include app:graph="@navigation/staking_main_graph" />
-
     <fragment
         android:id="@+id/walletConnectScanFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan.WalletConnectScanFragment"
@@ -881,5 +863,37 @@
         android:id="@+id/swapDetailFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.SwapDetailFragment"
         android:label="SwapDetailFragment" />
+
+    <fragment
+        android:id="@+id/pushNotificationsWelcomeFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.PushWelcomeFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_push_welcome" />
+
+    <include app:graph="@navigation/start_swap_nav_graph" />
+
+    <include app:graph="@navigation/manage_tokens_graph" />
+
+    <include app:graph="@navigation/sign_parity_signer_graph" />
+
+    <include app:graph="@navigation/sign_ledger_nav_graph" />
+
+    <include app:graph="@navigation/add_ledger_chain_account_graph" />
+
+    <include app:graph="@navigation/referendum_details_graph" />
+
+    <include app:graph="@navigation/referendum_unlock_graph" />
+
+    <include app:graph="@navigation/delegation_nav_graph" />
+
+    <include app:graph="@navigation/your_delegations_nav_graph" />
+
+    <include app:graph="@navigation/referenda_search_graph" />
+
+    <include app:graph="@navigation/wallet_connect_nav_graph" />
+
+    <include app:graph="@navigation/external_sign_graph" />
+
+    <include app:graph="@navigation/staking_main_graph" />
 
 </navigation>

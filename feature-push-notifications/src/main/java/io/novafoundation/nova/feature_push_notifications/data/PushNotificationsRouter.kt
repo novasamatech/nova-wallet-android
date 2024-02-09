@@ -1,3 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.data
 
-interface PushNotificationsRouter
+import io.novafoundation.nova.common.navigation.ReturnableRouter
+
+interface PushNotificationsRouter : ReturnableRouter {
+    fun openPushSettings()
+}

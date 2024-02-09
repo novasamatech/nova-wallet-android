@@ -14,6 +14,7 @@ import kotlinx.coroutines.tasks.await
 class NovaFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
+        logToken()
         getPushNotificationService().onTokenUpdated(token)
     }
 
@@ -32,8 +33,21 @@ class NovaFirebaseMessagingService : FirebaseMessagingService() {
             return runCatching { FirebaseMessaging.getInstance().token.await() }.getOrNull()
         }
 
+        suspend fun requestToken(): Result<Unit> {
+            return runCatching {
+                FirebaseMessaging.getInstance().token.await()
+            }
+        }
+
+        suspend fun deleteToken(): Result<Unit> {
+            return runCatching {
+                FirebaseMessaging.getInstance().deleteToken().await()
+            }
+        }
+
         fun logToken() {
             if (!BuildConfig.DEBUG) return
+            if (!FirebaseMessaging.getInstance().isAutoInitEnabled) return
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener(
                 OnCompleteListener { task ->

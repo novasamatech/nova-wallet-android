@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.di.SettingsComponent
@@ -41,6 +42,7 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
             AccountFeatureApi::class,
             WalletConnectFeatureApi::class,
             VersionsFeatureApi::class,
+            PushNotificationsFeatureApi::class
         ]
     )
     interface SettingsFeatureDependenciesComponent : SettingsFeatureDependencies
