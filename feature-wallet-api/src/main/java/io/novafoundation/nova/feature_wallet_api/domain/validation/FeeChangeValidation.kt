@@ -14,10 +14,12 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -27,7 +29,7 @@ private val FEE_RATIO_THRESHOLD = 1.5.toBigDecimal()
 
 class FeeChangeValidation<P, E, F : GenericFee>(
     private val calculateFee: suspend (P) -> GenericDecimalFee<F>,
-    private val currentFee: (P) -> BigDecimal,
+    private val currentFee: GenericFeeProducer<F, P>,
     private val chainAsset: (P) -> Chain.Asset,
     private val error: (FeeChangeDetectedFailure.Payload<F>) -> E
 ) : Validation<P, E> {
@@ -36,12 +38,15 @@ class FeeChangeValidation<P, E, F : GenericFee>(
         val oldFee = currentFee(value)
         val newFee = calculateFee(value)
 
-        val areFeesSame = oldFee hasTheSaveValueAs newFee.decimalAmount
+        val oldAmount = oldFee.networkFeeByRequestedAccountOrZero
+        val newAmount = newFee.networkFeeByRequestedAccount
+
+        val areFeesSame = oldAmount hasTheSaveValueAs newAmount
 
         return areFeesSame isTrueOrError {
             val payload = FeeChangeDetectedFailure.Payload(
-                needsUserAttention = newFee.decimalAmount / oldFee > FEE_RATIO_THRESHOLD,
-                oldFee = oldFee,
+                needsUserAttention = newAmount / oldAmount > FEE_RATIO_THRESHOLD,
+                oldFee = oldAmount,
                 newFee = newFee,
                 chainAsset = chainAsset(value)
             )
@@ -65,7 +70,7 @@ interface FeeChangeDetectedFailure<T : GenericFee> {
 
 fun <P, E> ValidationSystemBuilder<P, E>.checkForSimpleFeeChanges(
     calculateFee: suspend (P) -> Fee,
-    currentFee: (P) -> BigDecimal,
+    currentFee: FeeProducer<P>,
     chainAsset: (P) -> Chain.Asset,
     error: (FeeChangeDetectedFailure.Payload<SimpleFee>) -> E
 ) {
@@ -79,7 +84,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.checkForSimpleFeeChanges(
 
 fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.checkForFeeChanges(
     calculateFee: suspend (P) -> F,
-    currentFee: (P) -> BigDecimal,
+    currentFee: GenericFeeProducer<F, P>,
     chainAsset: (P) -> Chain.Asset,
     error: (FeeChangeDetectedFailure.Payload<F>) -> E
 ) = validate(
@@ -98,16 +103,16 @@ fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.checkForFeeChanges(
     )
 )
 
-fun <T : GenericFee> CoroutineScope.handleFeeSpikeDetected(
-    error: FeeChangeDetectedFailure<T>,
+fun <F : GenericFee> CoroutineScope.handleFeeSpikeDetected(
+    error: FeeChangeDetectedFailure<F>,
     resourceManager: ResourceManager,
-    feeLoaderMixin: FeeLoaderMixin.Presentation,
+    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<F>,
     actions: ValidationFlowActions<*>
 ): TransformedFailure? = handleFeeSpikeDetected(
     error = error,
     resourceManager = resourceManager,
     actions = actions,
-    setFee = { feeLoaderMixin.setFee(it.newFee.fee) }
+    setFee = { feeLoaderMixin.setFee(it.newFee.genericFee) }
 )
 
 fun <T : GenericFee> CoroutineScope.handleFeeSpikeDetected(
@@ -123,7 +128,7 @@ fun <T : GenericFee> CoroutineScope.handleFeeSpikeDetected(
 
     val chainAsset = error.payload.chainAsset
     val oldFee = error.payload.oldFee.formatTokenAmount(chainAsset)
-    val newFee = error.payload.newFee.decimalAmount.formatTokenAmount(chainAsset)
+    val newFee = error.payload.newFee.networkFeeByRequestedAccount.formatTokenAmount(chainAsset)
 
     return TransformedFailure.Custom(
         Payload(

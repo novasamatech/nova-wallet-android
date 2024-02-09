@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.commissionAssetToSpe
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -18,7 +19,7 @@ data class SwapValidationPayload(
     val detailedAssetOut: SwapAssetData,
     val slippage: Percent,
     val feeAsset: Asset,
-    val swapFee: SwapFee,
+    val decimalFee: GenericDecimalFee<SwapFee>,
     val swapQuote: SwapQuote,
     val swapQuoteArgs: SwapQuoteArgs,
     val swapExecuteArgs: SwapExecuteArgs
@@ -43,14 +44,14 @@ val SwapValidationPayload.swapAmountInFeeToken: Balance
 
 val SwapValidationPayload.toBuyAmountToKeepMainEDInFeeAsset: Balance
     get() = if (isFeePayingByAssetIn) {
-        swapFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
+        decimalFee.genericFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
     } else {
         BigInteger.ZERO
     }
 
 val SwapValidationPayload.totalDeductedAmountInFeeToken: Balance
     get() = if (isFeePayingByAssetIn) {
-        swapFee.totalDeductedPlanks
+        decimalFee.genericFee.totalDeductedPlanks
     } else {
         BigInteger.ZERO
     }

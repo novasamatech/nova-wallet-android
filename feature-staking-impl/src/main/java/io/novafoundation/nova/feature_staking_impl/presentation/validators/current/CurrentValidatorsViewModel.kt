@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -17,11 +16,10 @@ import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidato
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.ChangeStackingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.CurrentStakeTargetsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetModel
@@ -64,8 +62,7 @@ class CurrentValidatorsViewModel(
 
     private val stashFlow = stakingInteractor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -76,13 +73,11 @@ class CurrentValidatorsViewModel(
 
     private val groupedCurrentValidatorsFlow = combineToPair(stashFlow, activeStakeFlow)
         .flatMapLatest { (stash, activeStake) -> currentValidatorsInteractor.nominatedValidatorsFlow(stash, activeStake, viewModelScope) }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     private val flattenCurrentValidators = groupedCurrentValidatorsFlow
         .map { it.toValueList() }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     private val tokenFlow = assetFlow
         .map { it.token }
@@ -150,10 +145,9 @@ class CurrentValidatorsViewModel(
 
     private fun openStartChangeValidators() {
         launch {
-            val currentState = setupStakingSharedState.get<SetupStakingProcess.Initial>()
             val currentValidators = flattenCurrentValidators.first().map(NominatedValidator::validator)
             val activeStake = activeStakeFlow.first()
-            val newState = currentState.next(activeStake, currentValidators, SelectionMethod.CUSTOM)
+            val newState = SetupStakingProcess.Initial.next(activeStake, currentValidators)
             setupStakingSharedState.set(newState)
             router.openStartChangeValidators()
         }

@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeCh
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceConsideringConsumersValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceGeneric
 import java.math.BigDecimal
 
 typealias SwapValidationSystem = ValidationSystem<SwapValidationPayload, SwapValidationFailure>
@@ -51,7 +52,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
         SwapValidationFailure.InsufficientBalance.BalanceNotConsiderConsumers(
             nativeAsset = payload.detailedAssetIn.asset.token.configuration,
             feeAsset = payload.feeAsset.token.configuration,
-            swapFee = payload.swapFee,
+            swapFee = payload.decimalFee.genericFee,
             existentialDeposit = existentialDeposit
         )
     }
@@ -65,20 +66,18 @@ fun SwapValidationSystemBuilder.enoughLiquidity(sharedQuoteValidationRetriever: 
     SwapEnoughLiquidityValidation { sharedQuoteValidationRetriever.retrieveQuote(it) }
 )
 
-fun SwapValidationSystemBuilder.sufficientBalanceInFeeAsset() = sufficientBalance(
+fun SwapValidationSystemBuilder.sufficientBalanceInFeeAsset() = sufficientBalanceGeneric(
     available = { it.feeAsset.transferable },
     amount = { BigDecimal.ZERO },
-    fee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
-    error = { _, _ -> SwapValidationFailure.NotEnoughFunds.ToPayFee }
+    fee = { it.decimalFee },
+    error = { SwapValidationFailure.NotEnoughFunds.ToPayFee }
 )
 
 fun SwapValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
     available = { it.detailedAssetIn.asset.transferable },
     amount = { it.detailedAssetIn.asset.token.amountFromPlanks(it.detailedAssetIn.amountInPlanks) },
-    fee = { BigDecimal.ZERO },
-    error = { _, _ ->
-        SwapValidationFailure.NotEnoughFunds.InUsedAsset
-    }
+    fee = { null },
+    error = { SwapValidationFailure.NotEnoughFunds.InUsedAsset }
 )
 
 fun SwapValidationSystemBuilder.sufficientAssetOutBalanceToStayAboveED(
@@ -89,7 +88,7 @@ fun SwapValidationSystemBuilder.checkForFeeChanges(
     swapService: SwapService
 ) = checkForFeeChanges(
     calculateFee = { swapService.estimateFee(it.swapExecuteArgs) },
-    currentFee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
+    currentFee = { it.decimalFee },
     chainAsset = { it.feeAsset.token.configuration },
     error = SwapValidationFailure::FeeChangeDetected
 )

@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -96,43 +98,38 @@ class SelectBondMoreViewModel(
             feeConstructor = { token ->
                 val amountInPlanks = token.planksFromAmount(amount)
 
-                bondMoreInteractor.estimateFee(amountInPlanks)
+                bondMoreInteractor.estimateFee(amountInPlanks, accountStakingFlow.first())
             },
             onRetryCancelled = ::backClicked
         )
     }
 
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
+    private fun maybeGoToNext() = launch {
+        _showNextProgress.value = true
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val payload = BondMoreValidationPayload(
-                stashAddress = stashAddress(),
-                fee = fee,
-                amount = amountChooserMixin.amount.first(),
-                stashAsset = assetFlow.first()
-            )
+        val payload = BondMoreValidationPayload(
+            stashAddress = stashAddress(),
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            amount = amountChooserMixin.amount.first(),
+            stashAsset = assetFlow.first()
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { bondMoreValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                _showNextProgress.value = false
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { bondMoreValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            _showNextProgress.value = false
 
-                openConfirm(payload)
-            }
+            openConfirm(payload)
         }
     }
 
     private fun openConfirm(validationPayload: BondMoreValidationPayload) {
         val confirmPayload = ConfirmBondMorePayload(
             amount = validationPayload.amount,
-            fee = validationPayload.fee,
+            fee = mapFeeToParcel(validationPayload.fee),
             stashAddress = validationPayload.stashAddress,
         )
 

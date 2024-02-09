@@ -4,11 +4,12 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.utils.daysFromMillis
-import io.novafoundation.nova.common.utils.formatting.duration.EstimatedDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.EstimatedDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.readText
@@ -109,7 +110,7 @@ class ResourceManagerImpl(
         return contextManager.getApplicationContext().resources.getDimensionPixelSize(id)
     }
 
-    override fun getFont(fontRes: Int): Typeface {
-        return contextManager.getApplicationContext().resources.getFont(fontRes)
+    override fun getFont(fontRes: Int): Typeface? {
+        return ResourcesCompat.getFont(contextManager.getApplicationContext(), fontRes)
     }
 }

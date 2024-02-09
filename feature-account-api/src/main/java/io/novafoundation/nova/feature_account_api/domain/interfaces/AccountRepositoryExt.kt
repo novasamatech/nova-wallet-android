@@ -5,10 +5,11 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-suspend fun AccountRepository.findMetaAccountOrThrow(accountId: AccountId) = findMetaAccount(accountId)
+suspend fun AccountRepository.findMetaAccountOrThrow(accountId: AccountId, chainId: ChainId) = findMetaAccount(accountId, chainId)
     ?: error("No meta account found for accountId: ${accountId.toHexString()}")
 
 suspend fun AccountRepository.requireIdOfSelectedMetaAccountIn(chain: Chain): AccountId {
@@ -23,9 +24,10 @@ suspend fun AccountRepository.getIdOfSelectedMetaAccountIn(chain: Chain): Accoun
     return metaAccount.accountIdIn(chain)
 }
 
-suspend fun AccountRepository.requireMetaAccountFor(transactionOrigin: TransactionOrigin): MetaAccount {
+suspend fun AccountRepository.requireMetaAccountFor(transactionOrigin: TransactionOrigin, chainId: ChainId): MetaAccount {
     return when (transactionOrigin) {
         TransactionOrigin.SelectedWallet -> getSelectedMetaAccount()
-        is TransactionOrigin.WalletWithAccount -> findMetaAccountOrThrow(transactionOrigin.accountId)
+        is TransactionOrigin.WalletWithAccount -> findMetaAccountOrThrow(transactionOrigin.accountId, chainId)
+        is TransactionOrigin.Wallet -> transactionOrigin.metaAccount
     }
 }

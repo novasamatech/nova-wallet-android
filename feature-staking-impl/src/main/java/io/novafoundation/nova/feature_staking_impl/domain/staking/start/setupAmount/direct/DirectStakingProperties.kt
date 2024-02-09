@@ -111,14 +111,14 @@ private class DirectStakingProperties(
 
     private fun StartMultiStakingValidationSystemBuilder.enoughAvailableToStake() {
         sufficientBalance(
-            fee = { it.fee.networkFeeDecimalAmount },
+            fee = { it.fee },
             available = { it.amountOf(availableBalance(it.asset)) },
             amount = { it.amountOf(it.selection.stake) },
-            error = { payload, availableToPayFees ->
+            error = { context ->
                 StartMultiStakingValidationFailure.NotEnoughToPayFees(
-                    chainAsset = payload.asset.token.configuration,
-                    maxUsable = availableToPayFees,
-                    fee = payload.fee.networkFeeDecimalAmount
+                    chainAsset = context.payload.asset.token.configuration,
+                    maxUsable = context.maxUsable,
+                    fee = context.fee
                 )
             }
         )

@@ -41,7 +41,7 @@ class ParachainStakingNavigator(
     )
 
     override fun openWalletDetails(metaId: Long) {
-        commonNavigator.openAccountDetails(metaId)
+        commonNavigator.openWalletDetails(metaId)
     }
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
@@ -72,4 +72,8 @@ class ParachainStakingNavigator(
         actionId = R.id.action_setupYieldBoostFragment_to_yieldBoostConfirmFragment,
         args = YieldBoostConfirmFragment.getBundle(payload)
     )
+
+    override fun openAddStakingProxy() {
+        performNavigation(R.id.action_open_addStakingProxyFragment)
+    }
 }

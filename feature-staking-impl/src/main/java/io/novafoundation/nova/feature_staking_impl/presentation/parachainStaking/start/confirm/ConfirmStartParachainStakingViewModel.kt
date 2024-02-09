@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -50,7 +51,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 class ConfirmStartParachainStakingViewModel(
     private val parachainStakingRouter: ParachainStakingRouter,
@@ -76,6 +76,8 @@ class ConfirmStartParachainStakingViewModel(
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
+
+    private val decimalFee = mapFeeFromParcel(payload.fee)
 
     // Take state only once since subscribing to it might cause switch to Delegator state while waiting for tx confirmation
     private val delegatorStateFlow = flowOf { delegatorStateUseCase.currentDelegatorState() }
@@ -149,27 +151,25 @@ class ConfirmStartParachainStakingViewModel(
     }
 
     private fun setInitialFee() = launch {
-        feeLoaderMixin.setFee(payload.fee)
+        feeLoaderMixin.setFee(decimalFee.genericFee)
     }
 
-    private fun sendTransactionIfValid() = requireFee { _ ->
-        launch {
-            val payload = StartParachainStakingValidationPayload(
-                amount = payload.amount,
-                fee = payload.fee,
-                collator = collator(),
-                asset = assetFlow.first(),
-                delegatorState = delegatorStateFlow.first(),
-            )
+    private fun sendTransactionIfValid() = launch {
+        val payload = StartParachainStakingValidationPayload(
+            amount = payload.amount,
+            fee = decimalFee,
+            collator = collator(),
+            asset = assetFlow.first(),
+            delegatorState = delegatorStateFlow.first(),
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                sendTransaction()
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            sendTransaction()
         }
     }
 
@@ -203,9 +203,4 @@ class ConfirmStartParachainStakingViewModel(
             StartParachainStakingMode.BOND_MORE -> parachainStakingRouter.returnToStakingMain()
         }
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 }

@@ -104,7 +104,7 @@ class DelegateDetailsViewModel(
         when {
             data == null -> DescriptiveButtonState.Gone
             data.userDelegations.isNotEmpty() -> DescriptiveButtonState.Gone
-            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.delegation_add_delegation))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_add_delegation))
         }
     }.shareWhileSubscribed()
 
@@ -270,7 +270,7 @@ class DelegateDetailsViewModel(
             is AddDelegationValidationFailure.NoChainAccountFailure -> handleChainAccountNotFound(
                 failure = failure,
                 resourceManager = resourceManager,
-                goToWalletDetails = { router.openAccountDetails(failure.account.id) },
+                goToWalletDetails = { router.openWalletDetails(failure.account.id) },
                 addAccountDescriptionRes = R.string.add_delegation_missing_account_message
             )
         }

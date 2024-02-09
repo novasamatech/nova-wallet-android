@@ -6,7 +6,7 @@ interface OnChainIdentity {
     val display: String?
     val legal: String?
     val web: String?
-    val riot: String?
+    val matrix: String?
     val email: String?
     val pgpFingerprint: String?
     val image: String?
@@ -17,7 +17,7 @@ class RootIdentity(
     override val display: String?,
     override val legal: String?,
     override val web: String?,
-    override val riot: String?,
+    override val matrix: String?,
     override val email: String?,
     override val pgpFingerprint: String?,
     override val image: String?,

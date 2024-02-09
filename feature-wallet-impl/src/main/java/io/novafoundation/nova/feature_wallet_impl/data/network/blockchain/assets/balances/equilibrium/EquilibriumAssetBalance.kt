@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.equilibrium
 
 import android.util.Log
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
@@ -102,7 +103,7 @@ class EquilibriumAssetBalance(
         }
     }
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
         val assetBalances = remoteStorageSource.query(
             chain.id,
             keyBuilder = { it.getAccountStorage().storageKey(it, accountId) },
@@ -120,7 +121,19 @@ class EquilibriumAssetBalance(
             .firstOrNull { it.assetId == chainAsset.id }
             ?.balance
             .orZero()
-        return assetBalance + reservedBalance
+
+        val lockedBalance = assetBalances.lock.orZero().takeIf { chainAsset.isUtilityAsset } ?: BigInteger.ZERO
+
+        return AccountBalance(
+            free = assetBalance,
+            reserved = reservedBalance,
+            frozen = lockedBalance
+        )
+    }
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        val accountBalance = queryAccountBalance(chain, chainAsset, accountId)
+        return accountBalance.free + accountBalance.reserved
     }
 
     override suspend fun startSyncingBalance(

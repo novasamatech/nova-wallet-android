@@ -7,12 +7,14 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
 import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
+import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
@@ -43,7 +45,8 @@ class RootViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val deepLinkHandler: DeepLinkHandler,
     private val automaticInteractionGate: AutomaticInteractionGate,
-    private val rootScope: RootScope
+    private val rootScope: RootScope,
+    private val compoundRequestBusHandler: CompoundRequestBusHandler
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -62,17 +65,25 @@ class RootViewModel(
 
         checkForUpdates()
 
+        syncProxies()
+
         syncCurrencies()
 
         syncWalletConnectSessions()
 
         updatePhishingAddresses()
 
+        obserBusEvents()
+
         walletConnectService.onPairErrorLiveData.observeForever {
             showError(it.peekContent())
         }
 
         subscribeDeepLinkCallback()
+    }
+
+    private fun obserBusEvents() {
+        compoundRequestBusHandler.observe()
     }
 
     private fun subscribeDeepLinkCallback() {
@@ -105,6 +116,12 @@ class RootViewModel(
 
     private fun syncCurrencies() {
         launch { currencyInteractor.syncCurrencies() }
+    }
+
+    private fun syncProxies() {
+        interactor.syncProxies()
+            .inBackground()
+            .launchIn(rootScope)
     }
 
     private fun handleUpdatesSideEffect(sideEffect: Updater.SideEffect) {

@@ -17,7 +17,7 @@ class FixedKnownNovaValidators : KnownNovaValidators {
 
         mapOf(
             Chain.Geneses.POLKADOT to sharedAccounts,
-            Chain.Geneses.KUSAMA to sharedAccounts,
+            Chain.Geneses.KUSAMA to kusamaValidators(),
             Chain.Geneses.ALEPH_ZERO to sharedAccounts
         )
     }
@@ -29,6 +29,13 @@ class FixedKnownNovaValidators : KnownNovaValidators {
     private fun sharedValidatorsAccountIdsHex(): Set<String> {
         return setOf(
             "127zarPDhVzmCXVQ7Kfr1yyaa9wsMuJ74GJW9Q7ezHfQEgh6".toHexAccountId()
+        )
+    }
+
+    private fun kusamaValidators(): Set<String> {
+        return setOf(
+            "DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4".toHexAccountId(),
+            "EtETk1FbrDg7FoAfkREuXT7xHxCjbEf28sBvWf6zfB5wFyV".toHexAccountId()
         )
     }
 }

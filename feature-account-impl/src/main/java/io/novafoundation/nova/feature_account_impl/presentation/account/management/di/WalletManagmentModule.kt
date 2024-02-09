@@ -28,7 +28,13 @@ class WalletManagmentModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         metaAccountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory
     ): ViewModel {
-        return WalletManagmentViewModel(interactor, router, resourceManager, actionAwaitableMixinFactory, metaAccountListingMixinFactory)
+        return WalletManagmentViewModel(
+            interactor,
+            router,
+            resourceManager,
+            actionAwaitableMixinFactory,
+            metaAccountListingMixinFactory
+        )
     }
 
     @Provides

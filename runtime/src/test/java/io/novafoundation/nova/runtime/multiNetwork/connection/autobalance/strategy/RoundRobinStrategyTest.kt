@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -32,5 +33,8 @@ class RoundRobinStrategyTest {
         assertEquals(nodes.first(), iterator.next())
     }
 
-    private fun createFakeNode(id: String) = Chain.Node(unformattedUrl = id, name = id, chainId = "test", orderId = 0)
+    private fun createFakeNode(id: String) = NodeWithSaturatedUrl(
+        node = Chain.Node(unformattedUrl = id, name = id, chainId = "test", orderId = 0),
+        saturatedUrl = id
+    )
 }

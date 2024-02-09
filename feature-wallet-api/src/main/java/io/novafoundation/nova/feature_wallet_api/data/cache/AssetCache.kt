@@ -56,7 +56,7 @@ class AssetCache(
         chainAsset: Chain.Asset,
         builder: (local: AssetLocal) -> AssetLocal,
     ): Boolean = withContext(Dispatchers.IO) {
-        val applicableMetaAccount = accountRepository.findMetaAccount(accountId)
+        val applicableMetaAccount = accountRepository.findMetaAccount(accountId, chainAsset.chainId)
 
         applicableMetaAccount?.let {
             updateAsset(it.id, chainAsset, builder)

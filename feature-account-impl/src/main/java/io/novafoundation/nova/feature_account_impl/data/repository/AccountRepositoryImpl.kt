@@ -25,18 +25,16 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrderi
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
-import io.novafoundation.nova.feature_account_api.domain.model.publicKeyIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.runtime.ext.genesisHash
-import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
-import jp.co.soramitsu.fearless_utils.encrypt.qr.QrFormat
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -116,28 +114,32 @@ class AccountRepositoryImpl(
         return accountDataSource.selectedMetaAccountFlow()
     }
 
-    override suspend fun findMetaAccount(accountId: ByteArray): MetaAccount? {
-        return accountDataSource.findMetaAccount(accountId)
+    override suspend fun findMetaAccount(accountId: ByteArray, chainId: String): MetaAccount? {
+        return accountDataSource.findMetaAccount(accountId, chainId)
     }
 
-    override suspend fun accountNameFor(accountId: AccountId): String? {
-        return accountDataSource.accountNameFor(accountId)
+    override suspend fun accountNameFor(accountId: AccountId, chainId: String): String? {
+        return accountDataSource.accountNameFor(accountId, chainId)
     }
 
-    override suspend fun allMetaAccounts(): List<MetaAccount> {
-        return accountDataSource.allMetaAccounts()
-    }
-
-    override suspend fun hasMetaAccounts(): Boolean {
-        return accountDataSource.hasMetaAccounts()
+    override suspend fun activeMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.activeMetaAccounts()
     }
 
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
         return accountDataSource.allLightMetaAccounts()
     }
 
+    override suspend fun hasActiveMetaAccounts(): Boolean {
+        return accountDataSource.hasActiveMetaAccounts()
+    }
+
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
         return accountDataSource.allMetaAccountsFlow()
+    }
+
+    override fun activeMetaAccountsFlow(): Flow<List<MetaAccount>> {
+        return accountDataSource.activeMetaAccountsFlow()
     }
 
     override fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
@@ -247,8 +249,16 @@ class AccountRepositoryImpl(
         }
     }
 
-    override suspend fun isAccountExists(accountId: AccountId): Boolean {
-        return accountDataSource.accountExists(accountId)
+    override suspend fun isAccountExists(accountId: AccountId, chainId: String): Boolean {
+        return accountDataSource.accountExists(accountId, chainId)
+    }
+
+    override suspend fun removeDeactivatedMetaAccounts() {
+        accountDataSource.removeDeactivatedMetaAccounts()
+    }
+
+    override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.getActiveMetaAccounts()
     }
 
     override fun nodesFlow(): Flow<List<Node>> {
@@ -300,18 +310,10 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun createQrAccountContent(chain: Chain, account: MetaAccount): String {
-        val payload = QrFormat.Payload(
-            address = account.addressIn(chain)!!,
-            publicKey = account.publicKeyIn(chain)!!,
-            name = account.name
-        )
-
-        val qrSharing = multiChainQrSharingFactory.create(addressValidator = chain::isValidAddress)
-
-        return qrSharing.encode(payload)
+        return account.requireAddressIn(chain)
     }
 
-    private suspend fun mapAccountLocalToAccount(accountLocal: AccountLocal): Account {
+    private fun mapAccountLocalToAccount(accountLocal: AccountLocal): Account {
         val network = getNetworkForType(accountLocal.networkType)
 
         return with(accountLocal) {

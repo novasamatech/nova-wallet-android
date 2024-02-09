@@ -16,11 +16,11 @@ fun ValidationSystem.Companion.yieldBoost(
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
-        error = { payload, availableToPayFees ->
+        error = { context ->
             YieldBoostValidationFailure.NotEnoughToPayToPayFees(
-                chainAsset = payload.asset.token.configuration,
-                maxUsable = availableToPayFees,
-                fee = payload.fee
+                chainAsset = context.payload.asset.token.configuration,
+                maxUsable = context.maxUsable,
+                fee = context.fee
             )
         }
     )

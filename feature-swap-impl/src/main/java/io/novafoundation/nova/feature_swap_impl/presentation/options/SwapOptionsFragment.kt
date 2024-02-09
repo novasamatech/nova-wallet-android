@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.validation.observeErrors
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.common.view.setTextOrHide
+import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
@@ -62,7 +62,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
         }
         viewModel.buttonState.observe { swapOptionsApplyButton.setState(it) }
         swapOptionsSlippageInput.observeErrors(viewModel.slippageInputValidationResult, viewModel.viewModelScope)
-        viewModel.slippageWarningState.observe { swapOptionsAlert.setTextOrHide(it) }
+        viewModel.slippageWarningState.observe { swapOptionsAlert.setMessageOrHide(it) }
         viewModel.resetButtonEnabled.observe { swapOptionsToolbar.setRightActionEnabled(it) }
     }
 }

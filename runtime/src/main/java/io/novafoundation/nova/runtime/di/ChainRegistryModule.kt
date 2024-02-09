@@ -117,7 +117,8 @@ class ChainRegistryModule {
     @ApplicationScope
     fun provideNodeAutoBalancer(
         autoBalanceStrategyProvider: AutoBalanceStrategyProvider,
-    ) = NodeAutobalancer(autoBalanceStrategyProvider)
+        connectionSecrets: ConnectionSecrets
+    ) = NodeAutobalancer(autoBalanceStrategyProvider, connectionSecrets)
 
     @Provides
     @ApplicationScope

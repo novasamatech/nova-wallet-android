@@ -15,9 +15,9 @@ import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
-import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
-import io.novafoundation.nova.core_db.model.chain.MetaAccountPositionUpdate
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.mi
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -132,17 +133,23 @@ class AccountDataSourceImpl(
 
     override fun selectedMetaAccountFlow(): Flow<MetaAccount> = selectedMetaAccountFlow
 
-    override suspend fun findMetaAccount(accountId: ByteArray): MetaAccount? {
-        return metaAccountDao.getMetaAccountInfo(accountId)
+    override suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount? {
+        return metaAccountDao.getMetaAccountInfo(accountId, chainId)
             ?.let(::mapMetaAccountLocalToMetaAccount)
     }
 
-    override suspend fun accountNameFor(accountId: AccountId): String? {
-        return metaAccountDao.metaAccountNameFor(accountId)
+    override suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String? {
+        return metaAccountDao.metaAccountNameFor(accountId, chainId)
     }
 
-    override suspend fun allMetaAccounts(): List<MetaAccount> {
-        return metaAccountDao.getJoinedMetaAccountsInfo().map(::mapMetaAccountLocalToMetaAccount)
+    override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
+        return metaAccountDao.getMetaAccountsInfoByStatus(MetaAccountLocal.Status.ACTIVE)
+            .map(::mapMetaAccountLocalToMetaAccount)
+    }
+
+    override suspend fun activeMetaAccounts(): List<MetaAccount> {
+        return metaAccountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
+            .map(::mapMetaAccountLocalToMetaAccount)
     }
 
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
@@ -153,6 +160,13 @@ class AccountDataSourceImpl(
         return metaAccountDao.getJoinedMetaAccountsInfoFlow().map { accountsLocal ->
             accountsLocal.map(::mapMetaAccountLocalToMetaAccount)
         }
+    }
+
+    override fun activeMetaAccountsFlow(): Flow<List<MetaAccount>> {
+        return metaAccountDao.getJoinedMetaAccountsInfoByStatusFlow(MetaAccountLocal.Status.ACTIVE)
+            .map { accountsLocal ->
+                accountsLocal.map(::mapMetaAccountLocalToMetaAccount)
+            }
     }
 
     override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
@@ -183,8 +197,8 @@ class AccountDataSourceImpl(
         preferences.saveCurrentLanguage(language.iso)
     }
 
-    override suspend fun accountExists(accountId: AccountId): Boolean {
-        return metaAccountDao.isMetaAccountExists(accountId)
+    override suspend fun accountExists(accountId: AccountId, chainId: ChainId): Boolean {
+        return metaAccountDao.isMetaAccountExists(accountId, chainId)
     }
 
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
@@ -226,9 +240,11 @@ class AccountDataSourceImpl(
             ethereumPublicKey = ethereumPublicKey,
             ethereumAddress = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value,
             name = name,
+            parentMetaId = null,
             isSelected = false,
             position = metaAccountDao.nextAccountPosition(),
-            type = MetaAccountLocal.Type.SECRETS
+            type = MetaAccountLocal.Type.SECRETS,
+            status = MetaAccountLocal.Status.ACTIVE
         )
 
         val metaId = metaAccountDao.insertMetaAccount(metaAccountLocal)
@@ -258,8 +274,12 @@ class AccountDataSourceImpl(
         secretStoreV2.putChainAccountSecrets(metaId, accountId, secrets)
     }
 
-    override suspend fun hasMetaAccounts(): Boolean {
-        return metaAccountDao.hasMetaAccounts()
+    override suspend fun hasActiveMetaAccounts(): Boolean {
+        return metaAccountDao.hasMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
+    }
+
+    override fun removeDeactivatedMetaAccounts() {
+        metaAccountDao.removeMetaAccountsByStatus(MetaAccountLocal.Status.DEACTIVATED)
     }
 
     private inline fun async(crossinline action: suspend () -> Unit) {

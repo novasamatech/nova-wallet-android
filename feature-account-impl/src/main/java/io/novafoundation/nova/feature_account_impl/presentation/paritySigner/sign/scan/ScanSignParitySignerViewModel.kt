@@ -5,9 +5,9 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.presentation.scan.ScanQrViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
+import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
 import io.novafoundation.nova.feature_account_impl.R
@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.mapValidityPeriodFromParcel
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper.Sr25519
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
@@ -26,7 +25,7 @@ class ScanSignParitySignerViewModel(
     private val router: AccountRouter,
     permissionsAsker: PermissionsAsker.Presentation,
     private val interactor: ScanSignParitySignerInteractor,
-    private val signSharedState: SharedState<SignerPayloadExtrinsic>,
+    private val signSharedState: SigningSharedState,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val responder: PolkadotVaultVariantSignCommunicator,
     private val payload: ScanSignParitySignerPayload,
@@ -55,7 +54,7 @@ class ScanSignParitySignerViewModel(
     }
 
     override suspend fun scanned(result: String) {
-        interactor.encodeAndVerifySignature(signSharedState.getOrThrow(), result)
+        interactor.encodeAndVerifySignature(signSharedState.getOrThrow().extrinsic, result)
             .onSuccess(::respondResult)
             .onFailure {
                 invalidQrConfirmation.awaitAction()

@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetMod
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
@@ -58,6 +59,8 @@ class ConfirmContributeViewModel(
     Validatable by validationExecutor,
     ExternalActions by externalActions {
 
+    private val decimalFee = mapFeeFromParcel(payload.fee)
+
     private val chain by lazyAsync { assetSharedState.chain() }
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -82,7 +85,7 @@ class ConfirmContributeViewModel(
     val selectedAmount = payload.amount.toString()
 
     val feeFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(payload.fee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee.genericFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -161,7 +164,7 @@ class ConfirmContributeViewModel(
     private fun maybeGoToNext() = launch {
         val validationPayload = ContributeValidationPayload(
             crowdloan = crowdloanFlow.first(),
-            fee = payload.fee,
+            fee = decimalFee,
             asset = assetFlow.first(),
             customizationPayload = payload.customizationPayload,
             bonusPayload = payload.bonusPayload,

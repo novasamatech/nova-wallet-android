@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConsta
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.controllerAccountAccess
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.ChangeStackingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.controllerAccountAccess
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.validators.getValidators

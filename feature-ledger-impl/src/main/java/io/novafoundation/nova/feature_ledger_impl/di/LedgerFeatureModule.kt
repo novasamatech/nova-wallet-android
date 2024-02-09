@@ -6,11 +6,10 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
-import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
-import io.novafoundation.nova.feature_ledger_impl.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.data.repository.RealLedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.RealSelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
@@ -21,7 +20,6 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.LedgerBleMa
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleLedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.transport.ChunkedLedgerTransport
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class LedgerFeatureModule {
@@ -56,10 +54,8 @@ class LedgerFeatureModule {
     @Provides
     @FeatureScope
     fun provideRepository(
-        metaAccountDao: MetaAccountDao,
-        chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2
-    ): LedgerRepository = RealLedgerRepository(metaAccountDao, chainRegistry, secretStoreV2)
+    ): LedgerRepository = RealLedgerRepository(secretStoreV2)
 
     @Provides
     fun provideLedgerMessagePresentable(): LedgerMessagePresentable = SingleSheetLedgerMessagePresentable()

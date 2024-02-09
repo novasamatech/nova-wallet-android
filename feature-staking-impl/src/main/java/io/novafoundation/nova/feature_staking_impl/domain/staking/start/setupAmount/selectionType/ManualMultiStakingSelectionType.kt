@@ -38,8 +38,8 @@ class ManualMultiStakingSelectionType(
         sufficientBalance(
             available = { it.amountOf(availableBalance(it.asset)) },
             amount = { it.amountOf(it.selection.stake) },
-            error = { _, _ -> StartMultiStakingValidationFailure.NotEnoughAvailableToStake },
-            fee = { it.fee.decimalAmount }
+            error = { StartMultiStakingValidationFailure.NotEnoughAvailableToStake },
+            fee = { it.fee }
         )
     }
 }

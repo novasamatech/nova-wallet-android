@@ -30,9 +30,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
@@ -135,24 +135,24 @@ class ConfirmGovernanceUnlockViewModel(
         router.back()
     }
 
-    fun confirmClicked() = originFeeMixin.requireFee(this) { fee ->
-        launch {
-            val claimable = unlockAffectsFlow.first().claimableChunk
-            val locksChange = unlockAffectsFlow.first().governanceLockChange
+    fun confirmClicked() = launch {
+        submissionInProgress.value = true
 
-            val validationPayload = UnlockReferendumValidationPayload(
-                asset = assetFlow.first(),
-                fee = fee
-            )
+        val claimable = unlockAffectsFlow.first().claimableChunk
+        val locksChange = unlockAffectsFlow.first().governanceLockChange
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = validationPayload,
-                validationFailureTransformer = { handleUnlockReferendumValidationFailure(it, resourceManager) },
-                progressConsumer = submissionInProgress.progressConsumer(),
-            ) {
-                executeUnlock(claimable, locksChange)
-            }
+        val validationPayload = UnlockReferendumValidationPayload(
+            asset = assetFlow.first(),
+            fee = originFeeMixin.awaitDecimalFee()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = validationPayload,
+            validationFailureTransformer = { handleUnlockReferendumValidationFailure(it, resourceManager) },
+            progressConsumer = submissionInProgress.progressConsumer(),
+        ) {
+            executeUnlock(claimable, locksChange)
         }
     }
 

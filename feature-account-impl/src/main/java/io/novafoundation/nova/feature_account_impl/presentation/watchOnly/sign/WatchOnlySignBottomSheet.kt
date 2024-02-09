@@ -13,8 +13,8 @@ class WatchOnlySignBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title.setText(R.string.account_watch_key_missing_title)
-        subtitle.setText(R.string.account_watch_key_missing_description)
+        titleView.setText(R.string.account_watch_key_missing_title)
+        subtitleView.setText(R.string.account_watch_key_missing_description)
 
         applyDashedIconStyle(R.drawable.ic_key_missing)
     }

@@ -47,7 +47,7 @@ class RealRevokeDelegationsInteractor(
     override suspend fun calculateFee(trackIds: Collection<TrackId>): Fee {
         val (chain, source) = useSelectedGovernance()
 
-        return extrinsicService.estimateMultiFee(chain) {
+        return extrinsicService.estimateMultiFee(chain, TransactionOrigin.SelectedWallet) {
             revokeDelegations(source, trackIds)
         }
     }

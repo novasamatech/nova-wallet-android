@@ -13,13 +13,13 @@ import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
-import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.RealSwapAvailabilityInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
@@ -69,9 +69,10 @@ class SwapFeatureModule {
     fun provideSwapService(
         assetConversionExchangeFactory: AssetConversionExchangeFactory,
         computationalCache: ComputationalCache,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        accountRepository: AccountRepository
     ): SwapService {
-        return RealSwapService(assetConversionExchangeFactory, computationalCache, chainRegistry)
+        return RealSwapService(assetConversionExchangeFactory, computationalCache, chainRegistry, accountRepository)
     }
 
     @Provides

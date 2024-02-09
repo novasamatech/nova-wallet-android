@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -9,6 +10,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -16,10 +18,12 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.stakeablePlanks
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.SelectedCollator
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
@@ -43,8 +47,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,12 +81,18 @@ class StartParachainStakingViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorsUseCase: CollatorsUseCase,
     private val payload: StartParachainStakingPayload,
+    private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
+    private val selectedAssetState: StakingSharedState,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin {
+
+    private val collatorRecommendator by lazyAsync {
+        collatorRecommendatorFactory.create(selectedAssetState.selectedOption(), scope = viewModelScope)
+    }
 
     private val validationInProgress = MutableStateFlow(false)
 
@@ -184,6 +198,8 @@ class StartParachainStakingViewModel(
 
         listenCollatorChanges()
         setInitialCollator()
+
+        setDefaultCollator()
     }
 
     fun selectCollatorClicked() = launch {
@@ -263,34 +279,34 @@ class StartParachainStakingViewModel(
             .launchIn(this)
     }
 
-    private fun maybeGoToNext() = requireFee { fee ->
-        launch {
-            val collator = selectedCollatorFlow.first() ?: return@launch
-            val amount = amountChooserMixin.amount.first()
+    private fun maybeGoToNext() = launch {
+        validationInProgress.value = true
 
-            val payload = StartParachainStakingValidationPayload(
-                amount = amount,
-                fee = fee,
-                asset = assetFlow.first(),
-                collator = collator,
-                delegatorState = currentDelegatorStateFlow.first(),
-            )
+        val collator = selectedCollatorFlow.first() ?: return@launch
+        val amount = amountChooserMixin.amount.first()
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-                progressConsumer = validationInProgress.progressConsumer()
-            ) {
-                validationInProgress.value = false
+        val payload = StartParachainStakingValidationPayload(
+            amount = amount,
+            fee = feeLoaderMixin.awaitDecimalFee(),
+            asset = assetFlow.first(),
+            collator = collator,
+            delegatorState = currentDelegatorStateFlow.first(),
+        )
 
-                goToNextStep(fee = fee, amount = amount, collator = collator)
-            }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+            progressConsumer = validationInProgress.progressConsumer()
+        ) {
+            validationInProgress.value = false
+
+            goToNextStep(fee = it.fee, amount = amount, collator = collator)
         }
     }
 
     private fun goToNextStep(
-        fee: BigDecimal,
+        fee: DecimalFee,
         amount: BigDecimal,
         collator: Collator,
     ) = launch {
@@ -298,7 +314,7 @@ class StartParachainStakingViewModel(
             ConfirmStartParachainStakingPayload(
                 collator = mapCollatorToCollatorParcelModel(collator),
                 amount = amount,
-                fee = fee,
+                fee = mapFeeToParcel(fee),
                 flowMode = payload.flowMode
             )
         }
@@ -306,8 +322,11 @@ class StartParachainStakingViewModel(
         router.openConfirmStartStaking(payload)
     }
 
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
+    private fun setDefaultCollator() {
+        launch {
+            val defaultCollator = collatorRecommendator.await().default()
+
+            selectedCollatorFlow.value = defaultCollator
+        }
+    }
 }

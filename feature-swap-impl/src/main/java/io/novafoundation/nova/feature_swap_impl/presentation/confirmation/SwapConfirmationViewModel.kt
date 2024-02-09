@@ -60,7 +60,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.Max
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.getFeeOrNull
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.getDecimalFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -253,7 +253,7 @@ class SwapConfirmationViewModel(
     }
 
     private fun executeSwap(validationPayload: SwapValidationPayload) = launch {
-        swapInteractor.executeSwap(validationPayload.swapExecuteArgs, validationPayload.swapFee)
+        swapInteractor.executeSwap(validationPayload.swapExecuteArgs, validationPayload.decimalFee)
             .onSuccess { navigateToNextScreen(validationPayload.swapExecuteArgs.assetIn) }
             .onFailure(::showError)
 
@@ -310,7 +310,7 @@ class SwapConfirmationViewModel(
 
     private suspend fun getValidationPayload(): SwapValidationPayload? {
         val confirmationState = confirmationStateFlow.value ?: return null
-        val swapFee = feeMixin.getFeeOrNull() ?: return null
+        val swapFee = feeMixin.getDecimalFeeOrNull() ?: return null
         return swapInteractor.getValidationPayload(
             assetIn = confirmationState.swapQuote.assetIn,
             assetOut = confirmationState.swapQuote.assetOut,

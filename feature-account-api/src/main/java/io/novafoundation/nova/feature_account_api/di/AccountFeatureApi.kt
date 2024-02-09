@@ -1,12 +1,15 @@
 package io.novafoundation.nova.feature_account_api.di
 
-import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
-import io.novafoundation.nova.common.utils.MutableSharedState
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -25,8 +28,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.language.Languag
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 interface AccountFeatureApi {
 
@@ -54,6 +57,8 @@ interface AccountFeatureApi {
 
     fun encryptionDefaults(): EncryptionDefaults
 
+    fun proxyExtrinsicValidationRequestBus(): ProxyExtrinsicValidationRequestBus
+
     val addressInputMixinFactory: AddressInputMixinFactory
 
     val walletUiUseCase: WalletUiUseCase
@@ -62,7 +67,7 @@ interface AccountFeatureApi {
 
     val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
 
-    val signSharedState: MutableSharedState<SignerPayloadExtrinsic>
+    val signSharedState: SigningSharedState
 
     val onChainIdentityRepository: OnChainIdentityRepository
 
@@ -71,6 +76,10 @@ interface AccountFeatureApi {
 
     @OnChainIdentity
     fun onChainIdentityProvider(): IdentityProvider
+
+    fun proxySyncService(): ProxySyncService
+
+    fun ledgerAddAccountRepository(): LedgerAddAccountRepository
 
     val evmTransactionService: EvmTransactionService
 
@@ -81,4 +90,6 @@ interface AccountFeatureApi {
     val selectWalletMixinFactory: SelectWalletMixin.Factory
 
     val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
 }

@@ -104,15 +104,23 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
     val hasReserveFee = reserveAssetLocation.chainId !in setOf(originChain.id, destinationChain.id)
     val reserveFee = if (hasReserveFee) {
         // reserve fee must be present if there is at least one non-reserve transfer
-        matchInstructions(reserveAssetLocation.reserveFee!!, reserveAssetLocation.chainId)
+        matchInstructions(reserveAssetLocation.reserveFee!!, originChain.id, reserveAssetLocation.chainId)
     } else {
         null
     }
 
+    val destinationFee = matchInstructions(
+        destination.destination.fee,
+        if (hasReserveFee) reserveAssetLocation.chainId else originChain.id,
+        destination.destination.chainId
+    )
+
     return CrossChainTransferConfiguration(
+        originChainId = originChain.id,
         assetLocation = originAssetLocationOf(assetTransfers),
+        reserveChainLocation = reserveAssetLocation.multiLocation,
         destinationChainLocation = destinationLocation(originChain, destinationParaId),
-        destinationFee = matchInstructions(destination.destination.fee, destination.destination.chainId),
+        destinationFee = destinationFee,
         reserveFee = reserveFee,
         transferType = destination.type
     )
@@ -120,14 +128,21 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
 
 private fun CrossChainTransfersConfiguration.matchInstructions(
     xcmFee: XcmFee<String>,
-    chainId: ChainId,
+    fromChainId: ChainId,
+    toChainId: ChainId,
 ): CrossChainFeeConfiguration {
     return CrossChainFeeConfiguration(
-        chainId = chainId,
-        instructionWeight = instructionBaseWeights.getValue(chainId),
-        xcmFeeType = XcmFee(
-            mode = xcmFee.mode,
-            instructions = feeInstructions.getValue(xcmFee.instructions),
+        from = CrossChainFeeConfiguration.From(
+            chainId = fromChainId,
+            deliveryFeeConfiguration = deliveryFeeConfigurations[fromChainId],
+        ),
+        to = CrossChainFeeConfiguration.To(
+            chainId = toChainId,
+            instructionWeight = instructionBaseWeights.getValue(toChainId),
+            xcmFeeType = XcmFee(
+                mode = xcmFee.mode,
+                instructions = feeInstructions.getValue(xcmFee.instructions),
+            )
         )
     )
 }

@@ -1,12 +1,12 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy
 
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 
 interface AutoBalanceStrategy {
 
-    fun generateNodeSequence(defaultNodes: List<Chain.Node>): Sequence<Chain.Node>
+    fun generateNodeSequence(defaultNodes: List<NodeWithSaturatedUrl>): Sequence<NodeWithSaturatedUrl>
 }
 
-fun AutoBalanceStrategy.generateNodeIterator(defaultNodes: List<Chain.Node>): Iterator<Chain.Node> {
+fun AutoBalanceStrategy.generateNodeIterator(defaultNodes: List<NodeWithSaturatedUrl>): Iterator<NodeWithSaturatedUrl> {
     return generateNodeSequence(defaultNodes).iterator()
 }

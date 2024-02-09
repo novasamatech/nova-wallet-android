@@ -73,7 +73,7 @@ android {
             versionNameSuffix '-github'
             applicationIdSuffix '.github'
 
-            buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/novasamatech/nova-wallet-android-releases/releases\""
+            buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/novasamatech/nova-wallet-android/releases\""
         }
         develop {
             signingConfig signingConfigs.dev
@@ -209,6 +209,9 @@ dependencies {
 
     implementation project(':feature-wallet-connect-api')
     implementation project(':feature-wallet-connect-impl')
+
+    implementation project(':feature-proxy-api')
+    implementation project(':feature-proxy-impl')
 
     implementation project(':feature-settings-api')
     implementation project(':feature-settings-impl')

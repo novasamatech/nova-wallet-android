@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setProgress
-import io.novafoundation.nova.common.view.setTextOrHide
+import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -86,7 +86,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         viewModel.wallet.observe { swapConfirmationWallet.showWallet(it) }
         viewModel.addressFlow.observe { swapConfirmationAccount.showAddress(it) }
 
-        viewModel.slippageAlertMessage.observe { swapConfirmationAlert.setTextOrHide(it) }
+        viewModel.slippageAlertMessage.observe { swapConfirmationAlert.setMessageOrHide(it) }
 
         viewModel.validationProgress.observe(swapConfirmationButton::setProgress)
     }

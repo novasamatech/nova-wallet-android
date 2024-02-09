@@ -33,7 +33,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.stakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.hints.ConfirmStakeHintsMixinFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.reset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
@@ -41,7 +43,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class ConfirmChangeValidatorsViewModel(
     private val router: StakingRouter,
@@ -94,7 +95,7 @@ class ConfirmChangeValidatorsViewModel(
         .share()
 
     val nominationsFlow = flowOf {
-        val selectedCount = currentProcessState.validators.size
+        val selectedCount = currentProcessState.newValidators.size
         val maxValidatorsPerNominator = maxValidatorsPerNominator()
 
         resourceManager.getString(R.string.staking_confirm_nominations, selectedCount, maxValidatorsPerNominator)
@@ -128,34 +129,34 @@ class ConfirmChangeValidatorsViewModel(
     private fun loadFee() {
         feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
-            feeConstructor = { changeValidatorsInteractor.estimateFee(prepareNominations()) },
+            feeConstructor = { changeValidatorsInteractor.estimateFee(prepareNominations(), stashFlow.first()) },
             onRetryCancelled = ::backClicked
         )
     }
 
-    private fun prepareNominations() = currentProcessState.validators.map(Validator::accountIdHex)
+    private fun prepareNominations() = currentProcessState.newValidators.map(Validator::accountIdHex)
 
-    private fun sendTransactionIfValid() = requireFee { fee ->
-        launch {
-            val payload = SetupStakingPayload(
-                maxFee = fee,
-                controllerAsset = controllerAssetFlow.first()
-            )
+    private fun sendTransactionIfValid() = launch {
+        _showNextProgress.value = true
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { stakingValidationFailure(it, resourceManager) },
-                progressConsumer = _showNextProgress.progressConsumer()
-            ) {
-                sendTransaction()
-            }
+        val payload = SetupStakingPayload(
+            maxFee = feeLoaderMixin.awaitDecimalFee(),
+            controllerAsset = controllerAssetFlow.first()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { stakingValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer()
+        ) {
+            sendTransaction()
         }
     }
 
     private fun sendTransaction() = launch {
         val setupResult = changeValidatorsInteractor.changeValidators(
-            controllerAddress = controllerAddressFlow.first(),
+            stakingState = stashFlow.first(),
             validatorAccountIds = prepareNominations(),
         )
 
@@ -164,18 +165,13 @@ class ConfirmChangeValidatorsViewModel(
         if (setupResult.isSuccess) {
             showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-            setupStakingSharedState.set(currentProcessState.reset())
+            setupStakingSharedState.reset()
 
             router.returnToCurrentValidators()
         } else {
             showError(setupResult.requireException())
         }
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 
     private suspend fun generateDestinationModel(address: String, name: String?): AddressModel {
         return addressIconGenerator.createAddressModel(

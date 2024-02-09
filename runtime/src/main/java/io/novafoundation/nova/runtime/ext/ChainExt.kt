@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
+import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
@@ -178,7 +179,7 @@ fun Chain.accountIdOrNull(address: String): ByteArray? {
 fun Chain.emptyAccountId() = if (isEthereumBased) {
     emptyEthereumAccountId()
 } else {
-    ByteArray(32)
+    emptySubstrateAccountId()
 }
 
 fun Chain.accountIdOrDefault(maybeAddress: String): ByteArray {
@@ -288,6 +289,8 @@ object ChainGeneses {
 
     const val ALEPH_ZERO = "70255b4d28de0fc4e1a193d7e175ad1ccef431598211c55538f1018651a0344e"
     const val TERNOA = "6859c81ca95ef624c9dfe4dc6e3381c33e5d6509e35e147092bfbc780f777c4e"
+
+    const val POLIMEC = "7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd"
 
     const val POLKADEX = "3920bcb4960a1eef5580cd5367ff3f430eef052774f78468852f7b9cb39f8a3c"
 

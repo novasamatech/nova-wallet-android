@@ -109,7 +109,7 @@
             android:id="@+id/btnDelete"
             style="@style/Widget.Nova.Button.PinCodeControlButton"
             android:layout_margin="@dimen/pin_code_view_spacing"
-            android:src="@drawable/ic_delete"
+            android:src="@drawable/ic_clear_pin_code_outline"
             android:tint="@color/color_delete_button" />
 
     </LinearLayout>

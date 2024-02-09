@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://api.subquery.network/sq/nova-wallet/subquery-staking__bm92Y\""
+        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://api.subquery.network/sq/nova-wallet/subquery-staking\""
     }
 
     buildTypes {
@@ -46,6 +46,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-ledger-api')
     implementation project(':feature-dapp-api')
+    implementation project(':feature-proxy-api')
     implementation project(':runtime')
 
     implementation kotlinDep

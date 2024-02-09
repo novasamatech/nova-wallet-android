@@ -311,6 +311,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
+            supportProxy = supportProxy,
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
             swap = mapSwapListFromLocal(swap),

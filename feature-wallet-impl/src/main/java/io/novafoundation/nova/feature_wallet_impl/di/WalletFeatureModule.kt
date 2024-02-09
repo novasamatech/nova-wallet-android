@@ -47,6 +47,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -74,6 +75,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPrice
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -229,9 +231,10 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideCrossChainWeigher(
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
         extrinsicService: ExtrinsicService,
         chainRegistry: ChainRegistry
-    ): CrossChainWeigher = RealCrossChainWeigher(extrinsicService, chainRegistry)
+    ): CrossChainWeigher = RealCrossChainWeigher(storageDataSource, extrinsicService, chainRegistry)
 
     @Provides
     @FeatureScope
@@ -328,8 +331,21 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideSubstrateRealtimeOperationFetcherFactory(
         multiLocationConverterFactory: MultiLocationConverterFactory,
-        eventsRepository: EventsRepository
+        eventsRepository: EventsRepository,
+        extrinsicWalk: ExtrinsicWalk
     ): SubstrateRealtimeOperationFetcher.Factory {
-        return SubstrateRealtimeOperationFetcherFactory(multiLocationConverterFactory, eventsRepository)
+        return SubstrateRealtimeOperationFetcherFactory(multiLocationConverterFactory, eventsRepository, extrinsicWalk)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideProxyHaveEnoughFeeValidationFactory(
+        assetSourceRegistry: AssetSourceRegistry,
+        walletRepository: WalletRepository,
+        extrinsicService: ExtrinsicService,
+    ) = ProxyHaveEnoughFeeValidationFactory(
+        assetSourceRegistry,
+        walletRepository,
+        extrinsicService
+    )
 }

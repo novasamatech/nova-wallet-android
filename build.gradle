@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.6.1'
-        versionCode = 105
+        versionName = '7.7.5'
+        versionCode = 114
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        fearlessLibVersion = '1.10.1'
+        fearlessLibVersion = '1.11.1'
 
         gifVersion = '1.2.19'
 

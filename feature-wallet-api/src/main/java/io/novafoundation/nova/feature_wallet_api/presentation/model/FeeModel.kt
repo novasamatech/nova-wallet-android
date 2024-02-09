@@ -1,12 +1,14 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.requestedAccountPaysFees
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
-typealias FeeModel = GenericFeeModel<SimpleFee>
 typealias DecimalFee = GenericDecimalFee<SimpleFee>
 
 class GenericFeeModel<F : GenericFee>(
@@ -20,8 +22,25 @@ class GenericDecimalFee<F : GenericFee>(
     val networkFeeDecimalAmount: BigDecimal
 ) {
 
-    @Deprecated("This field has unclear semantics in a case of custom fee structure", replaceWith = ReplaceWith("networkFeeDecimalAmount"))
-    val decimalAmount: BigDecimal = networkFeeDecimalAmount
+    val networkFee: Fee = genericFee.networkFee
 
-    val fee: Fee = genericFee.networkFee
+    companion object {
+        fun <F : GenericFee> from(genericFee: F, chainAsset: Chain.Asset): GenericDecimalFee<F> {
+            val decimalAmount = chainAsset.amountFromPlanks(genericFee.networkFee.amount)
+            return GenericDecimalFee(genericFee, decimalAmount)
+        }
+
+        fun from(fee: Fee, chainAsset: Chain.Asset): GenericDecimalFee<GenericFee> {
+            return from(SimpleFee(fee), chainAsset)
+        }
+    }
 }
+
+val <F : GenericFee> GenericDecimalFee<F>.networkFeeByRequestedAccount: BigDecimal
+    get() = if (networkFee.requestedAccountPaysFees) networkFeeDecimalAmount else BigDecimal.ZERO
+
+val <F : GenericFee> GenericDecimalFee<F>?.networkFeeByRequestedAccountOrZero: BigDecimal
+    get() = this?.networkFeeByRequestedAccount.orZero()
+
+val <F : GenericFee> GenericDecimalFee<F>?.networkFeeDecimalAmount: BigDecimal
+    get() = this?.networkFeeDecimalAmount.orZero()

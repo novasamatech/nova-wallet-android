@@ -9,11 +9,11 @@ fun ValidationSystem.Companion.removeVotesValidationSystem(): RemoteVotesValidat
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
-        error = { payload, leftForFees ->
+        error = { context ->
             RemoveVotesValidationFailure.NotEnoughToPayFees(
-                chainAsset = payload.asset.token.configuration,
-                maxUsable = leftForFees,
-                fee = payload.fee
+                chainAsset = context.payload.asset.token.configuration,
+                maxUsable = context.maxUsable,
+                fee = context.fee
             )
         }
     )

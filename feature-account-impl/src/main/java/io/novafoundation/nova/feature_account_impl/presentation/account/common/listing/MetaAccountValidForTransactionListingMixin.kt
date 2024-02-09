@@ -2,12 +2,13 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.common.
 
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Filter
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -25,19 +26,19 @@ class MetaAccountValidForTransactionListingMixinFactory(
 
     fun create(
         coroutineScope: CoroutineScope,
-        fromChainId: ChainId,
-        destinationChainId: ChainId,
-        selectedAddress: String?
+        chainId: ChainId,
+        selectedAddress: String?,
+        metaAccountFilter: Filter<MetaAccount>
     ): MetaAccountListingMixin {
         return MetaAccountValidForTransactionListingMixin(
             walletUiUseCase = walletUiUseCase,
             resourceManager = resourceManager,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             chainRegistry = chainRegistry,
-            fromChainId = fromChainId,
-            destinationChainId = destinationChainId,
+            chainId = chainId,
             selectedAddress = selectedAddress,
             accountTypePresentationMapper = accountTypePresentationMapper,
+            metaAccountFilter = metaAccountFilter,
             coroutineScope = coroutineScope
         )
     }
@@ -48,16 +49,16 @@ private class MetaAccountValidForTransactionListingMixin(
     private val resourceManager: ResourceManager,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val chainRegistry: ChainRegistry,
-    private val fromChainId: ChainId,
-    private val destinationChainId: ChainId,
+    private val chainId: ChainId,
     private val selectedAddress: String?,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
+    private val metaAccountFilter: Filter<MetaAccount>,
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
-    private val destinationChainFlow by coroutineScope.lazyAsync { chainRegistry.getChain(destinationChainId) }
+    private val chainFlow by coroutineScope.lazyAsync { chainRegistry.getChain(chainId) }
 
-    override val metaAccountsFlow = metaAccountGroupingInteractor.getMetaAccountsForTransaction(fromChainId, destinationChainId)
+    override val metaAccountsFlow = metaAccountGroupingInteractor.getMetaAccountsWithFilter(metaAccountFilter)
         .map { list ->
             list.toListWithHeaders(
                 keyMapper = { type, _ -> accountTypePresentationMapper.mapMetaAccountTypeToUi(type) },
@@ -69,7 +70,7 @@ private class MetaAccountValidForTransactionListingMixin(
     private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): AccountUi {
         val icon = walletUiUseCase.walletIcon(metaAccount)
 
-        val chainAddress = metaAccount.addressIn(destinationChainFlow.await())
+        val chainAddress = metaAccount.addressIn(chainFlow.await())
         val isSelected = chainAddress != null && chainAddress == selectedAddress
 
         return AccountUi(
@@ -79,7 +80,10 @@ private class MetaAccountValidForTransactionListingMixin(
             isSelected = isSelected,
             isClickable = chainAddress != null,
             picture = icon,
-            subtitleIconRes = if (chainAddress == null) R.drawable.ic_warning_filled else null
+            chainIconUrl = null,
+            updateIndicator = false,
+            subtitleIconRes = if (chainAddress == null) R.drawable.ic_warning_filled else null,
+            isEditable = false
         )
     }
 

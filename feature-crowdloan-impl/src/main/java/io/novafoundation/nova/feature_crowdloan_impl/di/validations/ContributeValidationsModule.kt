@@ -28,7 +28,7 @@ class ContributeValidationsModule {
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
         extraAmountExtractor = { it.contributionAmount },
-        errorProducer = { _, _ -> ContributeValidationFailure.CannotPayFees }
+        errorProducer = { ContributeValidationFailure.CannotPayFees }
     )
 
     @Provides
@@ -54,7 +54,7 @@ class ContributeValidationsModule {
         walletConstants: WalletConstants,
     ) = ContributeExistentialDepositValidation(
         countableTowardsEdBalance = { it.asset.balanceCountedTowardsED() },
-        feeProducer = { it.fee },
+        feeProducer = { listOf(it.fee) },
         extraAmountProducer = { it.contributionAmount },
         existentialDeposit = {
             val inPlanks = walletConstants.existentialDeposit(it.asset.token.configuration.chainId)

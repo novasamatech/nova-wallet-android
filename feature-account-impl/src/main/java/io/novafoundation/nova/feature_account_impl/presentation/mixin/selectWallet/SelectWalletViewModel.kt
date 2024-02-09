@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet
 
 import io.novafoundation.nova.common.navigation.requireLastInput
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletResponder
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -22,7 +22,7 @@ class SelectWalletViewModel(
         isMetaAccountSelected = { currentSelectedId == it.id }
     )
 
-    override val mode: AccountsAdapter.Mode = AccountsAdapter.Mode.SWITCH
+    override val mode: AccountHolder.Mode = AccountHolder.Mode.SWITCH
 
     override fun accountClicked(accountModel: AccountUi) {
         responder.respond(SelectWalletCommunicator.Response(accountModel.id))

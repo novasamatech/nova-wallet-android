@@ -17,7 +17,7 @@ import kotlin.math.roundToInt
 
 private const val BASE_ICON_PADDING_DP = 6
 
-class ChipLabelModel(
+data class ChipLabelModel(
     @DrawableRes val iconRes: Int,
     val title: String
 )

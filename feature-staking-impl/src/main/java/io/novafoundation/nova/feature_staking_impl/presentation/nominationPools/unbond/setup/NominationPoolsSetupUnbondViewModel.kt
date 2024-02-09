@@ -21,8 +21,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -110,7 +112,7 @@ class NominationPoolsSetupUnbondViewModel(
         val stakedBalance = asset.token.amountFromPlanks(stakedBalance.first())
 
         val payload = NominationPoolsUnbondValidationPayload(
-            fee = originFeeMixin.awaitFee(),
+            fee = originFeeMixin.awaitDecimalFee(),
             poolMember = poolMemberFlow.first(),
             stakedBalance = stakedBalance,
             asset = asset,
@@ -134,7 +136,7 @@ class NominationPoolsSetupUnbondViewModel(
     private fun openConfirm(validationPayload: NominationPoolsUnbondValidationPayload) = launch {
         val confirmPayload = NominationPoolsConfirmUnbondPayload(
             amount = validationPayload.amount,
-            fee = validationPayload.fee
+            fee = mapFeeToParcel(validationPayload.fee)
         )
 
         router.openConfirmUnbond(confirmPayload)

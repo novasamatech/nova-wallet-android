@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Subst
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
-import io.novafoundation.nova.feature_ledger_impl.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.NO
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId

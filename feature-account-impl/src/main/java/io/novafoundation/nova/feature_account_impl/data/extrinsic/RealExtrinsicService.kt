@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.sum
+import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.common.utils.takeWhileInclusive
 import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -13,22 +13,23 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.InlineFee
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
+import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -47,13 +48,25 @@ class RealExtrinsicService(
     private val extrinsicSplitter: ExtrinsicSplitter,
 ) : ExtrinsicService {
 
+    override suspend fun submitExtrinsic(
+        chain: Chain,
+        origin: TransactionOrigin,
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): Result<ExtrinsicSubmission> = runCatching {
+        val metaAccount = accountRepository.requireMetaAccountFor(origin, chain.id)
+        val (extrinsic, submissionOrigin) = buildExtrinsic(chain, metaAccount, formExtrinsic)
+        val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
+
+        ExtrinsicSubmission(hash, submissionOrigin)
+    }
+
     override suspend fun submitMultiExtrinsicAwaitingInclusion(
         chain: Chain,
         origin: TransactionOrigin,
         formExtrinsic: FormMultiExtrinsicWithOrigin
     ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         return runMultiCatching(
-            intermediateListLoading = { constructSplitExtrinsicsForSubmission(chain, formExtrinsic, origin) },
+            intermediateListLoading = { constructSplitExtrinsicsForSubmission(chain, origin, formExtrinsic) },
             listProcessing = { extrinsic ->
                 rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
                     .filterIsInstance<ExtrinsicStatus.InBlock>()
@@ -62,59 +75,26 @@ class RealExtrinsicService(
         )
     }
 
-    override suspend fun submitExtrinsicWithSelectedWalletV2(
+    // TODO: The flow in Result may produce an exception that will be not handled since Result can't catch an exception inside a flow
+    // For now it's handling in awaitInBlock() extension
+    override suspend fun submitAndWatchExtrinsic(
         chain: Chain,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<ExtrinsicSubmission> {
-        val account = accountRepository.getSelectedMetaAccount()
-        val accountId = account.requireAccountIdIn(chain)
+        origin: TransactionOrigin,
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): Result<Flow<ExtrinsicStatus>> = runCatching {
+        val metaAccount = accountRepository.requireMetaAccountFor(origin, chain.id)
+        val (extrinsic) = buildExtrinsic(chain, metaAccount, formExtrinsic)
 
-        return submitExtrinsicWithAnySuitableWalletV2(chain, accountId, formExtrinsic)
-    }
-
-    override suspend fun submitAndWatchExtrinsicWithSelectedWallet(
-        chain: Chain,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Flow<ExtrinsicStatus> {
-        val account = accountRepository.getSelectedMetaAccount()
-        val accountId = account.accountIdIn(chain)!!
-
-        return submitAndWatchExtrinsicAnySuitableWallet(chain, accountId, formExtrinsic)
-    }
-
-    override suspend fun submitExtrinsicWithAnySuitableWallet(
-        chain: Chain,
-        accountId: ByteArray,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<String> = submitExtrinsicWithAnySuitableWalletV2(chain, accountId, formExtrinsic)
-        .map { it.hash }
-
-    private suspend fun submitExtrinsicWithAnySuitableWalletV2(
-        chain: Chain,
-        accountId: ByteArray,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<ExtrinsicSubmission> = runCatching {
-        val extrinsic = buildExtrinsic(chain, accountId, formExtrinsic)
-        val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
-        ExtrinsicSubmission(hash, accountId)
-    }
-
-    override suspend fun submitAndWatchExtrinsicAnySuitableWallet(
-        chain: Chain,
-        accountId: ByteArray,
-        formExtrinsic: FormExtrinsicWithOrigin,
-    ): Flow<ExtrinsicStatus> {
-        val extrinsic = buildExtrinsic(chain, accountId, formExtrinsic)
-
-        return rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
+        rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
             .takeWhileInclusive { !it.terminal }
     }
 
     override suspend fun paymentInfo(
         chain: Chain,
+        origin: TransactionOrigin,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): FeeResponse {
-        val extrinsic = extrinsicBuilderFactory.createForFee(chain)
+        val extrinsic = extrinsicBuilderFactory.createForFee(getFeeSigner(chain, origin), chain)
             .also { it.formExtrinsic() }
             .build()
 
@@ -123,20 +103,22 @@ class RealExtrinsicService(
 
     override suspend fun estimateFee(
         chain: Chain,
-        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
-    ): BigInteger {
-        val extrinsicBuilder = extrinsicBuilderFactory.createForFee(chain)
+        origin: TransactionOrigin,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit
+    ): Fee {
+        val signer = getFeeSigner(chain, origin)
+        val extrinsicBuilder = extrinsicBuilderFactory.createForFee(signer, chain)
         extrinsicBuilder.formExtrinsic()
         val extrinsic = extrinsicBuilder.build()
 
-        return estimateFee(chain, extrinsic).amount
+        return estimateFee(chain, extrinsic, signer)
     }
 
-    override suspend fun estimateFeeV2(chain: Chain, formExtrinsic: suspend ExtrinsicBuilder.() -> Unit): Fee {
-        return InlineFee(estimateFee(chain, formExtrinsic))
-    }
-
-    override suspend fun estimateFee(chain: Chain, extrinsic: String): Fee {
+    override suspend fun estimateFee(
+        chain: Chain,
+        extrinsic: String,
+        usedSigner: FeeSigner
+    ): Fee {
         val chainId = chain.id
         val baseFee = rpcCalls.getExtrinsicFee(chain, extrinsic).partialFee
 
@@ -146,45 +128,64 @@ class RealExtrinsicService(
 
         val tip = decodedExtrinsic.tip().orZero()
 
-        return InlineFee(tip + baseFee)
+        return SubstrateFee(amount = tip + baseFee, submissionOrigin = usedSigner.submissionOrigin(chain))
     }
 
-    override suspend fun estimateMultiFee(chain: Chain, formExtrinsic: FormMultiExtrinsic): Fee {
-        val feeExtrinsicBuilderSequence = extrinsicBuilderFactory.createMultiForFee(chain)
+    override suspend fun zeroFee(chain: Chain, origin: TransactionOrigin): Fee {
+        val signer = getFeeSigner(chain, origin)
+        return zeroFee(chain, signer)
+    }
 
-        val extrinsics = constructSplitExtrinsics(chain, formExtrinsic, feeExtrinsicBuilderSequence)
+    override suspend fun estimateMultiFee(
+        chain: Chain,
+        origin: TransactionOrigin,
+        formExtrinsic: FormMultiExtrinsic
+    ): Fee {
+        val feeSigner = getFeeSigner(chain, origin)
+        val feeExtrinsicBuilderSequence = extrinsicBuilderFactory.createMultiForFee(feeSigner, chain)
 
-        val separateFees = extrinsics.map { estimateFee(chain, it).amount }
-        val totalFee = separateFees.sum()
+        val extrinsics = constructSplitExtrinsics(chain, origin, formExtrinsic, feeExtrinsicBuilderSequence, alreadyComputedFeeSigner = feeSigner)
 
-        return InlineFee(totalFee)
+        if (extrinsics.isEmpty()) return zeroFee(chain, feeSigner)
+
+        val fees = extrinsics.map { estimateFee(chain, it, feeSigner) }
+
+        val totalFee = fees.sumByBigInteger { it.amount }
+
+        return SubstrateFee(totalFee, feeSigner.submissionOrigin(chain))
     }
 
     private suspend fun constructSplitExtrinsicsForSubmission(
         chain: Chain,
-        formExtrinsic: FormMultiExtrinsicWithOrigin,
         origin: TransactionOrigin,
+        formExtrinsic: FormMultiExtrinsicWithOrigin,
     ): List<String> {
-        val metaAccount = accountRepository.requireMetaAccountFor(origin)
-        val signer = signerProvider.signerFor(metaAccount)
-        val accountId = metaAccount.requireAccountIdIn(chain)
+        val metaAccount = accountRepository.requireMetaAccountFor(origin, chain.id)
+        val signer = signerProvider.rootSignerFor(metaAccount)
 
-        val extrinsicBuilderSequence = extrinsicBuilderFactory.createMulti(chain, signer, accountId)
+        val requestedOrigin = metaAccount.requireAccountIdIn(chain)
+        val actualOrigin = signer.signerAccountId(chain)
+        val submissionOrigin = SubmissionOrigin(requestedOrigin = requestedOrigin, actualOrigin = actualOrigin)
 
-        val formExtrinsicWithOrigin: FormMultiExtrinsic = { formExtrinsic(accountId) }
+        val extrinsicBuilderSequence = extrinsicBuilderFactory.createMulti(chain, signer, requestedOrigin)
 
-        return constructSplitExtrinsics(chain, formExtrinsicWithOrigin, extrinsicBuilderSequence)
+        val formExtrinsicWithOrigin: FormMultiExtrinsic = { formExtrinsic(submissionOrigin) }
+
+        return constructSplitExtrinsics(chain, origin, formExtrinsicWithOrigin, extrinsicBuilderSequence)
     }
 
     private suspend fun constructSplitExtrinsics(
         chain: Chain,
+        origin: TransactionOrigin,
         formExtrinsic: FormMultiExtrinsic,
         extrinsicBuilderSequence: Sequence<ExtrinsicBuilder>,
+        alreadyComputedFeeSigner: FeeSigner? = null,
     ): List<String> = coroutineScope {
+        val feeSigner = alreadyComputedFeeSigner ?: getFeeSigner(chain, origin)
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val callBuilder = SimpleCallBuilder(runtime).apply { formExtrinsic() }
-        val splitCalls = extrinsicSplitter.split(callBuilder, chain)
+        val splitCalls = extrinsicSplitter.split(feeSigner, callBuilder, chain)
 
         val extrinsicBuilderIterator = extrinsicBuilderSequence.iterator()
 
@@ -201,16 +202,37 @@ class RealExtrinsicService(
 
     private suspend fun buildExtrinsic(
         chain: Chain,
-        accountId: ByteArray,
+        metaAccount: MetaAccount,
         formExtrinsic: FormExtrinsicWithOrigin,
-    ): String {
-        val metaAccount = accountRepository.findMetaAccount(accountId) ?: error("No meta account found accessing ${accountId.toHexString()}")
-        val signer = signerProvider.signerFor(metaAccount)
+    ): SubmissionRaw {
+        val signer = signerProvider.rootSignerFor(metaAccount)
 
-        val extrinsicBuilder = extrinsicBuilderFactory.create(chain, signer, accountId)
+        val requestedOrigin = metaAccount.requireAccountIdIn(chain)
+        val actualOrigin = signer.signerAccountId(chain)
 
-        extrinsicBuilder.formExtrinsic(accountId)
+        val submissionOrigin = SubmissionOrigin(requestedOrigin = requestedOrigin, actualOrigin = actualOrigin)
 
-        return extrinsicBuilder.build(useBatchAll = true)
+        val extrinsicBuilder = extrinsicBuilderFactory.create(chain, signer, requestedOrigin)
+
+        extrinsicBuilder.formExtrinsic(submissionOrigin)
+
+        val extrinsic = extrinsicBuilder.build(useBatchAll = true)
+
+        return SubmissionRaw(extrinsic, submissionOrigin)
+    }
+
+    private suspend fun getFeeSigner(chain: Chain, origin: TransactionOrigin): FeeSigner {
+        val metaAccount = accountRepository.requireMetaAccountFor(origin, chain.id)
+        return signerProvider.feeSigner(metaAccount, chain)
+    }
+
+    private data class SubmissionRaw(val extrinsicRaw: String, val submissionOrigin: SubmissionOrigin)
+
+    private suspend fun FeeSigner.submissionOrigin(chain: Chain): SubmissionOrigin {
+        return SubmissionOrigin(requestedFeeSignerId(chain = chain), actualFeeSignerId(chain))
+    }
+
+    private suspend fun zeroFee(chain: Chain, signer: FeeSigner): Fee {
+        return SubstrateFee(BigInteger.ZERO, signer.submissionOrigin(chain))
     }
 }

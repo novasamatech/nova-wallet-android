@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -138,6 +139,8 @@ class NewDelegationConfirmViewModel(
     private val _showTracksEvent = MutableLiveData<Event<List<TrackModel>>>()
     val showTracksEvent: LiveData<Event<List<TrackModel>>> = _showTracksEvent
 
+    private val decimalFee = mapFeeFromParcel(payload.fee)
+
     init {
         setFee()
     }
@@ -166,7 +169,7 @@ class NewDelegationConfirmViewModel(
         val amountPlanks = asset.token.planksFromAmount(payload.amount)
         val validationPayload = ChooseDelegationAmountValidationPayload(
             asset = asset,
-            fee = payload.fee,
+            fee = decimalFee,
             amount = payload.amount,
             delegate = payload.delegate
         )
@@ -186,7 +189,7 @@ class NewDelegationConfirmViewModel(
     }
 
     private fun setFee() = launch {
-        originFeeMixin.setFee(payload.fee)
+        originFeeMixin.setFee(decimalFee.genericFee)
     }
 
     private fun performDelegate(amountPlanks: Balance) = launch {

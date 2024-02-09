@@ -280,8 +280,8 @@ class StakingRepositoryImpl(
         return stakingStoriesDataSource.getStoriesFlow()
     }
 
-    override suspend fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger> {
-        return localStorage.query(stakingState.chain.id) {
+    override fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger> {
+        return localStorage.subscribe(stakingState.chain.id) {
             metadata.staking.ledger.observe(stakingState.controllerId)
         }.filterNotNull()
     }

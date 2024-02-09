@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
+import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
+import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
@@ -20,7 +22,7 @@ import javax.inject.Inject
 
 abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     BaseFragment<V>(),
-    AccountsAdapter.AccountItemHandler,
+    AccountHolder.AccountItemHandler,
     LedgerSelectAddressLoadMoreAdapter.Handler {
 
     companion object {
@@ -30,7 +32,17 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
         fun getBundle(payload: SelectLedgerAddressPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    private val addressesAdapter = AccountsAdapter(this, AccountsAdapter.Mode.VIEW)
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
+
+    private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        AccountsAdapter(
+            this,
+            imageLoader,
+            chainBorderColor = R.color.secondary_screen_background,
+            AccountHolder.Mode.SELECT
+        )
+    }
     private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
 
     @Inject

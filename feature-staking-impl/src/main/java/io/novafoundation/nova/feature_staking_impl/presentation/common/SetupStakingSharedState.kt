@@ -11,17 +11,33 @@ sealed class SetupStakingProcess {
 
         fun next(
             activeStake: Balance,
-            validators: List<Validator>,
-            selectionMethod: ReadyToSubmit.SelectionMethod
-        ): SetupStakingProcess {
-            return ReadyToSubmit(activeStake, validators, selectionMethod)
+            currentlyActiveValidators: List<Validator>,
+        ): ChoosingValidators {
+            return ChoosingValidators(currentlySelectedValidators = currentlyActiveValidators, activeStake)
         }
     }
 
-    class ReadyToSubmit(
+    class ChoosingValidators(
+        val currentlySelectedValidators: List<Validator>,
         val activeStake: Balance,
-        val validators: List<Validator>,
-        val selectionMethod: SelectionMethod
+    ) : SetupStakingProcess() {
+
+        fun next(
+            newValidators: List<Validator>,
+            selectionMethod: ReadyToSubmit.SelectionMethod,
+        ) = ReadyToSubmit(
+            activeStake = activeStake,
+            newValidators = newValidators,
+            selectionMethod = selectionMethod,
+            currentlySelectedValidators = currentlySelectedValidators
+        )
+    }
+
+    data class ReadyToSubmit(
+        val activeStake: Balance,
+        val newValidators: List<Validator>,
+        val selectionMethod: SelectionMethod,
+        val currentlySelectedValidators: List<Validator>,
     ) : SetupStakingProcess() {
 
         enum class SelectionMethod {
@@ -31,13 +47,11 @@ sealed class SetupStakingProcess {
         fun changeValidators(
             newValidators: List<Validator>,
             selectionMethod: SelectionMethod
-        ) = ReadyToSubmit(activeStake, newValidators, selectionMethod)
+        ) = copy(newValidators = newValidators, selectionMethod = selectionMethod)
 
-        fun previous(): Initial {
-            return Initial
+        fun previous(): ChoosingValidators {
+            return ChoosingValidators(currentlySelectedValidators, activeStake)
         }
-
-        fun reset() = Initial
     }
 }
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20
 
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -64,14 +65,22 @@ class EvmErc20AssetBalance(
         return BigInteger.ZERO
     }
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
         val erc20Type = chainAsset.requireErc20()
         val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
         val accountAddress = chain.addressOf(accountId)
-
-        return erc20Standard.querySingle(erc20Type.contractAddress, ethereumApi)
+        val balance = erc20Standard.querySingle(erc20Type.contractAddress, ethereumApi)
             .balanceOfAsync(accountAddress)
             .await()
+        return AccountBalance(
+            free = balance,
+            reserved = BigInteger.ZERO,
+            frozen = BigInteger.ZERO,
+        )
+    }
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(

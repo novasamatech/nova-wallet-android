@@ -3,9 +3,10 @@ package io.novafoundation.nova.feature_swap_impl.presentation.confirmation.paylo
 import android.os.Parcelable
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import java.math.BigDecimal
 import kotlinx.android.parcel.Parcelize
+import java.math.BigDecimal
 
 @Parcelize
 class SwapConfirmationPayload(
@@ -28,7 +29,7 @@ class SwapConfirmationPayload(
 
     @Parcelize
     class FeeDetails(
-        val amount: Balance,
+        val networkFee: FeeParcelModel,
         val minimumBalanceBuyIn: MinimumBalanceBuyIn
     ) : Parcelable {
 

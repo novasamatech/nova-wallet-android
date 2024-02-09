@@ -443,7 +443,7 @@ class ReferendumDetailsViewModel(
             is ReferendumPreVoteValidationFailure.NoRelaychainAccount -> handleChainAccountNotFound(
                 failure = failure,
                 resourceManager = resourceManager,
-                goToWalletDetails = { router.openAccountDetails(failure.account.id) },
+                goToWalletDetails = { router.openWalletDetails(failure.account.id) },
                 addAccountDescriptionRes = R.string.referendum_missing_account_message
             )
         }

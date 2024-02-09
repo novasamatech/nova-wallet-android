@@ -49,7 +49,7 @@ class SearchCustomValidatorsViewModel(
         .share()
 
     private val selectedValidators = confirmSetupState
-        .map { it.validators.toSet() }
+        .map { it.newValidators.toSet() }
         .inBackground()
         .share()
 
