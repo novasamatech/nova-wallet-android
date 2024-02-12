@@ -45,7 +45,7 @@ dependencies {
 cargo {
     module = "bindings/"
     libname = "hydra_dx_math_java"
-    targets = ["arm", "arm64", "x86", "x86_64", "win32-x86-64-gnu"]
+    targets = ["arm", "arm64", "x86", "x86_64"]
 }
 
 tasks.matching { it.name.matches(/merge.*JniLibFolders/) }.configureEach {
