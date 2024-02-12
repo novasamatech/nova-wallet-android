@@ -30,13 +30,3 @@ crate_type = ["cdylib"]
 default = ["std"]
 std = ["sp-arithmetic/std", "sp-runtime/std"]
 stableswap = []
-
-
-
-
-
-
-
-
-
-
