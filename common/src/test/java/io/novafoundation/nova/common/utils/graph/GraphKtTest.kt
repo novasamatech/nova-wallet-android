@@ -68,7 +68,7 @@ internal class GraphKtTest {
             4 to listOf(1, 2)
         )
 
-        val actual = graph.findBfsPathsBetween(2, 3, limit = 3)
+        val actual = graph.findDijkstraPathsBetween(2, 3, limit = 3)
         val expected = listOf(
             listOf(SimpleEdge(2, 3)),
             listOf(SimpleEdge(2, 1), SimpleEdge(1, 3)),

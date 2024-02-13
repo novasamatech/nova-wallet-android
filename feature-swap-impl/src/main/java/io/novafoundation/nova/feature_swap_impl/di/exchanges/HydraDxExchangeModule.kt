@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.di.exchanges
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.H
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -48,15 +50,17 @@ class HydraDxExchangeModule {
     @IntoSet
     fun provideStableSwapSourceFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        chainRegistry: ChainRegistry,
         assetSourceRegistry: AssetSourceRegistry,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+        gson: Gson,
+        chainStateRepository: ChainStateRepository
     ): HydraDxSwapSource.Factory {
         return StableSwapSourceFactory(
             remoteStorageSource = remoteStorageSource,
-            chainRegistry = chainRegistry,
             assetSourceRegistry = assetSourceRegistry,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter
+            hydraDxAssetIdConverter = hydraDxAssetIdConverter,
+            gson = gson,
+            chainStateRepository = chainStateRepository
         )
     }
 

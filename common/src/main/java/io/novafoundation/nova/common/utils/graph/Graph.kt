@@ -2,8 +2,7 @@ package io.novafoundation.nova.common.utils.graph
 
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.MultiMapList
-import java.util.ArrayDeque
-import java.util.Queue
+import java.util.PriorityQueue
 
 interface Edge<N> {
 
@@ -94,37 +93,50 @@ fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapL
     return result
 }
 
-// TODO this is not as memory efficient as using DFS since we maintain a copy of currentPath and visited for each pending queue element
-// Not sure if it is possible to improve memory consumption herу
-fun <N, E: Edge<N>> Graph<N, E>.findBfsPathsBetween(from: N, to: N, limit: Int): List<Path<E>> {
-    data class QueueElement(val node: N, val currentPath: Path<E>, val visited: Set<N>)
+fun <N, E: Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: Int): List<Path<E>> {
+    data class QueueElement(val currentPath: Path<E>, val nodeList: List<N>, val score: Int): Comparable<QueueElement> {
+        override fun compareTo(other: QueueElement): Int {
+            return score - other.score
+        }
+    }
 
     val paths = mutableListOf<Path<E>>()
 
-    val queue: Queue<QueueElement> = ArrayDeque()
+    val count = mutableMapOf<N, Int>()
+    adjacencyList.keys.forEach { count[it] = 0 }
 
-    for (edge in adjacencyList.getValue(from)) {
-        queue.offer(QueueElement(edge.to, listOf(edge), setOf(from)))
-    }
+    val heap = PriorityQueue<QueueElement>()
+    heap.add(QueueElement(currentPath = emptyList(), nodeList = listOf(from), score = 0))
 
-    while (paths.size < limit && queue.isNotEmpty()) {
-        val (currentNode, currentPath, visited) = queue.poll()!!
+    while (heap.isNotEmpty() && paths.size < limit) {
+        val minimumQueueElement = heap.poll()!!
+        val lastNode = minimumQueueElement.nodeList.last()
 
-        if (currentNode == to) {
-            paths.add(currentPath)
+        val newCount = count.getValue(lastNode) + 1
+        count[lastNode] = newCount
+
+        if (lastNode == to) {
+            paths.add(minimumQueueElement.currentPath)
             continue
         }
 
-        for (edge in adjacencyList.getValue(currentNode)) {
-            if (edge.to in visited) continue
+        if (newCount < limit) {
+            adjacencyList.getValue(lastNode).forEach { edge ->
+                if (edge.to in minimumQueueElement.nodeList) return@forEach
 
-            queue.offer(QueueElement(edge.to, currentPath + edge, visited + currentNode))
+                val newElement = QueueElement(
+                    currentPath = minimumQueueElement.currentPath + edge,
+                    nodeList = minimumQueueElement.nodeList + edge.to,
+                    score = minimumQueueElement.score + 1
+                )
+
+                heap.add(newElement)
+            }
         }
     }
 
     return paths
 }
-
 
 private fun <N, E: Edge<N>> connectedComponentsDfs(
     node: N,

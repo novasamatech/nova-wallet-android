@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.firstById
@@ -9,7 +10,7 @@ import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDirections
-import io.novafoundation.nova.common.utils.graph.findBfsPathsBetween
+import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.orZero
@@ -41,6 +42,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.refer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSystemAsset
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toChainAssetOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
@@ -64,7 +66,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
-private const val PATHS_LIMIT = 5
+private const val PATHS_LIMIT = 4
 
 class HydraDxExchangeFactory(
     private val remoteStorageSource: StorageDataSource,
@@ -144,7 +146,7 @@ private class HydraDxExchange(
         val paths = pathsFromCacheOrCompute(from, to) {
             val graph = graphState.first()
 
-            graph.findBfsPathsBetween(from, to, limit = PATHS_LIMIT)
+            graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT)
         }
 
         val quotedPaths = paths.mapNotNull { path -> quotePath(path, args.amount, args.swapDirection) }
@@ -152,7 +154,50 @@ private class HydraDxExchange(
             throw SwapQuoteException.NotEnoughLiquidity
         }
 
+        val allCandidates = quotedPaths.sortedDescending().map {
+            it.quote.toString() + " " + formatPath(it.path)
+        }.joinToString(separator = "\n")
+
+        Log.d("RealSwapService", "-------- New quote ----------")
+        Log.d("RealSwapService", allCandidates)
+        Log.d("RealSwapService", "-------- Done quote ----------\n\n\n")
+
         return quotedPaths.max()
+    }
+
+    private suspend fun formatPath(path: QuotePath): String {
+        val assets = chain.assetsById
+
+
+        return buildString {
+            val firstSegment = path.segments.first()
+
+            append(assets.getValue(firstSegment.from.assetId).symbol)
+
+            append("-- ${formatSource(firstSegment)} --> ")
+
+            append(assets.getValue(firstSegment.to.assetId).symbol)
+
+            path.segments.subList(1, path.segments.size).onEach { segment ->
+                append("-- ${formatSource(segment)} --> ")
+
+                append(assets.getValue(segment.to.assetId).symbol)
+            }
+        }
+    }
+
+    private suspend fun formatSource(segment: QuotePath.Segment): String {
+        return buildString {
+            append(segment.sourceId)
+
+            val stableswapPoolId = segment.sourceParams["PoolId"]
+            if (stableswapPoolId != null) {
+                val onChainId = stableswapPoolId.toBigInteger()
+                val chainAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, onChainId)
+
+                append("[${chainAsset.symbol}]")
+            }
+        }
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
@@ -255,11 +300,12 @@ private class HydraDxExchange(
     private suspend fun quotePathBuy(path: Path<HydraDxSwapEdge>, amount: Balance): Balance? {
         return runCatching {
             path.fold(amount) { currentAmount, segment ->
-                val args = AssetExchangeQuoteArgs(
+                val args = HydraDxSwapSourceQuoteArgs(
                     chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
                     chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
                     amount = currentAmount,
                     swapDirection = SwapDirection.SPECIFIED_OUT,
+                    params = segment.direction.params
                 )
 
                 segment.swapSource().quote(args)
@@ -271,11 +317,12 @@ private class HydraDxExchange(
     private suspend fun quotePathSell(path: Path<HydraDxSwapEdge>, amount: Balance): Balance? {
         return runCatching {
             path.foldRight(amount) { segment, currentAmount ->
-                val args = AssetExchangeQuoteArgs(
+                val args = HydraDxSwapSourceQuoteArgs(
                     chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
                     chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
                     amount = currentAmount,
                     swapDirection = SwapDirection.SPECIFIED_IN,
+                    params = segment.direction.params
                 )
 
                 segment.swapSource().quote(args)

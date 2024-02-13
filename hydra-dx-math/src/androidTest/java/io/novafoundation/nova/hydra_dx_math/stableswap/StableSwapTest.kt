@@ -233,4 +233,22 @@ class StableSwapTest {
 
         assertEquals("99999999999999", result.toString())
     }
+
+    @Test
+    fun failingCase() {
+        val data = """
+      [{"amount":"2246975221087","decimals":6,"asset_id":10},{"amount":"2256486088023","decimals":6,"asset_id":22}]
+        """
+
+        val result = StableSwapMathBridge.calculate_liquidity_out_one_asset(
+            data,
+            "1000000000",
+            10,
+            "100",
+            "4502091550542833181457210",
+            "0.00040"
+        )
+
+        assertEquals("99999999999999", result.toString())
+    }
 }
