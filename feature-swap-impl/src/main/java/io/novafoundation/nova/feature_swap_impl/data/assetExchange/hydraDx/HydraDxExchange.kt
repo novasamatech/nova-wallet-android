@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
@@ -146,8 +147,12 @@ private class HydraDxExchange(
             graph.findBfsPathsBetween(from, to, limit = PATHS_LIMIT)
         }
 
-        return paths.map { path -> quotePath(path, args.amount, args.swapDirection) }
-            .maxBy { it.quote }
+        val quotedPaths = paths.mapNotNull { path -> quotePath(path, args.amount, args.swapDirection) }
+        if (paths.isEmpty()) {
+            throw SwapQuoteException.NotEnoughLiquidity
+        }
+
+        return quotedPaths.max()
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
@@ -238,39 +243,44 @@ private class HydraDxExchange(
         path: Path<HydraDxSwapEdge>,
         amount: Balance,
         swapDirection: SwapDirection
-    ): AssetExchangeQuote {
+    ): AssetExchangeQuote? {
         val quote = when (swapDirection) {
             SwapDirection.SPECIFIED_IN -> quotePathSell(path, amount)
             SwapDirection.SPECIFIED_OUT -> quotePathBuy(path, amount)
-        }
+        } ?: return null
 
-        return AssetExchangeQuote(quote, path.toQuotePath())
+        return AssetExchangeQuote(swapDirection, quote, path.toQuotePath())
     }
 
-    private suspend fun quotePathBuy(path: Path<HydraDxSwapEdge>, amount: Balance): Balance {
-        return path.fold(amount) { currentAmount, segment ->
-            val args = AssetExchangeQuoteArgs(
-                chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
-                chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
-                amount = currentAmount,
-                swapDirection = SwapDirection.SPECIFIED_OUT,
-            )
+    private suspend fun quotePathBuy(path: Path<HydraDxSwapEdge>, amount: Balance): Balance? {
+        return runCatching {
+            path.fold(amount) { currentAmount, segment ->
+                val args = AssetExchangeQuoteArgs(
+                    chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
+                    chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
+                    amount = currentAmount,
+                    swapDirection = SwapDirection.SPECIFIED_OUT,
+                )
 
-            segment.swapSource().quote(args)
-        }
+                segment.swapSource().quote(args)
+            }
+        }.getOrNull()
     }
 
-    private suspend fun quotePathSell(path: Path<HydraDxSwapEdge>, amount: Balance): Balance {
-        return path.foldRight(amount) { segment, currentAmount ->
-            val args = AssetExchangeQuoteArgs(
-                chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
-                chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
-                amount = currentAmount,
-                swapDirection = SwapDirection.SPECIFIED_IN,
-            )
 
-            segment.swapSource().quote(args)
-        }
+    private suspend fun quotePathSell(path: Path<HydraDxSwapEdge>, amount: Balance): Balance? {
+        return runCatching {
+            path.foldRight(amount) { segment, currentAmount ->
+                val args = AssetExchangeQuoteArgs(
+                    chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
+                    chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
+                    amount = currentAmount,
+                    swapDirection = SwapDirection.SPECIFIED_IN,
+                )
+
+                segment.swapSource().quote(args)
+            }
+        }.getOrNull()
     }
 
     private val SwapExecuteArgs.usedFeeAsset: Chain.Asset
@@ -329,7 +339,7 @@ private class HydraDxExchange(
     }
 
     private suspend fun ExtrinsicBuilder.executeRouterSwap(args: SwapExecuteArgs) {
-        when(val limit = args.swapLimit) {
+        when (val limit = args.swapLimit) {
             is SwapLimit.SpecifiedIn -> executeRouterSell(args, limit)
             is SwapLimit.SpecifiedOut -> executeRouterBuy(args, limit)
         }
@@ -369,8 +379,8 @@ private class HydraDxExchange(
 
             structOf(
                 "pool" to source.routerPoolTypeFor(segment.sourceParams),
-                "asset_in" to hydraDxAssetIdConverter.toOnChainIdOrThrow(segment.from),
-                "asset_out" to hydraDxAssetIdConverter.toOnChainIdOrThrow(segment.to)
+                "assetIn" to hydraDxAssetIdConverter.toOnChainIdOrThrow(segment.from),
+                "assetOut" to hydraDxAssetIdConverter.toOnChainIdOrThrow(segment.to)
             )
         }
     }

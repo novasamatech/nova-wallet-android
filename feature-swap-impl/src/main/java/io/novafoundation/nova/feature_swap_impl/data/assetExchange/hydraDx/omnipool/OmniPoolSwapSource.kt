@@ -183,7 +183,7 @@ private class OmniPoolSwapSource(
     }
 
     override fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*> {
-        return DictEnum.Entry(identifier, null)
+        return DictEnum.Entry("Omnipool", null)
     }
 
     private suspend fun getPooledOnChainAssetIds(): List<BigInteger> {

@@ -123,7 +123,7 @@ private class AssetConversionExchange(
             )
         )
 
-        return AssetExchangeQuote(quote = quotedBalance, path = quotePath)
+        return AssetExchangeQuote(quote = quotedBalance, path = quotePath, direction = args.swapDirection)
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
