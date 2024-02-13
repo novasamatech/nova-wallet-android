@@ -58,14 +58,36 @@ fun <N, E: Edge<N>> Graph<N, E>.findConnectedComponents(): List<ConnectedCompone
 
 fun  <N, E: Edge<N>> Graph<N, E>.findAllPossibleDirections(): MultiMap<N, N> {
     val connectedComponents = findConnectedComponents()
+    return connectedComponents.findAllPossibleDirections()
+}
+
+fun  <N, E: Edge<N>> Graph<N, E>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
+    val connectedComponents = findConnectedComponents()
+    return connectedComponents.findAllPossibleDirectionsToList()
+}
+
+fun <N> List<ConnectedComponent<N>>.findAllPossibleDirections(): MultiMap<N, N> {
     val result = mutableMapOf<N, Set<N>>()
 
-    connectedComponents.forEach { connectedComponent ->
+    forEach { connectedComponent ->
         val asSet = connectedComponent.toSet()
 
         asSet.forEach { node ->
             // in the connected component every node is connected to every other except itself
             result[node] = asSet - node
+        }
+    }
+
+    return result
+}
+
+fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
+    val result = mutableMapOf<N, List<N>>()
+
+    forEach { connectedComponent ->
+        connectedComponent.forEach { node ->
+            // in the connected component every node is connected to every other except itself
+            result[node] = connectedComponent - node
         }
     }
 

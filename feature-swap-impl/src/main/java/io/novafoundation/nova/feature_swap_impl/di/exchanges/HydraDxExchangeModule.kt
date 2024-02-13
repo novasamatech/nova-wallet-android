@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.Hydra
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.RealHydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -36,6 +37,22 @@ class HydraDxExchangeModule {
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     ): HydraDxSwapSource.Factory {
         return OmniPoolSwapSourceFactory(
+            remoteStorageSource = remoteStorageSource,
+            chainRegistry = chainRegistry,
+            assetSourceRegistry = assetSourceRegistry,
+            hydraDxAssetIdConverter = hydraDxAssetIdConverter
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun provideStableSwapSourceFactory(
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        chainRegistry: ChainRegistry,
+        assetSourceRegistry: AssetSourceRegistry,
+        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    ): HydraDxSwapSource.Factory {
+        return StableSwapSourceFactory(
             remoteStorageSource = remoteStorageSource,
             chainRegistry = chainRegistry,
             assetSourceRegistry = assetSourceRegistry,
