@@ -13,16 +13,17 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
+import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -77,6 +78,8 @@ class AssetConversionExchangeFactory(
     }
 }
 
+private const val SOURCE_ID = "AssetConversion"
+
 private class AssetConversionExchange(
     private val chain: Chain,
     private val multiLocationConverter: MultiLocationConverter,
@@ -100,16 +103,27 @@ private class AssetConversionExchange(
         }
     }
 
-    override suspend fun quote(args: SwapQuoteArgs): AssetExchangeQuote {
+    override suspend fun quote(args: AssetExchangeQuoteArgs): AssetExchangeQuote {
         val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
         val quotedBalance = runtimeCallsApi.quote(
             swapDirection = args.swapDirection,
-            assetIn = args.tokenIn.configuration,
-            assetOut = args.tokenOut.configuration,
+            assetIn = args.chainAssetIn,
+            assetOut = args.chainAssetOut,
             amount = args.amount
         ) ?: throw SwapQuoteException.NotEnoughLiquidity
 
-        return AssetExchangeQuote(quote = quotedBalance)
+        val quotePath = QuotePath(
+            segments = listOf(
+                QuotePath.Segment(
+                    from = args.chainAssetIn.fullId,
+                    to = args.chainAssetOut.fullId,
+                    sourceId = SOURCE_ID,
+                    sourceParams = emptyMap()
+                )
+            )
+        )
+
+        return AssetExchangeQuote(quote = quotedBalance, path = quotePath)
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {

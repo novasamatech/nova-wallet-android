@@ -5,10 +5,11 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
+import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -33,7 +34,7 @@ interface AssetExchange {
     suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId>
 
     @Throws(SwapQuoteException::class)
-    suspend fun quote(args: SwapQuoteArgs): AssetExchangeQuote
+    suspend fun quote(args: AssetExchangeQuoteArgs): AssetExchangeQuote
 
     suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee
 
@@ -44,8 +45,17 @@ interface AssetExchange {
     fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 }
 
+data class AssetExchangeQuoteArgs(
+    val chainAssetIn: Chain.Asset,
+    val chainAssetOut: Chain.Asset,
+    val amount: Balance,
+    val swapDirection: SwapDirection,
+)
+
 class AssetExchangeQuote(
     val quote: Balance,
+
+    val path: QuotePath
 )
 
 class AssetExchangeFee(

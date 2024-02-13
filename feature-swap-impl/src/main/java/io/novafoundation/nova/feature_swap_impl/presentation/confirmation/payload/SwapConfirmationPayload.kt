@@ -25,7 +25,16 @@ class SwapConfirmationPayload(
         val planksOut: Balance,
         val direction: SwapDirectionModel,
         val priceImpact: Double,
+        val path: List<SwapQuotePathModel>
     ) : Parcelable
+
+    @Parcelize
+    class SwapQuotePathModel(
+        val from: AssetPayload,
+        val to: AssetPayload,
+        val sourceId: String,
+        val sourceParams: Map<String, String>
+    ): Parcelable
 
     @Parcelize
     class FeeDetails(

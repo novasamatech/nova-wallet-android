@@ -49,7 +49,7 @@ internal class RealHydraDxAssetIdConverter(
         }
     }
 
-    private fun Chain.Asset.requireOmniPoolTokenId(runtimeSnapshot: RuntimeSnapshot): HydraDxAssetId {
+    private fun Chain.Asset.requireHydraDxAssetId(runtimeSnapshot: RuntimeSnapshot): HydraDxAssetId {
         return requireNotNull(omniPoolTokenIdOrNull(runtimeSnapshot))
     }
 }

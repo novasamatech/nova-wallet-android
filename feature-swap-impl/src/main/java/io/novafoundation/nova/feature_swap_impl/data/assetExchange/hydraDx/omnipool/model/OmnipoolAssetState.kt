@@ -2,17 +2,18 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omni
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 class OmnipoolAssetState(
-    val tokenId: OmniPoolTokenId,
+    val tokenId: HydraDxAssetId,
     val hubReserve: Balance,
     val shares: Balance,
     val protocolShares: Balance,
     val tradeability: Tradeability
 )
 
-fun bindOmnipoolAssetState(decoded: Any?, tokenId: OmniPoolTokenId): OmnipoolAssetState {
+fun bindOmnipoolAssetState(decoded: Any?, tokenId: HydraDxAssetId): OmnipoolAssetState {
     val struct = decoded.castToStruct()
 
     return OmnipoolAssetState(

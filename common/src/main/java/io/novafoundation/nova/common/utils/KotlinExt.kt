@@ -5,7 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import org.web3j.utils.Numeric
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -54,6 +56,12 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
     }
 
     return destination
+}
+
+suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
+    return coroutineScope {
+        map { async { operation(it) } }
+    }.awaitAll()
 }
 
 fun ByteArray.startsWith(prefix: ByteArray): Boolean {

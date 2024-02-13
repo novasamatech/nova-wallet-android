@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
@@ -46,7 +45,6 @@ import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -56,7 +54,6 @@ import kotlinx.coroutines.withContext
 
 class SwapInteractor(
     private val swapService: SwapService,
-    private val chainStateRepository: ChainStateRepository,
     private val buyTokenRegistry: BuyTokenRegistry,
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val assetSourceRegistry: AssetSourceRegistry,
@@ -185,7 +182,7 @@ class SwapInteractor(
         val nativeChainAssetIn = chainIn.commissionAsset
 
         val executeArgs = quoteArgs.toExecuteArgs(
-            quotedBalance = swapQuote.quotedBalance,
+            quote = swapQuote,
             customFeeAsset = feeAsset,
             nativeAsset = walletRepository.getAsset(metaAccount.id, nativeChainAssetIn) ?: return null
         )
