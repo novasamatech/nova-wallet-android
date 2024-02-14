@@ -76,7 +76,7 @@ class RealPushSubscriptionService(
         val deferreds = mutableListOf<Deferred<Void>>()
         deferreds += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
 
-        //TODO unsubscribe from old gov topics
+        // TODO unsubscribe from old gov topics
         deferreds += pushSettings.governanceState.flatMapChainToTracks()
             .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
 

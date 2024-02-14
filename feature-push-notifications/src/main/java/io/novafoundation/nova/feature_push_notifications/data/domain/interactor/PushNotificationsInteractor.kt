@@ -26,7 +26,7 @@ class RealPushNotificationsInteractor(
 ) : PushNotificationsInteractor {
 
     override suspend fun syncSettings() {
-        //TODO: To handle case when user disable a permission in settings
+        // TODO: To handle case when user disable a permission in settings
     }
 
     override fun pushNotificationsEnabledFlow(): Flow<Boolean> {

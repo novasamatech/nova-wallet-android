@@ -5,7 +5,6 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.PushSettingsFragment
-import io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.PushWelcomeFragment
 
 @Subcomponent(
     modules = [

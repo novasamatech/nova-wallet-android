@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository

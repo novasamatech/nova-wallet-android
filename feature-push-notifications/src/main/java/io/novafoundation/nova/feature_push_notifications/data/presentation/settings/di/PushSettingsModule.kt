@@ -9,12 +9,9 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
-import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.PushSettingsViewModel
-import io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.PushWelcomeViewModel
 
 @Module(includes = [ViewModelModule::class])
 class PushSettingsModule {

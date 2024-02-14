@@ -74,4 +74,3 @@ fun ResourceManager.mapBooleanToState(isEnabled: Boolean): String {
 }
 
 private fun List<String>.joinPreviewItems(previewItemsCount: Int): String = take(previewItemsCount).joinToString(separator = ", ")
-

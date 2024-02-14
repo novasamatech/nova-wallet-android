@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_push_notifications.data.data.settings.Push
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.isAnyGovEnabled
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.isNotEmpty
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

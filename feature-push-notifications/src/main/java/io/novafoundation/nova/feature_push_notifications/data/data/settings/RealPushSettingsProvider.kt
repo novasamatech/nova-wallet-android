@@ -1,15 +1,9 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.settings
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonSerializer
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.utils.gson.SealedTypeAdapterFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 private const val PUSH_SETTINGS_KEY = "push_settings"
 private const val PREFS_PUSH_NOTIFICATIONS_ENABLED = "push_notifications_enabled"

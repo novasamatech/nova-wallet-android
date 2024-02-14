@@ -4,7 +4,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
-import io.novafoundation.nova.common.utils.repeatUntil
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
@@ -76,7 +75,7 @@ class RealPushNotificationsService(
     private suspend fun setPushNotificationsEnabled(isEnable: Boolean) {
         if (isEnable == isPushNotificationsEnabled()) return
         skipTokenCallback = true
-        
+
         val pushToken = if (isEnable) {
             NovaFirebaseMessagingService.requestToken()
         } else {

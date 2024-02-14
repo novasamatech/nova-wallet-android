@@ -57,12 +57,11 @@ fun PushSettings.ChainFeature.isNotEmpty(): Boolean {
 }
 
 fun PushSettings.isAnyGovEnabled(): Boolean {
-    return governanceState.isNotEmpty()
-        || newReferenda.isNotEmpty()
-        || govMyDelegatorVoted.isNotEmpty()
-        || govMyReferendumFinished.isNotEmpty()
+    return governanceState.isNotEmpty() ||
+        newReferenda.isNotEmpty() ||
+        govMyDelegatorVoted.isNotEmpty() ||
+        govMyReferendumFinished.isNotEmpty()
 }
-
 
 fun MetaAccount.toWalletSettings(): PushSettings.Wallet {
     return PushSettings.Wallet(

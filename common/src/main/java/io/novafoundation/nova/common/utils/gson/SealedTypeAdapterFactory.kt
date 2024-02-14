@@ -36,7 +36,9 @@ class SealedTypeAdapterFactory<T : Any> private constructor(
             override fun write(writer: JsonWriter, value: R) {
                 val srcType = value::class
                 val label = srcType.simpleName!!
-                @Suppress("UNCHECKED_CAST") val delegate = subclassToDelegate[srcType] as TypeAdapter<R>
+
+                @Suppress("UNCHECKED_CAST")
+                val delegate = subclassToDelegate[srcType] as TypeAdapter<R>
                 val jsonObject = delegate.toJsonTree(value).asJsonObject
 
                 if (jsonObject.has(typeFieldName)) {
