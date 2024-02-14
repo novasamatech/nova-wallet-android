@@ -103,10 +103,10 @@ private class StableSwapSource(
         val poolId = args.params.poolIdParam()
         val relevantPool = allPools.first { it.sharedAsset.id == poolId }
 
-        val omniPoolTokenIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.chainAssetIn)
-        val omniPoolTokenIdOut = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.chainAssetOut)
+        val hydraDxAssetIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.chainAssetIn)
+        val hydraDxAssetIdOut = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.chainAssetOut)
 
-        return relevantPool.quote(omniPoolTokenIdIn, omniPoolTokenIdOut, args.amount, args.swapDirection)
+        return relevantPool.quote(hydraDxAssetIdIn, hydraDxAssetIdOut, args.amount, args.swapDirection)
             ?: throw SwapQuoteException.NotEnoughLiquidity
     }
 
