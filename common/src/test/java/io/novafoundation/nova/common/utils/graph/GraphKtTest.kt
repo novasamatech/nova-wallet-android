@@ -68,11 +68,17 @@ internal class GraphKtTest {
             4 to listOf(1, 2)
         )
 
-        val actual = graph.findDijkstraPathsBetween(2, 3, limit = 3)
-        val expected = listOf(
+        var actual = graph.findDijkstraPathsBetween(2, 3, limit = 3)
+        var expected = listOf(
             listOf(SimpleEdge(2, 3)),
             listOf(SimpleEdge(2, 1), SimpleEdge(1, 3)),
             listOf(SimpleEdge(2, 4), SimpleEdge(4, 1), SimpleEdge(1, 3)),
+        )
+        assertListEquals(expected, actual)
+
+        actual = graph.findDijkstraPathsBetween(2, 3, limit = 1)
+        expected = listOf(
+            listOf(SimpleEdge(2, 3)),
         )
 
         assertListEquals(expected, actual)

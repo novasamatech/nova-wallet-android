@@ -120,7 +120,7 @@ fun <N, E: Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: 
             continue
         }
 
-        if (newCount < limit) {
+        if (newCount <= limit) {
             adjacencyList.getValue(lastNode).forEach { edge ->
                 if (edge.to in minimumQueueElement.nodeList) return@forEach
 

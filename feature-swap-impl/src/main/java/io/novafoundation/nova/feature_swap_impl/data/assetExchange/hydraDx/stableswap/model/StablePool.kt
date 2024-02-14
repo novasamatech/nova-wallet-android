@@ -84,7 +84,7 @@ fun StablePool.calculateInGivenOut(
 ): Balance? {
     return when {
         assetOut == sharedAsset.id -> calculateAddOneAsset(assetIn, amountOut)
-        assetIn == sharedAsset.id -> calculateSharesForAmount(assetIn, amountOut)
+        assetIn == sharedAsset.id -> calculateSharesForAmount(assetOut, amountOut)
         else -> calculateIn(assetIn, assetOut, amountOut)
     }
 }
@@ -177,7 +177,7 @@ private fun StablePool.calculateOut(
     ).fromBridgeResultToBalance()
 }
 
-private class SharesAssetInput(val assetId: Int, val amount: String)
+private class SharesAssetInput(@SerializedName("asset_id") val assetId: Int, val amount: String)
 
 private class ReservesInput(
     val amount: String,
