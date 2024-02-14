@@ -6,6 +6,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.h
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Extractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Factory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.hydraDx.HydraDxOmniPoolSwapExtractor
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.hydraDx.HydraDxRouterSwapExtractor
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.walkToList
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -20,22 +22,22 @@ internal class SubstrateRealtimeOperationFetcherFactory(
 ) : Factory {
 
     override fun create(sources: List<Factory.Source>): SubstrateRealtimeOperationFetcher {
-        val extractors = sources.map { it.extractor() }
+        val extractors = sources.flatMap { it.extractors() }
 
         return RealSubstrateRealtimeOperationFetcher(eventsRepository, extractors, extrinsicWalk)
     }
 
-    private fun Factory.Source.extractor(): Extractor {
+    private fun Factory.Source.extractors(): List<Extractor> {
         return when (this) {
-            is Factory.Source.FromExtractor -> extractor
-            is Factory.Source.Known -> id.extractor()
+            is Factory.Source.FromExtractor -> listOf(extractor)
+            is Factory.Source.Known -> id.extractors()
         }
     }
 
-    private fun Factory.Source.Known.Id.extractor(): Extractor {
+    private fun Factory.Source.Known.Id.extractors(): List<Extractor> {
         return when (this) {
-            Factory.Source.Known.Id.ASSET_CONVERSION_SWAP -> assetConversionSwap()
-            Factory.Source.Known.Id.HYDRA_DX_SWAP -> hydraDxOmniPoolSwap()
+            Factory.Source.Known.Id.ASSET_CONVERSION_SWAP -> listOf(assetConversionSwap())
+            Factory.Source.Known.Id.HYDRA_DX_SWAP -> listOf(hydraDxOmniPoolSwap(), hydraDxRouterSwap())
         }
     }
 
@@ -45,6 +47,10 @@ internal class SubstrateRealtimeOperationFetcherFactory(
 
     private fun hydraDxOmniPoolSwap(): Extractor {
         return HydraDxOmniPoolSwapExtractor(hydraDxAssetIdConverter)
+    }
+
+    private fun hydraDxRouterSwap(): Extractor {
+        return HydraDxRouterSwapExtractor(hydraDxAssetIdConverter)
     }
 }
 

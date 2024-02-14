@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.hydraDx
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
@@ -10,23 +10,24 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmou
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findLastEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNativeFee
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 
-class HydraDxOmniPoolSwapExtractor(
+abstract class BaseHydraDxSwapExtractor(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : SubstrateRealtimeOperationFetcher.Extractor {
 
-    private val calls = listOf("buy", "sell")
+    abstract fun isSwap(call: GenericCall.Instance): Boolean
+
+    protected abstract fun ExtrinsicVisit.extractSwapArgs(): SwapArgs
 
     override suspend fun extractRealtimeHistoryUpdates(
         extrinsicVisit: ExtrinsicVisit,
         chain: Chain,
         chainAsset: Chain.Asset
     ): RealtimeHistoryUpdate.Type? {
-        if (!extrinsicVisit.call.isSwap()) return null
+        if (!isSwap(extrinsicVisit.call)) return null
 
         val (assetIdIn, assetIdOut, amountIn, amountOut) = extrinsicVisit.extractSwapArgs()
 
@@ -44,46 +45,6 @@ class HydraDxOmniPoolSwapExtractor(
         )
     }
 
-    private fun ExtrinsicVisit.extractSwapArgs(): SwapArgs {
-        val swapExecutedEvent = events.findEvent(Modules.OMNIPOOL, "BuyExecuted")
-            ?: events.findEvent(Modules.OMNIPOOL, "SellExecuted")
-
-        return when {
-            // successful swap, extract from event
-            swapExecutedEvent != null -> {
-                val (_, assetIn, assetOut, amountIn, amountOut) = swapExecutedEvent.arguments
-
-                SwapArgs(
-                    assetIn = bindNumber(assetIn),
-                    assetOut = bindNumber(assetOut),
-                    amountIn = bindNumber(amountIn),
-                    amountOut = bindNumber(amountOut)
-                )
-            }
-
-            // failed swap, extract from call args
-            call.function.name == "sell" -> {
-                SwapArgs(
-                    assetIn = bindNumber(call.arguments["asset_in"]),
-                    assetOut = bindNumber(call.arguments["asset_out"]),
-                    amountIn = bindNumber(call.arguments["amount"]),
-                    amountOut = bindNumber(call.arguments["min_buy_amount"])
-                )
-            }
-
-            call.function.name == "buy" -> {
-                SwapArgs(
-                    assetIn = bindNumber(call.arguments["asset_in"]),
-                    assetOut = bindNumber(call.arguments["asset_out"]),
-                    amountIn = bindNumber(call.arguments["max_sell_amount"]),
-                    amountOut = bindNumber(call.arguments["amount"])
-                )
-            }
-
-            else -> error("Unknown call")
-        }
-    }
-
     private suspend fun ExtrinsicVisit.extractFee(chain: Chain): ChainAssetWithAmount {
         val feeDepositEvent = rootExtrinsic.events.findLastEvent(Modules.CURRENCIES, "Deposited") ?: return nativeFee(chain)
 
@@ -99,10 +60,10 @@ class HydraDxOmniPoolSwapExtractor(
         return ChainAssetWithAmount(chain.utilityAsset, rootExtrinsic.events.requireNativeFee())
     }
 
-    private fun GenericCall.Instance.isSwap(): Boolean {
-        return module.name == Modules.OMNIPOOL &&
-            function.name in calls
-    }
-
-    private data class SwapArgs(val assetIn: HydraDxAssetId, val assetOut: HydraDxAssetId, val amountIn: HydraDxAssetId, val amountOut: HydraDxAssetId)
+    protected data class SwapArgs(
+        val assetIn: HydraDxAssetId,
+        val assetOut: HydraDxAssetId,
+        val amountIn: HydraDxAssetId,
+        val amountOut: HydraDxAssetId
+    )
 }
