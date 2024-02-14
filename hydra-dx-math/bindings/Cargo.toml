@@ -1,0 +1,32 @@
+[package]
+authors = ['Novasama Technologies']
+edition = '2021'
+license = 'Apache 2.0'
+name = "hydra-dx-math-java"
+repository = 'https://github.com/nova-wallet/nova-wallet-android'
+version = "0.1.0"
+
+[dependencies]
+#wee_alloc = "0.4.5"
+serde = { version = "1.0.169", features = ["derive"] }
+serde_json = "1.0.100"
+serde-aux = "4.2.0"
+sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="9e733374233e2bdef039d5b3e73c5e939d7512f4"}
+jni = { version = "0.17.0", default-features = false }
+
+[dev-dependencies]
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false}
+sp-runtime  = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
+
+[profile.release]
+lto = true
+
+[lib]
+name = "hydra_dx_math_java"
+crate_type = ["cdylib"]
+
+[features]
+default = ["std"]
+std = ["sp-arithmetic/std", "sp-runtime/std"]
+stableswap = []
