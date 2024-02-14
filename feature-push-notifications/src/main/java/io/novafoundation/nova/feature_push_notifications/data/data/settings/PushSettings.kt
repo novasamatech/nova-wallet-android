@@ -65,7 +65,7 @@ fun PushSettings.isAnyGovEnabled(): Boolean {
 
 fun MetaAccount.toWalletSettings(): PushSettings.Wallet {
     return PushSettings.Wallet(
-        baseEthereumAccount = ethereumAccountId(),
+        baseEthereumAccount = ethereumAddress,
         baseSubstrateAccount = substrateAccountId,
         chainAccounts = chainAccounts.mapValues { (_, chainAccount) -> chainAccount.accountId }
     )
