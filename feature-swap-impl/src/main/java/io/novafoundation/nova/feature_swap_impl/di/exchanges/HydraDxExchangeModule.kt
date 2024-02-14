@@ -70,7 +70,8 @@ class HydraDxExchangeModule {
         extrinsicService: ExtrinsicService,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         hydraDxNovaReferral: HydraDxNovaReferral,
-        swapSourceFactories: Set<@JvmSuppressWildcards HydraDxSwapSource.Factory>
+        swapSourceFactories: Set<@JvmSuppressWildcards HydraDxSwapSource.Factory>,
+        assetSourceRegistry: AssetSourceRegistry,
     ): HydraDxExchangeFactory {
         return HydraDxExchangeFactory(
             remoteStorageSource = remoteStorageSource,
@@ -78,7 +79,8 @@ class HydraDxExchangeModule {
             extrinsicService = extrinsicService,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             hydraDxNovaReferral = hydraDxNovaReferral,
-            swapSourceFactories = swapSourceFactories
+            swapSourceFactories = swapSourceFactories,
+            assetSourceRegistry = assetSourceRegistry
         )
     }
 }

@@ -40,8 +40,10 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSystemAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toChainAssetOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
@@ -76,7 +78,8 @@ class HydraDxExchangeFactory(
     private val extrinsicService: ExtrinsicService,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
-    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>
+    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetExchange.Factory {
 
     override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
@@ -87,7 +90,8 @@ class HydraDxExchangeFactory(
             extrinsicService = extrinsicService,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             hydraDxNovaReferral = hydraDxNovaReferral,
-            swapSourceFactories = swapSourceFactories
+            swapSourceFactories = swapSourceFactories,
+            assetSourceRegistry = assetSourceRegistry
         )
     }
 }
@@ -103,6 +107,7 @@ private class HydraDxExchange(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val assetSourceRegistry: AssetSourceRegistry,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : AssetExchange {
 
@@ -324,7 +329,16 @@ private class HydraDxExchange(
             amount = nativeFeeAmount,
             swapDirection = SwapDirection.SPECIFIED_OUT
         )
-        return quote(args).quote
+
+        val quotedFee = quote(args).quote
+
+        // TODO
+        // There is a issue in Router implementation in Hydra that doesn't allow asset balance to go below ED. We add it to fee for simplicity instead
+        // of refactoring SwapExistentialDepositAwareMaxActionProvider
+        // This should be removed once Router issue is fixed
+        val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, targetAsset)
+
+        return quotedFee + existentialDeposit
     }
 
     private suspend fun getPaymentCurrencyToSetIfNeeded(expectedPaymentAsset: Chain.Asset): HydraDxAssetId? {
