@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
 import coil.ImageLoader
+import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -119,4 +120,6 @@ interface SwapFeatureDependencies {
     val multiLocationConverterFactory: MultiLocationConverterFactory
 
     val hydraDxAssetIdConverter: HydraDxAssetIdConverter
+
+    val gson: Gson
 }

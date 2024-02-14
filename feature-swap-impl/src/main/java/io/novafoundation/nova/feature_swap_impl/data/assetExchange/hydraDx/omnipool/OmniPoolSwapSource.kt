@@ -3,19 +3,19 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omni
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMapList
 import io.novafoundation.nova.common.utils.dynamicFees
-import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.omnipool
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.padEnd
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSourceId
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSourceQuoteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraSwapDirection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPool
@@ -44,11 +44,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.runningFold
 import java.math.BigInteger
 
 class OmniPoolSwapSourceFactory(
@@ -56,7 +54,7 @@ class OmniPoolSwapSourceFactory(
     private val chainRegistry: ChainRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-): HydraDxSwapSource.Factory {
+) : HydraDxSwapSource.Factory {
 
     companion object {
 
@@ -125,7 +123,7 @@ private class OmniPoolSwapSource(
         }
     }
 
-    override suspend fun quote(args: AssetExchangeQuoteArgs): Balance {
+    override suspend fun quote(args: HydraDxSwapSourceQuoteArgs): Balance {
         val omniPool = omniPoolFlow.first()
 
         val omniPoolTokenIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.chainAssetIn)
@@ -153,7 +151,7 @@ private class OmniPoolSwapSource(
         }
             .toMultiSubscription(pooledAssets.size)
 
-        val poolAccountId = poolAccountId()
+        val poolAccountId = omniPoolAccountId()
 
         val omniPoolBalancesFlow = pooledAssets.map { (omniPoolTokenId, chainAssetId) ->
             val chainAsset = chain.assetsById.getValue(chainAssetId.assetId)
@@ -174,12 +172,11 @@ private class OmniPoolSwapSource(
 
         val defaultFees = getDefaultFees()
 
-        val poolStateUpdates = combine(omniPoolStateFlow, omniPoolBalancesFlow, feesFlow) { poolState, poolBalances, fees ->
+        return combine(omniPoolStateFlow, omniPoolBalancesFlow, feesFlow) { poolState, poolBalances, fees ->
             createOmniPool(poolState, poolBalances, fees, defaultFees)
         }
             .onEach(omniPoolFlow::emit)
-
-        return poolStateUpdates.map { }
+            .map { }
     }
 
     override fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*> {
@@ -227,19 +224,6 @@ private class OmniPoolSwapSource(
         }
 
         return OmniPool(tokensState)
-    }
-
-    private fun <K, V> List<Flow<Pair<K, V>>>.toMultiSubscription(expectedSize: Int): Flow<Map<K, V>> {
-        return mergeIfMultiple()
-            .runningFold(emptyMap<K, V>()) { accumulator, tokenIdWithBalance ->
-                accumulator + tokenIdWithBalance
-            }
-            .filter { it.size == expectedSize }
-    }
-
-
-    private fun poolAccountId(): AccountId {
-        return "modlomnipool".encodeToByteArray().padEnd(expectedSize = 32, padding = 0)
     }
 
     private fun ExtrinsicBuilder.sell(
@@ -297,4 +281,10 @@ private class OmniPoolSwapSource(
     }
 }
 
-private typealias RemoteAndLocalId = Pair<HydraDxAssetId, FullChainAssetId>
+fun omniPoolAccountId(): AccountId {
+    return "modlomnipool".encodeToByteArray().padEnd(expectedSize = 32, padding = 0)
+}
+
+typealias RemoteAndLocalId = Pair<HydraDxAssetId, FullChainAssetId>
+
+typealias RemoteAndLocalIdOptional = Pair<HydraDxAssetId, FullChainAssetId?>

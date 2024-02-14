@@ -2,9 +2,9 @@ package io.novafoundation.nova.common.utils.graph
 
 import io.novafoundation.nova.common.utils.MultiMapList
 
-class GraphBuilder<N, E: Edge<N>> {
+class GraphBuilder<N, E : Edge<N>> {
 
-    private val adjacencyList: MutableMap<N, MutableList<E>>  = mutableMapOf()
+    private val adjacencyList: MutableMap<N, MutableList<E>> = mutableMapOf()
 
     fun addEdge(from: N, to: E) {
         val fromEdges = adjacencyList.getOrPut(from) { mutableListOf() }
@@ -21,10 +21,8 @@ class GraphBuilder<N, E: Edge<N>> {
     }
 }
 
-fun <N, E: Edge<N>> GraphBuilder<N, E>.addEdges(map: MultiMapList<N, E>) {
+fun <N, E : Edge<N>> GraphBuilder<N, E>.addEdges(map: MultiMapList<N, E>) {
     map.forEach { (fromNode, toNodes) ->
         addEdges(fromNode, toNodes)
     }
 }
-
-

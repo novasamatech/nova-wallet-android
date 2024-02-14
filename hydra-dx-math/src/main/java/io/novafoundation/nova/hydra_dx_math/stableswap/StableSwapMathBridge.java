@@ -1,6 +1,6 @@
 package io.novafoundation.nova.hydra_dx_math.stableswap;
 
-class StableSwapMathBridge {
+public class StableSwapMathBridge {
 
     static {
         System.loadLibrary("hydra_dx_math_java");
@@ -19,7 +19,7 @@ class StableSwapMathBridge {
         String reserves,
         int asset_in,
         int asset_out,
-        String amount_in,
+        String amount_out,
         String amplification,
         String fee
     );

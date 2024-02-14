@@ -49,6 +49,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
+import jp.co.soramitsu.fearless_utils.scale.utils.toUnsignedBytes
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -95,6 +96,10 @@ val Short.bigEndianBytes
 
 fun ByteArray.toBigEndianShort(): Short = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).short
 fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
+
+fun BigInteger.toUnsignedLittleEndian(): ByteArray {
+    return toUnsignedBytes().reversedArray()
+}
 
 fun ByteArray.toBigEndianU32(): UInt = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).int.toUInt()
 
@@ -186,6 +191,8 @@ fun RuntimeMetadata.eqBalances() = module(Modules.EQ_BALANCES)
 
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
 
+fun RuntimeMetadata.assetRegistry() = module(Modules.ASSET_REGISTRY)
+
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
@@ -241,6 +248,10 @@ fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERS
 fun RuntimeMetadata.omnipoolOrNull() = moduleOrNull(Modules.OMNIPOOL)
 
 fun RuntimeMetadata.omnipool() = module(Modules.OMNIPOOL)
+
+fun RuntimeMetadata.stableSwapOrNull() = moduleOrNull(Modules.STABLE_SWAP)
+
+fun RuntimeMetadata.stableSwap() = module(Modules.STABLE_SWAP)
 
 fun RuntimeMetadata.dynamicFeesOrNull() = moduleOrNull(Modules.DYNAMIC_FEES)
 
@@ -415,4 +426,8 @@ object Modules {
     const val REFERRALS = "Referrals"
 
     const val ROUTER = "Router"
+
+    const val STABLE_SWAP = "Stableswap"
+
+    const val ASSET_REGISTRY = "AssetRegistry"
 }

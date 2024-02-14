@@ -61,12 +61,12 @@ class AssetExchangeQuote(
 ) : Comparable<AssetExchangeQuote> {
 
     override fun compareTo(other: AssetExchangeQuote): Int {
-       return when(direction) {
-           // When we want to sell a token, the bigger the quote - the better
-           SwapDirection.SPECIFIED_IN -> (quote - other.quote).signum()
-           // When we want to buy a token, the smaller the quote - the better
-           SwapDirection.SPECIFIED_OUT -> (other.quote - quote).signum()
-       }
+        return when (direction) {
+            // When we want to sell a token, the bigger the quote - the better
+            SwapDirection.SPECIFIED_IN -> (quote - other.quote).signum()
+            // When we want to buy a token, the smaller the quote - the better
+            SwapDirection.SPECIFIED_OUT -> (other.quote - quote).signum()
+        }
     }
 }
 

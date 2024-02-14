@@ -8,6 +8,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.runningFold
 import org.web3j.utils.Numeric
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -40,6 +43,14 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
         onSuccess = { transform(it) },
         onFailure = { this as Result<R> }
     )
+}
+
+fun <K, V> List<Flow<Pair<K, V>>>.toMultiSubscription(expectedSize: Int): Flow<Map<K, V>> {
+    return mergeIfMultiple()
+        .runningFold(emptyMap<K, V>()) { accumulator, tokenIdWithBalance ->
+            accumulator + tokenIdWithBalance
+        }
+        .filter { it.size == expectedSize }
 }
 
 inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()

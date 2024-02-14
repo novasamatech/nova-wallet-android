@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.firstById
@@ -9,7 +10,7 @@ import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDirections
-import io.novafoundation.nova.common.utils.graph.findBfsPathsBetween
+import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.orZero
@@ -31,6 +32,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
@@ -38,11 +40,15 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSystemAsset
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toChainAssetOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.fullId
@@ -64,7 +70,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
-private const val PATHS_LIMIT = 5
+private const val PATHS_LIMIT = 4
 
 class HydraDxExchangeFactory(
     private val remoteStorageSource: StorageDataSource,
@@ -72,7 +78,8 @@ class HydraDxExchangeFactory(
     private val extrinsicService: ExtrinsicService,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
-    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>
+    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetExchange.Factory {
 
     override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
@@ -83,7 +90,8 @@ class HydraDxExchangeFactory(
             extrinsicService = extrinsicService,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             hydraDxNovaReferral = hydraDxNovaReferral,
-            swapSourceFactories = swapSourceFactories
+            swapSourceFactories = swapSourceFactories,
+            assetSourceRegistry = assetSourceRegistry
         )
     }
 }
@@ -98,7 +106,9 @@ private class HydraDxExchange(
     private val extrinsicService: ExtrinsicService,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
-    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>
+    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val assetSourceRegistry: AssetSourceRegistry,
+    private val debug: Boolean = BuildConfig.DEBUG
 ) : AssetExchange {
 
     private val swapSources: List<HydraDxSwapSource> = createSources()
@@ -144,12 +154,16 @@ private class HydraDxExchange(
         val paths = pathsFromCacheOrCompute(from, to) {
             val graph = graphState.first()
 
-            graph.findBfsPathsBetween(from, to, limit = PATHS_LIMIT)
+            graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT)
         }
 
         val quotedPaths = paths.mapNotNull { path -> quotePath(path, args.amount, args.swapDirection) }
         if (paths.isEmpty()) {
             throw SwapQuoteException.NotEnoughLiquidity
+        }
+
+        if (debug) {
+            logQuotes(args, quotedPaths)
         }
 
         return quotedPaths.max()
@@ -254,12 +268,13 @@ private class HydraDxExchange(
 
     private suspend fun quotePathBuy(path: Path<HydraDxSwapEdge>, amount: Balance): Balance? {
         return runCatching {
-            path.fold(amount) { currentAmount, segment ->
-                val args = AssetExchangeQuoteArgs(
+            path.foldRight(amount) { segment, currentAmount ->
+                val args = HydraDxSwapSourceQuoteArgs(
                     chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
                     chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
                     amount = currentAmount,
                     swapDirection = SwapDirection.SPECIFIED_OUT,
+                    params = segment.direction.params
                 )
 
                 segment.swapSource().quote(args)
@@ -267,15 +282,15 @@ private class HydraDxExchange(
         }.getOrNull()
     }
 
-
     private suspend fun quotePathSell(path: Path<HydraDxSwapEdge>, amount: Balance): Balance? {
         return runCatching {
-            path.foldRight(amount) { segment, currentAmount ->
-                val args = AssetExchangeQuoteArgs(
+            path.fold(amount) { currentAmount, segment ->
+                val args = HydraDxSwapSourceQuoteArgs(
                     chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
                     chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
                     amount = currentAmount,
                     swapDirection = SwapDirection.SPECIFIED_IN,
+                    params = segment.direction.params
                 )
 
                 segment.swapSource().quote(args)
@@ -314,7 +329,16 @@ private class HydraDxExchange(
             amount = nativeFeeAmount,
             swapDirection = SwapDirection.SPECIFIED_OUT
         )
-        return quote(args).quote
+
+        val quotedFee = quote(args).quote
+
+        // TODO
+        // There is a issue in Router implementation in Hydra that doesn't allow asset balance to go below ED. We add it to fee for simplicity instead
+        // of refactoring SwapExistentialDepositAwareMaxActionProvider
+        // This should be removed once Router issue is fixed
+        val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, targetAsset)
+
+        return quotedFee + existentialDeposit
     }
 
     private suspend fun getPaymentCurrencyToSetIfNeeded(expectedPaymentAsset: Chain.Asset): HydraDxAssetId? {
@@ -476,6 +500,54 @@ private class HydraDxExchange(
 
     private fun createSources(): List<HydraDxSwapSource> {
         return swapSourceFactories.map { it.create(chain) }
+    }
+
+    private suspend fun logQuotes(args: AssetExchangeQuoteArgs, quotes: List<AssetExchangeQuote>) {
+        val allCandidates = quotes.sortedDescending().map {
+            val formattedIn = args.amount.formatPlanks(args.chainAssetIn)
+            val formattedOut = it.quote.formatPlanks(args.chainAssetOut)
+            val formattedPath = formatPath(it.path)
+
+            "$formattedIn to $formattedOut via $formattedPath"
+        }.joinToString(separator = "\n")
+
+        Log.d("RealSwapService", "-------- New quote ----------")
+        Log.d("RealSwapService", allCandidates)
+        Log.d("RealSwapService", "-------- Done quote ----------\n\n\n")
+    }
+
+    private suspend fun formatPath(path: QuotePath): String {
+        val assets = chain.assetsById
+
+        return buildString {
+            val firstSegment = path.segments.first()
+
+            append(assets.getValue(firstSegment.from.assetId).symbol)
+
+            append("  -- ${formatSource(firstSegment)} -->  ")
+
+            append(assets.getValue(firstSegment.to.assetId).symbol)
+
+            path.segments.subList(1, path.segments.size).onEach { segment ->
+                append("  -- ${formatSource(segment)} -->  ")
+
+                append(assets.getValue(segment.to.assetId).symbol)
+            }
+        }
+    }
+
+    private suspend fun formatSource(segment: QuotePath.Segment): String {
+        return buildString {
+            append(segment.sourceId)
+
+            val stableswapPoolId = segment.sourceParams["PoolId"]
+            if (stableswapPoolId != null) {
+                val onChainId = stableswapPoolId.toBigInteger()
+                val chainAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, onChainId)
+
+                append("[${chainAsset.symbol}]")
+            }
+        }
     }
 }
 

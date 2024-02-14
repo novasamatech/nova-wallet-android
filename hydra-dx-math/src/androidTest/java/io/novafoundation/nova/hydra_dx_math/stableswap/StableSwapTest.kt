@@ -233,4 +233,39 @@ class StableSwapTest {
 
         assertEquals("99999999999999", result.toString())
     }
+
+    @Test
+    fun failingCase() {
+        val data = """
+      [{"amount":"2246975221087","decimals":6,"asset_id":10},{"amount":"2256486088023","decimals":6,"asset_id":22}]
+        """
+
+        val result = StableSwapMathBridge.calculate_liquidity_out_one_asset(
+            data,
+            "1000000000",
+            10,
+            "100",
+            "4502091550542833181457210",
+            "0.00040"
+        )
+
+        assertEquals("99999999999999", result.toString())
+    }
+
+    @Test
+    fun failingCase2() {
+        val data = """
+[{"amount":"505342304916","decimals":6,"asset_id":10},{"amount":"368030436758902944990436","decimals":18,"asset_id":18},{"amount":"410374848833","decimals":6,"asset_id":21},{"amount":"0","decimals":6,"asset_id":23}]        """
+
+        val result = StableSwapMathBridge.calculate_shares_for_amount(
+            data,
+            10,
+            "10",
+            "320",
+            "1662219218861236418723363",
+            "0.00040"
+        )
+
+        assertEquals("99999999999999", result.toString())
+    }
 }

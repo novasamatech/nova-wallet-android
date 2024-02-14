@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
@@ -50,6 +51,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
 private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
@@ -88,27 +90,27 @@ internal class RealSwapService(
     }
 
     override suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote> {
-        val computationScope = CoroutineScope(coroutineContext)
+        return withContext(Dispatchers.Default) {
+            runCatching {
+                val exchange = exchanges(this).getValue(args.tokenIn.configuration.chainId)
+                val quoteArgs = AssetExchangeQuoteArgs(
+                    chainAssetIn = args.tokenIn.configuration,
+                    chainAssetOut = args.tokenOut.configuration,
+                    amount = args.amount,
+                    swapDirection = args.swapDirection
+                )
+                val quote = exchange.quote(quoteArgs)
 
-        return runCatching {
-            val exchange = exchanges(computationScope).getValue(args.tokenIn.configuration.chainId)
-            val quoteArgs = AssetExchangeQuoteArgs(
-                chainAssetIn = args.tokenIn.configuration,
-                chainAssetOut = args.tokenOut.configuration,
-                amount = args.amount,
-                swapDirection = args.swapDirection
-            )
-            val quote = exchange.quote(quoteArgs)
+                val (amountIn, amountOut) = args.inAndOutAmounts(quote)
 
-            val (amountIn, amountOut) = args.inAndOutAmounts(quote)
-
-            SwapQuote(
-                amountIn = args.tokenIn.configuration.withAmount(amountIn),
-                amountOut = args.tokenOut.configuration.withAmount(amountOut),
-                direction = args.swapDirection,
-                priceImpact = args.calculatePriceImpact(amountIn, amountOut),
-                path = quote.path
-            )
+                SwapQuote(
+                    amountIn = args.tokenIn.configuration.withAmount(amountIn),
+                    amountOut = args.tokenOut.configuration.withAmount(amountOut),
+                    direction = args.swapDirection,
+                    priceImpact = args.calculatePriceImpact(amountIn, amountOut),
+                    path = quote.path
+                )
+            }
         }
     }
 
@@ -138,7 +140,7 @@ internal class RealSwapService(
         return withFlowScope { scope ->
             val exchanges = exchanges(scope)
             exchanges.getValue(chainIn.id).runSubscriptions(chainIn, metaAccount)
-        }
+        }.throttleLast(500.milliseconds)
     }
 
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {

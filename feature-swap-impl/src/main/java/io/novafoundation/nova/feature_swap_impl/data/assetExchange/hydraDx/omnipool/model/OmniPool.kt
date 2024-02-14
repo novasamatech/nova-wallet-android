@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.H
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import kotlin.math.floor
 
-
 class OmniPool(
     val tokens: Map<HydraDxAssetId, OmniPoolToken>,
 )
