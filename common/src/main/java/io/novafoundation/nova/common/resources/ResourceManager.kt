@@ -39,7 +39,7 @@ interface ResourceManager {
 
     fun getDimensionPixelSize(id: Int): Int
 
-    fun getFont(@FontRes fontRes: Int): Typeface
+    fun getFont(@FontRes fontRes: Int): Typeface?
 }
 
 fun ResourceManager.formatTimeLeft(elapsedTimeInMillis: Long): String {

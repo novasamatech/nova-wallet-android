@@ -19,7 +19,7 @@ fun ValidationSystem.Companion.yieldBoost(
         error = { context ->
             YieldBoostValidationFailure.NotEnoughToPayToPayFees(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }

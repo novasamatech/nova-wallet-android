@@ -83,7 +83,7 @@
                         app:title="@string/delegation_undelegating_period"
                         app:titleEllipsisable="true"
                         app:titleIconStart="@drawable/ic_time_16"
-                        app:titleIconTint="@color/icon_secondary" />
+                        app:titleIconStartTint="@color/icon_secondary" />
 
                 </io.novafoundation.nova.common.view.TableView>
 

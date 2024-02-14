@@ -1,8 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="staking_manage_proxy_requires_stash_title">Select stash account to setup proxy</string>
+    <string name="staking_manage_proxy_requires_stash_message">Please switch your wallet to %s to setup a proxy</string>
+
+    <string name="common_network_not_supported">%s not supported</string>
+
+    <string name="remove_proxy_confirmation_revoke_access_type">Revoke access type</string>
+    <string name="remove_proxy_confirmation_revoke_for">Revoke for</string>
+
+    <string name="common_add_delegation">Add delegation</string>
+
+    <string name="staking_proxies_group_title">Delegated authorities (proxy)</string>
+    <string name="common_proxy_rewoke_access">Revoke access</string>
+
+    <string name="proxy_access_type_staking_operations">Staking operations</string>
+
+    <string name="add_proxy_confirmation_delegating_wallet">Delegating wallet</string>
+    <string name="add_proxy_confirmation_delegating_account">Delegating account</string>
+    <string name="add_proxy_confirmation_grant_access_type">Grant access type</string>
+    <string name="add_proxy_confirmation_delegate_to">Delegate to</string>
+
+    <string name="staking_add_proxy_confirmation_title">Add delegation</string>
+
+    <string name="duplicate_proxy_type_title">Delegation already exists</string>
+    <string name="duplicate_proxy_type_message">You are already delegating to this account: %s</string>
+
+    <string name="invalid_proxy_address_title">Invalid proxy address</string>
+    <string name="invalid_proxy_address_message">Proxy address should be a valid %s address</string>
+
+    <string name="add_proxy_deposit_description_message">The deposit stays reserved on your account until the proxy is removed.</string>
+
+    <string name="add_proxy_maximum_reached_error_title">Maximum number of proxies has been reached</string>
+    <string name="add_proxy_maximum_reached_error_message">You have reached the limit of %s added proxies in %s. Remove proxies to add new ones.</string>
+
+    <string name="common_error_not_enough_tokens">Not enough tokens</string>
+    <string name="staking_not_enough_balance_to_pay_proxy_deposit_message">You don’t have enough balance for proxy deposit of %s. Available balance: %s</string>
+
+    <string name="staking_action_your_proxies">Your delegations</string>
+    <string name="staking_action_add_proxy">Add delegated authority (Proxy)</string>
+
+    <string name="set_staking_proxy_address_description">Give authority to</string>
+    <string name="common_proxy_deposit">Proxy deposit</string>
+    <string name="fragment_set_staking_proxy_title">Add delegation for %s staking</string>
+
+    <string name="common_enter_address">Enter address…</string>
+    <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn’t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
+    <string name="staking_no_access_to_controller_account_title">No access to controller account</string>
+    <string name="staking_no_access_to_controller_account_message">Add your controller account in device.</string>
+
+    <string name="staking_story_staking_page_1">Staking is an option to earn passive income by locking your tokens in the network. Staking rewards are allocated every era (6 hours on Kusama and 24 hours on Polkadot). You can stake as long as you wish, and for unstaking your tokens you need to wait for the unstaking period to end, making your tokens available to be redeemed.</string>
+
     <string name="proxy_signing_none_permissions_message">%1$s has not delegated %2$s</string>
 
-    <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn\'t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
     <string name="error_not_enough_to_pay_fee_title">Not enough tokens to pay the fee</string>
 
     <string name="proxied_wallet_details_info_warning">This account granted access to perform transactions to the following account:</string>
@@ -559,8 +609,6 @@
     <string name="delegation_delegate_filter_organizations">Organizations</string>
     <string name="delegation_delegate_filter_individuals">Individuals</string>
 
-    <string name="delegation_add_delegation">Add delegation</string>
-
     <string name="delegation_delegate_type_organization">Organization</string>
     <string name="delegation_delegate_type_individual">Individual</string>
 
@@ -624,9 +672,6 @@
     <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will not display the content</string>
 
     <string name="profile_settings_safe_mode_title">Safe mode</string>
-
-    <string name="stacking_no_access_to_controller_account_title">No access to controller account</string>
-    <string name="stacking_no_access_to_controller_account_message">Add your controller account in device.</string>
 
     <string name="dapp_options_title">Page settings</string>
     <string name="dapp_options_add_to_favorite">Add to Favorites</string>
@@ -1633,7 +1678,6 @@
     <string name="staking_story_reward_page_1">Rewards for staking are available to payout at the end of each era (6 hours in Kusama and 24 hours in Polkadot). Network stores pending rewards during 84 eras and in most cases validators are paying out the rewards for everyone. However, validators might forget or something might happen with them, so nominators can payout their rewards by themselves.</string>
     <string name="staking_story_reward_page_2">Although rewards are usually distributed by validators, Nova Wallet helps by alerting if there are any unpaid rewards that are close to expiring. You will receive alerts about this and other activities on the staking screen.</string>
     <string name="staking_story_reward_title">Receiving rewards</string>
-    <string name="staking_story_staking_page_1">Staking is an option to earn passive income by locking your tokens in the network. Staking rewards are allocated every era (6 hours on Kusama and 24 hours on Polkadot). You can stake as long as you wish, and for unstaking your tokens you need to wait for the unstacking period to end, making your tokens available to be redeemed.</string>
     <string name="staking_story_staking_page_2">Staking is an important part of network security and reliability. Anyone can run validator nodes, but only those who have enough tokens staked will be elected by the network to participate in composing new blocks and receive the rewards. Validators often do not have enough tokens by themselves, so nominators are helping them by locking their tokens for them to achieve the required amount of stake.</string>
     <string name="staking_story_staking_title">What is staking?</string>
     <string name="staking_story_validator_page_1">The validator runs a blockchain node 24/7 and is required to have enough stake locked (both owned and provided by nominators) to be elected by the network. Validators should maintain their nodes\' performance and reliability to be rewarded. Being a validator is almost a full-time job, there are companies that are focused to be validators on the blockchain networks.</string>

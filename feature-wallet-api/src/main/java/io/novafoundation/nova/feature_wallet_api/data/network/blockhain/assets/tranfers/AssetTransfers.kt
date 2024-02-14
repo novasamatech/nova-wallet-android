@@ -3,8 +3,9 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -43,10 +44,10 @@ data class WeightedAssetTransfer(
     override val destinationChainAsset: Chain.Asset,
     override val commissionAssetToken: Token,
     override val amount: BigDecimal,
-    val decimalFee: DecimalFee,
+    val decimalFee: OriginDecimalFee,
 ) : AssetTransfer {
 
-    constructor(assetTransfer: AssetTransfer, fee: DecimalFee) : this(
+    constructor(assetTransfer: AssetTransfer, fee: OriginDecimalFee) : this(
         sender = assetTransfer.sender,
         recipient = assetTransfer.recipient,
         originChain = assetTransfer.originChain,
@@ -64,6 +65,10 @@ val AssetTransfer.isCrossChain
 
 fun AssetTransfer.recipientOrNull(): AccountId? {
     return destinationChain.accountIdOrNull(recipient)
+}
+
+fun AssetTransfer.senderAccountId(): AccountId {
+    return sender.requireAccountIdIn(originChain)
 }
 
 interface AssetTransfers {

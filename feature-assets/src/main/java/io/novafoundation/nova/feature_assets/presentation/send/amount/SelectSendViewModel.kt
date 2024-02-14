@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.send.amount
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -13,12 +14,15 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.view.ChainChipModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -29,23 +33,25 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.CrossChainDestinationModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
+import io.novafoundation.nova.feature_assets.presentation.send.common.buildAssetTransfer
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.BaseAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -74,14 +80,15 @@ class SelectSendViewModel(
     private val initialRecipientAddress: String?,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    private val selectAddressRequester: SelectAddressForTransactionRequester,
     private val externalActions: ExternalActions.Presentation,
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
+    private val accountRepository: AccountRepository,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     addressInputMixinFactory: AddressInputMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
+    selectAddressMixinFactory: SelectAddressMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
@@ -94,6 +101,18 @@ class SelectSendViewModel(
 
     private val destinationAsset = destinationChainWithAsset.map { it.asset }
     private val destinationChain = destinationChainWithAsset.map { it.chain }
+
+    private val selectAddressPayloadFlow = combine(
+        originChain,
+        destinationChain
+    ) { origin, destination ->
+        SelectAddressMixin.Payload(
+            chain = destination,
+            filter = getMetaAccountsFilter(origin, destination)
+        )
+    }
+
+    val selectAddressMixin = selectAddressMixinFactory.create(this, selectAddressPayloadFlow, ::onAddressSelect)
 
     val addressInputMixin = with(addressInputMixinFactory) {
         val destinationChain = destinationChainWithAsset.map { it.chain }
@@ -117,11 +136,6 @@ class SelectSendViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val isSelectAddressAvailable = combine(originChain, destinationChain) { originChain, destinationChain ->
-        metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(originChain.id, destinationChain.id)
-    }
-        .shareInBackground()
-
     val transferDirectionModel = combine(
         availableCrossChainDestinations,
         originChainWithAsset,
@@ -143,8 +157,8 @@ class SelectSendViewModel(
     private val commissionAssetFlow = originChain.flatMapLatest(interactor::commissionAssetFlow)
         .shareInBackground()
 
-    val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(originAssetFlow)
+    val originFeeMixin = feeLoaderMixinFactory.createGeneric<OriginGenericFee>(commissionAssetFlow)
+    val crossChainFeeMixin = feeLoaderMixinFactory.create(originAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -166,8 +180,6 @@ class SelectSendViewModel(
 
     init {
         subscribeOnChangeDestination()
-
-        subscribeOnSelectAddress()
 
         setInitialState()
 
@@ -239,10 +251,7 @@ class SelectSendViewModel(
     fun selectRecipientWallet() {
         launch {
             val selectedAddress = addressInputMixin.inputFlow.value
-            val currentOriginChain = originChain.first()
-            val currentDestinationChain = destinationChain.first()
-            val request = SelectAddressForTransactionRequester.Request(currentOriginChain.id, currentDestinationChain.id, selectedAddress)
-            selectAddressRequester.openRequest(request)
+            selectAddressMixin.openSelectAddress(selectedAddress)
         }
     }
 
@@ -259,12 +268,8 @@ class SelectSendViewModel(
             .launchIn(this)
     }
 
-    private fun subscribeOnSelectAddress() {
-        selectAddressRequester.responseFlow
-            .onEach {
-                addressInputMixin.inputFlow.value = it.selectedAddress
-            }
-            .launchIn(this)
+    private fun onAddressSelect(address: String) {
+        addressInputMixin.inputFlow.value = address
     }
 
     private fun setInitialState() = launch {
@@ -301,32 +306,32 @@ class SelectSendViewModel(
     }
 
     private fun setupFees() {
-        originFeeMixin.setupFee { transfer -> sendInteractor.getOriginFee(transfer) }
-        crossChainFeeMixin.setupFee { transfer -> sendInteractor.getCrossChainFee(transfer) }
-    }
+        combine(
+            originChainWithAsset,
+            destinationChainWithAsset,
+            addressInputMixin.inputFlow,
+            amountChooserMixin.backPressuredAmount
+        ) { originAsset, destinationAsset, address, amount ->
+            originFeeMixin.invalidateFee()
+            crossChainFeeMixin.invalidateFee()
 
-    private fun FeeLoaderMixin.Presentation.setupFee(
-        feeConstructor: suspend Token.(transfer: AssetTransfer) -> Fee?
-    ) {
-        connectWith(
-            inputSource1 = originChainWithAsset,
-            inputSource2 = destinationChainWithAsset,
-            inputSource3 = addressInputMixin.inputFlow,
-            inputSource4 = amountChooserMixin.backPressuredAmount,
-            scope = viewModelScope,
-            expectedChain = { originChain, _, _, _ -> originChain.chain.id },
-            feeConstructor = { originChain, destinationChain, addressInput, amount ->
-                val transfer = buildTransfer(origin = originChain, destination = destinationChain, amount = amount, address = addressInput)
+            val assetTransfer = buildTransfer(origin = originAsset, destination = destinationAsset, amount = amount, address = address)
+            val planks = originAsset.asset.planksFromAmount(amount)
 
-                feeConstructor(transfer)
-            }
-        )
+            val transferFeeModel = sendInteractor.getFee(planks, assetTransfer)
+            val originFee = SimpleGenericFee(transferFeeModel.originFee)
+            val crossChainFee = transferFeeModel.crossChainFee?.let { SimpleFee(it) }
+
+            originFeeMixin.setFee(originFee)
+            crossChainFeeMixin.setFee(crossChainFee)
+        }
+            .inBackground()
+            .launchIn(this)
     }
 
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
-            originFee = mapFeeToParcel(validPayload.transfer.decimalFee),
             origin = AssetPayload(
                 chainId = validPayload.transfer.originChain.id,
                 chainAssetId = validPayload.transfer.originChainAsset.id
@@ -336,7 +341,6 @@ class SelectSendViewModel(
                 chainAssetId = validPayload.transfer.destinationChainAsset.id
             ),
             recipientAddress = validPayload.transfer.recipient,
-            crossChainFee = validPayload.crossChainFee?.let(::mapFeeToParcel),
             openAssetDetailsOnCompletion = payload is SendPayload.SpecifiedOrigin
         )
 
@@ -351,15 +355,13 @@ class SelectSendViewModel(
     ): AssetTransfer {
         val commissionAsset = commissionAssetFlow.first { it.token.configuration.chainId == origin.chain.id }
 
-        return BaseAssetTransfer(
-            sender = selectedAccount.first(),
-            recipient = address,
-            originChain = origin.chain,
-            originChainAsset = origin.asset,
-            destinationChain = destination.chain,
-            destinationChainAsset = destination.asset,
+        return buildAssetTransfer(
+            metaAccount = selectedAccount.first(),
+            commissionAsset = commissionAsset,
+            origin = origin,
+            destination = destination,
             amount = amount,
-            commissionAssetToken = commissionAsset.token,
+            address = address
         )
     }
 
@@ -490,6 +492,23 @@ class SelectSendViewModel(
                     balances = null
                 )
             }
+        }
+    }
+
+    private suspend fun getMetaAccountsFilter(origin: Chain, desination: Chain): SelectAddressAccountFilter {
+        val isCrossChain = origin.id != desination.id
+
+        return if (isCrossChain) {
+            SelectAddressAccountFilter.Everything()
+        } else {
+            val destinationAccountId = selectedAccount.first().requireAccountIdIn(desination)
+            val notOriginMetaAccounts = accountRepository.activeMetaAccounts()
+                .filter { it.accountIdIn(origin)?.intoKey() == destinationAccountId.intoKey() }
+                .map { it.id }
+
+            SelectAddressAccountFilter.ExcludeMetaAccounts(
+                notOriginMetaAccounts
+            )
         }
     }
 

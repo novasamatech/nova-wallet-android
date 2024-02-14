@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.data.model.asCursorOrNull
 import io.novafoundation.nova.common.utils.nullIfEmpty
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
@@ -179,9 +180,11 @@ abstract class SubstrateAssetHistory(
 
         when {
             node.reward != null -> with(node.reward) {
+                val planks = amount?.toBigIntegerOrNull().orZero()
+
                 type = Operation.Type.Reward(
-                    amount = amount,
-                    fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
+                    amount = planks,
+                    fiatAmount = coinRate?.convertPlanks(chainAsset, planks),
                     isReward = isReward,
                     kind = Operation.Type.Reward.RewardKind.Direct(
                         era = era,

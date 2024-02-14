@@ -6,7 +6,7 @@ class IdentityModel(
     val display: String?,
     val legal: String?,
     val web: String?,
-    val riot: String?,
+    val matrix: String?,
     val email: String?,
     val image: String?,
     val twitter: String?
@@ -21,7 +21,7 @@ fun IdentityModel.Companion.from(identity: OnChainIdentity): IdentityModel {
             display = display,
             legal = legal,
             web = web,
-            riot = riot,
+            matrix = matrix,
             email = email,
             image = image,
             twitter = twitter

@@ -77,11 +77,17 @@ class ValidatorExposureUpdater(
     }
 
     private suspend fun checkValuesInCache(era: BigInteger, chainId: String, runtimeSnapshot: RuntimeSnapshot): Boolean {
+        if (!isPagedExposuresFlagInCache(chainId)) return false
+
         if (runtimeSnapshot.pagedExposuresEnabled()) {
             return isPagedExposuresInCache(era, chainId, runtimeSnapshot) || isLegacyExposuresInCache(era, chainId, runtimeSnapshot)
         }
 
         return isLegacyExposuresInCache(era, chainId, runtimeSnapshot)
+    }
+
+    private suspend fun isPagedExposuresFlagInCache(chainId: String): Boolean {
+        return storageCache.isFullKeyInCache(STORAGE_KEY_PAGED_EXPOSURES, chainId)
     }
 
     private suspend fun isPagedExposuresInCache(era: BigInteger, chainId: String, runtimeSnapshot: RuntimeSnapshot): Boolean {

@@ -103,6 +103,7 @@ data class Asset(
     val transferable = token.amountFromPlanks(transferableInPlanks)
 
     val free = token.amountFromPlanks(freeInPlanks)
+    val frozen = token.amountFromPlanks(frozenInPlanks)
 
     // TODO move to runtime storage
     val bonded = token.amountFromPlanks(bondedInPlanks)
@@ -116,4 +117,8 @@ fun Asset.balanceCountedTowardsED(): BigDecimal {
 
 fun Asset.transferableReplacingFrozen(newFrozen: Balance): Balance {
     return transferableMode.calculateTransferable(freeInPlanks, newFrozen, reservedInPlanks)
+}
+
+fun Asset.regularTransferableBalance(): Balance {
+    return Asset.TransferableMode.REGULAR.calculateTransferable(freeInPlanks, frozenInPlanks, reservedInPlanks)
 }

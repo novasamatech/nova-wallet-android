@@ -75,6 +75,8 @@ class RealExtrinsicService(
         )
     }
 
+    // TODO: The flow in Result may produce an exception that will be not handled since Result can't catch an exception inside a flow
+    // For now it's handling in awaitInBlock() extension
     override suspend fun submitAndWatchExtrinsic(
         chain: Chain,
         origin: TransactionOrigin,

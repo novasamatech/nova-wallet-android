@@ -12,3 +12,5 @@ typealias PlanksProducer<P> = suspend (P) -> BigInteger
 typealias FeeProducer<P> = suspend (P) -> DecimalFee?
 
 typealias GenericFeeProducer<F, P> = suspend (P) -> GenericDecimalFee<F>?
+
+typealias GenericFeeListProducer<F, P> = suspend (P) -> List<GenericDecimalFee<F>>
