@@ -26,6 +26,8 @@ open class AccountBalance(
     }
 }
 
+fun AccountBalance?.orEmpty(): AccountBalance = this ?: AccountBalance.empty()
+
 class AccountData(
     free: BigInteger,
     reserved: BigInteger,
@@ -126,5 +128,19 @@ fun bindAccountInfo(decoded: Any?): AccountInfo {
         providers = dynamicInstance.getTyped<BigInteger?>("providers").orZero(),
         sufficients = dynamicInstance.getTyped<BigInteger?>("sufficients").orZero(),
         data = bindAccountData(dynamicInstance.getTyped("data"))
+    )
+}
+
+fun bindOrmlAccountBalanceOrEmpty(decoded: Any?): AccountBalance {
+    return decoded?.let { bindOrmlAccountData(decoded) } ?: AccountBalance.empty()
+}
+
+fun bindOrmlAccountData(decoded: Any?): AccountBalance {
+    val dynamicInstance = decoded.cast<Struct.Instance>()
+
+    return AccountBalance(
+        free = bindNumber(dynamicInstance["free"]),
+        reserved = bindNumber(dynamicInstance["reserved"]),
+        frozen = bindNumber(dynamicInstance["frozen"]),
     )
 }

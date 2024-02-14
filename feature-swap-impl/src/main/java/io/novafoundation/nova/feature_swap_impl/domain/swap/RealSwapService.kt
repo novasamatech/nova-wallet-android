@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
@@ -27,8 +28,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.HydraDxOmnipoolExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
@@ -49,13 +51,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
 private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
-    private val hydraDxOmnipoolFactory: HydraDxOmnipoolExchangeFactory,
+    private val hydraDxOmnipoolFactory: HydraDxExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
@@ -87,20 +90,27 @@ internal class RealSwapService(
     }
 
     override suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote> {
-        val computationScope = CoroutineScope(coroutineContext)
+        return withContext(Dispatchers.Default) {
+            runCatching {
+                val exchange = exchanges(this).getValue(args.tokenIn.configuration.chainId)
+                val quoteArgs = AssetExchangeQuoteArgs(
+                    chainAssetIn = args.tokenIn.configuration,
+                    chainAssetOut = args.tokenOut.configuration,
+                    amount = args.amount,
+                    swapDirection = args.swapDirection
+                )
+                val quote = exchange.quote(quoteArgs)
 
-        return runCatching {
-            val exchange = exchanges(computationScope).getValue(args.tokenIn.configuration.chainId)
-            val quote = exchange.quote(args)
+                val (amountIn, amountOut) = args.inAndOutAmounts(quote)
 
-            val (amountIn, amountOut) = args.inAndOutAmounts(quote)
-
-            SwapQuote(
-                amountIn = args.tokenIn.configuration.withAmount(amountIn),
-                amountOut = args.tokenOut.configuration.withAmount(amountOut),
-                direction = args.swapDirection,
-                priceImpact = args.calculatePriceImpact(amountIn, amountOut),
-            )
+                SwapQuote(
+                    amountIn = args.tokenIn.configuration.withAmount(amountIn),
+                    amountOut = args.tokenOut.configuration.withAmount(amountOut),
+                    direction = args.swapDirection,
+                    priceImpact = args.calculatePriceImpact(amountIn, amountOut),
+                    path = quote.path
+                )
+            }
         }
     }
 
@@ -130,7 +140,7 @@ internal class RealSwapService(
         return withFlowScope { scope ->
             val exchanges = exchanges(scope)
             exchanges.getValue(chainIn.id).runSubscriptions(chainIn, metaAccount)
-        }
+        }.throttleLast(500.milliseconds)
     }
 
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {

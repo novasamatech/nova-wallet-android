@@ -43,7 +43,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
@@ -532,16 +531,16 @@ class SwapMainSettingsViewModel(
                     previous != current || feeMixin.feeLiveData.value !is FeeStatus.Loaded
                 }
             }
-            .onEach { quoteState ->
+            .mapLatest { quoteState ->
                 val swapArgs = quoteState.quoteArgs.toExecuteArgs(
-                    quotedBalance = quoteState.value.quotedBalance,
+                    quote = quoteState.value,
                     customFeeAsset = quoteState.feeAsset,
                     nativeAsset = nativeAssetFlow.first()
                 )
 
-                loadFeeV2Generic(
-                    coroutineScope = viewModelScope,
+                loadFeeSuspending(
                     feeConstructor = { swapInteractor.estimateFee(swapArgs) },
+                    retryScope = coroutineScope,
                     onRetryCancelled = {}
                 )
             }
@@ -625,6 +624,7 @@ class SwapMainSettingsViewModel(
 
     private fun setupSubscriptionQuoting() {
         swapSettings.mapNotNull { it.assetIn?.chainId }
+            .distinctUntilChanged()
             .flatMapLatest { chainId ->
                 val chain = chainRegistry.getChain(chainId)
 

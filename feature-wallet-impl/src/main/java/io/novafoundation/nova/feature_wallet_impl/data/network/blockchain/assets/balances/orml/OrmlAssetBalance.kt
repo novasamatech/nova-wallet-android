@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
+import io.novafoundation.nova.common.data.network.runtime.binding.bindOrmlAccountBalanceOrEmpty
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -142,9 +143,5 @@ class OrmlAssetBalance(
 
     private fun bindOrmlAccountBalanceOrEmpty(scale: String?, runtime: RuntimeSnapshot): AccountBalance {
         return scale?.let { bindOrmlAccountData(it, runtime) } ?: AccountBalance.empty()
-    }
-
-    private fun bindOrmlAccountBalanceOrEmpty(decoded: Any?): AccountBalance {
-        return decoded?.let { bindOrmlAccountData(decoded) } ?: AccountBalance.empty()
     }
 }

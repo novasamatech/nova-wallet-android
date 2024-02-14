@@ -22,6 +22,7 @@ class SwapExecuteArgs(
     val customFeeAsset: Chain.Asset?,
     val swapLimit: SwapLimit,
     val nativeAsset: Asset,
+    val path: QuotePath
 )
 
 val SwapExecuteArgs.feeAsset: Chain.Asset
@@ -42,13 +43,14 @@ sealed class SwapLimit(val expectedAmountIn: Balance, val expectedAmountOut: Bal
     ) : SwapLimit(expectedAmountIn, expectedAmountOut)
 }
 
-fun SwapQuoteArgs.toExecuteArgs(quotedBalance: Balance, customFeeAsset: Chain.Asset?, nativeAsset: Asset): SwapExecuteArgs {
+fun SwapQuoteArgs.toExecuteArgs(quote: SwapQuote, customFeeAsset: Chain.Asset?, nativeAsset: Asset): SwapExecuteArgs {
     return SwapExecuteArgs(
         assetIn = tokenIn.configuration,
         assetOut = tokenOut.configuration,
-        swapLimit = swapLimits(quotedBalance),
+        swapLimit = swapLimits(quote.quotedBalance),
         customFeeAsset = customFeeAsset,
-        nativeAsset = nativeAsset
+        nativeAsset = nativeAsset,
+        path = quote.path
     )
 }
 
