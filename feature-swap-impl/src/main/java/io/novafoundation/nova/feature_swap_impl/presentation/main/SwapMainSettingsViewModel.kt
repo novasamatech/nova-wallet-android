@@ -531,16 +531,16 @@ class SwapMainSettingsViewModel(
                     previous != current || feeMixin.feeLiveData.value !is FeeStatus.Loaded
                 }
             }
-            .onEach { quoteState ->
+            .mapLatest { quoteState ->
                 val swapArgs = quoteState.quoteArgs.toExecuteArgs(
                     quote = quoteState.value,
                     customFeeAsset = quoteState.feeAsset,
                     nativeAsset = nativeAssetFlow.first()
                 )
 
-                loadFeeV2Generic(
-                    coroutineScope = viewModelScope,
+                loadFeeSuspending(
                     feeConstructor = { swapInteractor.estimateFee(swapArgs) },
+                    retryScope = coroutineScope,
                     onRetryCancelled = {}
                 )
             }
@@ -624,6 +624,7 @@ class SwapMainSettingsViewModel(
 
     private fun setupSubscriptionQuoting() {
         swapSettings.mapNotNull { it.assetIn?.chainId }
+            .distinctUntilChanged()
             .flatMapLatest { chainId ->
                 val chain = chainRegistry.getChain(chainId)
 
