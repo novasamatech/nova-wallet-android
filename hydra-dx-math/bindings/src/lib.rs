@@ -70,10 +70,6 @@ fn get_str<'a>(jni: &'a JNIEnv<'a>, string: JString<'a>) -> String {
     return jni.get_string(string).unwrap().to_str().unwrap().to_string();
 }
 
-fn throw<'a>(jni: &'a JNIEnv<'a>, error: &str) {
-    jni.throw_new("java/lang/Exception", error).unwrap();
-}
-
 
 #[no_mangle]
 pub fn Java_io_novafoundation_nova_hydra_1dx_1math_stableswap_StableSwapMathBridge_calculate_1out_1given_1in<'a>(

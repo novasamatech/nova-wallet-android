@@ -4,9 +4,9 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omni
 
 import io.novafoundation.nova.common.utils.omnipool
 import io.novafoundation.nova.common.utils.omnipoolOrNull
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmniPoolTokenId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmnipoolAssetState
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.bindOmnipoolAssetState
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1
@@ -26,7 +26,7 @@ val RuntimeMetadata.omnipool: OmnipoolApi
     get() = OmnipoolApi(omnipool())
 
 context(StorageQueryContext)
-val OmnipoolApi.assets: QueryableStorageEntry1<OmniPoolTokenId, OmnipoolAssetState>
+val OmnipoolApi.assets: QueryableStorageEntry1<HydraDxAssetId, OmnipoolAssetState>
     get() = storage1(
         name = "Assets",
         binding = ::bindOmnipoolAssetState,

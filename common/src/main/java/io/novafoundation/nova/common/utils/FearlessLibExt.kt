@@ -413,4 +413,6 @@ object Modules {
     const val MULTI_TRANSACTION_PAYMENT = "MultiTransactionPayment"
 
     const val REFERRALS = "Referrals"
+
+    const val ROUTER = "Router"
 }

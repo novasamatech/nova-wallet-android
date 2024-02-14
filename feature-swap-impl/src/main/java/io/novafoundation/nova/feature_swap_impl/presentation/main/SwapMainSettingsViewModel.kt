@@ -43,7 +43,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
@@ -534,7 +533,7 @@ class SwapMainSettingsViewModel(
             }
             .onEach { quoteState ->
                 val swapArgs = quoteState.quoteArgs.toExecuteArgs(
-                    quotedBalance = quoteState.value.quotedBalance,
+                    quote = quoteState.value,
                     customFeeAsset = quoteState.feeAsset,
                     nativeAsset = nativeAssetFlow.first()
                 )

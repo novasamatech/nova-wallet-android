@@ -27,8 +27,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.HydraDxOmnipoolExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
@@ -55,7 +56,7 @@ private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
-    private val hydraDxOmnipoolFactory: HydraDxOmnipoolExchangeFactory,
+    private val hydraDxOmnipoolFactory: HydraDxExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
@@ -91,7 +92,13 @@ internal class RealSwapService(
 
         return runCatching {
             val exchange = exchanges(computationScope).getValue(args.tokenIn.configuration.chainId)
-            val quote = exchange.quote(args)
+            val quoteArgs = AssetExchangeQuoteArgs(
+                chainAssetIn = args.tokenIn.configuration,
+                chainAssetOut = args.tokenOut.configuration,
+                amount = args.amount,
+                swapDirection = args.swapDirection
+            )
+            val quote = exchange.quote(quoteArgs)
 
             val (amountIn, amountOut) = args.inAndOutAmounts(quote)
 
@@ -100,6 +107,7 @@ internal class RealSwapService(
                 amountOut = args.tokenOut.configuration.withAmount(amountOut),
                 direction = args.swapDirection,
                 priceImpact = args.calculatePriceImpact(amountIn, amountOut),
+                path = quote.path
             )
         }
     }

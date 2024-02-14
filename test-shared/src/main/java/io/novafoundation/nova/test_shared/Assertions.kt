@@ -16,3 +16,9 @@ fun <T> assertSetEquals(expected: Set<T>, actual: Set<T>) {
         throw AssertionError("Sets are not equal. Expected: $expected, actual: $actual")
     }
 }
+
+fun <K, V> assertMapEquals(expected: Map<K, V>, actual: Map<K, V>) {
+    if (expected != actual) {
+        throw AssertionError("Maps are not equal. Expected: $expected, actual: $actual")
+    }
+}
