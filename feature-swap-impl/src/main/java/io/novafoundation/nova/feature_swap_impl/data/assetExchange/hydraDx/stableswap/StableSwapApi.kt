@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap
 
-
 import io.novafoundation.nova.common.utils.stableSwap
 import io.novafoundation.nova.common.utils.stableSwapOrNull
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StableSwapPoolInfo

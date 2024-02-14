@@ -34,7 +34,7 @@ class SwapConfirmationPayload(
         val to: AssetPayload,
         val sourceId: String,
         val sourceParams: Map<String, String>
-    ): Parcelable
+    ) : Parcelable
 
     @Parcelize
     class FeeDetails(

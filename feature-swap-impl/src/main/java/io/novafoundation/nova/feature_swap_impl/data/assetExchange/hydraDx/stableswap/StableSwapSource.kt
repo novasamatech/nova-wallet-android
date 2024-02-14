@@ -166,7 +166,7 @@ private class StableSwapSource(
             poolParticipatingAssetsBalanceSubscription,
             totalIssuanceSubscriptions,
             chainStateRepository.currentBlockNumberFlow(chain.id),
-        ) { poolInfos,poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock ->
+        ) { poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock ->
             createStableSwapPool(poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock, precisions.await())
         }
             .onEach(stablePools::emit)
@@ -250,7 +250,7 @@ private class StableSwapSource(
     private suspend fun Map<HydraDxAssetId, StableSwapPoolInfo>.matchIdsWithLocal(): List<PoolInitialInfo> {
         val allOnChainIds = hydraDxAssetIdConverter.allOnChainIds(chain)
 
-        return mapNotNull outer@ { (poolAssetId, poolInfo) ->
+        return mapNotNull outer@{ (poolAssetId, poolInfo) ->
             val poolAssetMatchedId = allOnChainIds[poolAssetId]?.fullId
 
             val participatingAssetsMatchedIds = poolInfo.assets.map { assetId ->

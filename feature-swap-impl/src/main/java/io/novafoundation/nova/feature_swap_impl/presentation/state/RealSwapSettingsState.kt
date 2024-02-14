@@ -81,7 +81,7 @@ class RealSwapSettingsState(
         selectedOption.value = swapSettings
     }
 
-    private fun SwapSettings.convertedAmountForNewAssetIn(newAssetIn: Chain.Asset) : Balance? {
+    private fun SwapSettings.convertedAmountForNewAssetIn(newAssetIn: Chain.Asset): Balance? {
         val shouldConvertAsset = assetIn != null && amount != null && swapDirection == SwapDirection.SPECIFIED_IN
 
         return if (shouldConvertAsset) {
@@ -92,7 +92,7 @@ class RealSwapSettingsState(
         }
     }
 
-    private fun SwapSettings.convertedAmountForNewAssetOut(newAssetOut: Chain.Asset) : Balance? {
+    private fun SwapSettings.convertedAmountForNewAssetOut(newAssetOut: Chain.Asset): Balance? {
         val shouldConvertAsset = assetOut != null && amount != null && swapDirection == SwapDirection.SPECIFIED_OUT
 
         return if (shouldConvertAsset) {

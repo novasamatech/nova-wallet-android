@@ -11,7 +11,6 @@ interface Edge<N> {
     val to: N
 }
 
-
 class Graph<N, E : Edge<N>>(
     val adjacencyList: Map<N, List<E>>
 ) {
@@ -41,7 +40,7 @@ typealias Path<E> = List<E>
  * Time Complexity is O(V+E)
  * Space Complexity is O(V)
  */
-fun <N, E: Edge<N>> Graph<N, E>.findConnectedComponents(): List<ConnectedComponent<N>> {
+fun <N, E : Edge<N>> Graph<N, E>.findConnectedComponents(): List<ConnectedComponent<N>> {
     val visited = mutableSetOf<N>()
     val result = mutableListOf<ConnectedComponent<N>>()
 
@@ -55,12 +54,12 @@ fun <N, E: Edge<N>> Graph<N, E>.findConnectedComponents(): List<ConnectedCompone
     return result
 }
 
-fun  <N, E: Edge<N>> Graph<N, E>.findAllPossibleDirections(): MultiMap<N, N> {
+fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirections(): MultiMap<N, N> {
     val connectedComponents = findConnectedComponents()
     return connectedComponents.findAllPossibleDirections()
 }
 
-fun  <N, E: Edge<N>> Graph<N, E>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
+fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
     val connectedComponents = findConnectedComponents()
     return connectedComponents.findAllPossibleDirectionsToList()
 }
@@ -93,8 +92,8 @@ fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapL
     return result
 }
 
-fun <N, E: Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: Int): List<Path<E>> {
-    data class QueueElement(val currentPath: Path<E>, val nodeList: List<N>, val score: Int): Comparable<QueueElement> {
+fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: Int): List<Path<E>> {
+    data class QueueElement(val currentPath: Path<E>, val nodeList: List<N>, val score: Int) : Comparable<QueueElement> {
         override fun compareTo(other: QueueElement): Int {
             return score - other.score
         }
@@ -138,7 +137,7 @@ fun <N, E: Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: 
     return paths
 }
 
-private fun <N, E: Edge<N>> connectedComponentsDfs(
+private fun <N, E : Edge<N>> connectedComponentsDfs(
     node: N,
     adjacencyList: Map<N, List<E>>,
     visited: MutableSet<N>,

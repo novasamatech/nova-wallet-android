@@ -47,7 +47,7 @@ data class HydraDxSwapSourceQuoteArgs(
 )
 
 interface HydraSwapDirection {
-    
+
     val from: FullChainAssetId
 
     val to: FullChainAssetId

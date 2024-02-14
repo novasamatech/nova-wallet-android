@@ -161,7 +161,6 @@ private class HydraDxExchange(
             logQuotes(args, quotedPaths)
         }
 
-
         return quotedPaths.max()
     }
 
@@ -277,7 +276,6 @@ private class HydraDxExchange(
             }
         }.getOrNull()
     }
-
 
     private suspend fun quotePathSell(path: Path<HydraDxSwapEdge>, amount: Balance): Balance? {
         return runCatching {
@@ -506,7 +504,6 @@ private class HydraDxExchange(
 
     private suspend fun formatPath(path: QuotePath): String {
         val assets = chain.assetsById
-
 
         return buildString {
             val firstSegment = path.segments.first()

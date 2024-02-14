@@ -26,7 +26,7 @@ open class AccountBalance(
     }
 }
 
-fun AccountBalance?.orEmpty() : AccountBalance = this ?: AccountBalance.empty()
+fun AccountBalance?.orEmpty(): AccountBalance = this ?: AccountBalance.empty()
 
 class AccountData(
     free: BigInteger,

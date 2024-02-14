@@ -54,7 +54,7 @@ class OmniPoolSwapSourceFactory(
     private val chainRegistry: ChainRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-): HydraDxSwapSource.Factory {
+) : HydraDxSwapSource.Factory {
 
     companion object {
 
@@ -225,8 +225,6 @@ private class OmniPoolSwapSource(
 
         return OmniPool(tokensState)
     }
-
-
 
     private fun ExtrinsicBuilder.sell(
         assetIdIn: HydraDxAssetId,
