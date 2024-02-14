@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_push_notifications.data.presentation.sett
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.resources.mapBooleanToState
+import io.novafoundation.nova.common.resources.formatBooleanToState
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
@@ -46,12 +46,12 @@ class PushSettingsViewModel(
 
     val pushGovernanceState = pushSettingsState
         .mapNotNull { it }
-        .map { resourceManager.mapBooleanToState(it.isAnyGovEnabled()) }
+        .map { resourceManager.formatBooleanToState(it.isAnyGovEnabled()) }
         .distinctUntilChanged()
 
     val pushStakingRewardsState = pushSettingsState
         .mapNotNull { it }
-        .map { resourceManager.mapBooleanToState(it.stakingReward.isNotEmpty()) }
+        .map { resourceManager.formatBooleanToState(it.stakingReward.isNotEmpty()) }
         .distinctUntilChanged()
 
     init {

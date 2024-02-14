@@ -65,7 +65,7 @@ fun ResourceManager.formatListPreview(
     }
 }
 
-fun ResourceManager.mapBooleanToState(isEnabled: Boolean): String {
+fun ResourceManager.formatBooleanToState(isEnabled: Boolean): String {
     return if (isEnabled) {
         getString(R.string.common_on)
     } else {

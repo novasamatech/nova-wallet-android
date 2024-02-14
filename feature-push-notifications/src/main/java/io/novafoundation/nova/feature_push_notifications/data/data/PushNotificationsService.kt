@@ -23,7 +23,7 @@ interface PushNotificationsService {
 }
 
 class RealPushNotificationsService(
-    private val settingProvider: PushSettingsProvider,
+    private val settingsProvider: PushSettingsProvider,
     private val subscriptionService: PushSubscriptionService,
     private val rootScope: RootScope,
     private val preferences: Preferences,
@@ -31,7 +31,8 @@ class RealPushNotificationsService(
     private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 ) : PushNotificationsService {
 
-    private var skipTokenCallback = false
+    // Using to manually sync subscriptions (firestore, topics) after enabling push notifications
+    private var skipTokenReceivingCallback = false
 
     init {
         if (isPushNotificationsEnabled()) {
@@ -42,11 +43,11 @@ class RealPushNotificationsService(
     override fun onTokenUpdated(token: String) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
         if (!isPushNotificationsEnabled()) return
-        if (skipTokenCallback) return
+        if (skipTokenReceivingCallback) return
 
         rootScope.launch {
             tokenCache.updatePushToken(token)
-            updatePushSettings(isPushNotificationsEnabled(), settingProvider.getPushSettings())
+            updatePushSettings(isPushNotificationsEnabled(), settingsProvider.getPushSettings())
         }
     }
 
@@ -56,25 +57,25 @@ class RealPushNotificationsService(
         return runCatching {
             setPushNotificationsEnabled(enabled)
             val pushToken = getPushToken()
-            settingProvider.updateWalletSettings(pushSettings)
+            settingsProvider.updateWalletSettings(pushSettings)
             subscriptionService.handleSubscription(enabled, pushToken, pushSettings)
         }
     }
 
     override fun isPushNotificationsEnabled(): Boolean {
-        return settingProvider.isPushNotificationsEnabled()
+        return settingsProvider.isPushNotificationsEnabled()
     }
 
     override suspend fun initPushNotifications(): Result<Unit> {
         if (!googleApiAvailabilityProvider.isAvailable()) return Result.success(Unit)
 
-        return updatePushSettings(true, settingProvider.getDefaultPushSettings())
+        return updatePushSettings(true, settingsProvider.getDefaultPushSettings())
     }
 
     @Throws
     private suspend fun setPushNotificationsEnabled(isEnable: Boolean) {
         if (isEnable == isPushNotificationsEnabled()) return
-        skipTokenCallback = true
+        skipTokenReceivingCallback = true
 
         val pushToken = if (isEnable) {
             NovaFirebaseMessagingService.requestToken()
@@ -85,9 +86,9 @@ class RealPushNotificationsService(
 
         tokenCache.updatePushToken(pushToken)
         Firebase.messaging.isAutoInitEnabled = isEnable
-        settingProvider.setPushNotificationsEnabled(isEnable)
+        settingsProvider.setPushNotificationsEnabled(isEnable)
 
-        skipTokenCallback = false
+        skipTokenReceivingCallback = false
     }
 
     private suspend fun getPushToken(): String? {

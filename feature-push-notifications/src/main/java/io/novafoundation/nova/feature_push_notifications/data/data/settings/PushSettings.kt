@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.settings
 
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ethereumAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 data class PushSettings(
@@ -29,23 +28,6 @@ data class PushSettings(
         object All : ChainFeature()
 
         data class Concrete(val chainIds: List<ChainId>) : ChainFeature()
-    }
-
-    companion object {
-
-        fun getDefault(wallets: List<Wallet> = emptyList()): PushSettings {
-            return PushSettings(
-                announcementsEnabled = true,
-                sentTokensEnabled = true,
-                receivedTokensEnabled = true,
-                governanceState = emptyList(),
-                newReferenda = emptyList(),
-                wallets = wallets,
-                stakingReward = ChainFeature.Concrete(emptyList()),
-                govMyDelegatorVoted = ChainFeature.Concrete(emptyList()),
-                govMyReferendumFinished = ChainFeature.Concrete(emptyList())
-            )
-        }
     }
 }
 

@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.resources.mapBooleanToState
+import io.novafoundation.nova.common.resources.formatBooleanToState
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
@@ -106,7 +106,7 @@ class SettingsViewModel(
         .asLiveData()
 
     val pushNotificationsState = pushNotificationsInteractor.pushNotificationsEnabledFlow()
-        .map { resourceManager.mapBooleanToState(it) }
+        .map { resourceManager.formatBooleanToState(it) }
         .shareInBackground()
 
     init {

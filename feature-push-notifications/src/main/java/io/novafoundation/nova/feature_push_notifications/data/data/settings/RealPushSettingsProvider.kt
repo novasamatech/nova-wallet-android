@@ -21,7 +21,17 @@ class RealPushSettingsProvider(
     }
 
     override suspend fun getDefaultPushSettings(): PushSettings {
-        return PushSettings.getDefault(listOf(accountRepository.getSelectedMetaAccount().toWalletSettings()))
+        return PushSettings(
+            announcementsEnabled = true,
+            sentTokensEnabled = true,
+            receivedTokensEnabled = true,
+            governanceState = emptyList(),
+            newReferenda = emptyList(),
+            wallets = listOf(accountRepository.getSelectedMetaAccount().toWalletSettings()),
+            stakingReward = PushSettings.ChainFeature.Concrete(emptyList()),
+            govMyDelegatorVoted = PushSettings.ChainFeature.Concrete(emptyList()),
+            govMyReferendumFinished = PushSettings.ChainFeature.Concrete(emptyList())
+        )
     }
 
     override fun updateWalletSettings(pushWalletSettings: PushSettings) {
