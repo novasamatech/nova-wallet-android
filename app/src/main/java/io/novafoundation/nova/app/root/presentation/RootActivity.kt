@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.google.gson.GsonBuilder
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
@@ -12,10 +13,12 @@ import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.EventObserver
+import io.novafoundation.nova.common.utils.gson.SealedTypeAdapterFactory
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
+import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
 import javax.inject.Inject
@@ -40,7 +43,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-
         removeSplashBackground()
 
         viewModel.restoredAfterConfigChange()

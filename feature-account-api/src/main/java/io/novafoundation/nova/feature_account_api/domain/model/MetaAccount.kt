@@ -9,8 +9,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
+import jp.co.soramitsu.fearless_utils.extensions.toAddress
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
 
@@ -117,7 +119,11 @@ fun MetaAccount.mainEthereumAddress() = ethereumAddress?.toEthereumAddress()
 fun MetaAccount.requireAddressIn(chain: Chain): String = addressIn(chain) ?: throw NoSuchElementException("No chain account found for $chain in $name")
 
 val MetaAccount.defaultSubstrateAddress: String?
-    get() = substrateAccountId?.toAddress(SS58Encoder.DEFAULT_PREFIX)
+    get() = substrateAccountId?.toDefaultSubstrateAddress()
+
+fun ByteArray.toDefaultSubstrateAddress(): String {
+    return toAddress(SS58Encoder.DEFAULT_PREFIX)
+}
 
 fun MetaAccount.accountIdIn(chain: Chain): ByteArray? {
     return when {

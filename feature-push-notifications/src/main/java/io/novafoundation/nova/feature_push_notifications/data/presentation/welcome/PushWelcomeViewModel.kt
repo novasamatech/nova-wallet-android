@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.view.dialog.retryDialog
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 class PushWelcomeViewModel(
     private val router: PushNotificationsRouter,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
+    private val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor,
     private val permissionsAsker: PermissionsAsker.Presentation,
     private val resourceManager: ResourceManager
 ) : BaseViewModel(), PermissionsAsker by permissionsAsker, Retriable {
@@ -60,7 +62,10 @@ class PushWelcomeViewModel(
 
             _enablingInProgress.value = true
             pushNotificationsInteractor.setPushNotificationsEnabled(true)
-                .onSuccess { router.back() }
+                .onSuccess {
+                    welcomePushNotificationsInteractor.setWelcomeScreenShown()
+                    router.openPushSettings()
+                }
                 .onFailure { retryDialog() }
 
             _enablingInProgress.value = false

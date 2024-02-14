@@ -1,12 +1,12 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.settings.view
+package io.novafoundation.nova.common.view.settings
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewOutlineProvider
 import android.widget.LinearLayout
+import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.feature_settings_impl.R
 
 class SettingsGroupView @JvmOverloads constructor(
     context: Context,

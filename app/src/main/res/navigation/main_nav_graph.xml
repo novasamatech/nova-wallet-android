@@ -211,6 +211,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_pushNotificationsSettings"
+        app:destination="@id/push_settings_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -868,7 +876,18 @@
         android:id="@+id/pushNotificationsWelcomeFragment"
         android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.PushWelcomeFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_push_welcome" />
+        tools:layout="@layout/fragment_push_welcome">
+
+        <action
+            android:id="@+id/action_pushWelcom_to_pushSettings"
+            app:destination="@id/push_settings_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/mainFragment" />
+
+    </fragment>
 
     <include app:graph="@navigation/start_swap_nav_graph" />
 
@@ -895,5 +914,7 @@
     <include app:graph="@navigation/external_sign_graph" />
 
     <include app:graph="@navigation/staking_main_graph" />
+
+    <include app:graph="@navigation/push_settings_graph" />
 
 </navigation>

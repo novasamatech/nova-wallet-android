@@ -4,5 +4,5 @@ import io.novafoundation.nova.feature_push_notifications.data.data.settings.Push
 
 interface PushSubscriptionService {
 
-    suspend fun handleSubscription(token: String, pushSettings: PushSettings)
+    suspend fun handleSubscription(pushEnabled: Boolean, token: String?, pushSettings: PushSettings)
 }

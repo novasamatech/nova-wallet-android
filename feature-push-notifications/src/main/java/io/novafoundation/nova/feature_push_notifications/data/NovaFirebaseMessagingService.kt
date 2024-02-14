@@ -33,16 +33,12 @@ class NovaFirebaseMessagingService : FirebaseMessagingService() {
             return runCatching { FirebaseMessaging.getInstance().token.await() }.getOrNull()
         }
 
-        suspend fun requestToken(): Result<Unit> {
-            return runCatching {
-                FirebaseMessaging.getInstance().token.await()
-            }
+        suspend fun requestToken(): String {
+            return FirebaseMessaging.getInstance().token.await()
         }
 
-        suspend fun deleteToken(): Result<Unit> {
-            return runCatching {
-                FirebaseMessaging.getInstance().deleteToken().await()
-            }
+        suspend fun deleteToken() {
+            FirebaseMessaging.getInstance().deleteToken()
         }
 
         fun logToken() {

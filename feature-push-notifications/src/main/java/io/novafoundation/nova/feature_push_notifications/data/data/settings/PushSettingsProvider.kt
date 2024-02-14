@@ -4,9 +4,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface PushSettingsProvider {
 
-    suspend fun getPushSettings(): PushSettings?
+    suspend fun getPushSettings(): PushSettings
 
-    suspend fun updateWalletSettings(pushWalletSettings: PushSettings)
+    suspend fun getDefaultPushSettings(): PushSettings
+
+    fun updateWalletSettings(pushWalletSettings: PushSettings)
 
     fun setPushNotificationsEnabled(isEnabled: Boolean)
 

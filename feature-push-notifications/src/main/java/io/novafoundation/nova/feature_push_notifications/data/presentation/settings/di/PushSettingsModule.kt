@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.di
+package io.novafoundation.nova.feature_push_notifications.data.presentation.settings.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -13,34 +13,23 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.PushSettingsViewModel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.PushWelcomeViewModel
 
 @Module(includes = [ViewModelModule::class])
-class PushWelcomeModule {
-
-    @Provides
-    fun providePermissionAsker(
-        permissionsAskerFactory: PermissionsAskerFactory,
-        fragment: Fragment,
-        router: PushNotificationsRouter
-    ) = permissionsAskerFactory.create(fragment, router)
+class PushSettingsModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(PushWelcomeViewModel::class)
+    @ViewModelKey(PushSettingsViewModel::class)
     fun provideViewModel(
         router: PushNotificationsRouter,
         interactor: PushNotificationsInteractor,
-        permissionsAsker: PermissionsAsker.Presentation,
-        resourceManager: ResourceManager,
-        welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
+        resourceManager: ResourceManager
     ): ViewModel {
-        return PushWelcomeViewModel(
+        return PushSettingsViewModel(
             router,
             interactor,
-            welcomePushNotificationsInteractor,
-            permissionsAsker,
             resourceManager
         )
     }
@@ -49,7 +38,7 @@ class PushWelcomeModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): PushWelcomeViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(PushWelcomeViewModel::class.java)
+    ): PushSettingsViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(PushSettingsViewModel::class.java)
     }
 }

@@ -8,7 +8,7 @@ interface PushTokenCache {
 
     fun getPushToken(): String?
 
-    fun updatePushToken(pushToken: String)
+    fun updatePushToken(pushToken: String?)
 }
 
 class RealPushTokenCache(
@@ -19,7 +19,7 @@ class RealPushTokenCache(
         return preferences.getString(PUSH_TOKEN_KEY)
     }
 
-    override fun updatePushToken(pushToken: String) {
+    override fun updatePushToken(pushToken: String?) {
         preferences.putString(PUSH_TOKEN_KEY, pushToken)
     }
 }

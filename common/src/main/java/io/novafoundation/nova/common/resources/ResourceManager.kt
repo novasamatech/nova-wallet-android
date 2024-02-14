@@ -65,4 +65,13 @@ fun ResourceManager.formatListPreview(
     }
 }
 
+fun ResourceManager.mapBooleanToState(isEnabled: Boolean): String {
+    return if (isEnabled) {
+        getString(R.string.common_on)
+    } else {
+        getString(R.string.common_off)
+    }
+}
+
 private fun List<String>.joinPreviewItems(previewItemsCount: Int): String = take(previewItemsCount).joinToString(separator = ", ")
+

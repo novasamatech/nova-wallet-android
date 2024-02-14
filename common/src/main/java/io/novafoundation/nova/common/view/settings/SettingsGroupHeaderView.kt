@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.settings.view
+package io.novafoundation.nova.common.view.settings
 
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.TextView
-import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.common.R
 
 class SettingsGroupHeaderView @JvmOverloads constructor(
     context: Context,

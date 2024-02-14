@@ -1,13 +1,14 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.settings.view
+package io.novafoundation.nova.common.view.settings
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
+import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.useAttributes
-import io.novafoundation.nova.feature_settings_impl.R
 import kotlinx.android.synthetic.main.view_settings_item.view.settingsItemIcon
 import kotlinx.android.synthetic.main.view_settings_item.view.settingsItemTitle
 import kotlinx.android.synthetic.main.view_settings_item.view.settingsItemValue
@@ -27,6 +28,10 @@ class SettingsItemView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+    }
+
     fun setTitle(title: String?) {
         settingsItemTitle.text = title
     }
@@ -36,6 +41,7 @@ class SettingsItemView @JvmOverloads constructor(
     }
 
     fun setIcon(icon: Drawable?) {
+        settingsItemIcon.isVisible = icon != null
         settingsItemIcon.setImageDrawable(icon)
     }
 
