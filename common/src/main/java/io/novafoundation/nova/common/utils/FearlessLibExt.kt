@@ -191,6 +191,8 @@ fun RuntimeMetadata.eqBalances() = module(Modules.EQ_BALANCES)
 
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
 
+fun RuntimeMetadata.assetRegistry() = module(Modules.ASSET_REGISTRY)
+
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
@@ -426,4 +428,6 @@ object Modules {
     const val ROUTER = "Router"
 
     const val STABLE_SWAP = "Stableswap"
+
+    const val ASSET_REGISTRY = "AssetRegistry"
 }

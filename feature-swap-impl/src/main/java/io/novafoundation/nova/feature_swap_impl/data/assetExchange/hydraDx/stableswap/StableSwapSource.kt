@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stab
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.orEmpty
 import io.novafoundation.nova.common.utils.MultiMapList
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.Graph
@@ -15,28 +16,34 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSourceQuoteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraSwapDirection
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.RemoteAndLocalId
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.RemoteAndLocalIdOptional
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.omniPoolAccountId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StablePool
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StablePoolAsset
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StableSwapPoolInfo
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.quote
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.encrypt.json.asLittleEndianBytes
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
@@ -48,7 +55,6 @@ private const val POOL_ID_PARAM_KEY = "PoolId"
 
 class StableSwapSourceFactory(
     private val remoteStorageSource: StorageDataSource,
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val gson: Gson,
     private val chainStateRepository: ChainStateRepository
@@ -57,7 +63,6 @@ class StableSwapSourceFactory(
     override fun create(chain: Chain): HydraDxSwapSource {
         return StableSwapSource(
             remoteStorageSource = remoteStorageSource,
-            assetSourceRegistry = assetSourceRegistry,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             chain = chain,
             gson = gson,
@@ -68,7 +73,6 @@ class StableSwapSourceFactory(
 
 private class StableSwapSource(
     private val remoteStorageSource: StorageDataSource,
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val chain: Chain,
     private val gson: Gson,
@@ -110,7 +114,7 @@ private class StableSwapSource(
     override suspend fun runSubscriptions(
         userAccountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Unit> {
+    ): Flow<Unit> = coroutineScope {
         stablePools.resetReplayCache()
 
         val initialPoolsInfo = initialPoolsInfo.first()
@@ -126,10 +130,10 @@ private class StableSwapSource(
         val omniPoolAccountId = omniPoolAccountId()
 
         val poolSharedAssetBalanceSubscriptions = initialPoolsInfo.map { poolInfo ->
-            val chainAsset = chain.assetsById.getValue(poolInfo.sharedAsset.second.assetId)
-            val assetSource = assetSourceRegistry.sourceFor(chainAsset)
-            assetSource.balance.subscribeTransferableAccountBalance(chain, chainAsset, omniPoolAccountId, subscriptionBuilder).map {
-                poolInfo.sharedAsset.first to it
+            val sharedAssetRemoteId = poolInfo.sharedAsset.first
+
+            subscribeTransferableBalance(subscriptionBuilder, omniPoolAccountId, sharedAssetRemoteId).map {
+                sharedAssetRemoteId to it
             }
         }.toMultiSubscription(initialPoolsInfo.size)
 
@@ -139,9 +143,7 @@ private class StableSwapSource(
             val poolAccountId = stableSwapPoolAccountId(poolInfo.sharedAsset.first)
 
             poolInfo.poolAssets.map { poolAsset ->
-                val chainAsset = chain.assetsById.getValue(poolAsset.second.assetId)
-                val assetSource = assetSourceRegistry.sourceFor(chainAsset)
-                assetSource.balance.subscribeTransferableAccountBalance(chain, chainAsset, poolAccountId, subscriptionBuilder).map {
+                subscribeTransferableBalance(subscriptionBuilder, poolAccountId, poolAsset.first).map {
                     val key = poolInfo.sharedAsset.first to poolAsset.first
                     key to it
                 }
@@ -156,39 +158,49 @@ private class StableSwapSource(
             }
         }.toMultiSubscription(initialPoolsInfo.size)
 
-        return combine(
+        val precisions = fetchAssetsPrecisionsAsync()
+
+        combine(
             poolInfoSubscriptions,
             poolSharedAssetBalanceSubscriptions,
             poolParticipatingAssetsBalanceSubscription,
             totalIssuanceSubscriptions,
             chainStateRepository.currentBlockNumberFlow(chain.id),
-            ::createStableSwapPool
-        )
+        ) { poolInfos,poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock ->
+            createStableSwapPool(poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock, precisions.await())
+        }
             .onEach(stablePools::emit)
             .map { }
     }
 
-    private suspend fun createStableSwapPool(
+    private suspend fun subscribeTransferableBalance(subscriptionBuilder: SharedRequestsBuilder, account: AccountId, assetId: HydraDxAssetId): Flow<Balance> {
+        // We cant use AssetSource since it require Chain.Asset which might not always be present in case some stable pool assets are not yet in Nova configs
+        return remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
+            metadata.hydraTokens.accounts.observe(account, assetId).map {
+                Asset.TransferableMode.REGULAR.calculateTransferable(it.orEmpty())
+            }
+        }
+    }
+
+    private fun createStableSwapPool(
         poolInfos: Map<HydraDxAssetId, StableSwapPoolInfo?>,
         poolSharedAssetBalances: Map<HydraDxAssetId, Balance>,
         poolParticipatingAssetBalances: Map<Pair<HydraDxAssetId, HydraDxAssetId>, Balance>,
         totalIssuances: Map<HydraDxAssetId, Balance>,
-        currentBlock: BlockNumber
+        currentBlock: BlockNumber,
+        precisions: Map<HydraDxAssetId, Int>
     ): List<StablePool> {
-        val allLocalIds = hydraDxAssetIdConverter.allOnChainIds(chain)
-
         return poolInfos.mapNotNull outer@{ (poolId, poolInfo) ->
             if (poolInfo == null) return@outer null
 
             val sharedAssetBalance = poolSharedAssetBalances[poolId].orZero()
-            val sharedChainAsset = allLocalIds[poolId] ?: return@outer null
-            val sharedAsset = StablePoolAsset(sharedAssetBalance, poolId, sharedChainAsset.precision)
+            val sharedChainAssetPrecision = precisions[poolId] ?: return@outer null
+            val sharedAsset = StablePoolAsset(sharedAssetBalance, poolId, sharedChainAssetPrecision)
             val sharedAssetIssuance = totalIssuances[poolId].orZero()
 
             val pooledAssets = poolInfo.assets.mapNotNull { pooledAssetId ->
                 val pooledAssetBalance = poolParticipatingAssetBalances[poolId to pooledAssetId].orZero()
-                val pooledChainAsset = allLocalIds[pooledAssetId] ?: return@mapNotNull null
-                val decimals = pooledChainAsset.precision
+                val decimals = precisions[pooledAssetId] ?: return@mapNotNull null
 
                 StablePoolAsset(pooledAssetBalance, pooledAssetId, decimals)
             }
@@ -205,6 +217,14 @@ private class StableSwapSource(
                 gson = gson,
                 currentBlock = currentBlock
             )
+        }
+    }
+
+    private fun CoroutineScope.fetchAssetsPrecisionsAsync(): Deferred<Map<HydraDxAssetId, Int>> {
+        return async {
+            remoteStorageSource.query(chain.id) {
+                metadata.assetRegistry.assetMetadataMap.entries()
+            }
         }
     }
 
@@ -230,13 +250,11 @@ private class StableSwapSource(
     private suspend fun Map<HydraDxAssetId, StableSwapPoolInfo>.matchIdsWithLocal(): List<PoolInitialInfo> {
         val allOnChainIds = hydraDxAssetIdConverter.allOnChainIds(chain)
 
-        return mapNotNull { (poolAssetId, poolInfo) ->
-            // Ignore pool if its pool asset is unknown
-            val poolAssetMatchedId = allOnChainIds[poolAssetId]?.fullId ?: return@mapNotNull null
+        return mapNotNull outer@ { (poolAssetId, poolInfo) ->
+            val poolAssetMatchedId = allOnChainIds[poolAssetId]?.fullId
 
             val participatingAssetsMatchedIds = poolInfo.assets.map { assetId ->
-                // Be defensive here - we potentially may allow to swap using stableswap pool that contain unknown assets to us but for now forbid it
-                val localId = allOnChainIds[assetId]?.fullId ?: return@mapNotNull null
+                val localId = allOnChainIds[assetId]?.fullId
 
                 assetId to localId
             }
@@ -250,11 +268,20 @@ private class StableSwapSource(
 
     private fun List<PoolInitialInfo>.allPossibleDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection> {
         val perPoolMaps = map { (poolAssetId, poolAssets) ->
-            val allPoolAssetIds = poolAssets.map { it.second } + poolAssetId.second
+            val allPoolAssetIds = buildList {
+                addAll(poolAssets.mapNotNull { it.second })
+
+                val sharedAssetId = poolAssetId.second
+
+                if (sharedAssetId != null) {
+                    add(sharedAssetId)
+                }
+            }
 
             allPoolAssetIds.associateWith { assetId ->
                 allPoolAssetIds.mapNotNull { otherAssetId ->
-                    otherAssetId.takeIf { assetId != otherAssetId }?.let { StableSwapDirection(assetId, otherAssetId, poolAssetId.first) }
+                    otherAssetId.takeIf { assetId != otherAssetId }
+                        ?.let { StableSwapDirection(assetId, otherAssetId, poolAssetId.first) }
                 }
             }
         }
@@ -278,7 +305,7 @@ private class StableSwapSource(
     }
 
     private data class PoolInitialInfo(
-        val sharedAsset: RemoteAndLocalId,
-        val poolAssets: List<RemoteAndLocalId>
+        val sharedAsset: RemoteAndLocalIdOptional,
+        val poolAssets: List<RemoteAndLocalIdOptional>
     )
 }

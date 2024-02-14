@@ -68,7 +68,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
-private const val PATHS_LIMIT = 1
+private const val PATHS_LIMIT = 4
 
 class HydraDxExchangeFactory(
     private val remoteStorageSource: StorageDataSource,

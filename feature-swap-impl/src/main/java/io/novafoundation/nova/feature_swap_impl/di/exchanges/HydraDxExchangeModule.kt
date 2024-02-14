@@ -50,14 +50,12 @@ class HydraDxExchangeModule {
     @IntoSet
     fun provideStableSwapSourceFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        assetSourceRegistry: AssetSourceRegistry,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         gson: Gson,
         chainStateRepository: ChainStateRepository
     ): HydraDxSwapSource.Factory {
         return StableSwapSourceFactory(
             remoteStorageSource = remoteStorageSource,
-            assetSourceRegistry = assetSourceRegistry,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             gson = gson,
             chainStateRepository = chainStateRepository
