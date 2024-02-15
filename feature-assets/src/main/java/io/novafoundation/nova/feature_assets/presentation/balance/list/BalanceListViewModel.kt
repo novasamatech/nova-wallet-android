@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpleFormatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
@@ -137,7 +138,7 @@ class BalanceListViewModel(
         val currency = selectedCurrency.first()
         TotalBalanceModel(
             isBreakdownAbailable = breakdown.breakdown.isNotEmpty(),
-            totalBalanceFiat = breakdown.total.formatAsCurrency(currency).formatAsTotalBalance(),
+            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatAsTotalBalance(),
             lockedBalanceFiat = breakdown.locksTotal.amount.formatAsCurrency(currency),
             enableSwap = swapSupported
         )

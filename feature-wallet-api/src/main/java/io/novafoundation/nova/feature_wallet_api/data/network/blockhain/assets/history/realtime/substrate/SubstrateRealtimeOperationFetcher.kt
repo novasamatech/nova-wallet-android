@@ -32,7 +32,7 @@ interface SubstrateRealtimeOperationFetcher {
             class Known(val id: Id) : Source() {
 
                 enum class Id {
-                    ASSET_CONVERSION_SWAP
+                    ASSET_CONVERSION_SWAP, HYDRA_DX_SWAP
                 }
             }
         }

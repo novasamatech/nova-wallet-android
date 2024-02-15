@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmou
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigDecimal
 
 data class SwapQuote(
@@ -15,6 +16,7 @@ data class SwapQuote(
     val amountOut: ChainAssetWithAmount,
     val direction: SwapDirection,
     val priceImpact: Percent,
+    val path: QuotePath
 ) {
 
     val assetIn: Chain.Asset
@@ -34,6 +36,11 @@ data class SwapQuote(
             "Cross-chain swaps are not yet implemented"
         }
     }
+}
+
+class QuotePath(val segments: List<Segment>) {
+
+    class Segment(val from: FullChainAssetId, val to: FullChainAssetId, val sourceId: String, val sourceParams: Map<String, String>)
 }
 
 val SwapQuote.editedBalance: Balance

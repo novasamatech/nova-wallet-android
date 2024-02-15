@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.presentation.confirmation.paylo
 
 import io.novafoundation.nova.common.utils.asPercent
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
+import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
@@ -26,19 +27,37 @@ class SwapConfirmationPayloadFormatter(
                 amountIn = chainRegistry.asset(assetIn.fullChainAssetId).withAmount(planksIn),
                 amountOut = chainRegistry.asset(assetOut.fullChainAssetId).withAmount(planksOut),
                 direction = model.direction.mapFromModel(),
-                priceImpact = model.priceImpact.asPercent()
+                priceImpact = model.priceImpact.asPercent(),
+                path = QuotePath(
+                    segments = model.path.map {
+                        QuotePath.Segment(
+                            from = it.from.fullChainAssetId,
+                            to = it.to.fullChainAssetId,
+                            sourceId = it.sourceId,
+                            sourceParams = it.sourceParams
+                        )
+                    }
+                )
             )
         }
     }
 
     fun mapSwapQuoteToModel(model: SwapQuote): SwapConfirmationPayload.SwapQuoteModel {
         return SwapConfirmationPayload.SwapQuoteModel(
-            model.assetIn.fullId.toAssetPayload(),
-            model.assetOut.fullId.toAssetPayload(),
-            model.planksIn,
-            model.planksOut,
-            model.direction.mapToModel(),
-            model.priceImpact.value
+            assetIn = model.assetIn.fullId.toAssetPayload(),
+            assetOut = model.assetOut.fullId.toAssetPayload(),
+            planksIn = model.planksIn,
+            planksOut = model.planksOut,
+            direction = model.direction.mapToModel(),
+            priceImpact = model.priceImpact.value,
+            path = model.path.segments.map {
+                SwapConfirmationPayload.SwapQuotePathModel(
+                    from = it.from.toAssetPayload(),
+                    to = it.to.toAssetPayload(),
+                    sourceId = it.sourceId,
+                    sourceParams = it.sourceParams
+                )
+            }
         )
     }
 

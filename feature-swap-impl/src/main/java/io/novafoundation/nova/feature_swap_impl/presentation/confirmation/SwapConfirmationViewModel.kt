@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
-import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
@@ -50,13 +49,13 @@ import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.mapSwapValidationFailureToUI
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
@@ -361,7 +360,7 @@ class SwapConfirmationViewModel(
                 .getOrNull() ?: return@launch
 
             val nativeAsset = walletRepository.getAsset(metaAccount.id, newSwapQuoteArgs.tokenOut.configuration)!!
-            val executeArgs = newSwapQuoteArgs.toExecuteArgs(swapQuote.quotedBalance, confirmationState.feeAsset, nativeAsset)
+            val executeArgs = newSwapQuoteArgs.toExecuteArgs(swapQuote, confirmationState.feeAsset, nativeAsset)
             feeMixin.loadFeeV2Generic(
                 coroutineScope = viewModelScope,
                 feeConstructor = { swapInteractor.estimateFee(executeArgs) },

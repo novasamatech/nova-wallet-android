@@ -227,6 +227,23 @@ fun currencyFormatter() = CompoundNumberFormatter(
     )
 )
 
+fun simpleCurrencyFormatter() = CompoundNumberFormatter(
+    abbreviations = listOf(
+        NumberAbbreviation(
+            threshold = BigDecimal.ZERO,
+            divisor = BigDecimal.ONE,
+            suffix = "",
+            formatter = DynamicPrecisionFormatter(minScale = ABBREVIATED_SCALE, minPrecision = PRICE_MIN_PRECISION)
+        ),
+        NumberAbbreviation(
+            threshold = BigDecimal.ONE,
+            divisor = BigDecimal.ONE,
+            suffix = "",
+            formatter = defaultAbbreviationFormatter
+        )
+    )
+)
+
 fun baseDurationFormatter(
     context: Context,
     dayDurationFormatter: BoundedDurationFormatter = DayAndHourDurationFormatter(

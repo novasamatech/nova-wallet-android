@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
@@ -40,6 +41,10 @@ data class Asset(
                 TransferableMode.REGULAR -> legacyTransferable(free, frozen)
                 TransferableMode.HOLDS_AND_FREEZES -> holdAndFreezesTransferable(free, frozen, reserved)
             }
+        }
+
+        fun TransferableMode.calculateTransferable(accountBalance: AccountBalance): Balance {
+            return calculateTransferable(accountBalance.free, accountBalance.frozen, accountBalance.reserved)
         }
 
         fun EDCountingMode.calculateBalanceCountedTowardsEd(free: Balance, reserved: Balance): Balance {

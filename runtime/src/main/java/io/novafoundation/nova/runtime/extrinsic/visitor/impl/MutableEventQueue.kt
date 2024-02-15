@@ -52,6 +52,13 @@ internal inline fun MutableEventQueue.takeFromEndOrThrow(vararg eventTypes: Even
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun EventQueue.indexOfLastOrThrow(vararg eventTypes: Event, endExclusive: Int): Int {
+    return requireNotNull(indexOfLast(*eventTypes, endExclusive = endExclusive)) {
+        "No required event found for types ${eventTypes.joinToString { it.name }}"
+    }
+}
+
 data class EventWithIndex(val event: GenericEvent.Instance, val eventIndex: Int)
 
 class RealEventQueue(event: List<GenericEvent.Instance>) : MutableEventQueue {
@@ -112,6 +119,8 @@ class RealEventQueue(event: List<GenericEvent.Instance>) : MutableEventQueue {
     }
 
     private fun removeAllAfterInclusive(index: Int): List<GenericEvent.Instance> {
+        if (index > this.events.size) return emptyList()
+
         val subList = this.events.subList(index, this.events.size)
         val subListCopy = subList.toList()
 

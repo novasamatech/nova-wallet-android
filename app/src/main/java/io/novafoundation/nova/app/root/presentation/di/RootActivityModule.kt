@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
-import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -52,7 +51,6 @@ class RootActivityModule {
         walletConnectService: WalletConnectService,
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
         deepLinkHandler: RootDeepLinkHandler,
-        automaticInteractionGate: AutomaticInteractionGate,
         rootScope: RootScope,
         compoundRequestBusHandler: CompoundRequestBusHandler
     ): ViewModel {
@@ -70,7 +68,6 @@ class RootActivityModule {
             walletConnectService,
             walletConnectSessionsUseCase,
             deepLinkHandler,
-            automaticInteractionGate,
             rootScope,
             compoundRequestBusHandler
         )

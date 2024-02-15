@@ -40,9 +40,9 @@ class RealStakingStatsDataSource(
             val response = api.fetchStakingStats(request, dashboardApiUrl).data
 
             val earnings = response.stakingApies.associatedById()
-            val rewards = response.rewards.associatedById()
-            val slashes = response.slashes.associatedById()
-            val activeStakers = response.activeStakers.groupedById()
+            val rewards = response.rewards?.associatedById() ?: emptyMap()
+            val slashes = response.slashes?.associatedById() ?: emptyMap()
+            val activeStakers = response.activeStakers?.groupedById() ?: emptyMap()
 
             request.stakingKeysMapping.mapValues { (originalStakingOptionId, stakingKeys) ->
                 val totalReward = rewards.getPlanks(originalStakingOptionId) - slashes.getPlanks(originalStakingOptionId)
