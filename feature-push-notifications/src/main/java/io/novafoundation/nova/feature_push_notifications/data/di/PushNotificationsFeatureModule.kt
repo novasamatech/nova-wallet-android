@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificat
 import io.novafoundation.nova.feature_push_notifications.data.data.PushTokenCache
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushTokenCache
+import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.RealPushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.subscription.PushSubscriptionService
 import io.novafoundation.nova.feature_push_notifications.data.data.subscription.RealPushSubscriptionService
@@ -40,10 +41,10 @@ class PushNotificationsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideLocalPushSettingsProvider(
+    fun providePushSettingsProvider(
         gson: Gson,
         preferences: Preferences
-    ): RealPushSettingsProvider {
+    ): PushSettingsProvider {
         return RealPushSettingsProvider(gson, preferences)
     }
 
@@ -64,7 +65,7 @@ class PushNotificationsFeatureModule {
     @Provides
     @FeatureScope
     fun providePushNotificationsService(
-        localPushSettingsProvider: RealPushSettingsProvider,
+        pushSettingsProvider: PushSettingsProvider,
         pushSubscriptionService: PushSubscriptionService,
         rootScope: RootScope,
         preferences: Preferences,
@@ -72,7 +73,7 @@ class PushNotificationsFeatureModule {
         googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
     ): PushNotificationsService {
         return RealPushNotificationsService(
-            localPushSettingsProvider,
+            pushSettingsProvider,
             pushSubscriptionService,
             rootScope,
             preferences,
@@ -84,8 +85,9 @@ class PushNotificationsFeatureModule {
     @Provides
     @FeatureScope
     fun providePushNotificationsInteractor(
-        pushNotificationsService: PushNotificationsService
+        pushNotificationsService: PushNotificationsService,
+        pushSettingsProvider: PushSettingsProvider
     ): PushNotificationsInteractor {
-        return RealPushNotificationsInteractor(pushNotificationsService)
+        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider)
     }
 }

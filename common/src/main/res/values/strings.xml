@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_retry_message">Something went wrong. Please try again</string>
+    <string name="common_push_notifications">Push notifications</string>
+
+    <string name="push_welcome_title">Don’t miss a thing!</string>
+    <string name="push_welcome_message">Get notified about Wallet operations, Governance updates, Staking activity and Security, so you’re always in the know</string>
+    <string name="push_welcome_enable_button">Enable push notifications</string>
+    <string name="push_welcome_cancel_button">Not now</string>
+    <string name="push_welcome_terms_and_conditions">By enabling push notifications, you agree to our %s and %s</string>
+
     <string name="staking_no_access_to_controller_account_title">No access to controller account</string>
     <string name="staking_no_access_to_controller_account_message">Add your controller account in device.</string>
 

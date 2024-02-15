@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_push_notifications.data.data
 
+import com.google.firebase.messaging.messaging
 import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
@@ -14,7 +16,6 @@ import io.novafoundation.nova.feature_push_notifications.data.data.subscription.
 import kotlinx.coroutines.launch
 
 private const val PREFS_NEED_TO_SYNC_TOKEN = "need_to_sync_token"
-private const val PREFS_PUSH_NOTIFICATIONS_ENABLED = "push_notifications_enabled"
 
 interface PushNotificationsService {
 
@@ -24,7 +25,7 @@ interface PushNotificationsService {
 
     fun isPushNotificationsEnabled(): Boolean
 
-    fun setPushNotificationsEnabled(isEnabled: Boolean)
+    suspend fun setPushNotificationsEnabled(isEnabled: Boolean): Result<Unit>
 
     suspend fun onSettingsUpdated(settings: PushSettings): Result<Unit>
 
@@ -41,12 +42,16 @@ class RealPushNotificationsService(
 ) : PushNotificationsService {
 
     init {
-        logToken()
+        if (isPushNotificationsEnabled()) {
+            logToken()
+        }
     }
 
     override fun onTokenUpdated(token: String) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
         if (!isPushNotificationsEnabled()) return
+
+        logToken()
 
         rootScope.launch {
             pushTokenCache.updatePushToken(token)
@@ -82,12 +87,23 @@ class RealPushNotificationsService(
         return preferences.getBoolean(PREFS_NEED_TO_SYNC_TOKEN, false)
     }
 
-    override fun setPushNotificationsEnabled(isEnabled: Boolean) {
-        preferences.putBoolean(PREFS_PUSH_NOTIFICATIONS_ENABLED, isEnabled)
+    override fun isPushNotificationsEnabled(): Boolean {
+        return pushSettingsProvider.isPushNotificationsEnabled()
     }
 
-    override fun isPushNotificationsEnabled(): Boolean {
-        return preferences.getBoolean(PREFS_PUSH_NOTIFICATIONS_ENABLED, true)
+    override suspend fun setPushNotificationsEnabled(isEnabled: Boolean): Result<Unit> {
+        val result = if (isEnabled) {
+            NovaFirebaseMessagingService.requestToken()
+        } else {
+            NovaFirebaseMessagingService.deleteToken()
+        }
+
+        result.onSuccess {
+            Firebase.messaging.isAutoInitEnabled = isEnabled
+            pushSettingsProvider.setPushNotificationsEnabled(isEnabled)
+        }
+
+        return result
     }
 
     private fun setNeedToSyncSettings(needToSync: Boolean) {

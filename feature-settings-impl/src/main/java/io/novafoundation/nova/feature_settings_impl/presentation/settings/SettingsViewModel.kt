@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -48,7 +49,8 @@ class SettingsViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val twoFactorVerificationService: TwoFactorVerificationService,
-    private val biometricService: BiometricService
+    private val biometricService: BiometricService,
+    private val pushNotificationsInteractor: PushNotificationsInteractor
 ) : BaseViewModel(), Browserable {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -100,12 +102,20 @@ class SettingsViewModel(
         .map { Event(true) }
         .asLiveData()
 
+    val pushNotificationsState = pushNotificationsInteractor.pushNotificationsEnabledFlow()
+        .map { mapPushNotificationsState(it) }
+        .shareInBackground()
+
     init {
         setupBiometric()
     }
 
     fun walletsClicked() {
         router.openWallets()
+    }
+
+    fun pushNotificationsClicked() {
+        router.openPushNotifications()
     }
 
     fun currenciesClicked() {
@@ -221,6 +231,14 @@ class SettingsViewModel(
         }
     }
 
+    fun onResume() {
+        biometricService.refreshBiometryState()
+    }
+
+    fun onPause() {
+        biometricService.cancel()
+    }
+
     private fun openLink(link: String) {
         openBrowserEvent.value = link.event()
     }
@@ -232,11 +250,11 @@ class SettingsViewModel(
             .launchIn(this)
     }
 
-    fun onResume() {
-        biometricService.refreshBiometryState()
-    }
-
-    fun onPause() {
-        biometricService.cancel()
+    private fun mapPushNotificationsState(isEnabled: Boolean): String {
+        return if (isEnabled) {
+            resourceManager.getString(R.string.common_on)
+        } else {
+            resourceManager.getString(R.string.common_off)
+        }
     }
 }

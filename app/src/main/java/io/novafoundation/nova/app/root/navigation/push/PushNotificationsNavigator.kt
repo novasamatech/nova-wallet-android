@@ -6,4 +6,9 @@ import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsR
 
 class PushNotificationsNavigator(
     navigationHolder: NavigationHolder,
-) : BaseNavigator(navigationHolder), PushNotificationsRouter
+) : BaseNavigator(navigationHolder), PushNotificationsRouter {
+
+    override fun openPushSettings() {
+        TODO("Not yet implemented")
+    }
+}
