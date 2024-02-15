@@ -59,6 +59,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.BatchMode
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -183,7 +184,7 @@ private class HydraDxExchange(
             null
         }
 
-        val swapFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+        val swapFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, BatchMode.FORCE_BATCH) {
             executeSwap(args, paymentCurrencyToSet, currentFeeTokenId)
         }
 
@@ -217,7 +218,7 @@ private class HydraDxExchange(
         }
 
         return setCurrencyResult.flatMap {
-            extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) {
+            extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet, BatchMode.FORCE_BATCH) {
                 executeSwap(args, paymentCurrencyToSet, currentFeeTokenId)
             }
         }

@@ -4,6 +4,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisitor
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.BatchAllNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.ForceBatchNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.proxy.ProxyNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -23,7 +24,7 @@ internal class RealExtrinsicWalk(
 
     companion object {
 
-        fun defaultNodes() = listOf(ProxyNode(), BatchAllNode())
+        fun defaultNodes() = listOf(ProxyNode(), BatchAllNode(), ForceBatchNode())
     }
 
     override suspend fun walk(

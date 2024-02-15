@@ -12,6 +12,10 @@ internal fun RuntimeSnapshot.batchCompletedEvent(): Event {
     return metadata.utility().event("BatchCompleted")
 }
 
+internal fun RuntimeSnapshot.batchCompletedWithErrorsEvent(): Event {
+    return metadata.utility().event("BatchCompletedWithErrors")
+}
+
 internal fun RuntimeSnapshot.itemCompletedEvent(): Event {
     return metadata.utility().event("ItemCompleted")
 }
