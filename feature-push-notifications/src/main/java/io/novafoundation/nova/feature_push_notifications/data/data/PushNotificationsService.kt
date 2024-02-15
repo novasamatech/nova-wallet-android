@@ -1,10 +1,15 @@
 package io.novafoundation.nova.feature_push_notifications.data.data
 
+import com.google.firebase.messaging.messaging
+import android.util.Log
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.messaging
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.repeatUntil
+import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
@@ -39,13 +44,15 @@ class RealPushNotificationsService(
 
     init {
         if (isPushNotificationsEnabled()) {
-            NovaFirebaseMessagingService.logToken()
+            logToken()
         }
     }
 
     override fun onTokenUpdated(token: String) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
         if (!isPushNotificationsEnabled()) return
+
+        logToken()
 
         rootScope.launch {
             pushTokenCache.updatePushToken(token)
@@ -63,7 +70,7 @@ class RealPushNotificationsService(
     }
 
     override suspend fun onSettingsUpdated(settings: PushSettings): Result<Unit> {
-        if (!googleApiAvailabilityProvider.isAvailable()) return Result.success(Unit)
+        if (!googleApiAvailabilityProvider.isAvailable()) throw IllegalStateException("Google API is not available")
 
         return runCatching {
             if (!isPushNotificationsEnabled()) throw IllegalStateException("Push notifications are not enabled")
@@ -122,5 +129,19 @@ class RealPushNotificationsService(
         }
 
         setNeedToSyncSettings(!succesfullSync)
+    }
+
+    fun logToken() {
+        if (!BuildConfig.DEBUG) return
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(
+            OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    return@OnCompleteListener
+                }
+
+                Log.d("NOVA_PUSH_TOKEN", "FCM token: ${task.result}")
+            }
+        )
     }
 }
