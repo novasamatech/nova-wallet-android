@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -51,6 +52,7 @@ class RootFeatureHolder @Inject constructor(
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
             .walletConnectFeatureApi(getFeature(WalletConnectFeatureApi::class.java))
+            .pushNotificationsFeatureApi(getFeature(PushNotificationsFeatureApi::class.java))
             .build()
 
         return DaggerRootComponent.factory()

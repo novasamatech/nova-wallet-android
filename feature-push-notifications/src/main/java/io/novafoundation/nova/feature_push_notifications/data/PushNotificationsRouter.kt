@@ -1,0 +1,3 @@
+package io.novafoundation.nova.feature_push_notifications.data
+
+interface PushNotificationsRouter
