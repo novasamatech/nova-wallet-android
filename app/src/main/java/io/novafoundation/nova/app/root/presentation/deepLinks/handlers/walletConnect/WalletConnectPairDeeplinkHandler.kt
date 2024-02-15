@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks.handlers.walletConnect
 
 import android.net.Uri
-import android.util.Log
 import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
 import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -18,8 +17,6 @@ class WalletConnectPairDeeplinkHandler(
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
 
     override suspend fun matches(data: Uri): Boolean {
-        Log.d("RX", "Handling deeplink $data")
-
         val newLinkMatch = data.scheme == "novawallet" && data.host == "wc"
         // Older version of wc send both pair and sign requests through `wc:` deeplink so we additionaly check for `symKey` which is only present in pairing url
         val oldLinkMatch = data.scheme == "wc" && "symKey" in data.toString()
