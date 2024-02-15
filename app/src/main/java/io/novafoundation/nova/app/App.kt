@@ -17,7 +17,6 @@ import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.feature_wallet_connect_impl.BuildConfig
 import javax.inject.Inject
 
-
 private const val WC_REDIRECT_URL = "novawallet://request"
 
 open class App : Application(), FeatureContainer {

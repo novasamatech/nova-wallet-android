@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.emptyFlow
 class WalletConnectPairDeeplinkHandler(
     private val walletConnectService: WalletConnectService,
     private val automaticInteractionGate: AutomaticInteractionGate
-): DeepLinkHandler {
+) : DeepLinkHandler {
 
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
 
