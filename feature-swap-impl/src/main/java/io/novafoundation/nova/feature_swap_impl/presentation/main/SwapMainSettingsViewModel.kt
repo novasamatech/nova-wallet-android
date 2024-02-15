@@ -489,7 +489,9 @@ class SwapMainSettingsViewModel(
         combineToPair(nativeAssetFlow, feeMixin.loadedFeeModelOrNullFlow())
             .filter { (nativeAsset, feeModel) ->
                 val canChangeAutomatically = !feeTokenOnceChangedManually.value
+                val canAcceptAssetInAsPayment = canChangeFeeToken.first()
 
+                if (!canAcceptAssetInAsPayment) return@filter false
                 if (!canChangeAutomatically) return@filter false
                 if (nativeAsset.transferable.isZero) return@filter true
                 if (feeModel == null) return@filter false
