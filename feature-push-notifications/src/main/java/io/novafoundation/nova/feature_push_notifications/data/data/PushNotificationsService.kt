@@ -7,7 +7,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
-import io.novafoundation.nova.common.utils.repeatUntil
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
