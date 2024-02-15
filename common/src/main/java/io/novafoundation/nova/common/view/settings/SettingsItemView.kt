@@ -28,10 +28,6 @@ class SettingsItemView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-    }
-
     fun setTitle(title: String?) {
         settingsItemTitle.text = title
     }

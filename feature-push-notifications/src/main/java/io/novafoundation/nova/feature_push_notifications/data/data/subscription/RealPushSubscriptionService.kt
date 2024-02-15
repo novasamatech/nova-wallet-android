@@ -73,15 +73,16 @@ class RealPushSubscriptionService(
     }
 
     private suspend fun handleTopics(pushEnabled: Boolean, pushSettings: PushSettings) {
-        val deferreds = mutableListOf<Deferred<Void>>()
-        deferreds += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
-
         // TODO unsubscribe from old gov topics
-        deferreds += pushSettings.governanceState.flatMapChainToTracks()
-            .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
+        val deferreds = buildList<Deferred<Void>> {
+            this += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
 
-        deferreds += pushSettings.newReferenda.flatMapChainToTracks()
-            .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId:$track") }
+            this += pushSettings.governanceState.flatMapChainToTracks()
+                .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
+
+            this += pushSettings.newReferenda.flatMapChainToTracks()
+                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId:$track") }
+        }
 
         deferreds.awaitAll()
     }
