@@ -6,7 +6,6 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ReferendumHandlingException
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
@@ -14,8 +13,8 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
-import java.math.BigInteger
 import kotlinx.coroutines.flow.MutableSharedFlow
+import java.math.BigInteger
 
 private const val GOV_DEEP_LINK_PREFIX = "/open/gov"
 
@@ -23,7 +22,6 @@ class ReferendumDeepLinkHandler(
     private val governanceRouter: GovernanceRouter,
     private val chainRegistry: ChainRegistry,
     private val mutableGovernanceState: MutableGovernanceState,
-    private val accountRepository: AccountRepository,
     private val automaticInteractionGate: AutomaticInteractionGate
 ) : DeepLinkHandler {
 
@@ -57,7 +55,7 @@ class ReferendumDeepLinkHandler(
             ?.toBigIntegerOrNull()
     }
 
-    private suspend fun Uri.getGovernanceType(chain: Chain): Chain.Governance {
+    private fun Uri.getGovernanceType(chain: Chain): Chain.Governance {
         val supportedGov = chain.governance
         val govType = getQueryParameter("type")
             ?.toIntOrNull()
@@ -73,9 +71,5 @@ class ReferendumDeepLinkHandler(
             govType !in 0..1 -> throw ReferendumHandlingException.GovernanceTypeIsNotSupported
             else -> throw ReferendumHandlingException.GovernanceTypeIsNotSupported
         }
-    }
-
-    private fun Chain.Governance.takeIfContainedIn(list: List<Chain.Governance>): Chain.Governance? {
-        return list.firstOrNull { it == this }
     }
 }

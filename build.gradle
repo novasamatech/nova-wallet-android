@@ -83,8 +83,8 @@ buildscript {
 
         markwonVersion = '4.6.2'
 
-        walletConnectCoreVersion = "1.13.0"
-        walletConnectWalletVersion = "1.6.0"
+        walletConnectCoreVersion = "1.27.2"
+        walletConnectWalletVersion = "1.20.2"
 
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"

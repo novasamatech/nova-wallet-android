@@ -44,7 +44,6 @@ class RootViewModel(
     private val walletConnectService: WalletConnectService,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val deepLinkHandler: DeepLinkHandler,
-    private val automaticInteractionGate: AutomaticInteractionGate,
     private val rootScope: RootScope,
     private val compoundRequestBusHandler: CompoundRequestBusHandler
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
