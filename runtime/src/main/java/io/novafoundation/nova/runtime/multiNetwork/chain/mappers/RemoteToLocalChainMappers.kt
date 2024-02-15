@@ -22,6 +22,7 @@ private const val CROWDLOAN_OPTION = "crowdloans"
 private const val TESTNET_OPTION = "testnet"
 private const val PROXY_OPTION = "proxy"
 private const val SWAP_HUB = "swap-hub"
+private const val HYDRA_DX_SWAPS = "hydradx-swaps"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
 private const val FULL_SYNC_BY_DEFAULT = "fullSyncByDefault"
 
@@ -250,6 +251,7 @@ private fun Set<String>.swapTypesFromOptions(): List<Chain.Swap> {
     return mapNotNull { option ->
         when (option) {
             SWAP_HUB -> Chain.Swap.ASSET_CONVERSION
+            HYDRA_DX_SWAPS -> Chain.Swap.HYDRA_DX
             else -> null
         }
     }

@@ -11,10 +11,14 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toPercent
+import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
+import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
@@ -24,31 +28,37 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
+import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
 private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
+    private val hydraDxOmnipoolFactory: HydraDxExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
@@ -80,20 +90,27 @@ internal class RealSwapService(
     }
 
     override suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote> {
-        val computationScope = CoroutineScope(coroutineContext)
+        return withContext(Dispatchers.Default) {
+            runCatching {
+                val exchange = exchanges(this).getValue(args.tokenIn.configuration.chainId)
+                val quoteArgs = AssetExchangeQuoteArgs(
+                    chainAssetIn = args.tokenIn.configuration,
+                    chainAssetOut = args.tokenOut.configuration,
+                    amount = args.amount,
+                    swapDirection = args.swapDirection
+                )
+                val quote = exchange.quote(quoteArgs)
 
-        return runCatching {
-            val exchange = exchanges(computationScope).getValue(args.tokenIn.configuration.chainId)
-            val quote = exchange.quote(args)
+                val (amountIn, amountOut) = args.inAndOutAmounts(quote)
 
-            val (amountIn, amountOut) = args.inAndOutAmounts(quote)
-
-            SwapQuote(
-                amountIn = args.tokenIn.configuration.withAmount(amountIn),
-                amountOut = args.tokenOut.configuration.withAmount(amountOut),
-                direction = args.swapDirection,
-                priceImpact = args.calculatePriceImpact(amountIn, amountOut),
-            )
+                SwapQuote(
+                    amountIn = args.tokenIn.configuration.withAmount(amountIn),
+                    amountOut = args.tokenOut.configuration.withAmount(amountOut),
+                    direction = args.swapDirection,
+                    priceImpact = args.calculatePriceImpact(amountIn, amountOut),
+                    path = quote.path
+                )
+            }
         }
     }
 
@@ -117,6 +134,13 @@ internal class RealSwapService(
         val computationScope = CoroutineScope(coroutineContext)
         val exchanges = exchanges(computationScope)
         return exchanges[chainId]?.slippageConfig()
+    }
+
+    override fun runSubscriptions(chainIn: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
+        return withFlowScope { scope ->
+            val exchanges = exchanges(scope)
+            exchanges.getValue(chainIn.id).runSubscriptions(chainIn, metaAccount)
+        }.throttleLast(500.milliseconds)
     }
 
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {
@@ -150,7 +174,7 @@ internal class RealSwapService(
                     .catch {
                         emit(emptyMap())
 
-                        Log.d("RealSwapService", "Failed to fetch directions for exchange ${exchange::class} in chain $chainId")
+                        Log.e("RealSwapService", "Failed to fetch directions for exchange ${exchange::class} in chain $chainId", it)
                     }
             }
 
@@ -167,8 +191,19 @@ internal class RealSwapService(
     }
 
     private suspend fun createExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
-        return chainRegistry.findChains { it.swap.isNotEmpty() }
-            .associateBy(Chain::id) { assetConversionFactory.create(it.id, coroutineScope) }
+        return chainRegistry.chainsById.first().mapValues { (_, chain) ->
+            createExchange(coroutineScope, chain)
+        }
             .filterNotNull()
+    }
+
+    private suspend fun createExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
+        val factory = when {
+            chain.swap.assetConversionSupported() -> assetConversionFactory
+            chain.swap.hydraDxSupported() -> hydraDxOmnipoolFactory
+            else -> null
+        }
+
+        return factory?.create(chain, computationScope)
     }
 }

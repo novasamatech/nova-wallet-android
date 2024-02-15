@@ -23,6 +23,7 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytesOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArrayOrNull
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
@@ -48,6 +49,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
 import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
 import jp.co.soramitsu.fearless_utils.scale.Schema
 import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
+import jp.co.soramitsu.fearless_utils.scale.utils.toUnsignedBytes
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -94,6 +96,10 @@ val Short.bigEndianBytes
 
 fun ByteArray.toBigEndianShort(): Short = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).short
 fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
+
+fun BigInteger.toUnsignedLittleEndian(): ByteArray {
+    return toUnsignedBytes().reversedArray()
+}
 
 fun ByteArray.toBigEndianU32(): UInt = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).int.toUInt()
 
@@ -166,6 +172,10 @@ fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot
 
 fun Constant.asNumber(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
 
+fun Constant.decoded(runtimeSnapshot: RuntimeSnapshot): Any? {
+    return type?.fromByteArrayOrNull(runtimeSnapshot, value)
+}
+
 fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
@@ -180,6 +190,8 @@ fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 fun RuntimeMetadata.eqBalances() = module(Modules.EQ_BALANCES)
 
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
+
+fun RuntimeMetadata.assetRegistry() = module(Modules.ASSET_REGISTRY)
 
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
@@ -233,11 +245,29 @@ fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_PO
 
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
 
+fun RuntimeMetadata.omnipoolOrNull() = moduleOrNull(Modules.OMNIPOOL)
+
+fun RuntimeMetadata.omnipool() = module(Modules.OMNIPOOL)
+
+fun RuntimeMetadata.stableSwapOrNull() = moduleOrNull(Modules.STABLE_SWAP)
+
+fun RuntimeMetadata.stableSwap() = module(Modules.STABLE_SWAP)
+
+fun RuntimeMetadata.dynamicFeesOrNull() = moduleOrNull(Modules.DYNAMIC_FEES)
+
+fun RuntimeMetadata.dynamicFees() = module(Modules.DYNAMIC_FEES)
+
+fun RuntimeMetadata.multiTransactionPayment() = module(Modules.MULTI_TRANSACTION_PAYMENT)
+
+fun RuntimeMetadata.referralsOrNull() = moduleOrNull(Modules.REFERRALS)
+
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
 fun RuntimeMetadata.proxyOrNull() = moduleOrNull(Modules.PROXY)
 
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
+
+fun RuntimeMetadata.utility() = module(Modules.UTILITY)
 
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
@@ -396,4 +426,18 @@ object Modules {
     const val MULTISIG = "Multisig"
     const val REGISTRAR = "Registrar"
     const val FAST_UNSTAKE = "FastUnstake"
+
+    const val OMNIPOOL = "Omnipool"
+
+    const val DYNAMIC_FEES = "DynamicFees"
+
+    const val MULTI_TRANSACTION_PAYMENT = "MultiTransactionPayment"
+
+    const val REFERRALS = "Referrals"
+
+    const val ROUTER = "Router"
+
+    const val STABLE_SWAP = "Stableswap"
+
+    const val ASSET_REGISTRY = "AssetRegistry"
 }
