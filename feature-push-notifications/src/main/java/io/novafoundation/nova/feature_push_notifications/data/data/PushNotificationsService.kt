@@ -7,39 +7,36 @@ import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
-import io.novafoundation.nova.common.utils.repeatUntil
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.subscription.PushSubscriptionService
 import kotlinx.coroutines.launch
-
-private const val PREFS_NEED_TO_SYNC_TOKEN = "need_to_sync_token"
+import kotlin.jvm.Throws
 
 interface PushNotificationsService {
 
     fun onTokenUpdated(token: String)
 
-    fun isNeedToSyncSettings(): Boolean
-
     fun isPushNotificationsEnabled(): Boolean
 
-    suspend fun setPushNotificationsEnabled(isEnabled: Boolean): Result<Unit>
+    suspend fun initPushNotifications(): Result<Unit>
 
-    suspend fun onSettingsUpdated(settings: PushSettings): Result<Unit>
-
-    suspend fun syncSettings()
+    suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings): Result<Unit>
 }
 
 class RealPushNotificationsService(
-    private val pushSettingsProvider: PushSettingsProvider,
-    private val pushSubscriptionService: PushSubscriptionService,
+    private val settingsProvider: PushSettingsProvider,
+    private val subscriptionService: PushSubscriptionService,
     private val rootScope: RootScope,
     private val preferences: Preferences,
-    private val pushTokenCache: PushTokenCache,
+    private val tokenCache: PushTokenCache,
     private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 ) : PushNotificationsService {
+
+    // Using to manually sync subscriptions (firestore, topics) after enabling push notifications
+    private var skipTokenReceivingCallback = false
 
     init {
         if (isPushNotificationsEnabled()) {
@@ -50,84 +47,58 @@ class RealPushNotificationsService(
     override fun onTokenUpdated(token: String) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
         if (!isPushNotificationsEnabled()) return
+        if (skipTokenReceivingCallback) return
 
         logToken()
 
         rootScope.launch {
-            pushTokenCache.updatePushToken(token)
-
-            syncSettings()
+            tokenCache.updatePushToken(token)
+            updatePushSettings(isPushNotificationsEnabled(), settingsProvider.getPushSettings())
         }
     }
 
-    override suspend fun syncSettings() {
-        if (!googleApiAvailabilityProvider.isAvailable()) return
-        if (!isPushNotificationsEnabled()) return
-
-        val pushToken = getPushTokenOrFallback() ?: return
-        syncSettingsInternal(pushToken)
-    }
-
-    override suspend fun onSettingsUpdated(settings: PushSettings): Result<Unit> {
+    override suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings): Result<Unit> {
         if (!googleApiAvailabilityProvider.isAvailable()) throw IllegalStateException("Google API is not available")
 
         return runCatching {
-            if (!isPushNotificationsEnabled()) throw IllegalStateException("Push notifications are not enabled")
-
-            val pushToken = getPushTokenOrFallback() ?: throw IllegalStateException("Push token is not set")
-            pushSettingsProvider.updateWalletSettings(settings)
-            pushSubscriptionService.handleSubscription(pushToken, settings)
+            setPushNotificationsEnabled(enabled)
+            val pushToken = getPushToken()
+            settingsProvider.updateWalletSettings(pushSettings)
+            subscriptionService.handleSubscription(enabled, pushToken, pushSettings)
         }
-    }
-
-    override fun isNeedToSyncSettings(): Boolean {
-        if (!googleApiAvailabilityProvider.isAvailable()) return false
-        if (!isPushNotificationsEnabled()) return false
-
-        return preferences.getBoolean(PREFS_NEED_TO_SYNC_TOKEN, false)
     }
 
     override fun isPushNotificationsEnabled(): Boolean {
-        return pushSettingsProvider.isPushNotificationsEnabled()
+        return settingsProvider.isPushNotificationsEnabled()
     }
 
-    override suspend fun setPushNotificationsEnabled(isEnabled: Boolean): Result<Unit> {
-        val result = if (isEnabled) {
+    override suspend fun initPushNotifications(): Result<Unit> {
+        if (!googleApiAvailabilityProvider.isAvailable()) return Result.success(Unit)
+
+        return updatePushSettings(true, settingsProvider.getDefaultPushSettings())
+    }
+
+    @Throws
+    private suspend fun setPushNotificationsEnabled(isEnable: Boolean) {
+        if (isEnable == isPushNotificationsEnabled()) return
+        skipTokenReceivingCallback = true
+
+        val pushToken = if (isEnable) {
             NovaFirebaseMessagingService.requestToken()
         } else {
             NovaFirebaseMessagingService.deleteToken()
+            null
         }
 
-        result.onSuccess {
-            Firebase.messaging.isAutoInitEnabled = isEnabled
-            pushSettingsProvider.setPushNotificationsEnabled(isEnabled)
-        }
+        tokenCache.updatePushToken(pushToken)
+        Firebase.messaging.isAutoInitEnabled = isEnable
+        settingsProvider.setPushNotificationsEnabled(isEnable)
 
-        return result
+        skipTokenReceivingCallback = false
     }
 
-    private fun setNeedToSyncSettings(needToSync: Boolean) {
-        preferences.putBoolean(PREFS_NEED_TO_SYNC_TOKEN, needToSync)
-    }
-
-    private suspend fun getPushTokenOrFallback(): String? {
-        return pushTokenCache.getPushToken() ?: NovaFirebaseMessagingService.getToken()
-    }
-
-    private suspend fun syncSettingsInternal(token: String) {
-        if (!googleApiAvailabilityProvider.isAvailable()) return
-        if (!isPushNotificationsEnabled()) return
-
-        val succesfullSync = repeatUntil(maxTimes = 5) {
-            val pushSettings = pushSettingsProvider.getPushSettings() ?: PushSettings.getDefault()
-            val result = runCatching {
-                pushSubscriptionService.handleSubscription(token, pushSettings)
-            }
-
-            result.isSuccess
-        }
-
-        setNeedToSyncSettings(!succesfullSync)
+    private suspend fun getPushToken(): String? {
+        return tokenCache.getPushToken()
     }
 
     fun logToken() {

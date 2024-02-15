@@ -130,4 +130,5 @@ dependencies {
     implementation markwonLinkify
     implementation markwonStrikethrough
     implementation markwonHtml
+    implementation kotlinReflect
 }

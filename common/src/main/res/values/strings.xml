@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="push_settings_stakint_rewards">Staking rewards</string>
+    <string name="push_settings_others">Others</string>
+
+    <string name="push_settings_received_tokens">Received tokens</string>
+    <string name="push_settings_sent_tokens">Sent tokens</string>
+    <string name="push_settings_balances">Balances</string>
+
+    <string name="push_settings_announcements">Nova announcements</string>
+
+    <string name="push_settings_enable">Enable notifications</string>
+    <string name="push_settings_wallets">Wallets</string>
+
     <string name="common_retry_message">Something went wrong. Please try again</string>
     <string name="common_push_notifications">Push notifications</string>
 

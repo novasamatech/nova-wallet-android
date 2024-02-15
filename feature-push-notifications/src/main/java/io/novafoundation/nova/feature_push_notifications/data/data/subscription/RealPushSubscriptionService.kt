@@ -5,15 +5,21 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.messaging
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.formatting.formatDateISO_8601_NoMs
+import io.novafoundation.nova.common.utils.mapOfNotNullValues
 import io.novafoundation.nova.common.utils.mapValuesNotNull
+import io.novafoundation.nova.feature_account_api.domain.model.toDefaultSubstrateAddress
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.util.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
@@ -29,14 +35,14 @@ class RealPushSubscriptionService(
 
     private val generateIdMutex = Mutex()
 
-    override suspend fun handleSubscription(token: String, pushSettings: PushSettings) {
+    override suspend fun handleSubscription(pushEnabled: Boolean, token: String?, pushSettings: PushSettings) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
 
-        handleSubscription(pushSettings.appMajorUpdates, "appMajorUpdates")
-        handleSubscription(pushSettings.appCriticalUpdates, "appCriticalUpdates")
-        handleSubscription(pushSettings.chainReferendums, "chainReferendums")
+        val tokenExist = token != null
+        if (pushEnabled != tokenExist) throw IllegalStateException("Token should exist to enable push notifications")
 
-        sendWaletSettingsToFirestore(token, pushSettings)
+        handleTopics(pushEnabled, pushSettings)
+        handleFirestore(token, pushSettings)
     }
 
     private suspend fun getFirestoreUUID(): String {
@@ -52,73 +58,113 @@ class RealPushSubscriptionService(
         }
     }
 
-    private suspend fun sendWaletSettingsToFirestore(token: String, pushSettings: PushSettings) {
-        val model = mapToFirestorePushSettings(
-            token,
-            Date(),
-            chainRegistry.chainsById(),
-            pushSettings.wallets
-        )
-        Firebase.firestore.collection(COLLECTION_NAME)
-            .document(getFirestoreUUID())
-            .set(model)
-            .await()
+    private suspend fun handleFirestore(token: String?, pushSettings: PushSettings) {
+        if (token == null) {
+            Firebase.firestore.collection(COLLECTION_NAME)
+                .document(getFirestoreUUID())
+                .delete()
+                .await()
+        } else {
+            val model = mapToFirestorePushSettings(
+                token,
+                Date(),
+                pushSettings
+            )
+
+            Firebase.firestore.collection(COLLECTION_NAME)
+                .document(getFirestoreUUID())
+                .set(model)
+                .await()
+        }
     }
 
-    private suspend fun handleSubscription(subscribe: Boolean, topic: String) {
-        if (subscribe) {
+    private suspend fun handleTopics(pushEnabled: Boolean, pushSettings: PushSettings) {
+        // TODO unsubscribe from old gov topics
+        val deferreds = buildList<Deferred<Void>> {
+            this += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
+
+            this += pushSettings.governanceState.flatMapChainToTracks()
+                .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
+
+            this += pushSettings.newReferenda.flatMapChainToTracks()
+                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId:$track") }
+        }
+
+        deferreds.awaitAll()
+    }
+
+    private suspend fun handleSubscription(subscribe: Boolean, topic: String): Deferred<Void> {
+        return if (subscribe) {
             subscribeToTopic(topic)
         } else {
             unsubscribeFromTopic(topic)
         }
     }
 
-    private suspend fun subscribeToTopic(topic: String) {
-        Firebase.messaging.subscribeToTopic(topic)
-            .await()
+    private suspend fun subscribeToTopic(topic: String): Deferred<Void> {
+        return Firebase.messaging.subscribeToTopic(topic)
+            .asDeferred()
     }
 
-    private suspend fun unsubscribeFromTopic(topic: String) {
-        Firebase.messaging.unsubscribeFromTopic(topic)
-            .await()
+    private suspend fun unsubscribeFromTopic(topic: String): Deferred<Void> {
+        return Firebase.messaging.unsubscribeFromTopic(topic)
+            .asDeferred()
     }
 
-    private fun mapToFirestorePushSettings(
+    private suspend fun mapToFirestorePushSettings(
         token: String,
         date: Date,
-        chainsById: ChainsById,
-        walletsSettings: List<PushSettings.Wallet>
+        settings: PushSettings
     ): Map<String, Any> {
+        val chainsById = chainRegistry.chainsById()
+
         return mapOf(
             "pushToken" to token,
             "updatedAt" to formatDateISO_8601_NoMs(date),
-            "wallets" to walletsSettings.map { mapToFirestoreWallet(it, chainsById) }
-        )
-    }
-
-    private fun mapToFirestoreWallet(wallet: PushSettings.Wallet, chainsById: ChainsById): Map<String, Any> {
-        return mapOf(
-            "baseEthereumAccount" to wallet.baseEthereumAccount,
-            "baseSubstrateAccount" to wallet.baseSubstrateAccount,
-            "chainAccounts" to wallet.chainAccounts.mapValuesNotNull { chainsById.lovercaseNameOf(it.key) },
-            "notifications" to mapOf(
-                "stakingReward" to mapToFirestoreChainFeature(wallet.notifications.stakingReward, chainsById),
-                "transfer" to mapToFirestoreChainFeature(wallet.notifications.transfer, chainsById)
+            "wallets" to settings.wallets.map { mapToFirestoreWallet(it, chainsById) },
+            "notifications" to mapOfNotNullValues(
+                "stakingReward" to mapToFirestoreChainFeature(settings.stakingReward),
+                "tokenSent" to settings.sentTokensEnabled.mapToFirestoreChainFeatureOrNull(),
+                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull(),
+                "govMyDelegatorVoted" to mapToFirestoreChainFeature(settings.govMyDelegatorVoted),
+                "govMyReferendumFinished" to mapToFirestoreChainFeature(settings.govMyReferendumFinished)
             )
         )
     }
 
-    private fun mapToFirestoreChainFeature(chainFeature: PushSettings.ChainFeature, chainsById: ChainsById): Map<String, Any> {
+    private suspend fun mapToFirestoreWallet(wallet: PushSettings.Wallet, chainsById: ChainsById): Map<String, Any> {
+        return mapOfNotNullValues(
+            "baseEthereum" to wallet.baseEthereumAccount?.toEthereumAddress(),
+            "baseSubstrate" to wallet.baseSubstrateAccount?.toDefaultSubstrateAddress(),
+            "chainSpecific" to wallet.chainAccounts.mapValuesNotNull { (chainId, chainAccount) ->
+                val chain = chainsById[chainId] ?: return@mapValuesNotNull null
+                chain.addressOf(chainAccount)
+            }.nullIfEmpty()
+        )
+    }
+
+    private fun mapToFirestoreChainFeature(chainFeature: PushSettings.ChainFeature): Map<String, Any>? {
         return when (chainFeature) {
             is PushSettings.ChainFeature.All -> mapOf("type" to "all")
-            is PushSettings.ChainFeature.Concrete -> mapOf(
-                "type" to "concrete",
-                "value" to chainFeature.chainIds.mapNotNull { chainsById.lovercaseNameOf(it) }
-            )
+            is PushSettings.ChainFeature.Concrete -> {
+                if (chainFeature.chainIds.isEmpty()) {
+                    null
+                } else {
+                    mapOf("type" to "concrete", "value" to chainFeature.chainIds)
+                }
+            }
         }
     }
 
-    private fun Map<ChainId, Chain>.lovercaseNameOf(key: String): String? {
-        return this[key]?.name?.lowercase()
+    private fun Boolean.mapToFirestoreChainFeatureOrNull(): Map<String, Any>? {
+        return if (true) mapOf("type" to "all") else null
+    }
+
+    private fun List<PushSettings.GovernanceFeature>.flatMapChainToTracks(): List<Pair<ChainId, String>> {
+        return flatMap { chainGovState -> chainGovState.tracks.map { chainGovState.chainId to it } }
+    }
+
+    private fun Map<String, Any>.nullIfEmpty(): Map<String, Any>? {
+        return if (isEmpty()) null else this
     }
 }

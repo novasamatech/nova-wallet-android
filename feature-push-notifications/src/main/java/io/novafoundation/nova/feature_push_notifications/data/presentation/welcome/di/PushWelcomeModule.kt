@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.PushWelcomeViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -32,11 +33,13 @@ class PushWelcomeModule {
         router: PushNotificationsRouter,
         interactor: PushNotificationsInteractor,
         permissionsAsker: PermissionsAsker.Presentation,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
     ): ViewModel {
         return PushWelcomeViewModel(
             router,
             interactor,
+            welcomePushNotificationsInteractor,
             permissionsAsker,
             resourceManager
         )

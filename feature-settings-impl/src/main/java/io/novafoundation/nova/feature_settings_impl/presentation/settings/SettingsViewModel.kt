@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.resources.formatBooleanToState
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.language.Languag
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -50,7 +52,8 @@ class SettingsViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val twoFactorVerificationService: TwoFactorVerificationService,
     private val biometricService: BiometricService,
-    private val pushNotificationsInteractor: PushNotificationsInteractor
+    private val pushNotificationsInteractor: PushNotificationsInteractor,
+    private val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
 ) : BaseViewModel(), Browserable {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -103,7 +106,7 @@ class SettingsViewModel(
         .asLiveData()
 
     val pushNotificationsState = pushNotificationsInteractor.pushNotificationsEnabledFlow()
-        .map { mapPushNotificationsState(it) }
+        .map { resourceManager.formatBooleanToState(it) }
         .shareInBackground()
 
     init {
@@ -115,7 +118,11 @@ class SettingsViewModel(
     }
 
     fun pushNotificationsClicked() {
-        router.openPushNotifications()
+        if (welcomePushNotificationsInteractor.needToShowWelcomeScreen()) {
+            router.openPushWelcome()
+        } else {
+            router.openPushNotificationSettings()
+        }
     }
 
     fun currenciesClicked() {
@@ -248,13 +255,5 @@ class SettingsViewModel(
             .filterIsInstance<BiometricResponse.Success>()
             .onEach { biometricService.toggle() }
             .launchIn(this)
-    }
-
-    private fun mapPushNotificationsState(isEnabled: Boolean): String {
-        return if (isEnabled) {
-            resourceManager.getString(R.string.common_on)
-        } else {
-            resourceManager.getString(R.string.common_off)
-        }
     }
 }

@@ -1,12 +1,12 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.settings.view
+package io.novafoundation.nova.common.view.settings
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.useAttributes
-import io.novafoundation.nova.feature_settings_impl.R
 import kotlinx.android.synthetic.main.view_settings_switcher.view.settingsSwitcher
 
 class SettingsSwitcherView @JvmOverloads constructor(
