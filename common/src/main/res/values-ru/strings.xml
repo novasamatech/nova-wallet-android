@@ -1074,7 +1074,7 @@
     <string name="staking_selected_validators_count_v1.9.1" formatted="false">выбрано %d (макс. %d)</string>
     <string name="staking_selected_validators_mask">Валидаторы (%d)</string>
     <string name="staking_set_controller_deprecated_action">Изменить контроллер на стэш</string>
-    <string name="staking_set_controller_deprecated_subtitle">Сеть мигрирует в сторону замены контроллеров на прокси. Nova Wallet будет поддерживать прокси в будущих обновлениях</string>
+    <string name="staking_set_controller_deprecated_subtitle">Используйте прокси для делегирования операций стейкинга другому аккаунту</string>
     <string name="staking_set_controller_deprecated_title">Контроллер Аккаунты Устаревают</string>
     <string name="staking_set_controller_subtitle">Выберите другой аккаунт в качестве контроллера, чтобы делегировать ему операции по управлению стейкингом</string>
     <string name="staking_set_controller_title">Улучшите безопасность стейкинга</string>
