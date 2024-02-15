@@ -170,8 +170,10 @@ private class HydraDxExchange(
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
-        val feeAsset = args.usedFeeAsset
-        val paymentCurrencyToSet = getPaymentCurrencyToSetIfNeeded(feeAsset)
+        val expectedFeeAsset = args.usedFeeAsset
+
+        val currentFeeTokenId = currentPaymentAsset.first()
+        val paymentCurrencyToSet = getPaymentCurrencyToSetIfNeeded(expectedFeeAsset, currentFeeTokenId)
 
         val setCurrencyFee = if (paymentCurrencyToSet != null) {
             extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
@@ -182,13 +184,13 @@ private class HydraDxExchange(
         }
 
         val swapFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
-            executeSwap(args)
+            executeSwap(args, paymentCurrencyToSet, currentFeeTokenId)
         }
 
         val totalNativeFee = swapFee.amount + setCurrencyFee?.amount.orZero()
 
-        val feeAmountInExpectedCurrency = if (!feeAsset.isUtilityAsset) {
-            convertNativeFeeToAssetFee(totalNativeFee, feeAsset)
+        val feeAmountInExpectedCurrency = if (!expectedFeeAsset.isUtilityAsset) {
+            convertNativeFeeToAssetFee(totalNativeFee, expectedFeeAsset)
         } else {
             totalNativeFee
         }
@@ -201,8 +203,10 @@ private class HydraDxExchange(
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
-        val feeAsset = args.usedFeeAsset
-        val paymentCurrencyToSet = getPaymentCurrencyToSetIfNeeded(feeAsset)
+        val expectedFeeAsset = args.usedFeeAsset
+
+        val currentFeeTokenId = currentPaymentAsset.first()
+        val paymentCurrencyToSet = getPaymentCurrencyToSetIfNeeded(expectedFeeAsset, currentFeeTokenId)
 
         val setCurrencyResult = if (paymentCurrencyToSet != null) {
             extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
@@ -214,7 +218,7 @@ private class HydraDxExchange(
 
         return setCurrencyResult.flatMap {
             extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) {
-                executeSwap(args)
+                executeSwap(args, paymentCurrencyToSet, currentFeeTokenId)
             }
         }
     }
@@ -341,16 +345,25 @@ private class HydraDxExchange(
         return quotedFee + existentialDeposit
     }
 
-    private suspend fun getPaymentCurrencyToSetIfNeeded(expectedPaymentAsset: Chain.Asset): HydraDxAssetId? {
-        val currencyPaymentTokenId = currentPaymentAsset.first()
+    private suspend fun getPaymentCurrencyToSetIfNeeded(expectedPaymentAsset: Chain.Asset, currentFeeTokenId: HydraDxAssetId): HydraDxAssetId? {
         val expectedPaymentTokenId = hydraDxAssetIdConverter.toOnChainIdOrThrow(expectedPaymentAsset)
 
-        return expectedPaymentTokenId.takeIf { currencyPaymentTokenId != expectedPaymentTokenId }
+        return expectedPaymentTokenId.takeIf { currentFeeTokenId != expectedPaymentTokenId }
     }
 
-    private suspend fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs) {
+    private suspend fun ExtrinsicBuilder.executeSwap(
+        args: SwapExecuteArgs,
+        justSetFeeCurrency: HydraDxAssetId?,
+        previousFeeCurrency: HydraDxAssetId
+    ) {
         maybeSetReferral()
 
+        addSwapCall(args)
+
+        maybeRevertFeeCurrency(justSetFeeCurrency, previousFeeCurrency)
+    }
+
+    private suspend fun ExtrinsicBuilder.addSwapCall(args: SwapExecuteArgs) {
         val sourceForOptimizedTrade = args.path.checkForOptimizedTrade()
 
         if (sourceForOptimizedTrade != null) {
@@ -359,6 +372,12 @@ private class HydraDxExchange(
             }
         } else {
             executeRouterSwap(args)
+        }
+    }
+
+    private fun ExtrinsicBuilder.maybeRevertFeeCurrency(justSetFeeCurrency: HydraDxAssetId?, previousFeeCurrency: HydraDxAssetId) {
+        if (justSetFeeCurrency != null) {
+            setFeeCurrency(previousFeeCurrency)
         }
     }
 
