@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.polkadot
 
+import android.content.Context
 import com.google.gson.Gson
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionRequest
 import io.novafoundation.nova.caip.caip2.Caip2Parser
@@ -12,7 +13,8 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 
 class PolkadotWalletConnectRequestFactory(
     private val gson: Gson,
-    private val caip2Parser: Caip2Parser
+    private val caip2Parser: Caip2Parser,
+    private val context: Context
 ) : WalletConnectRequest.Factory {
 
     override fun create(sessionRequest: SessionRequest): WalletConnectRequest? {
@@ -38,7 +40,8 @@ class PolkadotWalletConnectRequestFactory(
         return PolkadotSignRequest(
             gson = gson,
             polkadotSignPayload = signTxPayload.transactionPayload,
-            sessionRequest = sessionRequest
+            sessionRequest = sessionRequest,
+            context = context
         )
     }
 
@@ -52,7 +55,8 @@ class PolkadotWalletConnectRequestFactory(
                 address = signMessagePayload.address,
                 type = null
             ),
-            sessionRequest = sessionRequest
+            sessionRequest = sessionRequest,
+            context = context
         )
     }
 }
