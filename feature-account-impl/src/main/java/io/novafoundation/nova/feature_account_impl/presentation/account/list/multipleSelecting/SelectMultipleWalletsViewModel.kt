@@ -73,7 +73,7 @@ class SelectMultipleWalletsViewModel(
                 showToast(resourceManager.getString(R.string.multiple_wallets_selection_max_message, request.max))
                 return
             }
-            
+
             selected.add(accountModel.id)
         }
 
