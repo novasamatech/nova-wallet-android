@@ -378,7 +378,7 @@ private class HydraDxExchange(
 
     private fun ExtrinsicBuilder.setFeeCurrencyToNative(justSetFeeCurrency: HydraDxAssetId?, previousFeeCurrency: HydraDxAssetId) {
         val justSetFeeToNonNative = justSetFeeCurrency != null && justSetFeeCurrency != hydraDxAssetIdConverter.systemAssetId
-        val previousCurrencyRemainsNonNative = justSetFeeCurrency == null && previousFeeCurrency !=  hydraDxAssetIdConverter.systemAssetId
+        val previousCurrencyRemainsNonNative = justSetFeeCurrency == null && previousFeeCurrency != hydraDxAssetIdConverter.systemAssetId
 
         if (justSetFeeToNonNative || previousCurrencyRemainsNonNative) {
             setFeeCurrency(hydraDxAssetIdConverter.systemAssetId)
