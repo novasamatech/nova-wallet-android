@@ -21,6 +21,6 @@ runs:
         profile: minimal
         toolchain: stable
         override: true
-        components: rustfmt, clippy
+        components: rustfmt, clippy, rust-std-armv7-linux-androideabi, rust-std-i686-linux-android, rust-std-aarch64-linux-android, rust-std-x86_64-linux-android
         target: armv7-linux-androideabi i686-linux-android aarch64-linux-android x86_64-linux-android
     
