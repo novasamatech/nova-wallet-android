@@ -88,7 +88,7 @@ class CrowdloanContributeInteractor(
         customizationPayload = customizationPayload,
         toCalculateFee = true
     ) { submission, chain, _ ->
-        extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, submission)
+        extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, formExtrinsic = submission)
     }
 
     suspend fun contribute(

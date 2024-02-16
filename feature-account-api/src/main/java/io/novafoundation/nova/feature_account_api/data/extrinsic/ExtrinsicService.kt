@@ -9,6 +9,7 @@ import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.BatchMode
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import kotlinx.coroutines.flow.Flow
@@ -39,35 +40,42 @@ class SubmissionOrigin(
 
 class ExtrinsicSubmission(val hash: String, val submissionOrigin: SubmissionOrigin)
 
+private val DEFAULT_BATCH_MODE = BatchMode.BATCH_ALL
+
 interface ExtrinsicService {
 
     suspend fun submitExtrinsic(
         chain: Chain,
         origin: TransactionOrigin,
+        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         formExtrinsic: FormExtrinsicWithOrigin,
     ): Result<ExtrinsicSubmission>
 
     suspend fun submitAndWatchExtrinsic(
         chain: Chain,
         origin: TransactionOrigin,
+        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         formExtrinsic: FormExtrinsicWithOrigin,
     ): Result<Flow<ExtrinsicStatus>>
 
     suspend fun submitMultiExtrinsicAwaitingInclusion(
         chain: Chain,
         origin: TransactionOrigin,
+        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         formExtrinsic: FormMultiExtrinsicWithOrigin,
     ): RetriableMultiResult<ExtrinsicStatus.InBlock>
 
     suspend fun paymentInfo(
         chain: Chain,
         origin: TransactionOrigin,
+        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): FeeResponse
 
     suspend fun estimateFee(
         chain: Chain,
         origin: TransactionOrigin,
+        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): Fee
 
@@ -76,6 +84,7 @@ interface ExtrinsicService {
     suspend fun estimateMultiFee(
         chain: Chain,
         origin: TransactionOrigin,
+        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         formExtrinsic: FormMultiExtrinsic,
     ): Fee
 
