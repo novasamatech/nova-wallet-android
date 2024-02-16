@@ -18,7 +18,7 @@ runs:
     - name: 🦀 Install Rust
       uses: actions-rs/toolchain@v1
       with:
-        profile: minimal
+        profile: nightly
         toolchain: stable
         override: true
         components: rustfmt, clippy, rust-std-armv7-linux-androideabi, rust-std-i686-linux-android, rust-std-aarch64-linux-android, rust-std-x86_64-linux-android
