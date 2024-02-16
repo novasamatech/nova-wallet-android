@@ -377,7 +377,7 @@ private class HydraDxExchange(
     }
 
     private fun ExtrinsicBuilder.maybeRevertFeeCurrency(justSetFeeCurrency: HydraDxAssetId?, previousFeeCurrency: HydraDxAssetId) {
-        if (justSetFeeCurrency != null) {
+        if (justSetFeeCurrency != null && justSetFeeCurrency != hydraDxAssetIdConverter.systemAssetId) {
             setFeeCurrency(previousFeeCurrency)
         }
     }
