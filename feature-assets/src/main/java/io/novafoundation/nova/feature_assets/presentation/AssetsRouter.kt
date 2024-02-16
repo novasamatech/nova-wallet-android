@@ -36,6 +36,8 @@ interface AssetsRouter {
 
     fun openSelectAddress(arguments: Bundle)
 
+    fun openSelectMultipleWallets(arguments: Bundle)
+
     fun openReceive(assetPayload: AssetPayload)
 
     fun openAssetFilters()

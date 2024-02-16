@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.resources.formatBooleanToState
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsRequester
+import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.isAnyGovEnabled
@@ -13,14 +15,19 @@ import io.novafoundation.nova.feature_push_notifications.data.data.settings.isNo
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+
+private const val MAX_WALLETS = 3
 
 class PushSettingsViewModel(
     private val router: PushNotificationsRouter,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val walletRequester: SelectMultipleWalletsRequester,
 ) : BaseViewModel() {
 
     private val _switchingInProgress = MutableStateFlow(false)
@@ -29,7 +36,7 @@ class PushSettingsViewModel(
     private val pushSettingsState = MutableStateFlow<PushSettings?>(null)
 
     val pushWalletsQuantity = pushSettingsState
-        .mapNotNull { it?.wallets?.size?.format() }
+        .mapNotNull { it?.subscribedMetaAccounts?.size?.format() }
         .distinctUntilChanged()
 
     val pushAnnouncements = pushSettingsState
@@ -58,6 +65,8 @@ class PushSettingsViewModel(
         launch {
             pushSettingsState.value = pushNotificationsInteractor.getPushSettings()
         }
+
+        subscribeOnSelectWallets()
     }
 
     fun backClicked() {
@@ -78,7 +87,13 @@ class PushSettingsViewModel(
     }
 
     fun walletsClicked() {
-        TODO()
+        walletRequester.openRequest(
+            SelectMultipleWalletsRequester.Request(
+                titleText = resourceManager.getString(R.string.push_wallets_title),
+                currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
+                max = MAX_WALLETS
+            )
+        )
     }
 
     fun announementsClicked() {
@@ -99,5 +114,14 @@ class PushSettingsViewModel(
 
     fun stakingRewardsClicked() {
         TODO()
+    }
+
+    private fun subscribeOnSelectWallets() {
+        walletRequester.responseFlow
+            .onEach {
+                pushSettingsState.value = pushSettingsState.value
+                    ?.copy(subscribedMetaAccounts = it.selectedMetaIds)
+            }
+            .launchIn(this)
     }
 }

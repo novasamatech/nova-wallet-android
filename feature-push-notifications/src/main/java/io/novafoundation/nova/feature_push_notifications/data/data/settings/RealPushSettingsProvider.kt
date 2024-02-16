@@ -27,7 +27,7 @@ class RealPushSettingsProvider(
             receivedTokensEnabled = true,
             governanceState = emptyList(),
             newReferenda = emptyList(),
-            wallets = listOf(accountRepository.getSelectedMetaAccount().toWalletSettings()),
+            subscribedMetaAccounts = setOf(accountRepository.getSelectedMetaAccount().id),
             stakingReward = PushSettings.ChainFeature.Concrete(emptyList()),
             govMyDelegatorVoted = PushSettings.ChainFeature.Concrete(emptyList()),
             govMyReferendumFinished = PushSettings.ChainFeature.Concrete(emptyList())

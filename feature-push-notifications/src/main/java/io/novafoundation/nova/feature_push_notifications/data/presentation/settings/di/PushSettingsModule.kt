@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.PushSettingsViewModel
@@ -22,12 +23,14 @@ class PushSettingsModule {
     fun provideViewModel(
         router: PushNotificationsRouter,
         interactor: PushNotificationsInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator
     ): ViewModel {
         return PushSettingsViewModel(
             router,
             interactor,
-            resourceManager
+            resourceManager,
+            selectMultipleWalletsCommunicator
         )
     }
 

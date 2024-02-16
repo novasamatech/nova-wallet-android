@@ -6,11 +6,13 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.app.root.navigation.account.PolkadotVaultVariantSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectAddressCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.account.SelectMultipleWalletsCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectWalletCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.pincode.PinCodeTwoFactorVerificationCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -43,6 +45,13 @@ class AccountNavigationModule {
         router: AssetsRouter,
         navigationHolder: NavigationHolder
     ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHolder)
+
+    @Provides
+    @ApplicationScope
+    fun provideSelectMultipleWalletsCommunicator(
+        router: AssetsRouter,
+        navigationHolder: NavigationHolder
+    ): SelectMultipleWalletsCommunicator = SelectMultipleWalletsCommunicatorImpl(router, navigationHolder)
 
     @ApplicationScope
     @Provides

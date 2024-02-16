@@ -292,6 +292,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_select_address, arguments)
     }
 
+    override fun openSelectMultipleWallets(arguments: Bundle) {
+        navController?.navigate(R.id.action_open_select_multiple_wallets, arguments)
+    }
+
     override fun openNodes() {
         navController?.navigate(R.id.action_mainFragment_to_nodesFragment)
     }

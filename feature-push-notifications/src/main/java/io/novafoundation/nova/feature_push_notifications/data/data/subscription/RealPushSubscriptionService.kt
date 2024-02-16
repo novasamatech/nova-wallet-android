@@ -7,11 +7,13 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.formatting.formatDateISO_8601_NoMs
 import io.novafoundation.nova.common.utils.mapOfNotNullValues
 import io.novafoundation.nova.common.utils.mapValuesNotNull
-import io.novafoundation.nova.feature_account_api.domain.model.toDefaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.domain.model.mainEthereumAddress
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -28,7 +30,8 @@ private const val PREFS_FIRESTORE_UUID = "firestore_uuid"
 class RealPushSubscriptionService(
     private val prefs: Preferences,
     private val chainRegistry: ChainRegistry,
-    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
+    private val accountRepository: AccountRepository
 ) : PushSubscriptionService {
 
     override suspend fun handleSubscription(pushEnabled: Boolean, token: String?, pushSettings: PushSettings) {
@@ -111,11 +114,14 @@ class RealPushSubscriptionService(
         settings: PushSettings
     ): Map<String, Any> {
         val chainsById = chainRegistry.chainsById()
+        val metaAccountsById = accountRepository
+            .getActiveMetaAccounts()
+            .associateBy { it.id }
 
         return mapOf(
             "pushToken" to token,
             "updatedAt" to formatDateISO_8601_NoMs(date),
-            "wallets" to settings.wallets.map { mapToFirestoreWallet(it, chainsById) },
+            "wallets" to settings.subscribedMetaAccounts.mapNotNull { mapToFirestoreWallet(it, metaAccountsById, chainsById) },
             "notifications" to mapOfNotNullValues(
                 "stakingReward" to mapToFirestoreChainFeature(settings.stakingReward),
                 "tokenSent" to settings.sentTokensEnabled.mapToFirestoreChainFeatureOrNull(),
@@ -126,13 +132,14 @@ class RealPushSubscriptionService(
         )
     }
 
-    private suspend fun mapToFirestoreWallet(wallet: PushSettings.Wallet, chainsById: ChainsById): Map<String, Any> {
+    private suspend fun mapToFirestoreWallet(metaId: Long, metaAccountsById: Map<Long, MetaAccount>, chainsById: ChainsById): Map<String, Any>? {
+        val metaAccount = metaAccountsById[metaId] ?: return null
         return mapOfNotNullValues(
-            "baseEthereum" to wallet.baseEthereumAccount?.toEthereumAddress(),
-            "baseSubstrate" to wallet.baseSubstrateAccount?.toDefaultSubstrateAddress(),
-            "chainSpecific" to wallet.chainAccounts.mapValuesNotNull { (chainId, chainAccount) ->
+            "baseEthereum" to metaAccount.mainEthereumAddress(),
+            "baseSubstrate" to metaAccount.defaultSubstrateAddress,
+            "chainSpecific" to metaAccount.chainAccounts.mapValuesNotNull { (chainId, chainAccount) ->
                 val chain = chainsById[chainId] ?: return@mapValuesNotNull null
-                chain.addressOf(chainAccount)
+                chain.addressOf(chainAccount.accountId)
             }.nullIfEmpty()
         )
     }

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.settings
 
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 data class PushSettings(
@@ -9,17 +8,11 @@ data class PushSettings(
     val receivedTokensEnabled: Boolean,
     val governanceState: List<GovernanceFeature>,
     val newReferenda: List<GovernanceFeature>,
-    val wallets: List<Wallet>,
+    val subscribedMetaAccounts: Set<Long>,
     val stakingReward: ChainFeature,
     val govMyDelegatorVoted: ChainFeature,
     val govMyReferendumFinished: ChainFeature
 ) {
-
-    data class Wallet(
-        val baseEthereumAccount: ByteArray?,
-        val baseSubstrateAccount: ByteArray?,
-        val chainAccounts: Map<ChainId, ByteArray>
-    )
 
     class GovernanceFeature(val chainId: ChainId, val tracks: List<String>)
 
@@ -43,12 +36,4 @@ fun PushSettings.isAnyGovEnabled(): Boolean {
         newReferenda.isNotEmpty() ||
         govMyDelegatorVoted.isNotEmpty() ||
         govMyReferendumFinished.isNotEmpty()
-}
-
-fun MetaAccount.toWalletSettings(): PushSettings.Wallet {
-    return PushSettings.Wallet(
-        baseEthereumAccount = ethereumAddress,
-        baseSubstrateAccount = substrateAccountId,
-        chainAccounts = chainAccounts.mapValues { (_, chainAccount) -> chainAccount.accountId }
-    )
 }
