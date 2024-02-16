@@ -11,7 +11,7 @@ runs:
         cache: 'gradle'
 
     - name: 🛠️ Install NDK
-      uses: android-actions/setup-ndk@v1.4.2
+      uses: nttld/setup-ndk@v1.4.2
       with:
         ndk-version: '26.1.10909125'
 
