@@ -20,7 +20,9 @@ sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-
 sp-runtime  = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
 
 [profile.release]
+strip = true
 lto = true
+opt-level = "s"
 
 [lib]
 name = "hydra_dx_math_java"
