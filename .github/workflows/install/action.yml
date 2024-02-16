@@ -13,7 +13,7 @@ runs:
     - name: 🛠️ Install NDK
       uses: nttld/setup-ndk@v1.4.2
       with:
-        ndk-version: '26.1.10909125'
+        ndk-version: 'r26b'
 
     - name: 🦀 Install Rust
       uses: actions-rs/toolchain@v1
