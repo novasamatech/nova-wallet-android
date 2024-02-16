@@ -4,8 +4,23 @@ runs:
   using: "composite"
   steps:
     - name: ☕️ Install Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4.0.0
       with:
         distribution: 'temurin'
         java-version: '11'
         cache: 'gradle'
+
+    - name: 🛠️ Install NDK
+      uses: android-actions/setup-ndk@v1.4.2
+      with:
+        ndk-version: '26.1.10909125'
+
+    - name: 🦀 Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: rustfmt, clippy
+        target: armv7-linux-androideabi i686-linux-android aarch64-linux-android x86_64-linux-android
+    
