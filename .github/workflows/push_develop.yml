@@ -7,9 +7,9 @@ on:
 
 jobs:
   build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@fix/build_with_rust
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
-      branch: fix/build_with_rust
+      branch: develop
       gradlew-command: assembleDevelop
     secrets: inherit
 

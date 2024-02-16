@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@fix/build_with_rust
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
       branch: ${{github.head_ref}}
     secrets: inherit
