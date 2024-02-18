@@ -17,6 +17,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.util.*
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.asDeferred
@@ -84,10 +86,10 @@ class RealPushSubscriptionService(
             this += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
 
             this += pushSettings.governanceState.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
+                .map { (chainId, track) -> handleSubscription(true, "govState:${chainId.to16Hex()}:$track") }
 
             this += pushSettings.newReferenda.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId:$track") }
+                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId.to16Hex():$track") }
         }
 
         deferreds.awaitAll()
@@ -139,7 +141,8 @@ class RealPushSubscriptionService(
             "chainSpecific" to wallet.chainAccounts.mapValuesNotNull { (chainId, chainAccount) ->
                 val chain = chainsById[chainId] ?: return@mapValuesNotNull null
                 chain.addressOf(chainAccount)
-            }.nullIfEmpty()
+            }.transfromChainIdsTo16Hex()
+                .nullIfEmpty()
         )
     }
 
@@ -150,7 +153,7 @@ class RealPushSubscriptionService(
                 if (chainFeature.chainIds.isEmpty()) {
                     null
                 } else {
-                    mapOf("type" to "concrete", "value" to chainFeature.chainIds)
+                    mapOf("type" to "concrete", "value" to chainFeature.chainIds.transfromChainIdsTo16Hex())
                 }
             }
         }
@@ -166,5 +169,20 @@ class RealPushSubscriptionService(
 
     private fun Map<String, Any>.nullIfEmpty(): Map<String, Any>? {
         return if (isEmpty()) null else this
+    }
+
+    private fun <T> Map<ChainId, T>.transfromChainIdsTo16Hex(): Map<String, T> {
+        return mapKeys { (chainId, _) -> chainId.to16Hex() }
+    }
+
+    private fun List<ChainId>.transfromChainIdsTo16Hex(): List<String> {
+        return map { chainId -> chainId.to16Hex() }
+    }
+
+    private fun ChainId.to16Hex(): String {
+        return fromHex()
+            .take(16)
+            .toByteArray()
+            .toHexString(withPrefix = true)
     }
 }
