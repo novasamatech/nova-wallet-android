@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
@@ -22,11 +23,13 @@ class PushSettingsModule {
     fun provideViewModel(
         router: PushNotificationsRouter,
         interactor: PushNotificationsInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     ): ViewModel {
         return PushSettingsViewModel(
             router,
             interactor,
+            actionAwaitableMixinFactory,
             resourceManager
         )
     }

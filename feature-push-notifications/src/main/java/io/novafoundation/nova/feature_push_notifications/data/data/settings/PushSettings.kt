@@ -21,7 +21,7 @@ data class PushSettings(
         val chainAccounts: Map<ChainId, ByteArray>
     )
 
-    class GovernanceFeature(val chainId: ChainId, val tracks: List<String>)
+    data class GovernanceFeature(val chainId: ChainId, val tracks: List<String>)
 
     sealed class ChainFeature {
 
