@@ -1,22 +1,42 @@
 package io.novafoundation.nova.feature_push_notifications.data
 
-import android.util.Log
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureComponent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationHandler
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.CoroutineContext
 
-class NovaFirebaseMessagingService : FirebaseMessagingService() {
+
+class NovaFirebaseMessagingService : FirebaseMessagingService(), CoroutineScope {
+
+    override val coroutineContext: CoroutineContext = Dispatchers.Main + SupervisorJob()
 
     @Inject
     lateinit var pushNotificationsService: PushNotificationsService
 
-    init {
+    @Inject
+    lateinit var notificationHandler: NotificationHandler
+
+    override fun onCreate() {
+        super.onCreate()
+
         injectDependencies()
     }
 
@@ -25,7 +45,15 @@ class NovaFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.d("NovaFirebaseMessagingService", "onMessageReceived: $message")
+        launch {
+            notificationHandler.handleNotification(message)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        coroutineContext.cancel()
     }
 
     private fun injectDependencies() {
