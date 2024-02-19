@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.subscription.PushSubscriptionService
 import kotlinx.coroutines.launch

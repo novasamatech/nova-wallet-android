@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.mapOfNotNullValues
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.feature_account_api.domain.model.toDefaultSubstrateAddress
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry

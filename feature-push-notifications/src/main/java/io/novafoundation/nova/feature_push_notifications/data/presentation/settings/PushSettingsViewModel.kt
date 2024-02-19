@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.data.presentation.settings
 
+import android.Manifest
+import android.os.Build
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
@@ -8,13 +10,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatBooleanToState
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.isAnyGovEnabled
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.isNotEmpty
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.isAnyGovEnabled
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.isNotEmpty
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +32,7 @@ class PushSettingsViewModel(
     private val router: PushNotificationsRouter,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val permissionsAsker: PermissionsAsker.Presentation,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -107,7 +111,17 @@ class PushSettingsViewModel(
     }
 
     fun enableSwitcherClicked() {
-        pushEnabledState.toggle()
+        launch {
+            if (pushEnabledState.value == false && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val isPermissionsGranted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.POST_NOTIFICATIONS)
+
+                if (!isPermissionsGranted) {
+                    return@launch
+                }
+            }
+
+            pushEnabledState.toggle()
+        }
     }
 
     fun walletsClicked() {
