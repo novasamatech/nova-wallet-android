@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.DeliveryFeeConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.DeliveryFeeConfiguration.Type
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainOriginAssetRemote
@@ -27,27 +26,27 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toInterior
 import java.math.BigInteger
 
 fun mapCrossChainConfigFromRemote(remote: CrossChainTransfersConfigRemote): CrossChainTransfersConfiguration {
-    val assetsLocations = remote.assetsLocation.mapValues { (_, reserveLocationRemote) ->
+    val assetsLocations = remote.assetsLocation.orEmpty().mapValues { (_, reserveLocationRemote) ->
         mapReserveLocationFromRemote(reserveLocationRemote)
     }
 
-    val feeInstructions = remote.instructions.mapValues { (_, instructionsRemote) ->
+    val feeInstructions = remote.instructions.orEmpty().mapValues { (_, instructionsRemote) ->
         instructionsRemote.map(::mapXcmInstructionFromRemote)
     }
 
-    val chains = remote.chains.associateBy(
+    val chains = remote.chains.orEmpty().associateBy(
         keySelector = { it.chainId },
         valueTransform = { it.assets.map(::mapAssetTransfersFromRemote) }
     )
 
-    val networkDeliveryFee = remote.networkDeliveryFee.mapValues { (_, networkDeliveryFeeRemote) ->
+    val networkDeliveryFee = remote.networkDeliveryFee.orEmpty().mapValues { (_, networkDeliveryFeeRemote) ->
         mapNetworkDeliveryFeeFromRemote(networkDeliveryFeeRemote)
     }
 
     return CrossChainTransfersConfiguration(
         assetLocations = assetsLocations,
         feeInstructions = feeInstructions,
-        instructionBaseWeights = remote.networkBaseWeight,
+        instructionBaseWeights = remote.networkBaseWeight.orEmpty(),
         deliveryFeeConfigurations = networkDeliveryFee,
         chains = chains
     )
