@@ -1,15 +1,9 @@
 package io.novafoundation.nova.feature_push_notifications.data
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureComponent
@@ -22,7 +16,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.CoroutineContext
-
 
 class NovaFirebaseMessagingService : FirebaseMessagingService(), CoroutineScope {
 

@@ -19,11 +19,11 @@ class SendingNotificationHandler(
 ) {
 
     override fun handleNotificationInternal(notificationManager: NotificationManagerCompat, channelId: String, message: RemoteMessage): Boolean {
-        //TODO check if the notification has a send type
+        // TODO check if the notification has a send type
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("\uD83D\uDCB8 Sent [Account name/id]") //TODO stub
-            .setContentText("Sent 0.5 ETH (\$900) to 0xc6c...81cdd on Moonbeam") //TODO stub
+            .setContentTitle("\uD83D\uDCB8 Sent [Account name/id]") // TODO stub
+            .setContentText("Sent 0.5 ETH (\$900) to 0xc6c...81cdd on Moonbeam") // TODO stub
             .setSmallIcon(R.drawable.ic_nova)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()

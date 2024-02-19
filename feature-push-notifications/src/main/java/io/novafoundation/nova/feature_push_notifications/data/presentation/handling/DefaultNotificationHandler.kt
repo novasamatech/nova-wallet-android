@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_push_notifications.data.presentation.handling
 
-import android.app.NotificationManager
 import android.content.Context
-import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat.*
+import androidx.core.app.NotificationCompat.PRIORITY_DEFAULT
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -24,7 +22,7 @@ class DefaultNotificationHandler(
     override fun handleNotificationInternal(notificationManager: NotificationManagerCompat, channelId: String, message: RemoteMessage): Boolean {
         val notificationPart = message.notification ?: return false
 
-        val notification = Builder(context, channelId)
+        val notification = NotificationCompat.Builder(context, channelId)
             .setContentTitle(notificationPart.title)
             .setContentText(notificationPart.body)
             .setSmallIcon(R.drawable.ic_nova)

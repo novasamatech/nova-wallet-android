@@ -49,7 +49,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel>() {
 
     override fun subscribe(viewModel: PushSettingsViewModel) {
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.closeConfirmationAction)
-        
+
         viewModel.pushSettingsWasChangedState.observe { pushSettingsToolbar.setRightActionEnabled(it) }
         viewModel.savingInProgress.observe { pushSettingsToolbar.showProgress(it) }
 

@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.settings.model
 
-import com.google.gson.annotations.JsonAdapter
-import io.novafoundation.nova.common.utils.gson.SealedTypeAdapterFactory
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
