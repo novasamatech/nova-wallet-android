@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondM
 
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.isTrueOrError
-import jp.co.soramitsu.fearless_utils.hash.isPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 
 class NotUnstakingAllValidation : NominationPoolsBondMoreValidation {
 

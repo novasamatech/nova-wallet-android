@@ -1,8 +1,8 @@
 package io.novafoundation.nova.runtime.storage.source.query.api
 
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 
 typealias QueryableStorageKeyBinder<K> = (keyInstance: Any) -> K
 typealias QueryableStorageKeyBinder2<K1, K2> = (keyInstance: Any) -> Pair<K1, K2>

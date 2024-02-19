@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.decoded
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 
 class DynamicFee(
     val assetFee: Perbill,

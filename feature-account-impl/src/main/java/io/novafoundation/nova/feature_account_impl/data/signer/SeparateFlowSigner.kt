@@ -8,8 +8,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenRequester
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignatureWrapper
 import io.novafoundation.nova.feature_account_api.presenatation.sign.awaitConfirmation
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

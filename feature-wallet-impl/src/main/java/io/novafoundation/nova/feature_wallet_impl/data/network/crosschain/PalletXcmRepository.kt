@@ -4,12 +4,12 @@ import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
-import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
-import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
+import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 
 enum class XcmVersion {
     V0, V1, V2, V3;

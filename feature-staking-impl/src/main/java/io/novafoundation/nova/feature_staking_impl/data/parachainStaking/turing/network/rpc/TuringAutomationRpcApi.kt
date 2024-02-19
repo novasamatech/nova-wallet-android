@@ -9,12 +9,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
-import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.NullableMapper
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
+import io.novasama.substrate_sdk_android.wsrpc.executeAsync
+import io.novasama.substrate_sdk_android.wsrpc.mappers.NullableMapper
+import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
+import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
+import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
 
 interface TuringAutomationRpcApi {
 

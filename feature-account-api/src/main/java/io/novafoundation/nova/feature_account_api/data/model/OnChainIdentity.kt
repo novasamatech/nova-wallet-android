@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_account_api.data.model
 
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 interface OnChainIdentity {
     val display: String?

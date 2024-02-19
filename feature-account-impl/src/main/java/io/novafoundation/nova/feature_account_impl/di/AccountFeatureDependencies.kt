@@ -46,7 +46,7 @@ import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
-import jp.co.soramitsu.fearless_utils.icon.IconGenerator
+import io.novasama.substrate_sdk_android.icon.IconGenerator
 import java.util.Random
 import javax.inject.Named
 

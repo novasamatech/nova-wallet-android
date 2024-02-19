@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets.Substrat
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets.SubstrateKeypair
 import io.novafoundation.nova.test_shared.HashMapEncryptedPreferences
 import io.novafoundation.nova.test_shared.assertSetEquals
-import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
+import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals

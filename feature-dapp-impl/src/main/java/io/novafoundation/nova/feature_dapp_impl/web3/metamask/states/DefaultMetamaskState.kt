@@ -29,8 +29,8 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.Ev
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTransaction
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTypedMessage
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.toAccountId
 
 class DefaultMetamaskState(
     commonInteractor: DappInteractor,

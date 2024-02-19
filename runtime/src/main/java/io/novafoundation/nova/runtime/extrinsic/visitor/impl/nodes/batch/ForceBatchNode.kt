@@ -10,7 +10,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.impl.VisitingContext
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.indexOfLastOrThrow
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.peekItemFromEndOrThrow
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.takeFromEndOrThrow
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 internal class ForceBatchNode : NestedCallNode {
 

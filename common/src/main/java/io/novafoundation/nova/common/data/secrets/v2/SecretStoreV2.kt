@@ -4,11 +4,11 @@ import io.novafoundation.nova.common.data.secrets.v1.Keypair
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.Union
 import io.novafoundation.nova.common.utils.fold
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
-import jp.co.soramitsu.fearless_utils.scale.toHexString
+import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.scale.EncodableStruct
+import io.novasama.substrate_sdk_android.scale.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

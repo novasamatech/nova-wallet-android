@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.storage.source.multi
 import io.novafoundation.nova.runtime.storage.source.query.DynamicInstanceBinder
 import io.novafoundation.nova.runtime.storage.source.query.StorageKeyComponents
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 
 interface MultiQueryBuilder {
 

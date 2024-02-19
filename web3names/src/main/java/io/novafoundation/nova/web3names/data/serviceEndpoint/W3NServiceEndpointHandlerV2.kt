@@ -5,7 +5,7 @@ import io.ipfs.multibase.Multibase
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientDetailsRemoteV2
-import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import org.erdtman.jcs.JsonCanonicalizer
 
 private typealias RecipientsByChainV2 = Map<String, Map<String, TransferRecipientDetailsRemoteV2>>

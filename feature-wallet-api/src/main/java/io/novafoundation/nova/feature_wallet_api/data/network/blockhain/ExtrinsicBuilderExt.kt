@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.firstExistingCallName
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
 fun ExtrinsicBuilder.nativeTransfer(accountId: AccountId, amount: BigInteger, keepAlive: Boolean = false): ExtrinsicBuilder {

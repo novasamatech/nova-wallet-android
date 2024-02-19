@@ -1,6 +1,6 @@
 package io.novafoundation.nova.runtime.extrinsic
 
-import jp.co.soramitsu.fearless_utils.wsrpc.subscription.response.SubscriptionChange
+import io.novasama.substrate_sdk_android.wsrpc.subscription.response.SubscriptionChange
 
 sealed class ExtrinsicStatus(val extrinsicHash: String, val terminal: Boolean) {
 

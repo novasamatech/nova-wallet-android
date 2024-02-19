@@ -27,5 +27,5 @@ dependencies {
     implementation project(":common")
     implementation project(':runtime')
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 }

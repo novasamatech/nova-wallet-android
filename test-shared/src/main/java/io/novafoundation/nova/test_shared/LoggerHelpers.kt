@@ -1,6 +1,6 @@
 package io.novafoundation.nova.test_shared
 
-import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 object StdoutLogger : Logger {
     override fun log(message: String?) {

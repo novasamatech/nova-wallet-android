@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strate
 import io.novafoundation.nova.test_shared.CoroutineTest
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.whenever
-import jp.co.soramitsu.fearless_utils.wsrpc.state.SocketStateMachine
+import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf

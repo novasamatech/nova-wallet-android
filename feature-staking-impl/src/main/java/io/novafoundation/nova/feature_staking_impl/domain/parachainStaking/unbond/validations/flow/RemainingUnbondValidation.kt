@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.TooLowRemainingBond.WillBeAddedToUnbondings
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.TooLowRemainingBond.WontReceiveRewards
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.fromHex
 
 class RemainingUnbondValidationFactory(
     private val stakingConstantsRepository: ParachainStakingConstantsRepository,

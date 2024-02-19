@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_api.data.repository
 
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import java.math.BigInteger
 
 typealias HexHash = String

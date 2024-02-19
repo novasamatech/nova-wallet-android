@@ -7,8 +7,8 @@ import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
 import io.novafoundation.nova.core_db.model.AssetLocal.TransferableModeLocal
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 
 suspend fun AssetCache.updateAsset(
     metaId: Long,

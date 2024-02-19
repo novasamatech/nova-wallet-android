@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_proxy_api.data.common.NestedProxiesGraphConstructor.Node
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_api.domain.model.min
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 interface NestedProxiesGraphConstructor {
 

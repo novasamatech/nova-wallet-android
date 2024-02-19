@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.repository.addAccount.Add
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 interface ProxiedAddAccountRepository : AddAccountRepository<ProxiedAddAccountRepository.Payload> {
 

@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.satisfies
 import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 private const val FIRST_PAGE_INDEX = 1
 private const val SECOND_PAGE_INDEX = 2

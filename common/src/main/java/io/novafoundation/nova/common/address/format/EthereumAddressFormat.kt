@@ -1,11 +1,11 @@
 package io.novafoundation.nova.common.address.format
 
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
-import jp.co.soramitsu.fearless_utils.extensions.isValid
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.extensions.toAddress
+import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
+import io.novasama.substrate_sdk_android.extensions.isValid
+import io.novasama.substrate_sdk_android.extensions.toAccountId
+import io.novasama.substrate_sdk_android.extensions.toAddress
 
 class EthereumAddressFormat : AddressFormat {
 

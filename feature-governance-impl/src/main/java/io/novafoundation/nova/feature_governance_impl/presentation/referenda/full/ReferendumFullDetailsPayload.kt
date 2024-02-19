@@ -4,7 +4,7 @@ import android.os.Parcelable
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.PreimagePreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

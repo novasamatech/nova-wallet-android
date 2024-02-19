@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.util.Base64
-import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import org.bouncycastle.jcajce.provider.digest.SHA256
 import java.security.MessageDigest
 import javax.crypto.Mac

@@ -2,7 +2,7 @@
 package io.novafoundation.nova.common.data.network
 
 import android.util.Log
-import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 const val TAG = "AndroidLogger"
 

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.utils
 
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 
 interface Filter<T> {
     fun shouldInclude(model: T): Boolean

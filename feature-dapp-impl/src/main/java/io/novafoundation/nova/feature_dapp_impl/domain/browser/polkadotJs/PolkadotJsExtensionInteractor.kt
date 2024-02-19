@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 
 class PolkadotJsExtensionInteractor(
     private val chainRegistry: ChainRegistry,

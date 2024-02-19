@@ -1,11 +1,11 @@
 package io.novafoundation.nova.runtime.util
 
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.MULTI_ADDRESS_ID
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.FixedByteArray
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.MULTI_ADDRESS_ID
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.FixedByteArray
+import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
 
 fun RuntimeType<*, *>.constructAccountLookupInstance(accountId: AccountId): Any {
     return when (skipAliases()) {
