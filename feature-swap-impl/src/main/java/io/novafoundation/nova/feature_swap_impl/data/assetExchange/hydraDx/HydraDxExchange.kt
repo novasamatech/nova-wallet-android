@@ -361,7 +361,7 @@ private class HydraDxExchange(
 
         addSwapCall(args)
 
-        maybeRevertFeeCurrency(justSetFeeCurrency, previousFeeCurrency)
+        setFeeCurrencyToNative(justSetFeeCurrency, previousFeeCurrency)
     }
 
     private suspend fun ExtrinsicBuilder.addSwapCall(args: SwapExecuteArgs) {
@@ -376,9 +376,12 @@ private class HydraDxExchange(
         }
     }
 
-    private fun ExtrinsicBuilder.maybeRevertFeeCurrency(justSetFeeCurrency: HydraDxAssetId?, previousFeeCurrency: HydraDxAssetId) {
-        if (justSetFeeCurrency != null && justSetFeeCurrency != hydraDxAssetIdConverter.systemAssetId) {
-            setFeeCurrency(previousFeeCurrency)
+    private fun ExtrinsicBuilder.setFeeCurrencyToNative(justSetFeeCurrency: HydraDxAssetId?, previousFeeCurrency: HydraDxAssetId) {
+        val justSetFeeToNonNative = justSetFeeCurrency != null && justSetFeeCurrency != hydraDxAssetIdConverter.systemAssetId
+        val previousCurrencyRemainsNonNative = justSetFeeCurrency == null && previousFeeCurrency != hydraDxAssetIdConverter.systemAssetId
+
+        if (justSetFeeToNonNative || previousCurrencyRemainsNonNative) {
+            setFeeCurrency(hydraDxAssetIdConverter.systemAssetId)
         }
     }
 
