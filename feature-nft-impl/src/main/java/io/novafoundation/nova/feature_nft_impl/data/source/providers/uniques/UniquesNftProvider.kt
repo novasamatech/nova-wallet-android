@@ -64,13 +64,13 @@ class UniquesNftProvider(
                     keyExtractor = { (classId: BigInteger) -> classId },
                     binding = ::bindMetadata
                 )
-                instanceMetadataDescriptor = runtime.metadata.uniques().storage("InstanceMetadataOf").querySingleArgKeys(
-                    keysArgs = classesIds,
+                instanceMetadataDescriptor = runtime.metadata.uniques().storage("InstanceMetadataOf").queryKeys(
+                    keysArgs = classesWithInstances,
                     keyExtractor = { (classId: BigInteger, instance: BigInteger) -> classId to instance },
                     binding = ::bindMetadata
                 )
-                totalIssuanceDescriptor = runtime.metadata.uniques().storage("Class").queryKeys(
-                    keysArgs = classesWithInstances,
+                totalIssuanceDescriptor = runtime.metadata.uniques().storage("Class").querySingleArgKeys(
+                    keysArgs = classesIds,
                     keyExtractor = { (classId: BigInteger) -> classId },
                     binding = { bindNumber(it.castToStruct()["items"]) }
                 )
