@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="nft_issuance_fungible_format">%s units of %s</string>
+
+    <string name="nft_fungile_price">%s for %s</string>
 
     <string name="staking_set_controller_deprecated_subtitle">Use Proxies to delegate Staking operations to another account</string>
 
     <string name="staking_manage_proxy_requires_stash_title">Select stash account to setup proxy</string>
     <string name="staking_manage_proxy_requires_stash_message">Please switch your wallet to %s to setup a proxy</string>
 
-    <string name="common_network_not_supported">%s not supported</string>
+    <string name="common_network_not_supported">%s is not supported</string>
 
     <string name="remove_proxy_confirmation_revoke_access_type">Revoke access type</string>
     <string name="remove_proxy_confirmation_revoke_for">Revoke for</string>

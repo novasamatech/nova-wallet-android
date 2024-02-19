@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.polkadot
 
+import android.content.Context
 import com.google.gson.Gson
 import com.walletconnect.web3.wallet.client.Wallet
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
@@ -12,8 +13,9 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 class PolkadotSignRequest(
     private val gson: Gson,
     private val polkadotSignPayload: PolkadotSignPayload,
-    private val sessionRequest: Wallet.Model.SessionRequest
-) : SignWalletConnectRequest(sessionRequest) {
+    private val sessionRequest: Wallet.Model.SessionRequest,
+    context: Context
+) : SignWalletConnectRequest(sessionRequest, context) {
 
     override suspend fun signedResponse(response: ExternalSignCommunicator.Response.Signed): Wallet.Params.SessionRequestResponse {
         val responseData = PolkadotSignerResult(id, response.signature)

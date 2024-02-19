@@ -19,6 +19,7 @@
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
         tools:targetApi="s" />
+
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -70,6 +71,37 @@
                 <data
                     android:host="nova"
                     android:scheme="novawallet" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <data android:host="request" />
+                <data android:scheme="novawallet" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <data android:host="wc" />
+                <data android:scheme="novawallet" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <data
+                    android:pathPattern="/.*@2"
+                    android:scheme="wc" />
 
                 <action android:name="android.intent.action.VIEW" />
 

@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.8.0'
-        versionCode = 115
+        versionName = '7.9.0'
+        versionCode = 117
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        fearlessLibVersion = '1.11.1'
+        fearlessLibVersion = '1.11.2'
 
         gifVersion = '1.2.19'
 
@@ -83,8 +83,8 @@ buildscript {
 
         markwonVersion = '4.6.2'
 
-        walletConnectCoreVersion = "1.13.0"
-        walletConnectWalletVersion = "1.6.0"
+        walletConnectCoreVersion = "1.27.2"
+        walletConnectWalletVersion = "1.20.2"
 
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
@@ -208,6 +208,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.14'
+        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.3'
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistrVersion"
         classpath "com.github.triplet.gradle:play-publisher:$playPublisherVersion"
     }

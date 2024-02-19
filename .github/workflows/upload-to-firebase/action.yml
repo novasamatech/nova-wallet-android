@@ -24,10 +24,10 @@ runs:
     - name: Upload artifact to Firebase App Distribution
       id: upload
       continue-on-error: true
-      uses: wzieba/Firebase-Distribution-Github-Action@v1
+      uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
       with:
         appId: ${{ inputs.appId }}
-        token: ${{ inputs.firebase-token }}
+        serviceCredentialsFileContent: ${{ inputs.firebase-token }}
         releaseNotes: ${{ inputs.releaseNotes }}
         groups: ${{ inputs.test-groups }}
         file: ${{ inputs.upload-file }}
@@ -40,10 +40,10 @@ runs:
 
     - name: Retry upload artifacts
       if: steps.upload.outcome=='failure'
-      uses: wzieba/Firebase-Distribution-Github-Action@v1
+      uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
       with:
         appId: ${{ inputs.appId }}
-        token: ${{ inputs.firebase-token }}
+        serviceCredentialsFileContent: ${{ inputs.firebase-token }}
         releaseNotes: ${{ inputs.releaseNotes }}
         groups: ${{ inputs.test-groups }}
         file: ${{ inputs.upload-file }}

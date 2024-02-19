@@ -11,6 +11,7 @@ import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -21,7 +22,8 @@ import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
-import io.novafoundation.nova.feature_wallet_api.presentation.view.setPriceOrHide
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.model.NftPriceModel
+import io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsChain
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCollection
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCreator
@@ -122,5 +124,9 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
                 setMessage(it)
             }
         }
+    }
+
+    private fun PriceSectionView.setPriceOrHide(maybePrice: NftPriceModel?) = letOrHide(maybePrice) { price ->
+        setPrice(price.amountInfo, price.fiat)
     }
 }

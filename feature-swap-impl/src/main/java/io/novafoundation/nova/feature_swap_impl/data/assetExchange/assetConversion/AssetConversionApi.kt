@@ -1,6 +1,6 @@
 @file:Suppress("RedundantUnitExpression")
 
-package io.novafoundation.nova.feature_swap_impl.data.network.blockhain.api
+package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindPair
 import io.novafoundation.nova.common.utils.assetConversionOrNull

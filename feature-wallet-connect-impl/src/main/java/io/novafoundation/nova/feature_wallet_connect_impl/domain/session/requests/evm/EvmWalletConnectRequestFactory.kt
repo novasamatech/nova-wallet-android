@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm
 
+import android.content.Context
 import com.google.gson.Gson
 import com.walletconnect.web3.wallet.client.Wallet
 import io.novafoundation.nova.caip.caip2.Caip2Parser
@@ -17,6 +18,7 @@ class EvmWalletConnectRequestFactory(
     private val gson: Gson,
     private val caip2Parser: Caip2Parser,
     private val typedMessageParser: EvmTypedMessageParser,
+    private val context: Context
 ) : WalletConnectRequest.Factory {
 
     override fun create(sessionRequest: Wallet.Model.SessionRequest): WalletConnectRequest? {
@@ -39,25 +41,25 @@ class EvmWalletConnectRequestFactory(
         val (message, address) = gson.fromJson<List<String>>(sessionRequest.request.params)
         val personalSignMessage = EvmPersonalSignMessage(message)
 
-        return EvmPersonalSignRequest(address, personalSignMessage, sessionRequest)
+        return EvmPersonalSignRequest(address, personalSignMessage, sessionRequest, context)
     }
 
     private fun parseEvmSignTypedMessage(sessionRequest: Wallet.Model.SessionRequest): WalletConnectRequest {
         val (address, typedMessage) = parseEvmSignTypedDataParams(sessionRequest.request.params)
 
-        return EvmSignTypedDataRequest(address, typedMessage, sessionRequest)
+        return EvmSignTypedDataRequest(address, typedMessage, sessionRequest, context)
     }
 
     private fun parseEvmSendTx(sessionRequest: Wallet.Model.SessionRequest, chainId: Int): WalletConnectRequest {
         val transaction = parseStructTransaction(sessionRequest.request.params)
 
-        return EvmSendTransactionRequest(transaction, chainId, sessionRequest)
+        return EvmSendTransactionRequest(transaction, chainId, sessionRequest, context)
     }
 
     private fun parseEvmSignTx(sessionRequest: Wallet.Model.SessionRequest, chainId: Int): WalletConnectRequest {
         val transaction = parseStructTransaction(sessionRequest.request.params)
 
-        return EvmSignTransactionRequest(transaction, chainId, sessionRequest)
+        return EvmSignTransactionRequest(transaction, chainId, sessionRequest, context)
     }
 
     private fun Wallet.Model.SessionRequest.eipChainId(): Int {

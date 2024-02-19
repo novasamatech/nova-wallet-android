@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_nft_api.data.model
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import java.math.BigInteger
 
 class NftDetails(
     val identifier: String,
@@ -13,7 +12,7 @@ class NftDetails(
     val name: String,
     val description: String?,
     val issuance: Nft.Issuance,
-    val price: BigInteger?,
+    val price: Nft.Price?,
     val collection: Collection?
 ) {
 

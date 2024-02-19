@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.di
 
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
@@ -72,4 +73,6 @@ interface WalletFeatureApi {
     val crossChainTransfersUseCase: CrossChainTransfersUseCase
 
     val arbitraryTokenUseCase: ArbitraryTokenUseCase
+
+    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
 }
