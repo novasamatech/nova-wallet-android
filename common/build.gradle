@@ -79,7 +79,7 @@ dependencies {
 
     implementation bouncyCastleDep
 
-    api fearlessLibDep
+    api substrateSdkDep
 
     implementation coroutinesDep
     api liveDataKtxDep

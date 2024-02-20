@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.data.secrets.v1
 
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.BaseKeypair
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.Sr25519Keypair
+import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
+import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
 
 /**
  * Creates [Sr25519Keypair] if [nonce] is not null

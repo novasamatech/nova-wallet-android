@@ -6,7 +6,7 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 
 class AstarContributeInteractor(
     private val selectedAssetSharedState: SingleAssetSharedState,

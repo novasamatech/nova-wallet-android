@@ -2,11 +2,11 @@ package io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch
 
 import io.novafoundation.nova.common.utils.utility
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.VisitingContext
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
-import jp.co.soramitsu.fearless_utils.runtime.metadata.event
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Event
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.metadata.event
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
 
 internal fun RuntimeSnapshot.batchCompletedEvent(): Event {
     return metadata.utility().event("BatchCompleted")

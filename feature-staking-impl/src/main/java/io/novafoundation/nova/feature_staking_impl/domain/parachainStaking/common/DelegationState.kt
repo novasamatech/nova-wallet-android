@@ -8,8 +8,8 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.isStakeEnoughToEarnRewards
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.isElected
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 enum class DelegationState {
     COLLATOR_NOT_ACTIVE, TOO_LOW_STAKE, WAITING, ACTIVE

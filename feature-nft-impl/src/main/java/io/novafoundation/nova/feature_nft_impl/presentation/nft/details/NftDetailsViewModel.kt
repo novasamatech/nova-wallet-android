@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetai
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatNftPrice
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

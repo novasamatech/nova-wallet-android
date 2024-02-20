@@ -34,7 +34,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
 class RealCrossChainTransactor(

@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.networ
 
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
 fun ExtrinsicBuilder.delegate(

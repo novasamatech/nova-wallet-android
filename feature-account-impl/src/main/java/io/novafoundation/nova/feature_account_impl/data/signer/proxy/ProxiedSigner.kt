@@ -21,11 +21,11 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 
 class ProxiedSignerFactory(
     private val chainRegistry: ChainRegistry,

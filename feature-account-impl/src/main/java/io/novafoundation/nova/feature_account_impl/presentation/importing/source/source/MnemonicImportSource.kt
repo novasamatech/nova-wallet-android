@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncrypt
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.view.ImportSourceView
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.view.MnemonicImportView
-import jp.co.soramitsu.fearless_utils.exceptions.Bip39Exception
+import io.novasama.substrate_sdk_android.exceptions.Bip39Exception
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow

@@ -12,8 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.multiAddressOf
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 
 data class DirectStakingSelection(
     val validators: List<Validator>,

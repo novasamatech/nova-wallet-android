@@ -11,8 +11,8 @@ import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith

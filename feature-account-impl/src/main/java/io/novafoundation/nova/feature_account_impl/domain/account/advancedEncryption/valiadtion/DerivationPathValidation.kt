@@ -4,9 +4,9 @@ import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.fold
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.validOrError
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.SubstrateJunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.SubstrateJunctionDecoder
 
 sealed class DerivationPathValidation(
     private val junctionDecoder: JunctionDecoder,

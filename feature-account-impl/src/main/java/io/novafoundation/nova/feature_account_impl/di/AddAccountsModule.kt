@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.se
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 
 @Module()
 class AddAccountsModule {

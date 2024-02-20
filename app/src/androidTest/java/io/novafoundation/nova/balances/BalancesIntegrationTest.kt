@@ -23,10 +23,10 @@ import io.novafoundation.nova.runtime.extrinsic.systemRemark
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import jp.co.soramitsu.fearless_utils.wsrpc.networkStateFlow
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.wsrpc.networkStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first

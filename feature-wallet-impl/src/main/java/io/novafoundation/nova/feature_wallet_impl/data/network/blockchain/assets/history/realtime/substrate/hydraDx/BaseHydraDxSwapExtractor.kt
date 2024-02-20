@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findLastEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNativeFee
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 abstract class BaseHydraDxSwapExtractor(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,

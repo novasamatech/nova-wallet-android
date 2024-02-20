@@ -1,8 +1,8 @@
 package io.novafoundation.nova.common.utils
 
 import android.util.Log
-import jp.co.soramitsu.fearless_utils.wsrpc.recovery.LinearReconnectStrategy
-import jp.co.soramitsu.fearless_utils.wsrpc.recovery.ReconnectStrategy
+import io.novasama.substrate_sdk_android.wsrpc.recovery.LinearReconnectStrategy
+import io.novasama.substrate_sdk_android.wsrpc.recovery.ReconnectStrategy
 import kotlinx.coroutines.delay
 
 suspend inline fun <T> retryUntilDone(

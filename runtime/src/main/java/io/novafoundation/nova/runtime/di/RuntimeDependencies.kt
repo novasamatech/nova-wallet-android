@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 
 interface RuntimeDependencies {
 

@@ -108,10 +108,10 @@ import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
-import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
 import javax.inject.Named
 
 @Module(

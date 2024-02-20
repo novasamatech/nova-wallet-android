@@ -1,6 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote
 
-import jp.co.soramitsu.fearless_utils.runtime.definitions.v14.typeMapping.ReplaceTypesSiTypeMapping
+import io.novasama.substrate_sdk_android.runtime.definitions.v14.typeMapping.ReplaceTypesSiTypeMapping
 
 fun SiVoteTypeMapping(): ReplaceTypesSiTypeMapping {
     val voteType = VoteType("NovaWallet.ConvictionVote")

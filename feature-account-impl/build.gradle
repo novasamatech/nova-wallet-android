@@ -58,7 +58,7 @@ dependencies {
 
     implementation bouncyCastleDep
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation biometricDep
 

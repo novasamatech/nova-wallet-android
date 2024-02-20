@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.typed.number
 import io.novafoundation.nova.runtime.storage.typed.system
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.math.BigInteger

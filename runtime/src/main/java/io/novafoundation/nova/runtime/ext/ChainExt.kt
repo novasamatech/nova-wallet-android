@@ -21,21 +21,21 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.isValid
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.extensions.toAddress
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHexUntyped
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.isValid
+import io.novasama.substrate_sdk_android.extensions.toAccountId
+import io.novasama.substrate_sdk_android.extensions.toAddress
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.toHexUntyped
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 
 val Chain.typesUsage: TypesUsage
     get() = when {

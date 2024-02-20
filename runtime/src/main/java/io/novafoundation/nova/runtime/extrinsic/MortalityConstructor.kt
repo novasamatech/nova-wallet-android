@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Era
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Era
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext

@@ -4,9 +4,9 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIde
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import java.math.BigInteger
 
 private const val SUCCESS_EVENT = "ExtrinsicSuccess"

@@ -21,9 +21,9 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.chainAsset
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromUtf8
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromUtf8
 import java.math.BigDecimal
 
 class AcalaContributeInteractor(

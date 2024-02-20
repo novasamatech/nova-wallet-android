@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.calls
 
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
 
 object GetFinalizedHeadRequest : RuntimeRequest(
     method = "chain_getFinalizedHead",

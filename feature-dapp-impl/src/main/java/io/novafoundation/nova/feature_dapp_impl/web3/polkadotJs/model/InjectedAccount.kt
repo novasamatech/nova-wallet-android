@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model
 
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 
 class InjectedAccount internal constructor(
     val address: String,

@@ -28,9 +28,9 @@ import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.recipientCan
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 
 abstract class BaseAssetTransfers(
     internal val chainRegistry: ChainRegistry,

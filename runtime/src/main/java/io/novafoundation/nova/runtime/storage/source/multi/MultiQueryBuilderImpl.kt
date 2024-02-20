@@ -4,11 +4,11 @@ import io.novafoundation.nova.common.utils.splitKeyToComponents
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder.Descriptor
 import io.novafoundation.nova.runtime.storage.source.query.DynamicInstanceBinder
 import io.novafoundation.nova.runtime.storage.source.query.StorageKeyComponents
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKeys
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKeys
 
 class MultiQueryBuilderImpl(
     private val runtime: RuntimeSnapshot

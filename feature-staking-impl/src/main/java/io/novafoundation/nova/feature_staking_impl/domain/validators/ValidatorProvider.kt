@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposure
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import kotlinx.coroutines.CoroutineScope
 
 sealed class ValidatorSource {

@@ -13,7 +13,7 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 

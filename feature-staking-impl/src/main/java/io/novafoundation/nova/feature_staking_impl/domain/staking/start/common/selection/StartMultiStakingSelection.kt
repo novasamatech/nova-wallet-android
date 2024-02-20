@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.asset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigDecimal
 
 interface StartMultiStakingSelection {

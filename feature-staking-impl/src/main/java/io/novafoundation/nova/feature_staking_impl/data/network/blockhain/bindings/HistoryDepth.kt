@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.storageReturnType
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import java.math.BigInteger
 
 @UseCaseBinding

@@ -12,10 +12,10 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.isSuccess
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.signer
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 
 internal class RealExtrinsicWalk(
     private val chainRegistry: ChainRegistry,

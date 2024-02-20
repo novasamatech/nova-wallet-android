@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.ext.decodeOrNull
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import java.math.BigInteger
 
 private val SYSTEM_ON_CHAIN_ASSET_ID = BigInteger.ZERO

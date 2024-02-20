@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import io.novafoundation.nova.core_db.model.AggregatedExternalBalanceLocal
 import io.novafoundation.nova.core_db.model.ExternalBalanceLocal
-import jp.co.soramitsu.fearless_utils.hash.isPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.flow.Flow
 
 @Dao

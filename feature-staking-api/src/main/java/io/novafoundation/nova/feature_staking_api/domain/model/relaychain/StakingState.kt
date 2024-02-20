@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 sealed class StakingState(
     val chain: Chain,

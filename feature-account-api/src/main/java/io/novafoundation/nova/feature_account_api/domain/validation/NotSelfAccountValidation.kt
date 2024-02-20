@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class NotSelfAccountValidation<P, F>(
     private val chainProvider: (P) -> Chain,

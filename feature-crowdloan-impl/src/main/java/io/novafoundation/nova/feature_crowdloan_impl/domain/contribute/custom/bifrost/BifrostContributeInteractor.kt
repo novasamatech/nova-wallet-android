@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.bifrost.BifrostApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.bifrost.getAccountByReferralCode
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic.addMemo
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 
 class BifrostContributeInteractor(
     val novaReferralCode: String,

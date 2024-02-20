@@ -236,7 +236,7 @@ dependencies {
 
     implementation roomDep
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation daggerDep
     kapt daggerKapt

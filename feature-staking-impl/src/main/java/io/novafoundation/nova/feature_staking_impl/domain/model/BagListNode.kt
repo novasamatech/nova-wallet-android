@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.model
 
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 class BagListNode(

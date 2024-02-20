@@ -44,12 +44,12 @@ import io.novafoundation.nova.runtime.storage.source.query.DynamicInstanceBinder
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.source.query.multi
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
-import jp.co.soramitsu.fearless_utils.hash.isPositive
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import java.math.BigInteger
 
 typealias HistoricalMapping<T> = Map<BigInteger, T> // EraIndex -> T

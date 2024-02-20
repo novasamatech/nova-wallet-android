@@ -5,9 +5,9 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getList
 import io.novafoundation.nova.common.data.network.runtime.binding.storageReturnType
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
 
 fun bindSlashingSpans(
     decoded: Any?,

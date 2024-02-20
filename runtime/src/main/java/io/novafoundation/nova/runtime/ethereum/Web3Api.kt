@@ -6,8 +6,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import okhttp3.OkHttpClient

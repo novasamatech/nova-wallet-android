@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSo
 import io.novafoundation.nova.feature_staking_impl.domain.validators.getValidators
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.selectedOption
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

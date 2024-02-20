@@ -1,11 +1,11 @@
 package io.novafoundation.nova.common.data.network.rpc
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojoList
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.executeAsync
+import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
+import io.novasama.substrate_sdk_android.wsrpc.mappers.pojoList
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext

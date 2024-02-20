@@ -8,8 +8,8 @@ import io.novafoundation.nova.common.utils.filterValuesIsInstance
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting.Approval
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 fun OnChainReferendum.proposal(): Proposal? {
     return status.asOngoingOrNull()?.proposal

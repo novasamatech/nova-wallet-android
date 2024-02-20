@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_nft_api.data.model
 
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 class Nft(
