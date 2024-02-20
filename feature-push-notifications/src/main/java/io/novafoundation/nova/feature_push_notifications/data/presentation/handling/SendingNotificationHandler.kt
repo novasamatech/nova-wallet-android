@@ -13,9 +13,7 @@ class SendingNotificationHandler(
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
     notificationManager,
-    resourceManager,
-    R.string.default_notification_channel_id,
-    R.string.default_notification_channel_name,
+    resourceManager
 ) {
 
     override fun handleNotificationInternal(notificationManager: NotificationManagerCompat, channelId: String, message: RemoteMessage): Boolean {
@@ -28,7 +26,7 @@ class SendingNotificationHandler(
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
 
-        notificationManager.notify(1, notification)
+        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
 
         return true
     }

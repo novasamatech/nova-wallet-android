@@ -19,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 
 class NovaFirebaseMessagingService : FirebaseMessagingService(), CoroutineScope {
 
-    override val coroutineContext: CoroutineContext = Dispatchers.Main + SupervisorJob()
+    override val coroutineContext: CoroutineContext = Dispatchers.Default + SupervisorJob()
 
     @Inject
     lateinit var pushNotificationsService: PushNotificationsService

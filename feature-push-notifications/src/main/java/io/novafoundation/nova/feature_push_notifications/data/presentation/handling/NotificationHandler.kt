@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_push_notifications.data.presentation.hand
 
 import com.google.firebase.messaging.RemoteMessage
 
+public const val DEFAULT_NOTIFICATION_ID = 1
+
 interface NotificationHandler {
 
     /**

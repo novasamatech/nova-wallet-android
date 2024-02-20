@@ -7,12 +7,13 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_push_notifications.R
 
 abstract class BaseNotificationHandler(
     private val notificationManager: NotificationManagerCompat,
     val resourceManager: ResourceManager,
-    @StringRes private val channelIdRes: Int,
-    @StringRes private val channelNameRes: Int,
+    @StringRes private val channelIdRes: Int = R.string.default_notification_channel_id,
+    @StringRes private val channelNameRes: Int = R.string.default_notification_channel_name,
     private val importance: Int = NotificationManager.IMPORTANCE_DEFAULT
 ) : NotificationHandler {
 
