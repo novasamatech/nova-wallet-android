@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.9.0'
-        versionCode = 117
+        versionName = '7.9.1'
+        versionCode = 118
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
