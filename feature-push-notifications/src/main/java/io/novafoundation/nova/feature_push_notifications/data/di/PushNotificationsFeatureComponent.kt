@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
+import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.di.PushGovernanceSettingsComponent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.di.PushSettingsComponent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.di.PushWelcomeComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -28,6 +29,8 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
     fun pushWelcomeComponentFactory(): PushWelcomeComponent.Factory
 
     fun pushSettingsComponentFactory(): PushSettingsComponent.Factory
+
+    fun pushGovernanceSettings(): PushGovernanceSettingsComponent.Factory
 
     @Component.Factory
     interface Factory {

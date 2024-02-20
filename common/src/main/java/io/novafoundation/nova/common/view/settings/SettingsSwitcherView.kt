@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_settings_switcher.view.settingsSwitcher
 
@@ -26,6 +27,7 @@ class SettingsSwitcherView @JvmOverloads constructor(
     }
 
     fun setIcon(icon: Drawable?) {
+        icon?.setBounds(0, 0, 24.dp, 24.dp)
         settingsSwitcher.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
     }
 

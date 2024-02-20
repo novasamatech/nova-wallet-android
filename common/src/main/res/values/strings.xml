@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
+
+    <string name="push_governance_settings_new_referendum">New Referendum</string>
+    <string name="push_governance_settings_referendum_update">Referendum Update</string>
+    <string name="push_governance_settings_delegate_votes">Delegate has voted</string>
+    <string name="common_clear">Clear</string>
+
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
     <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
 
