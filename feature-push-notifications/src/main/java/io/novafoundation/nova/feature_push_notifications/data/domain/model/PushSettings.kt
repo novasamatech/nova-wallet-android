@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_push_notifications.data.data.settings
+package io.novafoundation.nova.feature_push_notifications.data.domain.model
 
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -21,7 +21,7 @@ data class PushSettings(
         val chainAccounts: Map<ChainId, ByteArray>
     )
 
-    class GovernanceFeature(val chainId: ChainId, val tracks: List<String>)
+    data class GovernanceFeature(val chainId: ChainId, val tracks: List<String>)
 
     sealed class ChainFeature {
 

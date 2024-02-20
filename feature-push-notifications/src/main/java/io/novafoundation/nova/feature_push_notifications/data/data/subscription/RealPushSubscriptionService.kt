@@ -7,9 +7,10 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.formatting.formatDateISO_8601_NoMs
 import io.novafoundation.nova.common.utils.mapOfNotNullValues
 import io.novafoundation.nova.common.utils.mapValuesNotNull
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_account_api.domain.model.toDefaultSubstrateAddress
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -17,6 +18,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.util.*
+import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.asDeferred
@@ -84,10 +86,10 @@ class RealPushSubscriptionService(
             this += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
 
             this += pushSettings.governanceState.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
+                .map { (chainId, track) -> handleSubscription(true, "govState:${chainId.hexPrefix16()}:$track") }
 
             this += pushSettings.newReferenda.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId:$track") }
+                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId.to16Hex():$track") }
         }
 
         deferreds.awaitAll()
@@ -139,7 +141,8 @@ class RealPushSubscriptionService(
             "chainSpecific" to wallet.chainAccounts.mapValuesNotNull { (chainId, chainAccount) ->
                 val chain = chainsById[chainId] ?: return@mapValuesNotNull null
                 chain.addressOf(chainAccount)
-            }.nullIfEmpty()
+            }.transfromChainIdsTo16Hex()
+                .nullIfEmpty()
         )
     }
 
@@ -150,7 +153,7 @@ class RealPushSubscriptionService(
                 if (chainFeature.chainIds.isEmpty()) {
                     null
                 } else {
-                    mapOf("type" to "concrete", "value" to chainFeature.chainIds)
+                    mapOf("type" to "concrete", "value" to chainFeature.chainIds.transfromChainIdsTo16Hex())
                 }
             }
         }
@@ -166,5 +169,19 @@ class RealPushSubscriptionService(
 
     private fun Map<String, Any>.nullIfEmpty(): Map<String, Any>? {
         return if (isEmpty()) null else this
+    }
+
+    private fun <T> Map<ChainId, T>.transfromChainIdsTo16Hex(): Map<String, T> {
+        return mapKeys { (chainId, _) -> chainId.hexPrefix16() }
+    }
+
+    private fun List<ChainId>.transfromChainIdsTo16Hex(): List<String> {
+        return map { chainId -> chainId.hexPrefix16() }
+    }
+
+    private fun ChainId.hexPrefix16(): String {
+        return removeHexPrefix()
+            .take(32)
+            .requireHexPrefix()
     }
 }
