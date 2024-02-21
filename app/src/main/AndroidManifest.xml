@@ -41,6 +41,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.NovaFoundation.Nova"
             android:windowSoftInputMode="adjustResize">
 
