@@ -43,7 +43,8 @@ class RemoteStorageSource(
         chainId: String,
         at: BlockHash?,
         runtime: RuntimeSnapshot,
-        subscriptionBuilder: SubstrateSubscriptionBuilder?
+        applyStorageDefault: Boolean,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?,
     ): StorageQueryContext {
         return RemoteStorageQueryContext(
             bulkRetriever = bulkRetriever,
@@ -51,7 +52,8 @@ class RemoteStorageSource(
             subscriptionBuilder = subscriptionBuilder,
             chainId = chainId,
             at = at,
-            runtime = runtime
+            runtime = runtime,
+            applyStorageDefault = applyStorageDefault
         )
     }
 

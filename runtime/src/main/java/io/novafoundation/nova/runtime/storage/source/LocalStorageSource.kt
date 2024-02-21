@@ -36,9 +36,10 @@ class LocalStorageSource(
         chainId: String,
         at: BlockHash?,
         runtime: RuntimeSnapshot,
+        applyStorageDefault: Boolean,
         subscriptionBuilder: SubstrateSubscriptionBuilder?
     ): StorageQueryContext {
-        return LocalStorageQueryContext(storageCache, chainId, at, runtime)
+        return LocalStorageQueryContext(storageCache, chainId, at, runtime, applyStorageDefault)
     }
 
     private fun requireWithoutAt(at: BlockHash?) = require(at == null) {

@@ -20,8 +20,9 @@ class RemoteStorageQueryContext(
     private val subscriptionBuilder: SubstrateSubscriptionBuilder?,
     chainId: ChainId,
     at: BlockHash?,
-    runtime: RuntimeSnapshot
-) : BaseStorageQueryContext(chainId, runtime, at) {
+    runtime: RuntimeSnapshot,
+    applyStorageDefault: Boolean
+) : BaseStorageQueryContext(chainId, runtime, at, applyStorageDefault) {
 
     override suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String> {
         return bulkRetriever.retrieveAllKeys(socketService, prefix, at)

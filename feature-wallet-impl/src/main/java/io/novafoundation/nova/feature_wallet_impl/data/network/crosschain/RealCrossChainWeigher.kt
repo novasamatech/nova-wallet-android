@@ -263,7 +263,7 @@ class RealCrossChainWeigher(
     private fun Chain.emptyBeneficiaryMultiLocation(): MultiLocation = emptyAccountId().accountIdToMultiLocation()
 
     private suspend fun xcmParachainDeliveryFeeFactor(chainId: ChainId, moduleName: String, paraId: ParaId): BigInteger {
-        return storageDataSource.query(chainId) {
+        return storageDataSource.query(chainId, applyStorageDefault = true) {
             runtime.metadata.module(moduleName).storage("DeliveryFeeFactor")
                 .query(
                     paraId,
