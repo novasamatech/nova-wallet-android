@@ -14,8 +14,9 @@ class LocalStorageQueryContext(
     private val storageCache: StorageCache,
     chainId: ChainId,
     at: BlockHash?,
-    runtime: RuntimeSnapshot
-) : BaseStorageQueryContext(chainId, runtime, at) {
+    runtime: RuntimeSnapshot,
+    applyStorageDefault: Boolean
+) : BaseStorageQueryContext(chainId, runtime, at, applyStorageDefault) {
 
     override suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String> {
         return storageCache.getKeys(prefix, chainId)

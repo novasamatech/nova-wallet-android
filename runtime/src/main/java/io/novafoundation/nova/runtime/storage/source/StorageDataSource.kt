@@ -37,6 +37,7 @@ interface StorageDataSource {
     suspend fun <R> query(
         chainId: String,
         at: BlockHash? = null,
+        applyStorageDefault: Boolean = false,
         query: suspend StorageQueryContext.() -> R
     ): R
 
