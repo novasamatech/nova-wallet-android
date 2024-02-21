@@ -33,7 +33,7 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.sufficientCommiss
         fee = { it.fee },
         balance = { it.asset.balanceCountedTowardsED() },
         chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
-        error = { payload, _ -> NominationPoolsClaimRewardsValidationFailure.ToStayAboveED(payload.chain.utilityAsset) }
+        error = { payload, error -> NominationPoolsClaimRewardsValidationFailure.ToStayAboveED(payload.chain.utilityAsset, error) }
     )
 }
 

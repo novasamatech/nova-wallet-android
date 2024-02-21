@@ -35,9 +35,10 @@ fun AddStakingProxyValidationSystemBuilder.sufficientBalanceToStayAboveEd(
     chainWithAsset = { ChainWithAsset(it.chain, it.asset.token.configuration) },
     balance = { it.asset.balanceCountedTowardsED() },
     fee = { it.fee },
-    error = { payload, _ ->
+    error = { payload, errorModel ->
         AddStakingProxyValidationFailure.NotEnoughToStayAboveED(
-            asset = payload.asset.token.configuration
+            asset = payload.asset.token.configuration,
+            errorModel = errorModel
         )
     }
 )

@@ -59,7 +59,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
         fee = { it.originFee.networkFeePart() },
         balance = { it.originCommissionAsset.balanceCountedTowardsED() },
         chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
-        error = { payload, _ -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset) }
+        error = { payload, error -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset, error) }
     )
 }
 

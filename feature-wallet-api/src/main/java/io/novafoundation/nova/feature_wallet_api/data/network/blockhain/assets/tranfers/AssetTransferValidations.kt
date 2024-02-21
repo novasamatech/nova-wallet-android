@@ -47,7 +47,9 @@ sealed class AssetTransferValidationFailure {
             override val fee: BigDecimal
         ) : NotEnoughFunds(), NotEnoughToPayFeesError
 
-        class ToStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
+        class ToStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
+            NotEnoughFunds(),
+            InsufficientBalanceToStayAboveEDError
 
         class ToPayCrossChainFee(
             val usedAsset: Chain.Asset,
