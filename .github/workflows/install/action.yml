@@ -15,6 +15,7 @@ runs:
       with:
         ndk-version: 'r26b'
         local-cache: true
+        link-to-sdk: true
 
     - name: 🦀 Install Rust
       run: |
