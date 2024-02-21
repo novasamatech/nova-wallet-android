@@ -13,5 +13,6 @@ sealed interface RemoveStakingProxyValidationFailure {
         override val fee: BigDecimal
     ) : RemoveStakingProxyValidationFailure, NotEnoughToPayFeesError
 
-    class NotEnoughToStayAboveED(override val asset: Chain.Asset) : RemoveStakingProxyValidationFailure, InsufficientBalanceToStayAboveEDError
+    class NotEnoughToStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
+        RemoveStakingProxyValidationFailure, InsufficientBalanceToStayAboveEDError
 }

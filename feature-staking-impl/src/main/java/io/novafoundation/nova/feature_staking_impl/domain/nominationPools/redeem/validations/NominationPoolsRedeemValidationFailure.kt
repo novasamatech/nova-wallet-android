@@ -13,5 +13,6 @@ sealed class NominationPoolsRedeemValidationFailure {
         override val fee: BigDecimal
     ) : NominationPoolsRedeemValidationFailure(), NotEnoughToPayFeesError
 
-    class ToStayAboveED(override val asset: Chain.Asset) : NominationPoolsRedeemValidationFailure(), InsufficientBalanceToStayAboveEDError
+    class ToStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
+        NominationPoolsRedeemValidationFailure(), InsufficientBalanceToStayAboveEDError
 }

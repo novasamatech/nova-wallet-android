@@ -18,9 +18,10 @@ fun RemoveStakingProxyValidationSystemBuilder.sufficientBalanceToStayAboveEd(
     chainWithAsset = { ChainWithAsset(it.chain, it.asset.token.configuration) },
     balance = { it.asset.balanceCountedTowardsED() },
     fee = { it.fee },
-    error = { payload, _ ->
+    error = { payload, errorModel ->
         RemoveStakingProxyValidationFailure.NotEnoughToStayAboveED(
-            asset = payload.asset.token.configuration
+            asset = payload.asset.token.configuration,
+            errorModel = errorModel
         )
     }
 )
