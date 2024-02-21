@@ -2,8 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
     <string name="common_too_small_balance_title">Your balance is too small</string>
-    <!--<string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fee and remain above minimal balance</string>-->
-    <string name="wallet_send_insufficient_balance_commission">You need to have at least %s to pay this transaction fee and stay above the minimum network balance. Your current balance is: %s. You need to add %s DOT to your balance to perform this operation.</string>
+    <string name="wallet_send_insufficient_balance_commission">You need to have at least %s to pay this transaction fee and stay above the minimum network balance. Your current balance is: %s. You need to add %s to your balance to perform this operation.</string>
 
     <string name="nft_issuance_fungible_format">%s units of %s</string>
 
