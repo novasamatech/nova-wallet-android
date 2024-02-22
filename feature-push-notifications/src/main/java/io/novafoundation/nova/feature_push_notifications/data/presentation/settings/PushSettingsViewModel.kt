@@ -50,8 +50,8 @@ class PushSettingsViewModel(
     private val pushSettingsState = MutableStateFlow<PushSettings?>(null)
 
     val pushSettingsWasChangedState = combine(pushEnabledState, pushSettingsState, oldPushSettingsState) { pushEnabled, newState, oldState ->
-        pushEnabled != pushNotificationsInteractor.isPushNotificationsEnabled()
-            || newState != oldState
+        pushEnabled != pushNotificationsInteractor.isPushNotificationsEnabled() ||
+            newState != oldState
     }
 
     val pushWalletsQuantity = pushSettingsState
