@@ -34,7 +34,7 @@ class PushSettingsModule {
         router: PushNotificationsRouter,
         interactor: PushNotificationsInteractor,
         resourceManager: ResourceManager,
-        selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator
+        selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
         permissionsAsker: PermissionsAsker.Presentation,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     ): ViewModel {

@@ -9,7 +9,7 @@ class PushSettingsCacheV1(
     val receivedTokensEnabled: Boolean,
     val governanceState: List<GovernanceFeature>,
     val newReferenda: List<GovernanceFeature>,
-    val wallets: List<Wallet>,
+    val subscribedMetaAccounts: Set<Long>,
     val stakingReward: ChainFeature,
     val govMyDelegatorVoted: ChainFeature,
     val govMyReferendumFinished: ChainFeature
@@ -24,13 +24,7 @@ class PushSettingsCacheV1(
             receivedTokensEnabled = receivedTokensEnabled,
             governanceState = governanceState.map { PushSettings.GovernanceFeature(it.chainId, it.tracks) },
             newReferenda = newReferenda.map { PushSettings.GovernanceFeature(it.chainId, it.tracks) },
-            wallets = wallets.map {
-                PushSettings.Wallet(
-                    baseEthereumAccount = it.baseEthereumAccount,
-                    baseSubstrateAccount = it.baseSubstrateAccount,
-                    chainAccounts = it.chainAccounts.mapValues { (_, chainAccount) -> chainAccount }
-                )
-            },
+            subscribedMetaAccounts = subscribedMetaAccounts,
             stakingReward = stakingReward.toDomain(),
             govMyDelegatorVoted = govMyDelegatorVoted.toDomain(),
             govMyReferendumFinished = govMyReferendumFinished.toDomain()
@@ -60,18 +54,10 @@ fun PushSettings.toCache(): PushSettingsCacheV1 {
         receivedTokensEnabled = receivedTokensEnabled,
         governanceState = governanceState.map { PushSettingsCacheV1.GovernanceFeature(it.chainId, it.tracks) },
         newReferenda = newReferenda.map { PushSettingsCacheV1.GovernanceFeature(it.chainId, it.tracks) },
-        wallets = wallets.map { it.toCache() },
+        subscribedMetaAccounts = subscribedMetaAccounts,
         stakingReward = stakingReward.toCache(),
         govMyDelegatorVoted = govMyDelegatorVoted.toCache(),
         govMyReferendumFinished = govMyReferendumFinished.toCache()
-    )
-}
-
-fun PushSettings.Wallet.toCache(): PushSettingsCacheV1.Wallet {
-    return PushSettingsCacheV1.Wallet(
-        baseEthereumAccount = baseEthereumAccount,
-        baseSubstrateAccount = baseSubstrateAccount,
-        chainAccounts = chainAccounts.mapValues { (_, chainAccount) -> chainAccount }
     )
 }
 

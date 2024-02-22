@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_account_api.domain.model.mainEthereumAddress
 import io.novafoundation.nova.common.utils.removeHexPrefix
-import io.novafoundation.nova.feature_account_api.domain.model.toDefaultSubstrateAddress
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
