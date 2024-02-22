@@ -11,17 +11,27 @@ runs:
         cache: 'gradle'
 
     - name: 🛠️ Install NDK
+      id: setup-ndk
       uses: nttld/setup-ndk@v1.4.2
       with:
         ndk-version: 'r26b'
-        local-cache: true
-        link-to-sdk: true
+
+    - name: Set ndk.dir in local.properties
+      run: echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" >> local.properties
+      shell: bash
 
     - name: 🦀 Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: rustfmt, clippy
+
+    - name: Add targets
       run: |
-        curl https://sh.rustup.rs -sSf | sh -s -- -q -y --no-modify-path && \
-        rustup target add armv7-linux-androideabi && \
-        rustup target add i686-linux-android && \
-        rustup target add aarch64-linux-android && \
+        rustup target add armv7-linux-androideabi
+        rustup target add i686-linux-android
         rustup target add x86_64-linux-android
+        rustup target add aarch64-linux-android
       shell: bash
