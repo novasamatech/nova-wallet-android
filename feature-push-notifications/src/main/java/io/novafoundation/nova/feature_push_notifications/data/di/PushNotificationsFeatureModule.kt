@@ -68,12 +68,14 @@ class PushNotificationsFeatureModule {
     fun providePushSubscriptionService(
         prefs: Preferences,
         chainRegistry: ChainRegistry,
-        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
+        accountRepository: AccountRepository
     ): PushSubscriptionService {
         return RealPushSubscriptionService(
             prefs,
             chainRegistry,
-            googleApiAvailabilityProvider
+            googleApiAvailabilityProvider,
+            accountRepository
         )
     }
 

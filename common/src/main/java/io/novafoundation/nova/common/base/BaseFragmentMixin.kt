@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.showToast
 import kotlinx.coroutines.flow.Flow
 
 interface BaseFragmentMixin<T : BaseViewModel> : BaseScreenMixin<T> {
@@ -77,5 +78,7 @@ class BaseFragmentDelegate<T : BaseViewModel>(
         }
 
         viewModel.messageLiveData.observeEvent(::showMessage)
+
+        viewModel.toastLiveData.observeEvent { view.context.showToast(it) }
     }
 }

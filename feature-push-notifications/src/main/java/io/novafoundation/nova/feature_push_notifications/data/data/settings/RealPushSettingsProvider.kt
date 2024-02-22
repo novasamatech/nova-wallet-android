@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_push_notifications.data.data.settings.mode
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.model.VersionedPushSettingsCache
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.model.toCache
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
-import io.novafoundation.nova.feature_push_notifications.data.domain.model.toWalletSettings
 import kotlinx.coroutines.flow.Flow
 
 private const val PUSH_SETTINGS_KEY = "push_settings"
@@ -35,7 +34,7 @@ class RealPushSettingsProvider(
             receivedTokensEnabled = true,
             governanceState = emptyList(),
             newReferenda = emptyList(),
-            wallets = listOf(accountRepository.getSelectedMetaAccount().toWalletSettings()),
+            subscribedMetaAccounts = setOf(accountRepository.getSelectedMetaAccount().id),
             stakingReward = PushSettings.ChainFeature.Concrete(emptyList()),
             govMyDelegatorVoted = PushSettings.ChainFeature.Concrete(emptyList()),
             govMyReferendumFinished = PushSettings.ChainFeature.Concrete(emptyList())
