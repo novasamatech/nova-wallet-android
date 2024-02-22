@@ -1,8 +1,8 @@
 package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 
 import io.novafoundation.nova.common.utils.instanceOf
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Event
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
 
 internal interface MutableEventQueue : EventQueue {
 

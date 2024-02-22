@@ -30,7 +30,7 @@ dependencies {
 
     implementation daggerDep
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation androidDep
 

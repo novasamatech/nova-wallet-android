@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.query.LocalStorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -36,9 +36,10 @@ class LocalStorageSource(
         chainId: String,
         at: BlockHash?,
         runtime: RuntimeSnapshot,
+        applyStorageDefault: Boolean,
         subscriptionBuilder: SubstrateSubscriptionBuilder?
     ): StorageQueryContext {
-        return LocalStorageQueryContext(storageCache, chainId, at, runtime)
+        return LocalStorageQueryContext(storageCache, chainId, at, runtime, applyStorageDefault)
     }
 
     private fun requireWithoutAt(at: BlockHash?) = require(at == null) {

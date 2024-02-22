@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod.CustomRange
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.Date

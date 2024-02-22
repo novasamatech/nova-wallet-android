@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.data.fullId
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 interface StakingRewardsRepository {

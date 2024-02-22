@@ -5,7 +5,7 @@ import io.novafoundation.nova.runtime.ethereum.contract.base.CallableContract
 import io.novafoundation.nova.runtime.ethereum.contract.base.ContractStandard
 import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ContractCaller
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Deferred
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address

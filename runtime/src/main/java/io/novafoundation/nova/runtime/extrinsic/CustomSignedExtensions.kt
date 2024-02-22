@@ -2,10 +2,10 @@ package io.novafoundation.nova.runtime.extrinsic
 
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.CustomExtension.ASSETS_TX_PAYMENT
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signedExtra
-import jp.co.soramitsu.fearless_utils.runtime.metadata.SignedExtensionId
-import jp.co.soramitsu.fearless_utils.runtime.metadata.SignedExtensionValue
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signedExtra
+import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionId
+import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
 import java.math.BigInteger
 
 object CustomSignedExtensions {

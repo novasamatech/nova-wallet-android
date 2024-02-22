@@ -30,11 +30,11 @@ import io.novafoundation.nova.runtime.extrinsic.systemRemark
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromUtf8
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromUtf8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first

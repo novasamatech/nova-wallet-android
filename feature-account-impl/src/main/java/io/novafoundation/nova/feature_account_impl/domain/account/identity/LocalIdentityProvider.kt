@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

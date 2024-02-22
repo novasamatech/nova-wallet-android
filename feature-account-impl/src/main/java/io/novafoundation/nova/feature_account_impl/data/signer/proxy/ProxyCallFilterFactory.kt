@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.EverythingFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.WhiteListFilter
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class ProxyCallFilterFactory {
 

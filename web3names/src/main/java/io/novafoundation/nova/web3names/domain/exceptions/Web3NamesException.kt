@@ -1,7 +1,7 @@
 package io.novafoundation.nova.web3names.domain.exceptions
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.extensions.requirePrefix
+import io.novasama.substrate_sdk_android.extensions.requirePrefix
 
 sealed class Web3NamesException(identifier: String) : Exception() {
 

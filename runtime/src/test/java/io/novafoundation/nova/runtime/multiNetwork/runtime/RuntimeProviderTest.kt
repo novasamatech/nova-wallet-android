@@ -7,7 +7,7 @@ import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.eq
 import io.novafoundation.nova.test_shared.thenThrowUnsafe
 import io.novafoundation.nova.test_shared.whenever
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first

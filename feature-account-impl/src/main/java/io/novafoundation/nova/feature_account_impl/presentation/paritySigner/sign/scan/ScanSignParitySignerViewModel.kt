@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.mapValidityPeriodFromParcel
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper.Sr25519
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper.Sr25519
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 

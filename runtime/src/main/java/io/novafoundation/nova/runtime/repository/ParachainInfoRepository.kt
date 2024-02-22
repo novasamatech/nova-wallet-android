@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.parachainInfoOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 

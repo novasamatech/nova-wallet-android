@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.storage
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

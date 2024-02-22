@@ -3,7 +3,7 @@ package io.novafoundation.nova.core.updater
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.model.StorageChange
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response

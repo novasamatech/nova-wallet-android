@@ -27,9 +27,9 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.singleValueOf
 import io.novafoundation.nova.runtime.storage.source.query.multi
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 

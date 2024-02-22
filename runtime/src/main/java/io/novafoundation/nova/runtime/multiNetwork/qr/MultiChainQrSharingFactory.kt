@@ -1,8 +1,8 @@
 package io.novafoundation.nova.runtime.multiNetwork.qr
 
-import jp.co.soramitsu.fearless_utils.encrypt.qr.QrSharing
-import jp.co.soramitsu.fearless_utils.encrypt.qr.formats.AddressQrFormat
-import jp.co.soramitsu.fearless_utils.encrypt.qr.formats.SubstrateQrFormat
+import io.novasama.substrate_sdk_android.encrypt.qr.QrSharing
+import io.novasama.substrate_sdk_android.encrypt.qr.formats.AddressQrFormat
+import io.novasama.substrate_sdk_android.encrypt.qr.formats.SubstrateQrFormat
 
 class MultiChainQrSharingFactory {
 

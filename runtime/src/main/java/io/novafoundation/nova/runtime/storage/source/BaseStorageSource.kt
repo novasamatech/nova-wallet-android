@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -33,7 +33,8 @@ abstract class BaseStorageSource(
         chainId: String,
         at: BlockHash?,
         runtime: RuntimeSnapshot,
-        subscriptionBuilder: SubstrateSubscriptionBuilder?
+        applyStorageDefault: Boolean,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?,
     ): StorageQueryContext
 
     override suspend fun <T> query(
@@ -85,10 +86,11 @@ abstract class BaseStorageSource(
     override suspend fun <R> query(
         chainId: String,
         at: BlockHash?,
+        applyStorageDefault: Boolean,
         query: suspend StorageQueryContext.() -> R
     ): R {
         val runtime = chainRegistry.getRuntime(chainId)
-        val context = createQueryContext(chainId, at, runtime, subscriptionBuilder = null)
+        val context = createQueryContext(chainId, at, runtime, applyStorageDefault, subscriptionBuilder = null)
 
         return context.query()
     }
@@ -100,7 +102,7 @@ abstract class BaseStorageSource(
     ): Flow<R> {
         return flow {
             val runtime = chainRegistry.getRuntime(chainId)
-            val context = createQueryContext(chainId, at, runtime, subscriptionBuilder = null)
+            val context = createQueryContext(chainId, at, runtime, applyStorageDefault = false, subscriptionBuilder = null)
 
             emitAll(context.subscribe())
         }
@@ -113,7 +115,7 @@ abstract class BaseStorageSource(
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R> {
         val runtime = chainRegistry.getRuntime(chainId)
-        val context = createQueryContext(chainId, at, runtime, subscriptionBuilder)
+        val context = createQueryContext(chainId, at, runtime, applyStorageDefault = false, subscriptionBuilder)
 
         return subscribe(context)
     }
@@ -125,7 +127,7 @@ abstract class BaseStorageSource(
     ): Flow<R> {
         val runtime = chainRegistry.getRuntime(chainId)
         val sharedSubscription = sharedRequestsBuilderFactory.create(chainId)
-        val context = createQueryContext(chainId, at, runtime, sharedSubscription)
+        val context = createQueryContext(chainId, at, runtime, applyStorageDefault = false, sharedSubscription)
 
         val result = subscribe(context)
 

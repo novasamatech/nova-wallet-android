@@ -1,9 +1,9 @@
 package io.novafoundation.nova.runtime.extrinsic.signer
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 interface NovaSigner : Signer {
 

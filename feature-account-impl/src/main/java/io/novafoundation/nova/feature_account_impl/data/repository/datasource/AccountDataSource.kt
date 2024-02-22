@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetB
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import kotlinx.coroutines.flow.Flow
 
 interface AccountDataSource : SecretStoreV1 {

@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.Identi
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

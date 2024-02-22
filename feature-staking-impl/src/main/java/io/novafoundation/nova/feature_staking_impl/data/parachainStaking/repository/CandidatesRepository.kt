@@ -7,9 +7,9 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 
 interface CandidatesRepository {
 

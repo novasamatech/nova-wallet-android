@@ -49,7 +49,7 @@ dependencies {
     implementation daggerDep
     kapt daggerKapt
 
-    api fearlessLibDep
+    api substrateSdkDep
 
     api project(':core-api')
 }

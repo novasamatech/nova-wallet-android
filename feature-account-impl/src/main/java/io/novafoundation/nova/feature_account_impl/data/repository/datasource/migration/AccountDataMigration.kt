@@ -7,9 +7,9 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.core.model.SecuritySource
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.model.AccountLocal
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
-import jp.co.soramitsu.fearless_utils.scale.Schema
-import jp.co.soramitsu.fearless_utils.scale.byteArray
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
+import io.novasama.substrate_sdk_android.scale.Schema
+import io.novasama.substrate_sdk_android.scale.byteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bouncycastle.util.encoders.Hex

@@ -4,9 +4,9 @@ import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService.ResponseListener
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.toAccountId
+import io.novasama.substrate_sdk_android.wsrpc.SocketService.ResponseListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow

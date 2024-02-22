@@ -22,10 +22,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.hasSameId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.metadata.call
+import io.novasama.substrate_sdk_android.runtime.metadata.module
 
 class StatemineAssetHistory(
     private val chainRegistry: ChainRegistry,

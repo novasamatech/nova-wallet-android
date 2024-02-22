@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_impl.domain.errors.NodeAlreadyExis
 import io.novafoundation.nova.feature_account_impl.domain.errors.UnsupportedNetworkException
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 

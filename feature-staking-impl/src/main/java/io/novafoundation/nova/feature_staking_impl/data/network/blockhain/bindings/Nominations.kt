@@ -8,11 +8,11 @@ import io.novafoundation.nova.common.data.network.runtime.binding.requireType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 
 @UseCaseBinding
 fun bindNominations(scale: String, runtime: RuntimeSnapshot): Nominations {

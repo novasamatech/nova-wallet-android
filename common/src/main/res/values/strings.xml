@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="common_too_small_balance_title">Your balance is too small</string>
+    <string name="wallet_send_insufficient_balance_commission">You need to have at least %s to pay this transaction fee and stay above the minimum network balance. Your current balance is: %s. You need to add %s to your balance to perform this operation.</string>
+
     <string name="nft_issuance_fungible_format">%s units of %s</string>
 
     <string name="nft_fungile_price">%s for %s</string>
@@ -102,8 +106,6 @@
     <string name="referendim_details_not_found_title">Referendum not found</string>
 
     <string name="settings_wiki">Wiki</string>
-
-    <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fee and remain above minimal balance</string>
 
     <string name="operations_swap_title">Swap</string>
 

@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.delegationStatesFor
 import io.novafoundation.nova.runtime.state.selectedOption
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow

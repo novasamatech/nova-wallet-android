@@ -47,7 +47,7 @@ dependencies {
 
     implementation materialDep
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation kotlinDep
 

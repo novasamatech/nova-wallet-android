@@ -17,13 +17,13 @@ import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepositor
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.NO
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
-import jp.co.soramitsu.fearless_utils.encrypt.json.copyBytes
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
-import jp.co.soramitsu.fearless_utils.extensions.copyLast
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.encodedSignaturePayload
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.json.copyBytes
+import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.extensions.copyLast
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 
 private enum class Instruction(val code: UByte) {
     GET_ADDRESS(0x01u), SIGN(0x02u)

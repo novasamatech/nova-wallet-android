@@ -10,11 +10,11 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novafoundation.nova.runtime.storage.source.query.RemoteStorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.storageChange
-import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.wsrpc.executeAsync
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.storage.SubscribeStorageRequest
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.storage.storageChange
+import io.novasama.substrate_sdk_android.wsrpc.subscriptionFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -43,7 +43,8 @@ class RemoteStorageSource(
         chainId: String,
         at: BlockHash?,
         runtime: RuntimeSnapshot,
-        subscriptionBuilder: SubstrateSubscriptionBuilder?
+        applyStorageDefault: Boolean,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?,
     ): StorageQueryContext {
         return RemoteStorageQueryContext(
             bulkRetriever = bulkRetriever,
@@ -51,7 +52,8 @@ class RemoteStorageSource(
             subscriptionBuilder = subscriptionBuilder,
             chainId = chainId,
             at = at,
-            runtime = runtime
+            runtime = runtime,
+            applyStorageDefault = applyStorageDefault
         )
     }
 

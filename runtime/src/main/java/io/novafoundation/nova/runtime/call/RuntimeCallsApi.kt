@@ -2,15 +2,15 @@ package io.novafoundation.nova.runtime.call
 
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.runtime.network.rpc.StateCallRequest
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.TypeRegistry
-import jp.co.soramitsu.fearless_utils.runtime.definitions.registry.getOrThrow
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytes
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.registry.TypeRegistry
+import io.novasama.substrate_sdk_android.runtime.definitions.registry.getOrThrow
+import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.executeAsync
+import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 
 typealias RuntimeTypeName = String
 typealias RuntimeTypeValue = Any?

@@ -3,9 +3,9 @@ package io.novafoundation.nova.runtime.ethereum
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.request.base.RpcRequest
+import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
 import org.web3j.protocol.ObjectMapperFactory
 import org.web3j.protocol.Web3jService
 import org.web3j.protocol.core.BatchRequest

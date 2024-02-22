@@ -19,10 +19,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u32
+import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

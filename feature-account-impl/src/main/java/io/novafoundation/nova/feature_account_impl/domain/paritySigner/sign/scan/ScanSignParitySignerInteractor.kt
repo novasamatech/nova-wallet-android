@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.scan
 
 import io.novafoundation.nova.common.utils.dropBytes
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureVerifier
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
-import jp.co.soramitsu.fearless_utils.encrypt.Signer
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.encodedSignaturePayload
+import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.Signer
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

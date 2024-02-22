@@ -13,7 +13,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.statemineAssetIdS
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.Deferred
 
 private typealias ScaleEncodedMultiLocation = String

@@ -2,7 +2,7 @@ package io.novafoundation.nova.runtime.ethereum.transaction.builder
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.utils.ethereumAccountIdToAddress
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Type

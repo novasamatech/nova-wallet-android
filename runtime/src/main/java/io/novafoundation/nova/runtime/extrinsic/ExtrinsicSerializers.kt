@@ -6,9 +6,9 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import java.lang.reflect.Type
 
 private class GenericCallAdapter : JsonSerializer<GenericCall.Instance> {

@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import java.math.BigDecimal
 import java.math.BigInteger
 

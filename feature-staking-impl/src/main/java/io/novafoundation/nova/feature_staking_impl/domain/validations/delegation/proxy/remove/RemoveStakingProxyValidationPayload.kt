@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.validations.delegatio
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class RemoveStakingProxyValidationPayload(
     val chain: Chain,

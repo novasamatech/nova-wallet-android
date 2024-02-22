@@ -6,8 +6,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 suspend fun AccountRepository.findMetaAccountOrThrow(accountId: AccountId, chainId: ChainId) = findMetaAccount(accountId, chainId)
     ?: error("No meta account found for accountId: ${accountId.toHexString()}")

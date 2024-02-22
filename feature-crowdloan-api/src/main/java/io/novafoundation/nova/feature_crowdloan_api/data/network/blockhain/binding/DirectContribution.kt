@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution.Companion.DIRECT_SOURCE_ID
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import java.math.BigInteger
 
 class DirectContribution(

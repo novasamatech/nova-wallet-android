@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
 import java.math.BigInteger

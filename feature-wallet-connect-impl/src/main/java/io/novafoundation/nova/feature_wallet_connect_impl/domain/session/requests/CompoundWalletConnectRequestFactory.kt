@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests
 
 import com.walletconnect.web3.wallet.client.Wallet
-import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 
 class CompoundWalletConnectRequestFactory(
     private val nestedFactories: List<WalletConnectRequest.Factory>

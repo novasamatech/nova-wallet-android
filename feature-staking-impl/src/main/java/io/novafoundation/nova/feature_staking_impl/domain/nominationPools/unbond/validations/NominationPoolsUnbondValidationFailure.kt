@@ -28,5 +28,6 @@ sealed class NominationPoolsUnbondValidationFailure {
 
     class PoolMemberMaxUnlockingLimitReached(val limit: Int) : NominationPoolsUnbondValidationFailure()
 
-    class ToStayAboveED(override val asset: Chain.Asset) : NominationPoolsUnbondValidationFailure(), InsufficientBalanceToStayAboveEDError
+    class ToStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
+        NominationPoolsUnbondValidationFailure(), InsufficientBalanceToStayAboveEDError
 }

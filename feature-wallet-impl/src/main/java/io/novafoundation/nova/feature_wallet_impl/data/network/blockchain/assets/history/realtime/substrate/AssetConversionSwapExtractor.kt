@@ -16,7 +16,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.Multi
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findAllOfType
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNativeFee
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.coroutineContext
 

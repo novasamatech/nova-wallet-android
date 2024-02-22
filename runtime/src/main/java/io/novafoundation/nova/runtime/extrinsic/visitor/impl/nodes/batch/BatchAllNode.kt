@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.impl.EventCountingContex
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.NestedCallNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.VisitingContext
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.indexOfLastOrThrow
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 internal class BatchAllNode : NestedCallNode {
 

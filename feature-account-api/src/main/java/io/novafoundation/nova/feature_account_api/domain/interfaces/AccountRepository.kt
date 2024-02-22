@@ -10,8 +10,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetB
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 class AccountAlreadyExistsException : Exception()
