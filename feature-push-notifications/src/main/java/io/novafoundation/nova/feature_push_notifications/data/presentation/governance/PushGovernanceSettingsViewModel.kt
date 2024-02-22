@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_push_notifications.data.presentation.gove
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.updateValue
+import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksRequester
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.ChainWithGovTracks
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.GovernancePushSettingsInteractor
@@ -13,6 +15,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 data class GovChainKey(val chainId: ChainId, val governance: Chain.Governance)
@@ -22,7 +26,8 @@ class PushGovernanceSettingsViewModel(
     private val interactor: GovernancePushSettingsInteractor,
     private val pushGovernanceSettingsResponder: PushGovernanceSettingsResponder,
     private val chainRegistry: ChainRegistry,
-    private val request: PushGovernanceSettingsRequester.Request
+    private val request: PushGovernanceSettingsRequester.Request,
+    private val selectTracksRequester: SelectTracksRequester
 ) : BaseViewModel() {
 
     private val chainsWithTracksQuantity = interactor.governanceChainsFlow()
@@ -35,7 +40,7 @@ class PushGovernanceSettingsViewModel(
             val changedItem = changedSettings[chainWithTracksQuantity.key()]
             changedItem ?: PushGovernanceRVItem.default(chainWithTracksQuantity.chain, chainWithTracksQuantity.govVersion)
         }
-    }
+    }.withSafeLoading()
 
     init {
         launch {
@@ -47,6 +52,16 @@ class PushGovernanceSettingsViewModel(
                     mapCommunicatorModelToItem(chainIdToSettings, chain)
                 }.associateBy { it.key() }
         }
+
+        subscribeOnSelectTracks()
+    }
+
+    private fun subscribeOnSelectTracks() {
+        selectTracksRequester.responseFlow
+            .onEach {
+                // set tracks to item
+            }
+            .launchIn(this)
     }
 
     fun backClicked() {
@@ -95,7 +110,7 @@ class PushGovernanceSettingsViewModel(
     }
 
     fun tracksClicked(item: PushGovernanceRVItem) {
-        // Open tracks screen
+        selectTracksRequester.openRequest(SelectTracksRequester.Request(item.chainId, emptySet()))
     }
 
     private fun mapCommunicatorModelToItem(item: PushGovernanceSettings, chain: Chain): PushGovernanceRVItem {
@@ -110,7 +125,7 @@ class PushGovernanceSettingsViewModel(
             isDelegationVotesEnabled = item.delegateVotes,
             tracks = when (item.tracks) {
                 is PushGovernanceSettings.Tracks.All -> PushGovernanceRVItem.Tracks.All
-                is PushGovernanceSettings.Tracks.Specified -> PushGovernanceRVItem.Tracks.Specified(item.tracks.items)
+                is PushGovernanceSettings.Tracks.Specified -> PushGovernanceRVItem.Tracks.Specified(item.tracks.items, 0)
             }
         )
     }

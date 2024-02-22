@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
 
     <string name="push_governance_settings_new_referendum">New Referendum</string>

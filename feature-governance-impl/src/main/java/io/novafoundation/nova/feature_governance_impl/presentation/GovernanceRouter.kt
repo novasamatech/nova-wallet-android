@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation
 
+import android.os.Bundle
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
@@ -76,4 +77,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openRevokeDelegationsConfirm(payload: RevokeDelegationConfirmPayload)
 
     fun openDelegateSearch()
+
+    fun openSelectGovernanceTracks(bundle: Bundle)
 }

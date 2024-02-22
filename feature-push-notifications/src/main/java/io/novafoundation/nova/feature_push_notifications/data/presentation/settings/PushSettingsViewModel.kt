@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_push_notifications.data.data.settings.Push
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.isAnyGovEnabled
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.isNotEmpty
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsRequester
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -28,6 +29,7 @@ class PushSettingsViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val resourceManager: ResourceManager,
     private val walletRequester: SelectMultipleWalletsRequester,
+    private val pushGovernanceSettingsRequester: PushGovernanceSettingsRequester
 ) : BaseViewModel() {
 
     private val _switchingInProgress = MutableStateFlow(false)
@@ -109,7 +111,7 @@ class PushSettingsViewModel(
     }
 
     fun governanceClicked() {
-        TODO()
+        pushGovernanceSettingsRequester.openRequest(PushGovernanceSettingsRequester.Request(emptyList()))
     }
 
     fun stakingRewardsClicked() {

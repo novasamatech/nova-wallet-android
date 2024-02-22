@@ -36,11 +36,6 @@ class RealPushNotificationsInteractor(
         // TODO: To handle case when user disable a permission in settings
     }
 
-    override fun governanceChainsFlow(): Flow<List<Chain>> {
-        return chainRegistry.currentChains
-            .map { it.filter { it.governance.isNotEmpty() } }
-    }
-
     override fun pushNotificationsEnabledFlow(): Flow<Boolean> {
         return pushSettingsProvider.pushEnabledFlow()
     }

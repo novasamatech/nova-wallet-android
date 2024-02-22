@@ -17,8 +17,6 @@ interface GovernancePushSettingsInteractor {
 }
 
 class RealGovernancePushSettingsInteractor(
-    private val pushNotificationsService: PushNotificationsService,
-    private val pushSettingsProvider: PushSettingsProvider,
     private val chainRegistry: ChainRegistry,
     private val governanceSourceRegistry: GovernanceSourceRegistry
 ) : GovernancePushSettingsInteractor {

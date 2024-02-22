@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.flexbox.FlexboxLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="16dp"
+    app:alignContent="flex_start"
+    app:flexWrap="wrap">
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:includeFontPadding="false"
+        android:text="@string/select_tracks_for"
+        android:textColor="@color/text_primary" />
+
+    <io.novafoundation.nova.feature_account_api.view.ChainChipView
+        android:id="@+id/selectGovernanceTracksChain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</com.google.android.flexbox.FlexboxLayout>

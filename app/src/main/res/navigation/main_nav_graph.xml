@@ -227,6 +227,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_select_governance_tracks"
+        app:destination="@id/selectGovernanceTracks"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -478,7 +486,7 @@
         android:id="@+id/selectMultipleWalletsFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.SelectMultipleWalletsFragment"
         android:label="SelectMultipleWalletsFragment"
-        tools:layout="@layout/fragment_select_multiple_wallets"/>
+        tools:layout="@layout/fragment_select_multiple_wallets" />
 
     <fragment
         android:id="@+id/nodesFragment"
@@ -893,7 +901,7 @@
         tools:layout="@layout/fragment_push_welcome">
 
         <action
-            android:id="@+id/action_pushWelcom_to_pushSettings"
+            android:id="@+id/action_pushWelcome_to_pushSettings"
             app:destination="@id/push_settings_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
@@ -902,6 +910,12 @@
             app:popUpTo="@id/mainFragment" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/selectGovernanceTracks"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.governanceTracks.SelectGovernanceTracksFragment"
+        android:label="SelectGovernanceTracksFragment"
+        tools:layout="@layout/fragment_select_tracks" />
 
     <include app:graph="@navigation/start_swap_nav_graph" />
 

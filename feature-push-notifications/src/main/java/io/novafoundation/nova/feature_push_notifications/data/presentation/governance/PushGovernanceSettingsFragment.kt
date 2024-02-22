@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.observe
 import io.novafoundation.nova.feature_push_notifications.R
@@ -54,7 +55,13 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
     }
 
     override fun subscribe(viewModel: PushGovernanceSettingsViewModel) {
-        viewModel.governanceSettingsList.observe(adapter::submitList)
+        viewModel.governanceSettingsList.observe {
+            when (it) {
+                is ExtendedLoadingState.Loaded -> adapter.submitList(it.data)
+                ExtendedLoadingState.Loading -> Unit
+                else -> {}
+            }
+        }
     }
 
     override fun enableSwitcherClick(item: PushGovernanceRVItem) {

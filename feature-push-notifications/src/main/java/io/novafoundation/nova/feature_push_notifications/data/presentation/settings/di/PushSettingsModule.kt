@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsCommunicator
 import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.PushSettingsViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -24,13 +25,15 @@ class PushSettingsModule {
         router: PushNotificationsRouter,
         interactor: PushNotificationsInteractor,
         resourceManager: ResourceManager,
-        selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator
+        selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
+        pushGovernanceSettingsCommunicator: PushGovernanceSettingsCommunicator,
     ): ViewModel {
         return PushSettingsViewModel(
             router,
             interactor,
             resourceManager,
-            selectMultipleWalletsCommunicator
+            selectMultipleWalletsCommunicator,
+            pushGovernanceSettingsCommunicator,
         )
     }
 

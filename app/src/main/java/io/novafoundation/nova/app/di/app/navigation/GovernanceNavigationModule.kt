@@ -4,8 +4,13 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.app.root.navigation.account.SelectMultipleWalletsCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.governance.GovernanceNavigator
+import io.novafoundation.nova.app.root.navigation.governance.SelectTracksCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 
 @Module
@@ -17,4 +22,11 @@ class GovernanceNavigationModule {
         navigationHolder: NavigationHolder,
         commonNavigator: Navigator,
     ): GovernanceRouter = GovernanceNavigator(navigationHolder, commonNavigator)
+
+    @Provides
+    @ApplicationScope
+    fun provideSelectTracksCommunicator(
+        router: GovernanceRouter,
+        navigationHolder: NavigationHolder
+    ): SelectTracksCommunicator = SelectTracksCommunicatorImpl(router, navigationHolder)
 }

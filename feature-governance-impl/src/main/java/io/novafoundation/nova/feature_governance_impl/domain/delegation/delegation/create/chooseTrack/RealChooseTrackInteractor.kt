@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack
 
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
@@ -22,6 +23,9 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.AVAILABLE
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -39,6 +43,7 @@ class RealChooseTrackInteractor(
     private val accountRepository: AccountRepository,
     private val trackCategorizer: TrackCategorizer,
     private val removeVotesSuggestionRepository: RemoveVotesSuggestionRepository,
+    private val chainRegistry: ChainRegistry
 ) : ChooseTrackInteractor {
 
     override suspend fun isAllowedToShowRemoveVotesSuggestion(): Boolean {
@@ -47,6 +52,27 @@ class RealChooseTrackInteractor(
 
     override suspend fun disallowShowRemoveVotesSuggestion() {
         removeVotesSuggestionRepository.disallowShowRemoveVotesSuggestion()
+    }
+
+    override fun observeTracksByChain(chainId: ChainId): Flow<ChooseTrackData> = flowOf {
+        val chain = chainRegistry.getChain(chainId)
+        val govType = chain.governance.firstOrNull { it == Chain.Governance.V2 } ?: return@flowOf ChooseTrackData.empty()
+
+        val governanceSource = governanceSourceRegistry.sourceFor(govType)
+        val allTracks = governanceSource.referenda.getTracksById(chain.id)
+            .mapValues { (_, track) -> mapTrackInfoToTrack(track) }
+            .values
+            .toList()
+
+        ChooseTrackData(
+            trackPartition = TrackPartition(
+                available = allTracks,
+                alreadyVoted = emptyList(),
+                alreadyDelegated = emptyList(),
+                preCheckedTrackIds = emptySet()
+            ),
+            presets = buildPresets(allTracks)
+        )
     }
 
     override fun observeNewDelegationTrackData(): Flow<ChooseTrackData> {

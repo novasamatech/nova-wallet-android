@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.adapter
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.delegationTracks.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDel
 import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksUnavailableTracksText
 import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.selectDelegationTracksTitle
 
-class SelectDelegationTracksHeaderAdapter(
+class SelectTracksHeaderAdapter(
     private val handler: Handler
 ) : RecyclerView.Adapter<DelegationTracksHeaderViewHolder>() {
 
@@ -56,7 +56,7 @@ class SelectDelegationTracksHeaderAdapter(
 
 class DelegationTracksHeaderViewHolder(
     containerView: View,
-    handler: SelectDelegationTracksHeaderAdapter.Handler
+    handler: SelectTracksHeaderAdapter.Handler
 ) : ViewHolder(containerView) {
 
     init {
