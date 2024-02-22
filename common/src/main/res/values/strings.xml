@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="default_notification_channel_id">default_notifications_channel_id</string>
+    <string name="default_notification_channel_name">Default Notifications Channel</string>
+
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
     <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
 

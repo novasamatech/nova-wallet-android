@@ -29,7 +29,7 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class PushSettingsSerialization
 
-@Module()
+@Module(includes = [NotificationHandlersModule::class])
 class PushNotificationsFeatureModule {
 
     @Provides

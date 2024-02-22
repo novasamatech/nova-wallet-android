@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_push_notifications.data.data.settings
+package io.novafoundation.nova.feature_push_notifications.data.domain.model
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 

@@ -11,17 +11,22 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_account_api.domain.model.mainEthereumAddress
+import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.feature_account_api.domain.model.toDefaultSubstrateAddress
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.util.*
+import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.asDeferred
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
 
 private const val COLLECTION_NAME = "users"
@@ -34,6 +39,8 @@ class RealPushSubscriptionService(
     private val accountRepository: AccountRepository
 ) : PushSubscriptionService {
 
+    private val generateIdMutex = Mutex()
+
     override suspend fun handleSubscription(pushEnabled: Boolean, token: String?, pushSettings: PushSettings) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
 
@@ -44,15 +51,17 @@ class RealPushSubscriptionService(
         handleFirestore(token, pushSettings)
     }
 
-    private fun getFirestoreUUID(): String {
-        var uuid = prefs.getString(PREFS_FIRESTORE_UUID)
+    private suspend fun getFirestoreUUID(): String {
+        return generateIdMutex.withLock {
+            var uuid = prefs.getString(PREFS_FIRESTORE_UUID)
 
-        if (uuid == null) {
-            uuid = UUID.randomUUID().toString()
-            prefs.putString(PREFS_FIRESTORE_UUID, uuid)
+            if (uuid == null) {
+                uuid = UUID.randomUUID().toString()
+                prefs.putString(PREFS_FIRESTORE_UUID, uuid)
+            }
+
+            uuid
         }
-
-        return uuid
     }
 
     private suspend fun handleFirestore(token: String?, pushSettings: PushSettings) {
@@ -81,10 +90,10 @@ class RealPushSubscriptionService(
             this += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
 
             this += pushSettings.governanceState.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
+                .map { (chainId, track) -> handleSubscription(true, "govState:${chainId.hexPrefix16()}:$track") }
 
             this += pushSettings.newReferenda.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId:$track") }
+                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId.to16Hex():$track") }
         }
 
         deferreds.awaitAll()
@@ -140,7 +149,8 @@ class RealPushSubscriptionService(
             "chainSpecific" to metaAccount.chainAccounts.mapValuesNotNull { (chainId, chainAccount) ->
                 val chain = chainsById[chainId] ?: return@mapValuesNotNull null
                 chain.addressOf(chainAccount.accountId)
-            }.nullIfEmpty()
+            }.transfromChainIdsTo16Hex()
+                .nullIfEmpty()
         )
     }
 
@@ -151,7 +161,7 @@ class RealPushSubscriptionService(
                 if (chainFeature.chainIds.isEmpty()) {
                     null
                 } else {
-                    mapOf("type" to "concrete", "value" to chainFeature.chainIds)
+                    mapOf("type" to "concrete", "value" to chainFeature.chainIds.transfromChainIdsTo16Hex())
                 }
             }
         }
@@ -167,5 +177,19 @@ class RealPushSubscriptionService(
 
     private fun Map<String, Any>.nullIfEmpty(): Map<String, Any>? {
         return if (isEmpty()) null else this
+    }
+
+    private fun <T> Map<ChainId, T>.transfromChainIdsTo16Hex(): Map<String, T> {
+        return mapKeys { (chainId, _) -> chainId.hexPrefix16() }
+    }
+
+    private fun List<ChainId>.transfromChainIdsTo16Hex(): List<String> {
+        return map { chainId -> chainId.hexPrefix16() }
+    }
+
+    private fun ChainId.hexPrefix16(): String {
+        return removeHexPrefix()
+            .take(32)
+            .requireHexPrefix()
     }
 }

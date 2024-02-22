@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.data.domain.interactor
 
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
 import kotlinx.coroutines.flow.Flow
 
