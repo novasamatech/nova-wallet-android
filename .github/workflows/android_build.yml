@@ -100,10 +100,13 @@ env:
   CI_GITHUB_KEYSTORE_KEY_PASS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_PASS }}
   CI_GITHUB_KEYSTORE_KEY_FILE: ${{ secrets.BASE64_GITHUB_KEYSTORE_FILE }}
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-app:
-    name: Build and test android app
+    name: Build app and test
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -144,8 +147,8 @@ jobs:
         run: rm ./app/${{ inputs.keystore-file-name }}
 
       - name: ➡️ Upload build artifacts
-        uses: actions/upload-artifact@v2
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
+        uses: actions/upload-artifact@v2
         with:
           name: apk
           path: app/build/outputs/apk/
