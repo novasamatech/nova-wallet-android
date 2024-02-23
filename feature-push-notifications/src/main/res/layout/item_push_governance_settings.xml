@@ -29,6 +29,7 @@
         android:id="@+id/pushGovernanceItemDelegateVotes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:title="@string/push_governance_settings_delegate_votes" />
 
     <io.novafoundation.nova.common.view.settings.SettingsItemView
