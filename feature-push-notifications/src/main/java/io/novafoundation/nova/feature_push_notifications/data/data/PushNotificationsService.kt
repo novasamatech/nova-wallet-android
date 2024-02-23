@@ -57,8 +57,9 @@ class RealPushNotificationsService(
         return runCatching {
             setPushNotificationsEnabled(enabled)
             val pushToken = getPushToken()
-            settingsProvider.updateWalletSettings(pushSettings)
-            subscriptionService.handleSubscription(enabled, pushToken, pushSettings)
+            val oldSettings = settingsProvider.getPushSettings()
+            subscriptionService.handleSubscription(enabled, pushToken, oldSettings, pushSettings)
+            settingsProvider.updateSettings(pushSettings)
         }
     }
 

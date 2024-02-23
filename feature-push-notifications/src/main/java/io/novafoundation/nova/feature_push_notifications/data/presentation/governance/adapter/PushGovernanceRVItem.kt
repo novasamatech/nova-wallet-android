@@ -1,39 +1,24 @@
 package io.novafoundation.nova.feature_push_notifications.data.presentation.governance.adapter
 
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceModel
 
 data class PushGovernanceRVItem(
-    val chainId: ChainId,
-    val governance: Chain.Governance,
-    val chainName: String,
-    val chainIconUrl: String,
-    val isEnabled: Boolean,
-    val isNewReferendaEnabled: Boolean,
-    val isReferendaUpdatesEnabled: Boolean,
-    val isDelegationVotesEnabled: Boolean,
-    val tracks: Tracks
+    val model: PushGovernanceModel,
+    val tracksText: String
 ) {
+    val chainId = model.chainId
 
-    sealed class Tracks {
-        object All : Tracks()
+    val governance = model.governance
 
-        data class Specified(val items: List<String>, val max: Int) : Tracks()
-    }
+    val chainName = model.chainName
 
-    companion object
-}
+    val chainIconUrl = model.chainIconUrl
 
-fun PushGovernanceRVItem.Companion.default(chain: Chain, governance: Chain.Governance): PushGovernanceRVItem {
-    return PushGovernanceRVItem(
-        chain.id,
-        governance,
-        chain.name,
-        chain.icon,
-        false,
-        true,
-        true,
-        true,
-        PushGovernanceRVItem.Tracks.All
-    )
+    val isEnabled = model.isEnabled
+
+    val isNewReferendaEnabled = model.isNewReferendaEnabled
+
+    val isReferendaUpdatesEnabled = model.isReferendaUpdatesEnabled
+
+    val isDelegationVotesEnabled = model.isDelegationVotesEnabled
 }

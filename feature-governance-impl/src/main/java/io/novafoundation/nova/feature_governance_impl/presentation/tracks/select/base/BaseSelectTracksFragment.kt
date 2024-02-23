@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter.SelectTracksAdapter
-import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.delegationTracks.adapter.SelectTracksHeaderAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter.SelectTracksPresetsAdapter
 import kotlinx.android.synthetic.main.fragment_select_tracks.selectTracksList
 import kotlinx.android.synthetic.main.fragment_select_tracks.selectTracksProgress
@@ -27,7 +26,6 @@ abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
     SelectTracksPresetsAdapter.Handler {
 
     abstract val headerAdapter: RecyclerView.Adapter<*>
-
     private val presetsAdapter = NestedAdapter(
         nestedAdapter = SelectTracksPresetsAdapter(this),
         orientation = RecyclerView.HORIZONTAL,
@@ -36,7 +34,13 @@ abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
     )
     private val placeholderAdapter = CustomPlaceholderAdapter(R.layout.item_tracks_placeholder)
     private val tracksAdapter = SelectTracksAdapter(this)
-    private val concatAdapter = ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter)
+    private lateinit var adapter: ConcatAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        adapter = ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +52,7 @@ abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
 
     override fun initViews() {
         selectTracksList.itemAnimator = null
-        selectTracksList.adapter = concatAdapter
+        selectTracksList.adapter = adapter
 
         selectTracksToolbar.applyStatusBarInsets()
         selectTracksToolbar.setHomeButtonListener { viewModel.backClicked() }

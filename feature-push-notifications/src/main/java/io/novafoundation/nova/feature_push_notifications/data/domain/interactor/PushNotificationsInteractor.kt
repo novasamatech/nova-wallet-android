@@ -1,19 +1,14 @@
 package io.novafoundation.nova.feature_push_notifications.data.domain.interactor
 
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 
 interface PushNotificationsInteractor {
 
     suspend fun syncSettings()
-
 
     fun pushNotificationsEnabledFlow(): Flow<Boolean>
 

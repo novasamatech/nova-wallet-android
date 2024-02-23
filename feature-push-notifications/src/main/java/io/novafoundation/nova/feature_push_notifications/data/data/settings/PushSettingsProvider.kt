@@ -8,7 +8,7 @@ interface PushSettingsProvider {
 
     suspend fun getDefaultPushSettings(): PushSettings
 
-    fun updateWalletSettings(pushWalletSettings: PushSettings)
+    fun updateSettings(pushWalletSettings: PushSettings)
 
     fun setPushNotificationsEnabled(isEnabled: Boolean)
 

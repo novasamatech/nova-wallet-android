@@ -22,6 +22,11 @@ class SelectGovernanceTracksFragment : BaseSelectTracksFragment<SelectGovernance
 
     override val headerAdapter = SelectGovernanceTracksHeaderAdapter()
 
+    override fun initViews() {
+        super.initViews()
+        onBackPressed { viewModel.backClicked() }
+    }
+
     override fun inject() {
         FeatureUtils.getFeature<GovernanceFeatureComponent>(
             requireContext(),

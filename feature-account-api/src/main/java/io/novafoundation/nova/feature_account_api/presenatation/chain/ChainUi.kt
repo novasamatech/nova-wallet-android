@@ -28,6 +28,7 @@ fun ImageView.loadChainIcon(icon: String?, imageLoader: ImageLoader) {
 
 fun ImageLoader.loadChainIconToTarget(icon: String?, context: Context, target: (Drawable) -> Unit) {
     val request = ImageRequest.Builder(context)
+        .data(icon)
         .placeholder(R.drawable.bg_chain_placeholder)
         .error(R.drawable.bg_chain_placeholder)
         .fallback(R.drawable.bg_chain_placeholder)

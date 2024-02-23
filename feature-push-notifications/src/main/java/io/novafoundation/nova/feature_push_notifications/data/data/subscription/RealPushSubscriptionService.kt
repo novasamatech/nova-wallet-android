@@ -4,6 +4,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.messaging
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.utils.CollectionDiffer
+import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.formatting.formatDateISO_8601_NoMs
 import io.novafoundation.nova.common.utils.mapOfNotNullValues
 import io.novafoundation.nova.common.utils.mapValuesNotNull
@@ -18,6 +20,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import java.math.BigInteger
 import java.util.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
@@ -27,6 +30,14 @@ import kotlinx.coroutines.tasks.await
 private const val COLLECTION_NAME = "users"
 private const val PREFS_FIRESTORE_UUID = "firestore_uuid"
 
+private const val GOV_STATE_TOPIC_NAME = "govState"
+private const val NEW_REFERENDA_TOPIC_NAME = "govNewRef"
+
+class TrackIdentifiable(val chainId: ChainId, val track: BigInteger) : Identifiable {
+    override val identifier: String
+        get() = "$chainId:$track"
+}
+
 class RealPushSubscriptionService(
     private val prefs: Preferences,
     private val chainRegistry: ChainRegistry,
@@ -34,14 +45,14 @@ class RealPushSubscriptionService(
     private val accountRepository: AccountRepository
 ) : PushSubscriptionService {
 
-    override suspend fun handleSubscription(pushEnabled: Boolean, token: String?, pushSettings: PushSettings) {
+    override suspend fun handleSubscription(pushEnabled: Boolean, token: String?, oldSettings: PushSettings, newSettings: PushSettings) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
 
         val tokenExist = token != null
         if (pushEnabled != tokenExist) throw IllegalStateException("Token should exist to enable push notifications")
 
-        handleTopics(pushEnabled, pushSettings)
-        handleFirestore(token, pushSettings)
+        handleTopics(pushEnabled, oldSettings, newSettings)
+        handleFirestore(token, newSettings)
     }
 
     private fun getFirestoreUUID(): String {
@@ -75,16 +86,29 @@ class RealPushSubscriptionService(
         }
     }
 
-    private suspend fun handleTopics(pushEnabled: Boolean, pushSettings: PushSettings) {
-        // TODO unsubscribe from old gov topics
+    private suspend fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings) {
+        val govStateTracksDiff = CollectionDiffer.findDiff(
+            oldItems = oldSettings.getGovernanceTracksFor { it.referendumUpdateEnabled },
+            newItems = newSettings.getGovernanceTracksFor { it.referendumUpdateEnabled },
+            forceUseNewItems = false
+        )
+        val newReferendaDiff = CollectionDiffer.findDiff(
+            oldItems = oldSettings.getGovernanceTracksFor { it.newReferendaEnabled },
+            newItems = newSettings.getGovernanceTracksFor { it.newReferendaEnabled },
+            forceUseNewItems = false
+        )
+
         val deferreds = buildList<Deferred<Void>> {
-            this += handleSubscription(pushSettings.announcementsEnabled && pushEnabled, "appUpdates")
+            this += handleSubscription(newSettings.announcementsEnabled && pushEnabled, "appUpdates")
+            this += govStateTracksDiff.newOrUpdated
+                .map { subscribeToTopic("$GOV_STATE_TOPIC_NAME:${it.chainId}:${it.track}") }
+            this += govStateTracksDiff.removed
+                .map { unsubscribeFromTopic("$GOV_STATE_TOPIC_NAME:${it.chainId}:${it.track}") }
 
-            this += pushSettings.governanceState.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govState:$chainId:$track") }
-
-            this += pushSettings.newReferenda.flatMapChainToTracks()
-                .map { (chainId, track) -> handleSubscription(true, "govNewRef:$chainId:$track") }
+            this += newReferendaDiff.newOrUpdated
+                .map { subscribeToTopic("$NEW_REFERENDA_TOPIC_NAME:${it.chainId}:${it.track}") }
+            this += newReferendaDiff.removed
+                .map { unsubscribeFromTopic("$NEW_REFERENDA_TOPIC_NAME:${it.chainId}:${it.track}") }
         }
 
         deferreds.awaitAll()
@@ -125,9 +149,7 @@ class RealPushSubscriptionService(
             "notifications" to mapOfNotNullValues(
                 "stakingReward" to mapToFirestoreChainFeature(settings.stakingReward),
                 "tokenSent" to settings.sentTokensEnabled.mapToFirestoreChainFeatureOrNull(),
-                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull(),
-                "govMyDelegatorVoted" to mapToFirestoreChainFeature(settings.govMyDelegatorVoted),
-                "govMyReferendumFinished" to mapToFirestoreChainFeature(settings.govMyReferendumFinished)
+                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull()
             )
         )
     }
@@ -161,8 +183,9 @@ class RealPushSubscriptionService(
         return if (true) mapOf("type" to "all") else null
     }
 
-    private fun List<PushSettings.GovernanceFeature>.flatMapChainToTracks(): List<Pair<ChainId, String>> {
-        return flatMap { chainGovState -> chainGovState.tracks.map { chainGovState.chainId to it } }
+    private fun PushSettings.getGovernanceTracksFor(filter: (PushSettings.GovernanceState) -> Boolean): List<TrackIdentifiable> {
+        return governance.filter { (_, state) -> filter(state) }
+            .flatMap { (chainId, state) -> state.tracks.map { TrackIdentifiable(chainId, it.value) } }
     }
 
     private fun Map<String, Any>.nullIfEmpty(): Map<String, Any>? {

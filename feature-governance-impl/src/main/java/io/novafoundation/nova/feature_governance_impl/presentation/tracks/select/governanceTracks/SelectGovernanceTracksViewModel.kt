@@ -2,11 +2,9 @@ package io.novafoundation.nova.feature_governance_impl.presentation.tracks.selec
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksRequester
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksResponder
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.fromTrackIds
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.toTrackIds
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.ChooseTrackInteractor
@@ -16,7 +14,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -48,7 +45,7 @@ class SelectGovernanceTracksViewModel(
 
     override fun backClicked() {
         launch {
-            responder.respond(SelectTracksResponder.Response(selectedTracksFlow.value.fromTrackIds()))
+            responder.respond(SelectTracksResponder.Response(payload.chainId, selectedTracksFlow.value.fromTrackIds()))
 
             super.backClicked()
         }

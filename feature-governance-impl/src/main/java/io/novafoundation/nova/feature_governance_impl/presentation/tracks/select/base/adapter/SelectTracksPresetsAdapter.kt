@@ -12,9 +12,7 @@ import kotlinx.android.synthetic.main.item_delegation_tracks_preset.view.itemDel
 
 class SelectTracksPresetsAdapter(
     private val handler: Handler
-) : ListAdapter<DelegationTracksPresetModel, DelegationTrackPresetViewHolder>(
-    TracksPresetDiffCallback
-) {
+) : ListAdapter<DelegationTracksPresetModel, DelegationTrackPresetViewHolder>(TracksPresetDiffCallback) {
 
     interface Handler {
         fun presetClicked(position: Int)

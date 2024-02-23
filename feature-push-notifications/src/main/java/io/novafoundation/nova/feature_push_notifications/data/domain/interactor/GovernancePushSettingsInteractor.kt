@@ -1,15 +1,19 @@
 package io.novafoundation.nova.feature_push_notifications.data.domain.interactor
 
+import io.novafoundation.nova.common.utils.mapToSet
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
-import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class ChainWithGovTracks(val chain: Chain, val govVersion: Chain.Governance, val tracksQuantity: Int)
+class ChainWithGovTracks(
+    val chain: Chain,
+    val govVersion: Chain.Governance,
+    val tracks: Set<TrackId>
+)
 
 interface GovernancePushSettingsInteractor {
 
@@ -24,17 +28,20 @@ class RealGovernancePushSettingsInteractor(
     override fun governanceChainsFlow(): Flow<List<ChainWithGovTracks>> {
         return chainRegistry.currentChains
             .map {
-                it.filter { it.governance.isNotEmpty() }
-                    .flatMap { chain -> chain.governance.map { chain to it } }
-                    .map { (chain, govType) -> ChainWithGovTracks(chain, govType, getTracksQuantity(chain, govType)) }
+                it
+                    .flatMap { chain ->
+                        chain.governance.filter { it == Chain.Governance.V2 }
+                            .map { chain to it }
+                    }
+                    .map { (chain, govType) -> ChainWithGovTracks(chain, govType, getTrackIds(chain, govType)) }
                     .sortedWith(Chain.defaultComparatorFrom(ChainWithGovTracks::chain))
             }
     }
 
-    private suspend fun getTracksQuantity(chain: Chain, governance: Chain.Governance): Int {
+    private suspend fun getTrackIds(chain: Chain, governance: Chain.Governance): Set<TrackId> {
         return governanceSourceRegistry.sourceFor(governance)
             .referenda
             .getTracks(chain.id)
-            .size
+            .mapToSet { it.id }
     }
 }

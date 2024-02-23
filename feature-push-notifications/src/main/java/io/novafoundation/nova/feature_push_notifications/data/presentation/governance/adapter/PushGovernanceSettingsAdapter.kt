@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.ImageLoader
+import io.novafoundation.nova.common.list.PayloadGenerator
+import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIconToTarget
 import io.novafoundation.nova.feature_push_notifications.R
@@ -40,6 +42,21 @@ class PushGovernanceSettingsAdapter(
     override fun onBindViewHolder(holder: PushGovernanceItemViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    override fun onBindViewHolder(holder: PushGovernanceItemViewHolder, position: Int, payloads: MutableList<Any>) {
+        resolvePayload(holder, position, payloads) {
+            val item = getItem(position)
+            holder.updateListenners(item)
+
+            when (it) {
+                PushGovernanceRVItem::isEnabled -> holder.setEnabled(item)
+                PushGovernanceRVItem::isNewReferendaEnabled -> holder.setNewReferendaEnabled(item)
+                PushGovernanceRVItem::isReferendaUpdatesEnabled -> holder.setReferendaUpdatesEnabled(item)
+                PushGovernanceRVItem::isDelegationVotesEnabled -> holder.setDelegationVotesEnabled(item)
+                PushGovernanceRVItem::tracksText -> holder.setTracks(item)
+            }
+        }
+    }
 }
 
 class PushGovernanceItemCallback() : DiffUtil.ItemCallback<PushGovernanceRVItem>() {
@@ -50,6 +67,10 @@ class PushGovernanceItemCallback() : DiffUtil.ItemCallback<PushGovernanceRVItem>
     override fun areContentsTheSame(oldItem: PushGovernanceRVItem, newItem: PushGovernanceRVItem): Boolean {
         return oldItem == newItem
     }
+
+    override fun getChangePayload(oldItem: PushGovernanceRVItem, newItem: PushGovernanceRVItem): Any? {
+        return PushGovernancePayloadGenerator.diff(oldItem, newItem)
+    }
 }
 
 class PushGovernanceItemViewHolder(
@@ -58,39 +79,66 @@ class PushGovernanceItemViewHolder(
     private val itemHandler: PushGovernanceSettingsAdapter.ItemHandler
 ) : ViewHolder(itemView) {
 
+    init {
+        itemView.pushGovernanceItemState.setIconTintColor(null)
+    }
+
     fun bind(item: PushGovernanceRVItem) {
         with(itemView) {
-            pushGovernanceItemState.setOnClickListener { itemHandler.enableSwitcherClick(item) }
-            pushGovernanceItemNewReferenda.setOnClickListener { itemHandler.newReferendaClick(item) }
-            pushGovernanceItemReferendumUpdate.setOnClickListener { itemHandler.referendaUpdatesClick(item) }
-            pushGovernanceItemDelegateVotes.setOnClickListener { itemHandler.delegateVotesClick(item) }
-            pushGovernanceItemTracks.setOnClickListener { itemHandler.tracksClicked(item) }
+            updateListenners(item)
 
             pushGovernanceItemState.setTitle(item.chainName)
             imageLoader.loadChainIconToTarget(item.chainIconUrl, context) {
                 pushGovernanceItemState.setIcon(it)
             }
 
-            pushGovernanceItemState.setChecked(item.isEnabled)
-            pushGovernanceItemNewReferenda.isVisible = item.isEnabled
-            pushGovernanceItemReferendumUpdate.isVisible = item.isEnabled
-            pushGovernanceItemDelegateVotes.isVisible = item.isEnabled
-            pushGovernanceItemTracks.isVisible = item.isEnabled
-
-            pushGovernanceItemNewReferenda.setChecked(item.isNewReferendaEnabled)
-            pushGovernanceItemReferendumUpdate.setChecked(item.isReferendaUpdatesEnabled)
-            pushGovernanceItemDelegateVotes.setChecked(item.isDelegationVotesEnabled)
+            setEnabled(item)
+            setNewReferendaEnabled(item)
+            setReferendaUpdatesEnabled(item)
+            setDelegationVotesEnabled(item)
             setTracks(item)
         }
     }
 
     fun setTracks(item: PushGovernanceRVItem) {
-        val tracks = item.tracks
-        val value = when (tracks) {
-            is PushGovernanceRVItem.Tracks.All -> itemView.context.getString(R.string.common_all)
-            is PushGovernanceRVItem.Tracks.Specified -> itemView.context.getString(R.string.selected_tracks_quantity, tracks.items.size, tracks.max)
-        }
+        itemView.pushGovernanceItemTracks.setValue(item.tracksText)
+    }
 
-        itemView.pushGovernanceItemTracks.setValue(value)
+    fun setEnabled(item: PushGovernanceRVItem) {
+        with(itemView) {
+            pushGovernanceItemState.setChecked(item.isEnabled)
+            pushGovernanceItemNewReferenda.isVisible = item.isEnabled
+            pushGovernanceItemReferendumUpdate.isVisible = item.isEnabled
+            pushGovernanceItemDelegateVotes.isVisible = item.isEnabled
+            pushGovernanceItemTracks.isVisible = item.isEnabled
+        }
+    }
+
+    fun setNewReferendaEnabled(item: PushGovernanceRVItem) {
+        itemView.pushGovernanceItemNewReferenda.setChecked(item.isNewReferendaEnabled)
+    }
+
+    fun setReferendaUpdatesEnabled(item: PushGovernanceRVItem) {
+        itemView.pushGovernanceItemReferendumUpdate.setChecked(item.isReferendaUpdatesEnabled)
+    }
+
+    fun setDelegationVotesEnabled(item: PushGovernanceRVItem) {
+        itemView.pushGovernanceItemDelegateVotes.setChecked(item.isDelegationVotesEnabled)
+    }
+
+    fun updateListenners(item: PushGovernanceRVItem) {
+        itemView.pushGovernanceItemState.setOnClickListener { itemHandler.enableSwitcherClick(item) }
+        itemView.pushGovernanceItemNewReferenda.setOnClickListener { itemHandler.newReferendaClick(item) }
+        itemView.pushGovernanceItemReferendumUpdate.setOnClickListener { itemHandler.referendaUpdatesClick(item) }
+        itemView.pushGovernanceItemDelegateVotes.setOnClickListener { itemHandler.delegateVotesClick(item) }
+        itemView.pushGovernanceItemTracks.setOnClickListener { itemHandler.tracksClicked(item) }
     }
 }
+
+private object PushGovernancePayloadGenerator : PayloadGenerator<PushGovernanceRVItem>(
+    PushGovernanceRVItem::isEnabled,
+    PushGovernanceRVItem::isNewReferendaEnabled,
+    PushGovernanceRVItem::isReferendaUpdatesEnabled,
+    PushGovernanceRVItem::isDelegationVotesEnabled,
+    PushGovernanceRVItem::tracksText,
+)

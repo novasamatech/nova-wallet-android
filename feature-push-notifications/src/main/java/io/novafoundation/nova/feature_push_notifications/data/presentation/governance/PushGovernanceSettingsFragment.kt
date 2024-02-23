@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -16,6 +17,8 @@ import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificatio
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.adapter.PushGovernanceRVItem
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.adapter.PushGovernanceSettingsAdapter
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceList
+import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceProgress
 import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceToolbar
 
 class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewModel>(), PushGovernanceSettingsAdapter.ItemHandler {
@@ -44,7 +47,10 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
     override fun initViews() {
         pushGovernanceToolbar.applyStatusBarInsets()
         pushGovernanceToolbar.setHomeButtonListener { viewModel.backClicked() }
+        pushGovernanceToolbar.setRightActionClickListener { viewModel.clearClicked() }
         onBackPressed { viewModel.backClicked() }
+
+        pushGovernanceList.adapter = adapter
     }
 
     override fun inject() {
@@ -56,10 +62,12 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
 
     override fun subscribe(viewModel: PushGovernanceSettingsViewModel) {
         viewModel.governanceSettingsList.observe {
-            when (it) {
-                is ExtendedLoadingState.Loaded -> adapter.submitList(it.data)
-                ExtendedLoadingState.Loading -> Unit
-                else -> {}
+            pushGovernanceList.isVisible = it is ExtendedLoadingState.Loaded
+            pushGovernanceToolbar.setRightActionEnabled(it is ExtendedLoadingState.Loaded)
+            pushGovernanceProgress.isVisible = it is ExtendedLoadingState.Loading
+
+            if (it is ExtendedLoadingState.Loaded) {
+                adapter.submitList(it.data)
             }
         }
     }

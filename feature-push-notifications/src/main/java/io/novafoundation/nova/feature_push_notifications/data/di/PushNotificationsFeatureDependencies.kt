@@ -28,6 +28,5 @@ interface PushNotificationsFeatureDependencies {
 
     val governanceSourceRegistry: GovernanceSourceRegistry
 
-
     val imageLoader: ImageLoader
 }

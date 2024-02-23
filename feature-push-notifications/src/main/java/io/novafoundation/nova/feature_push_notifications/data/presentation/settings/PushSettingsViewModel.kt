@@ -7,13 +7,19 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsRequester
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.fromTrackIds
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.toTrackIds
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.isAnyGovEnabled
+import io.novafoundation.nova.feature_push_notifications.data.data.settings.isGovEnabled
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.isNotEmpty
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsPayload
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsRequester
+import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsResponder
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -41,25 +47,20 @@ class PushSettingsViewModel(
         .mapNotNull { it?.subscribedMetaAccounts?.size?.format() }
         .distinctUntilChanged()
 
-    val pushAnnouncements = pushSettingsState
-        .mapNotNull { it?.announcementsEnabled }
+    val pushAnnouncements = pushSettingsState.mapNotNull { it?.announcementsEnabled }
         .distinctUntilChanged()
 
-    val pushSentTokens = pushSettingsState
-        .mapNotNull { it?.sentTokensEnabled }
+    val pushSentTokens = pushSettingsState.mapNotNull { it?.sentTokensEnabled }
         .distinctUntilChanged()
 
-    val pushReceivedTokens = pushSettingsState
-        .mapNotNull { it?.receivedTokensEnabled }
+    val pushReceivedTokens = pushSettingsState.mapNotNull { it?.receivedTokensEnabled }
         .distinctUntilChanged()
 
-    val pushGovernanceState = pushSettingsState
-        .mapNotNull { it }
-        .map { resourceManager.formatBooleanToState(it.isAnyGovEnabled()) }
+    val pushGovernanceState = pushSettingsState.mapNotNull { it }
+        .map { resourceManager.formatBooleanToState(it.isGovEnabled()) }
         .distinctUntilChanged()
 
-    val pushStakingRewardsState = pushSettingsState
-        .mapNotNull { it }
+    val pushStakingRewardsState = pushSettingsState.mapNotNull { it }
         .map { resourceManager.formatBooleanToState(it.stakingReward.isNotEmpty()) }
         .distinctUntilChanged()
 
@@ -69,6 +70,7 @@ class PushSettingsViewModel(
         }
 
         subscribeOnSelectWallets()
+        subscribeOnGovernanceSettings()
     }
 
     fun backClicked() {
@@ -111,7 +113,8 @@ class PushSettingsViewModel(
     }
 
     fun governanceClicked() {
-        pushGovernanceSettingsRequester.openRequest(PushGovernanceSettingsRequester.Request(emptyList()))
+        val settings = pushSettingsState.value ?: return
+        pushGovernanceSettingsRequester.openRequest(PushGovernanceSettingsRequester.Request(mapGovSettingsToPayload(settings)))
     }
 
     fun stakingRewardsClicked() {
@@ -125,5 +128,41 @@ class PushSettingsViewModel(
                     ?.copy(subscribedMetaAccounts = it.selectedMetaIds)
             }
             .launchIn(this)
+    }
+
+    private fun subscribeOnGovernanceSettings() {
+        pushGovernanceSettingsRequester.responseFlow
+            .onEach { response ->
+                pushSettingsState.updateValue { settings ->
+                    settings?.copy(governance = mapGovSettingsReponseToModel(response))
+                }
+            }
+            .launchIn(this)
+    }
+
+    private fun mapGovSettingsToPayload(pushSettings: PushSettings): List<PushGovernanceSettingsPayload> {
+        return pushSettings.governance.map { (chainId, govState) ->
+            PushGovernanceSettingsPayload(
+                chainId = chainId,
+                governance = Chain.Governance.V2,
+                newReferenda = govState.newReferendaEnabled,
+                referendaUpdates = govState.referendumUpdateEnabled,
+                delegateVotes = govState.govMyDelegateVotedEnabled,
+                tracksIds = govState.tracks.fromTrackIds()
+            )
+        }
+    }
+
+    private fun mapGovSettingsReponseToModel(response: PushGovernanceSettingsResponder.Response): Map<ChainId, PushSettings.GovernanceState> {
+        return response.enabledGovernanceSettings
+            .associateBy { it.chainId }
+            .mapValues { (_, govState) ->
+                PushSettings.GovernanceState(
+                    newReferendaEnabled = govState.newReferenda,
+                    referendumUpdateEnabled = govState.referendaUpdates,
+                    govMyDelegateVotedEnabled = govState.delegateVotes,
+                    tracks = govState.tracksIds.toTrackIds()
+                )
+            }
     }
 }
