@@ -108,15 +108,16 @@ class RealPushSubscriptionService(
 
         val deferreds = buildList<Deferred<Void>> {
             this += handleSubscription(newSettings.announcementsEnabled && pushEnabled, "appUpdates")
+
             this += govStateTracksDiff.newOrUpdated
-                .map { subscribeToTopic("$GOV_STATE_TOPIC_NAME:${it.chainId}:${it.track}") }
+                .map { subscribeToTopic("$GOV_STATE_TOPIC_NAME-${it.chainId}-${it.track}") }
             this += govStateTracksDiff.removed
-                .map { unsubscribeFromTopic("$GOV_STATE_TOPIC_NAME:${it.chainId}:${it.track}") }
+                .map { unsubscribeFromTopic("$GOV_STATE_TOPIC_NAME-${it.chainId}-${it.track}") }
 
             this += newReferendaDiff.newOrUpdated
-                .map { subscribeToTopic("$NEW_REFERENDA_TOPIC_NAME:${it.chainId}:${it.track}") }
+                .map { subscribeToTopic("$NEW_REFERENDA_TOPIC_NAME-${it.chainId}-${it.track}") }
             this += newReferendaDiff.removed
-                .map { unsubscribeFromTopic("$NEW_REFERENDA_TOPIC_NAME:${it.chainId}:${it.track}") }
+                .map { unsubscribeFromTopic("$NEW_REFERENDA_TOPIC_NAME-${it.chainId}-${it.track}") }
         }
 
         deferreds.awaitAll()

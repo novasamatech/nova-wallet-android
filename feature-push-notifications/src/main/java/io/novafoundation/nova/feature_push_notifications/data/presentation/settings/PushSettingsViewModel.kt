@@ -118,6 +118,7 @@ class PushSettingsViewModel(
             val pushSettings = pushSettingsState.value ?: return@launch
             pushNotificationsInteractor.updatePushSettings(pushEnabledState.value, pushSettings)
                 .onSuccess { router.back() }
+                .onFailure { showError(it) }
 
             _savingInProgress.value = false
         }

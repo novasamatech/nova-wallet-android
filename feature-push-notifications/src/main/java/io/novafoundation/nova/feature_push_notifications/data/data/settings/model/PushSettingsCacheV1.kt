@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.settings.model
 
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -7,12 +8,9 @@ class PushSettingsCacheV1(
     val announcementsEnabled: Boolean,
     val sentTokensEnabled: Boolean,
     val receivedTokensEnabled: Boolean,
-    val governanceState: List<GovernanceFeature>,
-    val newReferenda: List<GovernanceFeature>,
     val subscribedMetaAccounts: Set<Long>,
     val stakingReward: ChainFeature,
-    val govMyDelegatorVoted: ChainFeature,
-    val govMyReferendumFinished: ChainFeature
+    val governance: Map<ChainId, GovernanceState>
 ) : PushSettingsCache {
 
     override val version: String = "V1"
@@ -22,22 +20,18 @@ class PushSettingsCacheV1(
             announcementsEnabled = announcementsEnabled,
             sentTokensEnabled = sentTokensEnabled,
             receivedTokensEnabled = receivedTokensEnabled,
-            governanceState = governanceState.map { PushSettings.GovernanceFeature(it.chainId, it.tracks) },
-            newReferenda = newReferenda.map { PushSettings.GovernanceFeature(it.chainId, it.tracks) },
             subscribedMetaAccounts = subscribedMetaAccounts,
             stakingReward = stakingReward.toDomain(),
-            govMyDelegatorVoted = govMyDelegatorVoted.toDomain(),
-            govMyReferendumFinished = govMyReferendumFinished.toDomain()
+            governance = governance.mapValues { (_, value) -> value.toDomain() }
         )
     }
 
-    data class Wallet(
-        val baseEthereumAccount: ByteArray?,
-        val baseSubstrateAccount: ByteArray?,
-        val chainAccounts: Map<ChainId, ByteArray>
+    class GovernanceState(
+        val newReferendaEnabled: Boolean,
+        val referendumUpdateEnabled: Boolean,
+        val govMyDelegateVotedEnabled: Boolean,
+        val tracks: Set<TrackId>
     )
-
-    data class GovernanceFeature(val chainId: ChainId, val tracks: List<String>)
 
     sealed class ChainFeature {
 
@@ -52,12 +46,9 @@ fun PushSettings.toCache(): PushSettingsCacheV1 {
         announcementsEnabled = announcementsEnabled,
         sentTokensEnabled = sentTokensEnabled,
         receivedTokensEnabled = receivedTokensEnabled,
-        governanceState = governanceState.map { PushSettingsCacheV1.GovernanceFeature(it.chainId, it.tracks) },
-        newReferenda = newReferenda.map { PushSettingsCacheV1.GovernanceFeature(it.chainId, it.tracks) },
         subscribedMetaAccounts = subscribedMetaAccounts,
         stakingReward = stakingReward.toCache(),
-        govMyDelegatorVoted = govMyDelegatorVoted.toCache(),
-        govMyReferendumFinished = govMyReferendumFinished.toCache()
+        governance = governance.mapValues { (_, value) -> value.toCache() }
     )
 }
 
@@ -73,4 +64,22 @@ fun PushSettingsCacheV1.ChainFeature.toDomain(): PushSettings.ChainFeature {
         is PushSettingsCacheV1.ChainFeature.All -> PushSettings.ChainFeature.All
         is PushSettingsCacheV1.ChainFeature.Concrete -> PushSettings.ChainFeature.Concrete(chainIds)
     }
+}
+
+fun PushSettingsCacheV1.GovernanceState.toDomain(): PushSettings.GovernanceState {
+    return PushSettings.GovernanceState(
+        newReferendaEnabled = newReferendaEnabled,
+        referendumUpdateEnabled = referendumUpdateEnabled,
+        govMyDelegateVotedEnabled = govMyDelegateVotedEnabled,
+        tracks = tracks
+    )
+}
+
+fun PushSettings.GovernanceState.toCache(): PushSettingsCacheV1.GovernanceState {
+    return PushSettingsCacheV1.GovernanceState(
+        newReferendaEnabled = newReferendaEnabled,
+        referendumUpdateEnabled = referendumUpdateEnabled,
+        govMyDelegateVotedEnabled = govMyDelegateVotedEnabled,
+        tracks = tracks
+    )
 }

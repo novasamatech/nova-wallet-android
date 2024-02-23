@@ -31,7 +31,7 @@ fun PushGovernanceModel.Companion.default(
         false,
         isNewReferendaEnabled = true,
         isReferendaUpdatesEnabled = true,
-        isDelegationVotesEnabled = true,
+        isDelegationVotesEnabled = false,
         trackIds = tracks
     )
 }
