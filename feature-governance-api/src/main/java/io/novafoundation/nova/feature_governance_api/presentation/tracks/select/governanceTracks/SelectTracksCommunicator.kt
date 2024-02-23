@@ -13,6 +13,7 @@ interface SelectTracksRequester : InterScreenRequester<SelectTracksRequester.Req
     class Request(
         val chainId: ChainId,
         val selectedTracks: Set<BigInteger>,
+        val minTracks: Int,
     ) : Parcelable
 }
 

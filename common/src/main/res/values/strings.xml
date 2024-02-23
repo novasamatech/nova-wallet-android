@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <plurals name="governance_select_tracks_min_tracks_error">
+        <item quantity="one">Youn need to select at least %d track</item>
+        <item quantity="other">Youn need to select at least %d tracks</item>
+    </plurals>
+
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
 

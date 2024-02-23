@@ -109,7 +109,7 @@ class PushGovernanceItemViewHolder(
             pushGovernanceItemState.setChecked(item.isEnabled)
             pushGovernanceItemNewReferenda.isVisible = item.isEnabled
             pushGovernanceItemReferendumUpdate.isVisible = item.isEnabled
-            //pushGovernanceItemDelegateVotes.isVisible = item.isEnabled // currently disabled
+            // pushGovernanceItemDelegateVotes.isVisible = item.isEnabled // currently disabled
             pushGovernanceItemTracks.isVisible = item.isEnabled
         }
     }

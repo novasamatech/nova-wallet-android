@@ -40,7 +40,7 @@ abstract class BaseSelectTracksViewModel(
     private val trackPresetsFlow = chooseTrackDataFlowShared.map { it.presets }
         .shareWhileSubscribed()
 
-    private val availableTrackFlow = chooseTrackDataFlowShared.map { it.trackPartition.available }
+    protected val availableTrackFlow = chooseTrackDataFlowShared.map { it.trackPartition.available }
         .shareWhileSubscribed()
 
     val trackPresetsModels = trackPresetsFlow
@@ -57,7 +57,7 @@ abstract class BaseSelectTracksViewModel(
         router.back()
     }
 
-    fun trackClicked(position: Int) {
+    open fun trackClicked(position: Int) {
         launch {
             val track = availableTrackFlow.first()[position]
             val selectedTracks = selectedTracksFlow.value

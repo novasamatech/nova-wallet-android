@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+private const val MIN_TRACKS = 1
+
 data class GovChainKey(val chainId: ChainId, val governance: Chain.Governance)
 
 class PushGovernanceSettingsViewModel(
@@ -120,7 +122,7 @@ class PushGovernanceSettingsViewModel(
     fun tracksClicked(item: PushGovernanceRVItem) {
         launch {
             val selectedTracks = item.model.trackIds.mapToSet { it.value }
-            selectTracksRequester.openRequest(SelectTracksRequester.Request(item.chainId, selectedTracks))
+            selectTracksRequester.openRequest(SelectTracksRequester.Request(item.chainId, selectedTracks, MIN_TRACKS))
         }
     }
 
