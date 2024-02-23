@@ -61,6 +61,10 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
     }
 
     override fun subscribe(viewModel: PushGovernanceSettingsViewModel) {
+        viewModel.clearButtonEnabledFlow.observe {
+            pushGovernanceToolbar.setRightActionEnabled(it)
+        }
+
         viewModel.governanceSettingsList.observe {
             pushGovernanceList.isVisible = it is ExtendedLoadingState.Loaded
             pushGovernanceToolbar.setRightActionEnabled(it is ExtendedLoadingState.Loaded)
