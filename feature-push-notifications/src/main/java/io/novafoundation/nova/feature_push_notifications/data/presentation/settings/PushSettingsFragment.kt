@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
@@ -47,6 +48,11 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: PushSettingsViewModel) {
+        setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.closeConfirmationAction)
+
+        viewModel.pushSettingsWasChangedState.observe { pushSettingsToolbar.setRightActionEnabled(it) }
+        viewModel.savingInProgress.observe { pushSettingsToolbar.showProgress(it) }
+
         viewModel.pushEnabledState.observe { enabled ->
             pushSettingsEnable.setChecked(enabled)
             pushSettingsAnnouncements.setEnabled(enabled)

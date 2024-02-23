@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.subscription
 
-import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettings
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 
 interface PushSubscriptionService {
 

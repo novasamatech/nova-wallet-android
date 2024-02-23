@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.settings
 
+import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import kotlinx.coroutines.flow.Flow
 
 interface PushSettingsProvider {

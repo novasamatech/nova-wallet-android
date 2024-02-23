@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_push_notifications.data.di
 import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -25,6 +26,8 @@ interface PushNotificationsFeatureDependencies {
     val resourceManager: ResourceManager
 
     val accountRepository: AccountRepository
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val governanceSourceRegistry: GovernanceSourceRegistry
 

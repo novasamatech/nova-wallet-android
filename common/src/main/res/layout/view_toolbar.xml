@@ -31,29 +31,47 @@
         android:textColor="@color/text_primary"
         tools:text="Title" />
 
-    <ImageView
-        android:id="@+id/rightImg"
+    <FrameLayout
+        android:id="@+id/rightActionContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="9dp"
-        android:padding="8dp"
-        app:tint="@color/icon_primary_state_colors"
-        android:src="@drawable/ic_info_24"
-        android:visibility="gone" />
+        android:layout_gravity="end|center_vertical">
 
-    <TextView
-        android:id="@+id/rightText"
-        style="@style/TextAppearance.NovaFoundation.Regular.Body"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical|end"
-        android:gravity="center_vertical"
-        android:paddingStart="@dimen/x2"
-        android:paddingEnd="@dimen/x2"
-        android:textColor="@color/text_action_colors"
-        android:visibility="gone"
-        tools:text="Action" />
+        <ImageView
+            android:id="@+id/rightImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="9dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_info_24"
+            android:visibility="gone"
+            app:tint="@color/icon_primary_state_colors" />
+
+        <TextView
+            android:id="@+id/rightText"
+            style="@style/TextAppearance.NovaFoundation.Regular.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical|end"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/x2"
+            android:paddingEnd="@dimen/x2"
+            android:textColor="@color/text_action_colors"
+            android:visibility="gone"
+            tools:text="Action" />
+
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/toolbarProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginEnd="16dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/toolbarCustomActions"
