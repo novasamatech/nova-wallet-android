@@ -69,6 +69,11 @@ on:
         required: false
       CI_GITHUB_KEYSTORE_KEY_PASS:
         required: false
+      # Secrets for google-services:
+      CI_DEVELOP_GOOGLE_SERVICES:
+        required: true
+      CI_PRODUCTION_GOOGLE_SERVICES:
+        required: true
 
 env:
   ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
@@ -87,6 +92,7 @@ env:
   WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
 
   CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
+  CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
   CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
   CI_MARKET_KEYSTORE_KEY_PASS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_PASS }}
   CI_MARKET_KEY_FILE: ${{ secrets.RELEASE_MARKET_KEY_FILE }}
@@ -99,6 +105,9 @@ env:
   CI_GITHUB_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_ALIAS }}
   CI_GITHUB_KEYSTORE_KEY_PASS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_PASS }}
   CI_GITHUB_KEYSTORE_KEY_FILE: ${{ secrets.BASE64_GITHUB_KEYSTORE_FILE }}
+
+  CI_DEVELOP_GOOGLE_SERVICES_FILE: ${{ secrets.CI_DEVELOP_GOOGLE_SERVICES }}
+  CI_PRODUCTION_GOOGLE_SERVICES_FILE: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -137,6 +146,12 @@ jobs:
           fileName: ${{ inputs.keystore-file-name }}
           fileDir: './app/'
           encodedString: ${{ env.CI_MARKET_KEY_FILE }}
+
+      - name: 📂 Set up Google Services for Debug flavor
+        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
+        run: |
+          echo "${{ secrets.CI_DEVELOP_GOOGLE_SERVICES_FILE }}" > ./app/google-services.json 
+          echo "${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}" > ./app/src/release/google-services.json
 
       - name: 🏗 Build app
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
