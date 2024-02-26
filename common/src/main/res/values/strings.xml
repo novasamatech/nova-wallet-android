@@ -20,7 +20,7 @@
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
     <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
 
-    <string name="push_settings_stakint_rewards">Staking rewards</string>
+    <string name="push_settings_staking_rewards">Staking rewards</string>
     <string name="push_settings_others">Others</string>
 
     <string name="push_settings_received_tokens">Received tokens</string>

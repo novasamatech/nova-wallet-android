@@ -110,7 +110,7 @@
                     android:id="@+id/pushSettingsStakingRewards"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@string/push_settings_stakint_rewards"
+                    app:title="@string/push_settings_staking_rewards"
                     tools:settingValue="On" />
 
             </io.novafoundation.nova.common.view.settings.SettingsGroupView>

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsCommunicator
+import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsCommunicator
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class PushNotificationsFeatureHolder @Inject constructor(
     private val selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
     private val selectTracksCommunicator: SelectTracksCommunicator,
     private val pushGovernanceSettingsCommunicator: PushGovernanceSettingsCommunicator,
+    private val pushStakingSettingsCommunicator: PushStakingSettingsCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -33,6 +35,7 @@ class PushNotificationsFeatureHolder @Inject constructor(
                 selectMultipleWalletsCommunicator,
                 selectTracksCommunicator,
                 pushGovernanceSettingsCommunicator,
+                pushStakingSettingsCommunicator,
                 dependencies
             )
     }

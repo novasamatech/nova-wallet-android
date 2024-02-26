@@ -8,4 +8,6 @@ interface PushNotificationsRouter : ReturnableRouter {
     fun openPushSettings()
 
     fun openPushGovernanceSettings(args: Bundle)
+
+    fun openPushStakingSettings(args: Bundle)
 }

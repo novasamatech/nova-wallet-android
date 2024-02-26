@@ -23,7 +23,9 @@ import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealGovernancePushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealPushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealStakingPushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealWelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.StakingPushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Qualifier
@@ -128,5 +130,11 @@ class PushNotificationsFeatureModule {
             chainRegistry,
             governanceSourceRegistry
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingPushSettingsInteractor(chainRegistry: ChainRegistry): StakingPushSettingsInteractor {
+        return RealStakingPushSettingsInteractor(chainRegistry)
     }
 }

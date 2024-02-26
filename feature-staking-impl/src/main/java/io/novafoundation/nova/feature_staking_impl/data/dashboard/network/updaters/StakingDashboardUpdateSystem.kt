@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_staking_api.data.dashboard.SyncingStageMap
 import io.novafoundation.nova.feature_staking_api.data.dashboard.getSyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.common.stakingChains
+import io.novafoundation.nova.feature_staking_api.data.dashboard.common.stakingChains
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardOptionAccounts
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingAccounts
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingOptionAccounts
