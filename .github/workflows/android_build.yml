@@ -123,11 +123,21 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
-      - name: 📂 Set up Google Services
+      - name: 📂 Set up Google Services debug
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
-        run: |
-          echo "${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}" | base64 -d  > ./app/google-services.json 
-          echo "${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}" | base64 -d  > ./app/src/release/google-services.json
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: 'google-services.json'
+          fileDir: './app/'
+          encodedString: ${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}
+
+      - name: 📂 Set up Google Services release
+        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: 'google-services.json'
+          fileDir: './app/release/'
+          encodedString: ${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}
 
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
