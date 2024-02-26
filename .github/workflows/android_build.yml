@@ -123,6 +123,12 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
+      - name: 📂 Set up Google Services for Debug flavor
+        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
+        run: |
+          echo "${{ secrets.CI_DEVELOP_GOOGLE_SERVICES_FILE }}" > ./app/google-services.json 
+          echo "${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}" > ./app/src/release/google-services.json
+
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
 
@@ -145,12 +151,6 @@ jobs:
           fileName: ${{ inputs.keystore-file-name }}
           fileDir: './app/'
           encodedString: ${{ env.CI_MARKET_KEY_FILE }}
-
-      - name: 📂 Set up Google Services for Debug flavor
-        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
-        run: |
-          echo "${{ secrets.CI_DEVELOP_GOOGLE_SERVICES_FILE }}" > ./app/google-services.json 
-          echo "${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}" > ./app/src/release/google-services.json
 
       - name: 🏗 Build app
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
