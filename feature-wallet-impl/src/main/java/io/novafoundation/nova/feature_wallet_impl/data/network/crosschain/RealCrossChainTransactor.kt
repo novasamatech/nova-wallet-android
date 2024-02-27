@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
@@ -60,6 +61,8 @@ class RealCrossChainTransactor(
 
         sufficientTransferableBalanceToPayOriginFee()
         canPayCrossChainFee()
+
+        cannotDropBelowEdBeforePayingDeliveryFee(assetSourceRegistry)
 
         doNotCrossExistentialDepositInUsedAsset(
             assetSourceRegistry = assetSourceRegistry,
