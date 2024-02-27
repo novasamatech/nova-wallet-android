@@ -31,7 +31,8 @@ class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
         val paysDeliveryFee = deliveryFeePart.isPositive()
 
         val networkFeePlanks = value.originFee.networkFeePart().networkFee.amount
-        val requiredAmountBeforePayingDeliveryFee = value.transfer.amountInPlanks + networkFeePlanks + existentialDeposit
+        val sendingAmount = value.transfer.amountInPlanks + value.crossChainFee?.networkFee?.amount.orZero()
+        val requiredAmountBeforePayingDeliveryFee = sendingAmount + networkFeePlanks + existentialDeposit
 
         val balanceCountedTowardsEd = value.originUsedAsset.balanceCountedTowardsEDInPlanks
 
