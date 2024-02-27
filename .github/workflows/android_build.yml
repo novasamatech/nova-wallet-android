@@ -69,11 +69,6 @@ on:
         required: false
       CI_GITHUB_KEYSTORE_KEY_PASS:
         required: false
-      # Secrets for google-services:
-      CI_DEVELOP_GOOGLE_SERVICES:
-        required: true
-      CI_PRODUCTION_GOOGLE_SERVICES:
-        required: true
 
 env:
   ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
@@ -105,8 +100,6 @@ env:
   CI_GITHUB_KEYSTORE_KEY_PASS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_PASS }}
   CI_GITHUB_KEYSTORE_KEY_FILE: ${{ secrets.BASE64_GITHUB_KEYSTORE_FILE }}
 
-  CI_DEVELOP_GOOGLE_SERVICES_FILE: ${{ secrets.CI_DEVELOP_GOOGLE_SERVICES }}
-  CI_PRODUCTION_GOOGLE_SERVICES_FILE: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -125,9 +118,19 @@ jobs:
 
       - name: 📂 Set up Google Services
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
-        run: |
-          echo "${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}" > ./app/google-services.json 
-          echo "${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}" > ./app/src/release/google-services.json
+        uses: davidSchuppa/base64Secret-toFile-action@v3
+        with:
+            secret: ${{ secrets.CI_DEVELOP_GOOGLE_SERVICES }}
+            filename: google-services.json
+            destination-path: ./app
+      
+      - name: 📂 Set up Google Services
+        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
+        uses: davidSchuppa/base64Secret-toFile-action@v3
+        with:
+            secret: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
+            filename: google-services.json
+            destination-path: ./app/src/release/
 
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
