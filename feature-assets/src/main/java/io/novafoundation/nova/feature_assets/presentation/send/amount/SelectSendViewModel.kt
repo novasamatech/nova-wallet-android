@@ -49,9 +49,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGe
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -284,7 +284,11 @@ class SelectSendViewModel(
 
             is SendPayload.SpecifiedDestination -> {
                 val destination = chainRegistry.chainWithAsset(payload.destination.chainId, payload.destination.chainAssetId)
-                val origin = availableCrossChainDestinations.first().first().chainWithAsset
+
+                // When destination chain is specified we expect at least one destination to be available
+                val availableCrossChainDestinations = availableCrossChainDestinations.first { it.isNotEmpty() }
+                val origin = availableCrossChainDestinations.first().chainWithAsset
+
                 destinationChainWithAsset.emit(destination)
                 originChainWithAsset.emit(origin)
             }
