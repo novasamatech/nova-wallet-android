@@ -124,15 +124,13 @@ jobs:
           ref: ${{ inputs.branch }}
 
       - name: 📂 Set up DEV Google Services
-        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
         uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
             secret: ${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}
             filename: google-services.json
-            destination-path: ./app
+            destination-path: ./app/
       
       - name: 📂 Set up PROD Google Services
-        if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
         uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
             secret: ${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}
