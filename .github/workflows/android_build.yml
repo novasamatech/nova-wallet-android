@@ -126,8 +126,8 @@ jobs:
       - name: 📂 Set up Google Services
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
         run: |
-          echo ${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }} > ./app/google-services.json 
-          echo ${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }} > ./app/src/release/google-services.json
+          echo "${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}" > ./app/google-services.json 
+          echo "${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}" > ./app/src/release/google-services.json
 
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
