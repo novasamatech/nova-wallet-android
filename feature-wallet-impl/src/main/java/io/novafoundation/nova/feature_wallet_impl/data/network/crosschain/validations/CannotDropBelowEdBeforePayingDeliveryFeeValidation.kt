@@ -18,11 +18,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.deliveryFeePart
 import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novasama.substrate_sdk_android.hash.isPositive
 
-
 class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
     private val assetSourceRegistry: AssetSourceRegistry
 ) : AssetTransfersValidation {
-
 
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
         if (!value.isSendingCommissionAsset) return valid()
@@ -62,4 +60,3 @@ class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
 fun AssetTransfersValidationSystemBuilder.cannotDropBelowEdBeforePayingDeliveryFee(
     assetSourceRegistry: AssetSourceRegistry
 ) = validate(CannotDropBelowEdBeforePayingDeliveryFeeValidation(assetSourceRegistry))
-

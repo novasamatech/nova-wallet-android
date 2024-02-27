@@ -64,7 +64,7 @@ sealed class AssetTransferValidationFailure {
             val networkFee: Balance,
             val maxPossibleTransferAmount: Balance,
             val chainAsset: Chain.Asset,
-        ): NotEnoughFunds()
+        ) : NotEnoughFunds()
     }
 
     class InvalidRecipientAddress(val chain: Chain) : AssetTransferValidationFailure()
