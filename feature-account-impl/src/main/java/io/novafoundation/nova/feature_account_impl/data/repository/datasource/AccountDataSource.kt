@@ -97,4 +97,6 @@ interface AccountDataSource : SecretStoreV1 {
     fun removeDeactivatedMetaAccounts()
 
     suspend fun getActiveMetaAccounts(): List<MetaAccount>
+
+    suspend fun getActiveMetaAccountsQuantity(): Int
 }

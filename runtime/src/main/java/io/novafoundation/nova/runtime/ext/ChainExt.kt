@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -18,14 +19,17 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.isValid
+import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.extensions.toAddress
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -83,6 +87,12 @@ fun Chain.Additional?.relaychainAsNative(): Boolean {
 
 fun Chain.Additional?.feeViaRuntimeCall(): Boolean {
     return this?.feeViaRuntimeCall ?: false
+}
+
+fun ChainId.chainIdHexPrefix16(): String {
+    return removeHexPrefix()
+        .take(32)
+        .requireHexPrefix()
 }
 
 enum class StakingTypeGroup {
@@ -378,3 +388,21 @@ fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?):
 
 val Chain.Asset.localId: AssetAndChainId
     get() = AssetAndChainId(chainId, id)
+
+val Chain.Asset.onChainAssetId: String?
+    get() = when (this.type) {
+        is Type.Equilibrium -> this.type.toString()
+        is Type.Orml -> this.type.currencyIdScale
+        is Type.Statemine -> this.type.id.onChainAssetId()
+        is Type.EvmErc20 -> this.type.contractAddress
+        is Type.Native -> null
+        is Type.EvmNative -> null
+        Type.Unsupported -> error("Unsupported assetId type: ${this.type::class.simpleName}")
+    }
+
+fun StatemineAssetId.onChainAssetId(): String {
+    return when (this) {
+        is StatemineAssetId.Number -> value.toString()
+        is StatemineAssetId.ScaleEncoded -> scaleHex
+    }
+}

@@ -252,6 +252,10 @@ class AccountRepositoryImpl(
         return accountDataSource.getActiveMetaAccounts()
     }
 
+    override suspend fun getActiveMetaAccountsQuantity(): Int {
+        TODO("Not yet implemented")
+    }
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }

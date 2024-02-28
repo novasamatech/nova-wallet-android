@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_push_notifications.data.di
 
 import android.content.Context
 import coil.ImageLoader
+import com.google.gson.Gson
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -9,6 +10,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface PushNotificationsFeatureDependencies {
@@ -32,4 +34,8 @@ interface PushNotificationsFeatureDependencies {
     val governanceSourceRegistry: GovernanceSourceRegistry
 
     val imageLoader: ImageLoader
+
+    val gson: Gson
+
+    val referendaStatusFormatter: ReferendaStatusFormatter
 }

@@ -147,6 +147,10 @@ class AccountDataSourceImpl(
             .map(::mapMetaAccountLocalToMetaAccount)
     }
 
+    override suspend fun getActiveMetaAccountsQuantity(): Int {
+        return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
+    }
+
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
         return metaAccountDao.getMetaAccounts().map(::mapMetaAccountLocalToLightMetaAccount)
     }

@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="push_token_received_title">⬇️ Received %s</string>
+    <string name="push_token_received_no_account_name_title">⬇️ Received</string>
+    <string name="push_token_received_message">Received %s (%s) on %s</string>
+
+    <string name="push_token_sent_title">💸 Sent %s</string>
+    <string name="push_token_sent_no_account_name_title">💸 Sent</string>
+    <string name="push_token_sent_message">Sent %1$s (%2$s) to %3$s on %4$s</string>
+    <string name="push_token_sent_message_no_fiat">Sent %1$s to %2$s on %3$s</string>
+
+    <string name="push_staking_reward_single_account_title">⭐️ New reward</string>
+    <string name="push_staking_reward_many_accounts_title">⭐️ New reward %s</string>
+    <string name="push_staking_reward_message">Received %s (%s) from %s staking</string>
+    <string name="push_staking_reward_message_no_fiat">Received %s from %s staking</string>
+
+    <string name="push_referendum_approved_title">✅ Referendum approved!</string>
+    <string name="push_referendum_approved_message">%1$s referendum #%2$s has ended and been approved 🎉</string>
+    <string name="push_referendum_rejected_title">❌ Referendum rejected!</string>
+    <string name="push_referendum_rejected_message">%1$s referendum #%2$s has ended and been rejected!</string>
+    <string name="push_referendum_status_changed_title">🗳️ Referendum status changed</string>
+    <string name="push_referendum_status_changed_message">%1$s Referendum #%2$s status changed from %3$s to %4$s</string>
+
+    <string name="referendum_status_in_queue">In queue</string>
+
+    <string name="push_new_update_title">A new update of Nova Wallet is available!</string>
+    <string name="push_new_update_message">Download Nova Wallet v%s to get all the new features!</string>
+    <string name="push_new_referendum_title">🗳️ New referendum</string>
+    <string name="push_new_referendum_message">%s Referendum %s is now live!</string>
 
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Youn need to select at least %d track</item>
