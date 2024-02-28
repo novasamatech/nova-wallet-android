@@ -45,13 +45,12 @@ class TokenReceivedNotificationHandler(
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.TOKENS_RECEIVED)
         val chain = content.getChain()
-        val sender = content.extractPayloadField<String>("sender")
         val recepient = content.extractPayloadField<String>("recepient")
         val assetId = content.extractPayloadField<String?>("assetId")
         val amount = content.extractAmount("amount")
 
         val metaAccountsQuantity = accountRepository.getActiveMetaAccountsQuantity()
-        val senderMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(sender), chain.id)
+        val senderMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recepient), chain.id)
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setContentTitle(getTitle(metaAccountsQuantity, senderMetaAccount))
