@@ -64,10 +64,6 @@ class SendInteractor(
         )
     }
 
-    suspend fun syncCrossChainConfig() = kotlin.runCatching {
-        crossChainTransfersRepository.syncConfiguration()
-    }
-
     suspend fun getFee(amount: Balance, transfer: AssetTransfer): TransferFeeModel = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!

@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
@@ -73,6 +74,17 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
                     R.string.wallet_send_cannot_pay_cross_chain_fee,
                     reason.fee.formatTokenAmount(reason.usedAsset),
                     reason.remainingBalanceAfterTransfer.formatTokenAmount(reason.usedAsset)
+                )
+        )
+
+        is AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveEdBeforePayingDeliveryFees -> Default(
+            resourceManager.getString(R.string.common_not_enough_funds_title) to
+                resourceManager.getString(
+                    R.string.wallet_send_cannot_dust_before_delivery_fee_message,
+                    reason.balanceCountedTowardsEd.formatPlanks(reason.chainAsset),
+                    reason.existentialDeposit.formatPlanks(reason.chainAsset),
+                    reason.networkFee.formatPlanks(reason.chainAsset),
+                    reason.maxPossibleTransferAmount.formatPlanks(reason.chainAsset)
                 )
         )
 
