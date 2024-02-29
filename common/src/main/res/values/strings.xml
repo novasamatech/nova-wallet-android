@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="deep_linking_host">nova</string>
+    <string name="deep_linking_scheme">novawallet</string>
+
     <string name="push_token_received_title">⬇️ Received %s</string>
     <string name="push_token_received_no_account_name_title">⬇️ Received</string>
     <string name="push_token_received_message">Received %s (%s) on %s</string>

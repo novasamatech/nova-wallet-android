@@ -11,12 +11,12 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester

@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressViewModel

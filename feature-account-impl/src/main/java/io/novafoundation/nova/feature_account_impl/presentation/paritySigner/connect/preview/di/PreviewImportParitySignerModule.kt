@@ -15,8 +15,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.preview.PreviewImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.preview.RealPreviewImportParitySignerInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 

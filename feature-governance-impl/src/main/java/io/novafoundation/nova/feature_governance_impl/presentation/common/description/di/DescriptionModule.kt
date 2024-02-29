@@ -10,8 +10,8 @@ import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.di.modules.shared.MarkdownFullModule
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionViewModel
 
 @Module(includes = [ViewModelModule::class, MarkdownFullModule::class])

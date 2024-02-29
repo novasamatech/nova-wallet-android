@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.search.RealDelegateSearchInteractor
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.search.DelegateSearchViewModel

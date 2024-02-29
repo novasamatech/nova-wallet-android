@@ -220,6 +220,7 @@ dependencies {
     implementation project(":feature-buy-impl")
 
     implementation project(':feature-push-notifications')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 

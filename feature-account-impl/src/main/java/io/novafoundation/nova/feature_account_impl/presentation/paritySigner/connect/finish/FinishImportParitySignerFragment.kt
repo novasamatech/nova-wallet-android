@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_api.presenatation.account.createName.CreateWalletNameFragment
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.connect.ParitySignerAccountPayload
 
 class FinishImportParitySignerFragment : CreateWalletNameFragment<FinishImportParitySignerViewModel>() {
 

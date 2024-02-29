@@ -13,8 +13,8 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.valiadtion.AdvancedEncryptionValidationSystem
 import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncryptionSelectionStoreProvider
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionViewModel
 
 @Module(includes = [ViewModelModule::class, ValidationsModule::class])

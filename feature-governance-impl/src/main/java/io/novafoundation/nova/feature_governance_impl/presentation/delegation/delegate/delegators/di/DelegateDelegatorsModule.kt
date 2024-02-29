@@ -11,9 +11,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
+import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 

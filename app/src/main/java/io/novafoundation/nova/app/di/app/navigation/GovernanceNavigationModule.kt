@@ -8,7 +8,7 @@ import io.novafoundation.nova.app.root.navigation.governance.GovernanceNavigator
 import io.novafoundation.nova.app.root.navigation.governance.SelectTracksCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 
 @Module
 class GovernanceNavigationModule {

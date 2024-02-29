@@ -5,7 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmFragment
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
+import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 
 @Subcomponent(
     modules = [

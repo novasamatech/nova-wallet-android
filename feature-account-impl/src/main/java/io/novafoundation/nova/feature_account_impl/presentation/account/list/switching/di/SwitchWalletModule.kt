@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.SwitchWalletViewModel
 

@@ -6,6 +6,8 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -51,13 +53,15 @@ class NotificationHandlersModule {
         gson: Gson,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        tokenRepository: TokenRepository
+        tokenRepository: TokenRepository,
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
     ): NotificationHandler {
         return TokenSentNotificationHandler(
             context,
             accountRepository,
             tokenRepository,
             chainRegistry,
+            assetDetailsDeepLinkHandler,
             gson,
             notificationManagerCompat,
             resourceManager
@@ -73,12 +77,14 @@ class NotificationHandlersModule {
         gson: Gson,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        tokenRepository: TokenRepository
+        tokenRepository: TokenRepository,
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
     ): NotificationHandler {
         return TokenReceivedNotificationHandler(
             context,
             accountRepository,
             tokenRepository,
+            assetDetailsDeepLinkHandler,
             chainRegistry,
             gson,
             notificationManagerCompat,
@@ -95,12 +101,14 @@ class NotificationHandlersModule {
         gson: Gson,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        tokenRepository: TokenRepository
+        tokenRepository: TokenRepository,
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
     ): NotificationHandler {
         return StakingRewardNotificationHandler(
             context,
             accountRepository,
             tokenRepository,
+            assetDetailsDeepLinkHandler,
             chainRegistry,
             gson,
             notificationManagerCompat,
@@ -117,9 +125,11 @@ class NotificationHandlersModule {
         referendaStatusFormatter: ReferendaStatusFormatter,
         gson: Gson,
         chainRegistry: ChainRegistry,
+        referendumDeepLinkHandler: ReferendumDeepLinkHandler
     ): NotificationHandler {
         return ReferendumStateUpdateNotificationHandler(
             context,
+            referendumDeepLinkHandler,
             referendaStatusFormatter,
             chainRegistry,
             gson,
@@ -152,9 +162,11 @@ class NotificationHandlersModule {
         resourceManager: ResourceManager,
         gson: Gson,
         chainRegistry: ChainRegistry,
+        referendumDeepLinkHandler: ReferendumDeepLinkHandler
     ): NotificationHandler {
         return NewReferendumNotificationHandler(
             context,
+            referendumDeepLinkHandler,
             chainRegistry,
             gson,
             notificationManagerCompat,

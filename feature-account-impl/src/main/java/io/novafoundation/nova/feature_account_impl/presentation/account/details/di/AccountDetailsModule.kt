@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.polkadot
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory

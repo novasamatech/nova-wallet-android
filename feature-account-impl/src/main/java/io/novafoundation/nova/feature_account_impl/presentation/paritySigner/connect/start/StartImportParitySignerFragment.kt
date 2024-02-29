@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig.Connect.Instruction
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
+import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.view.InstructionImageView
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerConnectOverview
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerInstructionContainer

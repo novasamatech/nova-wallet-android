@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 
 @Module

@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
 @Module

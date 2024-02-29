@@ -6,7 +6,7 @@ import android.content.Intent
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import javax.inject.Inject
 
 class ShareCompletedReceiver : BroadcastReceiver() {

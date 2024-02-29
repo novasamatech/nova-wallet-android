@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.model.AddressAndAmountModel

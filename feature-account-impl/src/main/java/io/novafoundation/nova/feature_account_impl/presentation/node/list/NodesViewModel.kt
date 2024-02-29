@@ -15,7 +15,7 @@ import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.accounts.model.AccountByNetworkModel
 import io.novafoundation.nova.feature_account_impl.presentation.node.mixin.api.NodeListingMixin
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel

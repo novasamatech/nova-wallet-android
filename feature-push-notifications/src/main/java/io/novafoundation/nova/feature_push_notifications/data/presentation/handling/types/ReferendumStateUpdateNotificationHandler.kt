@@ -5,8 +5,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkConfigPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatusType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.asReferendumStatusType
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
@@ -15,13 +17,17 @@ import io.novafoundation.nova.feature_push_notifications.data.data.NotificationT
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigInteger
 
 class ReferendumStateUpdateNotificationHandler(
     private val context: Context,
+    private val referendumDeepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
     private val referendaStatusFormatter: ReferendaStatusFormatter,
     override val chainRegistry: ChainRegistry,
     gson: Gson,
@@ -37,7 +43,7 @@ class ReferendumStateUpdateNotificationHandler(
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.GOV_STATE)
         val chain = content.getChain()
-        val referendumId = content.extractPayloadField<Int>("referendumId").format()
+        val referendumId = content.extractBigInteger("referendumId")
         val stateFrom = content.extractPayloadField<String>("from").asReferendumStatusType() ?: return false
         val stateTo = content.extractPayloadField<String>("to").asReferendumStatusType() ?: return false
 
@@ -46,6 +52,7 @@ class ReferendumStateUpdateNotificationHandler(
             .setContentText(getMessage(chain, referendumId, stateFrom, stateTo))
             .setSmallIcon(R.drawable.ic_nova)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(context.makeReferendumPendingIntent(referendumDeepLinkConfigurator, chain.id, referendumId))
             .build()
 
         notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
@@ -61,14 +68,14 @@ class ReferendumStateUpdateNotificationHandler(
         }
     }
 
-    private fun getMessage(chain: Chain, referendumId: String, stateFrom: ReferendumStatusType, stateTo: ReferendumStatusType): String {
+    private fun getMessage(chain: Chain, referendumId: BigInteger, stateFrom: ReferendumStatusType, stateTo: ReferendumStatusType): String {
         return when (stateTo) {
-            ReferendumStatusType.APPROVED -> resourceManager.getString(R.string.push_referendum_approved_message, chain.name, referendumId)
-            ReferendumStatusType.REJECTED -> resourceManager.getString(R.string.push_referendum_rejected_message, chain.name, referendumId)
+            ReferendumStatusType.APPROVED -> resourceManager.getString(R.string.push_referendum_approved_message, chain.name, referendumId.format())
+            ReferendumStatusType.REJECTED -> resourceManager.getString(R.string.push_referendum_rejected_message, chain.name, referendumId.format())
             else -> resourceManager.getString(
                 R.string.push_referendum_status_changed_message,
                 chain.name,
-                referendumId,
+                referendumId.format(),
                 referendaStatusFormatter.formatStatus(stateFrom),
                 referendaStatusFormatter.formatStatus(stateTo)
             )

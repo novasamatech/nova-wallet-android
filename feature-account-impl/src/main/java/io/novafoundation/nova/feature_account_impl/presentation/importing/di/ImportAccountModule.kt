@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncryptionSelectionStoreProvider
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.AccountNameChooserFactory
 import io.novafoundation.nova.feature_account_impl.presentation.importing.FileReader

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import kotlinx.android.synthetic.main.fragment_description.descriptionFullDescription

@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isAddressValid
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.change.ChangeWatchAccountInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

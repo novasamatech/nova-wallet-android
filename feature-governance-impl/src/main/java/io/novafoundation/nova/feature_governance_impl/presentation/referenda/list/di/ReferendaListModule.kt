@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory

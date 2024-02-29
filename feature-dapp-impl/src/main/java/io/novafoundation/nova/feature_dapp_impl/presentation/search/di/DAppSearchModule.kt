@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator

@@ -82,7 +82,7 @@ import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory

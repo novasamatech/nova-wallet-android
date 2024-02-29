@@ -15,11 +15,11 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
 import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncryptionSelectionStoreProvider
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.spacedWords
-import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
-import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
+import io.novafoundation.nova.feature_account_api.presenatation.mnemonic.confirm.ConfirmMnemonicPayload
+import io.novafoundation.nova.feature_account_api.presenatation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine

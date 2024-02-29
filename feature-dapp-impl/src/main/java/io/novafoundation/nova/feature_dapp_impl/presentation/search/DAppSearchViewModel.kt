@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult

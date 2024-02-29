@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.setValueIfNew
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeToNodeModel
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.node.NodeDetailsRootViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
 import kotlinx.coroutines.launch

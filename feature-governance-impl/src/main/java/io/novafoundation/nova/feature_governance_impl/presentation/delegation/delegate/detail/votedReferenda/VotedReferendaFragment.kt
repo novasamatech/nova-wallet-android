@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.BaseReferendaListFragment

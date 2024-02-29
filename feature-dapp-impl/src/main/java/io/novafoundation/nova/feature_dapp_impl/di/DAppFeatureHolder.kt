@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi

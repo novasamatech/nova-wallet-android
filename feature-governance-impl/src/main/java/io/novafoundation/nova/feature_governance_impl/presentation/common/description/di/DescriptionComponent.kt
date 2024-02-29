@@ -5,7 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment
-import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.description.DescriptionPayload
 
 @Subcomponent(
     modules = [

@@ -7,9 +7,13 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.full.PreImagePreviewPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.full.ReferendumCallPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.full.ReferendumFullDetailsPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.model.AddressAndAmountModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase

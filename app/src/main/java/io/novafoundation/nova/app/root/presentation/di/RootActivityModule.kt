@@ -9,7 +9,6 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.RootViewModel
-import io.novafoundation.nova.app.root.presentation.deepLinks.RootDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -21,6 +20,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -30,8 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Module(
     includes = [
-        ViewModelModule::class,
-        DeepLinkModule::class
+        ViewModelModule::class
     ]
 )
 class RootActivityModule {

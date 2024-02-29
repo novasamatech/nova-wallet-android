@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.delegationTracks.SelectDelegationTracksFragment
 

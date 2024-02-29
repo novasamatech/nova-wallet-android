@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureHolder
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureHolder
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -215,4 +217,10 @@ interface ComponentHolderModule {
     @ClassKey(PushNotificationsFeatureApi::class)
     @IntoMap
     fun providePushNotificationsFeature(holder: PushNotificationsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(DeepLinkingFeatureApi::class)
+    @IntoMap
+    fun provideDeepLinkingFeatureHolder(holder: DeepLinkingFeatureHolder): FeatureApiHolder
 }

@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.indexOfFirstOrNull
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappModelToDApp
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor

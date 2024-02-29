@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.node.NodeDetailsRootViewModel
 import kotlinx.coroutines.launch
 

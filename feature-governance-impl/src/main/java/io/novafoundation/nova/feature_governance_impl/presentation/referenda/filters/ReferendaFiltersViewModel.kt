@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 

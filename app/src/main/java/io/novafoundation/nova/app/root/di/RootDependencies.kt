@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRep
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -90,4 +91,6 @@ interface RootDependencies {
     val walletConnectSessionsUseCase: WalletConnectSessionsUseCase
 
     val pushNotificationsInteractor: PushNotificationsInteractor
+
+    val rootDeepLinkHandler: RootDeepLinkHandler
 }

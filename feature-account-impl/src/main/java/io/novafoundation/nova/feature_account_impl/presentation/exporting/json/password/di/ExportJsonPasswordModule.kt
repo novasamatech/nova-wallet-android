@@ -12,8 +12,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.json.ExportJsonInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.json.validations.ExportJsonPasswordValidationSystem
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordViewModel
 
 @Module(includes = [ViewModelModule::class, ValidationsModule::class])

@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi

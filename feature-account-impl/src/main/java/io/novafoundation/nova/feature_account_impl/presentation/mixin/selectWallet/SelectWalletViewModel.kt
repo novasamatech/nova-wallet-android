@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletResponder
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.SelectedMetaAccountState
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel

@@ -13,8 +13,8 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.RealScanImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ScanImportParitySignerInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
+import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerViewModel
 
 @Module(includes = [ViewModelModule::class])

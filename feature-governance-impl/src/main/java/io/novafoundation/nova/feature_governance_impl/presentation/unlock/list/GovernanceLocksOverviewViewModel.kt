@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.G
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceLocksOverview.Lock
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.canClaimTokens
-import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel.StatusContent
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
