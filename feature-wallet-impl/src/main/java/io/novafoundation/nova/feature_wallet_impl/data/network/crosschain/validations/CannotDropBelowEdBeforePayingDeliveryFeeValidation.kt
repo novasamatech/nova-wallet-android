@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
+import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
@@ -30,8 +31,9 @@ class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
         val deliveryFeePart = value.originFee.deliveryFeePart()?.networkFee?.amount.orZero()
         val paysDeliveryFee = deliveryFeePart.isPositive()
 
-        val networkFeePlanks = value.originFee.networkFeePart().networkFee.amount
-        val requiredAmountBeforePayingDeliveryFee = value.transfer.amountInPlanks + networkFeePlanks + existentialDeposit
+        val networkFeePlanks = value.originFee.networkFeePart().networkFee.amountByRequestedAccount
+        val sendingAmount = value.transfer.amountInPlanks + value.crossChainFee?.networkFee?.amountByRequestedAccount.orZero()
+        val requiredAmountBeforePayingDeliveryFee = sendingAmount + networkFeePlanks + existentialDeposit
 
         val balanceCountedTowardsEd = value.originUsedAsset.balanceCountedTowardsEDInPlanks
 
