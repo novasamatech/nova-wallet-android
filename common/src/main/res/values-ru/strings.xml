@@ -1360,7 +1360,7 @@
     <string name="wallet_search_empty_title">Убедитесь, что адрес\nиз правильной сети</string>
     <string name="wallet_search_empty_title_v2_2_0">Неверный формат адреса.\nУбедитесь, что адрес \nсоответствует сети</string>
     <string name="wallet_send_balance_minimal">Минимальный баланс</string>
-    <string name="wallet_send_cannot_dust_before_delivery_fee_message">Ваш доступный баланс %s, вам необходимо оставить минимум %s для доставки перевода и заплатить комиссию сети %s. Вы можете перевести не более %s</string>
+    <string name="wallet_send_cannot_dust_before_delivery_fee_message">Из-за межсетевых ограничений вы можете перевести не более %s</string>
     <string name="wallet_send_cannot_pay_cross_chain_fee" formatted="false">У вас недостаточно токенов для оплаты межсетевой комиссии в размере %s.\nОстаток баланса после перевода: %s</string>
     <string name="wallet_send_confirm_hint">Межсетевая комиссия добавляется к введенной сумме. Получатель может получить часть межсетевой комиссии</string>
     <string name="wallet_send_confirm_transfer">Подтвердить</string>

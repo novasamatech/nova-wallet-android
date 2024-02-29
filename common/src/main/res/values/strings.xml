@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <string name="wallet_send_cannot_dust_before_delivery_fee_message">Your available balance is %s, you need to leave at least %s for transfer delivery and pay network fee of %s. You can transfer not more than %s</string>
+    <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>
 
     <string name="common_too_small_balance_title">Your balance is too small</string>
     <string name="wallet_send_insufficient_balance_commission">You need to have at least %s to pay this transaction fee and stay above the minimum network balance. Your current balance is: %s. You need to add %s to your balance to perform this operation.</string>

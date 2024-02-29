@@ -59,9 +59,6 @@ sealed class AssetTransferValidationFailure {
         ) : NotEnoughFunds()
 
         class ToStayAboveEdBeforePayingDeliveryFees(
-            val balanceCountedTowardsEd: Balance,
-            val existentialDeposit: Balance,
-            val networkFee: Balance,
             val maxPossibleTransferAmount: Balance,
             val chainAsset: Chain.Asset,
         ) : NotEnoughFunds()
