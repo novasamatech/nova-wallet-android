@@ -12,10 +12,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApi
 import io.novafoundation.nova.runtime.multiNetwork.getSocketOrNull
 import io.novafoundation.nova.runtime.multiNetwork.getSubscriptionEthereumApi
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.StorageSubscriptionMultiplexer
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsing
-import jp.co.soramitsu.fearless_utils.wsrpc.subscribe
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.storage.StorageSubscriptionMultiplexer
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.storage.subscribeUsing
+import io.novasama.substrate_sdk_android.wsrpc.subscribe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn

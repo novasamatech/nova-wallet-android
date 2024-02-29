@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.data.secrets.v2.mapChainAccountSecretsToKey
 import io.novafoundation.nova.common.data.secrets.v2.mapMetaAccountSecretsToDerivationPath
 import io.novafoundation.nova.common.data.secrets.v2.mapMetaAccountSecretsToKeypair
 import io.novafoundation.nova.common.utils.fold
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
+import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class DelegateListModel(
     val icon: DelegateIcon,

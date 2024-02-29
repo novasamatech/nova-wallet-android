@@ -24,3 +24,6 @@ app/*.apk
 !/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/2.json
 !/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/8.json
 !/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/9.json
+
+google-services.json
+

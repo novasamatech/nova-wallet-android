@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.runtime.ext.addressOf
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class PoolStakingRewardsDataSource(
     private val stakingApi: StakingApi,

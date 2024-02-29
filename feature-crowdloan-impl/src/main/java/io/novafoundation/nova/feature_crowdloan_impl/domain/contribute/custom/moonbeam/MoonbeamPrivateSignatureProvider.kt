@@ -7,10 +7,10 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.M
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.moonbeam.makeSignature
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.PrivateCrowdloanSignatureProvider
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.PrivateCrowdloanSignatureProvider.Mode
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.MultiSignature
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.prepareForEncoding
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.MultiSignature
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.prepareForEncoding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger

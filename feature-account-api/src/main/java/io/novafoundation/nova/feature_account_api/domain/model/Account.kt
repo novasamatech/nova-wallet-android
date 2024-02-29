@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_api.domain.model
 
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Network
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.fromHex
 
 data class Account(
     val address: String,

@@ -6,7 +6,7 @@ import io.novafoundation.nova.runtime.ext.typesUsage
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

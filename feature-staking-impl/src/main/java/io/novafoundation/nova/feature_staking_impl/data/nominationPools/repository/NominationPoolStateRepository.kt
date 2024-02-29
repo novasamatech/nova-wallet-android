@@ -21,7 +21,7 @@ import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 interface NominationPoolStateRepository {

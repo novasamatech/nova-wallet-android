@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.PricedNft
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatNftPrice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -69,17 +69,13 @@ class NftListViewModel(
             is Nft.Details.Loaded -> {
                 val issuanceFormatted = resourceManager.formatIssuance(details.issuance)
 
-                val amountModel = if (details.price != null && pricedNft.nftPriceToken != null) {
-                    mapAmountToAmountModel(details.price!!, pricedNft.nftPriceToken)
-                } else {
-                    null
-                }
+                val price = resourceManager.formatNftPrice(details.price, pricedNft.nftPriceToken)
 
                 LoadingState.Loaded(
                     NftListItem.Content(
                         issuance = issuanceFormatted,
                         title = details.name ?: pricedNft.nft.instanceId ?: pricedNft.nft.collectionId,
-                        price = amountModel,
+                        price = price,
                         media = details.media
                     )
                 )

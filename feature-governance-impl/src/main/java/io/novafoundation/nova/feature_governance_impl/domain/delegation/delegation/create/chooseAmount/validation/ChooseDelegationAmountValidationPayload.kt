@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegat
 
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigDecimal
 
 class ChooseDelegationAmountValidationPayload(

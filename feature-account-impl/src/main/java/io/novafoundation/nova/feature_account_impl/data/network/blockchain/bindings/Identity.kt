@@ -12,8 +12,8 @@ import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.data.model.RootIdentity
 import io.novafoundation.nova.feature_account_api.data.model.SuperOf
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 
 @UseCaseBinding
 fun bindIdentity(dynamic: Any?): OnChainIdentity? {

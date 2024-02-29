@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.isValid
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.isValid
+import io.novasama.substrate_sdk_android.extensions.toAccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

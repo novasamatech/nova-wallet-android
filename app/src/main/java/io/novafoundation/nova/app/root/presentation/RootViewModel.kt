@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -45,7 +44,6 @@ class RootViewModel(
     private val walletConnectService: WalletConnectService,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val deepLinkHandler: DeepLinkHandler,
-    private val automaticInteractionGate: AutomaticInteractionGate,
     private val rootScope: RootScope,
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor

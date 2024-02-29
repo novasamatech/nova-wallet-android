@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 @HelperBinding
 fun bindAccountId(dynamicInstance: Any?): AccountId = dynamicInstance.cast()

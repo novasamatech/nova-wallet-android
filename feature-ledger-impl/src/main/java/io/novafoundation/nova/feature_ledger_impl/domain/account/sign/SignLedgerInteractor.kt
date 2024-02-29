@@ -4,10 +4,10 @@ import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
 import io.novafoundation.nova.feature_account_api.domain.model.publicKeyIn
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureVerifier
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
-import jp.co.soramitsu.fearless_utils.encrypt.Signer.MessageHashing
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.encodedSignaturePayload
+import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.Signer.MessageHashing
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 
 interface SignLedgerInteractor {
 

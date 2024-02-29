@@ -9,8 +9,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaDat
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.model.NetworkTypeIdentifier
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
+import io.novasama.substrate_sdk_android.encrypt.model.NetworkTypeIdentifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.uos.
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.uos.ParitySignerUOSPayloadCode
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.uos.UOS
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.uos.paritySignerUOSCryptoType
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

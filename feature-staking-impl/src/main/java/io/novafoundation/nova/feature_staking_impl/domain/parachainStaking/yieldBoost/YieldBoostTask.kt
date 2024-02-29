@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost
 
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 

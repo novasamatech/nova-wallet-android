@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinder
 import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import java.io.OutputStream
 
@@ -37,6 +37,7 @@ interface StorageDataSource {
     suspend fun <R> query(
         chainId: String,
         at: BlockHash? = null,
+        applyStorageDefault: Boolean = false,
         query: suspend StorageQueryContext.() -> R
     ): R
 

@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallAdapter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParseContext
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class BatchAdapter : ReferendumCallAdapter {
 

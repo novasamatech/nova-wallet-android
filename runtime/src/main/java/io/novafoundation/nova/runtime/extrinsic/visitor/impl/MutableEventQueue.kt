@@ -1,8 +1,8 @@
 package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 
 import io.novafoundation.nova.common.utils.instanceOf
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Event
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
 
 internal interface MutableEventQueue : EventQueue {
 
@@ -48,6 +48,13 @@ internal inline fun EventQueue.peekItemFromEndOrThrow(vararg eventTypes: Event, 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun MutableEventQueue.takeFromEndOrThrow(vararg eventTypes: Event): GenericEvent.Instance {
     return requireNotNull(takeFromEnd(*eventTypes)) {
+        "No required event found for types ${eventTypes.joinToString { it.name }}"
+    }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun EventQueue.indexOfLastOrThrow(vararg eventTypes: Event, endExclusive: Int): Int {
+    return requireNotNull(indexOfLast(*eventTypes, endExclusive = endExclusive)) {
         "No required event found for types ${eventTypes.joinToString { it.name }}"
     }
 }
@@ -112,6 +119,8 @@ class RealEventQueue(event: List<GenericEvent.Instance>) : MutableEventQueue {
     }
 
     private fun removeAllAfterInclusive(index: Int): List<GenericEvent.Instance> {
+        if (index > this.events.size) return emptyList()
+
         val subList = this.events.subList(index, this.events.size)
         val subListCopy = subList.toList()
 

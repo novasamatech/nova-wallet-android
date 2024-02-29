@@ -1,6 +1,6 @@
 package io.novafoundation.nova.core.model
 
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
+import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 
 sealed class SecuritySource(
     val keypair: Keypair

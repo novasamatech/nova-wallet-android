@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ExposureOverview
 import io.novafoundation.nova.feature_staking_api.domain.model.ExposurePage
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 
 /*

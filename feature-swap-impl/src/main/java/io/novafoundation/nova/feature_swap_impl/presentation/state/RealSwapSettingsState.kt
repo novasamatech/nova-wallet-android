@@ -6,6 +6,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.flip
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -21,22 +23,29 @@ class RealSwapSettingsState(
 
     override suspend fun setAssetInUpdatingFee(asset: Chain.Asset) {
         val current = selectedOption.value
+
         val chain = chainRegistry.getChain(asset.chainId)
+
+        val newPlanks = current.convertedAmountForNewAssetIn(asset)
 
         val feeIsNotCommissionAsset = current.feeAsset?.isCommissionAsset == false
         val feeIsInAnotherChain = current.feeAsset?.chainId != chain.id
         val needToResetFeeToNative = feeIsNotCommissionAsset || feeIsInAnotherChain
         val new = if (current.feeAsset == null || needToResetFeeToNative) {
-            current.copy(assetIn = asset, feeAsset = chain.commissionAsset)
+            current.copy(assetIn = asset, feeAsset = chain.commissionAsset, amount = newPlanks)
         } else {
-            current.copy(assetIn = asset)
+            current.copy(assetIn = asset, amount = newPlanks)
         }
 
         selectedOption.value = new
     }
 
     override fun setAssetOut(asset: Chain.Asset) {
-        selectedOption.value = selectedOption.value.copy(assetOut = asset)
+        val current = selectedOption.value
+
+        val newPlanks = current.convertedAmountForNewAssetOut(asset)
+
+        selectedOption.value = selectedOption.value.copy(assetOut = asset, amount = newPlanks)
     }
 
     override fun setFeeAsset(asset: Chain.Asset) {
@@ -70,5 +79,27 @@ class RealSwapSettingsState(
 
     override fun setSwapSettings(swapSettings: SwapSettings) {
         selectedOption.value = swapSettings
+    }
+
+    private fun SwapSettings.convertedAmountForNewAssetIn(newAssetIn: Chain.Asset): Balance? {
+        val shouldConvertAsset = assetIn != null && amount != null && swapDirection == SwapDirection.SPECIFIED_IN
+
+        return if (shouldConvertAsset) {
+            val decimalAmount = assetIn!!.amountFromPlanks(amount!!)
+            newAssetIn.planksFromAmount(decimalAmount)
+        } else {
+            amount
+        }
+    }
+
+    private fun SwapSettings.convertedAmountForNewAssetOut(newAssetOut: Chain.Asset): Balance? {
+        val shouldConvertAsset = assetOut != null && amount != null && swapDirection == SwapDirection.SPECIFIED_OUT
+
+        return if (shouldConvertAsset) {
+            val decimalAmount = assetOut!!.amountFromPlanks(amount!!)
+            newAssetOut.planksFromAmount(decimalAmount)
+        } else {
+            amount
+        }
     }
 }

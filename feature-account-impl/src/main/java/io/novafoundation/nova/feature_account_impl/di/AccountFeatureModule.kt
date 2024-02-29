@@ -29,11 +29,8 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
-import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
-import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
-import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
@@ -61,8 +58,6 @@ import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUp
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncService
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.RealProxyRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
@@ -81,12 +76,18 @@ import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInt
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
@@ -97,6 +98,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.R
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -106,10 +108,10 @@ import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
-import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
 import javax.inject.Named
 
 @Module(
@@ -130,36 +132,6 @@ class AccountFeatureModule {
     fun provideMetaAccountsUpdatesRegistry(
         preferences: Preferences
     ): MetaAccountsUpdatesRegistry = RealMetaAccountsUpdatesRegistry(preferences)
-
-    @Provides
-    @FeatureScope
-    fun provideProxyRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-        chainRegistry: ChainRegistry
-    ): ProxyRepository = RealProxyRepository(storageDataSource, chainRegistry)
-
-    @Provides
-    @FeatureScope
-    fun provideProxySyncService(
-        chainRegistry: ChainRegistry,
-        proxyRepository: ProxyRepository,
-        accounRepository: AccountRepository,
-        metaAccountDao: MetaAccountDao,
-        @OnChainIdentity identityProvider: IdentityProvider,
-        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-        proxiedAddAccountRepository: ProxiedAddAccountRepository,
-        rootScope: RootScope
-    ): ProxySyncService = RealProxySyncService(
-        chainRegistry = chainRegistry,
-        proxyRepository = proxyRepository,
-        accountRepository = accounRepository,
-        accountDao = metaAccountDao,
-        identityProvider = identityProvider,
-        metaAccountsUpdatesRegistry = metaAccountsUpdatesRegistry,
-        proxiedAddAccountRepository = proxiedAddAccountRepository,
-        rootScope = rootScope,
-        shouldSyncWatchOnlyProxies = BuildConfig.DEBUG
-    )
 
     @Provides
     @FeatureScope
@@ -508,4 +480,39 @@ class AccountFeatureModule {
     fun provideSigningNotSupportedPresentable(
         contextManager: ContextManager
     ): SigningNotSupportedPresentable = RealSigningNotSupportedPresentable(contextManager)
+
+    @Provides
+    @FeatureScope
+    fun provideProxySyncService(
+        chainRegistry: ChainRegistry,
+        getProxyRepository: GetProxyRepository,
+        accounRepository: AccountRepository,
+        metaAccountDao: MetaAccountDao,
+        @OnChainIdentity identityProvider: IdentityProvider,
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository: ProxiedAddAccountRepository,
+        rootScope: RootScope
+    ): ProxySyncService = RealProxySyncService(
+        chainRegistry,
+        getProxyRepository,
+        accounRepository,
+        metaAccountDao,
+        identityProvider,
+        metaAccountsUpdatesRegistry,
+        proxiedAddAccountRepository,
+        rootScope,
+        shouldSyncWatchOnlyProxies = BuildConfig.DEBUG
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideSelectAddressMixinFactory(
+        selectAddressCommunicator: SelectAddressCommunicator,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+    ): SelectAddressMixin.Factory {
+        return SelectAddressMixinFactory(
+            selectAddressCommunicator,
+            metaAccountGroupingInteractor
+        )
+    }
 }

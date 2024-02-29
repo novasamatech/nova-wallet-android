@@ -14,7 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strate
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.generateNodeIterator
 import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrls
 import io.reactivex.Flowable
-import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient

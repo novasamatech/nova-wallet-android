@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_account_api.domain.account.identity
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

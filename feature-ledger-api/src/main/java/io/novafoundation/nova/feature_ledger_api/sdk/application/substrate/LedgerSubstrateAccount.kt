@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_ledger_api.sdk.application.substrate
 
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 
 class LedgerSubstrateAccount(
     val address: String,

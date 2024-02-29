@@ -26,7 +26,7 @@ private fun NominationPoolsRedeemValidationSystemBuilder.enoughToPayFees() {
         error = { context ->
             NominationPoolsRedeemValidationFailure.NotEnoughBalanceToPayFees(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }
@@ -40,6 +40,6 @@ private fun NominationPoolsRedeemValidationSystemBuilder.sufficientCommissionBal
         fee = { it.fee },
         balance = { it.asset.balanceCountedTowardsED() },
         chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
-        error = { payload, _ -> NominationPoolsRedeemValidationFailure.ToStayAboveED(payload.chain.utilityAsset) }
+        error = { payload, error -> NominationPoolsRedeemValidationFailure.ToStayAboveED(payload.chain.utilityAsset, error) }
     )
 }

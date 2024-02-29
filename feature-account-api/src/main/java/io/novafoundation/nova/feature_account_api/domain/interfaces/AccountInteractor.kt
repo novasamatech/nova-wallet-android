@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import kotlinx.coroutines.flow.Flow
 
 interface AccountInteractor {

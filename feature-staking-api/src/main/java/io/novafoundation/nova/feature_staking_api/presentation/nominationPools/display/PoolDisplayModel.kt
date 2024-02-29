@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_api.presentation.nominationPools.
 
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.view.TableCellView
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class PoolDisplayModel(
     val icon: Icon,

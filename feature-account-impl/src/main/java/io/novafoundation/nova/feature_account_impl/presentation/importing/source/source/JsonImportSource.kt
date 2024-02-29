@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.importing.FileRe
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.view.ImportSourceView
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.view.JsonImportView
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecodingException
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecodingException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

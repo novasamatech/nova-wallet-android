@@ -46,10 +46,10 @@ import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.parallaxCard.BackingParallaxCardLruCache
-import jp.co.soramitsu.fearless_utils.encrypt.Signer
-import jp.co.soramitsu.fearless_utils.icon.IconGenerator
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.encrypt.Signer
+import io.novasama.substrate_sdk_android.icon.IconGenerator
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import okhttp3.OkHttpClient
 import java.util.Random
 

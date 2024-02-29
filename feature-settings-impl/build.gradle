@@ -53,7 +53,7 @@ dependencies {
 
     implementation biometricDep
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation coroutinesDep
     implementation coroutinesAndroidDep

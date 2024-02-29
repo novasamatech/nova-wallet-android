@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.ca
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class ProxyHaveEnoughFeeValidationFactory(
     private val assetSourceRegistry: AssetSourceRegistry,

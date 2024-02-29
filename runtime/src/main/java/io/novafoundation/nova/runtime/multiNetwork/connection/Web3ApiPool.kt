@@ -6,7 +6,7 @@ import io.novafoundation.nova.runtime.ext.httpNodes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import java.util.concurrent.ConcurrentHashMap
 
 typealias Web3ApiPoolKey = Pair<ChainId, ConnectionType>

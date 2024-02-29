@@ -4,13 +4,14 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 class AccountAlreadyExistsException : Exception()
@@ -40,6 +41,10 @@ interface AccountRepository {
     suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount?
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
+
+    suspend fun activeMetaAccounts(): List<MetaAccount>
+
+    suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
     suspend fun hasActiveMetaAccounts(): Boolean
 

@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.ClaimAction.Unlock
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.UnlockChunk
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.hash.isPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 
 private data class ClaimableLock(
     val claimAt: ClaimTime,

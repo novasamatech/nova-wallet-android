@@ -69,7 +69,7 @@
         android:clipChildren="false"
         android:minHeight="24dp"
         android:paddingStart="16dp"
-        android:paddingEnd="12dp">
+        android:paddingEnd="16dp">
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -81,46 +81,11 @@
             android:text="@string/wallet_recipient"
             android:textColor="@color/text_secondary" />
 
-        <LinearLayout
+        <io.novafoundation.nova.common.view.YourWalletsView
             android:id="@+id/selectWallet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="4dp"
-            android:visibility="invisible">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="5dp"
-                app:srcCompat="@drawable/ic_users"
-                app:tint="@color/icon_accent"
-                tools:tint="@color/icon_accent" />
-
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:text="@string/assets_select_send_your_wallets"
-                android:textColor="@color/button_text_accent" />
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="5dp"
-                android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_chevron_down"
-                app:tint="@color/icon_accent"
-                tools:tint="@color/icon_accent" />
-
-        </LinearLayout>
+            android:layout_gravity="end|center_vertical"/>
 
     </FrameLayout>
 
@@ -129,7 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/send_address_hint"
         app:hasExternalAccountIdentifiers="true" />

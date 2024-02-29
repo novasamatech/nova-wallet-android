@@ -7,10 +7,10 @@ import com.neovisionaries.ws.client.WebSocketException
 import com.neovisionaries.ws.client.WebSocketFactory
 import io.novafoundation.nova.common.base.errors.NovaException
 import io.novafoundation.nova.common.resources.ResourceManager
-import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.ResponseMapper
-import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.wsrpc.mappers.ResponseMapper
+import io.novasama.substrate_sdk_android.wsrpc.request.base.RpcRequest
+import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext

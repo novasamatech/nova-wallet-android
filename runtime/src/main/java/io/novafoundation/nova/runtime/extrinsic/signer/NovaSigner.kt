@@ -1,12 +1,15 @@
 package io.novafoundation.nova.runtime.extrinsic.signer
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 interface NovaSigner : Signer {
 
     suspend fun signerAccountId(chain: Chain): AccountId
+
+    suspend fun modifyPayload(payloadExtrinsic: SignerPayloadExtrinsic): SignerPayloadExtrinsic
 }
 
 interface FeeSigner : NovaSigner {
@@ -23,4 +26,8 @@ interface FeeSigner : NovaSigner {
      * It might not be equal to [actualFeeSignerId] if [Signer] modifies the payload
      */
     suspend fun requestedFeeSignerId(chain: Chain): AccountId
+
+    override suspend fun modifyPayload(payloadExtrinsic: SignerPayloadExtrinsic): SignerPayloadExtrinsic {
+        throw NotImplementedError("This method should not be called")
+    }
 }

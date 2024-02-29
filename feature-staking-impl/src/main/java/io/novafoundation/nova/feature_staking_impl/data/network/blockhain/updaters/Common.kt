@@ -4,10 +4,10 @@ import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core.model.StorageEntry
 import io.novafoundation.nova.core.storage.StorageCache
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 
 fun RuntimeMetadata.activeEraStorageKey() = staking().storage("ActiveEra").storageKey()
 

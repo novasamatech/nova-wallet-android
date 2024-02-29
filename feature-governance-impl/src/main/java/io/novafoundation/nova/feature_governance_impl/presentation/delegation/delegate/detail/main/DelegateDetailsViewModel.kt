@@ -104,7 +104,7 @@ class DelegateDetailsViewModel(
         when {
             data == null -> DescriptiveButtonState.Gone
             data.userDelegations.isNotEmpty() -> DescriptiveButtonState.Gone
-            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.delegation_add_delegation))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_add_delegation))
         }
     }.shareWhileSubscribed()
 

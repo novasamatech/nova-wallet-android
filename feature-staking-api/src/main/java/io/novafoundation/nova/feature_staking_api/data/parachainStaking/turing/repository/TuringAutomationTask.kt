@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.
 
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigInteger
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class TuringAutomationTask(
     val id: String,

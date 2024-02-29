@@ -35,7 +35,7 @@ dependencies {
     implementation daggerDep
     kapt daggerKapt
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation androidDep
     implementation constraintDep

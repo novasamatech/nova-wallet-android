@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.data.model.stakingExternalApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingNominatorEraInfosRequest
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingValidatorEraInfosRequest
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import java.math.BigInteger
 
 data class PayoutTarget(val validatorStash: AccountIdKey, val era: BigInteger)
