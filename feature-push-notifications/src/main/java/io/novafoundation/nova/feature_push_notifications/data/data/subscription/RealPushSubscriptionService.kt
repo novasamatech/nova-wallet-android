@@ -20,7 +20,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.util.*
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.asDeferred
