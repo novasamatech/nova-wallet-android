@@ -16,7 +16,9 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
@@ -30,10 +32,12 @@ class ReferendumStateUpdateNotificationHandler(
     private val referendumDeepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
     private val referendaStatusFormatter: ReferendaStatusFormatter,
     override val chainRegistry: ChainRegistry,
+    notificationIdReceiver: NotificationIdReceiver,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    notificationIdReceiver,
     gson,
     notificationManager,
     resourceManager
@@ -48,14 +52,14 @@ class ReferendumStateUpdateNotificationHandler(
         val stateTo = content.extractPayloadField<String>("to").asReferendumStatusType() ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(getTitle(stateTo))
-            .setContentText(getMessage(chain, referendumId, stateFrom, stateTo))
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(context.makeReferendumPendingIntent(referendumDeepLinkConfigurator, chain.id, referendumId))
-            .build()
+            .buildWithDefaults(
+                context,
+                getTitle(stateTo),
+                getMessage(chain, referendumId, stateFrom, stateTo),
+                makeReferendumPendingIntent(referendumDeepLinkConfigurator, chain.id, referendumId)
+            ).build()
 
-        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
+        notify(notification)
 
         return true
     }

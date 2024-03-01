@@ -15,7 +15,9 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
@@ -36,10 +38,12 @@ class TokenSentNotificationHandler(
     private val tokenRepository: TokenRepository,
     override val chainRegistry: ChainRegistry,
     private val deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
+    notificationIdReceiver: NotificationIdReceiver,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    notificationIdReceiver,
     gson,
     notificationManager,
     resourceManager
@@ -50,23 +54,23 @@ class TokenSentNotificationHandler(
         content.requireType(NotificationTypes.TOKENS_SENT)
         val chain = content.getChain()
         val sender = content.extractPayloadField<String>("sender")
-        val recepient = content.extractPayloadField<String>("recepient")
+        val recipient = content.extractPayloadField<String>("recipient")
         val assetId = content.extractPayloadField<String?>("assetId")
         val amount = content.extractBigInteger("amount")
 
         val metaAccountsQuantity = accountRepository.getActiveMetaAccountsQuantity()
-        val senderMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(sender), chain.id)
-        val recepientMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recepient), chain.id)
+        val senderMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(sender), chain.id) ?: return false
+        val recipientMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recipient), chain.id)
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(getTitle(metaAccountsQuantity, senderMetaAccount))
-            .setContentText(getMessage(chain, recepientMetaAccount, recepient, assetId, amount))
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(context.makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id))
-            .build()
+            .buildWithDefaults(
+                context,
+                getTitle(metaAccountsQuantity, senderMetaAccount),
+                getMessage(chain, recipientMetaAccount, recipient, assetId, amount),
+                makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+            ).build()
 
-        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
+        notify(notification)
 
         return true
     }
@@ -81,8 +85,8 @@ class TokenSentNotificationHandler(
 
     private suspend fun getMessage(
         chain: Chain,
-        recepientMetaAccount: MetaAccount?,
-        recepientAddress: String,
+        recipientMetaAccount: MetaAccount?,
+        recipientAddress: String,
         assetId: String?,
         amount: BigInteger
     ): String {
@@ -92,7 +96,7 @@ class TokenSentNotificationHandler(
         val fiatAmount = token?.planksToFiat(amount)
             ?.formatAsCurrency(token.currency)
 
-        val accountNameOrAddress = recepientMetaAccount?.formattedAccountName() ?: recepientAddress
+        val accountNameOrAddress = recipientMetaAccount?.formattedAccountName() ?: recipientAddress
 
         return when {
             fiatAmount != null -> resourceManager.getString(R.string.push_token_sent_message, tokenAmount, fiatAmount, accountNameOrAddress, chain.name)

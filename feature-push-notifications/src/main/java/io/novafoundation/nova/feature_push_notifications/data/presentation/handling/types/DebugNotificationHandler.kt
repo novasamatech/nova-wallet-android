@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -9,11 +10,16 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
+
+private const val DEBUG_NOTIFICATION_ID = -1
 
 /**
  * A [NotificationHandler] that is used as a fallback if previous handlers didn't handle the notification
@@ -39,14 +45,18 @@ class DebugNotificationHandler(
         }
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("Notification handling error!")
-            .setContentText("The notification was not handled")
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .build()
+            .buildWithDefaults(
+                context,
+                "Notification handling error!",
+                "The notification was not handled\n${message.data}",
+            ).build()
 
-        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
+        notify(notification)
 
         return true
+    }
+
+    override fun notify(notification: Notification) {
+        notificationManager.notify(DEBUG_NOTIFICATION_ID, notification)
     }
 }

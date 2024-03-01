@@ -10,13 +10,19 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
+import io.novafoundation.nova.runtime.ext.utilityAsset
 
 class SystemNotificationHandler(
     private val context: Context,
+    notificationIdReceiver: NotificationIdReceiver,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    notificationIdReceiver,
     gson,
     notificationManager,
     resourceManager
@@ -25,14 +31,14 @@ class SystemNotificationHandler(
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val notificationPart = message.notification ?: return false
 
+        val title = notificationPart.title ?: return false
+        val body = notificationPart.body ?: return false
+
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(notificationPart.title)
-            .setContentText(notificationPart.body)
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(PRIORITY_DEFAULT)
+            .buildWithDefaults(context, title, body)
             .build()
 
-        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
+        notify(notification)
 
         return true
     }

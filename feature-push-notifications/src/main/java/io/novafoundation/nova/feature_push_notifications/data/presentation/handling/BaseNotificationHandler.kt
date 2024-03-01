@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.presentation.handling
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
@@ -15,10 +16,12 @@ import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import okhttp3.internal.notify
 
 abstract class BaseNotificationHandler(
+    private val notificationIdReceiver: NotificationIdReceiver,
     private val gson: Gson,
-    protected val notificationManager: NotificationManagerCompat,
+    private val notificationManager: NotificationManagerCompat,
     val resourceManager: ResourceManager,
     @StringRes private val channelIdRes: Int = R.string.default_notification_channel_id,
     @StringRes private val channelNameRes: Int = R.string.default_notification_channel_name,
@@ -38,7 +41,12 @@ abstract class BaseNotificationHandler(
         }
 
         return runCatching { handleNotificationInternal(channelId, message) }
+            .onFailure { it.printStackTrace() }
             .getOrNull() ?: false
+    }
+
+    override fun notify(notification: Notification) {
+        notificationManager.notify(notificationIdReceiver.getId(), notification)
     }
 
     protected abstract suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean

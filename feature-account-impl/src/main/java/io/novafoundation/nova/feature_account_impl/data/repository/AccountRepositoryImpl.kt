@@ -253,7 +253,7 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {
-        TODO("Not yet implemented")
+        return accountDataSource.getActiveMetaAccountsQuantity()
     }
 
     override fun nodesFlow(): Flow<List<Node>> {

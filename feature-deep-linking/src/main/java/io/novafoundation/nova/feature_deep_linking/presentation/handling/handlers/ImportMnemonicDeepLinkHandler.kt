@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
-import com.walletconnect.util.hexToBytes
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ImportMnemonicHandlingException
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -19,6 +18,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.Callbac
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -83,7 +83,7 @@ class ImportMnemonicDeepLinkHandler(
 
     private fun Uri.getMnemonic(): Mnemonic {
         val mnemonicHex = getQueryParameter("mnemonic")
-        return runCatching { MnemonicCreator.fromEntropy(mnemonicHex!!.hexToBytes()) }.getOrNull()
+        return runCatching { MnemonicCreator.fromEntropy(mnemonicHex!!.fromHex()) }.getOrNull()
             ?: throw ImportMnemonicHandlingException.InvalidMnemonic
     }
 

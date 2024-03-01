@@ -47,8 +47,6 @@ dependencies {
     implementation androidDep
     implementation materialDep
 
-    implementation walletConnectCoreDep
-
     implementation coroutinesDep
 
     implementation daggerDep

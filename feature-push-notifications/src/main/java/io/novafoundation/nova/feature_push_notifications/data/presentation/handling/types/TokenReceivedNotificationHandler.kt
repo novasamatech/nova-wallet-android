@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types
 
+import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsLinkConfigPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -16,7 +16,9 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
@@ -37,10 +39,12 @@ class TokenReceivedNotificationHandler(
     private val tokenRepository: TokenRepository,
     private val deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
     override val chainRegistry: ChainRegistry,
+    notificationIdReceiver: NotificationIdReceiver,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    notificationIdReceiver,
     gson,
     notificationManager,
     resourceManager
@@ -50,22 +54,22 @@ class TokenReceivedNotificationHandler(
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.TOKENS_RECEIVED)
         val chain = content.getChain()
-        val recepient = content.extractPayloadField<String>("recepient")
+        val recipient = content.extractPayloadField<String>("recipient")
         val assetId = content.extractPayloadField<String?>("assetId")
         val amount = content.extractBigInteger("amount")
 
         val metaAccountsQuantity = accountRepository.getActiveMetaAccountsQuantity()
-        val senderMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recepient), chain.id)
+        val recipientMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recipient), chain.id) ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(getTitle(metaAccountsQuantity, senderMetaAccount))
-            .setContentText(getMessage(chain, assetId, amount))
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(context.makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id))
-            .build()
+            .buildWithDefaults(
+                context,
+                getTitle(metaAccountsQuantity, recipientMetaAccount),
+                getMessage(chain, assetId, amount),
+                makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+            ).build()
 
-        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
+        notify(notification)
 
         return true
     }
@@ -90,8 +94,12 @@ class TokenReceivedNotificationHandler(
             ?.formatAsCurrency(token.currency)
 
         return when {
-            fiatAmount != null -> resourceManager.getString(R.string.push_token_sent_message, tokenAmount, fiatAmount, chain.name)
-            else -> resourceManager.getString(R.string.push_token_sent_message_no_fiat, tokenAmount, chain.name)
+            fiatAmount != null -> resourceManager.getString(R.string.push_token_received_message, tokenAmount, fiatAmount, chain.name)
+            else -> resourceManager.getString(R.string.push_token_received_message_no_fiat, tokenAmount, chain.name)
         }
+    }
+
+    fun generateUniqueNotificationId(): Int {
+        return System.currentTimeMillis().toInt()
     }
 }

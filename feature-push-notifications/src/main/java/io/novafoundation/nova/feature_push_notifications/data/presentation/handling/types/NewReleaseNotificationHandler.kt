@@ -6,19 +6,25 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 
 class NewReleaseNotificationHandler(
     private val context: Context,
+    notificationIdReceiver: NotificationIdReceiver,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    notificationIdReceiver,
     gson,
     notificationManager,
     resourceManager
@@ -30,13 +36,14 @@ class NewReleaseNotificationHandler(
         val version = content.extractPayloadField<String>("version")
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(resourceManager.getString(R.string.push_new_update_title))
-            .setContentText(resourceManager.getString(R.string.push_new_update_message, version))
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .buildWithDefaults(
+                context,
+                resourceManager.getString(R.string.push_new_update_title),
+                resourceManager.getString(R.string.push_new_update_message, version)
+            )
             .build()
 
-        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
+        notify(notification)
 
         return true
     }

@@ -26,12 +26,12 @@ class DeepLinkingFeatureHolder @Inject constructor(
 
     override fun initializeDependencies(): Any {
         val dependencies = DaggerDeepLinkingFeatureComponent_DeepLinkingFeatureDependenciesComponent.builder()
-            .commonApi(getFeature<CommonApi>(CommonApi::class.java))
-            .runtimeApi(getFeature<RuntimeApi>(RuntimeApi::class.java))
-            .accountFeatureApi(getFeature<AccountFeatureApi>(AccountFeatureApi::class.java))
-            .governanceFeatureApi(getFeature<GovernanceFeatureApi>(GovernanceFeatureApi::class.java))
-            .dAppFeatureApi(getFeature<DAppFeatureApi>(DAppFeatureApi::class.java))
-            .assetsFeatureApi(getFeature<AssetsFeatureApi>(AssetsFeatureApi::class.java))
+            .commonApi(commonApi())
+            .runtimeApi(getFeature(RuntimeApi::class.java))
+            .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
+            .governanceFeatureApi(getFeature(GovernanceFeatureApi::class.java))
+            .dAppFeatureApi(getFeature(DAppFeatureApi::class.java))
+            .assetsFeatureApi(getFeature(AssetsFeatureApi::class.java))
             .build()
 
         return DaggerDeepLinkingFeatureComponent.factory()

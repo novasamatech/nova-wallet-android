@@ -6,6 +6,7 @@
     <string name="push_token_received_title">⬇️ Received %s</string>
     <string name="push_token_received_no_account_name_title">⬇️ Received</string>
     <string name="push_token_received_message">Received %s (%s) on %s</string>
+    <string name="push_token_received_message_no_fiat">Received %s on %s</string>
 
     <string name="push_token_sent_title">💸 Sent %s</string>
     <string name="push_token_sent_no_account_name_title">💸 Sent</string>

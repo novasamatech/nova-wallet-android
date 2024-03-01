@@ -15,11 +15,14 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -35,10 +38,12 @@ class StakingRewardNotificationHandler(
     private val tokenRepository: TokenRepository,
     private val deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
     override val chainRegistry: ChainRegistry,
+    notificationIdReceiver: NotificationIdReceiver,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    notificationIdReceiver,
     gson,
     notificationManager,
     resourceManager
@@ -46,25 +51,23 @@ class StakingRewardNotificationHandler(
 
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()
-        content.requireType(NotificationTypes.TOKENS_SENT)
+        content.requireType(NotificationTypes.STAKING_REWARD)
         val chain = content.getChain()
-        val recepient = content.extractPayloadField<String>("recipient")
+        val recipient = content.extractPayloadField<String>("recipient")
         val amount = content.extractBigInteger("amount")
 
         val metaAccountsCount = accountRepository.getActiveMetaAccountsQuantity()
-        val metaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recepient), chain.id) ?: return false
+        val metaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recipient), chain.id) ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(getTitle(metaAccountsCount, metaAccount))
-            .setContentText(getMessage(chain, amount))
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(context.makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id))
-            .build()
+            .buildWithDefaults(
+                context,
+                getTitle(metaAccountsCount, metaAccount),
+                getMessage(chain, amount),
+                makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+            ).build()
 
-        notificationManager.notify(
-            DEFAULT_NOTIFICATION_ID, notification
-        )
+        notify(notification)
 
         return true
     }
@@ -86,8 +89,8 @@ class StakingRewardNotificationHandler(
         val fiatAmount = token?.planksToFiat(amount)
             ?.formatAsCurrency(token.currency)
         return when {
-            fiatAmount == null -> resourceManager.getString(R.string.push_staking_reward_message_no_fiat, tokenAmount, chain.name)
-            else -> resourceManager.getString(R.string.push_staking_reward_message_no_fiat, tokenAmount, fiatAmount, chain.name)
+            fiatAmount != null -> resourceManager.getString(R.string.push_staking_reward_message, tokenAmount, fiatAmount, chain.name)
+            else -> resourceManager.getString(R.string.push_staking_reward_message_no_fiat, tokenAmount, chain.name)
         }
     }
 }

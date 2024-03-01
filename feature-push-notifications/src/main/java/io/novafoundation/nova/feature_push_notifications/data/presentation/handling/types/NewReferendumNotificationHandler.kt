@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
@@ -15,23 +13,26 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makePeddingIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 
 class NewReferendumNotificationHandler(
     private val context: Context,
     private val referendumDeepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
     override val chainRegistry: ChainRegistry,
+    notificationIdReceiver: NotificationIdReceiver,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    notificationIdReceiver,
     gson,
     notificationManager,
     resourceManager
@@ -44,14 +45,14 @@ class NewReferendumNotificationHandler(
         val referendumId = content.extractBigInteger("referendumId")
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(resourceManager.getString(R.string.push_new_referendum_title))
-            .setContentText(resourceManager.getString(R.string.push_new_referendum_message, chain.name, referendumId.format()))
-            .setSmallIcon(R.drawable.ic_nova)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(context.makeReferendumPendingIntent(referendumDeepLinkConfigurator, chain.id, referendumId))
-            .build()
+            .buildWithDefaults(
+                context,
+                resourceManager.getString(R.string.push_new_referendum_title),
+                resourceManager.getString(R.string.push_new_referendum_message, chain.name, referendumId.format()),
+                makeReferendumPendingIntent(referendumDeepLinkConfigurator, chain.id, referendumId)
+            ).build()
 
-        notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification)
+        notify(notification)
 
         return true
     }
