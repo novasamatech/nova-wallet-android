@@ -32,7 +32,9 @@ class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
         val paysDeliveryFee = deliveryFeePart.isPositive()
 
         val networkFeePlanks = value.originFee.networkFeePart().networkFee.amountByRequestedAccount
-        val sendingAmount = value.transfer.amountInPlanks + value.crossChainFee?.networkFee?.amountByRequestedAccount.orZero()
+        val crossChainFeePlanks = value.crossChainFee?.networkFee?.amountByRequestedAccount.orZero()
+
+        val sendingAmount = value.transfer.amountInPlanks + crossChainFeePlanks
         val requiredAmountBeforePayingDeliveryFee = sendingAmount + networkFeePlanks + existentialDeposit
 
         val balanceCountedTowardsEd = value.originUsedAsset.balanceCountedTowardsEDInPlanks
@@ -43,13 +45,10 @@ class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
             requiredAmountBeforePayingDeliveryFee <= balanceCountedTowardsEd -> valid()
 
             else -> {
-                val availableBalance = (balanceCountedTowardsEd - networkFeePlanks - existentialDeposit).atLeastZero()
+                val availableBalance = (balanceCountedTowardsEd - networkFeePlanks - crossChainFeePlanks - existentialDeposit).atLeastZero()
 
                 validationError(
                     ToStayAboveEdBeforePayingDeliveryFees(
-                        balanceCountedTowardsEd = balanceCountedTowardsEd,
-                        existentialDeposit = existentialDeposit,
-                        networkFee = networkFeePlanks,
                         maxPossibleTransferAmount = availableBalance,
                         chainAsset = value.transfer.originChainAsset
                     )

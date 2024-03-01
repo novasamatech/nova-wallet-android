@@ -81,9 +81,6 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
             resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(
                     R.string.wallet_send_cannot_dust_before_delivery_fee_message,
-                    reason.balanceCountedTowardsEd.formatPlanks(reason.chainAsset),
-                    reason.existentialDeposit.formatPlanks(reason.chainAsset),
-                    reason.networkFee.formatPlanks(reason.chainAsset),
                     reason.maxPossibleTransferAmount.formatPlanks(reason.chainAsset)
                 )
         )

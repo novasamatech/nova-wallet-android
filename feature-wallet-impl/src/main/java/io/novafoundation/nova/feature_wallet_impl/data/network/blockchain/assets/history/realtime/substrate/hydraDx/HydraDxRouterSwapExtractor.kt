@@ -20,6 +20,7 @@ class HydraDxRouterSwapExtractor(
 
     override fun ExtrinsicVisit.extractSwapArgs(): SwapArgs {
         val swapExecutedEvent = events.findEvent(Modules.ROUTER, "RouteExecuted")
+            ?: events.findEvent(Modules.ROUTER, "Executed")
 
         return when {
             // successful swap, extract from event
