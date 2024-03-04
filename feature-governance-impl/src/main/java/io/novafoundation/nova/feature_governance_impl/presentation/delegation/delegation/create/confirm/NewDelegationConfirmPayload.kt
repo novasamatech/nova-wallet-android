@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.confirm
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId

@@ -29,7 +29,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase

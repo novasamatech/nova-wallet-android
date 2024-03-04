@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation.referenda.full
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.full
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.PreimagePreview
@@ -41,7 +41,10 @@ class ReferendumProposerPayload(val accountId: AccountId, val offChainName: Stri
 
 fun ReferendumCallPayload(referendumCall: ReferendumCall?): ReferendumCallPayload? {
     return when (referendumCall) {
-        is ReferendumCall.TreasuryRequest -> ReferendumCallPayload.TreasuryRequest(referendumCall.amount, referendumCall.beneficiary)
+        is ReferendumCall.TreasuryRequest -> ReferendumCallPayload.TreasuryRequest(
+            referendumCall.amount,
+            referendumCall.beneficiary
+        )
         null -> null
     }
 }

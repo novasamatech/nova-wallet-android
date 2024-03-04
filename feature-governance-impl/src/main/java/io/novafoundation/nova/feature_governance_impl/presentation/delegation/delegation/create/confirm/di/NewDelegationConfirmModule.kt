@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter

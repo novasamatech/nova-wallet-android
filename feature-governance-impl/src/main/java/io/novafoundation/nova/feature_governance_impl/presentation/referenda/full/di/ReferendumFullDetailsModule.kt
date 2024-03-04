@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.full.ReferendumFullDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 

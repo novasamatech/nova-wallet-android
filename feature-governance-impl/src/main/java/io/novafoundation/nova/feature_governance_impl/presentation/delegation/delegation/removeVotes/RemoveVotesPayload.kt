@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.removeVotes
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId

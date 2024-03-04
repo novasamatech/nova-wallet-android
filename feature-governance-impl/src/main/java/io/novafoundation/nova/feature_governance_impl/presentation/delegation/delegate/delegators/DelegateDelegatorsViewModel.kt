@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.Delegator
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers

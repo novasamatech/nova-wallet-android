@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase

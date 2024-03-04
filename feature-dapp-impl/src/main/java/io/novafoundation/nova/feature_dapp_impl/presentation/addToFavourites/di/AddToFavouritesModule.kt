@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepos
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.addToFavourites.AddToFavouritesInteractor
-import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesViewModel
 
 @Module(includes = [ViewModelModule::class])

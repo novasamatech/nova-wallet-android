@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.RevokeDelegationsInteractor

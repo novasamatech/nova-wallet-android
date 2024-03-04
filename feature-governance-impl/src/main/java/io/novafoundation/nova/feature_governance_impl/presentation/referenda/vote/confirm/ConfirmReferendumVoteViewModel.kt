@@ -17,8 +17,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.confirm.referendumId
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload

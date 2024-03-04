@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabel
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter

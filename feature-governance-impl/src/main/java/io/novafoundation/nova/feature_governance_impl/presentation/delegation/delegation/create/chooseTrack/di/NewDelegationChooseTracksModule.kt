@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.ChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 

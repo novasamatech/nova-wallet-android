@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
@@ -23,7 +22,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationHints
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationTitle
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset

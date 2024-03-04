@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel

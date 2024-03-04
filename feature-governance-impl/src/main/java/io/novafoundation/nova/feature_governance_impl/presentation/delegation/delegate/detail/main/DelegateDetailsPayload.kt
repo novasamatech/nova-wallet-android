@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation.delegation.delegate.detail.main
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main
 
 import android.os.Parcelable
 import jp.co.soramitsu.fearless_utils.runtime.AccountId

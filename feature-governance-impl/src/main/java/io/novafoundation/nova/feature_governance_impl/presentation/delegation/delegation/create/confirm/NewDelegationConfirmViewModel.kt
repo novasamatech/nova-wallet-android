@@ -21,8 +21,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.confirm.convictionVote
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationPayload

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation
 
 import io.novafoundation.nova.common.navigation.ReturnableRouter
-import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 
 interface DAppRouter : ReturnableRouter {
 

@@ -18,7 +18,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setAddressOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel

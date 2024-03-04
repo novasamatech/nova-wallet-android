@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteViewModel
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin

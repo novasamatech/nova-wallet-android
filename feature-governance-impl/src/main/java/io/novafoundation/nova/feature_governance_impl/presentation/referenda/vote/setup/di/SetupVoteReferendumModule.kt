@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.convic
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.setup.SetupVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.create.chooseTrack
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack
 
 import android.os.Parcelable
 import jp.co.soramitsu.fearless_utils.runtime.AccountId

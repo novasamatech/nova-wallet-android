@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.removeVotes.RemoveTrackVotesInteractor
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.RemoteVotesValidationSystem

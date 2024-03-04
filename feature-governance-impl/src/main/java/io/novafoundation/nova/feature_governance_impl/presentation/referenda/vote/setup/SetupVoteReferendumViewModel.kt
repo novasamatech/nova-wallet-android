@@ -14,8 +14,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.setup.SetupVoteReferendumPayload
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.setup.referendumId
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
@@ -26,8 +24,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.confirm.AccountVoteParcelModel
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.AccountVoteParcelModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount

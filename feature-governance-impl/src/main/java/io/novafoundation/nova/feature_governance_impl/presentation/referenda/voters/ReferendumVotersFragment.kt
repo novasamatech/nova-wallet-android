@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VoterItemDecoration

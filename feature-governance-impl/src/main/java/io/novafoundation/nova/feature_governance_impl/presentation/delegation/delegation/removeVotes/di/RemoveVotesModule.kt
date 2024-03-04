@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.removeVotesValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase

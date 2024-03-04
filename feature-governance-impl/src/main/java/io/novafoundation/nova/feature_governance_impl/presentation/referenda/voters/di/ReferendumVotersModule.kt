@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.Re
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.voters.ReferendumVotersPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers

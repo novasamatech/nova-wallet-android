@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites
+package io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

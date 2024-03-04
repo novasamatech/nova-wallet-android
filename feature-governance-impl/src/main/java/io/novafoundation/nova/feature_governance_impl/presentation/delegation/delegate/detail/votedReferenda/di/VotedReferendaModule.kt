@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase

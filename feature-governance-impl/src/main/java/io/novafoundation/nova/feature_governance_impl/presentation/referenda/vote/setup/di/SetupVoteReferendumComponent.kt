@@ -5,7 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumFragment
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.setup.SetupVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 
 @Subcomponent(
     modules = [

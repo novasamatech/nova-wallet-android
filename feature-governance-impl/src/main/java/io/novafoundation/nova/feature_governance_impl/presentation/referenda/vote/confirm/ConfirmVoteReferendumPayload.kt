@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation.referenda.vote.confirm
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
