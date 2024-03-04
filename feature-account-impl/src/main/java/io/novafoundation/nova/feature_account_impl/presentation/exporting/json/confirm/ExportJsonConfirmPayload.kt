@@ -5,4 +5,4 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.Export
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class ExportJsonConfirmPayload(val exportPayload: io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload, val json: String) : Parcelable
+class ExportJsonConfirmPayload(val exportPayload: ExportPayload, val json: String) : Parcelable

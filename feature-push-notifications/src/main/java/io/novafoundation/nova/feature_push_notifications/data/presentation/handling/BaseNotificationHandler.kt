@@ -4,13 +4,11 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.fromJson
-import io.novafoundation.nova.feature_push_notifications.R
 
 abstract class BaseNotificationHandler(
     private val notificationIdProvider: NotificationIdProvider,

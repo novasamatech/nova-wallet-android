@@ -35,7 +35,8 @@ class NewReferendumNotificationHandler(
     notificationManager,
     resourceManager,
     channel = NovaNotificationChannel.GOVERNANCE
-), PushChainRegestryHolder {
+),
+    PushChainRegestryHolder {
 
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()

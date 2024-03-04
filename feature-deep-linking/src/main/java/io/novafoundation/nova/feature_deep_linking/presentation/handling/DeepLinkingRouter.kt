@@ -13,6 +13,6 @@ interface DeepLinkingRouter {
     fun openImportAccountScreen(importAccountPayload: ImportAccountPayload)
 
     fun openReferendum(payload: io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload)
-    
+
     fun openStakingDashboard()
 }

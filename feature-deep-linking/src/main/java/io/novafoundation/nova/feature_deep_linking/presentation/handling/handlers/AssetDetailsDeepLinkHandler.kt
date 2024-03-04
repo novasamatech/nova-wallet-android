@@ -4,7 +4,6 @@ import android.net.Uri
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
-import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler

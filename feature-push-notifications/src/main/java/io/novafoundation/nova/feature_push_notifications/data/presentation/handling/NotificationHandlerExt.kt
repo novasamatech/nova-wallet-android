@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
@@ -83,7 +82,6 @@ fun makeReferendumPendingIntent(
     val deepLink = deepLinkConfigurator.configure(payload)
     return Intent(Intent.ACTION_VIEW, deepLink)
 }
-
 
 fun makeAssetDetailsPendingIntent(
     deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,

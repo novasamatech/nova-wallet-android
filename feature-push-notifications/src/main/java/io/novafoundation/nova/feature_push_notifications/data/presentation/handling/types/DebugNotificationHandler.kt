@@ -8,16 +8,11 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.Gson
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.R
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
 
 private const val DEBUG_NOTIFICATION_ID = -1
 

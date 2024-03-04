@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.model
 
 import io.novafoundation.nova.runtime.ext.onChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 
 fun Chain.Asset.Type.subQueryAssetId(): String {
     return when (this) {
