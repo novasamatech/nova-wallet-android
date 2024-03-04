@@ -38,8 +38,7 @@ private const val GOV_STATE_TOPIC_NAME = "govState"
 private const val NEW_REFERENDA_TOPIC_NAME = "govNewRef"
 
 class TrackIdentifiable(val chainId: ChainId, val track: BigInteger) : Identifiable {
-    override val identifier: String
-        get() = "$chainId:$track"
+    override val identifier: String = "$chainId:$track"
 }
 
 class RealPushSubscriptionService(

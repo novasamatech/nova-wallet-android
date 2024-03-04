@@ -127,7 +127,7 @@ class PushGovernanceSettingsViewModel(
     fun tracksClicked(item: PushGovernanceRVItem) {
         launch {
             val selectedTracks = item.model.trackIds.mapToSet { it.value }
-            selectTracksRequester.openRequest(SelectTracksRequester.Request(item.chainId, selectedTracks, MIN_TRACKS))
+            selectTracksRequester.openRequest(SelectTracksRequester.Request(item.chainId, item.governance, selectedTracks, MIN_TRACKS))
         }
     }
 
@@ -183,16 +183,15 @@ class PushGovernanceSettingsViewModel(
     private fun subscribeOnSelectTracks() {
         selectTracksRequester.responseFlow
             .onEach { response ->
-                val governanceVersion = Chain.Governance.V2 // Since we can use track selecting only for OpenGov
                 val chain = chainRegistry.getChain(response.chainId)
-                val key = GovChainKey(response.chainId, governanceVersion)
+                val key = GovChainKey(response.chainId, response.governanceType)
                 val selectedTracks = response.selectedTracks.toTrackIds()
 
                 _changedGovernanceSettingsList.updateValue { governanceSettings ->
                     val model = governanceSettings[key]?.copy(trackIds = selectedTracks)
                         ?: PushGovernanceModel.default(
                             chain = chain,
-                            governance = governanceVersion,
+                            governance = response.governanceType,
                             tracks = selectedTracks
                         )
 

@@ -18,7 +18,7 @@ class PushNotificationsNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideSelectTracksCommunicator(
+    fun providePushGovernanceSettingsCommunicator(
         router: PushNotificationsRouter,
         navigationHolder: NavigationHolder
     ): PushGovernanceSettingsCommunicator = PushGovernanceSettingsCommunicatorImpl(router, navigationHolder)

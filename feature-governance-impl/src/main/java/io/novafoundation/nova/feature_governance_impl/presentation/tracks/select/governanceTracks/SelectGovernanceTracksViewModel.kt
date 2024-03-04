@@ -32,7 +32,7 @@ class SelectGovernanceTracksViewModel(
     trackFormatter = trackFormatter,
     resourceManager = resourceManager,
     router = router,
-    chooseTrackDataFlow = interactor.observeTracksByChain(payload.chainId)
+    chooseTrackDataFlow = interactor.observeTracksByChain(payload.chainId, payload.governanceType)
 ) {
 
     val chainModel = flowOf { chainRegistry.getChain(payload.chainId) }

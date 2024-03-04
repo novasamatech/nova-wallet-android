@@ -54,9 +54,13 @@ class RealChooseTrackInteractor(
         removeVotesSuggestionRepository.disallowShowRemoveVotesSuggestion()
     }
 
-    override fun observeTracksByChain(chainId: ChainId): Flow<ChooseTrackData> = flowOf {
+    override fun observeTracksByChain(chainId: ChainId, govType: Chain.Governance): Flow<ChooseTrackData> = flowOf {
         val chain = chainRegistry.getChain(chainId)
-        val govType = chain.governance.firstOrNull { it == Chain.Governance.V2 } ?: return@flowOf ChooseTrackData.empty()
+
+        val chainSupportGovType = chain.governance.any { it == govType }
+        if (!chainSupportGovType) {
+            return@flowOf ChooseTrackData.empty()
+        }
 
         val governanceSource = governanceSourceRegistry.sourceFor(govType)
         val allTracks = governanceSource.referenda.getTracksById(chain.id)
