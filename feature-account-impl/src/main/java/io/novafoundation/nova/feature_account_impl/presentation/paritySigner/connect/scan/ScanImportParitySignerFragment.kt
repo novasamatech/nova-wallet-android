@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.connect.ParitySignerStartPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySignerScan
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySignerScanToolbar
 

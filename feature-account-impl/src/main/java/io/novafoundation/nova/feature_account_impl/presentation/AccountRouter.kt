@@ -6,13 +6,13 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.navigation.SecureRouter
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.account.advancedEncryption.AdvancedEncryptionModePayload
-import io.novafoundation.nova.feature_account_api.presenatation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_api.presenatation.exporting.json.ExportJsonConfirmPayload
-import io.novafoundation.nova.feature_account_api.presenatation.mnemonic.confirm.ConfirmMnemonicPayload
-import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.connect.ParitySignerAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.connect.ParitySignerStartPayload
-import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.sign.scan.ScanSignParitySignerPayload
+import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonConfirmPayload
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.ConfirmMnemonicPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerPayload
 
 interface AccountRouter : SecureRouter, ReturnableRouter {
 

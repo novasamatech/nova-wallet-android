@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_api.presenatation.account.advancedEncryption
+package io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
