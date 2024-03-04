@@ -22,6 +22,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.math.BigInteger
+import java.util.UUID
 import java.util.Date
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
@@ -109,14 +110,14 @@ class RealPushSubscriptionService(
             this += handleSubscription(newSettings.announcementsEnabled && pushEnabled, "appUpdates")
 
             this += govStateTracksDiff.newOrUpdated
-                .map { subscribeToTopic("$GOV_STATE_TOPIC_NAME-${it.chainId}-${it.track}") }
+                .map { subscribeToTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
             this += govStateTracksDiff.removed
-                .map { unsubscribeFromTopic("$GOV_STATE_TOPIC_NAME-${it.chainId}-${it.track}") }
+                .map { unsubscribeFromTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
 
             this += newReferendaDiff.newOrUpdated
-                .map { subscribeToTopic("$NEW_REFERENDA_TOPIC_NAME-${it.chainId}-${it.track}") }
+                .map { subscribeToTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
             this += newReferendaDiff.removed
-                .map { unsubscribeFromTopic("$NEW_REFERENDA_TOPIC_NAME-${it.chainId}-${it.track}") }
+                .map { unsubscribeFromTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
         }
 
         deferreds.awaitAll()
