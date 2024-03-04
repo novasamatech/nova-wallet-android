@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
-import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.RealBrowserHostSettingsRepository

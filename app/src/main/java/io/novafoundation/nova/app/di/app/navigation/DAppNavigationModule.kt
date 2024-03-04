@@ -6,7 +6,7 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.dApp.DAppNavigator
 import io.novafoundation.nova.app.root.navigation.dApp.DAppSearchCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
-import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 
 @Module

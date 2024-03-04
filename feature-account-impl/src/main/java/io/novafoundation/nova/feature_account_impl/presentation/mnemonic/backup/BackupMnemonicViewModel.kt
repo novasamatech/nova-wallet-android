@@ -18,8 +18,8 @@ import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncrypt
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.spacedWords
-import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.ConfirmMnemonicPayload
-import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.ConfirmMnemonicPayload.CreateExtras
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine

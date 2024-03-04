@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPay
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapOptionalNameToNameChooserState
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.ConfirmMnemonicPayload
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
 import kotlinx.coroutines.Dispatchers

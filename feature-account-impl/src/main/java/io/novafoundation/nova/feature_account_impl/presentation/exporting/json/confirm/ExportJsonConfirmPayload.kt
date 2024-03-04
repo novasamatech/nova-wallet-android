@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.exporting.json
+package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload

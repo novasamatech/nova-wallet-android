@@ -8,11 +8,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonConfirmPayload
-import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.ConfirmMnemonicPayload
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 
 interface AccountRouter : SecureRouter, ReturnableRouter {
 

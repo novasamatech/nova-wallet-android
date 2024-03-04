@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.
 
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonConfirmPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportViewModel
 
 class ExportJsonConfirmViewModel(

@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBr
 import io.novafoundation.nova.feature_governance_impl.BuildConfig
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsFragment

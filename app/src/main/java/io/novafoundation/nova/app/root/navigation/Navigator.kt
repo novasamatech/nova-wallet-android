@@ -20,14 +20,14 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.advanced
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonConfirmPayload
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment
-import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.ConfirmMnemonicPayload
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.NodeDetailsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
@@ -36,7 +36,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.StartImportParitySignerFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerFragment
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration

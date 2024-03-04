@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan
+package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.utils.formatting.TimerValue

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation
 
 import android.os.Bundle
 import io.novafoundation.nova.common.navigation.ReturnableRouter
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload

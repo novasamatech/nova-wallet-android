@@ -3,7 +3,7 @@ package io.novafoundation.nova.app.root.navigation.deepLinking
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.mnemonic
+package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload

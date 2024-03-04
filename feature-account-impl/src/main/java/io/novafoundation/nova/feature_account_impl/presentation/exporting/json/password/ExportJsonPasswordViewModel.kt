@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.export.json.va
 import io.novafoundation.nova.feature_account_impl.domain.account.export.json.validations.mapExportJsonPasswordValidationFailureToUi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonConfirmPayload
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine

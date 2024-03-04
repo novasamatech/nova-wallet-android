@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.addToFavourites.AddToFavouritesInteractor
 import kotlinx.coroutines.flow.MutableStateFlow

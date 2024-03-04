@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation.referenda.common.description
+package io.novafoundation.nova.feature_governance_impl.presentation.common.description
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
