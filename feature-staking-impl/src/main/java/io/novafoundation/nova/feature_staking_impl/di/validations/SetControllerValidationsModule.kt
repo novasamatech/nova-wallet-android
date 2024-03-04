@@ -7,10 +7,10 @@ import io.novafoundation.nova.common.validation.CompositeValidation
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.validations.NotZeroBalanceValidation
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.IsNotControllerAccountValidation
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerFeeValidation
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerValidationFailure
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.IsNotControllerAccountValidation
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerFeeValidation
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidation
 

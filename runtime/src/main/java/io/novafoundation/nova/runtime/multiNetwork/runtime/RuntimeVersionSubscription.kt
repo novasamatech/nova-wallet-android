@@ -4,8 +4,8 @@ import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.runtimeVersionChange
-import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.runtimeVersionChange
+import io.novasama.substrate_sdk_android.wsrpc.subscriptionFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch

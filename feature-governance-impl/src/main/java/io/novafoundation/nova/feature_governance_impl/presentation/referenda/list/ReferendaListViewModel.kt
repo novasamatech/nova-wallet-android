@@ -143,7 +143,7 @@ class ReferendaListViewModel(
 
             DelegatedState.NotDelegated -> GovernanceLocksModel(
                 amount = null,
-                title = resourceManager.getString(R.string.delegation_add_delegation),
+                title = resourceManager.getString(R.string.common_add_delegation),
                 hasUnlockableLocks = false
             )
 

@@ -28,11 +28,10 @@ class RealGovernancePushSettingsInteractor(
     override fun governanceChainsFlow(): Flow<List<ChainWithGovTracks>> {
         return chainRegistry.currentChains
             .map {
-                it
-                    .flatMap { chain ->
-                        chain.governance.filter { it == Chain.Governance.V2 }
-                            .map { chain to it }
-                    }
+                it.flatMap { chain ->
+                    chain.governance.filter { it == Chain.Governance.V2 }
+                        .map { chain to it }
+                }
                     .map { (chain, govType) -> ChainWithGovTracks(chain, govType, getTrackIds(chain, govType)) }
                     .sortedWith(Chain.defaultComparatorFrom(ChainWithGovTracks::chain))
             }

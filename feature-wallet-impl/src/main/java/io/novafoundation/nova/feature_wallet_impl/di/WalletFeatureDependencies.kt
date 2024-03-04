@@ -44,9 +44,9 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.Multi
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import jp.co.soramitsu.fearless_utils.encrypt.Signer
-import jp.co.soramitsu.fearless_utils.icon.IconGenerator
-import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.encrypt.Signer
+import io.novasama.substrate_sdk_android.icon.IconGenerator
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface WalletFeatureDependencies {

@@ -14,7 +14,7 @@ import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 
 class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>) {
 

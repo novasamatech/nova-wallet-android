@@ -11,7 +11,7 @@ import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import org.intellij.lang.annotations.Language
 import java.math.BigDecimal
@@ -115,6 +115,9 @@ interface MetaAccountDao {
     @Query("SELECT id FROM meta_accounts WHERE status = :status")
     suspend fun getMetaAccountIdsByStatus(status: MetaAccountLocal.Status): List<Long>
 
+    @Query("SELECT * FROM meta_accounts WHERE status = :status")
+    suspend fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
+
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
 
@@ -164,7 +167,18 @@ interface MetaAccountDao {
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
     suspend fun updateName(metaId: Long, newName: String)
 
-    @Query("DELETE FROM meta_accounts WHERE id = :metaId OR parentMetaId = :metaId")
+    @Query(
+        """
+        WITH RECURSIVE accounts_to_delete AS (
+            SELECT id, parentMetaId FROM meta_accounts WHERE id = :metaId
+            UNION ALL
+            SELECT m.id, m.parentMetaId
+            FROM meta_accounts m
+            JOIN accounts_to_delete r ON m.parentMetaId = r.id
+        )
+        DELETE FROM meta_accounts WHERE id IN (SELECT id FROM accounts_to_delete)
+    """
+    )
     suspend fun delete(metaId: Long)
 
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")

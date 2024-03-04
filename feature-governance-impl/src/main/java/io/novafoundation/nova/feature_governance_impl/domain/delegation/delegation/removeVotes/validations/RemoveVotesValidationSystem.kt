@@ -12,7 +12,7 @@ fun ValidationSystem.Companion.removeVotesValidationSystem(): RemoteVotesValidat
         error = { context ->
             RemoveVotesValidationFailure.NotEnoughToPayFees(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }

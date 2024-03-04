@@ -878,6 +878,7 @@
         android:label="SelectWalletFragment" />
 
     <fragment
+        app:useAdd="true"
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
         android:label="WalletConnectApproveSessionFragment" />

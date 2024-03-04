@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_account_api.data.derivationPath
 
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.SubstrateJunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.SubstrateJunctionDecoder
 
 object DerivationPathDecoder {
 

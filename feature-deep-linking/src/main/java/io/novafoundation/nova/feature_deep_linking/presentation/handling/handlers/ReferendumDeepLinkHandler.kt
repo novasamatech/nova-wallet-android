@@ -17,8 +17,8 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
-import java.math.BigInteger
 import kotlinx.coroutines.flow.MutableSharedFlow
+import java.math.BigInteger
 
 private const val GOV_DEEP_LINK_PREFIX = "/open/gov"
 
@@ -78,7 +78,7 @@ class ReferendumDeepLinkHandler(
             ?.toBigIntegerOrNull()
     }
 
-    private suspend fun Uri.getGovernanceType(chain: Chain): Chain.Governance {
+    private fun Uri.getGovernanceType(chain: Chain): Chain.Governance {
         val supportedGov = chain.governance
         val govType = getQueryParameter(PARAM_GOV_TYPE)
             ?.toIntOrNull()

@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransportError
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransportError.Reason
-import jp.co.soramitsu.fearless_utils.encrypt.json.copyBytes
+import io.novasama.substrate_sdk_android.encrypt.json.copyBytes
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.math.min

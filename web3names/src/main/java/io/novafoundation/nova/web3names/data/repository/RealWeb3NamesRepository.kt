@@ -17,9 +17,9 @@ import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.Cha
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.UnsupportedAsset
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ValidAccountNotFoundException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.metadata.module
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 
 class RealWeb3NamesRepository(
     private val remoteStorageSource: StorageDataSource,

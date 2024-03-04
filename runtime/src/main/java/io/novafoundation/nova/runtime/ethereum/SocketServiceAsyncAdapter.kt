@@ -1,11 +1,11 @@
 package io.novafoundation.nova.runtime.ethereum
 
 import io.reactivex.Observable
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.DeliveryType
-import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
-import jp.co.soramitsu.fearless_utils.wsrpc.subscription.response.SubscriptionChange
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.request.DeliveryType
+import io.novasama.substrate_sdk_android.wsrpc.request.base.RpcRequest
+import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
+import io.novasama.substrate_sdk_android.wsrpc.subscription.response.SubscriptionChange
 import kotlinx.coroutines.future.await
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response

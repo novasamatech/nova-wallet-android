@@ -11,13 +11,13 @@ import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncrypt
 import io.novafoundation.nova.feature_account_impl.data.signer.LeafSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
-import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.KeyPairSigner
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.KeyPairSigner
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 
 class SecretsSignerFactory(
     private val secretStoreV2: SecretStoreV2,

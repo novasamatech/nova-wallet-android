@@ -10,18 +10,19 @@ import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u16
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
-import jp.co.soramitsu.fearless_utils.runtime.metadata.StorageEntryModifier
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntryType
-import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKeys
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArray
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u16
+import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
+import io.novasama.substrate_sdk_android.runtime.metadata.StorageEntryModifier
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntryType
+import io.novasama.substrate_sdk_android.runtime.metadata.splitKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
@@ -31,6 +32,7 @@ abstract class BaseStorageQueryContext(
     override val chainId: ChainId,
     override val runtime: RuntimeSnapshot,
     private val at: BlockHash?,
+    private val applyStorageDefault: Boolean
 ) : StorageQueryContext {
 
     protected abstract suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String>
@@ -137,7 +139,7 @@ abstract class BaseStorageQueryContext(
     ): V {
         val storageKey = storageKeyWith(keyArguments)
         val scaleResult = queryKey(storageKey, at)
-        val decoded = scaleResult?.let { type.value?.fromHex(runtime, scaleResult) }
+        val decoded = scaleResult?.let { type.value?.fromHex(runtime, scaleResult) } ?: takeDefaultIfAllowed()
 
         return binding(decoded)
     }
@@ -259,6 +261,12 @@ abstract class BaseStorageQueryContext(
                 null
             }
         }
+    }
+
+    private fun StorageEntry.takeDefaultIfAllowed(): Any? {
+        if (!applyStorageDefault) return null
+
+        return type.value?.fromByteArray(runtime, default)
     }
 
     @JvmInline

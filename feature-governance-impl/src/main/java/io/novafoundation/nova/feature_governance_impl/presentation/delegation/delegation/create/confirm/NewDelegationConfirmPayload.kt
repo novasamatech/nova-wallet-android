@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
 import java.math.BigInteger

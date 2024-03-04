@@ -13,8 +13,8 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.junctionList
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 import kotlinx.coroutines.Deferred
 import java.math.BigInteger
 

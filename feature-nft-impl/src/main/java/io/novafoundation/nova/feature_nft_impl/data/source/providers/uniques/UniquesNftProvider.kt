@@ -12,9 +12,11 @@ import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
+import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
@@ -25,9 +27,9 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.singleValueOf
 import io.novafoundation.nova.runtime.storage.source.query.multi
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 
@@ -62,13 +64,13 @@ class UniquesNftProvider(
                     keyExtractor = { (classId: BigInteger) -> classId },
                     binding = ::bindMetadata
                 )
-                instanceMetadataDescriptor = runtime.metadata.uniques().storage("InstanceMetadataOf").querySingleArgKeys(
-                    keysArgs = classesIds,
+                instanceMetadataDescriptor = runtime.metadata.uniques().storage("InstanceMetadataOf").queryKeys(
+                    keysArgs = classesWithInstances,
                     keyExtractor = { (classId: BigInteger, instance: BigInteger) -> classId to instance },
                     binding = ::bindMetadata
                 )
-                totalIssuanceDescriptor = runtime.metadata.uniques().storage("Class").queryKeys(
-                    keysArgs = classesWithInstances,
+                totalIssuanceDescriptor = runtime.metadata.uniques().storage("Class").querySingleArgKeys(
+                    keysArgs = classesIds,
                     keyExtractor = { (classId: BigInteger) -> classId },
                     binding = { bindNumber(it.castToStruct()["items"]) }
                 )
@@ -91,8 +93,9 @@ class UniquesNftProvider(
                     instanceId = instanceId.toString(),
                     metadata = metadata,
                     type = NftLocal.Type.UNIQUES,
-                    issuanceTotal = totalIssuances.getValue(collectionId).toInt(),
+                    issuanceTotal = totalIssuances.getValue(collectionId),
                     issuanceMyEdition = instanceId.toString(),
+                    issuanceType = NftLocal.IssuanceType.LIMITED,
                     price = null,
 
                     // to load at full sync
@@ -169,13 +172,13 @@ class UniquesNftProvider(
                 NftDetails(
                     identifier = nftLocal.identifier,
                     chain = chain,
-                    owner = metaAccount.accountIdIn(chain)!!,
+                    owner = metaAccount.requireAccountIdIn(chain),
                     creator = classIssuer,
                     media = nftLocal.media,
                     name = nftLocal.name ?: nftLocal.instanceId!!,
                     description = nftLocal.label,
                     issuance = nftIssuance(nftLocal),
-                    price = nftLocal.price,
+                    price = nftPrice(nftLocal),
                     collection = collection
                 )
             }

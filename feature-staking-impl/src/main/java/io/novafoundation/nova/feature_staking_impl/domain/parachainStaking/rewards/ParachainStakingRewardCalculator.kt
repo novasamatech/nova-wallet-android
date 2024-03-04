@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.utils.percentageToFraction
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationInfo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.ParachainBondConfig
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigDecimal
 import java.math.BigInteger
 

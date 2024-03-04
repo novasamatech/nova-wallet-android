@@ -40,6 +40,8 @@ import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureHolder
+import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
+import io.novafoundation.nova.feature_proxy_impl.di.ProxyFeatureHolder
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -217,6 +219,12 @@ interface ComponentHolderModule {
     @ClassKey(PushNotificationsFeatureApi::class)
     @IntoMap
     fun providePushNotificationsFeature(holder: PushNotificationsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(ProxyFeatureApi::class)
+    @IntoMap
+    fun provideProxyFeature(holder: ProxyFeatureHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

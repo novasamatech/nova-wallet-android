@@ -13,8 +13,8 @@ import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.Po
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.scale.dataType.uint32
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.scale.dataType.uint32
 
 private const val PREFIX = "modl"
 

@@ -35,6 +35,8 @@
             style="@style/TextAppearance.NovaFoundation.Bold.HugeTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
             android:textColor="@color/text_primary"
             android:visibility="gone"
             tools:text="$214.66"

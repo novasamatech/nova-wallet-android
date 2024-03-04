@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeProducer
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.hash.isPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 
 class PoolAvailableBalanceValidationFactory(

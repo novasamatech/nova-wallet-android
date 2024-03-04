@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toBuyAmountToKeepMainEDInFeeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.totalDeductedAmountInFeeToken
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import jp.co.soramitsu.fearless_utils.hash.isPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 
 class SwapSmallRemainingBalanceValidation(
     private val assetSourceRegistry: AssetSourceRegistry

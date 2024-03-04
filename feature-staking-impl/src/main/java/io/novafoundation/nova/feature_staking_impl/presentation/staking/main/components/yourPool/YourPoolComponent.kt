@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.nominationPools.NominationPoolsYourPoolComponentFactory
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 typealias YourPoolComponent = StatefullComponent<LoadingState<YourPoolComponentState>, YourPoolEvent, YourPoolAction>
 

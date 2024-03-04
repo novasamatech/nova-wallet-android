@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import io.novasama.substrate_sdk_android.runtime.metadata.call
 
 interface StakingVersioningRepository {
 

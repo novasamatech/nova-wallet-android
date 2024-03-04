@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -62,10 +62,6 @@ class SendInteractor(
             myAccounts = emptyList(),
             contacts = emptyList()
         )
-    }
-
-    suspend fun syncCrossChainConfig() = kotlin.runCatching {
-        crossChainTransfersRepository.syncConfiguration()
     }
 
     suspend fun getFee(amount: Balance, transfer: AssetTransfer): TransferFeeModel = withContext(Dispatchers.Default) {

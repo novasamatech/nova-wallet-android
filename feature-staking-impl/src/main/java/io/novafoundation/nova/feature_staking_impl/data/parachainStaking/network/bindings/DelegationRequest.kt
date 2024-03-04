@@ -8,8 +8,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegationAction
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 
 fun bindDelegationRequests(instance: Any?, collatorId: AccountId) = instance?.let {
     bindList(instance) { listElement -> bindDelegationRequest(collatorId, listElement) }

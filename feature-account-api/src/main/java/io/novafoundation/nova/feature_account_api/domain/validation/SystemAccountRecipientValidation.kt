@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.account.system.SystemAccountMatcher
 import io.novafoundation.nova.feature_account_api.domain.account.system.default
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class SystemAccountRecipientValidation<P, E>(
     private val accountId: (P) -> AccountId?,

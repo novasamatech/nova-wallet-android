@@ -34,12 +34,10 @@ abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
     )
     private val placeholderAdapter = CustomPlaceholderAdapter(R.layout.item_tracks_placeholder)
     private val tracksAdapter = SelectTracksAdapter(this)
-    private lateinit var adapter: ConcatAdapter
+    val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        adapter = ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter)
     }
 
     override fun onCreateView(

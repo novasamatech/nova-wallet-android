@@ -17,7 +17,11 @@ class RootDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        nestedHandlers.find { it.matches(data) }
-            ?.handleDeepLink(data)
+        runCatching {
+            nestedHandlers.find {
+                runCatching { it.matches(data) }.getOrDefault(false)
+            }
+                ?.handleDeepLink(data)
+        }
     }
 }

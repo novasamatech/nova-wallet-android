@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.Acal
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class LiquidAcalaContributionSource(
     private val acalaApi: AcalaApi,

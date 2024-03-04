@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.toTimer
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.from
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

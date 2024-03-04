@@ -1,8 +1,8 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Data as DataType
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Data as DataType
 
 sealed class Data {
     abstract fun asString(): String?

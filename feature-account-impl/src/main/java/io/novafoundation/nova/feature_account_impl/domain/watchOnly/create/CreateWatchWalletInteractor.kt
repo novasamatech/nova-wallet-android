@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchOnlyRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchWalletSuggestion
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 
 interface CreateWatchWalletInteractor {
 

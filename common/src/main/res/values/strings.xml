@@ -31,6 +31,21 @@
     <string name="push_new_update_message">Download Nova Wallet v%s to get all the new features!</string>
     <string name="push_new_referendum_title">🗳️ New referendum</string>
     <string name="push_new_referendum_message">%s Referendum %s is now live!</string>
+    <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>
+
+    <string name="common_too_small_balance_title">Your balance is too small</string>
+    <string name="wallet_send_insufficient_balance_commission">You need to have at least %s to pay this transaction fee and stay above the minimum network balance. Your current balance is: %s. You need to add %s to your balance to perform this operation.</string>
+
+    <string name="nft_issuance_fungible_format">%s units of %s</string>
+
+    <string name="nft_fungile_price">%s for %s</string>
+
+    <string name="staking_set_controller_deprecated_subtitle">Use Proxies to delegate Staking operations to another account</string>
+
+    <string name="staking_manage_proxy_requires_stash_title">Select stash account to setup proxy</string>
+    <string name="staking_manage_proxy_requires_stash_message">Please switch your wallet to %s to setup a proxy</string>
+
+    <string name="common_network_not_supported">%s is not supported</string>
 
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Youn need to select at least %d track</item>
@@ -78,6 +93,46 @@
     <string name="push_welcome_cancel_button">Not now</string>
     <string name="push_welcome_terms_and_conditions">By enabling push notifications, you agree to our %s and %s</string>
 
+    <string name="remove_proxy_confirmation_revoke_access_type">Revoke access type</string>
+    <string name="remove_proxy_confirmation_revoke_for">Revoke for</string>
+
+    <string name="common_add_delegation">Add delegation</string>
+
+    <string name="staking_proxies_group_title">Delegated authorities (proxy)</string>
+    <string name="common_proxy_rewoke_access">Revoke access</string>
+
+    <string name="proxy_access_type_staking_operations">Staking operations</string>
+
+    <string name="add_proxy_confirmation_delegating_wallet">Delegating wallet</string>
+    <string name="add_proxy_confirmation_delegating_account">Delegating account</string>
+    <string name="add_proxy_confirmation_grant_access_type">Grant access type</string>
+    <string name="add_proxy_confirmation_delegate_to">Delegate to</string>
+
+    <string name="staking_add_proxy_confirmation_title">Add delegation</string>
+
+    <string name="duplicate_proxy_type_title">Delegation already exists</string>
+    <string name="duplicate_proxy_type_message">You are already delegating to this account: %s</string>
+
+    <string name="invalid_proxy_address_title">Invalid proxy address</string>
+    <string name="invalid_proxy_address_message">Proxy address should be a valid %s address</string>
+
+    <string name="add_proxy_deposit_description_message">The deposit stays reserved on your account until the proxy is removed.</string>
+
+    <string name="add_proxy_maximum_reached_error_title">Maximum number of proxies has been reached</string>
+    <string name="add_proxy_maximum_reached_error_message">You have reached the limit of %s added proxies in %s. Remove proxies to add new ones.</string>
+
+    <string name="common_error_not_enough_tokens">Not enough tokens</string>
+    <string name="staking_not_enough_balance_to_pay_proxy_deposit_message">You don’t have enough balance for proxy deposit of %s. Available balance: %s</string>
+
+    <string name="staking_action_your_proxies">Your delegations</string>
+    <string name="staking_action_add_proxy">Add delegated authority (Proxy)</string>
+
+    <string name="set_staking_proxy_address_description">Give authority to</string>
+    <string name="common_proxy_deposit">Proxy deposit</string>
+    <string name="fragment_set_staking_proxy_title">Add delegation for %s staking</string>
+
+    <string name="common_enter_address">Enter address…</string>
+    <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn’t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
     <string name="staking_no_access_to_controller_account_title">No access to controller account</string>
     <string name="staking_no_access_to_controller_account_message">Add your controller account in device.</string>
 
@@ -85,7 +140,6 @@
 
     <string name="proxy_signing_none_permissions_message">%1$s has not delegated %2$s</string>
 
-    <string name="proxy_error_not_enough_to_pay_fee_message">Delegated account %s doesn\'t have enough balance to pay the network fee of %s. Available balance to pay fee: %s</string>
     <string name="error_not_enough_to_pay_fee_title">Not enough tokens to pay the fee</string>
 
     <string name="proxied_wallet_details_info_warning">This account granted access to perform transactions to the following account:</string>
@@ -130,8 +184,6 @@
     <string name="referendim_details_not_found_title">Referendum not found</string>
 
     <string name="settings_wiki">Wiki</string>
-
-    <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fee and remain above minimal balance</string>
 
     <string name="operations_swap_title">Swap</string>
 
@@ -399,7 +451,6 @@
     <string name="account_polkadot_vault">Polkadot Vault</string>
 
     <string name="staking_set_controller_deprecated_title">Controller Accounts Are Being Deprecated</string>
-    <string name="staking_set_controller_deprecated_subtitle">Network is migrating towards replacing Controllers to Proxies feature. Nova Wallet will support Proxies in future updates</string>
     <string name="staking_set_controller_deprecated_action">Update Controller to Stash</string>
 
     <string name="assets_search_placeholder">No networks or tokens with entered\nname were found</string>
@@ -641,8 +692,6 @@
     <string name="delegation_delegate_filter_all">All accounts</string>
     <string name="delegation_delegate_filter_organizations">Organizations</string>
     <string name="delegation_delegate_filter_individuals">Individuals</string>
-
-    <string name="delegation_add_delegation">Add delegation</string>
 
     <string name="delegation_delegate_type_organization">Organization</string>
     <string name="delegation_delegate_type_individual">Individual</string>

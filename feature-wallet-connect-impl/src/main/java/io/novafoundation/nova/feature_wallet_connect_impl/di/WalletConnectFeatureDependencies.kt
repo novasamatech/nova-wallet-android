@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.di
 
+import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.caip.caip2.Caip2Parser
@@ -48,6 +49,8 @@ interface WalletConnectFeatureDependencies {
     val sessionsDao: WalletConnectSessionsDao
 
     val selectWalletMixinFactory: SelectWalletMixin.Factory
+
+    val appContext: Context
 
     fun rootScope(): RootScope
 }

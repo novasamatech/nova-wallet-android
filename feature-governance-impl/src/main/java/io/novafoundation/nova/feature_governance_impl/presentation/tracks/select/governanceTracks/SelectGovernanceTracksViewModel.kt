@@ -32,7 +32,7 @@ class SelectGovernanceTracksViewModel(
     trackFormatter = trackFormatter,
     resourceManager = resourceManager,
     router = router,
-    chooseTrackDataFlow = interactor.observeTracksByChain(payload.chainId)
+    chooseTrackDataFlow = interactor.observeTracksByChain(payload.chainId, payload.governanceType)
 ) {
 
     val chainModel = flowOf { chainRegistry.getChain(payload.chainId) }
@@ -60,7 +60,7 @@ class SelectGovernanceTracksViewModel(
 
     override fun backClicked() {
         launch {
-            responder.respond(SelectTracksResponder.Response(payload.chainId, selectedTracksFlow.value.fromTrackIds()))
+            responder.respond(SelectTracksResponder.Response(payload.chainId, payload.governanceType, selectedTracksFlow.value.fromTrackIds()))
 
             super.backClicked()
         }

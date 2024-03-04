@@ -6,7 +6,7 @@ import io.novafoundation.nova.core.model.SecuritySource
 import io.novafoundation.nova.core.model.WithDerivationPath
 import io.novafoundation.nova.core.model.WithMnemonic
 import io.novafoundation.nova.core.model.WithSeed
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.Sr25519Keypair
+import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

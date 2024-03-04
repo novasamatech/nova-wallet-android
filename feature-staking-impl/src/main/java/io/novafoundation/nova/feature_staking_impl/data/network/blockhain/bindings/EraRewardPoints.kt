@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getList
 import io.novafoundation.nova.common.data.network.runtime.binding.requireType
 import io.novafoundation.nova.common.utils.second
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 typealias RewardPoints = BigInteger

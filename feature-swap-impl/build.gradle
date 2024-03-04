@@ -43,9 +43,11 @@ dependencies {
     implementation project(":common")
     implementation project(":runtime")
 
+    implementation project(":hydra-dx-math")
+
     implementation materialDep
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation kotlinDep
 

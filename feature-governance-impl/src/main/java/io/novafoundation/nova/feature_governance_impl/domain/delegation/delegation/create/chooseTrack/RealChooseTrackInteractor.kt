@@ -28,7 +28,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.selectedOption
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -54,9 +54,13 @@ class RealChooseTrackInteractor(
         removeVotesSuggestionRepository.disallowShowRemoveVotesSuggestion()
     }
 
-    override fun observeTracksByChain(chainId: ChainId): Flow<ChooseTrackData> = flowOf {
+    override fun observeTracksByChain(chainId: ChainId, govType: Chain.Governance): Flow<ChooseTrackData> = flowOf {
         val chain = chainRegistry.getChain(chainId)
-        val govType = chain.governance.firstOrNull { it == Chain.Governance.V2 } ?: return@flowOf ChooseTrackData.empty()
+
+        val chainSupportGovType = chain.governance.any { it == govType }
+        if (!chainSupportGovType) {
+            return@flowOf ChooseTrackData.empty()
+        }
 
         val governanceSource = governanceSourceRegistry.sourceFor(govType)
         val allTracks = governanceSource.referenda.getTracksById(chain.id)

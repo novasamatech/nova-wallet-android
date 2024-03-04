@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.validation.isFalseOrError
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegationAction
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.fromHex
 
 class NoPendingRevokeValidationFactory(
     private val delegatorStateRepository: DelegatorStateRepository,

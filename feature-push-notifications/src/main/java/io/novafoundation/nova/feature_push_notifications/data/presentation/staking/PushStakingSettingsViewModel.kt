@@ -40,10 +40,11 @@ class PushStakingSettingsViewModel(
             )
         }
     }.withSafeLoading()
+        .shareInBackground()
 
     val clearButtonEnabledFlow = _enabledStakingSettingsList.map {
         it.isNotEmpty()
-    }
+    }.shareInBackground()
 
     init {
         launch {

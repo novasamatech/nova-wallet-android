@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoT
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 interface DelegateCommonRepository {
     suspend fun getDelegatesStats(governanceOption: SupportedGovernanceOption, accountIds: List<AccountId>? = null): List<DelegateStats>

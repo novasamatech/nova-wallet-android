@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.filters.NotSlashedFilter
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.postprocessors.RemoveClusteringPostprocessor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.APYSorting
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 

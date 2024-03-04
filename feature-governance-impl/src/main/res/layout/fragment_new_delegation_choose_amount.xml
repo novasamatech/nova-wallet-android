@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_arrow_back"
-        app:titleText="@string/delegation_add_delegation" />
+        app:titleText="@string/common_add_delegation" />
 
     <ScrollView
         android:layout_width="match_parent"

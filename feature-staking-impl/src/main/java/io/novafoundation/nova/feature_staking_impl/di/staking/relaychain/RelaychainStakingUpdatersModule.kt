@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.MaxNominatorsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.MinBondUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ParachainsUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ProxiesUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLedgerUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
@@ -361,6 +362,20 @@ class RelaychainStakingUpdatersModule {
     )
 
     @Provides
+    @FeatureScope
+    fun provideProxiesUpdater(
+        storageCache: StorageCache,
+        scope: AccountStakingScope,
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = ProxiesUpdater(
+        scope,
+        sharedState,
+        chainRegistry,
+        storageCache,
+    )
+
+    @Provides
     @Relaychain
     @FeatureScope
     fun provideRelaychainStakingUpdaters(
@@ -385,6 +400,7 @@ class RelaychainStakingUpdatersModule {
         genesisSlotUpdater: GenesisSlotUpdater,
         currentSessionIndexUpdater: CurrentSessionIndexUpdater,
         eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
+        proxiesUpdater: ProxiesUpdater
     ) = StakingUpdaters.Group(
         activeEraUpdater,
         validatorExposureUpdater,
@@ -406,6 +422,7 @@ class RelaychainStakingUpdatersModule {
         currentSlotUpdater,
         genesisSlotUpdater,
         currentSessionIndexUpdater,
-        eraStartSessionIndexUpdater
+        eraStartSessionIndexUpdater,
+        proxiesUpdater
     )
 }
