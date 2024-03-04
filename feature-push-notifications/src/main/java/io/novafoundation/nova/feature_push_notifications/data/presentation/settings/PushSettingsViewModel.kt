@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsPayload
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsRequester
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsResponder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsPayload
+import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsRequester
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +48,7 @@ class PushSettingsViewModel(
     private val resourceManager: ResourceManager,
     private val walletRequester: SelectMultipleWalletsRequester,
     private val pushGovernanceSettingsRequester: PushGovernanceSettingsRequester,
+    private val pushStakingSettingsRequester: PushStakingSettingsRequester,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val permissionsAsker: PermissionsAsker.Presentation,
 ) : BaseViewModel() {
@@ -93,6 +96,7 @@ class PushSettingsViewModel(
 
         subscribeOnSelectWallets()
         subscribeOnGovernanceSettings()
+        subscribeOnStakingSettings()
     }
 
     fun backClicked() {
@@ -166,7 +170,13 @@ class PushSettingsViewModel(
     }
 
     fun stakingRewardsClicked() {
-        TODO()
+        val stakingRewards = pushSettingsState.value?.stakingReward ?: return
+        val settings = when (stakingRewards) {
+            is PushSettings.ChainFeature.All -> PushStakingSettingsPayload.AllChains
+            is PushSettings.ChainFeature.Concrete -> PushStakingSettingsPayload.SpecifiedChains(stakingRewards.chainIds.toSet())
+        }
+        val request = PushStakingSettingsRequester.Request(settings)
+        pushStakingSettingsRequester.openRequest(request)
     }
 
     private fun subscribeOnSelectWallets() {
@@ -183,6 +193,21 @@ class PushSettingsViewModel(
             .onEach { response ->
                 pushSettingsState.updateValue { settings ->
                     settings?.copy(governance = mapGovSettingsReponseToModel(response))
+                }
+            }
+            .launchIn(this)
+    }
+
+    private fun subscribeOnStakingSettings() {
+        pushStakingSettingsRequester.responseFlow
+            .onEach { response ->
+                val stakingSettings = when (response.settings) {
+                    is PushStakingSettingsPayload.AllChains -> PushSettings.ChainFeature.All
+                    is PushStakingSettingsPayload.SpecifiedChains -> PushSettings.ChainFeature.Concrete(response.settings.enabledChainIds.toList())
+                }
+
+                pushSettingsState.updateValue { settings ->
+                    settings?.copy(stakingReward = stakingSettings)
                 }
             }
             .launchIn(this)

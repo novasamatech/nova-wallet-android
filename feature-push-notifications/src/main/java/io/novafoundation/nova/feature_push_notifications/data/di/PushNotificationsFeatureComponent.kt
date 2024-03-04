@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificat
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsCommunicator
 import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.di.PushGovernanceSettingsComponent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.di.PushSettingsComponent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsCommunicator
+import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.di.PushStakingSettingsComponent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.di.PushWelcomeComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -35,6 +37,8 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
 
     fun pushGovernanceSettings(): PushGovernanceSettingsComponent.Factory
 
+    fun pushStakingSettings(): PushStakingSettingsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -43,6 +47,7 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
             @BindsInstance selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
             @BindsInstance selectTracksCommunicator: SelectTracksCommunicator,
             @BindsInstance pushGovernanceSettingsCommunicator: PushGovernanceSettingsCommunicator,
+            @BindsInstance pushStakingSettingsCommunicator: PushStakingSettingsCommunicator,
             deps: PushNotificationsFeatureDependencies
         ): PushNotificationsFeatureComponent
     }

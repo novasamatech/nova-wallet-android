@@ -17,4 +17,8 @@ class PushNotificationsNavigator(
     override fun openPushGovernanceSettings(args: Bundle) {
         performNavigation(R.id.action_pushSettings_to_governanceSettings, args)
     }
+
+    override fun openPushStakingSettings(args: Bundle) {
+        performNavigation(R.id.action_pushSettings_to_stakingSettings, args)
+    }
 }

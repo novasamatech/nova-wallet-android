@@ -29,7 +29,7 @@ data class PushSettings(
 
 fun PushSettings.ChainFeature.isNotEmpty(): Boolean {
     return when (this) {
-        is PushSettings.ChainFeature.All -> false
+        is PushSettings.ChainFeature.All -> true
         is PushSettings.ChainFeature.Concrete -> chainIds.isNotEmpty()
     }
 }

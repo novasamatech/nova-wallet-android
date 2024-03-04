@@ -19,13 +19,26 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
-    </fragment>
+        <action
+            android:id="@+id/action_pushSettings_to_stakingSettings"
+            app:destination="@id/pushStakingSettings"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
 
+    </fragment>
 
     <fragment
         android:id="@+id/pushGovernanceFragment"
         android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsFragment"
         android:label="PushGovernanceSettingsFragment"
         tools:layout="@layout/fragment_push_governance_settings" />
+
+    <fragment
+        android:id="@+id/pushStakingSettings"
+        android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsFragment"
+        android:label="PushStakingSettingsFragment"
+        tools:layout="@layout/fragment_push_staking_settings" />
 
 </navigation>
