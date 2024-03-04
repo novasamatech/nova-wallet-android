@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.WatchOnlyRepo
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.create.CreateWatchWalletInteractor
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.create.RealCreateWatchWalletInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.CreateWatchWalletViewModel
 
 @Module(includes = [ViewModelModule::class])

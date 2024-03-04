@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.polkadot
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.runtime.extrinsic.ValidityPeriod
 import io.novafoundation.nova.runtime.extrinsic.startExtrinsicValidityTimer
 import kotlinx.coroutines.Dispatchers

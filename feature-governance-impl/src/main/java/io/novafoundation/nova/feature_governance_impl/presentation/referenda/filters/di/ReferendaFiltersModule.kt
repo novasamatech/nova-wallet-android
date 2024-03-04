@@ -9,7 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.filters.ReferendaFiltersViewModel
 
 @Module(includes = [ViewModelModule::class])

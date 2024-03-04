@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_api.presenatation
+package io.novafoundation.nova.feature_account_impl.presentation
 
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.navigation.PinRequired

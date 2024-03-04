@@ -598,7 +598,6 @@
         android:label="BalanceDetailFragment"
         tools:layout="@layout/fragment_balance_detail" />
 
-
     <fragment
         android:id="@+id/transferDetailFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment"

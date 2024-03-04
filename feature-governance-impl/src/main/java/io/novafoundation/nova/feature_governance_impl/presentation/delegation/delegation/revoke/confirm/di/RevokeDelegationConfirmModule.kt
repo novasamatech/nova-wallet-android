@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.RevokeDelegationValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.revokeDelegationValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_api.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmViewModel

@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_push_notifications.data.presentation.hand
 
 import io.novafoundation.nova.common.data.storage.Preferences
 
-interface NotificationIdReceiver {
+interface NotificationIdProvider {
     fun getId(): Int
 }
 
-class RealNotificationIdReceiver(
+class RealNotificationIdProvider(
     private val preferences: Preferences
-) : NotificationIdReceiver {
+) : NotificationIdProvider {
 
     override fun getId(): Int {
         val id = preferences.getInt(KEY, START_ID)

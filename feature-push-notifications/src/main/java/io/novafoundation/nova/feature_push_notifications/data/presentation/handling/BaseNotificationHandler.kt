@@ -10,31 +10,24 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.fromJson
-import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_push_notifications.R
-import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chainsById
-import okhttp3.internal.notify
 
 abstract class BaseNotificationHandler(
-    private val notificationIdReceiver: NotificationIdReceiver,
+    private val notificationIdProvider: NotificationIdProvider,
     private val gson: Gson,
     private val notificationManager: NotificationManagerCompat,
     val resourceManager: ResourceManager,
-    @StringRes private val channelIdRes: Int = R.string.default_notification_channel_id,
-    @StringRes private val channelNameRes: Int = R.string.default_notification_channel_name,
+    private val channel: NovaNotificationChannel,
     private val importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
 ) : NotificationHandler {
 
     final override suspend fun handleNotification(message: RemoteMessage): Boolean {
-        val channelId = resourceManager.getString(channelIdRes)
+        val channelId = resourceManager.getString(channel.idRes)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                resourceManager.getString(channelNameRes),
+                resourceManager.getString(channel.nameRes),
                 importance
             )
             notificationManager.createNotificationChannel(channel)
@@ -46,14 +39,18 @@ abstract class BaseNotificationHandler(
     }
 
     override fun notify(notification: Notification) {
-        notificationManager.notify(notificationIdReceiver.getId(), notification)
+        notificationManager.notify(notificationIdProvider.getId(), notification)
     }
 
     protected abstract suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean
 
-    internal fun RemoteMessage.getMessageContent(): MessageContent {
-        val messageValue = data.getValue("message")
-        return runCatching { gson.fromJson<MessageContent>(messageValue) }
-            .getOrThrow()
+    internal fun RemoteMessage.getMessageContent(): NotificationData {
+        val payload: Map<String, Any> = data["payload"]?.let { payload -> gson.fromJson(payload) } ?: emptyMap()
+
+        return NotificationData(
+            type = data.getValue("type"),
+            chainId = data["chainId"],
+            payload = payload
+        )
     }
 }

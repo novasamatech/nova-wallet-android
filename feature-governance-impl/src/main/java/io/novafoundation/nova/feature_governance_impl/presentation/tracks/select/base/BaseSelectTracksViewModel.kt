@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.model.TrackPreset
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.model.DelegationTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.model.DelegationTracksPresetModel

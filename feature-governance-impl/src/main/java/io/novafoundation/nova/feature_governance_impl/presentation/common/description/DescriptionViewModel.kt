@@ -4,7 +4,7 @@ import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.description.DescriptionPayload
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 
 class DescriptionViewModel(
     private val router: GovernanceRouter,

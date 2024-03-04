@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -15,6 +16,8 @@ import io.novafoundation.nova.feature_governance_api.presentation.referenda.comm
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.CompoundNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.SystemNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.RealNotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.DebugNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.NewReferendumNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.NewReleaseNotificationHandler
@@ -29,6 +32,11 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 class NotificationHandlersModule {
 
     @Provides
+    fun provideNotificationIdProvider(preferences: Preferences): NotificationIdProvider {
+        return RealNotificationIdProvider(preferences)
+    }
+
+    @Provides
     fun provideNotificationManagerCompat(context: Context): NotificationManagerCompat {
         return NotificationManagerCompat.from(context)
     }
@@ -37,17 +45,19 @@ class NotificationHandlersModule {
     @IntoSet
     fun systemNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         gson: Gson
     ): NotificationHandler {
-        return SystemNotificationHandler(context, gson, notificationManagerCompat, resourceManager)
+        return SystemNotificationHandler(context, notificationIdProvider, gson, notificationManagerCompat, resourceManager)
     }
 
     @Provides
     @IntoSet
     fun tokenSentNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         gson: Gson,
@@ -62,6 +72,7 @@ class NotificationHandlersModule {
             tokenRepository,
             chainRegistry,
             assetDetailsDeepLinkHandler,
+            notificationIdProvider,
             gson,
             notificationManagerCompat,
             resourceManager
@@ -72,6 +83,7 @@ class NotificationHandlersModule {
     @IntoSet
     fun tokenReceivedNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         gson: Gson,
@@ -86,6 +98,7 @@ class NotificationHandlersModule {
             tokenRepository,
             assetDetailsDeepLinkHandler,
             chainRegistry,
+            notificationIdProvider,
             gson,
             notificationManagerCompat,
             resourceManager
@@ -96,6 +109,7 @@ class NotificationHandlersModule {
     @IntoSet
     fun stakingRewardNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         gson: Gson,
@@ -110,6 +124,7 @@ class NotificationHandlersModule {
             tokenRepository,
             assetDetailsDeepLinkHandler,
             chainRegistry,
+            notificationIdProvider,
             gson,
             notificationManagerCompat,
             resourceManager
@@ -120,6 +135,7 @@ class NotificationHandlersModule {
     @IntoSet
     fun referendumStateUpdateNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         referendaStatusFormatter: ReferendaStatusFormatter,
@@ -132,6 +148,7 @@ class NotificationHandlersModule {
             referendumDeepLinkHandler,
             referendaStatusFormatter,
             chainRegistry,
+            notificationIdProvider,
             gson,
             notificationManagerCompat,
             resourceManager
@@ -142,12 +159,14 @@ class NotificationHandlersModule {
     @IntoSet
     fun newReleaseNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         gson: Gson
     ): NotificationHandler {
         return NewReleaseNotificationHandler(
             context,
+            notificationIdProvider,
             gson,
             notificationManagerCompat,
             resourceManager
@@ -158,6 +177,7 @@ class NotificationHandlersModule {
     @IntoSet
     fun newReferendumNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         gson: Gson,
@@ -168,6 +188,7 @@ class NotificationHandlersModule {
             context,
             referendumDeepLinkHandler,
             chainRegistry,
+            notificationIdProvider,
             gson,
             notificationManagerCompat,
             resourceManager
@@ -185,7 +206,7 @@ class NotificationHandlersModule {
 
     @Provides
     @FeatureScope
-    fun provideCompoundnotificationHandler(
+    fun provideCompoundNotificationHandler(
         handlers: Set<@JvmSuppressWildcards NotificationHandler>,
         debugNotificationHandler: DebugNotificationHandler
     ): NotificationHandler {

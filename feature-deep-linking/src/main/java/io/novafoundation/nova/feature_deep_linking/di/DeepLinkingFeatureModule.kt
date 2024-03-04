@@ -1,52 +1,41 @@
 package io.novafoundation.nova.feature_deep_linking.di
 
-import android.content.Context
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.BuyCallbackDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.DAppDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ImportMnemonicDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.StakingDashboardDeepLinkHandler
-import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_dapp_api.presentation.DAppRouter
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
-import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import javax.inject.Qualifier
 
 @Module()
 class DeepLinkingFeatureModule {
 
     @Provides
     fun provideStakingDashboardDeepLinkHandler(
-        assetsRouter: AssetsRouter,
+        deepLinkingRouter: DeepLinkingRouter,
         automaticInteractionGate: AutomaticInteractionGate
-    ) = StakingDashboardDeepLinkHandler(assetsRouter, automaticInteractionGate)
+    ) = StakingDashboardDeepLinkHandler(deepLinkingRouter, automaticInteractionGate)
 
     @Provides
     fun provideImportMnemonicDeepLinkHandler(
-        accountRouter: AccountRouter,
+        deepLinkingRouter: DeepLinkingRouter,
         encryptionDefaults: EncryptionDefaults,
         accountRepository: AccountRepository,
         automaticInteractionGate: AutomaticInteractionGate
     ) = ImportMnemonicDeepLinkHandler(
-        accountRouter,
+        deepLinkingRouter,
         encryptionDefaults,
         accountRepository,
         automaticInteractionGate
@@ -55,27 +44,25 @@ class DeepLinkingFeatureModule {
     @Provides
     fun provideDappDeepLinkHandler(
         dAppMetadataRepository: DAppMetadataRepository,
-        dAppRouter: DAppRouter,
+        deepLinkingRouter: DeepLinkingRouter,
         automaticInteractionGate: AutomaticInteractionGate
     ) = DAppDeepLinkHandler(
         dAppMetadataRepository,
-        dAppRouter,
+        deepLinkingRouter,
         automaticInteractionGate
     )
 
     @Provides
     fun provideReferendumDeepLinkHandler(
-        governanceRouter: GovernanceRouter,
+        deepLinkingRouter: DeepLinkingRouter,
         chainRegistry: ChainRegistry,
         mutableGovernanceState: MutableGovernanceState,
-        accountRepository: AccountRepository,
         automaticInteractionGate: AutomaticInteractionGate,
         resourceManager: ResourceManager
     ) = ReferendumDeepLinkHandler(
-        governanceRouter,
+        deepLinkingRouter,
         chainRegistry,
         mutableGovernanceState,
-        accountRepository,
         automaticInteractionGate,
         resourceManager
     )
@@ -87,11 +74,11 @@ class DeepLinkingFeatureModule {
 
     @Provides
     fun provideAssetDetailsDeepLinkHandler(
-        assetsRouter: AssetsRouter,
+        deepLinkingRouter: DeepLinkingRouter,
         automaticInteractionGate: AutomaticInteractionGate,
         resourceManager: ResourceManager
     ) = AssetDetailsDeepLinkHandler(
-        assetsRouter = assetsRouter,
+        router = deepLinkingRouter,
         automaticInteractionGate = automaticInteractionGate,
         resourceManager = resourceManager
     )
@@ -102,14 +89,16 @@ class DeepLinkingFeatureModule {
         importMnemonicDeepLinkHandler: ImportMnemonicDeepLinkHandler,
         dappDeepLinkHandler: DAppDeepLinkHandler,
         referendumDeepLinkHandler: ReferendumDeepLinkHandler,
-        buyCallbackDeepLinkHandler: BuyCallbackDeepLinkHandler
+        buyCallbackDeepLinkHandler: BuyCallbackDeepLinkHandler,
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
     ): RootDeepLinkHandler {
         val deepLinkHandlers = listOf(
             stakingDashboardDeepLinkHandler,
             importMnemonicDeepLinkHandler,
             dappDeepLinkHandler,
             referendumDeepLinkHandler,
-            buyCallbackDeepLinkHandler
+            buyCallbackDeepLinkHandler,
+            assetDetailsDeepLinkHandler
         )
 
         return RootDeepLinkHandler(deepLinkHandlers)

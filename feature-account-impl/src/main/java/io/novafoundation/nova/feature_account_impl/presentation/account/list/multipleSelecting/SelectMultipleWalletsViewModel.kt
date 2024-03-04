@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsRequester
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsResponder
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.SelectedMetaAccountState
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel

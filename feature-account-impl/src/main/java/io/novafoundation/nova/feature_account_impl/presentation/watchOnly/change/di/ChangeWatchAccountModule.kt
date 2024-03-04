@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.change.ChangeWatchAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.watchOnly.change.RealChangeWatchAccountInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 

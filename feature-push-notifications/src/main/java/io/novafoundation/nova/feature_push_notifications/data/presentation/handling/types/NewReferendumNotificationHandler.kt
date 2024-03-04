@@ -12,30 +12,29 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class NewReferendumNotificationHandler(
     private val context: Context,
     private val referendumDeepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
     override val chainRegistry: ChainRegistry,
-    notificationIdReceiver: NotificationIdReceiver,
+    notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
-    notificationIdReceiver,
+    notificationIdProvider,
     gson,
     notificationManager,
-    resourceManager
+    resourceManager,
+    channel = NovaNotificationChannel.GOVERNANCE
 ), PushChainRegestryHolder {
 
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {

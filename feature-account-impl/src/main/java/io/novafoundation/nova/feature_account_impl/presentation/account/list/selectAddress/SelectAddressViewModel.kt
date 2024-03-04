@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionResponder
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel
 import kotlinx.coroutines.launch

@@ -15,8 +15,8 @@ import io.novafoundation.nova.feature_governance_api.presentation.referenda.comm
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
@@ -32,15 +32,16 @@ class ReferendumStateUpdateNotificationHandler(
     private val referendumDeepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
     private val referendaStatusFormatter: ReferendaStatusFormatter,
     override val chainRegistry: ChainRegistry,
-    notificationIdReceiver: NotificationIdReceiver,
+    notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
-    notificationIdReceiver,
+    notificationIdProvider,
     gson,
     notificationManager,
-    resourceManager
+    resourceManager,
+    channel = NovaNotificationChannel.GOVERNANCE
 ), PushChainRegestryHolder {
 
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {

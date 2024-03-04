@@ -22,24 +22,24 @@ interface PushChainRegestryHolder {
 
     val chainRegistry: ChainRegistry
 
-    suspend fun MessageContent.getChain(): Chain {
-        val chainId = data?.chainId ?: throw NullPointerException("Chain id is null")
+    suspend fun NotificationData.getChain(): Chain {
+        val chainId = chainId ?: throw NullPointerException("Chain id is null")
         return chainRegistry.chainsById()
             .mapKeys { it.key.chainIdHexPrefix16() }
             .getValue(chainId)
     }
 }
 
-internal fun MessageContent.requireType(type: String) {
-    require(data?.type == type)
+internal fun NotificationData.requireType(type: String) {
+    require(this.type == type)
 }
 
 /**
  * Example: {a_field: {b_field: {c_field: "value"}}}
  * To take a value from c_field use getPayloadFieldContent("a_field", "b_field", "c_field")
  */
-internal inline fun <reified T> MessageContent.extractPayloadField(vararg fields: String): T {
-    var payloadContent = data?.payload ?: throw NullPointerException("Payload is null")
+internal inline fun <reified T> NotificationData.extractPayloadField(vararg fields: String): T {
+    var payloadContent = payload
 
     val fieldsBeforeLast = fields.dropLast(1)
     val last = fields.last()
@@ -53,7 +53,7 @@ internal inline fun <reified T> MessageContent.extractPayloadField(vararg fields
     return result as? T ?: throw NullPointerException("Notification parameter $last is null")
 }
 
-internal fun MessageContent.extractBigInteger(vararg fields: String): BigInteger {
+internal fun NotificationData.extractBigInteger(vararg fields: String): BigInteger {
     return when (val value = extractPayloadField<Any>(*fields)) {
         is Float -> value.toLong().toBigInteger()
         is Double -> value.toLong().toBigInteger()

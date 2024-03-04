@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFi
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.ReferendaListStateModel
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload

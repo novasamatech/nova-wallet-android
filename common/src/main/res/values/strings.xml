@@ -45,8 +45,14 @@
     <string name="push_governance_settings_delegate_votes">Delegate has voted</string>
     <string name="common_clear">Clear</string>
 
-    <string name="default_notification_channel_id">default_notifications_channel_id</string>
-    <string name="default_notification_channel_name">Default Notifications Channel</string>
+    <string name="default_notification_channel_id">default_notification_channel_id</string>
+    <string name="default_notification_channel_name">Default Notification Channel</string>
+    <string name="transactions_notification_channel_id">transactions_notification_channel_id</string>
+    <string name="transactions_notification_channel_name">Transactions Notification Channel</string>
+    <string name="governance_notification_channel_id">default_notifications_channel_id</string>
+    <string name="governance_notification_channel_name">Governance Notification Channel</string>
+    <string name="staking_notification_channel_id">staking_notification_channel_id</string>
+    <string name="staking_notification_channel_name">Staking Notifications Channel</string>
 
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
     <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>

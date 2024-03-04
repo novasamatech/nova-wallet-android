@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment
 import io.novafoundation.nova.feature_account_api.presenatation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment
@@ -434,6 +434,12 @@ class Navigator(
         }
 
         action?.let { navController?.navigate(it, bundle) }
+    }
+
+    override fun openAssetDetailsByDeepLink(assetPayload: AssetPayload) {
+        val bundle = BalanceDetailFragment.getBundle(assetPayload)
+
+        navController?.navigate(R.id.action_root_to_balanceDetailFragment, bundle)
     }
 
     override fun openAddNode() {

@@ -14,15 +14,14 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DEFAULT_NOTIFICATION_ID
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdReceiver
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -38,15 +37,16 @@ class StakingRewardNotificationHandler(
     private val tokenRepository: TokenRepository,
     private val deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
     override val chainRegistry: ChainRegistry,
-    notificationIdReceiver: NotificationIdReceiver,
+    notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
-    notificationIdReceiver,
+    notificationIdProvider,
     gson,
     notificationManager,
-    resourceManager
+    resourceManager,
+    channel = NovaNotificationChannel.STAKING
 ), PushChainRegestryHolder {
 
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {

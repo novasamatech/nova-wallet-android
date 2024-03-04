@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.validations.UnlockReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.validations.unlockReferendumValidationSystem
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.ConfirmGovernanceUnlockViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.hints.ConfirmGovernanceUnlockHintsMixinFactory

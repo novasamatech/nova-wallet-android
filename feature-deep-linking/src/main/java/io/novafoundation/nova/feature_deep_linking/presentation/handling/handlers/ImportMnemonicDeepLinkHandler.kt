@@ -9,13 +9,13 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.AdvancedEncryptionModel
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.emptyFlow
 private const val IMPORT_WALLET_DEEP_LINK_PREFIX = "/create/wallet"
 
 class ImportMnemonicDeepLinkHandler(
-    private val accountRouter: AccountRouter,
+    private val router: DeepLinkingRouter,
     private val encryptionDefaults: EncryptionDefaults,
     private val accountRepository: AccountRepository,
     private val automaticInteractionGate: AutomaticInteractionGate,
@@ -61,7 +61,7 @@ class ImportMnemonicDeepLinkHandler(
             AddAccountPayload.MetaAccount
         )
 
-        accountRouter.openImportAccountScreen(importAccountPayload)
+        router.openImportAccountScreen(importAccountPayload)
     }
 
     private fun prepareMnemonicPreset(

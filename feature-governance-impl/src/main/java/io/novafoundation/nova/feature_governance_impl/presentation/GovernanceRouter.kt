@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_api.presentation
+package io.novafoundation.nova.feature_governance_impl.presentation
 
 import android.os.Bundle
 import io.novafoundation.nova.common.navigation.ReturnableRouter

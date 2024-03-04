@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Secr
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.asImportType
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin.Presentation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

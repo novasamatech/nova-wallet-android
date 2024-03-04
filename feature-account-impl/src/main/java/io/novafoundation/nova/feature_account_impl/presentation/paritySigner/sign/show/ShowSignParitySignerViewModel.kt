@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.sign.scan.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_api.presenatation.paritySigner.sign.scan.mapValidityPeriodToParcel

@@ -5,13 +5,12 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHan
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.buildDeepLink
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
-import io.novafoundation.nova.feature_governance_api.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -33,10 +32,9 @@ class ReferendumDeepLinkConfigPayload(
 )
 
 class ReferendumDeepLinkHandler(
-    private val governanceRouter: GovernanceRouter,
+    private val router: DeepLinkingRouter,
     private val chainRegistry: ChainRegistry,
     private val mutableGovernanceState: MutableGovernanceState,
-    private val accountRepository: AccountRepository,
     private val automaticInteractionGate: AutomaticInteractionGate,
     private val resourceManager: ResourceManager
 ) : DeepLinkHandler, DeepLinkConfigurator<ReferendumDeepLinkConfigPayload> {
@@ -67,7 +65,7 @@ class ReferendumDeepLinkHandler(
         val payload = ReferendumDetailsPayload(referendumId)
 
         mutableGovernanceState.update(chain.id, chain.utilityAsset.id, governanceType)
-        governanceRouter.openReferendum(payload)
+        router.openReferendum(payload)
     }
 
     private fun Uri.getChainId(): String? {

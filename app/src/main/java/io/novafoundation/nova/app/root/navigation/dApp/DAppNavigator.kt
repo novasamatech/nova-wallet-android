@@ -3,7 +3,7 @@ package io.novafoundation.nova.app.root.navigation.dApp
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.feature_dapp_api.presentation.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
