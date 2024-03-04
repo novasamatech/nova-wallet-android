@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.buildDeepLink
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -51,7 +52,7 @@ class ReferendumDeepLinkHandler(
         return buildDeepLink(resourceManager, GOV_DEEP_LINK_PREFIX)
             .appendQueryParameter(PARAM_CHAIN_ID, payload.chainId)
             .appendQueryParameter(PARAM_REF_ID, payload.referendumId.toString())
-            .appendQueryParameter(PARAM_GOV_TYPE, mapGovTypeToParams(payload.governanceType).toString())
+            .appendQueryParameter(PARAM_GOV_TYPE, mapGovTypeToParams(payload.governanceType))
             .build()
     }
 
@@ -62,10 +63,7 @@ class ReferendumDeepLinkHandler(
         val referendumId = data.getReferendumId() ?: throw ReferendumHandlingException.ReferendumIsNotSpecified
         val chain = chainRegistry.getChainOrNull(chainId) ?: throw ReferendumHandlingException.ChainIsNotFound
         val governanceType = data.getGovernanceType(chain)
-        val payload =
-            io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload(
-                referendumId
-            )
+        val payload = ReferendumDetailsPayload(referendumId)
 
         mutableGovernanceState.update(chain.id, chain.utilityAsset.id, governanceType)
         router.openReferendum(payload)

@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
