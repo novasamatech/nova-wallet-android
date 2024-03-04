@@ -12,14 +12,18 @@ import kotlinx.coroutines.flow.map
 
 fun ChainRegistry.stakingChainsFlow(): Flow<List<Chain>> {
     return currentChains.map { chains ->
-        chains.filter { it.utilityAsset.supportedStakingOptions().isNotEmpty() }
+        chains.filter { it.supportedStakingOptions() }
     }
 }
 
 suspend fun ChainRegistry.stakingChains(): List<Chain> {
-    return findChains { it.utilityAsset.supportedStakingOptions().isNotEmpty() }
+    return findChains { it.supportedStakingOptions() }
 }
 
 suspend fun ChainRegistry.stakingChainsById(): ChainsById {
-    return findChainsById { it.utilityAsset.supportedStakingOptions().isNotEmpty() }
+    return findChainsById { it.supportedStakingOptions() }
+}
+
+private fun Chain.supportedStakingOptions(): Boolean {
+    return utilityAsset.supportedStakingOptions().isNotEmpty()
 }
