@@ -17,7 +17,7 @@ class DeepLinkingNavigator(
 ) : DeepLinkingRouter {
 
     override fun openAssetDetails(payload: AssetPayload) {
-        assetsRouter.openAssetDetailsByDeepLink(payload)
+        assetsRouter.openAssetDetails(payload)
     }
 
     override fun openDAppBrowser(url: String) {

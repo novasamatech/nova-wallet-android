@@ -14,8 +14,6 @@ interface AssetsRouter {
 
     fun openAssetDetails(assetPayload: AssetPayload)
 
-    fun openAssetDetailsByDeepLink(assetPayload: AssetPayload)
-
     fun back()
 
     fun openFilter(payload: TransactionHistoryFilterPayload)

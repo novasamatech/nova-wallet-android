@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <string name="deep_linking_host">nova</string>
-    <string name="deep_linking_scheme">novawallet</string>
+    <string name="deep_linking_host" translatable="false">nova</string>
+    <string name="deep_linking_scheme" translatable="false">novawallet</string>
 
     <string name="push_token_received_title">⬇️ Received %s</string>
     <string name="push_token_received_no_account_name_title">⬇️ Received</string>
@@ -40,19 +40,19 @@
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
 
+    <string name="default_notification_channel_id" translatable="false">default_notification_channel_id</string>
+    <string name="transactions_notification_channel_id" translatable="false">transactions_notification_channel_id</string>
+    <string name="governance_notification_channel_id" translatable="false">default_notifications_channel_id</string>
+    <string name="staking_notification_channel_id" translatable="false">staking_notification_channel_id</string>
+    <string name="default_notification_channel_name">Default Notification Channel</string>
+    <string name="transactions_notification_channel_name">Transactions Notification Channel</string>
+    <string name="governance_notification_channel_name">Governance Notification Channel</string>
+    <string name="staking_notification_channel_name">Staking Notifications Channel</string>
+
     <string name="push_governance_settings_new_referendum">New Referendum</string>
     <string name="push_governance_settings_referendum_update">Referendum Update</string>
     <string name="push_governance_settings_delegate_votes">Delegate has voted</string>
     <string name="common_clear">Clear</string>
-
-    <string name="default_notification_channel_id">default_notification_channel_id</string>
-    <string name="default_notification_channel_name">Default Notification Channel</string>
-    <string name="transactions_notification_channel_id">transactions_notification_channel_id</string>
-    <string name="transactions_notification_channel_name">Transactions Notification Channel</string>
-    <string name="governance_notification_channel_id">default_notifications_channel_id</string>
-    <string name="governance_notification_channel_name">Governance Notification Channel</string>
-    <string name="staking_notification_channel_id">staking_notification_channel_id</string>
-    <string name="staking_notification_channel_name">Staking Notifications Channel</string>
 
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
     <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
