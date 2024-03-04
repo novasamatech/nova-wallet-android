@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.governance
 
+import android.os.Bundle
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -115,6 +116,10 @@ class GovernanceNavigator(
 
     override fun openDelegateSearch() {
         performNavigation(R.id.action_delegateListFragment_to_delegateSearchFragment)
+    }
+
+    override fun openSelectGovernanceTracks(bundle: Bundle) {
+        performNavigation(R.id.action_open_select_governance_tracks, args = bundle)
     }
 
     override fun openReferendaSearch() {

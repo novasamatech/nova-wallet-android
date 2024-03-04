@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.adapter
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -7,14 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.model.DelegationTracksPresetModel
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.model.DelegationTracksPresetModel
 import kotlinx.android.synthetic.main.item_delegation_tracks_preset.view.itemDelegationTracksPreset
 
-class SelectDelegationTracksPresetsAdapter(
+class SelectTracksPresetsAdapter(
     private val handler: Handler
-) : ListAdapter<DelegationTracksPresetModel, DelegationTrackPresetViewHolder>(
-    DelegationTracksPresetDiffCallback
-) {
+) : ListAdapter<DelegationTracksPresetModel, DelegationTrackPresetViewHolder>(TracksPresetDiffCallback) {
 
     interface Handler {
         fun presetClicked(position: Int)
@@ -31,7 +29,7 @@ class SelectDelegationTracksPresetsAdapter(
     }
 }
 
-private object DelegationTracksPresetDiffCallback : DiffUtil.ItemCallback<DelegationTracksPresetModel>() {
+private object TracksPresetDiffCallback : DiffUtil.ItemCallback<DelegationTracksPresetModel>() {
     override fun areItemsTheSame(oldItem: DelegationTracksPresetModel, newItem: DelegationTracksPresetModel): Boolean {
         return oldItem.label == newItem.label
     }
@@ -43,7 +41,7 @@ private object DelegationTracksPresetDiffCallback : DiffUtil.ItemCallback<Delega
 
 class DelegationTrackPresetViewHolder(
     containerView: View,
-    handler: SelectDelegationTracksPresetsAdapter.Handler
+    handler: SelectTracksPresetsAdapter.Handler
 ) : ViewHolder(containerView) {
 
     init {

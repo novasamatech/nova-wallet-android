@@ -16,6 +16,19 @@
 
     <string name="common_network_not_supported">%s is not supported</string>
 
+    <plurals name="governance_select_tracks_min_tracks_error">
+        <item quantity="one">Youn need to select at least %d track</item>
+        <item quantity="other">Youn need to select at least %d tracks</item>
+    </plurals>
+
+    <string name="select_tracks_for">Select tracks for</string>
+    <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
+
+    <string name="push_governance_settings_new_referendum">New Referendum</string>
+    <string name="push_governance_settings_referendum_update">Referendum Update</string>
+    <string name="push_governance_settings_delegate_votes">Delegate has voted</string>
+    <string name="common_clear">Clear</string>
+
     <string name="default_notification_channel_id">default_notifications_channel_id</string>
     <string name="default_notification_channel_name">Default Notifications Channel</string>
 

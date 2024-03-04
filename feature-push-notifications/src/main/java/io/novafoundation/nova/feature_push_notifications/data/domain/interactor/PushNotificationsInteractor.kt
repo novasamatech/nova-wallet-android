@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_push_notifications.data.domain.interactor
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 
 interface PushNotificationsInteractor {
@@ -22,7 +23,8 @@ interface PushNotificationsInteractor {
 
 class RealPushNotificationsInteractor(
     private val pushNotificationsService: PushNotificationsService,
-    private val pushSettingsProvider: PushSettingsProvider
+    private val pushSettingsProvider: PushSettingsProvider,
+    private val chainRegistry: ChainRegistry
 ) : PushNotificationsInteractor {
 
     override suspend fun syncSettings() {

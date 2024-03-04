@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.data.PushTokenCache
@@ -18,7 +19,9 @@ import io.novafoundation.nova.feature_push_notifications.data.data.settings.Push
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.RealPushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.subscription.PushSubscriptionService
 import io.novafoundation.nova.feature_push_notifications.data.data.subscription.RealPushSubscriptionService
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.GovernancePushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealGovernancePushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealPushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.RealWelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
@@ -103,14 +106,27 @@ class PushNotificationsFeatureModule {
     @FeatureScope
     fun providePushNotificationsInteractor(
         pushNotificationsService: PushNotificationsService,
-        pushSettingsProvider: PushSettingsProvider
+        pushSettingsProvider: PushSettingsProvider,
+        chainRegistry: ChainRegistry
     ): PushNotificationsInteractor {
-        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider)
+        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider, chainRegistry)
     }
 
     @Provides
     @FeatureScope
     fun provideWelcomePushNotificationsInteractor(preferences: Preferences): WelcomePushNotificationsInteractor {
         return RealWelcomePushNotificationsInteractor(preferences)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideGovernancePushSettingsInteractor(
+        chainRegistry: ChainRegistry,
+        governanceSourceRegistry: GovernanceSourceRegistry
+    ): GovernancePushSettingsInteractor {
+        return RealGovernancePushSettingsInteractor(
+            chainRegistry,
+            governanceSourceRegistry
+        )
     }
 }

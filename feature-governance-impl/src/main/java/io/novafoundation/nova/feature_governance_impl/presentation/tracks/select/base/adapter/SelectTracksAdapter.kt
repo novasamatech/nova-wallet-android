@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.adapter
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +9,11 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.model.DelegationTrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.model.DelegationTrackModel
 import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrack
 import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrackCheckbox
 
-class SelectDelegationTracksAdapter(
+class SelectTracksAdapter(
     private val handler: Handler
 ) : ListAdapter<DelegationTrackModel, DelegationTrackViewHolder>(DiffCallback) {
 
@@ -58,7 +58,7 @@ private object DiffCallback : DiffUtil.ItemCallback<DelegationTrackModel>() {
 
 class DelegationTrackViewHolder(
     containerView: View,
-    handler: SelectDelegationTracksAdapter.Handler
+    handler: SelectTracksAdapter.Handler
 ) : ViewHolder(containerView) {
 
     init {

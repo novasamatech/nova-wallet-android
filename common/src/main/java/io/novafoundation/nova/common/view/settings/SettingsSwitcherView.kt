@@ -5,7 +5,10 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_settings_switcher.view.settingsSwitcher
 
@@ -25,8 +28,15 @@ class SettingsSwitcherView @JvmOverloads constructor(
         settingsSwitcher.text = title
     }
 
+    fun setIconTintColor(@ColorRes tintRes: Int?) {
+        settingsSwitcher.setCompoundDrawableTint(tintRes)
+    }
+
     fun setIcon(icon: Drawable?) {
-        settingsSwitcher.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+        // Set icon size 24 dp
+        val iconSize = 24.dp
+        icon?.setBounds(0, 0, iconSize, iconSize)
+        settingsSwitcher.setCompoundDrawables(icon, null, null, null)
     }
 
     fun setChecked(checked: Boolean) {

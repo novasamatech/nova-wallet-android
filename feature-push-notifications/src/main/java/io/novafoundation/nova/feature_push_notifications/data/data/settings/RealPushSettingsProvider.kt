@@ -32,16 +32,13 @@ class RealPushSettingsProvider(
             announcementsEnabled = true,
             sentTokensEnabled = true,
             receivedTokensEnabled = true,
-            governanceState = emptyList(),
-            newReferenda = emptyList(),
             subscribedMetaAccounts = setOf(accountRepository.getSelectedMetaAccount().id),
             stakingReward = PushSettings.ChainFeature.Concrete(emptyList()),
-            govMyDelegatorVoted = PushSettings.ChainFeature.Concrete(emptyList()),
-            govMyReferendumFinished = PushSettings.ChainFeature.Concrete(emptyList())
+            governance = emptyMap()
         )
     }
 
-    override fun updateWalletSettings(pushWalletSettings: PushSettings) {
+    override fun updateSettings(pushWalletSettings: PushSettings) {
         val versionedCache = pushWalletSettings.toCache()
             .toVersionedPushSettingsCache()
 

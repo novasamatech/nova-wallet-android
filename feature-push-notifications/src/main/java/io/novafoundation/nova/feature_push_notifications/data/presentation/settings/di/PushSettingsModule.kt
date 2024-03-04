@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsCommunicator
 import io.novafoundation.nova.feature_push_notifications.data.presentation.settings.PushSettingsViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -35,6 +36,7 @@ class PushSettingsModule {
         interactor: PushNotificationsInteractor,
         resourceManager: ResourceManager,
         selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
+        pushGovernanceSettingsCommunicator: PushGovernanceSettingsCommunicator,
         permissionsAsker: PermissionsAsker.Presentation,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     ): ViewModel {
@@ -43,6 +45,7 @@ class PushSettingsModule {
             interactor,
             resourceManager,
             selectMultipleWalletsCommunicator,
+            pushGovernanceSettingsCommunicator,
             actionAwaitableMixinFactory,
             permissionsAsker
         )

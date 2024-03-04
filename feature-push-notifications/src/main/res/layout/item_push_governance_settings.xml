@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.novafoundation.nova.common.view.settings.SettingsGroupView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+
+    <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+        android:id="@+id/pushGovernanceItemState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:icon="@drawable/ic_nova"
+        tools:title="Polkdaot" />
+
+    <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+        android:id="@+id/pushGovernanceItemNewReferenda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/push_governance_settings_new_referendum" />
+
+    <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+        android:id="@+id/pushGovernanceItemReferendumUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/push_governance_settings_referendum_update" />
+
+    <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+        android:id="@+id/pushGovernanceItemDelegateVotes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:title="@string/push_governance_settings_delegate_votes" />
+
+    <io.novafoundation.nova.common.view.settings.SettingsItemView
+        android:id="@+id/pushGovernanceItemTracks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/delegation_tracks" />
+
+</io.novafoundation.nova.common.view.settings.SettingsGroupView>
