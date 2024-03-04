@@ -39,6 +39,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.toHexUntyped
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 
 val Chain.typesUsage: TypesUsage
     get() = when {

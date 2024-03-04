@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.mainEthereumAddre
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -23,7 +24,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.math.BigInteger
 import java.util.UUID
 import java.util.Date
-import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.asDeferred

@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 

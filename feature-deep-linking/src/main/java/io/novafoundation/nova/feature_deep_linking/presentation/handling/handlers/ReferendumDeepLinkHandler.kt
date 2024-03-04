@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.buildDeepLink
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
