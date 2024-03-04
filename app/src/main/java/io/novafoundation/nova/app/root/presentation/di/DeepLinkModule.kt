@@ -11,6 +11,7 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.DAppDeepL
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ImportMnemonicDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.StakingDashboardDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.walletConnect.WalletConnectPairDeeplinkHandler
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepos
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -71,14 +73,12 @@ class DeepLinkModule {
         governanceRouter: GovernanceRouter,
         chainRegistry: ChainRegistry,
         mutableGovernanceState: MutableGovernanceState,
-        accountRepository: AccountRepository,
         automaticInteractionGate: AutomaticInteractionGate
     ): DeepLinkHandler {
         return ReferendumDeepLinkHandler(
             governanceRouter,
             chainRegistry,
             mutableGovernanceState,
-            accountRepository,
             automaticInteractionGate
         )
     }
@@ -90,6 +90,15 @@ class DeepLinkModule {
         resourceManager: ResourceManager
     ): DeepLinkHandler {
         return BuyCallbackDeepLinkHandler(interactor, resourceManager)
+    }
+
+    @Provides
+    @IntoSet
+    fun provideWalletConnectPairDeepLinkHandler(
+        walletConnectService: WalletConnectService,
+        automaticInteractionGate: AutomaticInteractionGate
+    ): DeepLinkHandler {
+        return WalletConnectPairDeeplinkHandler(walletConnectService, automaticInteractionGate)
     }
 
     @Provides

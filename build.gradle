@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.7.4'
-        versionCode = 113
+        versionName = '7.9.3'
+        versionCode = 121
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        fearlessLibVersion = '1.11.1'
+        substrateSdkVersion = '2.0.0'
 
         gifVersion = '1.2.19'
 
@@ -85,8 +85,8 @@ buildscript {
 
         firebaseBomVersion = '32.7.1'
 
-        walletConnectCoreVersion = "1.13.0"
-        walletConnectWalletVersion = "1.6.0"
+        walletConnectCoreVersion = "1.27.2"
+        walletConnectWalletVersion = "1.20.2"
 
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
@@ -153,7 +153,7 @@ buildscript {
         zXingCoreDep = "com.google.zxing:core:$zXingVersion"
         zXingEmbeddedDep = "com.journeyapps:zxing-android-embedded:$zXingEmbeddedVersion"
 
-        fearlessLibDep = "io.github.nova-wallet:substrate-sdk-android:$fearlessLibVersion"
+        substrateSdkDep = "io.github.nova-wallet:substrate-sdk-android:$substrateSdkVersion"
 
         gifDep = "pl.droidsonroids.gif:android-gif-drawable:$gifVersion"
 
@@ -216,6 +216,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.14'
+        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.3'
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistrVersion"
         classpath "com.github.triplet.gradle:play-publisher:$playPublisherVersion"
     }
@@ -265,6 +266,7 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     main = "com.pinterest.ktlint.Main"
     args "-F", "$project.rootDir/**/src/main/**/*.kt"
     args "--android"
+    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
 }
 
 task runTest(type: GradleBuild) {

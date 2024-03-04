@@ -36,10 +36,10 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.isHere
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.paraIdOrNull
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytes
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
+import io.novasama.substrate_sdk_android.runtime.metadata.call
+import io.novasama.substrate_sdk_android.runtime.metadata.module
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 
 // TODO: Currently message doesn't contain setTopic command in the end. It will come with XCMv3 support
 private const val SET_TOPIC_SIZE = 33
@@ -263,7 +263,7 @@ class RealCrossChainWeigher(
     private fun Chain.emptyBeneficiaryMultiLocation(): MultiLocation = emptyAccountId().accountIdToMultiLocation()
 
     private suspend fun xcmParachainDeliveryFeeFactor(chainId: ChainId, moduleName: String, paraId: ParaId): BigInteger {
-        return storageDataSource.query(chainId) {
+        return storageDataSource.query(chainId, applyStorageDefault = true) {
             runtime.metadata.module(moduleName).storage("DeliveryFeeFactor")
                 .query(
                     paraId,

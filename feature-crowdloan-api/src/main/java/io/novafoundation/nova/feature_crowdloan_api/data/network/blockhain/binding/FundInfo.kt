@@ -7,10 +7,10 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.storageReturnType
 import io.novafoundation.nova.common.utils.Modules
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u32
+import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import java.math.BigInteger
 
 class FundInfo(

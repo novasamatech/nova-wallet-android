@@ -4,15 +4,15 @@ import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import java.math.BigInteger
 
 class ProxiedFeeSignerFactory(
@@ -49,7 +49,7 @@ class ProxiedFeeSigner(
             val modifiedPayloadExtrinsic = payloadExtrinsic.wrapIntoProxyPayload(
                 proxyAccountId = getProxyAccountId(),
                 currentProxyNonce = BigInteger.ZERO,
-                proxyType = ProxyAccount.ProxyType.Any,
+                proxyType = ProxyType.Any,
                 callInstance = callInstance
             )
 

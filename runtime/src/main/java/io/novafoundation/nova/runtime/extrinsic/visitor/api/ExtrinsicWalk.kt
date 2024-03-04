@@ -2,9 +2,9 @@ package io.novafoundation.nova.runtime.extrinsic.visitor.api
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 
 interface ExtrinsicWalk {
 

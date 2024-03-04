@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.domain.interfaces
 
 import io.novafoundation.nova.common.list.GroupedList
+import io.novafoundation.nova.common.utils.Filter
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
@@ -14,9 +15,12 @@ interface MetaAccountGroupingInteractor {
 
     fun metaAccountWithTotalBalanceFlow(metaId: Long): Flow<MetaAccountWithTotalBalance>
 
-    fun getMetaAccountsForTransaction(fromId: ChainId, destinationId: ChainId): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>>
+    fun getMetaAccountsWithFilter(metaAccountFilter: Filter<MetaAccount>): Flow<GroupedList<LightMetaAccount.Type, MetaAccount>>
 
     fun updatedProxieds(): Flow<GroupedList<LightMetaAccount.Status, ProxiedAndProxyMetaAccount>>
 
-    suspend fun hasAvailableMetaAccountsForDestination(fromId: ChainId, destinationId: ChainId): Boolean
+    suspend fun hasAvailableMetaAccountsForChain(
+        chainId: ChainId,
+        metaAccountFilter: Filter<MetaAccount>
+    ): Boolean
 }

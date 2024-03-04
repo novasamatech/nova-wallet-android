@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 sealed class StakingState(
     val chain: Chain,
@@ -19,7 +19,7 @@ sealed class StakingState(
         chainAsset: Chain.Asset,
         val accountId: AccountId,
         val controllerId: AccountId,
-        val stashId: AccountId,
+        val stashId: AccountId
     ) : StakingState(chain, chainAsset) {
 
         val accountAddress: String = chain.addressOf(accountId)
@@ -58,3 +58,5 @@ sealed class StakingState(
 fun StakingState.Stash.stashTransactionOrigin(): TransactionOrigin = TransactionOrigin.WalletWithAccount(stashId)
 
 fun StakingState.Stash.controllerTransactionOrigin(): TransactionOrigin = TransactionOrigin.WalletWithAccount(controllerId)
+
+fun StakingState.Stash.accountIsStash(): Boolean = accountId.contentEquals(stashId)

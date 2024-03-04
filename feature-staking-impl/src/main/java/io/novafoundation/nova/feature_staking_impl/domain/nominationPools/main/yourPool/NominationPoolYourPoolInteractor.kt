@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor.YourPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.PoolDisplay
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

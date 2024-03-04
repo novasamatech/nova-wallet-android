@@ -2,8 +2,8 @@ package io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote
 
 import io.emeraldpay.polkaj.scale.ScaleCodecReader
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.Primitive
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.Primitive
 import kotlin.experimental.and
 import kotlin.experimental.or
 

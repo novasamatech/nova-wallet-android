@@ -10,12 +10,12 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.Nonce
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersion
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import java.math.BigInteger
 
 class ExtrinsicBuilderFactory(

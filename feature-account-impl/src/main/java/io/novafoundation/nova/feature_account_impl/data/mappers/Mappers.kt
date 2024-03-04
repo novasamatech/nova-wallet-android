@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.network.model.NetworkModel
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
+import io.novafoundation.nova.feature_proxy_api.domain.model.fromString
 
 fun mapNetworkTypeToNetworkModel(networkType: NetworkType): NetworkModel {
     val type = when (networkType) {
@@ -182,7 +184,7 @@ fun mapProxyAccountFromLocal(proxyAccountLocal: ProxyAccountLocal): ProxyAccount
             metaId = proxyMetaId,
             chainId = chainId,
             proxiedAccountId = proxiedAccountId,
-            proxyType = mapProxyTypeToString(proxyType)
+            proxyType = ProxyType.fromString(proxyType)
         )
     }
 }
@@ -205,20 +207,6 @@ fun mapAddAccountPayloadToAddAccountType(
 fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
     null -> AccountNameChooserMixin.State.NoInput
     else -> AccountNameChooserMixin.State.Input(name)
-}
-
-fun mapProxyTypeToString(proxyType: String): ProxyAccount.ProxyType {
-    return when (proxyType) {
-        "Any" -> ProxyAccount.ProxyType.Any
-        "NonTransfer" -> ProxyAccount.ProxyType.NonTransfer
-        "Governance" -> ProxyAccount.ProxyType.Governance
-        "Staking" -> ProxyAccount.ProxyType.Staking
-        "IdentityJudgement" -> ProxyAccount.ProxyType.IdentityJudgement
-        "CancelProxy" -> ProxyAccount.ProxyType.CancelProxy
-        "Auction" -> ProxyAccount.ProxyType.Auction
-        "NominationPools" -> ProxyAccount.ProxyType.NominationPools
-        else -> ProxyAccount.ProxyType.Other(proxyType)
-    }
 }
 
 private fun mapMetaAccountStateFromLocal(local: MetaAccountLocal.Status): LightMetaAccount.Status {

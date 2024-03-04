@@ -2,7 +2,7 @@ package io.novafoundation.nova.common.mixin.impl
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
-import jp.co.soramitsu.fearless_utils.wsrpc.state.SocketStateMachine.State
+import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine.State
 
 private const val ATTEMPT_THRESHOLD = 1
 

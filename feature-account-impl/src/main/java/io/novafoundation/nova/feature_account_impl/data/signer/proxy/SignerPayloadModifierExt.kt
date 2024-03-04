@@ -1,23 +1,23 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.encodeNonce
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.replaceBaseNone
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
+import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
+import io.novasama.substrate_sdk_android.runtime.extrinsic.encodeNonce
+import io.novasama.substrate_sdk_android.runtime.extrinsic.replaceBaseNone
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import java.math.BigInteger
 
 fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
     proxyAccountId: AccountId,
     currentProxyNonce: BigInteger,
-    proxyType: ProxyAccount.ProxyType,
+    proxyType: ProxyType,
     callInstance: CallRepresentation.Instance
 ): SignerPayloadExtrinsic {
     val proxiedAccountId = accountId

@@ -1,8 +1,8 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
 import io.novafoundation.nova.common.utils.system
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import java.math.BigInteger
 
 typealias BlockNumber = BigInteger

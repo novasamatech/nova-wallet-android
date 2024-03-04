@@ -4,6 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
@@ -88,7 +89,8 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
                 expectedAmountOut = Balance.ZERO
             ),
             customFeeAsset = null,
-            nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first()
+            nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first(),
+            path = QuotePath(emptyList())
         )
 
         val fee = swapService.estimateFee(swapArgs)
@@ -111,7 +113,8 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
                 expectedAmountOut = Balance.ZERO
             ),
             customFeeAsset = siri,
-            nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first()
+            nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first(),
+            path = QuotePath(emptyList())
         )
 
         val fee = swapService.estimateFee(swapArgs)

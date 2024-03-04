@@ -6,11 +6,11 @@ import io.novafoundation.nova.common.data.network.rpc.retrieveAllValues
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.storageChange
-import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.storage.SubscribeStorageRequest
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.storage.storageChange
+import io.novasama.substrate_sdk_android.wsrpc.subscriptionFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -20,8 +20,9 @@ class RemoteStorageQueryContext(
     private val subscriptionBuilder: SubstrateSubscriptionBuilder?,
     chainId: ChainId,
     at: BlockHash?,
-    runtime: RuntimeSnapshot
-) : BaseStorageQueryContext(chainId, runtime, at) {
+    runtime: RuntimeSnapshot,
+    applyStorageDefault: Boolean
+) : BaseStorageQueryContext(chainId, runtime, at, applyStorageDefault) {
 
     override suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String> {
         return bulkRetriever.retrieveAllKeys(socketService, prefix, at)

@@ -1,16 +1,16 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArray
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArray
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
+import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.module
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 

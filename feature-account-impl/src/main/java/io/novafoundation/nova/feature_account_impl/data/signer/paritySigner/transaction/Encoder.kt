@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.transaction
 
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.encodedCallData
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.encodedExtensions
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
-import jp.co.soramitsu.fearless_utils.scale.dataType.compactInt
-import jp.co.soramitsu.fearless_utils.scale.dataType.toByteArray
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedCallData
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedExtensions
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
+import io.novasama.substrate_sdk_android.scale.dataType.compactInt
+import io.novasama.substrate_sdk_android.scale.dataType.toByteArray
 
 fun SignerPayloadExtrinsic.paritySignerTxPayload(): ByteArray {
     return accountId + transientCallData() + encodedExtensions() + genesisHash

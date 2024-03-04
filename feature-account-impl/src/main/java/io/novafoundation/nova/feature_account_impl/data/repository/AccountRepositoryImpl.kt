@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
@@ -31,10 +32,10 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -119,6 +120,14 @@ class AccountRepositoryImpl(
 
     override suspend fun accountNameFor(accountId: AccountId, chainId: String): String? {
         return accountDataSource.accountNameFor(accountId, chainId)
+    }
+
+    override suspend fun activeMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.activeMetaAccounts()
+    }
+
+    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
+        return accountDataSource.allLightMetaAccounts()
     }
 
     override suspend fun hasActiveMetaAccounts(): Boolean {

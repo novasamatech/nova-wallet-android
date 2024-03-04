@@ -8,10 +8,10 @@ import java.math.BigDecimal
 typealias StakingStatsRewards = SubQueryGroupedAggregates<GroupedAggregate.Sum<StakingStatsResponse.AccumulatedReward>>
 
 class StakingStatsResponse(
-    val activeStakers: SubQueryNodes<ActiveStaker>,
+    val activeStakers: SubQueryNodes<ActiveStaker>?,
     val stakingApies: SubQueryNodes<StakingApy>,
-    val rewards: SubQueryGroupedAggregates<GroupedAggregate.Sum<AccumulatedReward>>,
-    val slashes: SubQueryGroupedAggregates<GroupedAggregate.Sum<AccumulatedReward>>
+    val rewards: SubQueryGroupedAggregates<GroupedAggregate.Sum<AccumulatedReward>>?,
+    val slashes: SubQueryGroupedAggregates<GroupedAggregate.Sum<AccumulatedReward>>?
 ) {
 
     interface WithStakingId {

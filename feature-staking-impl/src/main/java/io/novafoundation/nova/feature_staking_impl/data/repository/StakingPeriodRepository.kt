@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.repository
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 interface StakingPeriodRepository {

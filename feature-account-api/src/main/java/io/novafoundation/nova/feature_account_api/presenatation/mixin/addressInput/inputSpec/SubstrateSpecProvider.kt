@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.utils.isValidSS58Address
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

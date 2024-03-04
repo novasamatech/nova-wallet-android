@@ -19,9 +19,15 @@ fun mainStakingValidationFailure(
             getString(R.string.staking_unbonding_limit_reached_title) to
                 getString(R.string.staking_unbonding_limit_reached_message, reason.limit)
         }
+
         is StakeActionsValidationFailure.StashRequired -> {
             getString(R.string.common_error_general_title) to
                 getString(R.string.staking_stash_missing_message, reason.stashAddress)
+        }
+
+        is StakeActionsValidationFailure.StashRequiredToManageProxies -> {
+            getString(R.string.staking_manage_proxy_requires_stash_title) to
+                getString(R.string.staking_manage_proxy_requires_stash_message, reason.stashMetaAccount?.name ?: reason.stashAddress)
         }
     }
 }

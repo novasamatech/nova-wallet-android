@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedCo
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import kotlinx.coroutines.CoroutineScope
 
 class StakingEraInteractorFactory(

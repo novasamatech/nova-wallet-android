@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests
 
+import android.content.Context
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
@@ -11,7 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 abstract class BaseWalletConnectRequest(
-    private val sessionRequest: Wallet.Model.SessionRequest
+    private val sessionRequest: Wallet.Model.SessionRequest,
+    private val context: Context,
 ) : WalletConnectRequest {
 
     override val id: String = sessionRequest.request.id.toString()
@@ -30,13 +32,23 @@ abstract class BaseWalletConnectRequest(
             }
 
             Web3Wallet.respondSessionRequest(walletConnectResponse).getOrThrow()
+
+            // TODO this code is untested since no dapp currently use redirect param
+            // We cant really enable this code without testing since we need to verify a corner-case when wc is used with redirect param inside dapp browser
+            // This might potentially break user flow since it might direct user to external browser instead of staying in our dapp browser
+
+//            val redirect = sessionRequest.peerMetaData?.redirect
+//            if (!redirect.isNullOrEmpty()) {
+//                context.startActivity(Intent(Intent.ACTION_VIEW, redirect.toUri()))
+//            }
         }
     }
 }
 
 abstract class SignWalletConnectRequest(
-    sessionRequest: Wallet.Model.SessionRequest
-) : BaseWalletConnectRequest(sessionRequest) {
+    sessionRequest: Wallet.Model.SessionRequest,
+    context: Context
+) : BaseWalletConnectRequest(sessionRequest, context) {
 
     override suspend fun sentResponse(response: ExternalSignCommunicator.Response.Sent): Wallet.Params.SessionRequestResponse {
         error("Expected Signed response, got: Sent")
@@ -44,8 +56,9 @@ abstract class SignWalletConnectRequest(
 }
 
 abstract class SendTxWalletConnectRequest(
-    sessionRequest: Wallet.Model.SessionRequest
-) : BaseWalletConnectRequest(sessionRequest) {
+    sessionRequest: Wallet.Model.SessionRequest,
+    context: Context
+) : BaseWalletConnectRequest(sessionRequest, context) {
 
     override suspend fun signedResponse(response: ExternalSignCommunicator.Response.Signed): Wallet.Params.SessionRequestResponse {
         error("Expected Sent response, got: Signed")

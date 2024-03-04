@@ -29,7 +29,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPo
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.logging.HttpLoggingInterceptor
 import org.web3j.protocol.http.HttpService

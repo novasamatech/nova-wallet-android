@@ -48,10 +48,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
 import io.novafoundation.nova.runtime.multiNetwork.findEvmChain
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.toAccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers

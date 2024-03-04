@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.multiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 fun Junctions(vararg junctions: MultiLocation.Junction) = MultiLocation.Interior.Junctions(junctions.toList())

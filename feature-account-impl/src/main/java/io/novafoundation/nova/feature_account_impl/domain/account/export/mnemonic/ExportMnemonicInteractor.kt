@@ -6,8 +6,8 @@ import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

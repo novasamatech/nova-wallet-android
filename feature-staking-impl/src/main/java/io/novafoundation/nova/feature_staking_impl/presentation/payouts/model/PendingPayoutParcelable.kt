@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.payouts.model
 import android.os.Parcelable
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import kotlinx.android.parcel.Parcelize
 import java.math.BigInteger
 

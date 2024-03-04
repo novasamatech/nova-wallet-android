@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.networ
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 typealias Percent = BigInteger

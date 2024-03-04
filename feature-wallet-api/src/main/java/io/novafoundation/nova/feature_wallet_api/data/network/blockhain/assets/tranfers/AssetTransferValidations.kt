@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
@@ -47,12 +48,19 @@ sealed class AssetTransferValidationFailure {
             override val fee: BigDecimal
         ) : NotEnoughFunds(), NotEnoughToPayFeesError
 
-        class ToStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
+        class ToStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
+            NotEnoughFunds(),
+            InsufficientBalanceToStayAboveEDError
 
         class ToPayCrossChainFee(
             val usedAsset: Chain.Asset,
             val fee: BigDecimal,
             val remainingBalanceAfterTransfer: BigDecimal,
+        ) : NotEnoughFunds()
+
+        class ToStayAboveEdBeforePayingDeliveryFees(
+            val maxPossibleTransferAmount: Balance,
+            val chainAsset: Chain.Asset,
         ) : NotEnoughFunds()
     }
 
@@ -97,13 +105,6 @@ val AssetTransferPayload.isSendingCommissionAsset
 
 val AssetTransferPayload.isReceivingCommissionAsset
     get() = transfer.destinationChainAsset == transfer.destinationChain.commissionAsset
-
-val AssetTransferPayload.originFeeInUsedAsset: OriginDecimalFee?
-    get() = if (isSendingCommissionAsset) {
-        originFee
-    } else {
-        null
-    }
 
 val AssetTransferPayload.receivingAmountInCommissionAsset: BigInteger
     get() = if (isReceivingCommissionAsset) {

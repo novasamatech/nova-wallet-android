@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Request
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Response
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first

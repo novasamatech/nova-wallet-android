@@ -28,7 +28,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.closeToExpire
 import io.novafoundation.nova.runtime.extrinsic.remainingTime
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay

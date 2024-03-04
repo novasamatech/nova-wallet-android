@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
@@ -76,9 +77,9 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
-import jp.co.soramitsu.fearless_utils.encrypt.Signer
-import jp.co.soramitsu.fearless_utils.icon.IconGenerator
-import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.encrypt.Signer
+import io.novasama.substrate_sdk_android.icon.IconGenerator
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
@@ -236,6 +237,8 @@ interface AssetsFeatureDependencies {
     val swapRateFormatter: SwapRateFormatter
 
     val bottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
 
     val chainStateRepository: ChainStateRepository
 }

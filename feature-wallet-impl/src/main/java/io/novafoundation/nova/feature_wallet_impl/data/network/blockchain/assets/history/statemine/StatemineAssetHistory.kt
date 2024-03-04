@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
+import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.isSwapSupported
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
@@ -21,10 +22,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.hasSameId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.metadata.call
+import io.novasama.substrate_sdk_android.runtime.metadata.module
 
 class StatemineAssetHistory(
     private val chainRegistry: ChainRegistry,
@@ -34,11 +35,14 @@ class StatemineAssetHistory(
     coinPriceRepository: CoinPriceRepository
 ) : SubstrateAssetHistory(walletOperationsApi, cursorStorage, realtimeOperationFetcherFactory, coinPriceRepository) {
 
-    override fun realtimeFetcherSources(): List<Source> {
-        return listOf(
-            TransferExtractor().asSource(),
-            Source.Known.Id.ASSET_CONVERSION_SWAP.asSource()
-        )
+    override fun realtimeFetcherSources(chain: Chain): List<Source> {
+        return buildList {
+            add(TransferExtractor().asSource())
+
+            if (chain.swap.assetConversionSupported()) {
+                add(Source.Known.Id.ASSET_CONVERSION_SWAP.asSource())
+            }
+        }
     }
 
     override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {

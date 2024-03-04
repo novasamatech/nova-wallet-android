@@ -33,8 +33,8 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.rep
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.state.selectedOption
-import jp.co.soramitsu.fearless_utils.hash.isPositive
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

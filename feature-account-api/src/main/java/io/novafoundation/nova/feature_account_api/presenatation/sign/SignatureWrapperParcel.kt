@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_api.presenatation.sign
 
 import android.os.Parcelable
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import kotlinx.android.parcel.Parcelize
 
 sealed class SignatureWrapperParcel : Parcelable {

@@ -10,10 +10,10 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b128Concat
-import jp.co.soramitsu.fearless_utils.hash.Hasher.xxHash128
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b128Concat
+import io.novasama.substrate_sdk_android.hash.Hasher.xxHash128
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onEach

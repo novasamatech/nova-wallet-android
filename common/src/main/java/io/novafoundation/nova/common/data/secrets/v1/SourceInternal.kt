@@ -1,8 +1,8 @@
 package io.novafoundation.nova.common.data.secrets.v1
 
-import jp.co.soramitsu.fearless_utils.scale.Schema
-import jp.co.soramitsu.fearless_utils.scale.byteArray
-import jp.co.soramitsu.fearless_utils.scale.string
+import io.novasama.substrate_sdk_android.scale.Schema
+import io.novasama.substrate_sdk_android.scale.byteArray
+import io.novasama.substrate_sdk_android.scale.string
 
 internal enum class SourceType {
     CREATE, SEED, MNEMONIC, JSON, UNSPECIFIED

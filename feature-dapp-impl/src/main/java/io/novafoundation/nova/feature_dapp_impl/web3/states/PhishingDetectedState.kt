@@ -5,10 +5,12 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMa
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.State
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.StateMachineTransition
 
-open class PhishingDetectedState<R : Web3Transport.Request<*>, S> : State<R, S> {
+abstract class PhishingDetectedState<R : Web3Transport.Request<*>, S> : State<R, S> {
+
+    abstract fun rejectError(): Throwable
 
     override suspend fun acceptRequest(request: R, transition: StateMachineTransition<S>) {
-        request.reject(IllegalStateException("Phishing detected!"))
+        request.reject(rejectError())
     }
 
     override suspend fun acceptEvent(event: ExternalEvent, transition: StateMachineTransition<S>) {

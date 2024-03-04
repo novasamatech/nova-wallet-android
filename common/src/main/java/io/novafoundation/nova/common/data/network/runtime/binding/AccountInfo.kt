@@ -2,10 +2,10 @@ package io.novafoundation.nova.common.data.network.runtime.binding
 
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.system
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import java.math.BigInteger
 
 open class AccountBalance(
@@ -25,6 +25,8 @@ open class AccountBalance(
         }
     }
 }
+
+fun AccountBalance?.orEmpty(): AccountBalance = this ?: AccountBalance.empty()
 
 class AccountData(
     free: BigInteger,
@@ -113,12 +115,32 @@ fun bindNonce(dynamicInstance: Any?): BigInteger {
 fun bindAccountInfo(scale: String, runtime: RuntimeSnapshot): AccountInfo {
     val type = runtime.metadata.system().storage("Account").returnType()
 
-    val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
+    val dynamicInstance = type.fromHexOrNull(runtime, scale)
+
+    return bindAccountInfo(dynamicInstance)
+}
+
+fun bindAccountInfo(decoded: Any?): AccountInfo {
+    val dynamicInstance = decoded.cast<Struct.Instance>()
 
     return AccountInfo(
         consumers = dynamicInstance.getTyped<BigInteger?>("consumers").orZero(),
         providers = dynamicInstance.getTyped<BigInteger?>("providers").orZero(),
         sufficients = dynamicInstance.getTyped<BigInteger?>("sufficients").orZero(),
         data = bindAccountData(dynamicInstance.getTyped("data"))
+    )
+}
+
+fun bindOrmlAccountBalanceOrEmpty(decoded: Any?): AccountBalance {
+    return decoded?.let { bindOrmlAccountData(decoded) } ?: AccountBalance.empty()
+}
+
+fun bindOrmlAccountData(decoded: Any?): AccountBalance {
+    val dynamicInstance = decoded.cast<Struct.Instance>()
+
+    return AccountBalance(
+        free = bindNumber(dynamicInstance["free"]),
+        reserved = bindNumber(dynamicInstance["reserved"]),
+        frozen = bindNumber(dynamicInstance["frozen"]),
     )
 }

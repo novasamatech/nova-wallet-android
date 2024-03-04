@@ -15,9 +15,9 @@ import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.ext.requireOrml
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
 class OrmlAssetTransfers(

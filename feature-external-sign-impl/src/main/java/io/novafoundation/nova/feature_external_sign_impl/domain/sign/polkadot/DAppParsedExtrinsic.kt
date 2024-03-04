@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot
 
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Era
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Era
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import java.math.BigInteger
 
 class DAppParsedExtrinsic(

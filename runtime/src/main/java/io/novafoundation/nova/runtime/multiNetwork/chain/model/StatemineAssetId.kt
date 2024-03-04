@@ -2,12 +2,12 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHexUntyped
-import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
+import io.novasama.substrate_sdk_android.runtime.definitions.types.toHexUntyped
+import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 import java.math.BigInteger
 
 sealed interface StatemineAssetId {

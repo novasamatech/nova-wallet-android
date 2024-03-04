@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class OnChainIdentityProvider(
     private val onChainIdentityRepository: OnChainIdentityRepository

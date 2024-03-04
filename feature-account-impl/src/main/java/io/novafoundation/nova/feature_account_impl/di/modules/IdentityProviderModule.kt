@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChai
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.account.identity.LocalIdentityProvider
 import io.novafoundation.nova.feature_account_impl.domain.account.identity.OnChainIdentityProvider
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class IdentityProviderModule {
@@ -16,9 +17,10 @@ class IdentityProviderModule {
     @Provides
     @LocalIdentity
     fun provideLocalIdentityProvider(
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry
     ): IdentityProvider {
-        return LocalIdentityProvider(accountRepository)
+        return LocalIdentityProvider(accountRepository, chainRegistry)
     }
 
     @Provides

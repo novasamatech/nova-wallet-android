@@ -15,12 +15,19 @@ import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -30,6 +37,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQuer
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
@@ -74,7 +82,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.controller.ControllerInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.RealStakingProxyListInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.StakingProxyListInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RealRemoveStakingProxyInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RemoveStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rebond.RebondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rewardDestination.ChangeRewardDestinationInteractor
@@ -601,5 +613,43 @@ class StakingFeatureModule {
         computationalCache = computationalCache,
         accountRepository = accountRepository,
         chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideAddProxyRepository(
+        extrinsicService: ExtrinsicService,
+        proxyDepositCalculator: ProxyDepositCalculator,
+        getProxyRepository: GetProxyRepository,
+        proxyConstantsRepository: ProxyConstantsRepository,
+        proxySyncService: ProxySyncService
+    ): AddStakingProxyInteractor {
+        return RealAddStakingProxyInteractor(
+            extrinsicService,
+            proxyDepositCalculator,
+            getProxyRepository,
+            proxyConstantsRepository,
+            proxySyncService
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingProxyListInteractor(
+        getProxyRepository: GetProxyRepository,
+        @LocalIdentity identityProvider: IdentityProvider
+    ): StakingProxyListInteractor = RealStakingProxyListInteractor(
+        getProxyRepository,
+        identityProvider
+    )
+
+    @Provides
+    @FeatureScope
+    fun removeStakingProxyInteractor(
+        extrinsicService: ExtrinsicService,
+        proxySyncService: ProxySyncService
+    ): RemoveStakingProxyInteractor = RealRemoveStakingProxyInteractor(
+        extrinsicService,
+        proxySyncService
     )
 }

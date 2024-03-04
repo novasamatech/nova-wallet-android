@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.f
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
 
 class EvmErc20AssetHistory(

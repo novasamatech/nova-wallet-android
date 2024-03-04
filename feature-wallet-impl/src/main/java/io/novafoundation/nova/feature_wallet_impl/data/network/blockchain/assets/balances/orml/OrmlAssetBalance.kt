@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
+import io.novafoundation.nova.common.data.network.runtime.binding.bindOrmlAccountBalanceOrEmpty
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -11,6 +12,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
@@ -19,10 +23,11 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
@@ -68,6 +73,23 @@ class OrmlAssetBalance(
             keyBuilder = { it.ormlBalanceKey(accountId, chainAsset) },
             binding = { scale, runtime -> bindOrmlAccountBalanceOrEmpty(scale, runtime) }
         )
+    }
+
+    override suspend fun subscribeTransferableAccountBalance(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        sharedSubscriptionBuilder: SharedRequestsBuilder
+    ): Flow<Balance> {
+        return remoteStorageSource.subscribe(chain.id, sharedSubscriptionBuilder) {
+            metadata.tokens().storage("Accounts").observe(
+                accountId,
+                chainAsset.ormlCurrencyId(runtime),
+                binding = ::bindOrmlAccountBalanceOrEmpty
+            ).map {
+                Asset.TransferableMode.REGULAR.calculateTransferable(it)
+            }
+        }
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {

@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.participatingBondedPoolStateFlow
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.poolState.isPoolStaking
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.amountOf
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector

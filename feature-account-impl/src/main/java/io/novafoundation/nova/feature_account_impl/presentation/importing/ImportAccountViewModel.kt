@@ -19,8 +19,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.ImportSourceFactory
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.FileRequester
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.ImportError
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.junction.JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch

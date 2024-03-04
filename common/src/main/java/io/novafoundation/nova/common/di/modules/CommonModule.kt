@@ -64,8 +64,8 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.common.view.bottomSheet.description.RealDescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.input.chooser.RealListChooserMixinFactory
-import jp.co.soramitsu.fearless_utils.encrypt.Signer
-import jp.co.soramitsu.fearless_utils.icon.IconGenerator
+import io.novasama.substrate_sdk_android.encrypt.Signer
+import io.novasama.substrate_sdk_android.icon.IconGenerator
 import java.security.SecureRandom
 import java.util.Random
 import javax.inject.Qualifier
