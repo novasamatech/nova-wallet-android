@@ -19,9 +19,9 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -54,7 +54,7 @@ class StakingRewardNotificationHandler(
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.STAKING_REWARD)
         val chain = content.getChain()
-        val recipient = content.extractPayloadField<String>("recipient")
+        val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
         val amount = content.extractBigInteger("amount")
 
         val metaAccountsCount = accountRepository.getActiveMetaAccountsQuantity()
@@ -65,7 +65,7 @@ class StakingRewardNotificationHandler(
                 context,
                 getTitle(metaAccountsCount, metaAccount),
                 getMessage(chain, amount),
-                makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+                makeAssetDetailsIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
             ).build()
 
         notify(notification)

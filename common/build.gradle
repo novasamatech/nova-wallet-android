@@ -37,6 +37,8 @@ android {
         buildConfigField "String", "NOVA_WALLET_WIKI_PROXY", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/delegated-authorities-proxies\""
 
         buildConfigField "String", "LEDGER_BLEUTOOTH_GUIDE", "\"https://support.ledger.com/hc/en-us/articles/360019138694-Set-up-Bluetooth-connection\""
+
+        buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://play.google.com/store/apps/details?id=io.novafoundation.nova.market\""
     }
 
     buildTypes {

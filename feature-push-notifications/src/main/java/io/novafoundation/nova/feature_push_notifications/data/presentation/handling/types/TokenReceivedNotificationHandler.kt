@@ -17,16 +17,16 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.assetByOnChainAssetIdOrUtility
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.ext.onChainAssetId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -55,8 +55,8 @@ class TokenReceivedNotificationHandler(
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.TOKENS_RECEIVED)
         val chain = content.getChain()
-        val recipient = content.extractPayloadField<String>("recipient")
-        val assetId = content.extractPayloadField<String?>("assetId")
+        val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
+        val assetId = content.extractPayloadFieldsWithPath<String?>("assetId")
         val amount = content.extractBigInteger("amount")
 
         val metaAccountsQuantity = accountRepository.getActiveMetaAccountsQuantity()
@@ -67,7 +67,7 @@ class TokenReceivedNotificationHandler(
                 context,
                 getTitle(metaAccountsQuantity, recipientMetaAccount),
                 getMessage(chain, assetId, amount),
-                makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+                makeAssetDetailsIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
             ).build()
 
         notify(notification)
@@ -88,7 +88,7 @@ class TokenReceivedNotificationHandler(
         assetId: String?,
         amount: BigInteger
     ): String {
-        val asset = chain.assets.firstOrNull { it.onChainAssetId == assetId } ?: chain.utilityAsset
+        val asset = chain.assetByOnChainAssetIdOrUtility(assetId)
         val token = tokenRepository.getTokenOrNull(asset)
         val tokenAmount = amount.formatPlanks(asset)
         val fiatAmount = token?.planksToFiat(amount)
@@ -98,9 +98,5 @@ class TokenReceivedNotificationHandler(
             fiatAmount != null -> resourceManager.getString(R.string.push_token_received_message, tokenAmount, fiatAmount, chain.name)
             else -> resourceManager.getString(R.string.push_token_received_message_no_fiat, tokenAmount, chain.name)
         }
-    }
-
-    fun generateUniqueNotificationId(): Int {
-        return System.currentTimeMillis().toInt()
     }
 }

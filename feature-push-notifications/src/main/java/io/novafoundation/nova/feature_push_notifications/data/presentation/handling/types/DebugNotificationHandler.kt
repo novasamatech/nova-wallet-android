@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.R
@@ -21,6 +22,7 @@ private const val DEBUG_NOTIFICATION_ID = -1
  */
 class DebugNotificationHandler(
     private val context: Context,
+    private val activityIntentProvider: ActivityIntentProvider,
     private val notificationManager: NotificationManagerCompat,
     private val resourceManager: ResourceManager
 ) : NotificationHandler {
@@ -44,6 +46,7 @@ class DebugNotificationHandler(
                 context,
                 "Notification handling error!",
                 "The notification was not handled\n${message.data}",
+                activityIntentProvider.getIntent()
             ).build()
 
         notify(notification)
@@ -51,7 +54,7 @@ class DebugNotificationHandler(
         return true
     }
 
-    override fun notify(notification: Notification) {
+    private fun notify(notification: Notification) {
         notificationManager.notify(DEBUG_NOTIFICATION_ID, notification)
     }
 }

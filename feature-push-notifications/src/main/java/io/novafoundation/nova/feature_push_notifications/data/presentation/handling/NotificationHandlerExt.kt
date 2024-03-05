@@ -3,13 +3,18 @@ package io.novafoundation.nova.feature_push_notifications.data.presentation.hand
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsLinkConfigPayload
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkConfigPayload
+import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatusType
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
+import io.novafoundation.nova.runtime.ext.onChainAssetId
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
@@ -37,27 +42,22 @@ internal fun NotificationData.requireType(type: String) {
  * Example: {a_field: {b_field: {c_field: "value"}}}
  * To take a value from c_field use getPayloadFieldContent("a_field", "b_field", "c_field")
  */
-internal inline fun <reified T> NotificationData.extractPayloadField(vararg fields: String): T {
-    var payloadContent = payload
-
+internal inline fun <reified T> NotificationData.extractPayloadFieldsWithPath(vararg fields: String): T {
     val fieldsBeforeLast = fields.dropLast(1)
     val last = fields.last()
 
-    fieldsBeforeLast.forEach {
-        payloadContent = payloadContent[it] as? Map<String, Any> ?: throw NullPointerException("Notification parameter $it is null")
+    val lastSearchingValue = fieldsBeforeLast.fold(payload) { acc, field ->
+        acc[field] as? Map<String, Any> ?: throw NullPointerException("Notification parameter $field is null")
     }
 
-    val result = payloadContent[last] ?: return null as T
+    val result = lastSearchingValue[last] ?: return null as T
 
     return result as? T ?: throw NullPointerException("Notification parameter $last is null")
 }
 
 internal fun NotificationData.extractBigInteger(vararg fields: String): BigInteger {
-    return when (val value = extractPayloadField<Any>(*fields)) {
-        is Float -> value.toLong().toBigInteger()
-        is Double -> value.toLong().toBigInteger()
-        else -> BigInteger(value.toString())
-    }
+    return extractPayloadFieldsWithPath<Any>(*fields)
+        .asGsonParsedNumber()
 }
 
 internal fun MetaAccount.formattedAccountName(): String {
@@ -73,7 +73,7 @@ fun Context.makePendingIntent(intent: Intent): PendingIntent {
     )
 }
 
-fun makeReferendumPendingIntent(
+fun makeReferendumIntent(
     deepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
     chainId: String,
     referendumId: BigInteger
@@ -83,7 +83,7 @@ fun makeReferendumPendingIntent(
     return Intent(Intent.ACTION_VIEW, deepLink)
 }
 
-fun makeAssetDetailsPendingIntent(
+fun makeAssetDetailsIntent(
     deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
     chainId: String,
     assetId: Int
@@ -97,7 +97,7 @@ fun NotificationCompat.Builder.buildWithDefaults(
     context: Context,
     title: String,
     message: String,
-    contentIntent: Intent = Intent()
+    contentIntent: Intent
 ): NotificationCompat.Builder {
     return setContentTitle(title)
         .setContentText(message)
@@ -109,4 +109,25 @@ fun NotificationCompat.Builder.buildWithDefaults(
                 .bigText(message)
         )
         .setContentIntent(context.makePendingIntent(contentIntent))
+}
+
+fun makeNewReleasesIntent(
+    storeLink: String
+): Intent {
+    return Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(storeLink) }
+}
+
+fun String.mapReferendumType(): ReferendumStatusType {
+    return when (this) {
+        "Approved" -> ReferendumStatusType.APPROVED
+        "Rejected" -> ReferendumStatusType.REJECTED
+        "TimedOut" -> ReferendumStatusType.TIMED_OUT
+        "Cancelled" -> ReferendumStatusType.CANCELLED
+        "DecisionStarted" -> ReferendumStatusType.DECIDING
+        else -> throw IllegalArgumentException("Unknown referendum status type: $this")
+    }
+}
+
+fun Chain.assetByOnChainAssetIdOrUtility(assetId: String?): Chain.Asset {
+    return assets.firstOrNull { it.onChainAssetId == assetId } ?: utilityAsset
 }

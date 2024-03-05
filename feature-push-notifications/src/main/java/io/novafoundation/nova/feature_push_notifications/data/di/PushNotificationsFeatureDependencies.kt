@@ -6,6 +6,8 @@ import com.google.gson.Gson
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.di.modules.StoreLink
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
@@ -47,4 +49,9 @@ interface PushNotificationsFeatureDependencies {
     val assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
 
     val tokenRepository: TokenRepository
+
+    val provideActivityIntentProvider: ActivityIntentProvider
+
+    @StoreLink
+    fun storeLink(): String
 }

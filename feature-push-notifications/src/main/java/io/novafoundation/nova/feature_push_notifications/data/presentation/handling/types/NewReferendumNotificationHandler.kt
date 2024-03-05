@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumPendingIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -49,7 +49,7 @@ class NewReferendumNotificationHandler(
                 context,
                 resourceManager.getString(R.string.push_new_referendum_title),
                 resourceManager.getString(R.string.push_new_referendum_message, chain.name, referendumId.format()),
-                makeReferendumPendingIntent(referendumDeepLinkConfigurator, chain.id, referendumId)
+                makeReferendumIntent(referendumDeepLinkConfigurator, chain.id, referendumId)
             ).build()
 
         notify(notification)
