@@ -5,6 +5,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
@@ -13,6 +14,7 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 
 class SystemNotificationHandler(
     private val context: Context,
+    private val activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
@@ -32,7 +34,7 @@ class SystemNotificationHandler(
         val body = notificationPart.body ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .buildWithDefaults(context, title, body)
+            .buildWithDefaults(context, title, body, activityIntentProvider.getIntent())
             .build()
 
         notify(notification)

@@ -8,8 +8,10 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
@@ -45,12 +47,13 @@ class NotificationHandlersModule {
     @IntoSet
     fun systemNotificationHandler(
         context: Context,
+        activityIntentProvider: ActivityIntentProvider,
         notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
         gson: Gson
     ): NotificationHandler {
-        return SystemNotificationHandler(context, notificationIdProvider, gson, notificationManagerCompat, resourceManager)
+        return SystemNotificationHandler(context, activityIntentProvider, notificationIdProvider, gson, notificationManagerCompat, resourceManager)
     }
 
     @Provides
@@ -159,6 +162,7 @@ class NotificationHandlersModule {
     @IntoSet
     fun newReleaseNotificationHandler(
         context: Context,
+        appLinksProvider: AppLinksProvider,
         notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
@@ -166,6 +170,7 @@ class NotificationHandlersModule {
     ): NotificationHandler {
         return NewReleaseNotificationHandler(
             context,
+            appLinksProvider,
             notificationIdProvider,
             gson,
             notificationManagerCompat,
@@ -198,10 +203,11 @@ class NotificationHandlersModule {
     @Provides
     fun debugNotificationHandler(
         context: Context,
+        activityIntentProvider: ActivityIntentProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager
     ): DebugNotificationHandler {
-        return DebugNotificationHandler(context, notificationManagerCompat, resourceManager)
+        return DebugNotificationHandler(context, activityIntentProvider, notificationManagerCompat, resourceManager)
     }
 
     @Provides

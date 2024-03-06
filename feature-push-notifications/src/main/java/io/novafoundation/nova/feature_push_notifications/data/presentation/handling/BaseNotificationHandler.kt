@@ -36,7 +36,7 @@ abstract class BaseNotificationHandler(
             .getOrNull() ?: false
     }
 
-    override fun notify(notification: Notification) {
+    internal fun notify(notification: Notification) {
         notificationManager.notify(notificationIdProvider.getId(), notification)
     }
 

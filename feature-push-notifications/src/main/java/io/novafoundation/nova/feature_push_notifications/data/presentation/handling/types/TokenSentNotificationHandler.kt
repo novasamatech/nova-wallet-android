@@ -9,7 +9,6 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDeta
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
@@ -17,16 +16,17 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.assetByOnChainAssetIdOrUtility
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadField
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsPendingIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.isNotSingleMetaAccount
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.notificationAmountFormat
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.ext.onChainAssetId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -55,21 +55,20 @@ class TokenSentNotificationHandler(
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.TOKENS_SENT)
         val chain = content.getChain()
-        val sender = content.extractPayloadField<String>("sender")
-        val recipient = content.extractPayloadField<String>("recipient")
-        val assetId = content.extractPayloadField<String?>("assetId")
+        val sender = content.extractPayloadFieldsWithPath<String>("sender")
+        val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
+        val assetId = content.extractPayloadFieldsWithPath<String?>("assetId")
         val amount = content.extractBigInteger("amount")
 
-        val metaAccountsQuantity = accountRepository.getActiveMetaAccountsQuantity()
         val senderMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(sender), chain.id) ?: return false
         val recipientMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recipient), chain.id)
 
         val notification = NotificationCompat.Builder(context, channelId)
             .buildWithDefaults(
                 context,
-                getTitle(metaAccountsQuantity, senderMetaAccount),
+                getTitle(senderMetaAccount),
                 getMessage(chain, recipientMetaAccount, recipient, assetId, amount),
-                makeAssetDetailsPendingIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+                makeAssetDetailsIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
             ).build()
 
         notify(notification)
@@ -77,10 +76,10 @@ class TokenSentNotificationHandler(
         return true
     }
 
-    private fun getTitle(metaAccountsQuantity: Int, senderMetaAccount: MetaAccount?): String {
+    private suspend fun getTitle(senderMetaAccount: MetaAccount?): String {
         val accountName = senderMetaAccount?.formattedAccountName()
         return when {
-            metaAccountsQuantity > 1 && accountName != null -> resourceManager.getString(R.string.push_token_sent_title, accountName)
+            accountRepository.isNotSingleMetaAccount() && accountName != null -> resourceManager.getString(R.string.push_token_sent_title, accountName)
             else -> resourceManager.getString(R.string.push_token_sent_no_account_name_title)
         }
     }
@@ -92,17 +91,12 @@ class TokenSentNotificationHandler(
         assetId: String?,
         amount: BigInteger
     ): String {
-        val asset = chain.assets.firstOrNull { it.onChainAssetId == assetId } ?: chain.utilityAsset
+        val asset = chain.assetByOnChainAssetIdOrUtility(assetId)
         val token = tokenRepository.getTokenOrNull(asset)
-        val tokenAmount = amount.formatPlanks(asset)
-        val fiatAmount = token?.planksToFiat(amount)
-            ?.formatAsCurrency(token.currency)
+        val formattedAmount = notificationAmountFormat(asset, token, amount)
 
         val accountNameOrAddress = recipientMetaAccount?.formattedAccountName() ?: recipientAddress
 
-        return when {
-            fiatAmount != null -> resourceManager.getString(R.string.push_token_sent_message, tokenAmount, fiatAmount, accountNameOrAddress, chain.name)
-            else -> resourceManager.getString(R.string.push_token_sent_message_no_fiat, tokenAmount, accountNameOrAddress, chain.name)
-        }
+        return resourceManager.getString(R.string.push_token_sent_message, formattedAmount, accountNameOrAddress, chain.name)
     }
 }

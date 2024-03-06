@@ -4,18 +4,20 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 
-enum class ReferendumStatusType(val id: String) {
-    WAITING_DEPOSIT("WaitingForDeposit"),
-    PREPARING("Preparing"),
-    IN_QUEUE("InQueue"),
-    DECIDING("Deciding"),
-    CONFIRMING("Confirming"),
-    APPROVED("Approved"),
-    EXECUTED("Executed"),
-    TIMED_OUT("TimedOut"),
-    KILLED("Killed"),
-    CANCELLED("Cancelled"),
-    REJECTED("Rejected")
+enum class ReferendumStatusType {
+    WAITING_DEPOSIT,
+    PREPARING,
+    IN_QUEUE,
+    DECIDING,
+    CONFIRMING,
+    APPROVED,
+    EXECUTED,
+    TIMED_OUT,
+    KILLED,
+    CANCELLED,
+    REJECTED;
+
+    companion object
 }
 
 sealed class ReferendumStatus {
@@ -77,5 +79,3 @@ sealed class PreparingReason {
 
     data class DecidingIn(val timeLeft: TimerValue) : PreparingReason()
 }
-
-fun String.asReferendumStatusType(): ReferendumStatusType? = ReferendumStatusType.values().find { it.id == this }
