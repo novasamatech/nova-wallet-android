@@ -1,4 +1,4 @@
-package io.novafoundation.nova.app.root.presentation.deepLinks
+package io.novafoundation.nova.feature_deep_linking.presentation.handling
 
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow

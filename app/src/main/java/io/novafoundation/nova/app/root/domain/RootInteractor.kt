@@ -4,7 +4,6 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
-import io.novafoundation.nova.feature_buy_impl.domain.providers.ExternalProvider
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
@@ -17,8 +16,6 @@ class RootInteractor(
 ) {
 
     fun runBalancesUpdate(): Flow<Updater.SideEffect> = updateSystem.start()
-
-    fun isBuyProviderRedirectLink(link: String) = ExternalProvider.REDIRECT_URL_BASE in link
 
     suspend fun updatePhishingAddresses() {
         runCatching {

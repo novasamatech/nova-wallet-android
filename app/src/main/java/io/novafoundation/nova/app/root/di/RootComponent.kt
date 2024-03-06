@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
@@ -71,7 +72,8 @@ interface RootComponent {
             RuntimeApi::class,
             VersionsFeatureApi::class,
             WalletConnectFeatureApi::class,
-            PushNotificationsFeatureApi::class
+            PushNotificationsFeatureApi::class,
+            DeepLinkingFeatureApi::class
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

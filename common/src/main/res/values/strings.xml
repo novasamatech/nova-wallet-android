@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="deep_linking_host" translatable="false">nova</string>
+    <string name="deep_linking_scheme" translatable="false">novawallet</string>
+
+    <string name="push_token_received_title">⬇️ Received %s</string>
+    <string name="push_token_received_no_account_name_title">⬇️ Received</string>
+    <string name="push_token_received_message">Received %s on %s</string>
+
+    <string name="push_token_sent_title">💸 Sent %s</string>
+    <string name="push_token_sent_no_account_name_title">💸 Sent</string>
+    <string name="push_token_sent_message">Sent %1$s to %2$s on %3$s</string>
+
+    <string name="push_staking_reward_single_account_title">⭐️ New reward</string>
+    <string name="push_staking_reward_many_accounts_title">⭐️ New reward %s</string>
+    <string name="push_staking_reward_message">Received %s from %s staking</string>
+
+    <string name="push_referendum_approved_title">✅ Referendum approved!</string>
+    <string name="push_referendum_approved_message">%1$s referendum #%2$s has ended and been approved 🎉</string>
+    <string name="push_referendum_rejected_title">❌ Referendum rejected!</string>
+    <string name="push_referendum_rejected_message">%1$s referendum #%2$s has ended and been rejected!</string>
+    <string name="push_referendum_status_changed_title">🗳️ Referendum status changed</string>
+    <string name="push_referendum_from_to_status_changed_message">%1$s Referendum #%2$s status changed from %3$s to %4$s</string>
+    <string name="push_referendum_to_status_changed_message">%1$s Referendum #%2$s status changed from %3$s to %4$s</string>
+
+    <string name="referendum_status_in_queue">In queue</string>
+
+    <string name="push_new_update_title">A new update of Nova Wallet is available!</string>
+    <string name="push_new_update_message">Download Nova Wallet v%s to get all the new features!</string>
+    <string name="push_new_referendum_title">🗳️ New referendum</string>
+    <string name="push_new_referendum_message">%s Referendum %s is now live!</string>
     <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>
 
     <string name="common_too_small_balance_title">Your balance is too small</string>
@@ -24,13 +53,19 @@
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
 
+    <string name="default_notification_channel_id" translatable="false">default_notification_channel_id</string>
+    <string name="transactions_notification_channel_id" translatable="false">transactions_notification_channel_id</string>
+    <string name="governance_notification_channel_id" translatable="false">default_notifications_channel_id</string>
+    <string name="staking_notification_channel_id" translatable="false">staking_notification_channel_id</string>
+    <string name="default_notification_channel_name">Default Notification Channel</string>
+    <string name="transactions_notification_channel_name">Transactions Notification Channel</string>
+    <string name="governance_notification_channel_name">Governance Notification Channel</string>
+    <string name="staking_notification_channel_name">Staking Notifications Channel</string>
+
     <string name="push_governance_settings_new_referendum">New Referendum</string>
     <string name="push_governance_settings_referendum_update">Referendum Update</string>
     <string name="push_governance_settings_delegate_votes">Delegate has voted</string>
     <string name="common_clear">Clear</string>
-
-    <string name="default_notification_channel_id">default_notifications_channel_id</string>
-    <string name="default_notification_channel_name">Default Notifications Channel</string>
 
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
     <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>

@@ -1,10 +1,10 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks.common
 
-import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.DAppHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ImportMnemonicHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ReferendumHandlingException
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_deep_linking.R
 
 fun formatDeepLinkHandlingException(resourceManager: ResourceManager, exception: DeepLinkHandlingException): String {
     return when (exception) {

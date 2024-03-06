@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_buy_impl.domain.providers
+package io.novafoundation.nova.feature_buy_api.domain.providers
 
 import android.content.Context
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry

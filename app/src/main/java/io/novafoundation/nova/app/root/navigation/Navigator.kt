@@ -430,10 +430,10 @@ class Navigator(
             R.id.mainFragment -> R.id.action_mainFragment_to_balanceDetailFragment
             R.id.assetSearchFragment -> R.id.action_assetSearchFragment_to_balanceDetailFragment
             R.id.confirmTransferFragment -> R.id.action_confirmTransferFragment_to_balanceDetailFragment
-            else -> null
+            else -> R.id.action_root_to_balanceDetailFragment
         }
 
-        action?.let { navController?.navigate(it, bundle) }
+        navController?.navigate(action, bundle)
     }
 
     override fun openAddNode() {

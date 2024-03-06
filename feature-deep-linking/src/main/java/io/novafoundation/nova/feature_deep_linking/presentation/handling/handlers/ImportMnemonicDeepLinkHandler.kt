@@ -1,9 +1,6 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
-import com.walletconnect.util.hexToBytes
-import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
-import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ImportMnemonicHandlingException
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -16,16 +13,19 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.AdvancedEncryptionModel
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
 private const val IMPORT_WALLET_DEEP_LINK_PREFIX = "/create/wallet"
 
 class ImportMnemonicDeepLinkHandler(
-    private val accountRouter: AccountRouter,
+    private val router: DeepLinkingRouter,
     private val encryptionDefaults: EncryptionDefaults,
     private val accountRepository: AccountRepository,
     private val automaticInteractionGate: AutomaticInteractionGate,
@@ -61,7 +61,7 @@ class ImportMnemonicDeepLinkHandler(
             AddAccountPayload.MetaAccount
         )
 
-        accountRouter.openImportAccountScreen(importAccountPayload)
+        router.openImportAccountScreen(importAccountPayload)
     }
 
     private fun prepareMnemonicPreset(
@@ -83,7 +83,7 @@ class ImportMnemonicDeepLinkHandler(
 
     private fun Uri.getMnemonic(): Mnemonic {
         val mnemonicHex = getQueryParameter("mnemonic")
-        return runCatching { MnemonicCreator.fromEntropy(mnemonicHex!!.hexToBytes()) }.getOrNull()
+        return runCatching { MnemonicCreator.fromEntropy(mnemonicHex!!.fromHex()) }.getOrNull()
             ?: throw ImportMnemonicHandlingException.InvalidMnemonic
     }
 

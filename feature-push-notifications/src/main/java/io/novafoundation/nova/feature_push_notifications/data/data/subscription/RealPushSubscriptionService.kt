@@ -13,17 +13,17 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_account_api.domain.model.mainEthereumAddress
-import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.math.BigInteger
-import java.util.*
-import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
+import java.util.UUID
+import java.util.Date
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.asDeferred
@@ -194,7 +194,7 @@ class RealPushSubscriptionService(
 
     private fun PushSettings.getGovernanceTracksFor(filter: (PushSettings.GovernanceState) -> Boolean): List<TrackIdentifiable> {
         return governance.filter { (_, state) -> filter(state) }
-            .flatMap { (chainId, state) -> state.tracks.map { TrackIdentifiable(chainId.hexPrefix16(), it.value) } }
+            .flatMap { (chainId, state) -> state.tracks.map { TrackIdentifiable(chainId.chainIdHexPrefix16(), it.value) } }
     }
 
     private fun Map<String, Any>.nullIfEmpty(): Map<String, Any>? {
@@ -202,16 +202,10 @@ class RealPushSubscriptionService(
     }
 
     private fun <T> Map<ChainId, T>.transfromChainIdsTo16Hex(): Map<String, T> {
-        return mapKeys { (chainId, _) -> chainId.hexPrefix16() }
+        return mapKeys { (chainId, _) -> chainId.chainIdHexPrefix16() }
     }
 
     private fun List<ChainId>.transfromChainIdsTo16Hex(): List<String> {
-        return map { chainId -> chainId.hexPrefix16() }
-    }
-
-    private fun ChainId.hexPrefix16(): String {
-        return removeHexPrefix()
-            .take(32)
-            .requireHexPrefix()
+        return map { chainId -> chainId.chainIdHexPrefix16() }
     }
 }

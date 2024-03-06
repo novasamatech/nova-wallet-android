@@ -1,23 +1,23 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
-import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.domain.RootInteractor
-import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
-import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
+import io.novafoundation.nova.feature_deep_linking.R
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class BuyCallbackDeepLinkHandler(
-    private val interactor: RootInteractor,
     private val resourceManager: ResourceManager
 ) : DeepLinkHandler {
 
     override val callbackFlow: MutableSharedFlow<CallbackEvent> = singleReplaySharedFlow()
 
     override suspend fun matches(data: Uri): Boolean {
-        return interactor.isBuyProviderRedirectLink(data.toString())
+        val link = data.toString()
+        return ExternalProvider.REDIRECT_URL_BASE in link
     }
 
     override suspend fun handleDeepLink(data: Uri) {

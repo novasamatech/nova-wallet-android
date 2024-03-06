@@ -1,14 +1,14 @@
 package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
-import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
-import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.DAppHandlingException
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -16,7 +16,7 @@ private const val DAPP_DEEP_LINK_PREFIX = "/open/dapp"
 
 class DAppDeepLinkHandler(
     private val dappRepository: DAppMetadataRepository,
-    private val dAppRouter: DAppRouter,
+    private val router: DeepLinkingRouter,
     private val automaticInteractionGate: AutomaticInteractionGate
 ) : DeepLinkHandler {
 
@@ -35,7 +35,7 @@ class DAppDeepLinkHandler(
 
         ensureDAppInCatalog(normalizedUrl)
 
-        dAppRouter.openDAppBrowser(url)
+        router.openDAppBrowser(url)
     }
 
     private suspend fun ensureDAppInCatalog(normalizedUrl: String) {

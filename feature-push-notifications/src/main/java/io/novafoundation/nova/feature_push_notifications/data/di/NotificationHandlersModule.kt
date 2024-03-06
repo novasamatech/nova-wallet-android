@@ -2,18 +2,41 @@ package io.novafoundation.nova.feature_push_notifications.data.di
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
+import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.CompoundNotificationHandler
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.DefaultNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.SystemNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationHandler
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.SendingNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.RealNotificationIdProvider
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.DebugNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.NewReferendumNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.NewReleaseNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.ReferendumStateUpdateNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.StakingRewardNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.TokenReceivedNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.types.TokenSentNotificationHandler
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module()
 class NotificationHandlersModule {
+
+    @Provides
+    fun provideNotificationIdProvider(preferences: Preferences): NotificationIdProvider {
+        return RealNotificationIdProvider(preferences)
+    }
 
     @Provides
     fun provideNotificationManagerCompat(context: Context): NotificationManagerCompat {
@@ -22,29 +45,178 @@ class NotificationHandlersModule {
 
     @Provides
     @IntoSet
-    fun defaultNotificationHandler(
+    fun systemNotificationHandler(
         context: Context,
+        activityIntentProvider: ActivityIntentProvider,
+        notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        gson: Gson
     ): NotificationHandler {
-        return DefaultNotificationHandler(context, notificationManagerCompat, resourceManager)
+        return SystemNotificationHandler(context, activityIntentProvider, notificationIdProvider, gson, notificationManagerCompat, resourceManager)
     }
 
     @Provides
     @IntoSet
-    fun sendingNotificationHandler(
+    fun tokenSentNotificationHandler(
         context: Context,
+        notificationIdProvider: NotificationIdProvider,
+        notificationManagerCompat: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+        gson: Gson,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        tokenRepository: TokenRepository,
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
+    ): NotificationHandler {
+        return TokenSentNotificationHandler(
+            context,
+            accountRepository,
+            tokenRepository,
+            chainRegistry,
+            assetDetailsDeepLinkHandler,
+            notificationIdProvider,
+            gson,
+            notificationManagerCompat,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun tokenReceivedNotificationHandler(
+        context: Context,
+        notificationIdProvider: NotificationIdProvider,
+        notificationManagerCompat: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+        gson: Gson,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        tokenRepository: TokenRepository,
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
+    ): NotificationHandler {
+        return TokenReceivedNotificationHandler(
+            context,
+            accountRepository,
+            tokenRepository,
+            assetDetailsDeepLinkHandler,
+            chainRegistry,
+            notificationIdProvider,
+            gson,
+            notificationManagerCompat,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun stakingRewardNotificationHandler(
+        context: Context,
+        notificationIdProvider: NotificationIdProvider,
+        notificationManagerCompat: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+        gson: Gson,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        tokenRepository: TokenRepository,
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
+    ): NotificationHandler {
+        return StakingRewardNotificationHandler(
+            context,
+            accountRepository,
+            tokenRepository,
+            assetDetailsDeepLinkHandler,
+            chainRegistry,
+            notificationIdProvider,
+            gson,
+            notificationManagerCompat,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun referendumStateUpdateNotificationHandler(
+        context: Context,
+        notificationIdProvider: NotificationIdProvider,
+        notificationManagerCompat: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+        referendaStatusFormatter: ReferendaStatusFormatter,
+        gson: Gson,
+        chainRegistry: ChainRegistry,
+        referendumDeepLinkHandler: ReferendumDeepLinkHandler
+    ): NotificationHandler {
+        return ReferendumStateUpdateNotificationHandler(
+            context,
+            referendumDeepLinkHandler,
+            referendaStatusFormatter,
+            chainRegistry,
+            notificationIdProvider,
+            gson,
+            notificationManagerCompat,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun newReleaseNotificationHandler(
+        context: Context,
+        appLinksProvider: AppLinksProvider,
+        notificationIdProvider: NotificationIdProvider,
+        notificationManagerCompat: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+        gson: Gson
+    ): NotificationHandler {
+        return NewReleaseNotificationHandler(
+            context,
+            appLinksProvider,
+            notificationIdProvider,
+            gson,
+            notificationManagerCompat,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun newReferendumNotificationHandler(
+        context: Context,
+        notificationIdProvider: NotificationIdProvider,
+        notificationManagerCompat: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+        gson: Gson,
+        chainRegistry: ChainRegistry,
+        referendumDeepLinkHandler: ReferendumDeepLinkHandler
+    ): NotificationHandler {
+        return NewReferendumNotificationHandler(
+            context,
+            referendumDeepLinkHandler,
+            chainRegistry,
+            notificationIdProvider,
+            gson,
+            notificationManagerCompat,
+            resourceManager
+        )
+    }
+
+    @Provides
+    fun debugNotificationHandler(
+        context: Context,
+        activityIntentProvider: ActivityIntentProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager
-    ): NotificationHandler {
-        return SendingNotificationHandler(context, notificationManagerCompat, resourceManager)
+    ): DebugNotificationHandler {
+        return DebugNotificationHandler(context, activityIntentProvider, notificationManagerCompat, resourceManager)
     }
 
     @Provides
     @FeatureScope
-    fun provideCompoundnotificationHandler(
-        handlers: Set<@JvmSuppressWildcards NotificationHandler>
+    fun provideCompoundNotificationHandler(
+        handlers: Set<@JvmSuppressWildcards NotificationHandler>,
+        debugNotificationHandler: DebugNotificationHandler
     ): NotificationHandler {
-        return CompoundNotificationHandler(handlers)
+        val handlersWithDebugHandler = handlers + debugNotificationHandler // Add debug handler as a fallback in the end
+        return CompoundNotificationHandler(handlersWithDebugHandler)
     }
 }

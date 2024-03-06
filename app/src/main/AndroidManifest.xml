@@ -71,8 +71,8 @@
 
             <intent-filter android:label="@string/app_name">
                 <data
-                    android:host="nova"
-                    android:scheme="novawallet" />
+                    android:host="@string/deep_linking_host"
+                    android:scheme="@string/deep_linking_scheme" />
 
                 <action android:name="android.intent.action.VIEW" />
 
@@ -156,6 +156,18 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
+
+        <meta-data
+            android:name="io.novafoundation.nova.transactions_notification_channel_id"
+            android:value="@string/transactions_notification_channel_id" />
+
+        <meta-data
+            android:name="io.novafoundation.nova.governance_notification_channel_id"
+            android:value="@string/governance_notification_channel_id" />
+
+        <meta-data
+            android:name="io.novafoundation.nova.staking_notification_channel_id"
+            android:value="@string/staking_notification_channel_id" />
 
     </application>
 
