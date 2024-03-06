@@ -9,7 +9,6 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDeta
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
@@ -22,10 +21,11 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.isNotSingleMetaAccount
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsIntent
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.notificationAmountFormat
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -59,13 +59,12 @@ class TokenReceivedNotificationHandler(
         val assetId = content.extractPayloadFieldsWithPath<String?>("assetId")
         val amount = content.extractBigInteger("amount")
 
-        val metaAccountsQuantity = accountRepository.getActiveMetaAccountsQuantity()
         val recipientMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recipient), chain.id) ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
             .buildWithDefaults(
                 context,
-                getTitle(metaAccountsQuantity, recipientMetaAccount),
+                getTitle(recipientMetaAccount),
                 getMessage(chain, assetId, amount),
                 makeAssetDetailsIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
             ).build()
@@ -75,10 +74,10 @@ class TokenReceivedNotificationHandler(
         return true
     }
 
-    private fun getTitle(metaAccountsQuantity: Int, senderMetaAccount: MetaAccount?): String {
+    private suspend fun getTitle(senderMetaAccount: MetaAccount?): String {
         val accountName = senderMetaAccount?.formattedAccountName()
         return when {
-            metaAccountsQuantity > 1 && accountName != null -> resourceManager.getString(R.string.push_token_received_title, accountName)
+            accountRepository.isNotSingleMetaAccount() && accountName != null -> resourceManager.getString(R.string.push_token_received_title, accountName)
             else -> resourceManager.getString(R.string.push_token_received_no_account_name_title)
         }
     }
@@ -90,13 +89,8 @@ class TokenReceivedNotificationHandler(
     ): String {
         val asset = chain.assetByOnChainAssetIdOrUtility(assetId)
         val token = tokenRepository.getTokenOrNull(asset)
-        val tokenAmount = amount.formatPlanks(asset)
-        val fiatAmount = token?.planksToFiat(amount)
-            ?.formatAsCurrency(token.currency)
+        val formattedAmount = notificationAmountFormat(asset, token, amount)
 
-        return when {
-            fiatAmount != null -> resourceManager.getString(R.string.push_token_received_message, tokenAmount, fiatAmount, chain.name)
-            else -> resourceManager.getString(R.string.push_token_received_message_no_fiat, tokenAmount, chain.name)
-        }
+        return resourceManager.getString(R.string.push_token_received_message, formattedAmount, chain.name)
     }
 }

@@ -8,8 +8,8 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.di.modules.StoreLink
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -162,7 +162,7 @@ class NotificationHandlersModule {
     @IntoSet
     fun newReleaseNotificationHandler(
         context: Context,
-        @StoreLink storeLink: String,
+        appLinksProvider: AppLinksProvider,
         notificationIdProvider: NotificationIdProvider,
         notificationManagerCompat: NotificationManagerCompat,
         resourceManager: ResourceManager,
@@ -170,7 +170,7 @@ class NotificationHandlersModule {
     ): NotificationHandler {
         return NewReleaseNotificationHandler(
             context,
-            storeLink,
+            appLinksProvider,
             notificationIdProvider,
             gson,
             notificationManagerCompat,

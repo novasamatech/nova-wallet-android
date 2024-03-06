@@ -20,8 +20,8 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.fromRemoteNotificationType
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumIntent
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.mapReferendumType
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -50,8 +50,8 @@ class ReferendumStateUpdateNotificationHandler(
         content.requireType(NotificationTypes.GOV_STATE)
         val chain = content.getChain()
         val referendumId = content.extractBigInteger("referendumId")
-        val stateFrom = content.extractPayloadFieldsWithPath<String?>("from")?.mapReferendumType()
-        val stateTo = content.extractPayloadFieldsWithPath<String>("to").mapReferendumType()
+        val stateFrom = content.extractPayloadFieldsWithPath<String?>("from")?.let { ReferendumStatusType.fromRemoteNotificationType(it) }
+        val stateTo = content.extractPayloadFieldsWithPath<String>("to").let { ReferendumStatusType.fromRemoteNotificationType(it) }
 
         val notification = NotificationCompat.Builder(context, channelId)
             .buildWithDefaults(

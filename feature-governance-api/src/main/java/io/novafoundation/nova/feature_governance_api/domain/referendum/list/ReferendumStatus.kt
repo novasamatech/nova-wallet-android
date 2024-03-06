@@ -15,7 +15,9 @@ enum class ReferendumStatusType {
     TIMED_OUT,
     KILLED,
     CANCELLED,
-    REJECTED,
+    REJECTED;
+
+    companion object
 }
 
 sealed class ReferendumStatus {

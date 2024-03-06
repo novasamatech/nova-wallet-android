@@ -9,7 +9,6 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
@@ -75,18 +74,10 @@ const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class StoreLink
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
 annotation class Caching
 
 @Module(includes = [ParallaxCardModule::class])
 class CommonModule {
-
-    @Provides
-    @StoreLink
-    fun provideStoreLink(): String = BuildConfig.APP_UPDATE_SOURCE_LINK
 
     @Provides
     @ApplicationScope

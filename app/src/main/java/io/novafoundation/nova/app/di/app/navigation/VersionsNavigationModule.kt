@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.versions.VersionsNavigator
-import io.novafoundation.nova.common.di.modules.StoreLink
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_versions_api.presentation.VersionsRouter
 
@@ -15,6 +15,6 @@ class VersionsNavigationModule {
     @ApplicationScope
     fun provideRouter(
         navigationHolder: NavigationHolder,
-        @StoreLink storeLink: String
-    ): VersionsRouter = VersionsNavigator(navigationHolder, storeLink)
+        appLinksProvider: AppLinksProvider
+    ): VersionsRouter = VersionsNavigator(navigationHolder, appLinksProvider.storeUrl)
 }

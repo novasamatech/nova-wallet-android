@@ -9,7 +9,6 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDeta
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
@@ -20,11 +19,12 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.notificationAmountFormat
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.isNotSingleMetaAccount
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -57,13 +57,12 @@ class StakingRewardNotificationHandler(
         val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
         val amount = content.extractBigInteger("amount")
 
-        val metaAccountsCount = accountRepository.getActiveMetaAccountsQuantity()
         val metaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recipient), chain.id) ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
             .buildWithDefaults(
                 context,
-                getTitle(metaAccountsCount, metaAccount),
+                getTitle(metaAccount),
                 getMessage(chain, amount),
                 makeAssetDetailsIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
             ).build()
@@ -73,9 +72,13 @@ class StakingRewardNotificationHandler(
         return true
     }
 
-    private fun getTitle(metaAccountsQuantity: Int, metaAccount: MetaAccount): String {
+    private suspend fun getTitle(metaAccount: MetaAccount): String {
         return when {
-            metaAccountsQuantity > 1 -> resourceManager.getString(R.string.push_staking_reward_many_accounts_title, metaAccount.formattedAccountName())
+            accountRepository.isNotSingleMetaAccount() -> resourceManager.getString(
+                R.string.push_staking_reward_many_accounts_title,
+                metaAccount.formattedAccountName()
+            )
+
             else -> resourceManager.getString(R.string.push_staking_reward_single_account_title)
         }
     }
@@ -86,12 +89,8 @@ class StakingRewardNotificationHandler(
     ): String {
         val asset = chain.utilityAsset
         val token = tokenRepository.getTokenOrNull(asset)
-        val tokenAmount = amount.formatPlanks(asset)
-        val fiatAmount = token?.planksToFiat(amount)
-            ?.formatAsCurrency(token.currency)
-        return when {
-            fiatAmount != null -> resourceManager.getString(R.string.push_staking_reward_message, tokenAmount, fiatAmount, chain.name)
-            else -> resourceManager.getString(R.string.push_staking_reward_message_no_fiat, tokenAmount, chain.name)
-        }
+        val formattedAmount = notificationAmountFormat(asset, token, amount)
+
+        return resourceManager.getString(R.string.push_staking_reward_message, formattedAmount, chain.name)
     }
 }

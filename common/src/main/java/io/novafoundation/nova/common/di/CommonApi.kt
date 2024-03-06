@@ -18,7 +18,6 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
-import io.novafoundation.nova.common.di.modules.StoreLink
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
@@ -137,9 +136,6 @@ interface CommonApi {
     fun bakingParallaxCardCache(): BackingParallaxCardLruCache
 
     fun descriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher
-
-    @StoreLink
-    fun storeLink(): String
 
     val systemCallExecutor: SystemCallExecutor
 
