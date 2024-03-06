@@ -20,13 +20,7 @@ abstract class SecretsAddAccountRepository<T>(
     private val proxySyncService: ProxySyncService
 ) : BaseAddAccountRepository<T>(proxySyncService) {
 
-    class Payload(
-        val derivationPaths: AdvancedEncryption.DerivationPaths,
-        val addAccountType: AddAccountType,
-        val accountSource: AccountSecretsFactory.AccountSource
-    )
-
-    protected final suspend fun pickCryptoType(addAccountType: AddAccountType, advancedEncryption: AdvancedEncryption): CryptoType {
+    protected suspend fun pickCryptoType(addAccountType: AddAccountType, advancedEncryption: AdvancedEncryption): CryptoType {
         val cryptoType = if (addAccountType is AddAccountType.ChainAccount && chainRegistry.getChain(addAccountType.chainId).isEthereumBased) {
             advancedEncryption.ethereumCryptoType
         } else {
@@ -38,7 +32,7 @@ abstract class SecretsAddAccountRepository<T>(
         return cryptoType
     }
 
-    protected final suspend fun addSecretsAccount(
+    protected suspend fun addSecretsAccount(
         derivationPaths: AdvancedEncryption.DerivationPaths,
         addAccountType: AddAccountType,
         accountSource: AccountSecretsFactory.AccountSource

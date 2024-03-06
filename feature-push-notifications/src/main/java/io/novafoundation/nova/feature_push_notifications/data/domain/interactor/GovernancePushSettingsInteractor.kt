@@ -28,13 +28,16 @@ class RealGovernancePushSettingsInteractor(
     override fun governanceChainsFlow(): Flow<List<ChainWithGovTracks>> {
         return chainRegistry.currentChains
             .map {
-                it.flatMap { chain ->
-                    chain.governance.filter { it == Chain.Governance.V2 }
-                        .map { chain to it }
-                }
+                it.filter { it.supportProxy }
+                    .flatMap { it.chainToGovTypes() }
                     .map { (chain, govType) -> ChainWithGovTracks(chain, govType, getTrackIds(chain, govType)) }
                     .sortedWith(Chain.defaultComparatorFrom(ChainWithGovTracks::chain))
             }
+    }
+
+    private fun Chain.chainToGovTypes(): List<Pair<Chain, Chain.Governance>> {
+        return governance.filter { it == Chain.Governance.V2 }
+            .map { this to it }
     }
 
     private suspend fun getTrackIds(chain: Chain, governance: Chain.Governance): Set<TrackId> {

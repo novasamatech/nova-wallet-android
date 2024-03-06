@@ -25,6 +25,7 @@ private const val SWAP_HUB = "swap-hub"
 private const val HYDRA_DX_SWAPS = "hydradx-swaps"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
 private const val FULL_SYNC_BY_DEFAULT = "fullSyncByDefault"
+private const val PUSH_SUPPORT = "pushSupport"
 
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 private const val CHAIN_THEME_COLOR = "themeColor"
@@ -73,6 +74,7 @@ fun mapRemoteChainToLocal(
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
             supportProxy = PROXY_OPTION in optionsOrEmpty,
             hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
+            pushSupport = PUSH_SUPPORT !in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             swap = mapSwapRemoteOptionsToLocal(optionsOrEmpty),
             connectionState = determineConnectionState(chainRemote, oldChain),

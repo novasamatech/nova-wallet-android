@@ -87,18 +87,18 @@ class PushNotificationsFeatureModule {
     @Provides
     @FeatureScope
     fun providePushNotificationsService(
+        context: Context,
         pushSettingsProvider: PushSettingsProvider,
         pushSubscriptionService: PushSubscriptionService,
         rootScope: RootScope,
-        preferences: Preferences,
         pushTokenCache: PushTokenCache,
         googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
     ): PushNotificationsService {
         return RealPushNotificationsService(
+            context,
             pushSettingsProvider,
             pushSubscriptionService,
             rootScope,
-            preferences,
             pushTokenCache,
             googleApiAvailabilityProvider
         )
@@ -108,10 +108,9 @@ class PushNotificationsFeatureModule {
     @FeatureScope
     fun providePushNotificationsInteractor(
         pushNotificationsService: PushNotificationsService,
-        pushSettingsProvider: PushSettingsProvider,
-        chainRegistry: ChainRegistry
+        pushSettingsProvider: PushSettingsProvider
     ): PushNotificationsInteractor {
-        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider, chainRegistry)
+        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider)
     }
 
     @Provides

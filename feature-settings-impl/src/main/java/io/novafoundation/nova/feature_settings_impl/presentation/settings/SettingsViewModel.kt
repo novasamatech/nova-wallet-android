@@ -105,6 +105,9 @@ class SettingsViewModel(
         .map { Event(true) }
         .asLiveData()
 
+    val pushNotificationsAvailable = flowOf { pushNotificationsInteractor.isPushNotificationsAvailable() }
+        .shareInBackground()
+
     val pushNotificationsState = pushNotificationsInteractor.pushNotificationsEnabledFlow()
         .map { resourceManager.formatBooleanToState(it) }
         .shareInBackground()

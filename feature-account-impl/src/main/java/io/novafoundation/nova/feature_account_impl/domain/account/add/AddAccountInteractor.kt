@@ -79,17 +79,17 @@ class AddAccountInteractor(
         }
     }
 
+    suspend fun extractJsonMetadata(json: String): Result<ImportJsonMetaData> {
+        return runCatching {
+            jsonAddAccountRepository.extractJsonMetadata(json)
+        }
+    }
+
     private suspend inline fun addAccount(addAccountType: AddAccountType, accountInserter: () -> Long) = runCatching {
         val metaId = accountInserter()
 
         if (addAccountType is AddAccountType.MetaAccount) {
             accountRepository.selectMetaAccount(metaId)
-        }
-    }
-
-    suspend fun extractJsonMetadata(json: String): Result<ImportJsonMetaData> {
-        return runCatching {
-            jsonAddAccountRepository.extractJsonMetadata(json)
         }
     }
 }

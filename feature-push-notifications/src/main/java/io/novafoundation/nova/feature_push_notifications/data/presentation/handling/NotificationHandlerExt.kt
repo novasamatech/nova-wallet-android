@@ -97,7 +97,7 @@ fun NotificationCompat.Builder.buildWithDefaults(
     context: Context,
     title: String,
     message: String,
-    contentIntent: Intent = Intent()
+    contentIntent: Intent
 ): NotificationCompat.Builder {
     return setContentTitle(title)
         .setContentText(message)

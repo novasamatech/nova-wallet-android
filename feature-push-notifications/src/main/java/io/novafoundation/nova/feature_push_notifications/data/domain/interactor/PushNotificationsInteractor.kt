@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_push_notifications.data.domain.interactor
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 
 interface PushNotificationsInteractor {
@@ -19,16 +18,17 @@ interface PushNotificationsInteractor {
     suspend fun getPushSettings(): PushSettings
 
     fun isPushNotificationsEnabled(): Boolean
+
+    fun isPushNotificationsAvailable(): Boolean
 }
 
 class RealPushNotificationsInteractor(
     private val pushNotificationsService: PushNotificationsService,
-    private val pushSettingsProvider: PushSettingsProvider,
-    private val chainRegistry: ChainRegistry
+    private val pushSettingsProvider: PushSettingsProvider
 ) : PushNotificationsInteractor {
 
     override suspend fun syncSettings() {
-        // TODO: To handle case when user disable a permission in settings
+        pushNotificationsService.syncSettings()
     }
 
     override fun pushNotificationsEnabledFlow(): Flow<Boolean> {
@@ -49,5 +49,9 @@ class RealPushNotificationsInteractor(
 
     override fun isPushNotificationsEnabled(): Boolean {
         return pushSettingsProvider.isPushNotificationsEnabled()
+    }
+
+    override fun isPushNotificationsAvailable(): Boolean {
+        return pushNotificationsService.isPushNotificationsAvailable()
     }
 }

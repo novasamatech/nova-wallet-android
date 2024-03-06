@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_push_notifications.data.data.settings
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_push_notifications.data.data.settings.model.PushSettingsCache
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.model.PushSettingsCacheV1
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.model.VersionedPushSettingsCache
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.model.toCache

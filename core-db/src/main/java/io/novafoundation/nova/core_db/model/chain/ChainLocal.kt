@@ -21,6 +21,8 @@ data class ChainLocal(
     val isTestNet: Boolean,
     @ColumnInfo(defaultValue = "1")
     val hasSubstrateRuntime: Boolean,
+    @ColumnInfo(defaultValue = "0")
+    val pushSupport: Boolean,
     val hasCrowdloans: Boolean,
     @ColumnInfo(defaultValue = "0")
     val supportProxy: Boolean,

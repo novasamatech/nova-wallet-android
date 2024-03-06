@@ -1,7 +1,12 @@
 package io.novafoundation.nova.feature_push_notifications.data.data
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import com.google.firebase.messaging.messaging
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
@@ -24,13 +29,17 @@ interface PushNotificationsService {
     suspend fun initPushNotifications(): Result<Unit>
 
     suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings): Result<Unit>
+
+    fun isPushNotificationsAvailable(): Boolean
+
+    suspend fun syncSettings()
 }
 
 class RealPushNotificationsService(
+    private val context: Context,
     private val settingsProvider: PushSettingsProvider,
     private val subscriptionService: PushSubscriptionService,
     private val rootScope: RootScope,
-    private val preferences: Preferences,
     private val tokenCache: PushTokenCache,
     private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 ) : PushNotificationsService {
@@ -69,6 +78,22 @@ class RealPushNotificationsService(
         }
     }
 
+    override fun isPushNotificationsAvailable(): Boolean {
+        return googleApiAvailabilityProvider.isAvailable()
+    }
+
+    override suspend fun syncSettings() {
+        if (!isPushNotificationsEnabled()) return
+
+        val isPermissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+
+        updatePushSettings(isPermissionGranted, settingsProvider.getPushSettings())
+    }
+
     override fun isPushNotificationsEnabled(): Boolean {
         return settingsProvider.isPushNotificationsEnabled()
     }
@@ -98,7 +123,7 @@ class RealPushNotificationsService(
         skipTokenReceivingCallback = false
     }
 
-    private suspend fun getPushToken(): String? {
+    private fun getPushToken(): String? {
         return tokenCache.getPushToken()
     }
 

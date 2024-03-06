@@ -67,7 +67,6 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
 
         viewModel.governanceSettingsList.observe {
             pushGovernanceList.isVisible = it is ExtendedLoadingState.Loaded
-            pushGovernanceToolbar.setRightActionEnabled(it is ExtendedLoadingState.Loaded)
             pushGovernanceProgress.isVisible = it is ExtendedLoadingState.Loading
 
             if (it is ExtendedLoadingState.Loaded) {
