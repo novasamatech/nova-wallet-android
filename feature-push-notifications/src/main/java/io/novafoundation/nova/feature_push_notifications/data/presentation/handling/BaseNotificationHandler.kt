@@ -7,10 +7,12 @@ import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.fromJson
 
 abstract class BaseNotificationHandler(
+    private val activityIntentProvider: ActivityIntentProvider,
     private val notificationIdProvider: NotificationIdProvider,
     private val gson: Gson,
     private val notificationManager: NotificationManagerCompat,
@@ -39,6 +41,8 @@ abstract class BaseNotificationHandler(
     internal fun notify(notification: Notification) {
         notificationManager.notify(notificationIdProvider.getId(), notification)
     }
+
+    internal fun activityIntent() = activityIntentProvider.getIntent()
 
     protected abstract suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean
 

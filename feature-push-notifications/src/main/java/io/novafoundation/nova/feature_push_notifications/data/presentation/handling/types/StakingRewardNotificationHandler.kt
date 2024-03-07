@@ -5,7 +5,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsLinkConfigPayload
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkData
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -22,7 +23,6 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.notificationAmountFormat
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.isNotSingleMetaAccount
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -35,13 +35,15 @@ class StakingRewardNotificationHandler(
     private val context: Context,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
-    private val deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
+    private val configurator: DeepLinkConfigurator<AssetDetailsDeepLinkData>,
     override val chainRegistry: ChainRegistry,
+    activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    activityIntentProvider,
     notificationIdProvider,
     gson,
     notificationManager,
@@ -64,7 +66,7 @@ class StakingRewardNotificationHandler(
                 context,
                 getTitle(metaAccount),
                 getMessage(chain, amount),
-                makeAssetDetailsIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+                activityIntent().setData(configurator.configure(AssetDetailsDeepLinkData(chain.id, chain.utilityAsset.id)))
             ).build()
 
         notify(notification)

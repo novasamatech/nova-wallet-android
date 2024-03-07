@@ -5,7 +5,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkConfigPayload
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkData
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
@@ -15,21 +16,23 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.addReferendumData
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeReferendumIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class NewReferendumNotificationHandler(
     private val context: Context,
-    private val referendumDeepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
+    private val configurator: DeepLinkConfigurator<ReferendumDeepLinkData>,
     override val chainRegistry: ChainRegistry,
+    activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    activityIntentProvider,
     notificationIdProvider,
     gson,
     notificationManager,
@@ -49,7 +52,7 @@ class NewReferendumNotificationHandler(
                 context,
                 resourceManager.getString(R.string.push_new_referendum_title),
                 resourceManager.getString(R.string.push_new_referendum_message, chain.name, referendumId.format()),
-                makeReferendumIntent(referendumDeepLinkConfigurator, chain.id, referendumId)
+                activityIntent().addReferendumData(configurator, chain.id, referendumId)
             ).build()
 
         notify(notification)

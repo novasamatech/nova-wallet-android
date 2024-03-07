@@ -14,12 +14,13 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 
 class SystemNotificationHandler(
     private val context: Context,
-    private val activityIntentProvider: ActivityIntentProvider,
+    activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    activityIntentProvider,
     notificationIdProvider,
     gson,
     notificationManager,
@@ -34,7 +35,7 @@ class SystemNotificationHandler(
         val body = notificationPart.body ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .buildWithDefaults(context, title, body, activityIntentProvider.getIntent())
+            .buildWithDefaults(context, title, body, activityIntent())
             .build()
 
         notify(notification)

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 private const val ASSET_PREFIX = "/open/asset"
 
-class AssetDetailsLinkConfigPayload(
+class AssetDetailsDeepLinkData(
     val chainId: String,
     val assetId: Int
 )
@@ -26,7 +26,7 @@ class AssetDetailsDeepLinkHandler(
     private val router: DeepLinkingRouter,
     private val automaticInteractionGate: AutomaticInteractionGate,
     private val resourceManager: ResourceManager
-) : DeepLinkHandler, DeepLinkConfigurator<AssetDetailsLinkConfigPayload> {
+) : DeepLinkHandler, DeepLinkConfigurator<AssetDetailsDeepLinkData> {
 
     override val callbackFlow = MutableSharedFlow<CallbackEvent>()
 
@@ -36,7 +36,7 @@ class AssetDetailsDeepLinkHandler(
         return path.startsWith(ASSET_PREFIX)
     }
 
-    override fun configure(payload: AssetDetailsLinkConfigPayload): Uri {
+    override fun configure(payload: AssetDetailsDeepLinkData): Uri {
         return buildDeepLink(resourceManager, ASSET_PREFIX)
             .appendQueryParameter(PARAM_CHAIN_ID, payload.chainId)
             .appendQueryParameter(PARAM_ASSET_ID, payload.assetId.toString())
