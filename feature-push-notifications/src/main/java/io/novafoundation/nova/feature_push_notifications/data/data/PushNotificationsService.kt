@@ -19,6 +19,8 @@ import io.novafoundation.nova.feature_push_notifications.data.data.subscription.
 import kotlinx.coroutines.launch
 import kotlin.jvm.Throws
 
+const val PUSH_LOG_TAG = "NOVA_PUSH"
+
 interface PushNotificationsService {
 
     fun onTokenUpdated(token: String)
@@ -135,7 +137,7 @@ class RealPushNotificationsService(
                     return@OnCompleteListener
                 }
 
-                Log.d("NOVA_PUSH_TOKEN", "FCM token: ${task.result}")
+                Log.d(PUSH_LOG_TAG, "FCM token: ${task.result}")
             }
         )
     }
