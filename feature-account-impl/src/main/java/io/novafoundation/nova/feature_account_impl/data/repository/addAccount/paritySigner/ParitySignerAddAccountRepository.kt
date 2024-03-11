@@ -5,15 +5,16 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class ParitySignerAddAccountRepository(
     private val accountDao: MetaAccountDao,
-    private val chainRegistry: ChainRegistry,
-    private val proxySyncService: ProxySyncService,
-) : BaseAddAccountRepository<ParitySignerAddAccountRepository.Payload>(proxySyncService) {
+    proxySyncService: ProxySyncService,
+    metaAccountChangesEventBus: MetaAccountChangesEventBus
+) : BaseAddAccountRepository<ParitySignerAddAccountRepository.Payload>(proxySyncService, metaAccountChangesEventBus) {
 
     class Payload(
         val name: String,
@@ -21,7 +22,7 @@ class ParitySignerAddAccountRepository(
         val variant: PolkadotVaultVariant
     )
 
-    override suspend fun addAccountInternal(payload: Payload): Long {
+    override suspend fun addAccountInternal(payload: Payload): AddAccountResult {
         val metaAccount = MetaAccountLocal(
             // it is safe to assume that accountId is equal to public key since Parity Signer only uses SR25519
             substratePublicKey = payload.substrateAccountId,
@@ -37,7 +38,9 @@ class ParitySignerAddAccountRepository(
             status = MetaAccountLocal.Status.ACTIVE
         )
 
-        return accountDao.insertMetaAccount(metaAccount)
+        val metaId = accountDao.insertMetaAccount(metaAccount)
+
+        return AddAccountResult.AccountAdded(metaId)
     }
 
     private fun PolkadotVaultVariant.asMetaAccountTypeLocal(): MetaAccountLocal.Type {

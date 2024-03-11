@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
@@ -28,7 +27,7 @@ interface PushNotificationsService {
 
     suspend fun initPushNotifications(): Result<Unit>
 
-    suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings): Result<Unit>
+    suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings?): Result<Unit>
 
     fun isPushNotificationsAvailable(): Boolean
 
@@ -66,7 +65,7 @@ class RealPushNotificationsService(
         }
     }
 
-    override suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings): Result<Unit> {
+    override suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings?): Result<Unit> {
         if (!googleApiAvailabilityProvider.isAvailable()) throw IllegalStateException("Google API is not available")
 
         return runCatching {
@@ -127,7 +126,7 @@ class RealPushNotificationsService(
         return tokenCache.getPushToken()
     }
 
-    fun logToken() {
+    private fun logToken() {
         if (!BuildConfig.DEBUG) return
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(

@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
@@ -53,4 +54,6 @@ interface PushNotificationsFeatureDependencies {
     val provideActivityIntentProvider: ActivityIntentProvider
 
     val appLinksProvider: AppLinksProvider
+
+    val metaAccountChangesEventBus: MetaAccountChangesEventBus
 }

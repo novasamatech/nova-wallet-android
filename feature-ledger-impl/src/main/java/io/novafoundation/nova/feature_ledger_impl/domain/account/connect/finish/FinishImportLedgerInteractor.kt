@@ -19,13 +19,13 @@ class RealFinishImportLedgerInteractor(
 ) : FinishImportLedgerInteractor {
 
     override suspend fun createWallet(name: String, ledgerChainAccounts: Map<ChainId, LedgerSubstrateAccount>) = runCatching {
-        val metaId = ledgerAddAccountRepository.addAccount(
+        val addAccountResult = ledgerAddAccountRepository.addAccount(
             LedgerAddAccountRepository.Payload.MetaAccount(
                 name,
                 ledgerChainAccounts
             )
         )
 
-        accountRepository.selectMetaAccount(metaId)
+        accountRepository.selectMetaAccount(addAccountResult.metaId)
     }
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.domain.account.add
 
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
@@ -85,11 +86,11 @@ class AddAccountInteractor(
         }
     }
 
-    private suspend inline fun addAccount(addAccountType: AddAccountType, accountInserter: () -> Long) = runCatching {
-        val metaId = accountInserter()
+    private suspend inline fun addAccount(addAccountType: AddAccountType, accountInserter: () -> AddAccountResult) = runCatching {
+        val addAccountResult = accountInserter()
 
         if (addAccountType is AddAccountType.MetaAccount) {
-            accountRepository.selectMetaAccount(metaId)
+            accountRepository.selectMetaAccount(addAccountResult.metaId)
         }
     }
 }

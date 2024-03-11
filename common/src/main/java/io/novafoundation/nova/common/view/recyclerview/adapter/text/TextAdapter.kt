@@ -2,9 +2,7 @@ package io.novafoundation.nova.common.view.recyclerview.adapter.text
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
 import androidx.annotation.StyleRes
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.R

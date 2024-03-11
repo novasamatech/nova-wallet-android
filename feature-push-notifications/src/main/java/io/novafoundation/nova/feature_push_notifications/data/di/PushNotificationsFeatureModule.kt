@@ -108,9 +108,10 @@ class PushNotificationsFeatureModule {
     @FeatureScope
     fun providePushNotificationsInteractor(
         pushNotificationsService: PushNotificationsService,
-        pushSettingsProvider: PushSettingsProvider
+        pushSettingsProvider: PushSettingsProvider,
+        accountRepository: AccountRepository
     ): PushNotificationsInteractor {
-        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider)
+        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider, accountRepository)
     }
 
     @Provides

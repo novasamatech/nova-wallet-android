@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_deep_linking.presentation.handling
 
-import android.content.Intent
 import android.net.Uri
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_deep_linking.R

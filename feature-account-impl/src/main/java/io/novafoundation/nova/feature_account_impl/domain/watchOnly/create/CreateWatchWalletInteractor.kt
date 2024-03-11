@@ -28,7 +28,7 @@ class RealCreateWatchWalletInteractor(
         val substrateAccountId = substrateAddress.toAccountId()
         val evmAccountId = evmAddress.takeIf { it.isNotEmpty() }?.ethereumAddressToAccountId()
 
-        val metaId = watchOnlyAddAccountRepository.addAccount(
+        val addAccountResult = watchOnlyAddAccountRepository.addAccount(
             WatchOnlyAddAccountRepository.Payload.MetaAccount(
                 name,
                 substrateAccountId,
@@ -36,7 +36,7 @@ class RealCreateWatchWalletInteractor(
             )
         )
 
-        accountRepository.selectMetaAccount(metaId)
+        accountRepository.selectMetaAccount(addAccountResult.metaId)
     }
 
     override suspend fun suggestions(): List<WatchWalletSuggestion> {
