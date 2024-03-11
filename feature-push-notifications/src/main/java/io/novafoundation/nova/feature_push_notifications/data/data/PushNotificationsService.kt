@@ -71,10 +71,11 @@ class RealPushNotificationsService(
         if (!googleApiAvailabilityProvider.isAvailable()) throw IllegalStateException("Google API is not available")
 
         return runCatching {
-            setPushNotificationsEnabled(enabled)
+            handlePushTokenIfNeeded(enabled)
             val pushToken = getPushToken()
             val oldSettings = settingsProvider.getPushSettings()
             subscriptionService.handleSubscription(enabled, pushToken, oldSettings, pushSettings)
+            settingsProvider.setPushNotificationsEnabled(enabled)
             settingsProvider.updateSettings(pushSettings)
         }
     }
@@ -106,7 +107,7 @@ class RealPushNotificationsService(
     }
 
     @Throws
-    private suspend fun setPushNotificationsEnabled(isEnable: Boolean) {
+    private suspend fun handlePushTokenIfNeeded(isEnable: Boolean) {
         if (isEnable == isPushNotificationsEnabled()) return
         skipTokenReceivingCallback = true
 
@@ -119,7 +120,6 @@ class RealPushNotificationsService(
 
         tokenCache.updatePushToken(pushToken)
         Firebase.messaging.isAutoInitEnabled = isEnable
-        settingsProvider.setPushNotificationsEnabled(isEnable)
 
         skipTokenReceivingCallback = false
     }
