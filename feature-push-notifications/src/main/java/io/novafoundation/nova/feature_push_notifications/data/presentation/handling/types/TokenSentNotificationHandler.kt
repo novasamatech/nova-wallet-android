@@ -71,7 +71,7 @@ class TokenSentNotificationHandler(
                 context,
                 getTitle(senderMetaAccount),
                 getMessage(chain, recipientMetaAccount, recipient, asset, amount),
-                activityIntent().addAssetDetailsData(configurator, chain.id, asset.id)
+                activityIntent().addAssetDetailsData(configurator, sender, chain.id, asset.id)
             ).build()
 
         notify(notification)

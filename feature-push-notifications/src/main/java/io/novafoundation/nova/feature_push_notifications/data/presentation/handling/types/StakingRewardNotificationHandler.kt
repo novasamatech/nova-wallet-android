@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.addAssetDetailsData
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
@@ -66,7 +67,7 @@ class StakingRewardNotificationHandler(
                 context,
                 getTitle(metaAccount),
                 getMessage(chain, amount),
-                activityIntent().setData(configurator.configure(AssetDetailsDeepLinkData(chain.id, chain.utilityAsset.id)))
+                activityIntent().addAssetDetailsData(configurator, recipient, chain.id, chain.utilityAsset.id)
             ).build()
 
         notify(notification)

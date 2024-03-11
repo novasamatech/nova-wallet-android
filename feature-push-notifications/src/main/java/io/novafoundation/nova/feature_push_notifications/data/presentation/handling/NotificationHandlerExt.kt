@@ -89,10 +89,11 @@ fun Intent.addReferendumData(
 
 fun Intent.addAssetDetailsData(
     deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsDeepLinkData>,
+    address: String,
     chainId: String,
     assetId: Int
 ): Intent {
-    val payload = AssetDetailsDeepLinkData(chainId, assetId)
+    val payload = AssetDetailsDeepLinkData(address, chainId, assetId)
     data = deepLinkConfigurator.configure(payload)
     return this
 }
