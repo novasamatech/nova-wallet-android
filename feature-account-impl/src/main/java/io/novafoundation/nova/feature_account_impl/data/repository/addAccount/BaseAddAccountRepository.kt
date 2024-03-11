@@ -19,7 +19,7 @@ abstract class BaseAddAccountRepository<T>(
 
         // We should sync push notification settings after adding/changing a chain account
         // to avoid notifications about status changes of unused accounts
-        withContext(Dispatchers.Default) { metaAccountChangesEventBus.notify(addAccountResult.toEvent()) }
+        metaAccountChangesEventBus.notify(addAccountResult.toEvent())
 
         return addAccountResult
     }
