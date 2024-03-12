@@ -10,6 +10,7 @@ interface SelectMultipleWalletsRequester : InterScreenRequester<SelectMultipleWa
     @Parcelize
     class Request(
         val titleText: String,
+        val min: Int,
         val max: Int,
         val currentlySelectedMetaIds: Set<Long>
     ) : Parcelable

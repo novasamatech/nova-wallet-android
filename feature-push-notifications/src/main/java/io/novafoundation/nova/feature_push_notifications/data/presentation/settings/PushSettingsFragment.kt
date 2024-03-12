@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificatio
 import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsAnnouncements
 import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsEnable
 import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsGovernance
+import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsNoSelectedWallets
 import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsReceivedTokens
 import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsSentTokens
 import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsStakingRewards
@@ -65,6 +67,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel>() {
         }
 
         viewModel.pushWalletsQuantity.observe { pushSettingsWallets.setValue(it) }
+        viewModel.showNoSelectedWalletsTip.observe { pushSettingsNoSelectedWallets.isVisible = it }
         viewModel.pushAnnouncements.observe { pushSettingsAnnouncements.setChecked(it) }
         viewModel.pushSentTokens.observe { pushSettingsSentTokens.setChecked(it) }
         viewModel.pushReceivedTokens.observe { pushSettingsReceivedTokens.setChecked(it) }
