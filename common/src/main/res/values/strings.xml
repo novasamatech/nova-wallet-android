@@ -24,7 +24,7 @@
     <string name="push_referendum_rejected_message">%1$s referendum #%2$s has ended and been rejected!</string>
     <string name="push_referendum_status_changed_title">🗳️ Referendum status changed</string>
     <string name="push_referendum_from_to_status_changed_message">%1$s Referendum #%2$s status changed from %3$s to %4$s</string>
-    <string name="push_referendum_to_status_changed_message">%1$s Referendum #%2$s status changed from %3$s to %4$s</string>
+    <string name="push_referendum_to_status_changed_message">%1$s Referendum #%2$s status changed to %3$s</string>
 
     <string name="referendum_status_in_queue">In queue</string>
 
