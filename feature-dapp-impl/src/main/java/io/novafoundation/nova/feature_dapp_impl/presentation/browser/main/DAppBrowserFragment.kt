@@ -94,7 +94,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
         dappBrowserMore.setOnClickListener { moreClicked() }
 
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
     }
 
     override fun onDestroyView() {
