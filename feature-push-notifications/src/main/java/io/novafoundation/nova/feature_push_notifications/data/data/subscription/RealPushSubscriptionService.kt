@@ -27,9 +27,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.math.BigInteger
 import java.util.UUID
 import java.util.Date
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
@@ -101,43 +98,33 @@ class RealPushSubscriptionService(
         }
     }
 
-    private suspend fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings?) {
-        val governanceTracks = if (pushEnabled) {
-            newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled } ?: emptyList()
-        } else {
-            emptyList()
-        }
-
+    private fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings?) {
         val govStateTracksDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.referendumUpdateEnabled },
-            newItems = governanceTracks,
+            newItems = newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled && pushEnabled } ?: emptyList(),
             forceUseNewItems = false
         )
         val newReferendaDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.newReferendaEnabled },
-            newItems = newSettings?.getGovernanceTracksFor { it.newReferendaEnabled } ?: emptyList(),
+            newItems = newSettings?.getGovernanceTracksFor { it.newReferendaEnabled && pushEnabled } ?: emptyList(),
             forceUseNewItems = false
         )
 
-        val deferreds = buildList<Deferred<Void>> {
-            val announcementsEnabled = newSettings?.announcementsEnabled ?: false
-            this += handleSubscription(announcementsEnabled && pushEnabled, "appUpdates")
+        val announcementsEnabled = newSettings?.announcementsEnabled ?: false
+        handleSubscription(announcementsEnabled && pushEnabled, "appUpdates")
 
-            this += govStateTracksDiff.added
-                .map { subscribeToTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
-            this += govStateTracksDiff.removed
-                .map { unsubscribeFromTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
+        govStateTracksDiff.added
+            .map { subscribeToTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
+        govStateTracksDiff.removed
+            .map { unsubscribeFromTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
 
-            this += newReferendaDiff.added
-                .map { subscribeToTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
-            this += newReferendaDiff.removed
-                .map { unsubscribeFromTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
-        }
-
-        deferreds.awaitAll()
+        newReferendaDiff.added
+            .map { subscribeToTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
+        newReferendaDiff.removed
+            .map { unsubscribeFromTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
     }
 
-    private fun handleSubscription(subscribe: Boolean, topic: String): Deferred<Void> {
+    private fun handleSubscription(subscribe: Boolean, topic: String) {
         return if (subscribe) {
             subscribeToTopic(topic)
         } else {
@@ -145,14 +132,12 @@ class RealPushSubscriptionService(
         }
     }
 
-    private fun subscribeToTopic(topic: String): Deferred<Void> {
-        return Firebase.messaging.subscribeToTopic(topic)
-            .asDeferred()
+    private fun subscribeToTopic(topic: String) {
+        Firebase.messaging.subscribeToTopic(topic)
     }
 
-    private fun unsubscribeFromTopic(topic: String): Deferred<Void> {
-        return Firebase.messaging.unsubscribeFromTopic(topic)
-            .asDeferred()
+    private fun unsubscribeFromTopic(topic: String) {
+        Firebase.messaging.unsubscribeFromTopic(topic)
     }
 
     private suspend fun mapToFirestorePushSettings(
