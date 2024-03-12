@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="push_template_message">Received +0.6068 KSM ($20.35) from Kusama staking</string>
+    <string name="push_template_app_name_and_time">Nova Wallet • now</string>
+
     <string name="push_settings_no_selected_wallets">You won\'t receive notifications about Wallet Activities (Balances, Staking) because your haven\'t selected any wallet</string>
 
     <string name="deep_linking_host" translatable="false">nova</string>

@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.language.Languag
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -52,8 +51,7 @@ class SettingsViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val twoFactorVerificationService: TwoFactorVerificationService,
     private val biometricService: BiometricService,
-    private val pushNotificationsInteractor: PushNotificationsInteractor,
-    private val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
+    private val pushNotificationsInteractor: PushNotificationsInteractor
 ) : BaseViewModel(), Browserable {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -121,11 +119,7 @@ class SettingsViewModel(
     }
 
     fun pushNotificationsClicked() {
-        if (welcomePushNotificationsInteractor.needToShowWelcomeScreen()) {
-            router.openPushWelcome()
-        } else {
-            router.openPushNotificationSettings()
-        }
+        router.openPushNotificationSettings()
     }
 
     fun currenciesClicked() {

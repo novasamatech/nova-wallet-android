@@ -38,6 +38,7 @@ class PushWelcomeViewModel(
     }
 
     fun backClicked() {
+        welcomePushNotificationsInteractor.setWelcomeScreenShown()
         router.back()
     }
 
