@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIconToTarget
 import io.novafoundation.nova.feature_push_notifications.R
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemDelegateVotes
 import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemNewReferenda
 import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemReferendumUpdate
 import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemState
@@ -29,8 +28,6 @@ class PushGovernanceSettingsAdapter(
         fun newReferendaClick(item: PushGovernanceRVItem)
 
         fun referendaUpdatesClick(item: PushGovernanceRVItem)
-
-        fun delegateVotesClick(item: PushGovernanceRVItem)
 
         fun tracksClicked(item: PushGovernanceRVItem)
     }
@@ -52,7 +49,6 @@ class PushGovernanceSettingsAdapter(
                 PushGovernanceRVItem::isEnabled -> holder.setEnabled(item)
                 PushGovernanceRVItem::isNewReferendaEnabled -> holder.setNewReferendaEnabled(item)
                 PushGovernanceRVItem::isReferendaUpdatesEnabled -> holder.setReferendaUpdatesEnabled(item)
-                PushGovernanceRVItem::isDelegationVotesEnabled -> holder.setDelegationVotesEnabled(item)
                 PushGovernanceRVItem::tracksText -> holder.setTracks(item)
             }
         }
@@ -95,7 +91,6 @@ class PushGovernanceItemViewHolder(
             setEnabled(item)
             setNewReferendaEnabled(item)
             setReferendaUpdatesEnabled(item)
-            setDelegationVotesEnabled(item)
             setTracks(item)
         }
     }
@@ -122,15 +117,10 @@ class PushGovernanceItemViewHolder(
         itemView.pushGovernanceItemReferendumUpdate.setChecked(item.isReferendaUpdatesEnabled)
     }
 
-    fun setDelegationVotesEnabled(item: PushGovernanceRVItem) {
-        itemView.pushGovernanceItemDelegateVotes.setChecked(item.isDelegationVotesEnabled)
-    }
-
     fun updateListenners(item: PushGovernanceRVItem) {
         itemView.pushGovernanceItemState.setOnClickListener { itemHandler.enableSwitcherClick(item) }
         itemView.pushGovernanceItemNewReferenda.setOnClickListener { itemHandler.newReferendaClick(item) }
         itemView.pushGovernanceItemReferendumUpdate.setOnClickListener { itemHandler.referendaUpdatesClick(item) }
-        itemView.pushGovernanceItemDelegateVotes.setOnClickListener { itemHandler.delegateVotesClick(item) }
         itemView.pushGovernanceItemTracks.setOnClickListener { itemHandler.tracksClicked(item) }
     }
 }
@@ -139,6 +129,5 @@ private object PushGovernancePayloadGenerator : PayloadGenerator<PushGovernanceR
     PushGovernanceRVItem::isEnabled,
     PushGovernanceRVItem::isNewReferendaEnabled,
     PushGovernanceRVItem::isReferendaUpdatesEnabled,
-    PushGovernanceRVItem::isDelegationVotesEnabled,
     PushGovernanceRVItem::tracksText,
 )

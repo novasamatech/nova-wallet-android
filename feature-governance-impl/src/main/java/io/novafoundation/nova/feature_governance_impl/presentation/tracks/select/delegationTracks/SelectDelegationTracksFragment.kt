@@ -20,11 +20,13 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
     override val headerAdapter = SelectTracksHeaderAdapter(this)
 
     override fun initViews() {
+        super.initViews()
         selectTracksApply.isVisible = true
         selectTracksApply.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun subscribe(viewModel: V) {
+        super.subscribe(viewModel)
         headerAdapter.setShowDescription(viewModel.showDescription)
 
         viewModel.title.observeWhenVisible(headerAdapter::setTitle)

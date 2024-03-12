@@ -12,7 +12,6 @@ data class PushGovernanceModel(
     val isEnabled: Boolean,
     val isNewReferendaEnabled: Boolean,
     val isReferendaUpdatesEnabled: Boolean,
-    val isDelegationVotesEnabled: Boolean,
     val trackIds: Set<TrackId>
 ) {
     companion object
@@ -31,7 +30,6 @@ fun PushGovernanceModel.Companion.default(
         false,
         isNewReferendaEnabled = true,
         isReferendaUpdatesEnabled = true,
-        isDelegationVotesEnabled = false,
         trackIds = tracks
     )
 }
