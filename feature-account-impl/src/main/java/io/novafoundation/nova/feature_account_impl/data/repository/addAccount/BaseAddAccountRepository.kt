@@ -15,8 +15,6 @@ abstract class BaseAddAccountRepository<T>(
         val addAccountResult = addAccountInternal(payload)
         proxySyncService.startSyncing()
 
-        // We should sync push notification settings after adding/changing a chain account
-        // to avoid notifications about status changes of unused accounts
         metaAccountChangesEventBus.notify(addAccountResult.toEvent())
 
         return addAccountResult

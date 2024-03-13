@@ -1,12 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.data.data
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import com.google.firebase.messaging.messaging
 import android.util.Log
-import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
@@ -37,12 +32,12 @@ interface PushNotificationsService {
 }
 
 class RealPushNotificationsService(
-    private val context: Context,
     private val settingsProvider: PushSettingsProvider,
     private val subscriptionService: PushSubscriptionService,
     private val rootScope: RootScope,
     private val tokenCache: PushTokenCache,
-    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
+    private val pushPermissionRepository: PushPermissionRepository
 ) : PushNotificationsService {
 
     // Using to manually sync subscriptions (firestore, topics) after enabling push notifications
@@ -87,11 +82,7 @@ class RealPushNotificationsService(
     override suspend fun syncSettings() {
         if (!isPushNotificationsEnabled()) return
 
-        val isPermissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true
-        }
+        val isPermissionGranted = pushPermissionRepository.isPermissionGranted()
 
         updatePushSettings(isPermissionGranted, settingsProvider.getPushSettings())
     }

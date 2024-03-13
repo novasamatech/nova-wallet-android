@@ -63,7 +63,7 @@ class RealPushNotificationsInteractor(
 
     override suspend fun onMetaAccountChanged(metaId: Long) {
         val pushSettings = pushSettingsProvider.getPushSettings()
-        if (pushSettings.subscribedMetaAccounts.contains(metaId)) {
+        if (metaId in pushSettings.subscribedMetaAccounts) {
             val isPushEnabled = pushSettingsProvider.isPushNotificationsEnabled()
             updatePushSettings(isPushEnabled, pushSettings)
         }

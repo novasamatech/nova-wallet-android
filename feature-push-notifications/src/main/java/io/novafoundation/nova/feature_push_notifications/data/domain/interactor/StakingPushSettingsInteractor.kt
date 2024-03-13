@@ -20,7 +20,7 @@ class RealStakingPushSettingsInteractor(
     override fun stakingChainsFlow(): Flow<List<Chain>> {
         return chainRegistry.stakingChainsFlow()
             .map { chains ->
-                chains.filter { it.supportProxy }
+                chains.filter { it.pushSupport }
                     .sortedWith(Chain.defaultComparator())
             }
     }

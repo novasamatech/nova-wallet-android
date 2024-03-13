@@ -102,20 +102,14 @@ class RealPushSubscriptionService(
     }
 
     private suspend fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings?) {
-        val governanceTracks = if (pushEnabled) {
-            newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled } ?: emptyList()
-        } else {
-            emptyList()
-        }
-
         val govStateTracksDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.referendumUpdateEnabled },
-            newItems = governanceTracks,
+            newItems = newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled && pushEnabled }.orEmpty(),
             forceUseNewItems = false
         )
         val newReferendaDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.newReferendaEnabled },
-            newItems = newSettings?.getGovernanceTracksFor { it.newReferendaEnabled } ?: emptyList(),
+            newItems = newSettings?.getGovernanceTracksFor { it.newReferendaEnabled && pushEnabled }.orEmpty(),
             forceUseNewItems = false
         )
 
