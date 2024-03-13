@@ -103,6 +103,7 @@ class PushSettingsViewModel(
         subscribeOnSelectWallets()
         subscribeOnGovernanceSettings()
         subscribeOnStakingSettings()
+        disableNotificationsIfPushSettingsEmpty()
     }
 
     fun backClicked() {
@@ -136,12 +137,16 @@ class PushSettingsViewModel(
 
     fun enableSwitcherClicked() {
         launch {
-            if (pushEnabledState.value == false && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!pushEnabledState.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val isPermissionsGranted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.POST_NOTIFICATIONS)
 
                 if (!isPermissionsGranted) {
                     return@launch
                 }
+            }
+
+            if (!pushEnabledState.value) {
+                makeDefaultPushSettingsIfNeeded()
             }
 
             pushEnabledState.toggle()
@@ -244,5 +249,21 @@ class PushSettingsViewModel(
                     tracks = govState.tracksIds.toTrackIds()
                 )
             }
+    }
+
+    private fun disableNotificationsIfPushSettingsEmpty() {
+        pushSettingsState
+            .onEach { pushSettings ->
+                if (pushSettings?.settingsIsEmpty() == true) {
+                    pushEnabledState.value = false
+                }
+            }
+            .launchIn(this)
+    }
+
+    private suspend fun makeDefaultPushSettingsIfNeeded() {
+        if (pushSettingsState.value?.settingsIsEmpty() == true) {
+            pushSettingsState.value = pushNotificationsInteractor.getPushSettings()
+        }
     }
 }

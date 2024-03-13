@@ -25,13 +25,25 @@ data class PushSettings(
 
         data class Concrete(val chainIds: List<ChainId>) : ChainFeature()
     }
+
+    fun settingsIsEmpty(): Boolean {
+        return !announcementsEnabled &&
+            !sentTokensEnabled &&
+            !receivedTokensEnabled &&
+            stakingReward.isEmpty() &&
+            !isGovEnabled()
+    }
+}
+
+fun PushSettings.ChainFeature.isEmpty(): Boolean {
+    return when (this) {
+        is PushSettings.ChainFeature.All -> false
+        is PushSettings.ChainFeature.Concrete -> chainIds.isEmpty()
+    }
 }
 
 fun PushSettings.ChainFeature.isNotEmpty(): Boolean {
-    return when (this) {
-        is PushSettings.ChainFeature.All -> true
-        is PushSettings.ChainFeature.Concrete -> chainIds.isNotEmpty()
-    }
+    return !isEmpty()
 }
 
 fun PushSettings.isGovEnabled(): Boolean {
