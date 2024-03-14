@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/pushSettingsFragment"
-        android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.settings.PushSettingsFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsFragment"
         android:label="PushSettingsFragment"
         tools:layout="@layout/fragment_push_settings">
 
@@ -31,13 +31,13 @@
 
     <fragment
         android:id="@+id/pushGovernanceFragment"
-        android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsFragment"
         android:label="PushGovernanceSettingsFragment"
         tools:layout="@layout/fragment_push_governance_settings" />
 
     <fragment
         android:id="@+id/pushStakingSettings"
-        android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsFragment"
         android:label="PushStakingSettingsFragment"
         tools:layout="@layout/fragment_push_staking_settings" />
 

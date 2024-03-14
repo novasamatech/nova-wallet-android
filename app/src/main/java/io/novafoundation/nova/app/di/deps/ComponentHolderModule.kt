@@ -38,8 +38,8 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
-import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureApi
-import io.novafoundation.nova.feature_push_notifications.data.di.PushNotificationsFeatureHolder
+import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
+import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureHolder
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_proxy_impl.di.ProxyFeatureHolder
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi

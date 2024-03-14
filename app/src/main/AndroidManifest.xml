@@ -134,7 +134,7 @@
             android:exported="false" />
 
         <service
-            android:name="io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService"
+            android:name="io.novafoundation.nova.feature_push_notifications.NovaFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
