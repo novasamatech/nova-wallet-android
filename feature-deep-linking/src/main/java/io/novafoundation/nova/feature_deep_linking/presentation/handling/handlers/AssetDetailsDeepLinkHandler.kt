@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
 
 import android.net.Uri
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -22,7 +23,7 @@ import kotlinx.coroutines.withContext
 private const val ASSET_PREFIX = "/open/asset"
 
 class AssetDetailsDeepLinkData(
-    val accountAddress: String,
+    val accountAddress: String?,
     val chainId: String,
     val assetId: Int
 )
@@ -49,7 +50,7 @@ class AssetDetailsDeepLinkHandler(
 
     override fun configure(payload: AssetDetailsDeepLinkData): Uri {
         return buildDeepLink(resourceManager, ASSET_PREFIX)
-            .appendQueryParameter(PARAM_ADDRESS, payload.accountAddress)
+            .appendNullableQueryParameter(PARAM_ADDRESS, payload.accountAddress)
             .appendQueryParameter(PARAM_CHAIN_ID, payload.chainId)
             .appendQueryParameter(PARAM_ASSET_ID, payload.assetId.toString())
             .build()
@@ -58,19 +59,19 @@ class AssetDetailsDeepLinkHandler(
     override suspend fun handleDeepLink(data: Uri) {
         automaticInteractionGate.awaitInteractionAllowed()
 
-        val address = data.getAddress() ?: throw IllegalStateException()
+        val address = data.getAddress()
         val chainId = data.getChainId() ?: throw IllegalStateException()
         val assetId = data.getAssetId() ?: throw IllegalStateException()
 
-        selectMetaAccount(chainId, address)
+        address?.let { selectMetaAccount(chainId, address) }
 
         val payload = AssetPayload(chainId, assetId)
         router.openAssetDetails(payload)
     }
 
-    private suspend fun selectMetaAccount(chainId: ChainId, address: String) {
+    private suspend fun selectMetaAccount(chainId: ChainId, address: String) = withContext(Dispatchers.Default) {
         val chain = chainRegistry.getChain(chainId)
-        val metaAccount = withContext(Dispatchers.Default) { accountRepository.findMetaAccountOrThrow(chain.accountIdOf(address), chainId) }
+        val metaAccount = accountRepository.findMetaAccountOrThrow(chain.accountIdOf(address), chainId)
         accountRepository.selectMetaAccount(metaAccount.id)
     }
 

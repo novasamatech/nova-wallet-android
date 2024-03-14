@@ -52,7 +52,7 @@ class ReferendumDeepLinkHandler(
         return buildDeepLink(resourceManager, GOV_DEEP_LINK_PREFIX)
             .appendQueryParameter(PARAM_CHAIN_ID, payload.chainId)
             .appendQueryParameter(PARAM_REF_ID, payload.referendumId.toString())
-            .appendNullableQueryParameter(PARAM_GOV_TYPE, payload.governanceType?.let { mapGovTypeToParams(it) })
+            .appendNullableQueryParameter(PARAM_GOV_TYPE, payload.governanceType?.let(::mapGovTypeToParams))
             .build()
     }
 

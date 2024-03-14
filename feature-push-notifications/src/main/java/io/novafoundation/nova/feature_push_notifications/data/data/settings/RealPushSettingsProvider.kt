@@ -42,7 +42,7 @@ class RealPushSettingsProvider(
         val versionedCache = pushWalletSettings?.toCache()
             ?.toVersionedPushSettingsCache()
 
-        prefs.putString(PUSH_SETTINGS_KEY, versionedCache?.let { gson.toJson(it) })
+        prefs.putString(PUSH_SETTINGS_KEY, versionedCache?.let(gson::toJson))
     }
 
     override fun setPushNotificationsEnabled(isEnabled: Boolean) {

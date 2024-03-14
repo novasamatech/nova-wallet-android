@@ -11,8 +11,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.PushNotificationsService
+import io.novafoundation.nova.feature_push_notifications.data.data.PushPermissionRepository
 import io.novafoundation.nova.feature_push_notifications.data.data.PushTokenCache
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushNotificationsService
+import io.novafoundation.nova.feature_push_notifications.data.data.RealPushPermissionRepository
 import io.novafoundation.nova.feature_push_notifications.data.data.RealPushTokenCache
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.data.settings.PushSettingsSerializer
@@ -86,21 +88,27 @@ class PushNotificationsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun providePushPermissionRepository(context: Context): PushPermissionRepository {
+        return RealPushPermissionRepository(context)
+    }
+
+    @Provides
+    @FeatureScope
     fun providePushNotificationsService(
-        context: Context,
         pushSettingsProvider: PushSettingsProvider,
         pushSubscriptionService: PushSubscriptionService,
         rootScope: RootScope,
         pushTokenCache: PushTokenCache,
-        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
+        pushPermissionRepository: PushPermissionRepository
     ): PushNotificationsService {
         return RealPushNotificationsService(
-            context,
             pushSettingsProvider,
             pushSubscriptionService,
             rootScope,
             pushTokenCache,
-            googleApiAvailabilityProvider
+            googleApiAvailabilityProvider,
+            pushPermissionRepository
         )
     }
 
