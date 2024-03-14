@@ -98,7 +98,7 @@ class RealPushSubscriptionService(
         }
     }
 
-    private suspend fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings?) {
+    private fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings?) {
         val referendumUpdateTracks = newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled }
             ?.takeIf { pushEnabled }
             .orEmpty()
