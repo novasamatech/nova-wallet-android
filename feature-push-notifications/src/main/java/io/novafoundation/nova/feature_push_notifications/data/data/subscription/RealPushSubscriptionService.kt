@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.data.data.subscription
 
+import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.messaging
@@ -13,7 +14,9 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_account_api.domain.model.mainEthereumAddress
+import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.data.GoogleApiAvailabilityProvider
+import io.novafoundation.nova.feature_push_notifications.data.data.PUSH_LOG_TAG
 import io.novafoundation.nova.feature_push_notifications.data.domain.model.PushSettings
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
@@ -50,7 +53,7 @@ class RealPushSubscriptionService(
 
     private val generateIdMutex = Mutex()
 
-    override suspend fun handleSubscription(pushEnabled: Boolean, token: String?, oldSettings: PushSettings, newSettings: PushSettings) {
+    override suspend fun handleSubscription(pushEnabled: Boolean, token: String?, oldSettings: PushSettings, newSettings: PushSettings?) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
 
         val tokenExist = token != null
@@ -58,6 +61,10 @@ class RealPushSubscriptionService(
 
         handleTopics(pushEnabled, oldSettings, newSettings)
         handleFirestore(token, newSettings)
+
+        if (BuildConfig.DEBUG) {
+            Log.d(PUSH_LOG_TAG, "Firestore user updated: ${getFirestoreUUID()}")
+        }
     }
 
     private suspend fun getFirestoreUUID(): String {
@@ -73,8 +80,9 @@ class RealPushSubscriptionService(
         }
     }
 
-    private suspend fun handleFirestore(token: String?, pushSettings: PushSettings) {
-        if (token == null) {
+    private suspend fun handleFirestore(token: String?, pushSettings: PushSettings?) {
+        val hasAccounts = pushSettings?.subscribedMetaAccounts?.any() ?: false
+        if (token == null || pushSettings == null || !hasAccounts) {
             Firebase.firestore.collection(COLLECTION_NAME)
                 .document(getFirestoreUUID())
                 .delete()
@@ -93,27 +101,36 @@ class RealPushSubscriptionService(
         }
     }
 
-    private suspend fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings) {
+    private suspend fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings?) {
+        val referendumUpdateTracks = newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled }
+            ?.takeIf { pushEnabled }
+            .orEmpty()
+
+        val newReferendaTracks = newSettings?.getGovernanceTracksFor { it.newReferendaEnabled }
+            ?.takeIf { pushEnabled }
+            .orEmpty()
+
         val govStateTracksDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.referendumUpdateEnabled },
-            newItems = newSettings.getGovernanceTracksFor { it.referendumUpdateEnabled },
+            newItems = referendumUpdateTracks,
             forceUseNewItems = false
         )
         val newReferendaDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.newReferendaEnabled },
-            newItems = newSettings.getGovernanceTracksFor { it.newReferendaEnabled },
+            newItems = newReferendaTracks,
             forceUseNewItems = false
         )
 
         val deferreds = buildList<Deferred<Void>> {
-            this += handleSubscription(newSettings.announcementsEnabled && pushEnabled, "appUpdates")
+            val announcementsEnabled = newSettings?.announcementsEnabled ?: false
+            this += handleSubscription(announcementsEnabled && pushEnabled, "appUpdates")
 
-            this += govStateTracksDiff.newOrUpdated
+            this += govStateTracksDiff.added
                 .map { subscribeToTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
             this += govStateTracksDiff.removed
                 .map { unsubscribeFromTopic("${GOV_STATE_TOPIC_NAME}_${it.chainId}_${it.track}") }
 
-            this += newReferendaDiff.newOrUpdated
+            this += newReferendaDiff.added
                 .map { subscribeToTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
             this += newReferendaDiff.removed
                 .map { unsubscribeFromTopic("${NEW_REFERENDA_TOPIC_NAME}_${it.chainId}_${it.track}") }
@@ -122,7 +139,7 @@ class RealPushSubscriptionService(
         deferreds.awaitAll()
     }
 
-    private suspend fun handleSubscription(subscribe: Boolean, topic: String): Deferred<Void> {
+    private fun handleSubscription(subscribe: Boolean, topic: String): Deferred<Void> {
         return if (subscribe) {
             subscribeToTopic(topic)
         } else {
@@ -130,12 +147,12 @@ class RealPushSubscriptionService(
         }
     }
 
-    private suspend fun subscribeToTopic(topic: String): Deferred<Void> {
+    private fun subscribeToTopic(topic: String): Deferred<Void> {
         return Firebase.messaging.subscribeToTopic(topic)
             .asDeferred()
     }
 
-    private suspend fun unsubscribeFromTopic(topic: String): Deferred<Void> {
+    private fun unsubscribeFromTopic(topic: String): Deferred<Void> {
         return Firebase.messaging.unsubscribeFromTopic(topic)
             .asDeferred()
     }
@@ -162,7 +179,7 @@ class RealPushSubscriptionService(
         )
     }
 
-    private suspend fun mapToFirestoreWallet(metaId: Long, metaAccountsById: Map<Long, MetaAccount>, chainsById: ChainsById): Map<String, Any>? {
+    private fun mapToFirestoreWallet(metaId: Long, metaAccountsById: Map<Long, MetaAccount>, chainsById: ChainsById): Map<String, Any>? {
         val metaAccount = metaAccountsById[metaId] ?: return null
         return mapOfNotNullValues(
             "baseEthereum" to metaAccount.mainEthereumAddress(),
@@ -189,7 +206,7 @@ class RealPushSubscriptionService(
     }
 
     private fun Boolean.mapToFirestoreChainFeatureOrNull(): Map<String, Any>? {
-        return if (true) mapOf("type" to "all") else null
+        return if (this) mapOf("type" to "all") else null
     }
 
     private fun PushSettings.getGovernanceTracksFor(filter: (PushSettings.GovernanceState) -> Boolean): List<TrackIdentifiable> {

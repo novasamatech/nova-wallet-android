@@ -26,12 +26,13 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
@@ -51,7 +52,7 @@ class AccountRepositoryImpl(
     private val languagesHolder: LanguagesHolder,
     private val accountSubstrateSource: AccountSubstrateSource,
     private val secretStoreV2: SecretStoreV2,
-    private val multiChainQrSharingFactory: MultiChainQrSharingFactory,
+    private val metaAccountChangesEventBus: MetaAccountChangesEventBus
 ) : AccountRepository {
 
     override fun getEncryptionTypes(): List<CryptoType> {
@@ -164,6 +165,8 @@ class AccountRepositoryImpl(
 
     override suspend fun deleteAccount(metaId: Long) {
         accountDataSource.deleteMetaAccount(metaId)
+
+        withContext(Dispatchers.Default) { metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId)) }
     }
 
     override suspend fun getAccounts(): List<Account> {

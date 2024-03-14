@@ -426,3 +426,7 @@ fun StatemineAssetId.onChainAssetId(): String {
         is StatemineAssetId.ScaleEncoded -> scaleHex
     }
 }
+
+fun Chain.openGovIfSupported(): Chain.Governance? {
+    return Chain.Governance.V2.takeIf { it in governance }
+}

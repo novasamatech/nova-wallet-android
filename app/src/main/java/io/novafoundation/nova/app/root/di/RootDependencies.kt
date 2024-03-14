@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -75,6 +76,8 @@ interface RootDependencies {
     fun encryptionDefaults(): EncryptionDefaults
 
     fun proxyExtrinsicValidationRequestBus(): ProxyExtrinsicValidationRequestBus
+
+    fun metaAccountChangesRequestBus(): MetaAccountChangesEventBus
 
     fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
 

@@ -38,11 +38,11 @@ class RealPushSettingsProvider(
         )
     }
 
-    override fun updateSettings(pushWalletSettings: PushSettings) {
-        val versionedCache = pushWalletSettings.toCache()
-            .toVersionedPushSettingsCache()
+    override fun updateSettings(pushWalletSettings: PushSettings?) {
+        val versionedCache = pushWalletSettings?.toCache()
+            ?.toVersionedPushSettingsCache()
 
-        prefs.putString(PUSH_SETTINGS_KEY, gson.toJson(versionedCache))
+        prefs.putString(PUSH_SETTINGS_KEY, versionedCache?.let(gson::toJson))
     }
 
     override fun setPushNotificationsEnabled(isEnabled: Boolean) {

@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsLinkConfigPayload
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkConfigPayload
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkData
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkData
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -73,28 +73,37 @@ fun Context.makePendingIntent(intent: Intent): PendingIntent {
         this,
         PEDDING_INTENT_REQUEST_CODE,
         intent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 }
 
-fun makeReferendumIntent(
-    deepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkConfigPayload>,
+fun Intent.addReferendumData(
+    deepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkData>,
     chainId: String,
     referendumId: BigInteger
 ): Intent {
-    val payload = ReferendumDeepLinkConfigPayload(chainId, referendumId, Chain.Governance.V2)
-    val deepLink = deepLinkConfigurator.configure(payload)
-    return Intent(Intent.ACTION_VIEW, deepLink)
+    val payload = ReferendumDeepLinkData(chainId, referendumId, Chain.Governance.V2)
+    data = deepLinkConfigurator.configure(payload)
+    return this
 }
 
-fun makeAssetDetailsIntent(
-    deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
+fun Intent.addAssetDetailsData(
+    deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsDeepLinkData>,
+    address: String,
     chainId: String,
     assetId: Int
 ): Intent {
-    val payload = AssetDetailsLinkConfigPayload(chainId, assetId)
-    val deepLink = deepLinkConfigurator.configure(payload)
-    return Intent(Intent.ACTION_VIEW, deepLink)
+    val payload = AssetDetailsDeepLinkData(address, chainId, assetId)
+    data = deepLinkConfigurator.configure(payload)
+    return this
+}
+
+fun <T> Intent.addData(
+    deepLinkConfigurator: DeepLinkConfigurator<T>,
+    payload: T
+): Intent {
+    data = deepLinkConfigurator.configure(payload)
+    return this
 }
 
 fun NotificationCompat.Builder.buildWithDefaults(
@@ -132,8 +141,10 @@ fun ReferendumStatusType.Companion.fromRemoteNotificationType(type: String): Ref
     }
 }
 
-fun Chain.assetByOnChainAssetIdOrUtility(assetId: String?): Chain.Asset {
-    return assets.firstOrNull { it.onChainAssetId == assetId } ?: utilityAsset
+fun Chain.assetByOnChainAssetIdOrUtility(assetId: String?): Chain.Asset? {
+    if (assetId == null) return utilityAsset
+
+    return assets.firstOrNull { it.onChainAssetId == assetId }
 }
 
 fun notificationAmountFormat(asset: Chain.Asset, token: Token?, amount: BigInteger): String {

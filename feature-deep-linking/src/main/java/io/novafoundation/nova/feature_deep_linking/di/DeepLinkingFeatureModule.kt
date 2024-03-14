@@ -74,10 +74,14 @@ class DeepLinkingFeatureModule {
     @Provides
     fun provideAssetDetailsDeepLinkHandler(
         deepLinkingRouter: DeepLinkingRouter,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
         automaticInteractionGate: AutomaticInteractionGate,
         resourceManager: ResourceManager
     ) = AssetDetailsDeepLinkHandler(
         router = deepLinkingRouter,
+        accountRepository = accountRepository,
+        chainRegistry = chainRegistry,
         automaticInteractionGate = automaticInteractionGate,
         resourceManager = resourceManager
     )

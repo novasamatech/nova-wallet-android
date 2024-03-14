@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.view.ButtonState
-import io.novafoundation.nova.common.view.dialog.retryDialog
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
@@ -61,7 +60,7 @@ class PushWelcomeViewModel(
             }
 
             _enablingInProgress.value = true
-            pushNotificationsInteractor.setPushNotificationsEnabled(true)
+            pushNotificationsInteractor.initPushSettings()
                 .onSuccess {
                     welcomePushNotificationsInteractor.setWelcomeScreenShown()
                     router.openPushSettings()

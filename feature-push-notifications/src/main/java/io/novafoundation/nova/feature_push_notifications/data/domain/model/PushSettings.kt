@@ -12,7 +12,7 @@ data class PushSettings(
     val governance: Map<ChainId, GovernanceState>
 ) {
 
-    class GovernanceState(
+    data class GovernanceState(
         val newReferendaEnabled: Boolean,
         val referendumUpdateEnabled: Boolean,
         val govMyDelegateVotedEnabled: Boolean,

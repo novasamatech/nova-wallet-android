@@ -6,6 +6,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.data.NotificationTypes
@@ -20,11 +21,13 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 class NewReleaseNotificationHandler(
     private val context: Context,
     private val appLinksProvider: AppLinksProvider,
+    activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    activityIntentProvider,
     notificationIdProvider,
     gson,
     notificationManager,

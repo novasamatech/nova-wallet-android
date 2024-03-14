@@ -5,7 +5,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsLinkConfigPayload
+import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkData
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -16,18 +17,17 @@ import io.novafoundation.nova.feature_push_notifications.data.presentation.handl
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.PushChainRegestryHolder
+import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.addAssetDetailsData
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.assetByOnChainAssetIdOrUtility
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.formattedAccountName
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.isNotSingleMetaAccount
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.makeAssetDetailsIntent
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.notificationAmountFormat
 import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -36,13 +36,15 @@ class TokenReceivedNotificationHandler(
     private val context: Context,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
-    private val deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsLinkConfigPayload>,
+    private val configurator: DeepLinkConfigurator<AssetDetailsDeepLinkData>,
     override val chainRegistry: ChainRegistry,
+    activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
     notificationManager: NotificationManagerCompat,
     resourceManager: ResourceManager,
 ) : BaseNotificationHandler(
+    activityIntentProvider,
     notificationIdProvider,
     gson,
     notificationManager,
@@ -59,14 +61,15 @@ class TokenReceivedNotificationHandler(
         val assetId = content.extractPayloadFieldsWithPath<String?>("assetId")
         val amount = content.extractBigInteger("amount")
 
+        val asset = chain.assetByOnChainAssetIdOrUtility(assetId) ?: return false
         val recipientMetaAccount = accountRepository.findMetaAccount(chain.accountIdOf(recipient), chain.id) ?: return false
 
         val notification = NotificationCompat.Builder(context, channelId)
             .buildWithDefaults(
                 context,
                 getTitle(recipientMetaAccount),
-                getMessage(chain, assetId, amount),
-                makeAssetDetailsIntent(deepLinkConfigurator, chain.id, chain.utilityAsset.id)
+                getMessage(chain, asset, amount),
+                activityIntent().addAssetDetailsData(configurator, recipient, chain.id, asset.id)
             ).build()
 
         notify(notification)
@@ -84,10 +87,9 @@ class TokenReceivedNotificationHandler(
 
     private suspend fun getMessage(
         chain: Chain,
-        assetId: String?,
+        asset: Chain.Asset,
         amount: BigInteger
     ): String {
-        val asset = chain.assetByOnChainAssetIdOrUtility(assetId)
         val token = tokenRepository.getTokenOrNull(asset)
         val formattedAmount = notificationAmountFormat(asset, token, amount)
 

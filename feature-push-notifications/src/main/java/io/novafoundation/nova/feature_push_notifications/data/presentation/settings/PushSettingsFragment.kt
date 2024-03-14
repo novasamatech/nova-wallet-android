@@ -27,6 +27,8 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel>() {
     }
 
     override fun initViews() {
+        onBackPressed { viewModel.backClicked() }
+
         pushSettingsToolbar.applyStatusBarInsets()
         pushSettingsToolbar.setRightActionClickListener { viewModel.saveClicked() }
         pushSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }

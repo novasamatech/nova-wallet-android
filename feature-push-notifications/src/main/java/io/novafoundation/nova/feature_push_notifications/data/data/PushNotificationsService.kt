@@ -5,7 +5,6 @@ import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.data.NovaFirebaseMessagingService
@@ -15,6 +14,8 @@ import io.novafoundation.nova.feature_push_notifications.data.data.subscription.
 import kotlinx.coroutines.launch
 import kotlin.jvm.Throws
 
+const val PUSH_LOG_TAG = "NOVA_PUSH"
+
 interface PushNotificationsService {
 
     fun onTokenUpdated(token: String)
@@ -23,16 +24,20 @@ interface PushNotificationsService {
 
     suspend fun initPushNotifications(): Result<Unit>
 
-    suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings): Result<Unit>
+    suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings?): Result<Unit>
+
+    fun isPushNotificationsAvailable(): Boolean
+
+    suspend fun syncSettings()
 }
 
 class RealPushNotificationsService(
     private val settingsProvider: PushSettingsProvider,
     private val subscriptionService: PushSubscriptionService,
     private val rootScope: RootScope,
-    private val preferences: Preferences,
     private val tokenCache: PushTokenCache,
-    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
+    private val pushPermissionRepository: PushPermissionRepository
 ) : PushNotificationsService {
 
     // Using to manually sync subscriptions (firestore, topics) after enabling push notifications
@@ -57,16 +62,29 @@ class RealPushNotificationsService(
         }
     }
 
-    override suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings): Result<Unit> {
+    override suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings?): Result<Unit> {
         if (!googleApiAvailabilityProvider.isAvailable()) throw IllegalStateException("Google API is not available")
 
         return runCatching {
-            setPushNotificationsEnabled(enabled)
+            handlePushTokenIfNeeded(enabled)
             val pushToken = getPushToken()
             val oldSettings = settingsProvider.getPushSettings()
             subscriptionService.handleSubscription(enabled, pushToken, oldSettings, pushSettings)
+            settingsProvider.setPushNotificationsEnabled(enabled)
             settingsProvider.updateSettings(pushSettings)
         }
+    }
+
+    override fun isPushNotificationsAvailable(): Boolean {
+        return googleApiAvailabilityProvider.isAvailable()
+    }
+
+    override suspend fun syncSettings() {
+        if (!isPushNotificationsEnabled()) return
+
+        val isPermissionGranted = pushPermissionRepository.isPermissionGranted()
+
+        updatePushSettings(isPermissionGranted, settingsProvider.getPushSettings())
     }
 
     override fun isPushNotificationsEnabled(): Boolean {
@@ -80,7 +98,7 @@ class RealPushNotificationsService(
     }
 
     @Throws
-    private suspend fun setPushNotificationsEnabled(isEnable: Boolean) {
+    private suspend fun handlePushTokenIfNeeded(isEnable: Boolean) {
         if (isEnable == isPushNotificationsEnabled()) return
         skipTokenReceivingCallback = true
 
@@ -93,16 +111,15 @@ class RealPushNotificationsService(
 
         tokenCache.updatePushToken(pushToken)
         Firebase.messaging.isAutoInitEnabled = isEnable
-        settingsProvider.setPushNotificationsEnabled(isEnable)
 
         skipTokenReceivingCallback = false
     }
 
-    private suspend fun getPushToken(): String? {
+    private fun getPushToken(): String? {
         return tokenCache.getPushToken()
     }
 
-    fun logToken() {
+    private fun logToken() {
         if (!BuildConfig.DEBUG) return
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(
@@ -111,7 +128,7 @@ class RealPushNotificationsService(
                     return@OnCompleteListener
                 }
 
-                Log.d("NOVA_PUSH_TOKEN", "FCM token: ${task.result}")
+                Log.d(PUSH_LOG_TAG, "FCM token: ${task.result}")
             }
         )
     }

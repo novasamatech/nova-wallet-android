@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
+import io.novafoundation.nova.runtime.ext.openGovIfSupported
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -28,13 +29,15 @@ class RealGovernancePushSettingsInteractor(
     override fun governanceChainsFlow(): Flow<List<ChainWithGovTracks>> {
         return chainRegistry.currentChains
             .map {
-                it.flatMap { chain ->
-                    chain.governance.filter { it == Chain.Governance.V2 }
-                        .map { chain to it }
-                }
+                it.filter { it.pushSupport }
+                    .flatMap { it.supportedGovTypes() }
                     .map { (chain, govType) -> ChainWithGovTracks(chain, govType, getTrackIds(chain, govType)) }
                     .sortedWith(Chain.defaultComparatorFrom(ChainWithGovTracks::chain))
             }
+    }
+
+    private fun Chain.supportedGovTypes(): List<Pair<Chain, Chain.Governance>> {
+        return listOfNotNull(openGovIfSupported()?.let { this to it })
     }
 
     private suspend fun getTrackIds(chain: Chain, governance: Chain.Governance): Set<TrackId> {
