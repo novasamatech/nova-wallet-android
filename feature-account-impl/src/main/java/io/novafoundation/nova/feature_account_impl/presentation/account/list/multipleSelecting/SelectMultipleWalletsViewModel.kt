@@ -66,7 +66,12 @@ class SelectMultipleWalletsViewModel(
 
     override fun accountClicked(accountModel: AccountUi) {
         val selected = mutableSetOf(*selectedMetaAccounts.value.ids.toTypedArray())
+
         if (selected.contains(accountModel.id)) {
+            if (selected.size <= request.min) {
+                return
+            }
+
             selected.remove(accountModel.id)
         } else {
             if (selected.size >= request.max) {

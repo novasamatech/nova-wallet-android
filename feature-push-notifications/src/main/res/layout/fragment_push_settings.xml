@@ -50,6 +50,15 @@
 
             </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
+            <TextView
+                android:id="@+id/pushSettingsNoSelectedWallets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/push_settings_no_selected_wallets"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
             <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+private const val MIN_WALLETS = 1
 private const val MAX_WALLETS = 3
 
 class PushSettingsViewModel(
@@ -56,6 +57,7 @@ class PushSettingsViewModel(
     val closeConfirmationAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
     private val oldPushSettingsState = flowOf { pushNotificationsInteractor.getPushSettings() }
+        .shareInBackground()
 
     val pushEnabledState = MutableStateFlow(pushNotificationsInteractor.isPushNotificationsEnabled())
     private val pushSettingsState = MutableStateFlow<PushSettings?>(null)
@@ -84,6 +86,10 @@ class PushSettingsViewModel(
 
     val pushStakingRewardsState = pushSettingsState.mapNotNull { it }
         .map { resourceManager.formatBooleanToState(it.stakingReward.isNotEmpty()) }
+        .distinctUntilChanged()
+
+    val showNoSelectedWalletsTip = pushSettingsState
+        .mapNotNull { it?.subscribedMetaAccounts?.isEmpty() }
         .distinctUntilChanged()
 
     private val _savingInProgress = MutableStateFlow(false)
@@ -147,6 +153,7 @@ class PushSettingsViewModel(
             SelectMultipleWalletsRequester.Request(
                 titleText = resourceManager.getString(R.string.push_wallets_title),
                 currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
+                min = MIN_WALLETS,
                 max = MAX_WALLETS
             )
         )
