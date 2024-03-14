@@ -36,10 +36,6 @@ abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
     private val tracksAdapter = SelectTracksAdapter(this)
     val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

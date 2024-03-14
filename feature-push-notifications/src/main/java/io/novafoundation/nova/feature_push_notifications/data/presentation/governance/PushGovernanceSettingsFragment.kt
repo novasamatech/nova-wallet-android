@@ -87,10 +87,6 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
         viewModel.referendaUpdatesClicked(item)
     }
 
-    override fun delegateVotesClick(item: PushGovernanceRVItem) {
-        viewModel.delegateVotesClicked(item)
-    }
-
     override fun tracksClicked(item: PushGovernanceRVItem) {
         viewModel.tracksClicked(item)
     }

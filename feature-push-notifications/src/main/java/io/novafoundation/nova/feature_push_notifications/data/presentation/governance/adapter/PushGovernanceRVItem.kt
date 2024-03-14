@@ -19,6 +19,4 @@ data class PushGovernanceRVItem(
     val isNewReferendaEnabled = model.isNewReferendaEnabled
 
     val isReferendaUpdatesEnabled = model.isReferendaUpdatesEnabled
-
-    val isDelegationVotesEnabled = model.isDelegationVotesEnabled
 }

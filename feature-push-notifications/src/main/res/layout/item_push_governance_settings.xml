@@ -25,13 +25,6 @@
         android:layout_height="wrap_content"
         app:title="@string/push_governance_settings_referendum_update" />
 
-    <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
-        android:id="@+id/pushGovernanceItemDelegateVotes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:title="@string/push_governance_settings_delegate_votes" />
-
     <io.novafoundation.nova.common.view.settings.SettingsItemView
         android:id="@+id/pushGovernanceItemTracks"
         android:layout_width="match_parent"

@@ -116,14 +116,6 @@ class PushGovernanceSettingsViewModel(
         }
     }
 
-    fun delegateVotesClicked(item: PushGovernanceRVItem) {
-        _changedGovernanceSettingsList.updateValue {
-            it + item.model.copy(isDelegationVotesEnabled = !item.isDelegationVotesEnabled)
-                .disableCompletelyIfFeaturesDisabled()
-                .withKey()
-        }
-    }
-
     fun tracksClicked(item: PushGovernanceRVItem) {
         launch {
             val selectedTracks = item.model.trackIds.mapToSet { it.value }
@@ -148,7 +140,6 @@ class PushGovernanceSettingsViewModel(
             isEnabled = true,
             isNewReferendaEnabled = item.newReferenda,
             isReferendaUpdatesEnabled = item.referendaUpdates,
-            isDelegationVotesEnabled = item.delegateVotes,
             trackIds = tracks
         )
     }
@@ -159,13 +150,13 @@ class PushGovernanceSettingsViewModel(
             item.governance,
             item.isNewReferendaEnabled,
             item.isReferendaUpdatesEnabled,
-            item.isDelegationVotesEnabled,
+            false, // Not supported yet
             item.trackIds.fromTrackIds()
         )
     }
 
     private fun PushGovernanceModel.disableCompletelyIfFeaturesDisabled(): PushGovernanceModel {
-        if (!isNewReferendaEnabled && !isReferendaUpdatesEnabled && !isDelegationVotesEnabled) {
+        if (!isNewReferendaEnabled && !isReferendaUpdatesEnabled) {
             return copy(isEnabled = false)
         }
 
@@ -173,8 +164,8 @@ class PushGovernanceSettingsViewModel(
     }
 
     private fun PushGovernanceModel.enableEverythingIfFeaturesDisabled(): PushGovernanceModel {
-        if (!isNewReferendaEnabled && !isReferendaUpdatesEnabled && !isDelegationVotesEnabled) {
-            return copy(isEnabled = true, isNewReferendaEnabled = true, isReferendaUpdatesEnabled = true, isDelegationVotesEnabled = true)
+        if (!isNewReferendaEnabled && !isReferendaUpdatesEnabled) {
+            return copy(isEnabled = true, isNewReferendaEnabled = true, isReferendaUpdatesEnabled = true)
         }
 
         return this
