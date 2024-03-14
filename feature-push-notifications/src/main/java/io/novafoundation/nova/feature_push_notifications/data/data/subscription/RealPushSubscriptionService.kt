@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.formatting.formatDateISO_8601_NoMs
 import io.novafoundation.nova.common.utils.mapOfNotNullValues
 import io.novafoundation.nova.common.utils.mapValuesNotNull
-import io.novafoundation.nova.common.utils.useIf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
