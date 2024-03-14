@@ -428,5 +428,5 @@ fun StatemineAssetId.onChainAssetId(): String {
 }
 
 fun Chain.openGovIfSupported(): Chain.Governance? {
-    return if (governance.contains(Chain.Governance.V2)) Chain.Governance.V2 else null
+    return Chain.Governance.V2.takeIf { it in governance }
 }

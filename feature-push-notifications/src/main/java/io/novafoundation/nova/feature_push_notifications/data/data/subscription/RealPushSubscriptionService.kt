@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.formatting.formatDateISO_8601_NoMs
 import io.novafoundation.nova.common.utils.mapOfNotNullValues
 import io.novafoundation.nova.common.utils.mapValuesNotNull
+import io.novafoundation.nova.common.utils.useIf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
@@ -102,14 +103,22 @@ class RealPushSubscriptionService(
     }
 
     private suspend fun handleTopics(pushEnabled: Boolean, oldSettings: PushSettings, newSettings: PushSettings?) {
+        val referendumUpdateTracks = newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled }
+            ?.takeIf { pushEnabled }
+            .orEmpty()
+
+        val newReferendaTracks = newSettings?.getGovernanceTracksFor { it.newReferendaEnabled }
+            ?.takeIf { pushEnabled }
+            .orEmpty()
+
         val govStateTracksDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.referendumUpdateEnabled },
-            newItems = newSettings?.getGovernanceTracksFor { it.referendumUpdateEnabled && pushEnabled }.orEmpty(),
+            newItems = referendumUpdateTracks,
             forceUseNewItems = false
         )
         val newReferendaDiff = CollectionDiffer.findDiff(
             oldItems = oldSettings.getGovernanceTracksFor { it.newReferendaEnabled },
-            newItems = newSettings?.getGovernanceTracksFor { it.newReferendaEnabled && pushEnabled }.orEmpty(),
+            newItems = newReferendaTracks,
             forceUseNewItems = false
         )
 

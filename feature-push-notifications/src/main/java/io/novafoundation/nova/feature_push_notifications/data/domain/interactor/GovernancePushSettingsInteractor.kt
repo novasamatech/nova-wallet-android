@@ -37,9 +37,7 @@ class RealGovernancePushSettingsInteractor(
     }
 
     private fun Chain.supportedGovTypes(): List<Pair<Chain, Chain.Governance>> {
-        return openGovIfSupported()?.let {
-            listOf(this to it)
-        }.orEmpty()
+        return listOfNotNull(openGovIfSupported()?.let { this to it })
     }
 
     private suspend fun getTrackIds(chain: Chain, governance: Chain.Governance): Set<TrackId> {
