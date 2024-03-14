@@ -18,6 +18,8 @@ interface PushNotificationsInteractor {
 
     suspend fun getPushSettings(): PushSettings
 
+    suspend fun getDefaultSettings(): PushSettings
+
     fun isPushNotificationsEnabled(): Boolean
 
     fun isPushNotificationsAvailable(): Boolean
@@ -51,6 +53,10 @@ class RealPushNotificationsInteractor(
 
     override suspend fun getPushSettings(): PushSettings {
         return pushSettingsProvider.getPushSettings()
+    }
+
+    override suspend fun getDefaultSettings(): PushSettings {
+        return pushSettingsProvider.getDefaultPushSettings()
     }
 
     override fun isPushNotificationsEnabled(): Boolean {

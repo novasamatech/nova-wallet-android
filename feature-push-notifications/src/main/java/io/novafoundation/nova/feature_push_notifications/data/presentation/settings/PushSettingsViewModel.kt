@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -103,6 +104,7 @@ class PushSettingsViewModel(
         subscribeOnSelectWallets()
         subscribeOnGovernanceSettings()
         subscribeOnStakingSettings()
+        disableNotificationsIfPushSettingsEmpty()
     }
 
     fun backClicked() {
@@ -136,12 +138,16 @@ class PushSettingsViewModel(
 
     fun enableSwitcherClicked() {
         launch {
-            if (pushEnabledState.value == false && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!pushEnabledState.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val isPermissionsGranted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.POST_NOTIFICATIONS)
 
                 if (!isPermissionsGranted) {
                     return@launch
                 }
+            }
+
+            if (!pushEnabledState.value) {
+                setDefaultPushSettingsIfEmpty()
             }
 
             pushEnabledState.toggle()
@@ -244,5 +250,22 @@ class PushSettingsViewModel(
                     tracks = govState.tracksIds.toTrackIds()
                 )
             }
+    }
+
+    private fun disableNotificationsIfPushSettingsEmpty() {
+        pushSettingsState
+            .filterNotNull()
+            .onEach { pushSettings ->
+                if (pushSettings.settingsIsEmpty()) {
+                    pushEnabledState.value = false
+                }
+            }
+            .launchIn(this)
+    }
+
+    private suspend fun setDefaultPushSettingsIfEmpty() {
+        if (pushSettingsState.value?.settingsIsEmpty() == true) {
+            pushSettingsState.value = pushNotificationsInteractor.getPushSettings()
+        }
     }
 }
