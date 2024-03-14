@@ -9,7 +9,6 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.fromJson
 
 abstract class BaseNotificationHandler(
