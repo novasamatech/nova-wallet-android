@@ -48,12 +48,12 @@ abstract class BaseNotificationHandler(
     protected abstract suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean
 
     internal fun RemoteMessage.getMessageContent(): NotificationData {
-        val payload: Map<String, Any?> = data["payload"]?.let { payload -> gson.fromJson(payload) } ?: emptyMap()
+        val payload: Map<String, Any> = data["payload"]?.let { payload -> gson.fromJson(payload) } ?: emptyMap()
 
         return NotificationData(
             type = data.getValue("type"),
             chainId = data["chainId"],
-            payload = payload.filterNotNull()
+            payload = payload
         )
     }
 }
