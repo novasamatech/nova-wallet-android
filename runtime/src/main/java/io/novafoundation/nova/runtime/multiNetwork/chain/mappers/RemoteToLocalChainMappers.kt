@@ -74,7 +74,7 @@ fun mapRemoteChainToLocal(
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
             supportProxy = PROXY_OPTION in optionsOrEmpty,
             hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
-            pushSupport = PUSH_SUPPORT !in optionsOrEmpty,
+            pushSupport = PUSH_SUPPORT in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             swap = mapSwapRemoteOptionsToLocal(optionsOrEmpty),
             connectionState = determineConnectionState(chainRemote, oldChain),
