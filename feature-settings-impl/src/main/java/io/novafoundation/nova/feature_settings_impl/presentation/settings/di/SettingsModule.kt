@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.SettingsViewModel
@@ -50,8 +49,7 @@ class SettingsModule {
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
         twoFactorVerificationService: TwoFactorVerificationService,
         biometricService: BiometricService,
-        pushNotificationsInteractor: PushNotificationsInteractor,
-        welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
+        pushNotificationsInteractor: PushNotificationsInteractor
     ): ViewModel {
         return SettingsViewModel(
             languageUseCase,
@@ -66,8 +64,7 @@ class SettingsModule {
             walletConnectSessionsUseCase,
             twoFactorVerificationService,
             biometricService,
-            pushNotificationsInteractor,
-            welcomePushNotificationsInteractor
+            pushNotificationsInteractor
         )
     }
 

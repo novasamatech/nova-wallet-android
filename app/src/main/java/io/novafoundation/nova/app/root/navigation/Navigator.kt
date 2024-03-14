@@ -406,6 +406,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_update_notifications)
     }
 
+    override fun openPushWelcome() {
+        performNavigation(R.id.action_open_pushNotificationsWelcome)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {

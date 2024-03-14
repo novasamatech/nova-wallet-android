@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepos
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -96,4 +97,6 @@ interface RootDependencies {
     val pushNotificationsInteractor: PushNotificationsInteractor
 
     val rootDeepLinkHandler: RootDeepLinkHandler
+
+    val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
 }

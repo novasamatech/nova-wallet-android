@@ -199,7 +199,7 @@ class PushSettingsViewModel(
         pushGovernanceSettingsRequester.responseFlow
             .onEach { response ->
                 pushSettingsState.updateValue { settings ->
-                    settings?.copy(governance = mapGovSettingsReponseToModel(response))
+                    settings?.copy(governance = mapGovSettingsResponseToModel(response))
                 }
             }
             .launchIn(this)
@@ -233,7 +233,7 @@ class PushSettingsViewModel(
         }
     }
 
-    private fun mapGovSettingsReponseToModel(response: PushGovernanceSettingsResponder.Response): Map<ChainId, PushSettings.GovernanceState> {
+    private fun mapGovSettingsResponseToModel(response: PushGovernanceSettingsResponder.Response): Map<ChainId, PushSettings.GovernanceState> {
         return response.enabledGovernanceSettings
             .associateBy { it.chainId }
             .mapValues { (_, govState) ->
