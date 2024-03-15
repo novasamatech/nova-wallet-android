@@ -635,6 +635,12 @@
     <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">Ваша мнемоника недействительна, пожалуйста, проверьте еще раз порядок слов</string>
     <string name="multiple_wallets_selection_max_message">Вы не можете выбрать более %d кошельков.</string>
+    <plurals name="multiple_wallets_selection_min_button_text">
+        <item quantity="one">Выберите хотя бы %d кошелек</item>
+        <item quantity="few">Выберите хотя бы %d кошелька</item>
+        <item quantity="many">Выберите хотя бы %d кошельков</item>
+        <item quantity="other">Выберите хотя бы %d кошельков</item>
+    </plurals>
     <string name="network_fee">Комиссия сети</string>
     <string name="network_info_address">Адрес ноды</string>
     <string name="network_info_title">Информация ноды</string>
@@ -737,6 +743,8 @@
     <string name="push_staking_reward_many_accounts_title">⭐️ Новая награда %s</string>
     <string name="push_staking_reward_message" formatted="false">Получено %s от %s стейкинга</string>
     <string name="push_staking_reward_single_account_title">⭐️ Новая награда</string>
+    <string name="push_template_app_name_and_time">Nova Wallet • сейчас</string>
+    <string name="push_template_message">Получено +0.6068 KSM ($20.35) от Kusama стейкинга</string>
     <string name="push_token_received_message" formatted="false">Получено %s в сети %s</string>
     <string name="push_token_received_no_account_name_title">⬇️ Получено</string>
     <string name="push_token_received_title">⬇️ Получено %s</string>

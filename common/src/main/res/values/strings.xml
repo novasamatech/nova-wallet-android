@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <plurals name="multiple_wallets_selection_min_button_text">
+        <item quantity="one">Select at least %d wallet</item>
+        <item quantity="other">Select at least %d wallets</item>
+    </plurals>
+
     <string name="common_terms_and_conditions_formatting">Terms and Conditions</string>
     <string name="common_privacy_policy_formatting">Privacy Policy</string>
 

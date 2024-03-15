@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list.mu
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.WalletListViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SelectMultipleWalletsViewModel(
@@ -39,6 +41,15 @@ class SelectMultipleWalletsViewModel(
     )
 
     override val mode: AccountHolder.Mode = AccountHolder.Mode.SELECT_MULTIPLE
+
+    val confirmButtonState = selectedMetaAccounts.map { selectedMetaAccounts ->
+        if (selectedMetaAccounts.ids.size < request.min) {
+            val disabledText = resourceManager.getQuantityString(R.plurals.multiple_wallets_selection_min_button_text, request.min, request.min)
+            DescriptiveButtonState.Disabled(disabledText)
+        } else {
+            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
+        }
+    }
 
     fun backClicked() {
         launch {
@@ -68,10 +79,6 @@ class SelectMultipleWalletsViewModel(
         val selected = mutableSetOf(*selectedMetaAccounts.value.ids.toTypedArray())
 
         if (selected.contains(accountModel.id)) {
-            if (selected.size <= request.min) {
-                return
-            }
-
             selected.remove(accountModel.id)
         } else {
             if (selected.size >= request.max) {
