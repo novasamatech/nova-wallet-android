@@ -19,12 +19,12 @@ val RuntimeMetadata.assetRegistry: AssetRegistryApi
     get() = AssetRegistryApi(assetRegistry())
 
 context(StorageQueryContext)
-val AssetRegistryApi.assetMetadataMap: QueryableStorageEntry1<HydraDxAssetId, Int>
+val AssetRegistryApi.assetMetadataMap: QueryableStorageEntry1<HydraDxAssetId, Int?>
     get() = storage1(
-        name = "AssetMetadataMap",
+        name = "Assets",
         binding = { decoded, _ -> bindMetadataDecimals(decoded) },
     )
 
-private fun bindMetadataDecimals(decoded: Any): Int {
-    return bindInt(decoded.castToStruct()["decimals"])
+private fun bindMetadataDecimals(decoded: Any): Int? {
+    return decoded.castToStruct().get<Any?>("decimals")?.let(::bindInt)
 }

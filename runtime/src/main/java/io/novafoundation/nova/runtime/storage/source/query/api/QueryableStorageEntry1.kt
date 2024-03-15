@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.filterNotNull
 
 typealias QueryableStorageBinder1<K, V> = (dynamicInstance: Any, key: K) -> V
 
-interface QueryableStorageEntry1<I, T : Any> {
+interface QueryableStorageEntry1<I, T> {
 
     context(StorageQueryContext)
     suspend fun keys(): List<I>
@@ -46,7 +46,7 @@ fun <I, T : Any> QueryableStorageEntry1<I, T>.observeNonNull(argument: I): Flow<
 context(StorageQueryContext)
 suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.queryNonNull(argument: I): T = requireNotNull(query(argument))
 
-internal class RealQueryableStorageEntry1<I, T : Any>(
+internal class RealQueryableStorageEntry1<I, T>(
     private val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder1<I, T>,
     @Suppress("UNCHECKED_CAST") private val keyBinding: QueryableStorageKeyBinder<I>? = null
