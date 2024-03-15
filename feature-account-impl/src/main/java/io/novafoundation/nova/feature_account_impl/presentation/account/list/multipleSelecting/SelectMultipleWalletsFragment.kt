@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
@@ -76,6 +77,7 @@ class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewMode
 
         viewModel.titleFlow.observe(titleAdapter::setText)
         viewModel.walletsListingMixin.metaAccountsFlow.observe(walletsAdapter::submitList)
+        viewModel.confirmButtonState.observe(selectMultipleWalletsConfirm::setState)
     }
 
     override fun itemClicked(accountModel: AccountUi) {
