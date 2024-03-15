@@ -18,7 +18,7 @@ fun <T : Any> QueryableModule.storage0(name: String, binding: QueryableStorageBi
 }
 
 context(StorageQueryContext)
-fun <I, T : Any> QueryableModule.storage1(
+fun <I, T> QueryableModule.storage1(
     name: String,
     binding: QueryableStorageBinder1<I, T>,
     keyBinding: QueryableStorageKeyBinder<I>? = null
