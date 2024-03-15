@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface PushNotificationsInteractor {
 
-    suspend fun syncSettings()
+    suspend fun initialSyncSettings()
 
     fun pushNotificationsEnabledFlow(): Flow<Boolean>
 
@@ -35,8 +35,8 @@ class RealPushNotificationsInteractor(
     private val accountRepository: AccountRepository
 ) : PushNotificationsInteractor {
 
-    override suspend fun syncSettings() {
-        pushNotificationsService.syncSettings()
+    override suspend fun initialSyncSettings() {
+        pushNotificationsService.syncSettingsIfNeeded()
     }
 
     override fun pushNotificationsEnabledFlow(): Flow<Boolean> {

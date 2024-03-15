@@ -132,11 +132,14 @@ fun makeNewReleasesIntent(
 
 fun ReferendumStatusType.Companion.fromRemoteNotificationType(type: String): ReferendumStatusType {
     return when (type) {
+        "Created" -> ReferendumStatusType.PREPARING
+        "Deciding" -> ReferendumStatusType.DECIDING
+        "Confirming" -> ReferendumStatusType.CONFIRMING
         "Approved" -> ReferendumStatusType.APPROVED
         "Rejected" -> ReferendumStatusType.REJECTED
         "TimedOut" -> ReferendumStatusType.TIMED_OUT
         "Cancelled" -> ReferendumStatusType.CANCELLED
-        "DecisionStarted" -> ReferendumStatusType.DECIDING
+        "Killed" -> ReferendumStatusType.KILLED
         else -> throw IllegalArgumentException("Unknown referendum status type: $this")
     }
 }

@@ -138,7 +138,7 @@ class RootViewModel(
 
     private fun syncPushSettingsIfNeeded() {
         launch {
-            pushNotificationsInteractor.syncSettings()
+            pushNotificationsInteractor.initialSyncSettings()
         }
     }
 
