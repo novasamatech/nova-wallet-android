@@ -4,7 +4,7 @@ import android.os.Bundle
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsRouter
+import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 
 class PushNotificationsNavigator(
     navigationHolder: NavigationHolder,

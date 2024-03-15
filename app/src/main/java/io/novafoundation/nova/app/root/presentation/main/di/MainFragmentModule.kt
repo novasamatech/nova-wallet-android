@@ -11,7 +11,7 @@ import io.novafoundation.nova.app.root.presentation.main.MainViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
-import io.novafoundation.nova.feature_push_notifications.data.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 
 @Module(

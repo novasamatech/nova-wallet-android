@@ -896,7 +896,7 @@
 
     <fragment
         android:id="@+id/pushNotificationsWelcomeFragment"
-        android:name="io.novafoundation.nova.feature_push_notifications.data.presentation.welcome.PushWelcomeFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.welcome.PushWelcomeFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_push_welcome">
 
