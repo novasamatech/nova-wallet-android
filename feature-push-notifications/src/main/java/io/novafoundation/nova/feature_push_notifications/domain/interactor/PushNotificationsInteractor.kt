@@ -36,7 +36,7 @@ class RealPushNotificationsInteractor(
 ) : PushNotificationsInteractor {
 
     override suspend fun syncSettings() {
-        pushNotificationsService.syncSettings()
+        pushNotificationsService.syncSettingsIfNeeded()
     }
 
     override fun pushNotificationsEnabledFlow(): Flow<Boolean> {

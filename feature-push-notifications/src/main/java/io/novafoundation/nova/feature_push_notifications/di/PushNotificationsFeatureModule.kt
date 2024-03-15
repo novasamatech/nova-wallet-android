@@ -100,7 +100,8 @@ class PushNotificationsFeatureModule {
         rootScope: RootScope,
         pushTokenCache: PushTokenCache,
         googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
-        pushPermissionRepository: PushPermissionRepository
+        pushPermissionRepository: PushPermissionRepository,
+        preferences: Preferences
     ): PushNotificationsService {
         return RealPushNotificationsService(
             pushSettingsProvider,
@@ -108,7 +109,8 @@ class PushNotificationsFeatureModule {
             rootScope,
             pushTokenCache,
             googleApiAvailabilityProvider,
-            pushPermissionRepository
+            pushPermissionRepository,
+            preferences
         )
     }
 
