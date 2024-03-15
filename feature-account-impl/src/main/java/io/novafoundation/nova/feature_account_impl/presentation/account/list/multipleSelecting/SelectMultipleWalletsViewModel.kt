@@ -43,7 +43,7 @@ class SelectMultipleWalletsViewModel(
     override val mode: AccountHolder.Mode = AccountHolder.Mode.SELECT_MULTIPLE
 
     val confirmButtonState = selectedMetaAccounts.map { selectedMetaAccounts ->
-        if (selectedMetaAccounts.ids.isEmpty()) {
+        if (selectedMetaAccounts.ids.size < request.min) {
             val disabledText = resourceManager.getQuantityString(R.plurals.multiple_wallets_selection_min_button_text, request.min, request.min)
             DescriptiveButtonState.Disabled(disabledText)
         } else {
