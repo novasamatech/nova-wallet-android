@@ -89,11 +89,8 @@ class RealPushNotificationsService(
         if (!isPushNotificationsEnabled()) return
         if (!googleApiAvailabilityProvider.isAvailable()) return
 
-        val isPermissionGranted = pushPermissionRepository.isPermissionGranted()
-        val isTimeToSync = isTimeToSync()
-
-        // Sync notifications only if push permission was revoked or if it's time to sync
-        if (!isPermissionGranted || isTimeToSync) {
+        if (isPermissionsRevoked() || isTimeToSync()) {
+            val isPermissionGranted = pushPermissionRepository.isPermissionGranted()
             updatePushSettings(isPermissionGranted, settingsProvider.getPushSettings())
         }
     }
@@ -145,6 +142,10 @@ class RealPushNotificationsService(
                 Log.d(PUSH_LOG_TAG, "FCM token: ${task.result}")
             }
         )
+    }
+
+    private fun isPermissionsRevoked(): Boolean {
+        return !pushPermissionRepository.isPermissionGranted()
     }
 
     private fun isTimeToSync(): Boolean {
