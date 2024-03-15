@@ -21,7 +21,7 @@ val RuntimeMetadata.assetRegistry: AssetRegistryApi
 context(StorageQueryContext)
 val AssetRegistryApi.assetMetadataMap: QueryableStorageEntry1<HydraDxAssetId, Int>
     get() = storage1(
-        name = "AssetMetadataMap",
+        name = "Assets",
         binding = { decoded, _ -> bindMetadataDecimals(decoded) },
     )
 
