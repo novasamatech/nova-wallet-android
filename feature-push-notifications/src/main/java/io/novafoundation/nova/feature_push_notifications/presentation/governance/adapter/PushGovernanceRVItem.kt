@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_push_notifications.presentation.governanc
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel
 
 data class PushGovernanceRVItem(
-    val model: _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel,
+    val model: PushGovernanceModel,
     val tracksText: String
 ) {
     val chainId = model.chainId

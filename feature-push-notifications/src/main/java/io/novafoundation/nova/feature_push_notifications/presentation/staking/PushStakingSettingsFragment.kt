@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.adapter.PushStakingRVItem
-import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.adapter.PushStakingSettingsAdapter
+import io.novafoundation.nova.feature_push_notifications.presentation.staking.adapter.PushStakingSettingsAdapter
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingList
 import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingProgress

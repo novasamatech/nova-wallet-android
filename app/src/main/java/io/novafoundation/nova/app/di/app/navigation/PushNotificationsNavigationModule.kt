@@ -8,8 +8,8 @@ import io.novafoundation.nova.app.root.navigation.push.PushNotificationsNavigato
 import io.novafoundation.nova.app.root.navigation.push.PushStakingSettingsCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
-import io.novafoundation.nova.feature_push_notifications.data.presentation.governance.PushGovernanceSettingsCommunicator
-import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsCommunicator
+import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsCommunicator
+import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsCommunicator
 
 @Module
 class PushNotificationsNavigationModule {

@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.governance
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsRequester
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsResponder
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsPayload
-import io.novafoundation.nova.feature_push_notifications.data.presentation.staking.PushStakingSettingsRequester
+import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsRequester
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow

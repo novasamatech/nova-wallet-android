@@ -17,12 +17,12 @@ data class PushGovernanceModel(
     companion object
 }
 
-fun io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel.Companion.default(
+fun PushGovernanceModel.Companion.default(
     chain: Chain,
     governance: Chain.Governance,
     tracks: Set<TrackId>
-): _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel {
-    return _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel(
+): PushGovernanceModel {
+    return PushGovernanceModel(
         chainId = chain.id,
         governance = governance,
         chainName = chain.name,

@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.NovaNotificationChannel
-import io.novafoundation.nova.feature_push_notifications.data.presentation.handling.buildWithDefaults
+import io.novafoundation.nova.feature_push_notifications.presentation.handling.NovaNotificationChannel
+import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 
 class SystemNotificationHandler(
     private val context: Context,

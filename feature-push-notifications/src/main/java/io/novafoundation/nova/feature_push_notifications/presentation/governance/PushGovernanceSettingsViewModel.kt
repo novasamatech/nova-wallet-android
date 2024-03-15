@@ -42,12 +42,12 @@ class PushGovernanceSettingsViewModel(
     private val chainsWithTracks = interactor.governanceChainsFlow()
         .shareInBackground()
 
-    val _changedGovernanceSettingsList: MutableStateFlow<Map<GovChainKey, _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel>> = MutableStateFlow(emptyMap())
+    val _changedGovernanceSettingsList: MutableStateFlow<Map<GovChainKey, PushGovernanceModel>> = MutableStateFlow(emptyMap())
 
     val governanceSettingsList = combine(chainsWithTracks, _changedGovernanceSettingsList) { chainsWithTracksQuantity, changedSettings ->
         chainsWithTracksQuantity.map { chainAndTracks ->
             val pushSettingsModel = changedSettings[chainAndTracks.key()]
-                ?: _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel.default(
+                ?: PushGovernanceModel.default(
                     chainAndTracks.chain,
                     chainAndTracks.govVersion,
                     chainAndTracks.tracks
@@ -130,9 +130,9 @@ class PushGovernanceSettingsViewModel(
     private fun mapCommunicatorModelToItem(
         item: PushGovernanceSettingsPayload,
         chain: Chain
-    ): _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel {
+    ): PushGovernanceModel {
         val tracks = item.tracksIds.toTrackIds()
-        return _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel(
+        return PushGovernanceModel(
             chainId = item.chainId,
             governance = item.governance,
             chainName = chain.name,
@@ -144,7 +144,7 @@ class PushGovernanceSettingsViewModel(
         )
     }
 
-    private fun mapItemToCommunicatorModel(item: _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel): PushGovernanceSettingsPayload {
+    private fun mapItemToCommunicatorModel(item: PushGovernanceModel): PushGovernanceSettingsPayload {
         return PushGovernanceSettingsPayload(
             item.chainId,
             item.governance,
@@ -155,7 +155,7 @@ class PushGovernanceSettingsViewModel(
         )
     }
 
-    private fun _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel.disableCompletelyIfFeaturesDisabled(): _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel {
+    private fun PushGovernanceModel.disableCompletelyIfFeaturesDisabled(): PushGovernanceModel {
         if (!isNewReferendaEnabled && !isReferendaUpdatesEnabled) {
             return copy(isEnabled = false)
         }
@@ -163,7 +163,7 @@ class PushGovernanceSettingsViewModel(
         return this
     }
 
-    private fun _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel.enableEverythingIfFeaturesDisabled(): _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel {
+    private fun PushGovernanceModel.enableEverythingIfFeaturesDisabled(): PushGovernanceModel {
         if (!isNewReferendaEnabled && !isReferendaUpdatesEnabled) {
             return copy(isEnabled = true, isNewReferendaEnabled = true, isReferendaUpdatesEnabled = true)
         }
@@ -180,7 +180,7 @@ class PushGovernanceSettingsViewModel(
 
                 _changedGovernanceSettingsList.updateValue { governanceSettings ->
                     val model = governanceSettings[key]?.copy(trackIds = selectedTracks)
-                        ?: _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel.default(
+                        ?: PushGovernanceModel.default(
                             chain = chain,
                             governance = response.governanceType,
                             tracks = selectedTracks
@@ -192,9 +192,9 @@ class PushGovernanceSettingsViewModel(
             .launchIn(this)
     }
 
-    private fun _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel.key() = GovChainKey(chainId, governance)
+    private fun PushGovernanceModel.key() = GovChainKey(chainId, governance)
 
-    private fun _root_ide_package_.io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceModel.withKey() = key() to this
+    private fun PushGovernanceModel.withKey() = key() to this
 
     private fun ChainWithGovTracks.key() = GovChainKey(chain.id, govVersion)
 
