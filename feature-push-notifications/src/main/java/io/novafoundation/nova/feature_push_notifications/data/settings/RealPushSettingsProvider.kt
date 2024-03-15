@@ -65,7 +65,7 @@ class RealPushSettingsProvider(
     }
 
     fun VersionedPushSettingsCache.toPushSettings(): PushSettings {
-        return gson.fromJson(settings, io.novafoundation.nova.feature_push_notifications.data.settings.model.PushSettingsCacheV1::class.java) // Currently we always use V1 version
+        return gson.fromJson(settings, PushSettingsCacheV1::class.java) // Currently we always use V1 version
             .toPushSettings()
     }
 }
