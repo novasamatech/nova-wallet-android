@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_terms_and_conditions_formatting">Terms and Conditions</string>
+    <string name="common_privacy_policy_formatting">Privacy Policy</string>
+
     <string name="push_template_message">Received +0.6068 KSM ($20.35) from Kusama staking</string>
     <string name="push_template_app_name_and_time">Nova Wallet • now</string>
 
-    <string name="push_settings_no_selected_wallets">You won\'t receive notifications about Wallet Activities (Balances, Staking) because your haven\'t selected any wallet</string>
+    <string name="push_settings_no_selected_wallets">You won\'t receive notifications about Wallet Activities (Balances, Staking) because you haven\'t selected any wallet</string>
 
     <string name="deep_linking_host" translatable="false">nova</string>
     <string name="deep_linking_scheme" translatable="false">novawallet</string>
@@ -35,25 +38,10 @@
     <string name="push_new_update_message">Download Nova Wallet v%s to get all the new features!</string>
     <string name="push_new_referendum_title">🗳️ New referendum</string>
     <string name="push_new_referendum_message">%s Referendum %s is now live!</string>
-    <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>
-
-    <string name="common_too_small_balance_title">Your balance is too small</string>
-    <string name="wallet_send_insufficient_balance_commission">You need to have at least %s to pay this transaction fee and stay above the minimum network balance. Your current balance is: %s. You need to add %s to your balance to perform this operation.</string>
-
-    <string name="nft_issuance_fungible_format">%s units of %s</string>
-
-    <string name="nft_fungile_price">%s for %s</string>
-
-    <string name="staking_set_controller_deprecated_subtitle">Use Proxies to delegate Staking operations to another account</string>
-
-    <string name="staking_manage_proxy_requires_stash_title">Select stash account to setup proxy</string>
-    <string name="staking_manage_proxy_requires_stash_message">Please switch your wallet to %s to setup a proxy</string>
-
-    <string name="common_network_not_supported">%s is not supported</string>
 
     <plurals name="governance_select_tracks_min_tracks_error">
-        <item quantity="one">Youn need to select at least %d track</item>
-        <item quantity="other">Youn need to select at least %d tracks</item>
+        <item quantity="one">You need to select at least %d track</item>
+        <item quantity="other">You need to select at least %d tracks</item>
     </plurals>
 
     <string name="select_tracks_for">Select tracks for</string>
@@ -95,7 +83,23 @@
     <string name="push_welcome_message">Get notified about Wallet operations, Governance updates, Staking activity and Security, so you’re always in the know</string>
     <string name="push_welcome_enable_button">Enable push notifications</string>
     <string name="push_welcome_cancel_button">Not now</string>
-    <string name="push_welcome_terms_and_conditions">By enabling push notifications, you agree to our %s and %s</string>
+    <string name="push_welcome_terms_and_conditions" formatted="false">By enabling push notifications, you agree to our %s and %s</string>
+
+    <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>
+
+    <string name="common_too_small_balance_title">Your balance is too small</string>
+    <string name="wallet_send_insufficient_balance_commission">You need to have at least %s to pay this transaction fee and stay above the minimum network balance. Your current balance is: %s. You need to add %s to your balance to perform this operation.</string>
+
+    <string name="nft_issuance_fungible_format">%s units of %s</string>
+
+    <string name="nft_fungile_price">%s for %s</string>
+
+    <string name="staking_set_controller_deprecated_subtitle">Use Proxies to delegate Staking operations to another account</string>
+
+    <string name="staking_manage_proxy_requires_stash_title">Select stash account to setup proxy</string>
+    <string name="staking_manage_proxy_requires_stash_message">Please switch your wallet to %s to setup a proxy</string>
+
+    <string name="common_network_not_supported">%s is not supported</string>
 
     <string name="remove_proxy_confirmation_revoke_access_type">Revoke access type</string>
     <string name="remove_proxy_confirmation_revoke_for">Revoke for</string>

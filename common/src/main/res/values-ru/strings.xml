@@ -230,6 +230,7 @@
     <string name="common_chain">Сеть</string>
     <string name="common_change">Изменить</string>
     <string name="common_choose_network">Выберите сеть</string>
+    <string name="common_clear">Очистить</string>
     <string name="common_close">Закрыть</string>
     <string name="common_close_confirmation_message">Вы уверены, что хотите закрыть этот экран?\nИзменения не будут применены.</string>
     <string name="common_completed">Завершённые</string>
@@ -340,9 +341,11 @@
     <string name="common_permission_permissions_needed_message">Для использования этого экрана требуются запрашиваемые разрешения.</string>
     <string name="common_permission_permissions_needed_title">Необходимы разрешения</string>
     <string name="common_price">Цена</string>
+    <string name="common_privacy_policy_formatting">Политикой конфиденциальности</string>
     <string name="common_proceed">Продолжить</string>
     <string name="common_proxy_deposit">Прокси депозит</string>
     <string name="common_proxy_rewoke_access">Отозвать доступ</string>
+    <string name="common_push_notifications">Push-уведомления</string>
     <string name="common_read_more">Подробнее</string>
     <string name="common_recommended">Рекомендовано</string>
     <string name="common_refresh_fee">Обновить</string>
@@ -351,6 +354,7 @@
     <string name="common_required">Обязательные</string>
     <string name="common_reset">Сброс</string>
     <string name="common_retry">Повторить</string>
+    <string name="common_retry_message">Что-то пошло не так. Пожалуйста, попробуйте еще раз</string>
     <string name="common_revoke">Отменить</string>
     <string name="common_save">Сохранить</string>
     <string name="common_scan_qr_code">Отсканируйте QR-код</string>
@@ -369,6 +373,7 @@
     <string name="common_sort_by">Сортировка по</string>
     <string name="common_status">Статус</string>
     <string name="common_substrate_address">Substrate адрес</string>
+    <string name="common_terms_and_conditions_formatting">Условиями использования</string>
     <string name="common_time_left">Оставшееся время</string>
     <string name="common_title">Заголовок</string>
     <string name="common_to_settings">Открыть Настройки</string>
@@ -503,6 +508,7 @@
     <string name="deep_linking_invalid_derivation_path">Неверный формат пути деривации</string>
     <string name="deep_linking_invalid_mnemonic">Неверный формат мнемоники</string>
     <string name="deep_linking_url_is_invalid">Неверный формат ссылки</string>
+    <string name="default_notification_channel_name">Основной канал уведомлений</string>
     <string name="delegate_search_hint">Поиск по адресу или имени</string>
     <string name="delegate_search_placeholder_empty">Недопустимый формат адреса. Убедитесь, что адрес принадлежит правильной сети</string>
     <string name="delegate_search_result_count">результаты поиска: %d</string>
@@ -570,6 +576,13 @@
     <string name="fragment_swap_main_settings_pay_title">Вы платите</string>
     <string name="fragment_swap_main_settings_receive_title">Вы получаете</string>
     <string name="fragment_swap_main_settings_select_token">Выберите токен</string>
+    <string name="governance_notification_channel_name">Канал уведомлений демократии</string>
+    <plurals name="governance_select_tracks_min_tracks_error">
+        <item quantity="one">Необходимо выбрать хотя бы %d трек</item>
+        <item quantity="few">Необходимо выбрать хотя бы %d трека</item>
+        <item quantity="many">Необходимо выбрать хотя бы %d треков</item>
+        <item quantity="other"></item>
+    </plurals>
     <string name="governance_unlock">Разблокировать</string>
     <string name="history_v1.9.0">История</string>
     <string name="identity_email_title">Почта</string>
@@ -621,6 +634,7 @@
     <string name="manage_assets_add_token">Добавить</string>
     <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">Ваша мнемоника недействительна, пожалуйста, проверьте еще раз порядок слов</string>
+    <string name="multiple_wallets_selection_max_message">Вы не можете выбрать более %d кошельков.</string>
     <string name="network_fee">Комиссия сети</string>
     <string name="network_info_address">Адрес ноды</string>
     <string name="network_info_title">Информация ноды</string>
@@ -697,6 +711,44 @@
     <string name="proxy_signing_warning_message">Транзакция будет инициирована %s как делегированным аккаунтом. Сетевая комиссия будет оплачена делегированным аккаунтом.</string>
     <string name="proxy_signing_warning_title">Это делегирующий (проксированный) аккаунт</string>
     <string name="proxy_wallet_type">%s</string>
+    <string name="push_governance_settings_delegate_votes">Голоса делегата</string>
+    <string name="push_governance_settings_new_referendum">Новые референдумы</string>
+    <string name="push_governance_settings_referendum_update">Обновление референдума</string>
+    <string name="push_new_referendum_message" formatted="false">%s Референдум %s уже доступен!</string>
+    <string name="push_new_referendum_title">🗳️ Новый референдум</string>
+    <string name="push_new_update_message">Загрузите Nova Wallet v%s, чтобы получить новые функции!</string>
+    <string name="push_new_update_title">Доступно новое обновление Nova Wallet!</string>
+    <string name="push_referendum_approved_message">%1$s Референдум #%2$s завершился и был одобрен 🎉</string>
+    <string name="push_referendum_approved_title">✅ Референдум одобрен!</string>
+    <string name="push_referendum_from_to_status_changed_message">%1$s Референдум #%2$s изменил статус с %3$s на %4$s</string>
+    <string name="push_referendum_rejected_message">%1$s Референдум #%2$s завершился и был отклонен!</string>
+    <string name="push_referendum_rejected_title">❌ Референдум отклонен!</string>
+    <string name="push_referendum_status_changed_title">🗳️ Статус референдума изменен</string>
+    <string name="push_referendum_to_status_changed_message">%1$s Референдум #%2$s изменил статус на %3$s</string>
+    <string name="push_settings_announcements">Объявления Nova</string>
+    <string name="push_settings_balances">Балансы</string>
+    <string name="push_settings_enable">Включить уведомления</string>
+    <string name="push_settings_no_selected_wallets">Вы не будете получать уведомления о деятельности кошелька (балансы, стейкинг), поскольку вы не выбрали ни один кошелек.</string>
+    <string name="push_settings_others">Прочее</string>
+    <string name="push_settings_received_tokens">Полученные токены</string>
+    <string name="push_settings_sent_tokens">Отправленные токены</string>
+    <string name="push_settings_staking_rewards">Награды стейкинга</string>
+    <string name="push_settings_wallets">Кошельки</string>
+    <string name="push_staking_reward_many_accounts_title">⭐️ Новая награда %s</string>
+    <string name="push_staking_reward_message" formatted="false">Получено %s от %s стейкинга</string>
+    <string name="push_staking_reward_single_account_title">⭐️ Новая награда</string>
+    <string name="push_token_received_message" formatted="false">Получено %s в сети %s</string>
+    <string name="push_token_received_no_account_name_title">⬇️ Получено</string>
+    <string name="push_token_received_title">⬇️ Получено %s</string>
+    <string name="push_token_sent_message">Отправлено %1$s на %2$s в сети %3$s</string>
+    <string name="push_token_sent_no_account_name_title">💸 Отправлено</string>
+    <string name="push_token_sent_title">💸 Отправлено %s</string>
+    <string name="push_wallets_title">Выберите до 3 кошельков для которых вы будете получать уведомления о событиях кошелька</string>
+    <string name="push_welcome_cancel_button">Не сейчас</string>
+    <string name="push_welcome_enable_button">Включить push-уведомления</string>
+    <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы вы всегда быть в куре событий</string>
+    <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
+    <string name="push_welcome_title">Не пропустите ничего!</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
     <string name="recover_json_upload">Загрузите файл</string>
     <string name="recovery_json">JSON для восстановления</string>
@@ -745,6 +797,7 @@
     <string name="referendum_status_deciding">Решение</string>
     <string name="referendum_status_deciding_in">Начнёт решаться через %s</string>
     <string name="referendum_status_executed">Выполнен</string>
+    <string name="referendum_status_in_queue">В очереди</string>
     <string name="referendum_status_in_queue_format" formatted="false">В очереди (%s из %s)</string>
     <string name="referendum_status_killed">Удалён</string>
     <string name="referendum_status_not_passing">Не проходит</string>
@@ -840,6 +893,8 @@
     <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
     <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
     <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
+    <string name="select_tracks_for">Выберите треки для</string>
+    <string name="selected_tracks_quantity" formatted="false">%d из %d</string>
     <string name="send_address_hint">Адрес или w3n</string>
     <string name="send_recipient_system_account_message">Получатель является системным аккаунтом. Этот аккаунт не контролируется какой-либо компанией или частным лицом. \nВы уверены, что все еще хотите выполнить данный перевод?</string>
     <string name="send_recipient_system_account_title">Токены будут потеряны</string>
@@ -970,6 +1025,7 @@
     <string name="staking_nominator_status_waiting">Ожидание следующей Эры</string>
     <string name="staking_nominator_status_waiting_format">ожидание следующей эры (%s)</string>
     <string name="staking_not_enough_balance_to_pay_proxy_deposit_message" formatted="false">У вас недостаточный баланс для прокси-депозита %s. Доступный баланс: %s</string>
+    <string name="staking_notification_channel_name">Канал уведомлений стейкинга</string>
     <string name="staking_parachain_collator">Коллатор</string>
     <string name="staking_parachain_collator_details_oversubscribed">Минимальный стейк коллатора выше, чем ваша делегация. Вы не будете получать вознаграждения от этого коллатора.</string>
     <string name="staking_parachain_collator_info">Информация о коллаторе</string>
@@ -1271,6 +1327,7 @@
     <string name="transaction_status_completed">Успешно</string>
     <string name="transaction_status_failed">Ошибка</string>
     <string name="transaction_status_pending">В ожидании</string>
+    <string name="transactions_notification_channel_name">Канал уведомлений о транзакциях</string>
     <string name="transfer_history_income_from">От: %s</string>
     <string name="transfer_history_send_to">Кому: %s</string>
     <string name="transfer_title">Перевод</string>
@@ -1374,7 +1431,7 @@
     <string name="wallet_send_existential_warning_title">Перевод удалит аккаунт</string>
     <string name="wallet_send_existential_warnining_transfer_dust">Ваша учетная запись будет удалена из блокчейна после перевода, потому что общий баланс становится ниже минимального. Остаток также будет переведен получателю.</string>
     <string name="wallet_send_from_network">Из сети</string>
-    <string name="wallet_send_insufficient_balance_commission" formatted="false">Вам необходимо иметь как минимум %s , чтобы оплатить комиссию за транзакцию и остаться выше минимального баланса. Ваш текущий баланс: %s . Для выполнения этой операции вам необходимо добавить %s к своему балансу.</string>
+    <string name="wallet_send_insufficient_balance_commission" formatted="false">Вам необходимо иметь как минимум %s, чтобы оплатить комиссию за транзакцию и остаться выше минимального баланса. Ваш текущий баланс: %s. Для выполнения этой операции вам необходимо добавить %s к своему балансу.</string>
     <string name="wallet_send_myself">Себе</string>
     <string name="wallet_send_on_chain">Внутри сети</string>
     <string name="wallet_send_phishing_warning_text">Следующий адрес: %s как известно, используется для фишинга, поэтому мы не рекомендуем отправлять токены на этот адрес. Вы все равно хотите продолжить?</string>
