@@ -44,9 +44,11 @@ class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel>() {
 
         pushWelcomeTermsAndConditions.text = SpannableFormatter.format(
             requireContext().getString(R.string.push_welcome_terms_and_conditions),
-            requireContext().getString(R.string.about_terms).toSpannable(clickableSpan { viewModel.termsClicked() })
+            requireContext().getString(R.string.common_terms_and_conditions_formatting)
+                .toSpannable(clickableSpan { viewModel.termsClicked() })
                 .setFullSpan(colorSpan(linkColor)),
-            requireContext().getString(R.string.about_privacy).toSpannable(clickableSpan { viewModel.privacyClicked() })
+            requireContext().getString(R.string.common_privacy_policy_formatting)
+                .toSpannable(clickableSpan { viewModel.privacyClicked() })
                 .setFullSpan(colorSpan(linkColor))
         )
     }
