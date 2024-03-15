@@ -138,7 +138,7 @@ fun ReferendumStatusType.Companion.fromRemoteNotificationType(type: String): Ref
         "Approved" -> ReferendumStatusType.APPROVED
         "Rejected" -> ReferendumStatusType.REJECTED
         "TimedOut" -> ReferendumStatusType.TIMED_OUT
-        "Canceled" -> ReferendumStatusType.CANCELED
+        "Cancelled" -> ReferendumStatusType.CANCELLED
         "Killed" -> ReferendumStatusType.KILLED
         else -> throw IllegalArgumentException("Unknown referendum status type: $this")
     }

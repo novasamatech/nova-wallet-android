@@ -20,7 +20,7 @@ class RealReferendaStatusFormatter(
             ReferendumStatusType.EXECUTED -> resourceManager.getString(R.string.referendum_status_executed)
             ReferendumStatusType.TIMED_OUT -> resourceManager.getString(R.string.referendum_status_timeout)
             ReferendumStatusType.KILLED -> resourceManager.getString(R.string.referendum_status_killed)
-            ReferendumStatusType.CANCELED -> resourceManager.getString(R.string.referendum_status_cancelled)
+            ReferendumStatusType.CANCELLED -> resourceManager.getString(R.string.referendum_status_cancelled)
             ReferendumStatusType.REJECTED -> resourceManager.getString(R.string.referendum_status_rejected)
         }
     }

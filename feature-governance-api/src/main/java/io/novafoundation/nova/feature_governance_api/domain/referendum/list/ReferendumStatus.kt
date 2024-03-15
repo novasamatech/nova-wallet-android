@@ -14,7 +14,7 @@ enum class ReferendumStatusType {
     EXECUTED,
     TIMED_OUT,
     KILLED,
-    CANCELED,
+    CANCELLED,
     REJECTED;
 
     companion object
@@ -64,7 +64,7 @@ sealed class ReferendumStatus {
         }
 
         object Cancelled : NotExecuted() {
-            override val type = ReferendumStatusType.CANCELED
+            override val type = ReferendumStatusType.CANCELLED
         }
 
         object Rejected : NotExecuted() {
