@@ -45,7 +45,7 @@
     <string name="push_new_update_title">A new update of Nova Wallet is available!</string>
     <string name="push_new_update_message">Download Nova Wallet v%s to get all the new features!</string>
     <string name="push_new_referendum_title">🗳️ New referendum</string>
-    <string name="push_new_referendum_message">%s Referendum %s is now live!</string>
+    <string name="push_new_referendum_message">%s Referendum #%s is now live!</string>
 
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">You need to select at least %d track</item>

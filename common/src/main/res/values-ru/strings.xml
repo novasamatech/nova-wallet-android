@@ -720,7 +720,7 @@
     <string name="push_governance_settings_delegate_votes">Голоса делегата</string>
     <string name="push_governance_settings_new_referendum">Новые референдумы</string>
     <string name="push_governance_settings_referendum_update">Обновление референдума</string>
-    <string name="push_new_referendum_message" formatted="false">%s Референдум %s уже доступен!</string>
+    <string name="push_new_referendum_message" formatted="false">%s Референдум #%s уже доступен!</string>
     <string name="push_new_referendum_title">🗳️ Новый референдум</string>
     <string name="push_new_update_message">Загрузите Nova Wallet v%s, чтобы получить новые функции!</string>
     <string name="push_new_update_title">Доступно новое обновление Nova Wallet!</string>
