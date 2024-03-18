@@ -4,6 +4,8 @@ import android.Manifest
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -24,12 +26,15 @@ class PushWelcomeViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor,
     private val permissionsAsker: PermissionsAsker.Presentation,
-    private val resourceManager: ResourceManager
-) : BaseViewModel(), PermissionsAsker by permissionsAsker, Retriable {
+    private val resourceManager: ResourceManager,
+    private val appLinksProvider: AppLinksProvider
+) : BaseViewModel(), PermissionsAsker by permissionsAsker, Retriable, Browserable {
 
     private val _enablingInProgress = MutableStateFlow(false)
 
     override val retryEvent: MutableLiveData<Event<RetryPayload>> = MutableLiveData()
+
+    override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     val buttonState = _enablingInProgress.map { inProgress ->
         when (inProgress) {
@@ -44,11 +49,11 @@ class PushWelcomeViewModel(
     }
 
     fun termsClicked() {
-        // Need to implement
+        openBrowserEvent.value = Event(appLinksProvider.termsUrl)
     }
 
     fun privacyClicked() {
-        // Need to implement
+        openBrowserEvent.value = Event(appLinksProvider.privacyUrl)
     }
 
     fun askPermissionAndOpenSettings() {
