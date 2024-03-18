@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettin
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.subscription.PushSubscriptionService
 import kotlinx.coroutines.launch
-import kotlin.jvm.Throws
 import kotlin.time.Duration.Companion.milliseconds
 
 const val PUSH_LOG_TAG = "NOVA_PUSH"
@@ -68,7 +67,7 @@ class RealPushNotificationsService(
     }
 
     override suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings?): Result<Unit> {
-        if (!googleApiAvailabilityProvider.isAvailable()) throw IllegalStateException("Google API is not available")
+        if (!googleApiAvailabilityProvider.isAvailable()) return googleApiFailureResult()
 
         return runCatching {
             handlePushTokenIfNeeded(enabled)
@@ -100,12 +99,11 @@ class RealPushNotificationsService(
     }
 
     override suspend fun initPushNotifications(): Result<Unit> {
-        if (!googleApiAvailabilityProvider.isAvailable()) return Result.success(Unit)
+        if (!googleApiAvailabilityProvider.isAvailable()) return googleApiFailureResult()
 
         return updatePushSettings(true, settingsProvider.getDefaultPushSettings())
     }
 
-    @Throws
     private suspend fun handlePushTokenIfNeeded(isEnable: Boolean) {
         if (!googleApiAvailabilityProvider.isAvailable()) return
         if (isEnable == isPushNotificationsEnabled()) return
@@ -163,5 +161,9 @@ class RealPushNotificationsService(
 
     private fun getLastSyncTimeIfPushEnabled(): Long {
         return preferences.getLong(PREFS_LAST_SYNC_TIME, 0)
+    }
+
+    private fun googleApiFailureResult(): Result<Unit> {
+        return Result.failure(IllegalStateException("Google API is not available"))
     }
 }

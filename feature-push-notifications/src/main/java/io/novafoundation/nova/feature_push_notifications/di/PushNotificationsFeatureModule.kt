@@ -126,8 +126,11 @@ class PushNotificationsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideWelcomePushNotificationsInteractor(preferences: Preferences): WelcomePushNotificationsInteractor {
-        return RealWelcomePushNotificationsInteractor(preferences)
+    fun provideWelcomePushNotificationsInteractor(
+        preferences: Preferences,
+        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+    ): WelcomePushNotificationsInteractor {
+        return RealWelcomePushNotificationsInteractor(preferences, googleApiAvailabilityProvider)
     }
 
     @Provides
