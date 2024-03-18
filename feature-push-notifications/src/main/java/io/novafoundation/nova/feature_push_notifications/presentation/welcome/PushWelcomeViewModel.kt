@@ -4,6 +4,8 @@ import android.Manifest
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -14,6 +16,7 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -23,12 +26,15 @@ class PushWelcomeViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor,
     private val permissionsAsker: PermissionsAsker.Presentation,
-    private val resourceManager: ResourceManager
-) : BaseViewModel(), PermissionsAsker by permissionsAsker, Retriable {
+    private val resourceManager: ResourceManager,
+    private val appLinksProvider: AppLinksProvider
+) : BaseViewModel(), PermissionsAsker by permissionsAsker, Retriable, Browserable {
 
     private val _enablingInProgress = MutableStateFlow(false)
 
     override val retryEvent: MutableLiveData<Event<RetryPayload>> = MutableLiveData()
+
+    override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     val buttonState = _enablingInProgress.map { inProgress ->
         when (inProgress) {
@@ -43,11 +49,11 @@ class PushWelcomeViewModel(
     }
 
     fun termsClicked() {
-        // Need to implement
+        openBrowserEvent.value = Event(appLinksProvider.termsUrl)
     }
 
     fun privacyClicked() {
-        // Need to implement
+        openBrowserEvent.value = Event(appLinksProvider.privacyUrl)
     }
 
     fun askPermissionAndOpenSettings() {
@@ -66,7 +72,16 @@ class PushWelcomeViewModel(
                     welcomePushNotificationsInteractor.setWelcomeScreenShown()
                     router.openPushSettings()
                 }
-                .onFailure { retryDialog() }
+                .onFailure {
+                    when (it) {
+                        is TimeoutCancellationException -> showError(
+                            resourceManager.getString(R.string.common_something_went_wrong_title),
+                            resourceManager.getString(R.string.push_welcome_timeout_error_message)
+                        )
+
+                        else -> retryDialog()
+                    }
+                }
 
             _enablingInProgress.value = false
         }

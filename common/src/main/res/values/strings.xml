@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_something_went_wrong_title">Something went wrong</string>
+    <string name="push_welcome_timeout_error_message">Please try again later by accessing notification settings from the Settings tab</string>
+
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="one">Select at least %d wallet</item>
         <item quantity="other">Select at least %d wallets</item>
@@ -42,7 +45,7 @@
     <string name="push_new_update_title">A new update of Nova Wallet is available!</string>
     <string name="push_new_update_message">Download Nova Wallet v%s to get all the new features!</string>
     <string name="push_new_referendum_title">🗳️ New referendum</string>
-    <string name="push_new_referendum_message">%s Referendum %s is now live!</string>
+    <string name="push_new_referendum_message">%s Referendum #%s is now live!</string>
 
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">You need to select at least %d track</item>

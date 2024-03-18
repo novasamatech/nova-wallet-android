@@ -370,6 +370,7 @@
     <string name="common_skip_process">Пропустить</string>
     <string name="common_some_tx_failed_message">Произошла ошибка при отправке некоторых транзакций. Вы хотите повторить попытку?</string>
     <string name="common_some_tx_failed_title">Не удалось отправить некоторые транзакции</string>
+    <string name="common_something_went_wrong_title">Что-то пошло не так</string>
     <string name="common_sort_by">Сортировка по</string>
     <string name="common_status">Статус</string>
     <string name="common_substrate_address">Substrate адрес</string>
@@ -720,7 +721,7 @@
     <string name="push_governance_settings_delegate_votes">Голоса делегата</string>
     <string name="push_governance_settings_new_referendum">Новые референдумы</string>
     <string name="push_governance_settings_referendum_update">Обновление референдума</string>
-    <string name="push_new_referendum_message" formatted="false">%s Референдум %s уже доступен!</string>
+    <string name="push_new_referendum_message" formatted="false">%s Референдум #%s уже доступен!</string>
     <string name="push_new_referendum_title">🗳️ Новый референдум</string>
     <string name="push_new_update_message">Загрузите Nova Wallet v%s, чтобы получить новые функции!</string>
     <string name="push_new_update_title">Доступно новое обновление Nova Wallet!</string>
@@ -756,6 +757,7 @@
     <string name="push_welcome_enable_button">Включить push-уведомления</string>
     <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы вы всегда быть в куре событий</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
+    <string name="push_welcome_timeout_error_message">Повторите попытку позже, открыв настройки уведомлений на вкладке «Настройки»</string>
     <string name="push_welcome_title">Не пропустите ничего!</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
     <string name="recover_json_upload">Загрузите файл</string>
