@@ -15,8 +15,8 @@ class RealWelcomePushNotificationsInteractor(
 ) : WelcomePushNotificationsInteractor {
 
     override fun needToShowWelcomeScreen(): Boolean {
-        return googleApiAvailabilityProvider.isAvailable()
-            && preferences.getBoolean(PREFS_WELCOME_SCREEN_SHOWN, true)
+        return googleApiAvailabilityProvider.isAvailable() &&
+            preferences.getBoolean(PREFS_WELCOME_SCREEN_SHOWN, true)
     }
 
     override fun setWelcomeScreenShown() {
