@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.orEmpty
 import io.novafoundation.nova.common.utils.MultiMapList
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.create
@@ -223,7 +224,7 @@ private class StableSwapSource(
     private fun CoroutineScope.fetchAssetsPrecisionsAsync(): Deferred<Map<HydraDxAssetId, Int>> {
         return async {
             remoteStorageSource.query(chain.id) {
-                metadata.assetRegistry.assetMetadataMap.entries()
+                metadata.assetRegistry.assetMetadataMap.entries().filterNotNull()
             }
         }
     }
