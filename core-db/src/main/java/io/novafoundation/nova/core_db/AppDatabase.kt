@@ -81,6 +81,7 @@ import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
+import io.novafoundation.nova.core_db.migrations.ChainPushSupport_56_57
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.migrations.ChangeChainNodes_20_21
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
@@ -137,7 +138,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 56,
+    version = 57,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -228,7 +229,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
                     .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51, AddBalanceModesToAssets_51_52)
                     .addMigrations(ChangeSessionTopicToParing_52_53, AddConnectionStateToChains_53_54, AddProxyAccount_54_55)
-                    .addMigrations(AddFungibleNfts_55_56)
+                    .addMigrations(AddFungibleNfts_55_56, ChainPushSupport_56_57)
                     .build()
             }
             return instance!!

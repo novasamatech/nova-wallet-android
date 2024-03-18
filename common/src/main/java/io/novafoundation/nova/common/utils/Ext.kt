@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.utils
 
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -17,7 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import java.net.URLEncoder
 
-fun Activity.showToast(msg: String, duration: Int = Toast.LENGTH_LONG) {
+fun Context.showToast(msg: String, duration: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this, msg, duration).show()
 }
 

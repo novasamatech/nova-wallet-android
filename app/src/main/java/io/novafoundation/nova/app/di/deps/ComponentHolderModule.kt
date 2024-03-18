@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureHolder
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureHolder
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -36,6 +38,8 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
+import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
+import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureHolder
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_proxy_impl.di.ProxyFeatureHolder
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
@@ -212,7 +216,19 @@ interface ComponentHolderModule {
 
     @ApplicationScope
     @Binds
-    @ClassKey(io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi::class)
+    @ClassKey(PushNotificationsFeatureApi::class)
+    @IntoMap
+    fun providePushNotificationsFeature(holder: PushNotificationsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(ProxyFeatureApi::class)
     @IntoMap
     fun provideProxyFeature(holder: ProxyFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(DeepLinkingFeatureApi::class)
+    @IntoMap
+    fun provideDeepLinkingFeatureHolder(holder: DeepLinkingFeatureHolder): FeatureApiHolder
 }

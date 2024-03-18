@@ -21,6 +21,10 @@ class SettingsNavigator(
         delegate.openWallets()
     }
 
+    override fun openPushNotificationSettings() {
+        performNavigation(R.id.action_open_pushNotificationsSettings)
+    }
+
     override fun openCurrencies() = performNavigation(R.id.action_mainFragment_to_currenciesFragment)
 
     override fun openLanguages() = performNavigation(R.id.action_mainFragment_to_languagesFragment)

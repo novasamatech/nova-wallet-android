@@ -27,6 +27,7 @@ data class Chain(
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
     val hasSubstrateRuntime: Boolean,
+    val pushSupport: Boolean,
     val hasCrowdloans: Boolean,
     val supportProxy: Boolean,
     val governance: List<Governance>,

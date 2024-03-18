@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.SelectDelegationTracksViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.delegationTracks.SelectDelegationTracksViewModel
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 

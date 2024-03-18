@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
@@ -29,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settingsLanguage
 import kotlinx.android.synthetic.main.fragment_settings.settingsPin
 import kotlinx.android.synthetic.main.fragment_settings.settingsPinCodeVerification
 import kotlinx.android.synthetic.main.fragment_settings.settingsPrivacy
+import kotlinx.android.synthetic.main.fragment_settings.settingsPushNotifications
 import kotlinx.android.synthetic.main.fragment_settings.settingsRateUs
 import kotlinx.android.synthetic.main.fragment_settings.settingsSafeMode
 import kotlinx.android.synthetic.main.fragment_settings.settingsTelegram
@@ -57,6 +59,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
         settingsWallets.setOnClickListener { viewModel.walletsClicked() }
 
+        settingsPushNotifications.setOnClickListener { viewModel.pushNotificationsClicked() }
         settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
         settingsLanguage.setOnClickListener { viewModel.languagesClicked() }
 
@@ -102,6 +105,14 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
             accountView.setAccountIcon(it.walletIcon)
             accountView.setTitle(it.name)
+        }
+
+        viewModel.pushNotificationsAvailable.observe {
+            settingsPushNotifications.isVisible = it
+        }
+
+        viewModel.pushNotificationsState.observe {
+            settingsPushNotifications.setValue(it)
         }
 
         viewModel.selectedCurrencyFlow.observe {

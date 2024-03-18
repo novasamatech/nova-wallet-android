@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.di.FeatureContainer
+import io.novafoundation.nova.common.utils.showToast
 import javax.inject.Inject
 
 abstract class BaseActivity<T : BaseViewModel> :
@@ -45,6 +46,8 @@ abstract class BaseActivity<T : BaseViewModel> :
         viewModel.errorLiveData.observeEvent(::showError)
 
         viewModel.messageLiveData.observeEvent(::showMessage)
+
+        viewModel.toastLiveData.observeEvent { showToast(it) }
     }
 
     abstract fun layoutResource(): Int

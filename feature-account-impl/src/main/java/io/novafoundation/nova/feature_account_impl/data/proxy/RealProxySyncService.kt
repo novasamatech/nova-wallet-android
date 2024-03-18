@@ -150,9 +150,9 @@ class RealProxySyncService(
             val maybeExistedProxiedMetaId = node.getExistedProxiedMetaId(chainId, oldProxies, proxyMetaId)
 
             var nextMetaId = if (maybeExistedProxiedMetaId == null) {
-                val newMetaId = addProxiedAccount(chainId, node, proxyMetaId, identities)
-                result.addedMetaIds.add(newMetaId)
-                newMetaId
+                val addAccountResult = addProxiedAccount(chainId, node, proxyMetaId, identities)
+                result.addedMetaIds.add(addAccountResult.metaId)
+                addAccountResult.metaId
             } else {
                 // An account may be deactivated but not deleted yet in case when we remove a proxy and then add it again
                 // To support this case we should track deactivated accounts and activate them again

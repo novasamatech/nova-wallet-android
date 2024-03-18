@@ -27,7 +27,7 @@ class RealFinishImportParitySignerInteractor(
         variant: PolkadotVaultVariant
     ): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
-            val metaId = paritySignerAddAccountRepository.addAccount(
+            val addAccountResult = paritySignerAddAccountRepository.addAccount(
                 ParitySignerAddAccountRepository.Payload(
                     name,
                     substrateAccountId,
@@ -35,7 +35,7 @@ class RealFinishImportParitySignerInteractor(
                 )
             )
 
-            accountRepository.selectMetaAccount(metaId)
+            accountRepository.selectMetaAccount(addAccountResult.metaId)
         }
     }
 }

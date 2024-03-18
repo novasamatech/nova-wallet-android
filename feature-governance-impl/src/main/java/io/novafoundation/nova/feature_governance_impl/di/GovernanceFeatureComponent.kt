@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -30,6 +31,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.sea
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.di.ConfirmReferendumVoteComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di.SetupVoteReferendumComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di.ReferendumVotersComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.governanceTracks.di.SelectGovernanceTracksComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.di.ConfirmGovernanceUnlockComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.di.GovernanceLocksOverviewComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -82,6 +84,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
 
     fun newDelegationChooseTracks(): NewDelegationChooseTracksComponent.Factory
 
+    fun selectGovernanceTracks(): SelectGovernanceTracksComponent.Factory
+
     fun newDelegationChooseAmountFactory(): NewDelegationChooseAmountComponent.Factory
 
     fun newDelegationConfirmFactory(): NewDelegationConfirmComponent.Factory
@@ -98,6 +102,7 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
         fun create(
             deps: GovernanceFeatureDependencies,
             @BindsInstance router: GovernanceRouter,
+            @BindsInstance selectTracksCommunicator: SelectTracksCommunicator
         ): GovernanceFeatureComponent
     }
 
