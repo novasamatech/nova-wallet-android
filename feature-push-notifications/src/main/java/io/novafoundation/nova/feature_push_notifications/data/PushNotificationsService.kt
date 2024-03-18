@@ -51,9 +51,7 @@ class RealPushNotificationsService(
     private var skipTokenReceivingCallback = false
 
     init {
-        if (isPushNotificationsEnabled()) {
-            logToken()
-        }
+        logToken()
     }
 
     override fun onTokenUpdated(token: String) {
@@ -133,6 +131,7 @@ class RealPushNotificationsService(
     }
 
     private fun logToken() {
+        if (!isPushNotificationsEnabled()) return
         if (!BuildConfig.DEBUG) return
         if (!googleApiAvailabilityProvider.isAvailable()) return
 
