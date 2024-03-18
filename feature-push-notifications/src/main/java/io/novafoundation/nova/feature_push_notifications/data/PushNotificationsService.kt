@@ -13,11 +13,14 @@ import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettin
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.subscription.PushSubscriptionService
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 const val PUSH_LOG_TAG = "NOVA_PUSH"
 private const val PREFS_LAST_SYNC_TIME = "PREFS_LAST_SYNC_TIME"
 private const val MIN_DAYS_TO_START_SYNC = 1
+private val SAVING_TIMEOUT = 15.seconds
 
 interface PushNotificationsService {
 
@@ -70,13 +73,15 @@ class RealPushNotificationsService(
         if (!googleApiAvailabilityProvider.isAvailable()) return googleApiFailureResult()
 
         return runCatching {
-            handlePushTokenIfNeeded(enabled)
-            val pushToken = getPushToken()
-            val oldSettings = settingsProvider.getPushSettings()
-            subscriptionService.handleSubscription(enabled, pushToken, oldSettings, pushSettings)
-            settingsProvider.setPushNotificationsEnabled(enabled)
-            settingsProvider.updateSettings(pushSettings)
-            updateLastSyncTime()
+            withTimeout(SAVING_TIMEOUT) {
+                handlePushTokenIfNeeded(enabled)
+                val pushToken = getPushToken()
+                val oldSettings = settingsProvider.getPushSettings()
+                subscriptionService.handleSubscription(enabled, pushToken, oldSettings, pushSettings)
+                settingsProvider.setPushNotificationsEnabled(enabled)
+                settingsProvider.updateSettings(pushSettings)
+                updateLastSyncTime()
+            }
         }
     }
 

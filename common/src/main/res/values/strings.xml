@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_something_went_wrong_title">Something went wrong</string>
+    <string name="push_welcome_timeout_error_message">Please try again later by accessing notification settings from the Settings tab</string>
+
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="one">Select at least %d wallet</item>
         <item quantity="other">Select at least %d wallets</item>

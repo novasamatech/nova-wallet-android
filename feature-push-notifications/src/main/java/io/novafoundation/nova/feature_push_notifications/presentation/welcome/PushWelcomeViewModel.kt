@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -66,7 +67,16 @@ class PushWelcomeViewModel(
                     welcomePushNotificationsInteractor.setWelcomeScreenShown()
                     router.openPushSettings()
                 }
-                .onFailure { retryDialog() }
+                .onFailure {
+                    when (it) {
+                        is TimeoutCancellationException -> showError(
+                            resourceManager.getString(R.string.common_something_went_wrong_title),
+                            resourceManager.getString(R.string.push_welcome_timeout_error_message)
+                        )
+
+                        else -> retryDialog()
+                    }
+                }
 
             _enablingInProgress.value = false
         }
