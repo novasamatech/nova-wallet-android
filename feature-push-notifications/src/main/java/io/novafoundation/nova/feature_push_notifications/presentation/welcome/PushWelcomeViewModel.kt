@@ -56,7 +56,7 @@ class PushWelcomeViewModel(
         openBrowserEvent.value = Event(appLinksProvider.privacyUrl)
     }
 
-    fun askPermissionAndOpenSettings() {
+    fun askPermissionAndEnableSettings() {
         launch {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val isPermissionsGranted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.POST_NOTIFICATIONS)
@@ -70,7 +70,7 @@ class PushWelcomeViewModel(
             pushNotificationsInteractor.initPushSettings()
                 .onSuccess {
                     welcomePushNotificationsInteractor.setWelcomeScreenShown()
-                    router.openPushSettings()
+                    router.back()
                 }
                 .onFailure {
                     when (it) {
@@ -92,7 +92,7 @@ class PushWelcomeViewModel(
             RetryPayload(
                 title = resourceManager.getString(R.string.common_error_general_title),
                 message = resourceManager.getString(R.string.common_retry_message),
-                onRetry = { askPermissionAndOpenSettings() }
+                onRetry = { askPermissionAndEnableSettings() }
             )
         )
     }
