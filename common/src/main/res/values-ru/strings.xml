@@ -755,7 +755,7 @@
     <string name="push_wallets_title">Выберите до 3 кошельков для которых вы будете получать уведомления о событиях кошелька</string>
     <string name="push_welcome_cancel_button">Не сейчас</string>
     <string name="push_welcome_enable_button">Включить push-уведомления</string>
-    <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы вы всегда быть в куре событий</string>
+    <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы всегда быть в куре событий</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
     <string name="push_welcome_timeout_error_message">Повторите попытку позже, открыв настройки уведомлений на вкладке «Настройки»</string>
     <string name="push_welcome_title">Не пропустите ничего!</string>
