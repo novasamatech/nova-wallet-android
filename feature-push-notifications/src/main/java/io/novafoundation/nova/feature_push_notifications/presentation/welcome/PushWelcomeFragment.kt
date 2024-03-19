@@ -36,7 +36,7 @@ class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel>() {
         pushWelcomeEnableButton.prepareForProgress(this)
         pushWelcomeCancelButton.prepareForProgress(this)
         pushWelcomeToolbar.setHomeButtonListener { viewModel.backClicked() }
-        pushWelcomeEnableButton.setOnClickListener { viewModel.askPermissionAndEnableSettings() }
+        pushWelcomeEnableButton.setOnClickListener { viewModel.askPermissionAndEnablePushNotifications() }
         pushWelcomeCancelButton.setOnClickListener { viewModel.backClicked() }
 
         configureTermsAndPrivacy()

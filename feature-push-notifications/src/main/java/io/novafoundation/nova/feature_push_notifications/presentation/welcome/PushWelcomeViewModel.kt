@@ -56,7 +56,7 @@ class PushWelcomeViewModel(
         openBrowserEvent.value = Event(appLinksProvider.privacyUrl)
     }
 
-    fun askPermissionAndEnableSettings() {
+    fun askPermissionAndEnablePushNotifications() {
         launch {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val isPermissionsGranted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.POST_NOTIFICATIONS)
@@ -92,7 +92,7 @@ class PushWelcomeViewModel(
             RetryPayload(
                 title = resourceManager.getString(R.string.common_error_general_title),
                 message = resourceManager.getString(R.string.common_retry_message),
-                onRetry = { askPermissionAndEnableSettings() }
+                onRetry = { askPermissionAndEnablePushNotifications() }
             )
         )
     }
