@@ -28,7 +28,7 @@ class FeeAssetSelectorBottomSheet(
         super.onCreate(savedInstanceState)
 
         payload.options.forEach { feeOption ->
-            bottomSheetFeeSelectionAssets.addTab(feeOption.symbol)
+            bottomSheetFeeSelectionAssets.addTab(feeOption.symbol.value)
         }
 
         bottomSheetFeeSelectionAssets.onTabSelected { index ->

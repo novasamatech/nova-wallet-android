@@ -96,7 +96,7 @@ class AssetViewHolder(
 
         bindTotal(asset)
 
-        itemAssetToken.text = asset.token.configuration.symbol
+        itemAssetToken.text = asset.token.configuration.symbol.value
 
         setOnClickListener { itemHandler.assetClicked(asset) }
     }

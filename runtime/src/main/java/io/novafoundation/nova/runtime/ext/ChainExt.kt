@@ -144,7 +144,7 @@ inline val Chain.Asset.isCommissionAsset: Boolean
 private const val MOONBEAM_XC_PREFIX = "xc"
 
 fun Chain.Asset.unifiedSymbol(): String {
-    return symbol.removePrefix(MOONBEAM_XC_PREFIX)
+    return symbol.value.removePrefix(MOONBEAM_XC_PREFIX)
 }
 
 val Chain.Node.isWss: Boolean
