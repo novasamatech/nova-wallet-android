@@ -1,22 +1,14 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 
-import android.graphics.Color
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.clickableSpan
-import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.applyTermsAndPrivacyPolicy
-import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
-import io.novafoundation.nova.common.utils.setFullSpan
-import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
