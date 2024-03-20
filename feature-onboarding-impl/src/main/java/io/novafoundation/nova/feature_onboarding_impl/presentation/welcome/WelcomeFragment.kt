@@ -9,8 +9,14 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.utils.clickableSpan
+import io.novafoundation.nova.common.utils.colorSpan
+import io.novafoundation.nova.common.utils.formatting.applyTermsAndPrivacyPolicy
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
+import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
@@ -49,34 +55,23 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     override fun initViews() {
-        configureTermsAndPrivacy(
-            getString(R.string.onboarding_terms_and_conditions_1_v2_2_0),
-            getString(R.string.onboarding_terms_and_conditions_2),
-            getString(R.string.onboarding_privacy_policy)
-        )
-        termsTv.movementMethod = LinkMovementMethod.getInstance()
-        termsTv.highlightColor = Color.TRANSPARENT
-
         createAccountBtn.setOnClickListener { viewModel.createAccountClicked() }
         importAccountBtn.setOnClickListener { viewModel.importAccountClicked() }
         welcomeAddWatchWallet.setOnClickListener { viewModel.addWatchWalletClicked() }
         welcomeConnectHardwareWallet.setOnClickListener { viewModel.connectHardwareWalletClicked() }
 
         back.setOnClickListener { viewModel.backClicked() }
+        configureTermsAndPrivacy()
     }
 
-    private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
-        val linkColor = requireContext().getColor(R.color.text_primary)
-
-        termsTv.text = styleText(sourceText) {
-            clickable(terms, linkColor) {
-                viewModel.termsClicked()
-            }
-
-            clickable(privacy, linkColor) {
-                viewModel.privacyClicked()
-            }
-        }
+    private fun configureTermsAndPrivacy() {
+        termsTv.applyTermsAndPrivacyPolicy(
+            R.string.onboarding_terms_and_conditions_1_v2_2_1,
+            R.string.onboarding_terms_and_conditions_2,
+            R.string.onboarding_privacy_policy,
+            viewModel::termsClicked,
+            viewModel::privacyClicked
+        )
     }
 
     override fun inject() {
