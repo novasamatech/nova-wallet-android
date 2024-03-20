@@ -19,12 +19,14 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import kotlinx.android.synthetic.main.view_toolbar.view.backImg
+import kotlinx.android.synthetic.main.view_toolbar.view.rightActionContainer
 import kotlinx.android.synthetic.main.view_toolbar.view.rightImg
 import kotlinx.android.synthetic.main.view_toolbar.view.rightText
 import kotlinx.android.synthetic.main.view_toolbar.view.titleTv
 import kotlinx.android.synthetic.main.view_toolbar.view.toolbarContainer
 import kotlinx.android.synthetic.main.view_toolbar.view.toolbarCustomActions
 import kotlinx.android.synthetic.main.view_toolbar.view.toolbarDivider
+import kotlinx.android.synthetic.main.view_toolbar.view.toolbarProgress
 
 class Toolbar @JvmOverloads constructor(
     context: Context,
@@ -91,6 +93,11 @@ class Toolbar @JvmOverloads constructor(
 
     fun setRightIconVisible(visible: Boolean) {
         rightImg.setVisible(visible)
+    }
+
+    fun showProgress(visible: Boolean) {
+        toolbarProgress.setVisible(visible)
+        rightActionContainer.setVisible(!visible)
     }
 
     fun setTitle(title: CharSequence?) {

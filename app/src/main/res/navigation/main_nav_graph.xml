@@ -104,6 +104,14 @@
         app:destination="@id/selectAddressFragment" />
 
     <action
+        android:id="@+id/action_open_select_multiple_wallets"
+        app:destination="@id/selectMultipleWalletsFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_accounts"
         app:destination="@id/accountsFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -198,6 +206,30 @@
     <action
         android:id="@+id/action_open_swapSetupAmount"
         app:destination="@id/start_swap_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_pushNotificationsWelcome"
+        app:destination="@id/pushNotificationsWelcomeFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_pushNotificationsSettings"
+        app:destination="@id/push_settings_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_select_governance_tracks"
+        app:destination="@id/selectGovernanceTracks"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -451,6 +483,12 @@
         tools:layout="@layout/bottom_sheet_dynamic_list" />
 
     <fragment
+        android:id="@+id/selectMultipleWalletsFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.SelectMultipleWalletsFragment"
+        android:label="SelectMultipleWalletsFragment"
+        tools:layout="@layout/fragment_select_multiple_wallets" />
+
+    <fragment
         android:id="@+id/nodesFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.node.list.NodesFragment"
         android:label="NodesFragment"
@@ -559,7 +597,6 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment"
         android:label="BalanceDetailFragment"
         tools:layout="@layout/fragment_balance_detail" />
-
 
     <fragment
         android:id="@+id/transferDetailFragment"
@@ -830,6 +867,56 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment"
         android:label="AssetSwapFlowFragment" />
 
+    <fragment
+        android:id="@+id/walletConnectScanFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan.WalletConnectScanFragment"
+        android:label="WalletConnectScanFragment" />
+
+    <dialog
+        android:id="@+id/selectWalletFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.SelectWalletFragment"
+        android:label="SelectWalletFragment" />
+
+    <fragment
+        app:useAdd="true"
+        android:id="@+id/walletConnectApproveSessionFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
+        android:label="WalletConnectApproveSessionFragment" />
+
+    <fragment
+        android:id="@+id/validatorDetailsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment"
+        android:label="validatorDetailsFragment"
+        tools:layout="@layout/fragment_validator_details" />
+
+    <fragment
+        android:id="@+id/swapDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.SwapDetailFragment"
+        android:label="SwapDetailFragment" />
+
+    <fragment
+        android:id="@+id/pushNotificationsWelcomeFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.welcome.PushWelcomeFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_push_welcome">
+
+        <action
+            android:id="@+id/action_pushWelcome_to_pushSettings"
+            app:destination="@id/push_settings_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/mainFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectGovernanceTracks"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.governanceTracks.SelectGovernanceTracksFragment"
+        android:label="SelectGovernanceTracksFragment"
+        tools:layout="@layout/fragment_select_tracks" />
+
     <include app:graph="@navigation/start_swap_nav_graph" />
 
     <include app:graph="@navigation/manage_tokens_graph" />
@@ -856,30 +943,6 @@
 
     <include app:graph="@navigation/staking_main_graph" />
 
-    <fragment
-        android:id="@+id/walletConnectScanFragment"
-        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan.WalletConnectScanFragment"
-        android:label="WalletConnectScanFragment" />
-
-    <dialog
-        android:id="@+id/selectWalletFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.SelectWalletFragment"
-        android:label="SelectWalletFragment" />
-
-    <fragment
-        android:id="@+id/walletConnectApproveSessionFragment"
-        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
-        android:label="WalletConnectApproveSessionFragment" />
-
-    <fragment
-        android:id="@+id/validatorDetailsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment"
-        android:label="validatorDetailsFragment"
-        tools:layout="@layout/fragment_validator_details" />
-
-    <fragment
-        android:id="@+id/swapDetailFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.SwapDetailFragment"
-        android:label="SwapDetailFragment" />
+    <include app:graph="@navigation/push_settings_graph" />
 
 </navigation>

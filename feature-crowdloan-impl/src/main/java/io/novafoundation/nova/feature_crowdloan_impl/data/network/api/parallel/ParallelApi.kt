@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel
 
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import retrofit2.http.GET
 import retrofit2.http.Path
 

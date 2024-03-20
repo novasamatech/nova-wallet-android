@@ -311,6 +311,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
+            pushSupport = pushSupport,
             supportProxy = supportProxy,
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
@@ -361,6 +362,10 @@ private fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLoca
     runCatching { Chain.Governance.valueOf(it) }.getOrNull()
 }
 
-private fun mapSwapListFromLocal(swapLocal: String) = swapLocal.split(",").mapNotNull {
-    enumValueOfOrNull<Chain.Swap>(swapLocal)
+private fun mapSwapListFromLocal(swapLocal: String): List<Chain.Swap> {
+    if (swapLocal.isEmpty()) return emptyList()
+
+    return swapLocal.split(",").mapNotNull {
+        enumValueOfOrNull<Chain.Swap>(swapLocal)
+    }
 }

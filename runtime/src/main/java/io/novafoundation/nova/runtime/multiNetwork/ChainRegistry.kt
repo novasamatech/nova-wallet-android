@@ -31,7 +31,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted

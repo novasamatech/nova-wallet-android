@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm
 
+import android.content.Context
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Wallet.Params.SessionRequestResponse
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
@@ -13,8 +14,9 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 class EvmSignTransactionRequest(
     private val transaction: EvmTransaction.Struct,
     private val chainId: Int,
-    private val sessionRequest: Wallet.Model.SessionRequest
-) : SignWalletConnectRequest(sessionRequest) {
+    private val sessionRequest: Wallet.Model.SessionRequest,
+    context: Context
+) : SignWalletConnectRequest(sessionRequest, context) {
 
     override suspend fun signedResponse(response: Response.Signed): SessionRequestResponse {
         return sessionRequest.approved(response.signature)

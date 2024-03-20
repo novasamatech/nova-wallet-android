@@ -5,11 +5,13 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.common.utils.filterValuesIsInstance
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting.Approval
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import java.math.BigInteger
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 fun OnChainReferendum.proposal(): Proposal? {
     return status.asOngoingOrNull()?.proposal
@@ -116,4 +118,12 @@ private inline fun Tally.votesOf(field: (Tally) -> Balance): Approval.Votes {
         amount = amount,
         fraction = fraction
     )
+}
+
+fun Set<BigInteger>.toTrackIds(): Set<TrackId> {
+    return mapToSet { TrackId(it) }
+}
+
+fun Set<TrackId>.fromTrackIds(): Set<BigInteger> {
+    return mapToSet { it.value }
 }

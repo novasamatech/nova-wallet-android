@@ -52,12 +52,12 @@ import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -66,6 +66,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
+import kotlinx.coroutines.flow.map
 
 class StakingRepositoryImpl(
     private val accountStakingDao: AccountStakingDao,

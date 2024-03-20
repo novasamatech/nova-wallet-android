@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.data.model.asCursorOrNull
 import io.novafoundation.nova.common.utils.nullIfEmpty
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
@@ -25,7 +26,7 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
 
 abstract class SubstrateAssetHistory(
@@ -35,7 +36,7 @@ abstract class SubstrateAssetHistory(
     coinPriceRepository: CoinPriceRepository
 ) : BaseAssetHistory(coinPriceRepository) {
 
-    abstract fun realtimeFetcherSources(): List<SubstrateRealtimeOperationFetcher.Factory.Source>
+    abstract fun realtimeFetcherSources(chain: Chain): List<SubstrateRealtimeOperationFetcher.Factory.Source>
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
@@ -43,7 +44,7 @@ abstract class SubstrateAssetHistory(
         blockHash: String,
         accountId: AccountId
     ): List<RealtimeHistoryUpdate> {
-        val sources = realtimeFetcherSources()
+        val sources = realtimeFetcherSources(chain)
         val realtimeOperationFetcher = realtimeOperationFetcherFactory.create(sources)
 
         return realtimeOperationFetcher.extractRealtimeHistoryUpdates(chain, chainAsset, blockHash)
@@ -179,9 +180,11 @@ abstract class SubstrateAssetHistory(
 
         when {
             node.reward != null -> with(node.reward) {
+                val planks = amount?.toBigIntegerOrNull().orZero()
+
                 type = Operation.Type.Reward(
-                    amount = amount,
-                    fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
+                    amount = planks,
+                    fiatAmount = coinRate?.convertPlanks(chainAsset, planks),
                     isReward = isReward,
                     kind = Operation.Type.Reward.RewardKind.Direct(
                         era = era,

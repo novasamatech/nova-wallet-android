@@ -7,6 +7,8 @@ import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 interface GovernanceSourceRegistry {
 
     suspend fun sourceFor(option: SupportedGovernanceOption): GovernanceSource
+
+    suspend fun sourceFor(option: Chain.Governance): GovernanceSource
 }
 
 typealias SupportedGovernanceOption = SelectedAssetOptionSharedState.SupportedAssetOption<GovernanceAdditionalState>

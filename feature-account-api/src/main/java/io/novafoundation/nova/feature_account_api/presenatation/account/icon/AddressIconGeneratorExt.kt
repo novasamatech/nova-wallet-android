@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.invoke
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 suspend fun AddressIconGenerator.createAddressModel(
     chain: Chain,

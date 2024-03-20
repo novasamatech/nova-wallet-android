@@ -22,10 +22,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.FixedByteArray
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.FixedByteArray
+import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.metadata.call
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger

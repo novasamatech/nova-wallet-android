@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

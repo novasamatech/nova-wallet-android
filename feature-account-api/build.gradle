@@ -30,6 +30,7 @@ dependencies {
     implementation project(':runtime')
     implementation project(":common")
     implementation project(":feature-currency-api")
+    implementation project(":feature-proxy-api")
     implementation project(':web3names')
 
     implementation project(":feature-ledger-api")
@@ -48,7 +49,7 @@ dependencies {
     implementation daggerDep
     kapt daggerKapt
 
-    api fearlessLibDep
+    api substrateSdkDep
 
     api project(':core-api')
 }

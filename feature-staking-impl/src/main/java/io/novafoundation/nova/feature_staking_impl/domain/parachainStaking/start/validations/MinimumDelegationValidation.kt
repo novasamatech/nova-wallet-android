@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.TooLowStake.TooLowTotalStake
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.TooLowStake.WontReceiveRewards
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.fromHex
 
 class MinimumDelegationValidationFactory(
     private val stakingConstantsRepository: ParachainStakingConstantsRepository,

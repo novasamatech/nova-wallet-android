@@ -3,6 +3,8 @@ package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisitor
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.BatchAllNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.ForceBatchNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.proxy.ProxyNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -10,10 +12,10 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.isSuccess
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.signer
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 
 internal class RealExtrinsicWalk(
     private val chainRegistry: ChainRegistry,
@@ -22,7 +24,7 @@ internal class RealExtrinsicWalk(
 
     companion object {
 
-        fun defaultNodes() = listOf(ProxyNode())
+        fun defaultNodes() = listOf(ProxyNode(), BatchAllNode(), ForceBatchNode())
     }
 
     override suspend fun walk(

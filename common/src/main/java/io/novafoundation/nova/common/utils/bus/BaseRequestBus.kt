@@ -11,7 +11,7 @@ abstract class BaseRequestBus<T : RequestBus.Request, R : RequestBus.Response> :
     private val eventFlow = MutableSharedFlow<Pair<Continuation<R>, T>>()
 
     override suspend fun handle(request: T): R {
-        return suspendCoroutine<R> { continuation ->
+        return suspendCoroutine { continuation ->
             runBlocking {
                 eventFlow.emit(continuation to request)
             }

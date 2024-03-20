@@ -1,10 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validations.main
 
 import io.novafoundation.nova.feature_staking_impl.domain.validations.AccountRequiredValidation
+import io.novafoundation.nova.feature_staking_impl.domain.validations.StashOnlyIsAllowedValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.UnbondingRequestsLimitValidation
 
-const val BALANCE_REQUIRED_STASH = "MainStakingAccountRequiredValidation.Stash"
+const val BALANCE_CONTROLLER_IS_NOT_ALLOWED = "ControllerAccountIsNotAllowedValidation"
+const val BALANCE_REQUIRED_STASH_META_ACCOUNT = "MainStakingAccountRequiredValidation.Stash"
 const val BALANCE_REQUIRED_CONTROLLER = "MainStakingAccountRequiredValidation.Controller"
 
-typealias MainStakingAccountRequiredValidation = AccountRequiredValidation<StakeActionsValidationPayload, StakeActionsValidationFailure>
+typealias ControllerAccountIsNotAllowedValidation = StashOnlyIsAllowedValidation<StakeActionsValidationPayload, StakeActionsValidationFailure>
+typealias MainStakingMetaAccountRequiredValidation = AccountRequiredValidation<StakeActionsValidationPayload, StakeActionsValidationFailure>
 typealias MainStakingUnlockingLimitValidation = UnbondingRequestsLimitValidation<StakeActionsValidationPayload, StakeActionsValidationFailure>

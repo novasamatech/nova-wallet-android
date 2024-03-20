@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -11,7 +12,6 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -22,8 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDepositInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notPhishingRecipient
@@ -33,9 +32,10 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
 class RealCrossChainTransactor(
@@ -62,10 +62,11 @@ class RealCrossChainTransactor(
         sufficientTransferableBalanceToPayOriginFee()
         canPayCrossChainFee()
 
-        doNotCrossExistentialDeposit(
+        cannotDropBelowEdBeforePayingDeliveryFee(assetSourceRegistry)
+
+        doNotCrossExistentialDepositInUsedAsset(
             assetSourceRegistry = assetSourceRegistry,
-            fee = { it.originFeeInUsedAsset },
-            extraAmount = { it.transfer.amount + it.crossChainFee.networkFeeByRequestedAccountOrZero }
+            extraAmount = { it.transfer.amount + it.crossChainFee?.networkFeeDecimalAmount.orZero() }
         )
     }
 
@@ -78,7 +79,7 @@ class RealCrossChainTransactor(
     override suspend fun performTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransfer,
-        crossChainFee: BigInteger
+        crossChainFee: Balance
     ): Result<ExtrinsicSubmission> {
         return extrinsicService.submitExtrinsic(transfer.originChain, TransactionOrigin.SelectedWallet) {
             crossChainTransfer(configuration, transfer, crossChainFee)
@@ -88,7 +89,7 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.crossChainTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransfer,
-        crossChainFee: BigInteger
+        crossChainFee: Balance
     ) {
         when (configuration.transferType) {
             XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
@@ -101,7 +102,7 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.xTokensTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,
-        crossChainFee: BigInteger
+        crossChainFee: Balance
     ) {
         val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
         val fullDestinationLocation = configuration.destinationChainLocation + assetTransfer.beneficiaryLocation()
@@ -128,7 +129,7 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,
-        crossChainFee: BigInteger
+        crossChainFee: Balance
     ) {
         xcmPalletTransfer(
             configuration = configuration,
@@ -141,7 +142,7 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.xcmPalletTeleport(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,
-        crossChainFee: BigInteger
+        crossChainFee: Balance
     ) {
         xcmPalletTransfer(
             configuration = configuration,
@@ -154,7 +155,7 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.xcmPalletTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,
-        crossChainFee: BigInteger,
+        crossChainFee: Balance,
         callName: String
     ) {
         val lowestMultiLocationVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
@@ -177,7 +178,7 @@ class RealCrossChainTransactor(
 
     private fun CrossChainTransferConfiguration.multiAssetFor(
         transfer: AssetTransfer,
-        crossChainFee: BigInteger
+        crossChainFee: Balance
     ): XcmMultiAsset {
         // we add cross chain fee top of entered amount so received amount will be no less than entered one
         val planks = transfer.originChainAsset.planksFromAmount(transfer.amount) + crossChainFee

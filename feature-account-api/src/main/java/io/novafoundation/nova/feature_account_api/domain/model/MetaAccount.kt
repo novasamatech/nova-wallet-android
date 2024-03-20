@@ -8,11 +8,11 @@ import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
+import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
+import io.novasama.substrate_sdk_android.extensions.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 
 class MetaAccountOrdering(
     val id: Long,
@@ -117,7 +117,11 @@ fun MetaAccount.mainEthereumAddress() = ethereumAddress?.toEthereumAddress()
 fun MetaAccount.requireAddressIn(chain: Chain): String = addressIn(chain) ?: throw NoSuchElementException("No chain account found for $chain in $name")
 
 val MetaAccount.defaultSubstrateAddress: String?
-    get() = substrateAccountId?.toAddress(SS58Encoder.DEFAULT_PREFIX)
+    get() = substrateAccountId?.toDefaultSubstrateAddress()
+
+fun ByteArray.toDefaultSubstrateAddress(): String {
+    return toAddress(SS58Encoder.DEFAULT_PREFIX)
+}
 
 fun MetaAccount.accountIdIn(chain: Chain): ByteArray? {
     return when {

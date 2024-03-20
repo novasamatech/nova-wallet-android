@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -27,7 +27,7 @@ class RealFinishImportParitySignerInteractor(
         variant: PolkadotVaultVariant
     ): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
-            val metaId = paritySignerAddAccountRepository.addAccount(
+            val addAccountResult = paritySignerAddAccountRepository.addAccount(
                 ParitySignerAddAccountRepository.Payload(
                     name,
                     substrateAccountId,
@@ -35,7 +35,7 @@ class RealFinishImportParitySignerInteractor(
                 )
             )
 
-            accountRepository.selectMetaAccount(metaId)
+            accountRepository.selectMetaAccount(addAccountResult.metaId)
         }
     }
 }

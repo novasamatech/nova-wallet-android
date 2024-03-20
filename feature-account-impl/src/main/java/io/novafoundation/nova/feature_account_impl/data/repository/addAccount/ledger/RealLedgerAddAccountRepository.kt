@@ -6,7 +6,11 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository.Payload
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -15,17 +19,18 @@ class RealLedgerAddAccountRepository(
     private val accountDao: MetaAccountDao,
     private val chainRegistry: ChainRegistry,
     private val secretStoreV2: SecretStoreV2,
-    private val proxySyncService: ProxySyncService,
-) : LedgerAddAccountRepository(proxySyncService) {
+    proxySyncService: ProxySyncService,
+    metaAccountChangesEventBus: MetaAccountChangesEventBus
+) : BaseAddAccountRepository<Payload>(proxySyncService, metaAccountChangesEventBus), LedgerAddAccountRepository {
 
-    override suspend fun addAccountInternal(payload: Payload): Long {
+    override suspend fun addAccountInternal(payload: Payload): AddAccountResult {
         return when (payload) {
             is Payload.MetaAccount -> addMetaAccount(payload)
             is Payload.ChainAccount -> addChainAccount(payload)
         }
     }
 
-    private suspend fun addMetaAccount(payload: Payload.MetaAccount): Long {
+    private suspend fun addMetaAccount(payload: Payload.MetaAccount): AddAccountResult {
         val metaAccount = MetaAccountLocal(
             substratePublicKey = null,
             substrateCryptoType = null,
@@ -59,10 +64,10 @@ class RealLedgerAddAccountRepository(
             secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, ledgerAccount.derivationPath)
         }
 
-        return metaId
+        return AddAccountResult.AccountAdded(metaId)
     }
 
-    private suspend fun addChainAccount(payload: Payload.ChainAccount): Long {
+    private suspend fun addChainAccount(payload: Payload.ChainAccount): AddAccountResult {
         val chain = chainRegistry.getChain(payload.chainId)
 
         val chainAccount = ChainAccountLocal(
@@ -78,6 +83,6 @@ class RealLedgerAddAccountRepository(
         val derivationPathKey = LedgerDerivationPath.derivationPathSecretKey(payload.chainId)
         secretStoreV2.putAdditionalMetaAccountSecret(payload.metaId, derivationPathKey, payload.ledgerChainAccount.derivationPath)
 
-        return payload.metaId
+        return AddAccountResult.AccountChanged(payload.metaId)
     }
 }

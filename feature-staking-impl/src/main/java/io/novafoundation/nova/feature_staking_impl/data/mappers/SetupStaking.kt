@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.mappers
 
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationModel
 

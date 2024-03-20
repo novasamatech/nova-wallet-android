@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationFilter
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 
 object HasIdentityFilter : RecommendationFilter {
 

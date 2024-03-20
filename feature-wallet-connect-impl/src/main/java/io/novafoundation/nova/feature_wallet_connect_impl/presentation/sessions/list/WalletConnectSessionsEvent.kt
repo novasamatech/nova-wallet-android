@@ -25,7 +25,7 @@ fun Web3Wallet.sessionEventsFlow(scope: CoroutineScope): Flow<WalletConnectSessi
     return callbackFlow {
         setWalletDelegate(object : Web3Wallet.WalletDelegate {
 
-            override fun onAuthRequest(authRequest: Wallet.Model.AuthRequest) {
+            override fun onAuthRequest(authRequest: Wallet.Model.AuthRequest, verifyContext: Wallet.Model.VerifyContext) {
                 Log.d("WalletConnect", "Auth request: $authRequest")
             }
 
@@ -37,17 +37,29 @@ fun Web3Wallet.sessionEventsFlow(scope: CoroutineScope): Flow<WalletConnectSessi
                 Log.e("WalletConnect", "Wallet Connect error", error.throwable)
             }
 
+            override fun onProposalExpired(proposal: Wallet.Model.ExpiredProposal) {
+                Log.d("WalletConnect", "Proposal expired: $proposal")
+            }
+
+            override fun onRequestExpired(request: Wallet.Model.ExpiredRequest) {
+                Log.d("WalletConnect", "Request expired: $request")
+            }
+
             override fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete) {
                 Log.d("WalletConnect", "on session delete: $sessionDelete")
                 channel.trySend(WalletConnectSessionsEvent.SessionDeleted(sessionDelete))
             }
 
-            override fun onSessionProposal(sessionProposal: Wallet.Model.SessionProposal) {
+            override fun onSessionExtend(session: Wallet.Model.Session) {
+                Log.d("WalletConnect", "On session extend: $session")
+            }
+
+            override fun onSessionProposal(sessionProposal: Wallet.Model.SessionProposal, verifyContext: Wallet.Model.VerifyContext) {
                 Log.d("WalletConnect", "on session proposal: $sessionProposal")
                 channel.trySend(WalletConnectSessionsEvent.SessionProposal(sessionProposal))
             }
 
-            override fun onSessionRequest(sessionRequest: Wallet.Model.SessionRequest) {
+            override fun onSessionRequest(sessionRequest: Wallet.Model.SessionRequest, verifyContext: Wallet.Model.VerifyContext) {
                 Log.d("WalletConnect", "on session request: $sessionRequest")
                 channel.trySend(WalletConnectSessionsEvent.SessionRequest(sessionRequest))
             }

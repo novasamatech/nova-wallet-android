@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.m
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
-import jp.co.soramitsu.fearless_utils.hash.isPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 
 interface StakingDashboardPresentationMapper {
 

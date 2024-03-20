@@ -12,10 +12,10 @@ import io.novafoundation.nova.feature_governance_api.data.repository.PreImageReq
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArray
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArray
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 
 class GovV1PreImageRepository(
     private val remoteStorageSource: StorageDataSource,

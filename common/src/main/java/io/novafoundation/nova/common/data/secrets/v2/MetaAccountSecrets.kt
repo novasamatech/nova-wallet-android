@@ -1,13 +1,13 @@
 package io.novafoundation.nova.common.data.secrets.v2
 
 import io.novafoundation.nova.common.utils.invoke
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.Keypair
-import jp.co.soramitsu.fearless_utils.encrypt.keypair.substrate.Sr25519Keypair
-import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
-import jp.co.soramitsu.fearless_utils.scale.Schema
-import jp.co.soramitsu.fearless_utils.scale.byteArray
-import jp.co.soramitsu.fearless_utils.scale.schema
-import jp.co.soramitsu.fearless_utils.scale.string
+import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
+import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
+import io.novasama.substrate_sdk_android.scale.EncodableStruct
+import io.novasama.substrate_sdk_android.scale.Schema
+import io.novasama.substrate_sdk_android.scale.byteArray
+import io.novasama.substrate_sdk_android.scale.schema
+import io.novasama.substrate_sdk_android.scale.string
 
 object KeyPairSchema : Schema<KeyPairSchema>() {
     val PrivateKey by byteArray()

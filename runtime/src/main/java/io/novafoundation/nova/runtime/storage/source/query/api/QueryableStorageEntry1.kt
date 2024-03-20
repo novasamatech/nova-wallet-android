@@ -1,18 +1,22 @@
 package io.novafoundation.nova.runtime.storage.source.query.api
 
+import io.novafoundation.nova.runtime.storage.source.query.StorageKeyComponents
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 
 typealias QueryableStorageBinder1<K, V> = (dynamicInstance: Any, key: K) -> V
 
-interface QueryableStorageEntry1<I, T : Any> {
+interface QueryableStorageEntry1<I, T> {
 
     context(StorageQueryContext)
     suspend fun keys(): List<I>
+
+    context(StorageQueryContext)
+    suspend fun entries(): Map<I, T>
 
     context(StorageQueryContext)
     suspend fun query(argument: I): T?
@@ -42,7 +46,7 @@ fun <I, T : Any> QueryableStorageEntry1<I, T>.observeNonNull(argument: I): Flow<
 context(StorageQueryContext)
 suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.queryNonNull(argument: I): T = requireNotNull(query(argument))
 
-internal class RealQueryableStorageEntry1<I, T : Any>(
+internal class RealQueryableStorageEntry1<I, T>(
     private val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder1<I, T>,
     @Suppress("UNCHECKED_CAST") private val keyBinding: QueryableStorageKeyBinder<I>? = null
@@ -95,13 +99,25 @@ internal class RealQueryableStorageEntry1<I, T : Any>(
 
     context(StorageQueryContext)
     override suspend fun keys(): List<I> {
-        return storageEntry.keys().map { (firstKey: Any?) ->
-            @Suppress("UNCHECKED_CAST")
-            if (firstKey != null && keyBinding != null) {
-                keyBinding.invoke(firstKey)
-            } else {
-                firstKey as I
-            }
+        return storageEntry.keys().map(::bindKey)
+    }
+
+    context(StorageQueryContext)
+    override suspend fun entries(): Map<I, T> {
+        return storageEntry.entries(
+            keyExtractor = ::bindKey,
+            binding = { decoded, key -> decoded?.let { binding(it, key) } as T }
+        )
+    }
+
+    private fun bindKey(storageKeyComponents: StorageKeyComponents): I {
+        val firstComponent = storageKeyComponents.component1<Any?>()
+
+        @Suppress("UNCHECKED_CAST")
+        return if (firstComponent != null && keyBinding != null) {
+            keyBinding.invoke(firstComponent)
+        } else {
+            firstComponent as I
         }
     }
 }

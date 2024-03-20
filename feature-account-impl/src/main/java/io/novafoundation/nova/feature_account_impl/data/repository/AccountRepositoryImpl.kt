@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
@@ -25,16 +26,17 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
-import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.MnemonicCreator
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -50,7 +52,7 @@ class AccountRepositoryImpl(
     private val languagesHolder: LanguagesHolder,
     private val accountSubstrateSource: AccountSubstrateSource,
     private val secretStoreV2: SecretStoreV2,
-    private val multiChainQrSharingFactory: MultiChainQrSharingFactory,
+    private val metaAccountChangesEventBus: MetaAccountChangesEventBus
 ) : AccountRepository {
 
     override fun getEncryptionTypes(): List<CryptoType> {
@@ -121,6 +123,14 @@ class AccountRepositoryImpl(
         return accountDataSource.accountNameFor(accountId, chainId)
     }
 
+    override suspend fun activeMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.activeMetaAccounts()
+    }
+
+    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
+        return accountDataSource.allLightMetaAccounts()
+    }
+
     override suspend fun hasActiveMetaAccounts(): Boolean {
         return accountDataSource.hasActiveMetaAccounts()
     }
@@ -155,6 +165,8 @@ class AccountRepositoryImpl(
 
     override suspend fun deleteAccount(metaId: Long) {
         accountDataSource.deleteMetaAccount(metaId)
+
+        withContext(Dispatchers.Default) { metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId)) }
     }
 
     override suspend fun getAccounts(): List<Account> {
@@ -250,6 +262,10 @@ class AccountRepositoryImpl(
 
     override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
         return accountDataSource.getActiveMetaAccounts()
+    }
+
+    override suspend fun getActiveMetaAccountsQuantity(): Int {
+        return accountDataSource.getActiveMetaAccountsQuantity()
     }
 
     override fun nodesFlow(): Flow<List<Node>> {

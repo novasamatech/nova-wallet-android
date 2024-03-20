@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposur
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 enum class NominationStatus {

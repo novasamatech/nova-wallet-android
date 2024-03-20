@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.di
 
+import android.content.Context
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -35,8 +36,12 @@ class WalletConnectFeatureModule {
 
     @Provides
     @FeatureScope
-    fun providePolkadotRequestFactory(gson: Gson, caip2Parser: Caip2Parser): PolkadotWalletConnectRequestFactory {
-        return PolkadotWalletConnectRequestFactory(gson, caip2Parser)
+    fun providePolkadotRequestFactory(
+        gson: Gson,
+        caip2Parser: Caip2Parser,
+        appContext: Context
+    ): PolkadotWalletConnectRequestFactory {
+        return PolkadotWalletConnectRequestFactory(gson, caip2Parser, appContext)
     }
 
     @Provides
@@ -45,8 +50,9 @@ class WalletConnectFeatureModule {
         gson: Gson,
         caip2Parser: Caip2Parser,
         typedMessageParser: EvmTypedMessageParser,
+        appContext: Context
     ): EvmWalletConnectRequestFactory {
-        return EvmWalletConnectRequestFactory(gson, caip2Parser, typedMessageParser)
+        return EvmWalletConnectRequestFactory(gson, caip2Parser, typedMessageParser, appContext)
     }
 
     @Provides

@@ -39,7 +39,7 @@ dependencies {
     api wsDep
 
     api gsonDep
-    api fearlessLibDep
+    api substrateSdkDep
 
     api coroutinesTestDep
 }

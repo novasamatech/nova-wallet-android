@@ -4,34 +4,34 @@ import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.common.validation.ValidationStatus
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
-import io.novafoundation.nova.feature_account_api.data.repository.ProxyRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount.ProxyType
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
+import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 
 class ProxiedSignerFactory(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val proxySigningPresenter: ProxySigningPresenter,
-    private val proxyRepository: ProxyRepository,
+    private val getProxyRepository: GetProxyRepository,
     private val rpcCalls: RpcCalls,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
     private val proxyCallFilterFactory: ProxyCallFilterFactory
@@ -44,7 +44,7 @@ class ProxiedSignerFactory(
             accountRepository = accountRepository,
             signerProvider = signerProvider,
             proxySigningPresenter = proxySigningPresenter,
-            proxyRepository = proxyRepository,
+            getProxyRepository = getProxyRepository,
             rpcCalls = rpcCalls,
             proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus,
             isRootProxied = isRoot,
@@ -59,7 +59,7 @@ class ProxiedSigner(
     private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
     private val proxySigningPresenter: ProxySigningPresenter,
-    private val proxyRepository: ProxyRepository,
+    private val getProxyRepository: GetProxyRepository,
     private val rpcCalls: RpcCalls,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
     private val isRootProxied: Boolean,
@@ -73,27 +73,30 @@ class ProxiedSigner(
         return delegate.signerAccountId(chain)
     }
 
+    override suspend fun modifyPayload(payloadExtrinsic: SignerPayloadExtrinsic): SignerPayloadExtrinsic {
+        val chain = chainRegistry.getChain(payloadExtrinsic.chainId)
+        val proxyMetaAccount = getProxyMetaAccount()
+        val delegate = createDelegate(proxyMetaAccount)
+        val payload = checkPermissionAndWrap(proxyMetaAccount, payloadExtrinsic, chain)
+        return delegate.modifyPayload(payload)
+    }
+
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         val chain = chainRegistry.getChain(payloadExtrinsic.chainId)
         val proxyMetaAccount = getProxyMetaAccount()
 
-        acknowledgeProxyOperation(proxyMetaAccount)
+        if (isRootProxied) {
+            acknowledgeProxyOperation(proxyMetaAccount)
+        }
 
-        // TODO this wont use the actual payload for fee validation when multiple nested proxies are used
-        // We need to design a universal solution
-        // We actually can use `signedExtrinsic.payload` to access actual payload but in this case validation will happen only after signing
-        // which will have bad UX with Vault and Ledger.
-        // As an option we could separate signing and wrapping step specifically for such nested signers and use only the wrapping step before fee validation
-        val modifiedPayload = modifyPayload(proxyMetaAccount, payloadExtrinsic, chain)
+        val payloadToSign = if (isRootProxied) modifyPayload(payloadExtrinsic) else payloadExtrinsic
 
         if (isRootProxied) {
-            validateExtrinsic(modifiedPayload, chain)
+            validateExtrinsic(payloadToSign, chain)
         }
 
         val delegate = createDelegate(proxyMetaAccount)
-
-        val signedExtrinsic = delegate.signExtrinsic(modifiedPayload)
-        return signedExtrinsic
+        return delegate.signExtrinsic(payloadToSign)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
@@ -129,11 +132,11 @@ class ProxiedSigner(
         }
     }
 
-    private suspend fun modifyPayload(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic, chain: Chain): SignerPayloadExtrinsic {
+    private suspend fun checkPermissionAndWrap(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic, chain: Chain): SignerPayloadExtrinsic {
         val proxyAccountId = proxyMetaAccount.requireAccountIdIn(chain)
         val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
 
-        val availableProxyTypes = proxyRepository.getDelegatedProxyTypes(
+        val availableProxyTypes = getProxyRepository.getDelegatedProxyTypesRemote(
             chainId = payload.chainId,
             proxiedAccountId = proxiedAccountId,
             proxyAccountId = proxyAccountId

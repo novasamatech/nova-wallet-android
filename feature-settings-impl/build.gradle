@@ -40,6 +40,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-wallet-connect-api')
     implementation project(':feature-versions-api')
+    implementation project(':feature-push-notifications')
 
     implementation project(':feature-settings-api')
 
@@ -52,7 +53,7 @@ dependencies {
 
     implementation biometricDep
 
-    implementation fearlessLibDep
+    implementation substrateSdkDep
 
     implementation coroutinesDep
     implementation coroutinesAndroidDep

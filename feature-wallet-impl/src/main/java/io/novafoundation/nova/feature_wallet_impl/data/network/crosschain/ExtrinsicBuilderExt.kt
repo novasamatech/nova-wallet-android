@@ -8,14 +8,14 @@ import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.NumberType
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.NumberType
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.metadata.call
+import io.novasama.substrate_sdk_android.runtime.metadata.module
 
 fun ExtrinsicBuilder.xcmExecute(
     message: VersionedXcm,
@@ -53,7 +53,7 @@ private fun Type<*>.isWeightV1(): Boolean {
     return this is NumberType
 }
 
-private fun VersionedXcm.toEncodableInstance() = when (this) {
+fun VersionedXcm.toEncodableInstance() = when (this) {
     is VersionedXcm.V2 -> DictEnum.Entry(
         name = "V2",
         value = message.toEncodableInstance()
@@ -87,6 +87,7 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
         name = "WithdrawAsset",
         value = assets.toEncodableInstance()
     )
+
     is XcmV2Instruction.DepositAsset -> DictEnum.Entry(
         name = "DepositAsset",
         value = structOf(
@@ -95,6 +96,7 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
             "beneficiary" to beneficiary.toEncodableInstance()
         )
     )
+
     is XcmV2Instruction.BuyExecution -> DictEnum.Entry(
         name = "BuyExecution",
         value = structOf(
@@ -103,14 +105,17 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
             "weight_limit" to weightLimit.toV1EncodableInstance()
         )
     )
+
     XcmV2Instruction.ClearOrigin -> DictEnum.Entry(
         name = "ClearOrigin",
         value = null
     )
+
     is XcmV2Instruction.ReserveAssetDeposited -> DictEnum.Entry(
         name = "ReserveAssetDeposited",
         value = assets.toEncodableInstance()
     )
+
     is XcmV2Instruction.DepositReserveAsset -> DictEnum.Entry(
         name = "DepositReserveAsset",
         value = structOf(
@@ -120,6 +125,7 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
             "xcm" to xcm.toEncodableInstance()
         )
     )
+
     is XcmV2Instruction.ReceiveTeleportedAsset -> DictEnum.Entry(
         name = "ReceiveTeleportedAsset",
         value = assets.toEncodableInstance()
@@ -151,6 +157,7 @@ fun VersionedMultiAssets.toEncodableInstance() = when (this) {
         name = "V1",
         value = assets.toEncodableInstance()
     )
+
     is VersionedMultiAssets.V2 -> DictEnum.Entry(
         name = "V2",
         value = assets.toEncodableInstance()
@@ -162,6 +169,7 @@ fun VersionedMultiAsset.toEncodableInstance() = when (this) {
         name = "V1",
         value = asset.toEncodableInstance()
     )
+
     is VersionedMultiAsset.V2 -> DictEnum.Entry(
         name = "V2",
         value = asset.toEncodableInstance()
@@ -173,6 +181,7 @@ fun VersionedMultiLocation.toEncodableInstance() = when (this) {
         name = "V1",
         value = multiLocation.toEncodableInstance()
     )
+
     is VersionedMultiLocation.V2 -> DictEnum.Entry(
         name = "V2",
         value = multiLocation.toEncodableInstance()

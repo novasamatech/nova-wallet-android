@@ -23,7 +23,7 @@ fun ValidationSystem.Companion.chooseDelegationAmount(
         error = { context ->
             ChooseDelegationAmountValidationFailure.NotEnoughToPayFees(
                 chainAsset = context.payload.asset.token.configuration,
-                maxUsable = context.availableToPayFees,
+                maxUsable = context.maxUsable,
                 fee = context.fee
             )
         }

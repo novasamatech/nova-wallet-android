@@ -38,8 +38,8 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
 import java.math.BigInteger
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow

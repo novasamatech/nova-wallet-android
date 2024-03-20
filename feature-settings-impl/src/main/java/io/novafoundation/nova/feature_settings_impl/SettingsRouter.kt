@@ -4,6 +4,8 @@ interface SettingsRouter {
 
     fun openWallets()
 
+    fun openPushNotificationSettings()
+
     fun openCurrencies()
 
     fun openLanguages()

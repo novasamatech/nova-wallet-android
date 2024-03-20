@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -18,23 +19,27 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.isValid
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.extensions.toAddress
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHexUntyped
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.isValid
+import io.novasama.substrate_sdk_android.extensions.toAccountId
+import io.novasama.substrate_sdk_android.extensions.toAddress
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.toHexUntyped
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 
 val Chain.typesUsage: TypesUsage
     get() = when {
@@ -64,6 +69,14 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
 
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
 
+fun List<Chain.Swap>.assetConversionSupported(): Boolean {
+    return Chain.Swap.ASSET_CONVERSION in this
+}
+
+fun List<Chain.Swap>.hydraDxSupported(): Boolean {
+    return Chain.Swap.HYDRA_DX in this
+}
+
 val Chain.ConnectionState.isFullSync: Boolean
     get() = this == Chain.ConnectionState.FULL_SYNC
 
@@ -83,6 +96,12 @@ fun Chain.Additional?.relaychainAsNative(): Boolean {
 
 fun Chain.Additional?.feeViaRuntimeCall(): Boolean {
     return this?.feeViaRuntimeCall ?: false
+}
+
+fun ChainId.chainIdHexPrefix16(): String {
+    return removeHexPrefix()
+        .take(32)
+        .requireHexPrefix()
 }
 
 enum class StakingTypeGroup {
@@ -290,6 +309,8 @@ object ChainGeneses {
     const val ALEPH_ZERO = "70255b4d28de0fc4e1a193d7e175ad1ccef431598211c55538f1018651a0344e"
     const val TERNOA = "6859c81ca95ef624c9dfe4dc6e3381c33e5d6509e35e147092bfbc780f777c4e"
 
+    const val POLIMEC = "7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd"
+
     const val POLKADEX = "3920bcb4960a1eef5580cd5367ff3f430eef052774f78468852f7b9cb39f8a3c"
 
     const val CALAMARI = "4ac80c99289841dd946ef92765bf659a307d39189b3ce374a92b5f0415ee17a1"
@@ -299,6 +320,8 @@ object ChainGeneses {
     const val ZEITGEIST = "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060"
 
     const val WESTMINT = "67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9"
+
+    const val HYDRA_DX = "afdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d"
 }
 
 object ChainIds {
@@ -333,6 +356,10 @@ fun Chain.Asset.requireOrml(): Type.Orml {
     require(type is Type.Orml)
 
     return type
+}
+
+fun Chain.Asset.ormlOrNull(): Type.Orml? {
+    return type as? Type.Orml
 }
 
 fun Chain.Asset.requireErc20(): Type.EvmErc20 {
@@ -374,5 +401,32 @@ fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?):
     }
 }
 
+fun Type.Orml.decodeOrNull(runtime: RuntimeSnapshot): Any? {
+    val currencyType = runtime.typeRegistry[currencyIdType] ?: return null
+    return currencyType.fromHexOrNull(runtime, currencyIdScale)
+}
+
 val Chain.Asset.localId: AssetAndChainId
     get() = AssetAndChainId(chainId, id)
+
+val Chain.Asset.onChainAssetId: String?
+    get() = when (this.type) {
+        is Type.Equilibrium -> this.type.toString()
+        is Type.Orml -> this.type.currencyIdScale
+        is Type.Statemine -> this.type.id.onChainAssetId()
+        is Type.EvmErc20 -> this.type.contractAddress
+        is Type.Native -> null
+        is Type.EvmNative -> null
+        Type.Unsupported -> error("Unsupported assetId type: ${this.type::class.simpleName}")
+    }
+
+fun StatemineAssetId.onChainAssetId(): String {
+    return when (this) {
+        is StatemineAssetId.Number -> value.toString()
+        is StatemineAssetId.ScaleEncoded -> scaleHex
+    }
+}
+
+fun Chain.openGovIfSupported(): Chain.Governance? {
+    return Chain.Governance.V2.takeIf { it in governance }
+}

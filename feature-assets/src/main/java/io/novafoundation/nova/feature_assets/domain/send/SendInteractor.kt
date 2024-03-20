@@ -1,26 +1,32 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_assets.domain.send.model.TransferFeeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.senderAccountId
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -58,51 +64,42 @@ class SendInteractor(
         )
     }
 
-    suspend fun syncCrossChainConfig() = kotlin.runCatching {
-        crossChainTransfersRepository.syncConfiguration()
-    }
-
-    suspend fun getOriginFee(transfer: AssetTransfer): Fee = withContext(Dispatchers.Default) {
+    suspend fun getFee(amount: Balance, transfer: AssetTransfer): TransferFeeModel = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
-            crossChainTransactor.estimateOriginFee(config, transfer)
+            val originFee = crossChainTransactor.estimateOriginFee(config, transfer)
+            val crossChainFeeModel = crossChainWeigher.estimateFee(amount, config)
+
+            val deliveryPartFee = getDeliveryFee(crossChainFeeModel.senderPart, transfer.senderAccountId())
+            val originFeeWithSenderPart = OriginFee(originFee, deliveryPartFee, transfer.commissionAssetToken.configuration)
+
+            TransferFeeModel(originFeeWithSenderPart, crossChainFeeModel.toSubstrateFee(transfer))
         } else {
-            getAssetTransfers(transfer).calculateFee(transfer)
+            val originFee = getAssetTransfers(transfer).calculateFee(transfer)
+            TransferFeeModel(
+                OriginFee(originFee, null, transfer.commissionAssetToken.configuration),
+                null
+            )
         }
-    }
-
-    suspend fun getCrossChainFee(transfer: AssetTransfer): Fee? = if (transfer.isCrossChain) {
-        val feePlanks = withContext(Dispatchers.Default) {
-            val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
-            val crossChainFee = crossChainWeigher.estimateFee(config)
-
-            crossChainFee.reserve.orZero() + crossChainFee.destination.orZero()
-        }
-
-        val submissionOriginId = transfer.sender.requireAccountIdIn(transfer.originChain)
-        val submissionOrigin = SubmissionOrigin.singleOrigin(submissionOriginId) // cross-chain fee is always paid by requested account id
-
-        SubstrateFee(feePlanks, submissionOrigin)
-    } else {
-        null
     }
 
     suspend fun performTransfer(
         transfer: WeightedAssetTransfer,
-        originFee: DecimalFee,
-        crossChainFee: DecimalFee?,
+        originFee: OriginDecimalFee,
+        crossChainFee: Fee?,
     ): Result<*> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
-            val crossChainFeePlanks = crossChainFee!!.networkFee.amountByRequestedAccount
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
-            crossChainTransactor.performTransfer(config, transfer, crossChainFeePlanks)
+            crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amountByRequestedAccount)
         } else {
+            val networkFee = originFee.networkFeePart()
+
             getAssetTransfers(transfer).performTransfer(transfer)
                 .onSuccess { submission ->
                     // Insert used fee regardless of who paid it
-                    walletRepository.insertPendingTransfer(submission.hash, transfer, originFee.networkFeeDecimalAmount)
+                    walletRepository.insertPendingTransfer(submission.hash, transfer, networkFee.networkFeeDecimalAmount)
                 }
         }
     }
@@ -122,5 +119,17 @@ class SendInteractor(
         originAsset = transfer.originChainAsset,
         destinationChain = transfer.destinationChain,
         destinationParaId = parachainInfoRepository.paraId(transfer.destinationChain.id)
+    )
+
+    private fun getDeliveryFee(amount: Balance, accountId: AccountId): Fee {
+        return SubstrateFee(
+            amount = amount,
+            submissionOrigin = SubmissionOrigin.singleOrigin(accountId)
+        )
+    }
+
+    private fun CrossChainFeeModel.toSubstrateFee(transfer: AssetTransfer) = SubstrateFee(
+        amount = holdingPart,
+        submissionOrigin = SubmissionOrigin.singleOrigin(transfer.sender.requireAccountIdIn(transfer.originChain))
     )
 }

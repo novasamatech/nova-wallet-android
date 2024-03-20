@@ -89,8 +89,10 @@
         <attr name="titleIcon" format="reference|color" />
         <attr name="titleIconStart" format="reference|color" />
         <attr name="titleIconTint" format="color" />
+        <attr name="titleIconStartTint" format="color" />
         <attr name="primaryValueIconTint" format="color" />
         <attr name="titleEllipsisable" format="boolean" />
+        <attr name="primaryValue" format="string" />
     </declare-styleable>
 
     <declare-styleable name="TableView">
@@ -293,6 +295,17 @@
         <attr name="postfix" format="string" />
         <attr name="android:digits" />
         <attr name="android:inputType" />
+    </declare-styleable>
+
+    <declare-styleable name="SettingsItemView">
+        <attr name="title" />
+        <attr name="settingValue" format="string" />
+        <attr name="icon" />
+    </declare-styleable>
+
+    <declare-styleable name="SettingsSwitcherView">
+        <attr name="title" />
+        <attr name="icon" />
     </declare-styleable>
 
 </resources>

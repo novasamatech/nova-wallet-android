@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmou
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 
 suspend fun List<GenericEvent.Instance>.assetFee(multiLocationConverter: MultiLocationConverter): ChainAssetWithAmount? {
     val event = assetTxFeePaidEvent() ?: return null

@@ -4,11 +4,11 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.resources.ResourceManager
-import jp.co.soramitsu.fearless_utils.exceptions.AddressFormatException
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.icon.IconGenerator
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.exceptions.AddressFormatException
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.icon.IconGenerator
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap

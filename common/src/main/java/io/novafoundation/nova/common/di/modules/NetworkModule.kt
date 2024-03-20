@@ -21,10 +21,10 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.bluetooth.RealBluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.location.RealLocationManager
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
-import jp.co.soramitsu.fearless_utils.wsrpc.recovery.Reconnector
-import jp.co.soramitsu.fearless_utils.wsrpc.request.RequestExecutor
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.wsrpc.recovery.Reconnector
+import io.novasama.substrate_sdk_android.wsrpc.request.RequestExecutor
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -63,6 +63,7 @@ class NetworkModule {
             github = BuildConfig.GITHUB_URL,
             email = BuildConfig.EMAIL,
             youtube = BuildConfig.YOUTUBE_URL,
+            storeUrl = BuildConfig.APP_UPDATE_SOURCE_LINK
         )
     }
 

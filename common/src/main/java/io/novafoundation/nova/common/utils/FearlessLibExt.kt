@@ -7,51 +7,53 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberCons
 import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.core.model.Node
-import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
-import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
-import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
-import jp.co.soramitsu.fearless_utils.encrypt.seed.SeedFactory
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
-import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.extensions.toAddress
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.bytesOrNull
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignedRaw
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
-import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.fullName
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Event
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.FunctionArgument
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
-import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
-import jp.co.soramitsu.fearless_utils.scale.EncodableStruct
-import jp.co.soramitsu.fearless_utils.scale.Schema
-import jp.co.soramitsu.fearless_utils.scale.dataType.DataType
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
+import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
+import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.toAccountId
+import io.novasama.substrate_sdk_android.extensions.toAddress
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
+import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.fullName
+import io.novasama.substrate_sdk_android.runtime.metadata.module
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
+import io.novasama.substrate_sdk_android.runtime.metadata.module.FunctionArgument
+import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.splitKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
+import io.novasama.substrate_sdk_android.scale.EncodableStruct
+import io.novasama.substrate_sdk_android.scale.Schema
+import io.novasama.substrate_sdk_android.scale.dataType.DataType
+import io.novasama.substrate_sdk_android.scale.utils.toUnsignedBytes
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 import org.web3j.crypto.Sign
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
@@ -94,6 +96,10 @@ val Short.bigEndianBytes
 
 fun ByteArray.toBigEndianShort(): Short = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).short
 fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
+
+fun BigInteger.toUnsignedLittleEndian(): ByteArray {
+    return toUnsignedBytes().reversedArray()
+}
 
 fun ByteArray.toBigEndianU32(): UInt = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).int.toUInt()
 
@@ -166,6 +172,10 @@ fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot
 
 fun Constant.asNumber(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
 
+fun Constant.decoded(runtimeSnapshot: RuntimeSnapshot): Any? {
+    return type?.fromByteArrayOrNull(runtimeSnapshot, value)
+}
+
 fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
@@ -180,6 +190,8 @@ fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 fun RuntimeMetadata.eqBalances() = module(Modules.EQ_BALANCES)
 
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
+
+fun RuntimeMetadata.assetRegistry() = module(Modules.ASSET_REGISTRY)
 
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
@@ -233,9 +245,29 @@ fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_PO
 
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
 
+fun RuntimeMetadata.omnipoolOrNull() = moduleOrNull(Modules.OMNIPOOL)
+
+fun RuntimeMetadata.omnipool() = module(Modules.OMNIPOOL)
+
+fun RuntimeMetadata.stableSwapOrNull() = moduleOrNull(Modules.STABLE_SWAP)
+
+fun RuntimeMetadata.stableSwap() = module(Modules.STABLE_SWAP)
+
+fun RuntimeMetadata.dynamicFeesOrNull() = moduleOrNull(Modules.DYNAMIC_FEES)
+
+fun RuntimeMetadata.dynamicFees() = module(Modules.DYNAMIC_FEES)
+
+fun RuntimeMetadata.multiTransactionPayment() = module(Modules.MULTI_TRANSACTION_PAYMENT)
+
+fun RuntimeMetadata.referralsOrNull() = moduleOrNull(Modules.REFERRALS)
+
 fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
 
+fun RuntimeMetadata.proxyOrNull() = moduleOrNull(Modules.PROXY)
+
 fun RuntimeMetadata.proxy() = module(Modules.PROXY)
+
+fun RuntimeMetadata.utility() = module(Modules.UTILITY)
 
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
@@ -317,6 +349,14 @@ fun CallRepresentation.toCallInstance(): CallRepresentation.Instance? {
     return (this as? CallRepresentation.Instance)
 }
 
+fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
+    ?: fallbacks.firstOrNull { modules[it] != null }
+        ?.let { modules[it] } ?: throw NoSuchElementException()
+
+fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEntry = storage?.get(name)
+    ?: fallbacks.firstOrNull { storage?.get(it) != null }
+        ?.let { storage?.get(it) } ?: throw NoSuchElementException()
+
 object Modules {
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
@@ -386,4 +426,18 @@ object Modules {
     const val MULTISIG = "Multisig"
     const val REGISTRAR = "Registrar"
     const val FAST_UNSTAKE = "FastUnstake"
+
+    const val OMNIPOOL = "Omnipool"
+
+    const val DYNAMIC_FEES = "DynamicFees"
+
+    const val MULTI_TRANSACTION_PAYMENT = "MultiTransactionPayment"
+
+    const val REFERRALS = "Referrals"
+
+    const val ROUTER = "Router"
+
+    const val STABLE_SWAP = "Stableswap"
+
+    const val ASSET_REGISTRY = "AssetRegistry"
 }

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.data.network.rpc
 
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import java.io.ByteArrayOutputStream
 
 private const val CHILD_KEY_DEFAULT = ":child_storage:default:"

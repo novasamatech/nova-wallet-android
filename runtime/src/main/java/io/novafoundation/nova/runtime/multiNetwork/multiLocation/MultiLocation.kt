@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.multiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 fun Junctions(vararg junctions: MultiLocation.Junction) = MultiLocation.Interior.Junctions(junctions.toList())
@@ -74,6 +74,14 @@ fun List<MultiLocation.Junction>.toInterior() = when (size) {
 }
 
 fun MultiLocation.Interior.isHere() = this is MultiLocation.Interior.Here
+
+fun MultiLocation.Interior.paraIdOrNull(): ParaId? {
+    if (this !is MultiLocation.Interior.Junctions) return null
+
+    return junctions.filterIsInstance<MultiLocation.Junction.ParachainId>()
+        .firstOrNull()
+        ?.id
+}
 
 private fun List<MultiLocation.Junction>.sorted(): List<MultiLocation.Junction> {
     return sortedBy(MultiLocation.Junction::order)

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.utils
 
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 
 interface Filter<T> {
     fun shouldInclude(model: T): Boolean
@@ -24,6 +24,11 @@ interface NamedFilter<T> : Filter<T> {
 interface OptionsFilter<T, O> : Filter<T> {
 
     val options: List<O>
+}
+
+class EverythingFilter<T> : Filter<T> {
+
+    override fun shouldInclude(model: T) = true
 }
 
 fun <T> List<T>.applyFilters(filters: List<Filter<T>>): List<T> {

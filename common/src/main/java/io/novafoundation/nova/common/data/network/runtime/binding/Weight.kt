@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 
 typealias Weight = BigInteger

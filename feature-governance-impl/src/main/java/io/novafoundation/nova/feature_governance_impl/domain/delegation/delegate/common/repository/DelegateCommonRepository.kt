@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -19,7 +18,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoT
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 interface DelegateCommonRepository {
     suspend fun getDelegatesStats(governanceOption: SupportedGovernanceOption, accountIds: List<AccountId>? = null): List<DelegateStats>

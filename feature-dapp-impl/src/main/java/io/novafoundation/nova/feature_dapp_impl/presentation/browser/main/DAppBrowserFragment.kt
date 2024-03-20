@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -92,12 +93,16 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         dappBrowserRefresh.setOnClickListener { refreshClicked() }
 
         dappBrowserMore.setOnClickListener { moreClicked() }
+
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
         dappBrowserWebView.uninjectWeb3()
+
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         webViewHolder.release()
     }

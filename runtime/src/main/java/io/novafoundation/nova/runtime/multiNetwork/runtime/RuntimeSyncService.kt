@@ -9,10 +9,10 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
-import jp.co.soramitsu.fearless_utils.runtime.metadata.GetMetadataRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
-import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
+import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
+import io.novasama.substrate_sdk_android.wsrpc.executeAsync
+import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
+import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -97,12 +97,13 @@ class RuntimeSyncService(
         cancelExistingSync(chainId)
 
         syncingChains[chainId] = launch(syncDispatcher) {
-            runCatching {
-                val syncResult = sync(chainId, forceFullSync)
-                syncResult?.let { _syncStatusFlow.emit(it) }
-            }
+            val syncResult = runCatching {
+                sync(chainId, forceFullSync)
+            }.getOrNull()
 
             syncFinished(chainId)
+
+            syncResult?.let { _syncStatusFlow.emit(it) }
         }
     }
 

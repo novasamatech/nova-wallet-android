@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.toUuid
-import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.callback.DataReceivedCallback
 import no.nordicsemi.android.ble.data.Data

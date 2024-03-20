@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.data.mappers
 
 import io.novafoundation.nova.core.model.CryptoType
-import jp.co.soramitsu.fearless_utils.encrypt.EncryptionType
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 
 fun mapCryptoTypeToEncryption(cryptoType: CryptoType): EncryptionType {
     return when (cryptoType) {

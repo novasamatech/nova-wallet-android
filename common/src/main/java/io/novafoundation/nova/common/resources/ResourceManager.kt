@@ -39,7 +39,7 @@ interface ResourceManager {
 
     fun getDimensionPixelSize(id: Int): Int
 
-    fun getFont(@FontRes fontRes: Int): Typeface
+    fun getFont(@FontRes fontRes: Int): Typeface?
 }
 
 fun ResourceManager.formatTimeLeft(elapsedTimeInMillis: Long): String {
@@ -62,6 +62,14 @@ fun ResourceManager.formatListPreview(
 
             getString(R.string.common_element_and_more_format, previewItems, remainingCount.format())
         }
+    }
+}
+
+fun ResourceManager.formatBooleanToState(isEnabled: Boolean): String {
+    return if (isEnabled) {
+        getString(R.string.common_on)
+    } else {
+        getString(R.string.common_off)
     }
 }
 

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.preImage
+import io.novafoundation.nova.common.utils.storageOrFallback
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.repository.HexHash
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
@@ -17,15 +18,15 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Tuple
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArray
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntryType
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Tuple
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArray
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
+import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntryType
+import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import java.math.BigInteger
 
 class Gov2PreImageRepository(
@@ -120,18 +121,20 @@ class Gov2PreImageRepository(
     }
 
     private suspend fun StorageQueryContext.fetchPreImageLength(callHash: ByteArray): BigInteger? {
-        return runtime.metadata.preImage().storage("StatusFor").query(
-            callHash,
-            binding = ::bindPreImageLength
-        )
+        return runtime.metadata.preImage().storageOrFallback("RequestStatusFor", "StatusFor")
+            .query(
+                callHash,
+                binding = ::bindPreImageLength
+            )
     }
 
     private suspend fun StorageQueryContext.fetchPreImagesLength(callHashes: Collection<ByteArray>): Map<HexHash, BigInteger?> {
-        return runtime.metadata.preImage().storage("StatusFor").entries(
-            keysArguments = callHashes.wrapSingleArgumentKeys(),
-            keyExtractor = { (callHash: ByteArray) -> callHash.toHexString() },
-            binding = { decoded, _ -> bindPreImageLength(decoded) }
-        )
+        return runtime.metadata.preImage().storageOrFallback("RequestStatusFor", "StatusFor")
+            .entries(
+                keysArguments = callHashes.wrapSingleArgumentKeys(),
+                keyExtractor = { (callHash: ByteArray) -> callHash.toHexString() },
+                binding = { decoded, _ -> bindPreImageLength(decoded) }
+            )
     }
 
     private fun bindPreImageLength(decoded: Any?): BigInteger? = runCatching {

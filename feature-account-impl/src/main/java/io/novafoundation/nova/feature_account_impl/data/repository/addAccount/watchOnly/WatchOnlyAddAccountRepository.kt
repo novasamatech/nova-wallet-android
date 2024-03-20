@@ -4,14 +4,17 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.BaseAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class WatchOnlyAddAccountRepository(
     private val accountDao: MetaAccountDao,
-    private val proxySyncService: ProxySyncService,
-) : BaseAddAccountRepository<WatchOnlyAddAccountRepository.Payload>(proxySyncService) {
+    proxySyncService: ProxySyncService,
+    metaAccountChangesEventBus: MetaAccountChangesEventBus
+) : BaseAddAccountRepository<WatchOnlyAddAccountRepository.Payload>(proxySyncService, metaAccountChangesEventBus) {
 
     sealed interface Payload {
         class MetaAccount(
@@ -27,14 +30,14 @@ class WatchOnlyAddAccountRepository(
         ) : Payload
     }
 
-    override suspend fun addAccountInternal(payload: Payload): Long {
+    override suspend fun addAccountInternal(payload: Payload): AddAccountResult {
         return when (payload) {
             is Payload.MetaAccount -> addWatchOnlyWallet(payload)
             is Payload.ChainAccount -> changeWatchOnlyChainAccount(payload)
         }
     }
 
-    private suspend fun addWatchOnlyWallet(payload: Payload.MetaAccount): Long {
+    private suspend fun addWatchOnlyWallet(payload: Payload.MetaAccount): AddAccountResult {
         val metaAccount = MetaAccountLocal(
             substratePublicKey = null,
             substrateCryptoType = null,
@@ -49,10 +52,12 @@ class WatchOnlyAddAccountRepository(
             status = MetaAccountLocal.Status.ACTIVE
         )
 
-        return accountDao.insertMetaAccount(metaAccount)
+        val metaId = accountDao.insertMetaAccount(metaAccount)
+
+        return AddAccountResult.AccountAdded(metaId)
     }
 
-    private suspend fun changeWatchOnlyChainAccount(payload: Payload.ChainAccount): Long {
+    private suspend fun changeWatchOnlyChainAccount(payload: Payload.ChainAccount): AddAccountResult {
         val chainAccount = ChainAccountLocal(
             metaId = payload.metaId,
             chainId = payload.chainId,
@@ -63,6 +68,6 @@ class WatchOnlyAddAccountRepository(
 
         accountDao.insertChainAccount(chainAccount)
 
-        return payload.metaId
+        return AddAccountResult.AccountChanged(payload.metaId)
     }
 }

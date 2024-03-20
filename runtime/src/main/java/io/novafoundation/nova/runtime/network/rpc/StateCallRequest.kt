@@ -1,6 +1,6 @@
 package io.novafoundation.nova.runtime.network.rpc
 
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
 
 class StateCallRequest(
     runtimeRpcName: String,

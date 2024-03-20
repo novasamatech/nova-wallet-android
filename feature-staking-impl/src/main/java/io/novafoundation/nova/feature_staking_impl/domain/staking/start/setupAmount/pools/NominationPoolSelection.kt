@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 
 data class NominationPoolSelection(
     val pool: NominationPool,

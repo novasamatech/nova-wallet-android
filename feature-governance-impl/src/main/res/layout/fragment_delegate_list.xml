@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:iconRight="@drawable/ic_search"
-        app:titleText="@string/delegation_add_delegation" />
+        app:titleText="@string/common_add_delegation" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/delegateListList"

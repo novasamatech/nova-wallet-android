@@ -8,6 +8,8 @@ import androidx.room.PrimaryKey
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.Default.NODE_SELECTION_STRATEGY_DEFAULT
 
+const val PUSH_DEFAULT_VALUE = "0"
+
 @Entity(tableName = "chains")
 data class ChainLocal(
     @PrimaryKey val id: String,
@@ -21,6 +23,8 @@ data class ChainLocal(
     val isTestNet: Boolean,
     @ColumnInfo(defaultValue = "1")
     val hasSubstrateRuntime: Boolean,
+    @ColumnInfo(defaultValue = PUSH_DEFAULT_VALUE)
+    val pushSupport: Boolean,
     val hasCrowdloans: Boolean,
     @ColumnInfo(defaultValue = "0")
     val supportProxy: Boolean,

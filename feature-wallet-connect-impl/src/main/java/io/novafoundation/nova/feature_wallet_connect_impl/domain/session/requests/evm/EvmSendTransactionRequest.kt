@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm
 
+import android.content.Context
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Wallet.Params.SessionRequestResponse
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
@@ -13,8 +14,9 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 class EvmSendTransactionRequest(
     private val transaction: EvmTransaction.Struct,
     private val chainId: Int,
-    private val sessionRequest: Wallet.Model.SessionRequest
-) : SendTxWalletConnectRequest(sessionRequest) {
+    private val sessionRequest: Wallet.Model.SessionRequest,
+    context: Context
+) : SendTxWalletConnectRequest(sessionRequest, context) {
 
     override suspend fun sentResponse(response: Response.Sent): SessionRequestResponse {
         return sessionRequest.approved(response.txHash)
