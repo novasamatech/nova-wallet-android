@@ -8,8 +8,10 @@ import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExt
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus.ValidationResponse
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.proxyHasEnoughFeeValidation
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import kotlinx.coroutines.flow.launchIn
 
 class ProxyExtrinsicValidationRequestBusHandler(
@@ -41,11 +43,12 @@ class ProxyExtrinsicValidationRequestBusHandler(
             call = { it.call },
             chainWithAsset = { it.chainWithAsset },
             proxyNotEnoughFee = { payload, availableBalance, fee ->
+                val asset = payload.chainWithAsset.asset
                 ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee(
-                    payload.proxyMetaAccount,
-                    payload.chainWithAsset.asset,
-                    availableBalance,
-                    fee
+                    metaAccount = payload.proxyMetaAccount,
+                    asset = asset,
+                    fee = asset.amountFromPlanks(fee.amount).formatTokenAmount(asset),
+                    availableBalance = asset.amountFromPlanks(availableBalance).formatTokenAmount(asset)
                 )
             }
         )

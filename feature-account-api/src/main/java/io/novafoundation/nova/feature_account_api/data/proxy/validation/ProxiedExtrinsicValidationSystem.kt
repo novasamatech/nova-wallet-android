@@ -2,11 +2,9 @@ package io.novafoundation.nova.feature_account_api.data.proxy.validation
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
@@ -25,7 +23,7 @@ sealed interface ProxiedExtrinsicValidationFailure {
     class ProxyNotEnoughFee(
         val metaAccount: MetaAccount,
         val asset: Chain.Asset,
-        val availableBalance: BigInteger,
-        val fee: Fee
+        val fee: String,
+        val availableBalance: String
     ) : ProxiedExtrinsicValidationFailure
 }
