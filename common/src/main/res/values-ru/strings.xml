@@ -503,7 +503,6 @@
     <string name="deep_linking_invalid_derivation_path">Неверный формат пути деривации</string>
     <string name="deep_linking_invalid_mnemonic">Неверный формат мнемоники</string>
     <string name="deep_linking_url_is_invalid">Неверный формат ссылки</string>
-    <string name="default_notification_channel_name">Основной канал уведомлений</string>
     <string name="delegate_search_hint">Поиск по адресу или имени</string>
     <string name="delegate_search_placeholder_empty">Недопустимый формат адреса. Убедитесь, что адрес принадлежит правильной сети</string>
     <string name="delegate_search_result_count">результаты поиска: %d</string>
