@@ -10,10 +10,10 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.eq
 import io.novafoundation.nova.test_shared.whenever
-import jp.co.soramitsu.fearless_utils.runtime.metadata.GetMetadataRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.RuntimeRequest
-import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
+import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
+import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
