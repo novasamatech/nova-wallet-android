@@ -5,7 +5,10 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 @JvmInline
-value class TokenSymbol(val value: String)
+value class TokenSymbol(val value: String) {
+
+    override fun toString() = value
+}
 
 fun String.asTokenSymbol() = TokenSymbol(this)
 
