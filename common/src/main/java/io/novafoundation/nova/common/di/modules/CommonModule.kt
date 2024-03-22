@@ -54,6 +54,8 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.RealProgressDialogMixin
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
@@ -310,4 +312,8 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideDescriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher = RealDescriptionBottomSheetLauncher()
+
+    @Provides
+    @ApplicationScope
+    fun provideProgressDialogMixin(): ProgressDialogMixin = RealProgressDialogMixin()
 }

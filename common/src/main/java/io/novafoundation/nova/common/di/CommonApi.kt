@@ -39,6 +39,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -136,6 +137,8 @@ interface CommonApi {
     fun bakingParallaxCardCache(): BackingParallaxCardLruCache
 
     fun descriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher
+
+    fun progressDialogMixin(): ProgressDialogMixin
 
     val systemCallExecutor: SystemCallExecutor
 
