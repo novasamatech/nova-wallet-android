@@ -34,8 +34,6 @@ class ImportOptionView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_import_option, this)
 
         attrs?.let(::applyAttributes)
-
-        setWillNotDraw(true)
     }
 
     override fun onDrawForeground(canvas: Canvas) {
