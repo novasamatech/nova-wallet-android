@@ -11,6 +11,6 @@ class OnboardingInteractorImpl : OnboardingInteractor {
     }
 
     override fun isCloudAvailable(): Boolean {
-        return false
+        return true
     }
 }
