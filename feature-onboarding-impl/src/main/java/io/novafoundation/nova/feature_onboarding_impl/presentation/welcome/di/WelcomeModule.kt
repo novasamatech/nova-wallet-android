@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeViewModel
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -26,7 +25,6 @@ class WelcomeModule {
         router: OnboardingRouter,
         appLinksProvider: AppLinksProvider,
         shouldShowBack: Boolean,
-        importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         addAccountPayload: AddAccountPayload,
         actionAwaitableMixin: ActionAwaitableMixin.Factory,
         updateNotificationsInteractor: UpdateNotificationsInteractor
@@ -36,7 +34,6 @@ class WelcomeModule {
             router,
             appLinksProvider,
             addAccountPayload,
-            importTypeChooserMixin,
             actionAwaitableMixin,
             updateNotificationsInteractor
         )
