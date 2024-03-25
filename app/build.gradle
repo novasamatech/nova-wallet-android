@@ -25,6 +25,12 @@ android {
             keyAlias readRawSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
             keyPassword readRawSecretOrNull('CI_KEYSTORE_KEY_PASS')
         }
+        debug {
+            storeFile file('develop_key.jks')
+            storePassword readRawSecretOrNull('CI_KEYSTORE_PASS')
+            keyAlias readRawSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
+            keyPassword readRawSecretOrNull('CI_KEYSTORE_KEY_PASS')
+        }
         market {
             storeFile file('market_key.jks')
             storePassword readRawSecretOrNull('CI_MARKET_KEYSTORE_PASS')
@@ -130,6 +136,7 @@ android {
 
     packagingOptions {
         resources.excludes.add("META-INF/versions/9/previous-compilation-data.bin")
+        resources.excludes.add("META-INF/DEPENDENCIES")
     }
 }
 

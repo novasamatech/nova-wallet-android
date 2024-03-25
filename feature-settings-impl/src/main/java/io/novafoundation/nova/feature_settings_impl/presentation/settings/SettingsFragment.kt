@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.fragment_settings.accountView
 import kotlinx.android.synthetic.main.fragment_settings.settingsAppVersion
 import kotlinx.android.synthetic.main.fragment_settings.settingsAvatar
 import kotlinx.android.synthetic.main.fragment_settings.settingsBiometricAuth
+import kotlinx.android.synthetic.main.fragment_settings.settingsCloudBackup
 import kotlinx.android.synthetic.main.fragment_settings.settingsContainer
 import kotlinx.android.synthetic.main.fragment_settings.settingsCurrency
 import kotlinx.android.synthetic.main.fragment_settings.settingsEmail
@@ -80,6 +81,8 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
         settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
+
+        settingsCloudBackup.setOnClickListener { viewModel.cloudBackupClicked() }
 
         settingsWalletConnect.setOnClickListener { viewModel.walletConnectClicked() }
 

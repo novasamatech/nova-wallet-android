@@ -1,25 +1,26 @@
 package io.novafoundation.nova.feature_cloud_backup_impl.domain
 
+import android.util.Log
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CreateBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.EncryptedCloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
+import io.novafoundation.nova.feature_cloud_backup_impl.data.cloudStorage.CloudBackupStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
-internal class RealCloudBackupService : CloudBackupService {
+internal class RealCloudBackupService(
+    private val cloudBackupStorage: CloudBackupStorage,
+): CloudBackupService {
 
-    override suspend fun validateCanCreateBackup(): PreCreateValidationStatus {
-        delay(1.seconds)
-
-        return PreCreateValidationStatus.Ok
+    override suspend fun validateCanCreateBackup(): PreCreateValidationStatus = withContext(Dispatchers.IO) {
+        validateCanCreateBackupInternal()
     }
 
     override suspend fun createBackup(request: CreateBackupRequest): Result<Unit> {
-        delay(1.seconds)
-
         return Result.success(Unit)
     }
 
@@ -32,15 +33,34 @@ internal class RealCloudBackupService : CloudBackupService {
     }
 
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
-        delay(1.seconds)
-
         return Result.success(StubEncryptedCloudBackup())
     }
 
     override suspend fun deleteBackup(): Result<Unit> {
-        delay(1.seconds)
-
         return Result.success(Unit)
+    }
+
+    private suspend fun CloudBackupStorage.ensureUserAuthenticated(): Result<Unit> {
+        return if (!isUserAuthenticated()) {
+            authenticateUser()
+        } else {
+            Result.success(Unit)
+        }
+    }
+
+    private suspend fun validateCanCreateBackupInternal(): PreCreateValidationStatus {
+        cloudBackupStorage.ensureUserAuthenticated().getOrNull() ?: return PreCreateValidationStatus.AuthenticationFailed
+
+        val fileExists = cloudBackupStorage.checkBackupExists()
+            .onFailure {
+                Log.e("RealCloudBackupService", "Failed to check backup existance", it)
+            }
+            .getOrNull() ?: return PreCreateValidationStatus.OtherError
+        if (fileExists) {
+            return PreCreateValidationStatus.ExistingBackupFound
+        }
+
+        return PreCreateValidationStatus.Ok
     }
 
     private class StubEncryptedCloudBackup : EncryptedCloudBackup {

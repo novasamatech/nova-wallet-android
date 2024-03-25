@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="cloud_backup">Cloud Backup</string>
 
     <string name="common_something_went_wrong_title">Something went wrong</string>
     <string name="push_welcome_timeout_error_message">Please try again later by accessing notification settings from the Settings tab</string>

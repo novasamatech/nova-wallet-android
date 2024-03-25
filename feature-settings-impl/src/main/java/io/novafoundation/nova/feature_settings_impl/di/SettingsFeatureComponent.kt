@@ -5,6 +5,7 @@ import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
@@ -42,7 +43,8 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
             AccountFeatureApi::class,
             WalletConnectFeatureApi::class,
             VersionsFeatureApi::class,
-            PushNotificationsFeatureApi::class
+            PushNotificationsFeatureApi::class,
+            CloudBackupFeatureApi::class
         ]
     )
     interface SettingsFeatureDependenciesComponent : SettingsFeatureDependencies
