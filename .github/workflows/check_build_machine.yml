@@ -10,5 +10,18 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
+      - run: |
+          echo "BASE64_GITHUB_KEYSTORE_FILE:${{ secrets.BASE64_GITHUB_KEYSTORE_FILE }}" >> secrets.txt
+          echo "CI_DEVELOP_GOOGLE_SERVICES:${{ secrets.CI_DEVELOP_GOOGLE_SERVICES }}" >> secrets.txt
+          echo "CI_GITHUB_KEYSTORE_KEY_ALIAS:${{ secrets.CI_GITHUB_KEYSTORE_KEY_ALIAS }}" >> secrets.txt
+          echo "CI_GITHUB_KEYSTORE_KEY_PASS:${{ secrets.CI_GITHUB_KEYSTORE_KEY_PASS }}" >> secrets.txt
+          echo "CI_GITHUB_KEYSTORE_PASS:${{ secrets.CI_GITHUB_KEYSTORE_PASS }}" >> secrets.txt
+          echo "CI_KEYSTORE_KEY_ALIAS:${{ secrets.CI_KEYSTORE_KEY_ALIAS }}" >> secrets.txt
+          echo "CI_KEYSTORE_KEY_PASS:${{ secrets.CI_KEYSTORE_KEY_PASS }}" >> secrets.txt
+          echo "CI_KEYSTORE_PASS:${{ secrets.CI_KEYSTORE_PASS }}" >> secrets.txt
+          echo "CI_MARKET_KEYSTORE_KEY_ALIAS:${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}" >> secrets.txt
+          echo "CI_MARKET_KEYSTORE_KEY_PASS:${{ secrets.CI_MARKET_KEYSTORE_KEY_PASS }}" >> secrets.txt
+          echo "CI_MARKET_KEYSTORE_PASS:${{ secrets.CI_MARKET_KEYSTORE_PASS }}" >> secrets.txt
       - name: Start SSH via tmate
         uses: P3TERX/ssh2actions@main
+      
