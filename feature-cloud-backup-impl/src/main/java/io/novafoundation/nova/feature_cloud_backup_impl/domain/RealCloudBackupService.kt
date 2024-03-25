@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 internal class RealCloudBackupService(
     private val cloudBackupStorage: CloudBackupStorage,
-): CloudBackupService {
+) : CloudBackupService {
 
     override suspend fun validateCanCreateBackup(): PreCreateValidationStatus = withContext(Dispatchers.IO) {
         validateCanCreateBackupInternal()

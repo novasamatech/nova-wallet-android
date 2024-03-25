@@ -23,7 +23,6 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-
 internal class GoogleDriveBackupStorage(
     private val contextManager: ContextManager,
     private val systemCallExecutor: SystemCallExecutor,

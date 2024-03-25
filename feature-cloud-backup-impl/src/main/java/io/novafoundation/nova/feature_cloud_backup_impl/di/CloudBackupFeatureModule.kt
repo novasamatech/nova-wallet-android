@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_cloud_backup_impl.domain.RealCloudBackupSe
 @Module(includes = [GoogleDriveBackupModule::class])
 internal class CloudBackupFeatureModule {
 
-
     @Provides
     @FeatureScope
     fun provideCloudBackupService(cloudBackupStorage: CloudBackupStorage): CloudBackupService {
