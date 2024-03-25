@@ -12,8 +12,8 @@
         tools:layout="@layout/fragment_welcome">
 
         <action
-            android:id="@+id/action_welcomeFragment_to_createAccountFragment"
-            app:destination="@id/createAccountFragment"
+            android:id="@+id/action_welcomeFragment_to_startCreateWallet"
+            app:destination="@id/startCreateWalletFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -38,13 +38,13 @@
 
 
     <fragment
-        android:id="@+id/createAccountFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment"
-        android:label="fragment_create_account"
+        android:id="@+id/startCreateWalletFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletFragment"
+        android:label="StartCreateWalletFragment"
         tools:layout="@layout/fragment_create_wallet_name">
 
         <action
-            android:id="@+id/action_createAccountFragment_to_mnemonic_nav_graph"
+            android:id="@+id/action_startCreateWalletFragment_to_mnemonic_nav_graph"
             app:destination="@id/mnemonic_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"

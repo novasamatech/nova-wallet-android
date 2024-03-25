@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/startCreateWalletToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="46dp"
+        android:gravity="center"
+        android:text="@string/start_create_wallet_name_your_wallet"
+        android:textColor="@color/text_primary"
+        app:layout_constraintTop_toBottomOf="@id/startCreateWalletToolbar"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <io.novafoundation.nova.common.view.parallaxCard.ParallaxCardView
+        android:id="@+id/startCreateWalletCard"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_nova_card_logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/username_setup_choose_title_v2_2_0"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintBottom_toTopOf="@+id/startCreateWalletNameInputLayout"
+            app:layout_constraintStart_toStartOf="@id/startCreateWalletNameInputLayout" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/startCreateWalletNameInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:hint="@string/start_create_wallet_input_hint"
+            app:boxBackgroundMode="none"
+            app:endIconDrawable="@drawable/ic_x_clear_filled"
+            app:endIconMode="clear_text"
+            app:hintEnabled="false"
+            app:layout_cardBackgroundColor="@color/input_background"
+            app:layout_cardBorderColor="@color/container_border"
+            app:layout_cardRadius="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/startCreateWalletNameInput"
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/start_create_wallet_input_hint"
+                android:inputType="text"
+                android:lines="1"
+                android:minHeight="48dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </io.novafoundation.nova.common.view.parallaxCard.ParallaxCardView>
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:paddingHorizontal="24dp"
+        android:text="@string/account_create_name_subtitle_v2_2_0"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/startCreateWalletCard" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/startCreateWalletConfirmName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        android:enabled="false"
+        android:text="@string/start_create_wallet_enter_wallet_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

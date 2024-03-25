@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.Polk
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.di.DelegatedAccountUpdatesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.di.SelectMultipleWalletsComponent
@@ -41,6 +40,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.di.ScanSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.di.ShowSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.di.StartCreateWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -60,8 +60,6 @@ import io.novafoundation.nova.web3names.di.Web3NamesApi
 )
 @FeatureScope
 interface AccountFeatureComponent : AccountFeatureApi {
-
-    fun createAccountComponentFactory(): CreateAccountComponent.Factory
 
     fun advancedEncryptionComponentFactory(): AdvancedEncryptionComponent.Factory
 
@@ -113,6 +111,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun showSignParitySignerComponentFactory(): ShowSignParitySignerComponent.Factory
     fun scanSignParitySignerComponentFactory(): ScanSignParitySignerComponent.Factory
+
+    fun startCreateWallet(): StartCreateWalletComponent.Factory
 
     @Component.Factory
     interface Factory {
