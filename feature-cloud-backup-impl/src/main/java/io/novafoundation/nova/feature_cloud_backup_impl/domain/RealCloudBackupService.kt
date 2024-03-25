@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_cloud_backup_impl.domain
 
-import android.util.Log
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CreateBackupRequest
@@ -51,11 +50,7 @@ internal class RealCloudBackupService(
     private suspend fun validateCanCreateBackupInternal(): PreCreateValidationStatus {
         cloudBackupStorage.ensureUserAuthenticated().getOrNull() ?: return PreCreateValidationStatus.AuthenticationFailed
 
-        val fileExists = cloudBackupStorage.checkBackupExists()
-            .onFailure {
-                Log.e("RealCloudBackupService", "Failed to check backup existance", it)
-            }
-            .getOrNull() ?: return PreCreateValidationStatus.OtherError
+        val fileExists = cloudBackupStorage.checkBackupExists().getOrNull() ?: return PreCreateValidationStatus.OtherError
         if (fileExists) {
             return PreCreateValidationStatus.ExistingBackupFound
         }
