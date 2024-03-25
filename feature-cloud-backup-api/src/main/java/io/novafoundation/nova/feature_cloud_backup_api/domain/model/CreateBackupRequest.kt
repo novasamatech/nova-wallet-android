@@ -7,4 +7,3 @@ class CreateBackupRequest(
     val walletName: String,
     val password: String
 )
-

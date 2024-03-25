@@ -4,7 +4,7 @@ sealed class PreCreateValidationStatus {
 
     object Ok : PreCreateValidationStatus()
 
-    object BackupServiceUnavailable: PreCreateValidationStatus()
+    object BackupServiceUnavailable : PreCreateValidationStatus()
 
     object ExistingBackupFound : PreCreateValidationStatus()
 
