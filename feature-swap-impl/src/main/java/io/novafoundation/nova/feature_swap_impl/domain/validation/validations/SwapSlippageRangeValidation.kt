@@ -17,7 +17,7 @@ class SwapSlippageRangeValidation(
         val slippageConfig = swapService.slippageConfig(value.detailedAssetIn.chain.id)!!
 
         if (value.slippage.value !in slippageConfig.minAvailableSlippage.value..slippageConfig.maxAvailableSlippage.value) {
-            return InvalidSlippage.validationError()
+            return InvalidSlippage(slippageConfig.minAvailableSlippage, slippageConfig.maxAvailableSlippage).validationError()
         }
 
         return valid()
