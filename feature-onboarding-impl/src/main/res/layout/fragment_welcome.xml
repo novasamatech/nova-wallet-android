@@ -11,13 +11,13 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_create_wallet_background"
-        app:layout_constraintBottom_toTopOf="@+id/createAccountBtn"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeCreateWalletButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/back"
+        android:id="@+id/welcomeBackButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -30,64 +30,35 @@
         app:tint="@color/icon_primary"
         tools:visibility="visible" />
 
-    <io.novafoundation.nova.common.view.ButtonLarge
-        android:id="@+id/createAccountBtn"
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/welcomeCreateWalletButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
-        app:buttonLargeStyle="primary"
-        app:icon="@drawable/ic_add_circle"
-        app:layout_constraintBottom_toTopOf="@+id/importAccountBtn"
+        android:text="@string/onboarding_create_wallet"
+        app:appearance="primary"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeRestoreWalletButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:title="@string/onboarding_create_wallet" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <io.novafoundation.nova.common.view.ButtonLarge
-        android:id="@+id/importAccountBtn"
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/welcomeRestoreWalletButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        app:buttonLargeStyle="secondary"
-        app:icon="@drawable/ic_key"
-        app:layout_constraintBottom_toTopOf="@+id/welcomeConnectHardwareWallet"
-        app:layout_constraintEnd_toEndOf="@+id/createAccountBtn"
-        app:layout_constraintStart_toStartOf="@+id/createAccountBtn"
-        app:subTitle="@string/account_import_wallet_subtitle"
-        app:title="@string/account_import_wallet_title" />
-
-    <io.novafoundation.nova.common.view.ButtonLarge
-        android:id="@+id/welcomeConnectHardwareWallet"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        app:buttonLargeStyle="secondary"
-        app:icon="@drawable/ic_hardware"
-        app:layout_constraintBottom_toTopOf="@+id/welcomeAddWatchWallet"
-        app:layout_constraintEnd_toEndOf="@+id/importAccountBtn"
-        app:layout_constraintStart_toStartOf="@+id/importAccountBtn"
-        app:subTitle="@string/account_welcome_hardware_wallet_subtitle"
-        app:title="@string/account_welcome_hardware_wallet_title" />
-
-    <io.novafoundation.nova.common.view.ButtonLarge
-        android:id="@+id/welcomeAddWatchWallet"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:buttonLargeStyle="secondary"
+        android:layout_marginBottom="24dp"
+        android:text="@string/onboarding_restore_wallet"
+        app:appearance="secondary"
         app:icon="@drawable/ic_watch_only_filled"
-        app:layout_constraintBottom_toTopOf="@+id/termsTv"
-        app:layout_constraintEnd_toEndOf="@+id/welcomeConnectHardwareWallet"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeTerms"
+        app:layout_constraintEnd_toEndOf="@+id/welcomeCreateWalletButton"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/welcomeConnectHardwareWallet"
-        app:subTitle="@string/account_add_watch_only_description"
-        app:title="@string/account_add_watch_wallet" />
+        app:layout_constraintStart_toStartOf="@+id/welcomeCreateWalletButton"
+        app:subTitle="@string/account_add_watch_only_description" />
 
     <TextView
-        android:id="@+id/termsTv"
+        android:id="@+id/welcomeTerms"
         style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

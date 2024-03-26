@@ -12,16 +12,13 @@ import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_welcome.back
-import kotlinx.android.synthetic.main.fragment_welcome.createAccountBtn
-import kotlinx.android.synthetic.main.fragment_welcome.importAccountBtn
-import kotlinx.android.synthetic.main.fragment_welcome.termsTv
-import kotlinx.android.synthetic.main.fragment_welcome.welcomeAddWatchWallet
-import kotlinx.android.synthetic.main.fragment_welcome.welcomeConnectHardwareWallet
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeBackButton
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeCreateWalletButton
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeRestoreWalletButton
 
 class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
@@ -54,21 +51,19 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
             getString(R.string.onboarding_terms_and_conditions_2),
             getString(R.string.onboarding_privacy_policy)
         )
-        termsTv.movementMethod = LinkMovementMethod.getInstance()
-        termsTv.highlightColor = Color.TRANSPARENT
+        welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
+        welcomeTerms.highlightColor = Color.TRANSPARENT
 
-        createAccountBtn.setOnClickListener { viewModel.createAccountClicked() }
-        importAccountBtn.setOnClickListener { viewModel.importAccountClicked() }
-        welcomeAddWatchWallet.setOnClickListener { viewModel.addWatchWalletClicked() }
-        welcomeConnectHardwareWallet.setOnClickListener { viewModel.connectHardwareWalletClicked() }
+        welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
+        welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
 
-        back.setOnClickListener { viewModel.backClicked() }
+        welcomeBackButton.setOnClickListener { viewModel.backClicked() }
     }
 
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
         val linkColor = requireContext().getColor(R.color.text_primary)
 
-        termsTv.text = styleText(sourceText) {
+        welcomeTerms.text = styleText(sourceText) {
             clickable(terms, linkColor) {
                 viewModel.termsClicked()
             }
@@ -92,13 +87,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
     override fun subscribe(viewModel: WelcomeViewModel) {
         observeBrowserEvents(viewModel)
-        setupImportTypeChooser(viewModel)
 
-        viewModel.shouldShowBackLiveData.observe(back::setVisible)
-
-        viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {
-            SelectHardwareWalletBottomSheet(requireContext(), it.onSuccess)
-                .show()
-        }
+        viewModel.shouldShowBackLiveData.observe(welcomeBackButton::setVisible)
     }
 }
