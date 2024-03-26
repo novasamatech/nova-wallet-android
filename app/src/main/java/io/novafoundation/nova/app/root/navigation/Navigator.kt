@@ -112,7 +112,7 @@ class Navigator(
     }
 
     override fun openCreateAccount() {
-        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment)
+        navController?.navigate(R.id.action_welcomeFragment_to_startCreateWallet)
     }
 
     override fun openMain() {
@@ -178,7 +178,7 @@ class Navigator(
     override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {
         val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
             R.id.welcomeFragment -> R.id.action_welcomeFragment_to_mnemonic_nav_graph
-            R.id.createAccountFragment -> R.id.action_createAccountFragment_to_mnemonic_nav_graph
+            R.id.startCreateWalletFragment -> R.id.action_startCreateWalletFragment_to_mnemonic_nav_graph
             R.id.walletDetailsFragment -> R.id.action_accountDetailsFragment_to_mnemonic_nav_graph
             else -> throw IllegalArgumentException("Unknown current destination to open mnemonic screen: $currentDestinationId")
         }
