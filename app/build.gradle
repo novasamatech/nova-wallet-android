@@ -265,6 +265,7 @@ dependencies {
     implementation platform(firebaseBomDep)
     implementation firestoreDep
     implementation firebaseCloudMessagingDep
+    implementation firebaseAppCheck
 
     implementation walletConnectCoreDep, withoutTransitiveAndroidX
     implementation walletConnectWalletDep, withoutTransitiveAndroidX
