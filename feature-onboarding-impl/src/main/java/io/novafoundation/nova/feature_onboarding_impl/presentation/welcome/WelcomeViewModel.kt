@@ -35,7 +35,7 @@ class WelcomeViewModel(
     }
 
     fun importAccountClicked() {
-        TODO("Waiting for import types screen")
+        router.openImportOptionsScreen()
     }
 
     fun termsClicked() {

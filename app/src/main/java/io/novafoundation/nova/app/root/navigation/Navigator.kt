@@ -168,7 +168,7 @@ class Navigator(
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
         val currentDestination = navController?.currentDestination ?: return
         val actionId = when (currentDestination.id) {
-            // Wee need the slpash fragment case to close app if we use back navigation in import mnemonic screen
+            // Wee need the splash fragment case to close app if we use back navigation in import mnemonic screen
             R.id.splashFragment -> R.id.action_splashFragment_to_import_nav_graph
             else -> R.id.action_import_nav_graph
         }
@@ -525,7 +525,7 @@ class Navigator(
     }
 
     override fun openCreateWatchWallet() {
-        navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_createWatchWalletFragment)
     }
 
     override fun openStartImportParitySigner() {
@@ -536,8 +536,12 @@ class Navigator(
         openStartImportPolkadotVault(PolkadotVaultVariant.POLKADOT_VAULT)
     }
 
+    override fun openImportOptionsScreen() {
+        navController?.navigate(R.id.action_welcomeFragment_to_importWalletOptionsFragment)
+    }
+
     override fun openStartImportLedger() {
-        navController?.navigate(R.id.action_welcomeFragment_to_import_ledger_graph)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_ledger_graph)
     }
 
     override fun withPinCodeCheckRequired(
@@ -558,7 +562,7 @@ class Navigator(
 
     private fun openStartImportPolkadotVault(variant: PolkadotVaultVariant) {
         val args = StartImportParitySignerFragment.getBundle(ParitySignerStartPayload(variant))
-        navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph, args)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_parity_signer_graph, args)
     }
 
     private fun buildCreatePinBundle(): Bundle {

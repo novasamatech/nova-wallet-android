@@ -18,5 +18,8 @@ interface OnboardingRouter {
     fun openStartImportLedger()
 
     fun back()
+
     fun openStartImportPolkadotVault()
+
+    fun openImportOptionsScreen()
 }
