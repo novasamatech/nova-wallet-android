@@ -26,6 +26,8 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
     override fun initViews() {
         startCreateWalletToolbar.applyStatusBarInsets()
         startCreateWalletToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        startCreateWalletConfirmName.setOnClickListener { viewModel.confirmNameClicked() }
     }
 
     override fun inject() {

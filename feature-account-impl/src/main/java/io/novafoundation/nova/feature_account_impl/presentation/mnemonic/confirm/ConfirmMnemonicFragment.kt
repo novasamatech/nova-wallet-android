@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.BackupMnemonicAdapter
 import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicDestination
 import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicSource
 import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicToolbar
@@ -31,11 +32,11 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel>() {
     }
 
     private val sourceAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ConfirmMnemonicAdapter(itemHandler = viewModel::sourceWordClicked)
+        BackupMnemonicAdapter(itemHandler = viewModel::sourceWordClicked)
     }
 
     private val destinationAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ConfirmMnemonicAdapter(itemHandler = viewModel::destinationWordClicked)
+        BackupMnemonicAdapter(itemHandler = viewModel::destinationWordClicked)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
