@@ -22,6 +22,9 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
@@ -43,6 +46,27 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
         onSuccess = { transform(it) },
         onFailure = { this as Result<R> }
     )
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable): Result<T> {
+    contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (val exception = this.exceptionOrNull()) {
+        null -> this
+        else -> Result.failure(transform(exception))
+    }
+}
+
+inline fun <T, reified E : Throwable> Result<T>.mapErrorNotInstance(transform: (throwable: Throwable) -> Throwable): Result<T> {
+    return mapError { throwable ->
+        if (throwable !is E) {
+            transform(throwable)
+        } else {
+            throwable
+        }
+    }
 }
 
 fun <K, V> List<Flow<Pair<K, V>>>.toMultiSubscription(expectedSize: Int): Flow<Map<K, V>> {

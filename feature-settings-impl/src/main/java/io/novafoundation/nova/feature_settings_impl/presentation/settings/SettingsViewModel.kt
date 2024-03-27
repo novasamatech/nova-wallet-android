@@ -26,7 +26,6 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
-import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupWallet
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
@@ -280,9 +279,12 @@ class SettingsViewModel(
 
     // TODO remove test code when implementing cloud backup settings screen
     fun cloudBackupLongClicked() = launch {
-        cloudBackupService.fetchAndDecryptExistingBackup(password = "test")
-            .onSuccess { showMessage("Retrieved and decrypted backup with first wallet name: ${it.wallets.first().name}") }
-            .onFailure { showMessage("Failed to retrieve and decrypt backup: ${it.message}") }
+//        cloudBackupService.fetchAndDecryptExistingBackup(password = "test")
+//            .onSuccess { showMessage("Retrieved and decrypted backup with first wallet name: ${it.wallets.first().name}") }
+//            .onFailure { showMessage("Failed to retrieve and decrypt backup: ${it.message}") }
+
+        val result = cloudBackupService.deleteBackup()
+        showMessage("Delete backup status: $result")
     }
 
     fun onResume() {
