@@ -19,6 +19,8 @@ import com.google.api.services.drive.DriveScopes
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.requireActivity
+import io.novafoundation.nova.common.utils.InformationSize
+import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +33,18 @@ internal class GoogleDriveBackupStorage(
     private val backupFileName: String = "novawallet_backup",
     private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
 ) : CloudBackupStorage {
+
+    private val drive: Drive by lazy {
+        createGoogleDriveService()
+    }
+
+    override suspend fun hasEnoughFreeStorage(neededSize: InformationSize): Result<Boolean> = withContext(Dispatchers.IO) {
+        runCatching {
+            val remainingSpaceInDrive = getRemainingSpace()
+
+            remainingSpaceInDrive >= neededSize
+        }
+    }
 
     override suspend fun isCloudStorageServiceAvailable(): Boolean {
         return googleApiAvailabilityProvider.isAvailable()
@@ -61,15 +75,22 @@ internal class GoogleDriveBackupStorage(
     }
 
     private fun checkBackupExistsUnsafe(): Boolean {
-        val service = createGoogleDriveService()
-
-        val result = service.files().list()
+        val result = drive.files().list()
             .setQ(backupNameQuery())
             .setSpaces("drive")
             .setFields("files(id, name)")
             .execute()
 
         return result.files.isNotEmpty()
+    }
+
+    private fun getRemainingSpace(): InformationSize {
+        val about = drive.about().get().setFields("storageQuota").execute()
+        val totalSpace: Long = about.storageQuota.limit
+        val usedSpace: Long = about.storageQuota.usage
+        val remainingSpace = totalSpace - usedSpace
+
+        return remainingSpace.bytes
     }
 
     private suspend fun UserRecoverableAuthException.askForConsent() {
@@ -101,6 +122,7 @@ private class GoogleSignInSystemCall(
 ) : SystemCall<Unit> {
 
     companion object {
+
         private const val REQUEST_CODE = 9001
     }
 
@@ -138,6 +160,7 @@ private class RemoteConsentSystemCall(
 ) : SystemCall<Unit> {
 
     companion object {
+
         private const val REQUEST_CODE = 9002
     }
 
