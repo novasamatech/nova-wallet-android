@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_cloud_backup_impl.di.modules
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -16,12 +17,14 @@ internal class GoogleDriveBackupModule {
     @FeatureScope
     fun provideCloudStorage(
         contextManager: ContextManager,
-        systemCallExecutor: SystemCallExecutor
+        systemCallExecutor: SystemCallExecutor,
+        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
     ): CloudBackupStorage {
         return GoogleDriveBackupStorage(
             contextManager = contextManager,
             systemCallExecutor = systemCallExecutor,
-            oauthClientId = BuildConfig.GOOGLE_OAUTH_ID
+            oauthClientId = BuildConfig.GOOGLE_OAUTH_ID,
+            googleApiAvailabilityProvider = googleApiAvailabilityProvider
         )
     }
 }

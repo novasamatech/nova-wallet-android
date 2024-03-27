@@ -23,8 +23,8 @@ internal class RealCloudBackupService(
         return Result.success(Unit)
     }
 
-    override suspend fun isCloudBackupExist(): Result<Boolean> {
-        return Result.success(false)
+    override suspend fun isCloudBackupExist(): Result<Boolean> = withContext(Dispatchers.IO){
+        cloudBackupStorage.checkBackupExists()
     }
 
     override suspend fun isCloudBackupActivated(): Result<Boolean> {
@@ -48,6 +48,8 @@ internal class RealCloudBackupService(
     }
 
     private suspend fun validateCanCreateBackupInternal(): PreCreateValidationStatus {
+        if (!cloudBackupStorage.isCloudStorageServiceAvailable()) return PreCreateValidationStatus.BackupServiceUnavailable
+
         cloudBackupStorage.ensureUserAuthenticated().getOrNull() ?: return PreCreateValidationStatus.AuthenticationFailed
 
         val fileExists = cloudBackupStorage.checkBackupExists().getOrNull() ?: return PreCreateValidationStatus.OtherError

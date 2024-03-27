@@ -16,6 +16,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.requireActivity
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
@@ -28,7 +29,12 @@ internal class GoogleDriveBackupStorage(
     private val systemCallExecutor: SystemCallExecutor,
     private val oauthClientId: String,
     private val backupFileName: String = "novawallet_backup",
+    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
 ) : CloudBackupStorage {
+
+    override suspend fun isCloudStorageServiceAvailable(): Boolean {
+        return googleApiAvailabilityProvider.isAvailable()
+    }
 
     override suspend fun isUserAuthenticated(): Boolean = withContext(Dispatchers.IO) {
         val account = GoogleSignIn.getLastSignedInAccount(contextManager.getApplicationContext())
