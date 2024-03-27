@@ -2,6 +2,27 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="cloud_backup">Cloud Backup</string>
 
+    <string name="backup_mnemonic_attention_title">Prepare to save your wallet!</string>
+    <string name="mnemonic_card_reveal_title">Tap to reveal</string>
+    <string name="mnemonic_card_reveal_subtitle">Make sure no one can see your screen\nand do not take screenshots</string>
+
+    <string name="mnemonic_card_title">Please %s anyone</string>
+    <string name="mnemonic_card_title_highlight">do not share with</string>
+
+    <string name="backup_mnemonic_disabled_button">Please, agree with conditions</string>
+
+    <string name="backup_mnemonic_condition_1">Having the Passphrase means having %s and the money within them.</string>
+    <string name="backup_mnemonic_condition_1_highlight">total and permanent access to all connected wallets</string>
+
+    <string name="backup_mnemonic_condition_2">%s They are not needed for app functionality.</string>
+    <string name="backup_mnemonic_condition_2_highlight">Do not enter your Passphrase or private key into any form or app.</string>
+
+    <string name="backup_mnemonic_condition_3">Support or %s or private key under any circumstances.</string>
+    <string name="backup_mnemonic_condition_3_highlight">admins will never request your Passphrase</string>
+
+    <!--<string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>-->
+    <string name="account_backup_mnemonic_title">Write down your Passphrase</string>
+
     <string name="start_create_wallet_input_hint">My new wallet</string>
     <string name="start_create_wallet_name_your_wallet">Name your wallet</string>
     <string name="start_create_wallet_enter_wallet_name">Enter wallet name</string>
@@ -1388,7 +1409,6 @@
     <string name="about_version_template" translatable="false">Nova Wallet v%s</string>
     <string name="about_website_v2_2_0">Website</string>
     <string name="account_add_already_exists_message">Account already exists. Please, try another one.</string>
-    <string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>
     <string name="account_backup_secret_caption">Please make sure to write down your phrase correctly and legibly.</string>
     <string name="account_confirm_mnemonic">Confirm mnemonic</string>
     <string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>

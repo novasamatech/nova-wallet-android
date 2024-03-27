@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
+package io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic
 
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +11,14 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.MnemonicWord
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_confirm_mnemonic_word.view.itemConfirmMnemonicIndex
-import kotlinx.android.synthetic.main.item_confirm_mnemonic_word.view.itemConfirmMnemonicWord
+import kotlinx.android.synthetic.main.item_backup_mnemonic_word.view.itemConfirmMnemonicIndex
+import kotlinx.android.synthetic.main.item_backup_mnemonic_word.view.itemConfirmMnemonicWord
 
-class ConfirmMnemonicAdapter(
+class BackupMnemonicAdapter(
     private val itemHandler: ItemHandler
-) : ListAdapter<MnemonicWord, ConfirmMnemonicAdapter.ConfirmMnemonicAdapterHolder>(DiffCallback) {
+) : ListAdapter<MnemonicWord, BackupMnemonicAdapter.ConfirmMnemonicAdapterHolder>(DiffCallback) {
 
     fun interface ItemHandler {
 
@@ -25,7 +26,7 @@ class ConfirmMnemonicAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConfirmMnemonicAdapterHolder {
-        return ConfirmMnemonicAdapterHolder(parent.inflateChild(R.layout.item_confirm_mnemonic_word), itemHandler)
+        return ConfirmMnemonicAdapterHolder(parent.inflateChild(R.layout.item_backup_mnemonic_word), itemHandler)
     }
 
     override fun onBindViewHolder(holder: ConfirmMnemonicAdapterHolder, position: Int) {

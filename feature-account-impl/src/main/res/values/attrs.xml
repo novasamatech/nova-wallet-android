@@ -22,6 +22,12 @@
 
     <declare-styleable name="MnemonicContainerView">
 
-        <attr name="showBackground" format="boolean" />
+        <attr name="paddingBetweenItems" format="dimension" />
+    </declare-styleable>
+
+
+    <declare-styleable name="MnemonicCardView">
+
+        <attr name="showRevealContainer" format="boolean" />
     </declare-styleable>
 </resources>

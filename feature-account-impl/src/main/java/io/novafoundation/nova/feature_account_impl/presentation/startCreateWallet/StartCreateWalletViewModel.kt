@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.startCreateWall
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import kotlinx.coroutines.flow.Flow
@@ -26,5 +27,9 @@ class StartCreateWalletViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    fun confirmNameClicked() {
+        router.openMnemonicScreen(null, AddAccountPayload.MetaAccount)
     }
 }
