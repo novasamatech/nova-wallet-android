@@ -39,7 +39,6 @@ annotation class PushSettingsSerialization
 @Module(includes = [NotificationHandlersModule::class])
 class PushNotificationsFeatureModule {
 
-
     @Provides
     @FeatureScope
     fun providePushTokenCache(

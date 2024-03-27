@@ -1,7 +1,5 @@
 package io.novafoundation.nova.common.utils
 
-
-
 @JvmInline
 value class InformationSize(private val sizeInBytes: Long) : Comparable<InformationSize> {
 
@@ -51,7 +49,7 @@ fun Long.toInformationSize(unit: InformationSizeUnit): InformationSize {
 }
 
 private fun InformationSizeUnit.convertToBytes(value: Long): Long {
-    return when(this) {
+    return when (this) {
         InformationSizeUnit.BYTES -> value
         InformationSizeUnit.KILOBYTES -> value * 1024
         InformationSizeUnit.MEGABYTES -> value * 1024 * 1024

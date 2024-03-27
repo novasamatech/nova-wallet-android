@@ -16,7 +16,7 @@ interface CloudBackupSerializer {
 
 internal class JsonCloudBackupSerializer(
     private val gson: Gson,
-): CloudBackupSerializer {
+) : CloudBackupSerializer {
 
     companion object {
 

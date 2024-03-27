@@ -11,7 +11,7 @@ interface GoogleApiAvailabilityProvider {
 
 internal class RealGoogleApiAvailabilityProvider(
     val context: Context
-): GoogleApiAvailabilityProvider {
+) : GoogleApiAvailabilityProvider {
 
     override fun isAvailable(): Boolean {
         val googleApiAvailability = GoogleApiAvailability.getInstance()

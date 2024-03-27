@@ -25,7 +25,7 @@ internal class RealCloudBackupService(
         return Result.success(Unit)
     }
 
-    override suspend fun isCloudBackupExist(): Result<Boolean> = withContext(Dispatchers.IO){
+    override suspend fun isCloudBackupExist(): Result<Boolean> = withContext(Dispatchers.IO) {
         cloudBackupStorage.checkBackupExists()
     }
 
