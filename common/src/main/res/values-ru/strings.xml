@@ -322,7 +322,7 @@
     <string name="common_no_changes">Нет изменений</string>
     <string name="common_no_screenshot_message_v2_2_0">Мы собираемся показать вашу мнемонику. Убедитесь, что никто не видит ваш экран и не делайте скриншотов - к ним могут получить доступ вредоносные программы</string>
     <string name="common_none">Нет</string>
-    <string name="common_not_avaiable">Не доступно</string>
+    <string name="common_not_available">Не доступно</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
     <string name="common_off">Выкл</string>

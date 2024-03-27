@@ -122,14 +122,14 @@ class SettingsViewModel(
 
             PushNotificationsAvailabilityState.PLAY_SERVICES_REQUIRED -> {
                 showError(
-                    resourceManager.getString(R.string.common_not_avaiable),
+                    resourceManager.getString(R.string.common_not_available),
                     resourceManager.getString(R.string.settings_push_notifications_only_available_with_google_services_error)
                 )
             }
 
             PushNotificationsAvailabilityState.GOOGLE_PLAY_INSTALLATION_REQUIRED -> {
                 showError(
-                    resourceManager.getString(R.string.common_not_avaiable),
+                    resourceManager.getString(R.string.common_not_available),
                     resourceManager.getString(R.string.settings_push_notifications_only_available_from_google_play_error)
                 )
             }

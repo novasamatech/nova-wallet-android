@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="common_not_avaiable">Not available</string>
+    <string name="common_not_available">Not available</string>
     <string name="settings_push_notifications_only_available_with_google_services_error">Push notifications are only available for devices with Google services.</string>
     <string name="settings_push_notifications_only_available_from_google_play_error">Push notifications are available only for the Nova Wallet version downloaded from Google Play.</string>
 
