@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
+import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
@@ -51,7 +52,8 @@ class SettingsViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val twoFactorVerificationService: TwoFactorVerificationService,
     private val biometricService: BiometricService,
-    private val pushNotificationsInteractor: PushNotificationsInteractor
+    private val pushNotificationsInteractor: PushNotificationsInteractor,
+    private val cloudBackupService: CloudBackupService
 ) : BaseViewModel(), Browserable {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -233,6 +235,12 @@ class SettingsViewModel(
         } else {
             router.openWalletConnectScan()
         }
+    }
+
+    fun cloudBackupClicked() = launch {
+        val validationStatus = cloudBackupService.validateCanCreateBackup()
+
+        showMessage(validationStatus.toString())
     }
 
     fun onResume() {

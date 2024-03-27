@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply from: '../scripts/secrets.gradle'
 
 android {
     namespace 'io.novafoundation.nova.feature_cloud_backup_impl'
@@ -13,6 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        buildConfigField "String", "GOOGLE_OAUTH_ID", readStringSecret("GOOGLE_OAUTH_ID")
     }
 
     kotlinOptions {
@@ -38,6 +40,10 @@ dependencies {
 
     api project(':core-api')
     api project(':core-db')
+
+    implementation playServicesAuthDep
+    implementation googleApiClientDep
+    implementation googleDriveDep
 
     testImplementation project(':test-shared')
 }
