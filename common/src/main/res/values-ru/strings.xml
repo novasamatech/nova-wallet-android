@@ -322,6 +322,7 @@
     <string name="common_no_changes">Нет изменений</string>
     <string name="common_no_screenshot_message_v2_2_0">Мы собираемся показать вашу мнемонику. Убедитесь, что никто не видит ваш экран и не делайте скриншотов - к ним могут получить доступ вредоносные программы</string>
     <string name="common_none">Нет</string>
+    <string name="common_not_avaiable">Не доступно</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
     <string name="common_off">Выкл</string>
@@ -725,13 +726,13 @@
     <string name="push_new_referendum_title">🗳️ Новый референдум</string>
     <string name="push_new_update_message">Загрузите Nova Wallet v%s, чтобы получить новые функции!</string>
     <string name="push_new_update_title">Доступно новое обновление Nova Wallet!</string>
-    <string name="push_referendum_approved_message">%1$s Референдум #%2$s завершился и был одобрен 🎉</string>
+    <string name="push_referendum_approved_message" formatted="false">%s Референдум #%s завершился и был одобрен 🎉</string>
     <string name="push_referendum_approved_title">✅ Референдум одобрен!</string>
-    <string name="push_referendum_from_to_status_changed_message">%1$s Референдум #%2$s изменил статус с %3$s на %4$s</string>
-    <string name="push_referendum_rejected_message">%1$s Референдум #%2$s завершился и был отклонен!</string>
+    <string name="push_referendum_from_to_status_changed_message" formatted="false">%s Референдум #%s изменил статус с %s на %s</string>
+    <string name="push_referendum_rejected_message" formatted="false">%s Референдум #%s завершился и был отклонен!</string>
     <string name="push_referendum_rejected_title">❌ Референдум отклонен!</string>
     <string name="push_referendum_status_changed_title">🗳️ Статус референдума изменен</string>
-    <string name="push_referendum_to_status_changed_message">%1$s Референдум #%2$s изменил статус на %3$s</string>
+    <string name="push_referendum_to_status_changed_message" formatted="false">%s Референдум #%s изменил статус на %s</string>
     <string name="push_settings_announcements">Объявления Nova</string>
     <string name="push_settings_balances">Балансы</string>
     <string name="push_settings_enable">Включить уведомления</string>
@@ -749,13 +750,13 @@
     <string name="push_token_received_message" formatted="false">Получено %s в сети %s</string>
     <string name="push_token_received_no_account_name_title">⬇️ Получено</string>
     <string name="push_token_received_title">⬇️ Получено %s</string>
-    <string name="push_token_sent_message">Отправлено %1$s на %2$s в сети %3$s</string>
+    <string name="push_token_sent_message" formatted="false">Отправлено %s на %s в сети %s</string>
     <string name="push_token_sent_no_account_name_title">💸 Отправлено</string>
     <string name="push_token_sent_title">💸 Отправлено %s</string>
     <string name="push_wallets_title">Выберите до 3 кошельков для которых вы будете получать уведомления о событиях кошелька</string>
     <string name="push_welcome_cancel_button">Не сейчас</string>
     <string name="push_welcome_enable_button">Включить push-уведомления</string>
-    <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы вы всегда быть в куре событий</string>
+    <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы всегда быть в куре событий</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
     <string name="push_welcome_timeout_error_message">Повторите попытку позже, открыв настройки уведомлений на вкладке «Настройки»</string>
     <string name="push_welcome_title">Не пропустите ничего!</string>
@@ -917,6 +918,8 @@
     <string name="settings_pin_code_verification_confirmation_message">Каждая операция подписи на кошельках с парой ключей (созданной в кошельке nova или импортированной) должна требовать проверки PIN-кода перед созданием подписи</string>
     <string name="settings_pin_code_verification_confirmation_title">Запрашивать аутентификацию для подписи операций</string>
     <string name="settings_preferences">Предпочтения</string>
+    <string name="settings_push_notifications_only_available_from_google_play_error">Push-уведомления доступны только для версии Nova Wallet, загруженной из Google Play.</string>
+    <string name="settings_push_notifications_only_available_with_google_services_error">Push-уведомления доступны только для устройств с сервисами Google.</string>
     <string name="settings_safe_mode_confirmation_message">Запись экрана и скриншоты будут недоступны. Свернутое приложение не будет отображать содержимое</string>
     <string name="settings_safe_mode_confirmation_title">Безопасный режим</string>
     <string name="settings_security">Безопасность</string>
