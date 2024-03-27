@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. Backup will make sure that your funds are safe and sound, and you can always restore your wallet anytime</string>
+    <string name="start_create_wallet_cloud_backup_btn">Back up to Cloud</string>
+    <string name="start_create_wallet_manual_backup_btn">Back up Manually</string>
 
     <string name="backup_mnemonic_attention_title">Prepare to save your wallet!</string>
     <string name="mnemonic_card_reveal_title">Tap to reveal</string>
