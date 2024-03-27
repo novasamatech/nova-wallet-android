@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.domain.model
 
+import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -10,7 +11,7 @@ class MetaAccountAssetBalance(
     val freeInPlanks: BigInteger,
     val reservedInPlanks: BigInteger,
     val offChainBalance: BigInteger?,
-    val precision: Int,
+    val precision: Precision,
     val rate: BigDecimal?
 )
 

@@ -26,6 +26,6 @@ internal fun ChooseAmountModel(
 )
 
 internal fun ChooseAmountInputModel(chainAsset: Chain.Asset): ChooseAmountInputModel = ChooseAmountInputModel(
-    tokenSymbol = chainAsset.symbol,
+    tokenSymbol = chainAsset.symbol.value,
     tokenIcon = chainAsset.iconUrl,
 )

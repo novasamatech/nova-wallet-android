@@ -198,11 +198,11 @@ private fun Operation.Type.Swap.formatSubHeader(resourceManager: ResourceManager
     }
 
     return buildSpannable(resourceManager) {
-        append(amountIn.chainAsset.symbol)
+        append(amountIn.chainAsset.symbol.value)
         append(" ")
         appendSpan(ImageSpan(arrowRight, imageAlignment))
         append(" ")
-        append(amountOut.chainAsset.symbol)
+        append(amountOut.chainAsset.symbol.value)
     }
 }
 

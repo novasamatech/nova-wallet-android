@@ -121,7 +121,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
-            balanceDetailTokenName.text = asset.token.configuration.symbol
+            balanceDetailTokenName.text = asset.token.configuration.symbol.value
 
             balanceDetailRate.text = asset.token.rate
 

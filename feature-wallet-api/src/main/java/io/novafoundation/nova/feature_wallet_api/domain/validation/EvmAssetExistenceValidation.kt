@@ -32,8 +32,8 @@ class EvmAssetExistenceValidation<P, E>(
             when {
                 alreadyExistingAsset == null -> valid()
                 // we only allow to modify manually added tokens. Default tokens should remain unchanged
-                alreadyExistingAsset.source == Source.MANUAL -> assetAlreadyExists(alreadyExistingAsset.symbol, true).validationWarning()
-                else -> assetAlreadyExists(alreadyExistingAsset.symbol, false).validationError()
+                alreadyExistingAsset.source == Source.MANUAL -> assetAlreadyExists(alreadyExistingAsset.symbol.value, true).validationWarning()
+                else -> assetAlreadyExists(alreadyExistingAsset.symbol.value, false).validationError()
             }
         } catch (e: Exception) {
             validationError(addressMappingError(value))

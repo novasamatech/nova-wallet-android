@@ -53,7 +53,7 @@ class TransakProvider(
                 .authority(host)
                 .appendQueryParameter("apiKey", apiKey)
                 .appendQueryParameter("environment", environment)
-                .appendQueryParameter("cryptoCurrencyCode", chainAsset.symbol)
+                .appendQueryParameter("cryptoCurrencyCode", chainAsset.symbol.value)
                 .appendNullableQueryParameter(NETWORK_KEY, network)
                 .appendQueryParameter("walletAddress", address)
                 .appendQueryParameter("disableWalletAddressForm", "true")
