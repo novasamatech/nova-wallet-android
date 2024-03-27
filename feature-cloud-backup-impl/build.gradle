@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "GOOGLE_OAUTH_ID", readStringSecret("GOOGLE_OAUTH_ID")
+        buildConfigField "String", "GOOGLE_OAUTH_ID", readStringSecret("DEBUG_GOOGLE_OAUTH_ID")
     }
 
     kotlinOptions {
