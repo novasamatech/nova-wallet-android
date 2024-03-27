@@ -14,9 +14,7 @@ import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.CloudBa
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.enableSyncWithCloud
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.CloudBackupSerializer
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.milliseconds
 
 internal class RealCloudBackupService(
     private val storage: CloudBackupStorage,
@@ -51,7 +49,11 @@ internal class RealCloudBackupService(
     }
 
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
-        return Result.success(StubEncryptedCloudBackup())
+        return storage.fetchBackup().map {
+            RealEncryptedCloudBackup(encryption, serializer, it)
+        }.onFailure {
+            Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
+        }
     }
 
     override suspend fun deleteBackup(): Result<Unit> {
@@ -96,17 +98,16 @@ internal class RealCloudBackupService(
         return storage.hasEnoughFreeStorage(neededBackupSize)
     }
 
-    private class StubEncryptedCloudBackup : EncryptedCloudBackup {
+    private class RealEncryptedCloudBackup(
+        private val encryption: CloudBackupEncryption,
+        private val serializer: CloudBackupSerializer,
+        private val encryptedBackupData: EncryptedBackupData,
+    ): EncryptedCloudBackup {
 
         override suspend fun decrypt(password: String): Result<CloudBackup> {
-            delay(100.milliseconds)
-
-            return Result.success(
-                CloudBackup(
-                    modifiedAt = System.currentTimeMillis(),
-                    wallets = emptyList()
-                )
-            )
+            return encryption.decryptBackup(encryptedBackupData, password).flatMap {
+                serializer.deserializeBackup(it)
+            }
         }
     }
 }

@@ -25,9 +25,11 @@ import io.novafoundation.nova.common.utils.InformationSize
 import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedBackupData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 
 internal class GoogleDriveBackupStorage(
     private val contextManager: ContextManager,
@@ -87,6 +89,14 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
+    override suspend fun fetchBackup(): Result<EncryptedBackupData> = withContext(Dispatchers.IO)  {
+        runCatching {
+            val fileContent = readBackupFileFromDrive()
+
+            EncryptedBackupData(fileContent)
+        }
+    }
+
     private fun writeBackupFileToDrive(fileContent: ByteArray) {
         val contentStream = ByteArrayContent(BACKUP_MIME_TYPE, fileContent)
 
@@ -102,6 +112,18 @@ internal class GoogleDriveBackupStorage(
             drive.files().create(fileMetadata, contentStream)
                 .execute()
         }
+    }
+
+    private fun readBackupFileFromDrive(): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+
+        val backupFile = getBackupFileFromCloud() ?: throw  FetchBackupError.BackupNotFound
+
+        drive.files()
+            .get(backupFile.id)
+            .executeMediaAndDownloadTo(outputStream)
+
+        return outputStream.toByteArray()
     }
 
     private fun checkBackupExistsUnsafe(): Boolean {
