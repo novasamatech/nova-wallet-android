@@ -42,7 +42,7 @@ internal class GoogleDriveBackupStorage(
     }
 
     override suspend fun checkBackupExists(): Result<Boolean> = withContext(Dispatchers.IO) {
-        runCatching { checkBackupExistsInner() }
+        runCatching { checkBackupExistsUnsafe() }
             .recoverCatching {
                 when (it) {
                     is UserRecoverableAuthException -> it.askForConsent()
@@ -50,11 +50,11 @@ internal class GoogleDriveBackupStorage(
                     else -> throw it
                 }
 
-                checkBackupExistsInner()
+                checkBackupExistsUnsafe()
             }
     }
 
-    private fun checkBackupExistsInner(): Boolean {
+    private fun checkBackupExistsUnsafe(): Boolean {
         val service = createGoogleDriveService()
 
         val result = service.files().list()
