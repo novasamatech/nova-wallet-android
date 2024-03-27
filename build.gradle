@@ -202,6 +202,7 @@ buildscript {
         firebaseBomDep = "com.google.firebase:firebase-bom:$firebaseBomVersion"
         firestoreDep = "com.google.firebase:firebase-firestore"
         firebaseCloudMessagingDep = "com.google.firebase:firebase-messaging"
+        firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     }

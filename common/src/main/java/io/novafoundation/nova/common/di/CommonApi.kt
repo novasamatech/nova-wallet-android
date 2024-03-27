@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
+import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -136,6 +137,8 @@ interface CommonApi {
     fun bakingParallaxCardCache(): BackingParallaxCardLruCache
 
     fun descriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher
+
+    fun buildTypeProvider(): BuildTypeProvider
 
     val systemCallExecutor: SystemCallExecutor
 

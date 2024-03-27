@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.feature_push_notifications.data.GoogleApiAvailabilityProvider
+import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
 
 interface WelcomePushNotificationsInteractor {
     fun needToShowWelcomeScreen(): Boolean
@@ -11,11 +11,11 @@ interface WelcomePushNotificationsInteractor {
 
 class RealWelcomePushNotificationsInteractor(
     private val preferences: Preferences,
-    private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+    private val pushNotificationsService: PushNotificationsService
 ) : WelcomePushNotificationsInteractor {
 
     override fun needToShowWelcomeScreen(): Boolean {
-        return googleApiAvailabilityProvider.isAvailable() &&
+        return pushNotificationsService.isPushNotificationsAvailable() &&
             preferences.getBoolean(PREFS_WELCOME_SCREEN_SHOWN, true)
     }
 
