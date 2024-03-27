@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.9.5'
-        versionCode = 123
+        versionName = '7.10.0'
+        versionCode = 127
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -82,6 +82,8 @@ buildscript {
         roomVersion = '2.4.3'
 
         markwonVersion = '4.6.2'
+
+        firebaseBomVersion = '32.7.1'
 
         walletConnectCoreVersion = "1.27.2"
         walletConnectWalletVersion = "1.20.2"
@@ -196,6 +198,13 @@ buildscript {
         walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"
 
         canonizationJsonDep = "io.github.erdtman:java-json-canonicalization:1.1"
+
+        firebaseBomDep = "com.google.firebase:firebase-bom:$firebaseBomVersion"
+        firestoreDep = "com.google.firebase:firebase-firestore"
+        firebaseCloudMessagingDep = "com.google.firebase:firebase-messaging"
+        firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
+
+        kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     }
 
     repositories {
@@ -256,6 +265,7 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     description = "Fix Kotlin code style deviations."
     classpath = configurations.ktlint
     main = "com.pinterest.ktlint.Main"
+    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
     args "-F", "$project.rootDir/**/src/main/**/*.kt"
     args "--android"
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"

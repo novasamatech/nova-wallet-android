@@ -56,8 +56,8 @@
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:singleLine="true"
-        app:layout_constrainedWidth="true"
         android:textColor="@color/text_primary"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@+id/itemAccountSubtitle"
         app:layout_constraintEnd_toStartOf="@+id/itemAccountEndBarrier"
         app:layout_constraintHorizontal_bias="0.0"
@@ -100,7 +100,7 @@
         app:tint="@color/icon_secondary" />
 
     <RadioButton
-        android:id="@+id/itemAccountCheck"
+        android:id="@+id/itemAccountRadioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -113,11 +113,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/itemAccountCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:clickable="false"
+        android:duplicateParentState="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/itemAccountEndBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="left"
-        app:constraint_referenced_ids="itemAccountCheck, itemAccountArrow" />
+        app:constraint_referenced_ids="itemAccountRadioButton, itemAccountCheckBox, itemAccountArrow" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

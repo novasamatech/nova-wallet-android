@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.common.utils.urlEncoded
+import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.toHexString

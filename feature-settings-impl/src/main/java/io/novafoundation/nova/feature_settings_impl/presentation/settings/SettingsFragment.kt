@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settingsLanguage
 import kotlinx.android.synthetic.main.fragment_settings.settingsPin
 import kotlinx.android.synthetic.main.fragment_settings.settingsPinCodeVerification
 import kotlinx.android.synthetic.main.fragment_settings.settingsPrivacy
+import kotlinx.android.synthetic.main.fragment_settings.settingsPushNotifications
 import kotlinx.android.synthetic.main.fragment_settings.settingsRateUs
 import kotlinx.android.synthetic.main.fragment_settings.settingsSafeMode
 import kotlinx.android.synthetic.main.fragment_settings.settingsTelegram
@@ -57,6 +58,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
         settingsWallets.setOnClickListener { viewModel.walletsClicked() }
 
+        settingsPushNotifications.setOnClickListener { viewModel.pushNotificationsClicked() }
         settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
         settingsLanguage.setOnClickListener { viewModel.languagesClicked() }
 
@@ -102,6 +104,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
             accountView.setAccountIcon(it.walletIcon)
             accountView.setTitle(it.name)
+        }
+
+        viewModel.pushNotificationsState.observe {
+            settingsPushNotifications.setValue(it)
         }
 
         viewModel.selectedCurrencyFlow.observe {

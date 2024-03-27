@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository

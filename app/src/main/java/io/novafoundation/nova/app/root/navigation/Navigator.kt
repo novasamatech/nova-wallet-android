@@ -292,6 +292,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_select_address, arguments)
     }
 
+    override fun openSelectMultipleWallets(arguments: Bundle) {
+        navController?.navigate(R.id.action_open_select_multiple_wallets, arguments)
+    }
+
     override fun openNodes() {
         navController?.navigate(R.id.action_mainFragment_to_nodesFragment)
     }
@@ -402,6 +406,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_update_notifications)
     }
 
+    override fun openPushWelcome() {
+        performNavigation(R.id.action_open_pushNotificationsWelcome)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {
@@ -426,10 +434,10 @@ class Navigator(
             R.id.mainFragment -> R.id.action_mainFragment_to_balanceDetailFragment
             R.id.assetSearchFragment -> R.id.action_assetSearchFragment_to_balanceDetailFragment
             R.id.confirmTransferFragment -> R.id.action_confirmTransferFragment_to_balanceDetailFragment
-            else -> null
+            else -> R.id.action_root_to_balanceDetailFragment
         }
 
-        action?.let { navController?.navigate(it, bundle) }
+        navController?.navigate(action, bundle)
     }
 
     override fun openAddNode() {

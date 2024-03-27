@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/pushSettingsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:textRight="@string/common_save"
+        app:titleText="@string/common_push_notifications" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pushSettingsToolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:orientation="vertical">
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+                    android:id="@+id/pushSettingsEnable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_notifications_outline"
+                    app:title="@string/push_settings_enable" />
+
+                <io.novafoundation.nova.common.view.settings.SettingsItemView
+                    android:id="@+id/pushSettingsWallets"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_wallet_outline"
+                    app:title="@string/push_settings_wallets"
+                    tools:settingValue="0" />
+
+            </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+            <TextView
+                android:id="@+id/pushSettingsNoSelectedWallets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/push_settings_no_selected_wallets"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_general" />
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+                    android:id="@+id/pushSettingsAnnouncements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/push_settings_announcements" />
+
+            </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/push_settings_balances" />
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+                    android:id="@+id/pushSettingsSentTokens"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/push_settings_sent_tokens" />
+
+                <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+                    android:id="@+id/pushSettingsReceivedTokens"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/push_settings_received_tokens" />
+
+            </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/push_settings_others" />
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.settings.SettingsItemView
+                    android:id="@+id/pushSettingsGovernance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_governance"
+                    tools:settingValue="On" />
+
+                <io.novafoundation.nova.common.view.settings.SettingsItemView
+                    android:id="@+id/pushSettingsStakingRewards"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/push_settings_staking_rewards"
+                    tools:settingValue="On" />
+
+            </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="64dp"
+                android:layout_marginBottom="8dp"
+                android:text="Powered by"
+                android:textColor="@color/text_secondary" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_web3_alert_icon" />
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

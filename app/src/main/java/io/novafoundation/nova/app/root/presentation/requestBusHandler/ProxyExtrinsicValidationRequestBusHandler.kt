@@ -1,6 +1,5 @@
 package io.novafoundation.nova.app.root.presentation.requestBusHandler
 
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bus.observeBusEvent
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -16,8 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 class ProxyExtrinsicValidationRequestBusHandler(
     private val scope: RootScope,
     private val proxyProxyExtrinsicValidationRequestBus: ProxyExtrinsicValidationRequestBus,
-    private val proxyHaveEnoughFeeValidationFactory: ProxyHaveEnoughFeeValidationFactory,
-    private val resourceManager: ResourceManager
+    private val proxyHaveEnoughFeeValidationFactory: ProxyHaveEnoughFeeValidationFactory
 ) : RequestBusHandler {
 
     override fun observe() {
@@ -30,7 +28,7 @@ class ProxyExtrinsicValidationRequestBusHandler(
     }
 
     private fun createValidationSystem(): ValidationSystem<ProxiedExtrinsicValidationPayload, ProxiedExtrinsicValidationFailure> {
-        return ValidationSystem<ProxiedExtrinsicValidationPayload, ProxiedExtrinsicValidationFailure> {
+        return ValidationSystem {
             proxyHasEnoughFee()
         }
     }

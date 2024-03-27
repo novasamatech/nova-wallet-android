@@ -15,5 +15,7 @@ interface TokenRepository {
 
     suspend fun getToken(chainAsset: Chain.Asset): Token
 
+    suspend fun getTokenOrNull(chainAsset: Chain.Asset): Token?
+
     fun observeToken(chainAsset: Chain.Asset): Flow<Token>
 }

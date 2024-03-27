@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreSta
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.common.stakingChainsById
+import io.novafoundation.nova.feature_staking_api.data.dashboard.common.stakingChainsById
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
@@ -66,6 +66,7 @@ class RealStakingDashboardInteractor(
     private val walletRepository: WalletRepository,
     private val totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
 ) : StakingDashboardInteractor {
+
     override suspend fun syncDapps() {
         runCatching {
             withContext(Dispatchers.Default) {

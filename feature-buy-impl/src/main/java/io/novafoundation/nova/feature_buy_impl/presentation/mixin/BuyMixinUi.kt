@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_buy_api.domain.BuyProvider
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_buy_impl.R
-import io.novafoundation.nova.feature_buy_impl.domain.providers.ExternalProvider
+import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
 import kotlinx.coroutines.flow.Flow
 
 class RealBuyMixinUi : BuyMixinUi {

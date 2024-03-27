@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -24,6 +25,7 @@ class AccountFeatureHolder @Inject constructor(
     private val polkadotVaultSignCommunicator: PolkadotVaultVariantSignCommunicator,
     private val ledgerSignCommunicator: LedgerSignCommunicator,
     private val selectAddressCommunicator: SelectAddressCommunicator,
+    private val selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
     private val selectWalletCommunicator: SelectWalletCommunicator,
     private val pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator
 ) : FeatureApiHolder(featureContainer) {
@@ -45,6 +47,7 @@ class AccountFeatureHolder @Inject constructor(
                 polkadotVaultSignInterScreenCommunicator = polkadotVaultSignCommunicator,
                 ledgerSignInterScreenCommunicator = ledgerSignCommunicator,
                 selectAddressCommunicator = selectAddressCommunicator,
+                selectMultipleWalletsCommunicator = selectMultipleWalletsCommunicator,
                 selectWalletCommunicator = selectWalletCommunicator,
                 pinCodeTwoFactorVerificationCommunicator = pinCodeTwoFactorVerificationCommunicator,
                 deps = accountFeatureDependencies

@@ -22,6 +22,7 @@ class AppLinksProvider(
     val ledgerBluetoothGuide: String,
     val wikiBase: String,
     val wikiProxy: String,
+    val storeUrl: String
 ) {
 
     fun getTwitterAccountUrl(

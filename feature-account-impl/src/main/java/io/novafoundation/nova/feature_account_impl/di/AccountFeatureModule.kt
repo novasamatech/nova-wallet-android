@@ -81,6 +81,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.Identi
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
@@ -172,6 +173,10 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideMetaAccountChangesRequestBus() = MetaAccountChangesEventBus()
+
+    @Provides
+    @FeatureScope
     fun provideAccountRepository(
         accountDataSource: AccountDataSource,
         accountDao: AccountDao,
@@ -180,7 +185,7 @@ class AccountFeatureModule {
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
         secretStoreV2: SecretStoreV2,
-        multiChainQrSharingFactory: MultiChainQrSharingFactory,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus,
     ): AccountRepository {
         return AccountRepositoryImpl(
             accountDataSource,
@@ -190,7 +195,7 @@ class AccountFeatureModule {
             languagesHolder,
             accountSubstrateSource,
             secretStoreV2,
-            multiChainQrSharingFactory
+            metaAccountChangesEventBus
         )
     }
 

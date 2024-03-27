@@ -7,4 +7,6 @@ interface RootRouter {
     fun nonCancellableVerify()
 
     fun openUpdateNotifications()
+
+    fun openPushWelcome()
 }

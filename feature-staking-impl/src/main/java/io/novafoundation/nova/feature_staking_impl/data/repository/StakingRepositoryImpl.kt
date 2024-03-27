@@ -66,6 +66,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
+import kotlinx.coroutines.flow.map
 
 class StakingRepositoryImpl(
     private val accountStakingDao: AccountStakingDao,

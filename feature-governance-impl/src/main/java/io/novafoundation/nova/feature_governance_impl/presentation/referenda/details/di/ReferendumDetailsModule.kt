@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDApp
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 

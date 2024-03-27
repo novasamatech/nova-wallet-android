@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerif
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -17,6 +18,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.advanced
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.di.DelegatedAccountUpdatesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.di.SelectMultipleWalletsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
@@ -79,6 +81,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun selectAddressComponentFactory(): SelectAddressComponent.Factory
 
+    fun selectMultipleWalletsComponentFactory(): SelectMultipleWalletsComponent.Factory
+
     fun delegatedAccountUpdatesFactory(): DelegatedAccountUpdatesComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
@@ -118,6 +122,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance polkadotVaultSignInterScreenCommunicator: PolkadotVaultVariantSignCommunicator,
             @BindsInstance ledgerSignInterScreenCommunicator: LedgerSignCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
+            @BindsInstance selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
             @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,
             @BindsInstance pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
             deps: AccountFeatureDependencies

@@ -76,6 +76,10 @@ fun <T> MutableStateFlow<T>.setter(): (T) -> Unit {
     return { value = it }
 }
 
+fun <T> MutableStateFlow<T>.updateValue(updater: (T) -> T) {
+    value = updater(value)
+}
+
 fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
     var currentScope: CoroutineScope? = null
 

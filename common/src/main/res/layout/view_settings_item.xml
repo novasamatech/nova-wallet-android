@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:background="@color/secondary_screen_background"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <ImageView
+        android:id="@+id/settingsItemIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:duplicateParentState="true"
+        app:tint="@color/icon_accent_state_colors"
+        tools:src="@drawable/ic_buy_outline" />
+
+    <TextView
+        android:id="@+id/settingsItemTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="24dp"
+        android:layout_weight="1"
+        android:drawablePadding="12dp"
+        android:duplicateParentState="true"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:minHeight="48dp"
+        android:textColor="@color/button_text_colors"
+        tools:text="Settings Item Name" />
+
+    <TextView
+        android:id="@+id/settingsItemValue"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="8dp"
+        android:duplicateParentState="true"
+        android:includeFontPadding="false"
+        android:textColor="@color/button_secondary_text_colors"
+        tools:text="Value" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="20dp"
+        android:duplicateParentState="true"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/icon_secondary_state_colors" />
+</merge>

@@ -4,6 +4,7 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository.Payload
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -18,14 +19,16 @@ class RealProxiedAddAccountRepository(
     private val chainRegistry: ChainRegistry
 ) : ProxiedAddAccountRepository {
 
-    override suspend fun addAccount(payload: Payload): Long {
+    override suspend fun addAccount(payload: Payload): AddAccountResult {
         val position = accountDao.nextAccountPosition()
 
-        return accountDao.insertProxiedMetaAccount(
+        val metaId = accountDao.insertProxiedMetaAccount(
             metaAccount = createMetaAccount(payload, position),
             chainAccount = { createChainAccount(it, payload) },
             proxyAccount = { createProxyAccount(it, payload) }
         )
+
+        return AddAccountResult.AccountAdded(metaId)
     }
 
     private suspend fun createMetaAccount(

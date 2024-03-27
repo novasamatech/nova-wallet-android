@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.di
 
+import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
@@ -10,6 +11,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -19,7 +21,10 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRep
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
+import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -74,7 +79,11 @@ interface RootDependencies {
 
     fun proxyExtrinsicValidationRequestBus(): ProxyExtrinsicValidationRequestBus
 
+    fun metaAccountChangesRequestBus(): MetaAccountChangesEventBus
+
     fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
+
+    fun context(): Context
 
     val systemCallExecutor: SystemCallExecutor
 
@@ -87,4 +96,10 @@ interface RootDependencies {
     val automaticInteractionGate: AutomaticInteractionGate
 
     val walletConnectSessionsUseCase: WalletConnectSessionsUseCase
+
+    val pushNotificationsInteractor: PushNotificationsInteractor
+
+    val rootDeepLinkHandler: RootDeepLinkHandler
+
+    val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
 }

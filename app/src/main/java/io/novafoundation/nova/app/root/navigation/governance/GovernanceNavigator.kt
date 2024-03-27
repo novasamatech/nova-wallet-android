@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.governance
 
+import android.os.Bundle
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -29,7 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteFragment
@@ -115,6 +116,10 @@ class GovernanceNavigator(
 
     override fun openDelegateSearch() {
         performNavigation(R.id.action_delegateListFragment_to_delegateSearchFragment)
+    }
+
+    override fun openSelectGovernanceTracks(bundle: Bundle) {
+        performNavigation(R.id.action_open_select_governance_tracks, args = bundle)
     }
 
     override fun openReferendaSearch() {

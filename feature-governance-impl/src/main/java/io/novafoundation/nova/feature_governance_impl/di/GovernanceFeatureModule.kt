@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.preimage.RealPreImageSizer
@@ -47,6 +48,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.RealVotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendaStatusFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
@@ -157,10 +159,17 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideReferendaStatusFormatter(
+        resourceManager: ResourceManager
+    ): ReferendaStatusFormatter = RealReferendaStatusFormatter(resourceManager)
+
+    @Provides
+    @FeatureScope
     fun provideReferendumFormatter(
         resourceManager: ResourceManager,
         trackFormatter: TrackFormatter,
-    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter)
+        referendaStatusFormatter: ReferendaStatusFormatter
+    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter, referendaStatusFormatter)
 
     @Provides
     @FeatureScope

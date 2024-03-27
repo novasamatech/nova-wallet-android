@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 
-@Module(includes = [RequestBusHandlerModule::class])
+@Module(includes = [RequestBusHandlerModule::class, ExternalServiceInitializersModule::class])
 class RootFeatureModule {
 
     @Provides

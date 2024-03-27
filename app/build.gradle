@@ -17,8 +17,6 @@ android {
         versionCode computeVersionCode()
         versionName computeVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://play.google.com/store/apps/details?id=io.novafoundation.nova.market\""
     }
     signingConfigs {
         dev {
@@ -44,10 +42,14 @@ android {
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
+
+            buildConfigField "String", "BuildType", "\"debug\""
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "BuildType", "\"release\""
         }
         releaseTest {
             initWith buildTypes.release
@@ -56,6 +58,8 @@ android {
 
             versionNameSuffix '-releaseTest'
             applicationIdSuffix '.releaseTest'
+
+            buildConfigField "String", "BuildType", "\"releaseTest\""
         }
         releaseMarket {
             initWith buildTypes.release
@@ -64,6 +68,8 @@ android {
 
             versionNameSuffix "-${releaseApplicationSuffix}"
             applicationIdSuffix ".${releaseApplicationSuffix}"
+
+            buildConfigField "String", "BuildType", "\"releaseMarket\""
         }
         releaseGithub {
             initWith buildTypes.release
@@ -74,6 +80,8 @@ android {
             applicationIdSuffix '.github'
 
             buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/novasamatech/nova-wallet-android/releases\""
+
+            buildConfigField "String", "BuildType", "\"releaseGithub\""
         }
         develop {
             signingConfig signingConfigs.dev
@@ -87,11 +95,15 @@ android {
                 releaseNotes = localReleaseNotes
                 groups = localFirebaseGroup
             }
+
+            buildConfigField "String", "BuildType", "\"develop\""
         }
         instrumentialTest {
             initWith buildTypes.debug
             matchingFallbacks = ['debug']
             defaultConfig.testInstrumentationRunner "io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
+
+            buildConfigField "String", "BuildType", "\"instrumentalTest\""
         }
     }
 
@@ -222,6 +234,9 @@ dependencies {
     implementation project(":feature-buy-api")
     implementation project(":feature-buy-impl")
 
+    implementation project(':feature-push-notifications')
+    implementation project(':feature-deep-linking')
+
     implementation kotlinDep
 
     implementation biometricDep
@@ -260,6 +275,11 @@ dependencies {
     implementation insetterDep
 
     implementation liveDataKtxDep
+
+    implementation platform(firebaseBomDep)
+    implementation firestoreDep
+    implementation firebaseCloudMessagingDep
+    implementation firebaseAppCheck
 
     implementation walletConnectCoreDep, withoutTransitiveAndroidX
     implementation walletConnectWalletDep, withoutTransitiveAndroidX

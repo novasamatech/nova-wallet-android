@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_api.di
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
@@ -92,4 +93,6 @@ interface AccountFeatureApi {
     val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
 
     val selectAddressMixinFactory: SelectAddressMixin.Factory
+
+    val metaAccountChangesEventBus: MetaAccountChangesEventBus
 }

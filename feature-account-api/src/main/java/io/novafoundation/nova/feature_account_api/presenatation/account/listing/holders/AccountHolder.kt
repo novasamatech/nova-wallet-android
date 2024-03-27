@@ -14,7 +14,8 @@ import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import kotlinx.android.synthetic.main.item_account.view.itemAccountArrow
-import kotlinx.android.synthetic.main.item_account.view.itemAccountCheck
+import kotlinx.android.synthetic.main.item_account.view.itemAccountCheckBox
+import kotlinx.android.synthetic.main.item_account.view.itemAccountRadioButton
 import kotlinx.android.synthetic.main.item_account.view.itemAccountContainer
 import kotlinx.android.synthetic.main.item_account.view.itemAccountDelete
 import kotlinx.android.synthetic.main.item_account.view.itemAccountIcon
@@ -34,7 +35,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
     }
 
     enum class Mode {
-        VIEW, SELECT, EDIT, SWITCH
+        VIEW, SELECT, SELECT_MULTIPLE, EDIT, SWITCH
     }
 
     init {
@@ -87,11 +88,25 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
             Mode.VIEW -> {
                 itemAccountArrow.visibility = View.GONE
                 itemAccountDelete.visibility = View.GONE
-                itemAccountCheck.visibility = View.GONE
+                itemAccountRadioButton.visibility = View.GONE
+                itemAccountCheckBox.visibility = View.GONE
 
                 itemAccountDelete.setOnClickListener(null)
 
                 setOnClickListener(null)
+            }
+
+            Mode.SELECT_MULTIPLE -> {
+                itemAccountArrow.visibility = View.GONE
+
+                itemAccountDelete.visibility = View.GONE
+
+                itemAccountCheckBox.isVisible = accountModel.isClickable
+                itemAccountCheckBox.isChecked = accountModel.isSelected
+
+                itemAccountRadioButton.visibility = View.GONE
+
+                setOnClickListener { handler?.itemClicked(accountModel) }
             }
 
             Mode.SELECT -> {
@@ -100,7 +115,8 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
                 itemAccountDelete.visibility = View.GONE
                 itemAccountDelete.setOnClickListener(null)
 
-                itemAccountCheck.visibility = View.GONE
+                itemAccountRadioButton.visibility = View.GONE
+                itemAccountCheckBox.visibility = View.GONE
 
                 setOnClickListener { handler?.itemClicked(accountModel) }
             }
@@ -113,7 +129,8 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
                 itemAccountDelete.setOnClickListener { handler?.deleteClicked(accountModel) }
                 itemAccountDelete.setImageResource(R.drawable.ic_delete_symbol)
 
-                itemAccountCheck.visibility = View.GONE
+                itemAccountRadioButton.visibility = View.GONE
+                itemAccountCheckBox.visibility = View.GONE
 
                 setOnClickListener(null)
             }
@@ -123,9 +140,10 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
 
                 itemAccountDelete.visibility = View.GONE
 
-                itemAccountCheck.isVisible = accountModel.isClickable
+                itemAccountRadioButton.isVisible = accountModel.isClickable
+                itemAccountRadioButton.isChecked = accountModel.isSelected
 
-                itemAccountCheck.isChecked = accountModel.isSelected
+                itemAccountCheckBox.visibility = View.GONE
 
                 setOnClickListener { handler?.itemClicked(accountModel) }
             }

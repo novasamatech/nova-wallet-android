@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.app.root.domain.RootInteractor
+import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 
 @Module(
@@ -24,11 +25,17 @@ class MainFragmentModule {
     @IntoMap
     @ViewModelKey(MainViewModel::class)
     fun provideViewModel(
-        interactor: RootInteractor,
         updateNotificationsInteractor: UpdateNotificationsInteractor,
         automaticInteractionGate: AutomaticInteractionGate,
+        welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor,
+        rootRouter: RootRouter
     ): ViewModel {
-        return MainViewModel(interactor, updateNotificationsInteractor, automaticInteractionGate)
+        return MainViewModel(
+            updateNotificationsInteractor,
+            automaticInteractionGate,
+            welcomePushNotificationsInteractor,
+            rootRouter
+        )
     }
 
     @Provides

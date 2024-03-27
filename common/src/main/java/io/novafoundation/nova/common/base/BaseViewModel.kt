@@ -29,6 +29,17 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
     private val _messageLiveData = MutableLiveData<Event<String>>()
     val messageLiveData: LiveData<Event<String>> = _messageLiveData
 
+    private val _toastLiveData = MutableLiveData<Event<String>>()
+    val toastLiveData: LiveData<Event<String>> = _toastLiveData
+
+    fun showRetryDialog(text: String) {
+        _messageLiveData.value = Event(text)
+    }
+
+    fun showToast(text: String) {
+        _toastLiveData.value = Event(text)
+    }
+
     fun showMessage(text: String) {
         _messageLiveData.value = Event(text)
     }

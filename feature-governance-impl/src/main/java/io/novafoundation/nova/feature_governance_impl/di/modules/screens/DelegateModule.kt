@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
@@ -94,13 +95,15 @@ class DelegateModule {
         accountRepository: AccountRepository,
         trackCategorizer: TrackCategorizer,
         removeVotesSuggestionRepository: RemoveVotesSuggestionRepository,
+        chainRegistry: ChainRegistry
     ): ChooseTrackInteractor = RealChooseTrackInteractor(
         governanceSharedState = governanceSharedState,
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         accountRepository = accountRepository,
         trackCategorizer = trackCategorizer,
-        removeVotesSuggestionRepository = removeVotesSuggestionRepository
+        removeVotesSuggestionRepository = removeVotesSuggestionRepository,
+        chainRegistry = chainRegistry
     )
 
     @Provides

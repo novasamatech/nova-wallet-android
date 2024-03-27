@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 
 interface GovernanceFeatureApi {
 
@@ -32,4 +33,6 @@ interface GovernanceFeatureApi {
     val delegateDelegatorsInteractor: DelegateDelegatorsInteractor
 
     val mutableGovernanceState: MutableGovernanceState
+
+    val referendaStatusFormatter: ReferendaStatusFormatter
 }

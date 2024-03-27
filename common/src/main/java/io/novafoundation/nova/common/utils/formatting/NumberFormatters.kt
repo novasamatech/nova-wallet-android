@@ -162,6 +162,10 @@ fun parseDateISO_8601_NoMs(value: String): Date? {
     return runCatching { dateTimeFormatISO_8601_NoMs.parse(value) }.getOrNull()
 }
 
+fun formatDateISO_8601_NoMs(date: Date): String {
+    return dateTimeFormatISO_8601_NoMs.format(date)
+}
+
 fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFormat {
     return DecimalFormat(pattern).apply {
         val symbols = decimalFormatSymbols
