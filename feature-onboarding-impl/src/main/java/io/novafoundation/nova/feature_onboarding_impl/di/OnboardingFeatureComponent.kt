@@ -5,6 +5,7 @@ import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser.di.ImportWalletOptionsComponent
@@ -39,7 +40,8 @@ interface OnboardingFeatureComponent : OnboardingFeatureApi {
         dependencies = [
             CommonApi::class,
             AccountFeatureApi::class,
-            VersionsFeatureApi::class
+            VersionsFeatureApi::class,
+            CloudBackupFeatureApi::class
         ]
     )
     interface OnboardingFeatureDependenciesComponent : OnboardingFeatureDependencies

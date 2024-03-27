@@ -5,6 +5,7 @@ import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
@@ -56,4 +57,6 @@ interface PushNotificationsFeatureDependencies {
     val appLinksProvider: AppLinksProvider
 
     val metaAccountChangesEventBus: MetaAccountChangesEventBus
+
+    val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 }

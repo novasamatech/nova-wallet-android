@@ -89,10 +89,5 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
         observeBrowserEvents(viewModel)
 
         viewModel.shouldShowBackLiveData.observe(welcomeBackButton::setVisible)
-
-        viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {
-            SelectHardwareWalletBottomSheet(requireContext(), it.onSuccess)
-                .show()
-        }
     }
 }
