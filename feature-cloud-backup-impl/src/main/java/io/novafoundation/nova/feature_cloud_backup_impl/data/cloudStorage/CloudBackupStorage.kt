@@ -19,7 +19,7 @@ internal interface CloudBackupStorage {
     suspend fun writeBackup(backup: EncryptedBackupData): Result<Unit>
 
     /**
-     * @throws  FetchBackupError.BackupNotFound
+     * @throws FetchBackupError.BackupNotFound
      */
     suspend fun fetchBackup(): Result<EncryptedBackupData>
 }

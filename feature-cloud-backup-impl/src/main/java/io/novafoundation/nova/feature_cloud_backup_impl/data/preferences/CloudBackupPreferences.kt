@@ -13,7 +13,7 @@ suspend fun CloudBackupPreferences.enableSyncWithCloud() = setSyncWithCloudEnabl
 
 internal class SharedPrefsCloudBackupPreferences(
     private val preferences: Preferences
-): CloudBackupPreferences {
+) : CloudBackupPreferences {
 
     companion object {
         private const val KEY = "BackupPreferences"
@@ -25,6 +25,6 @@ internal class SharedPrefsCloudBackupPreferences(
     }
 
     override suspend fun setSyncWithCloudEnabled(enabled: Boolean) {
-       preferences.putBoolean(KEY, enabled)
+        preferences.putBoolean(KEY, enabled)
     }
 }

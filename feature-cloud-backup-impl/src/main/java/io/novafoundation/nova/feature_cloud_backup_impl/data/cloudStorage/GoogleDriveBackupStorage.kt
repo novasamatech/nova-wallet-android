@@ -89,7 +89,7 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
-    override suspend fun fetchBackup(): Result<EncryptedBackupData> = withContext(Dispatchers.IO)  {
+    override suspend fun fetchBackup(): Result<EncryptedBackupData> = withContext(Dispatchers.IO) {
         runCatching {
             val fileContent = readBackupFileFromDrive()
 
@@ -102,7 +102,7 @@ internal class GoogleDriveBackupStorage(
 
         val backupInCloud = getBackupFileFromCloud()
 
-        if (backupInCloud != null){
+        if (backupInCloud != null) {
             drive.files()
                 .update(backupInCloud.id, null, contentStream)
                 .execute()
@@ -117,7 +117,7 @@ internal class GoogleDriveBackupStorage(
     private fun readBackupFileFromDrive(): ByteArray {
         val outputStream = ByteArrayOutputStream()
 
-        val backupFile = getBackupFileFromCloud() ?: throw  FetchBackupError.BackupNotFound
+        val backupFile = getBackupFileFromCloud() ?: throw FetchBackupError.BackupNotFound
 
         drive.files()
             .get(backupFile.id)

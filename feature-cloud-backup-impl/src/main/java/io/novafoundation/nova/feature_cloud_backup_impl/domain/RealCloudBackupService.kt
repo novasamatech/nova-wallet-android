@@ -102,7 +102,7 @@ internal class RealCloudBackupService(
         private val encryption: CloudBackupEncryption,
         private val serializer: CloudBackupSerializer,
         private val encryptedBackupData: EncryptedBackupData,
-    ): EncryptedCloudBackup {
+    ) : EncryptedCloudBackup {
 
         override suspend fun decrypt(password: String): Result<CloudBackup> {
             return encryption.decryptBackup(encryptedBackupData, password).flatMap {

@@ -20,7 +20,7 @@ interface CloudBackupEncryption {
     suspend fun decryptBackup(data: EncryptedBackupData, password: String): Result<UnencryptedBackupData>
 }
 
-class ScryptCloudBackupEncryption: CloudBackupEncryption {
+class ScryptCloudBackupEncryption : CloudBackupEncryption {
 
     private val random: Random = SecureRandom()
 
@@ -33,7 +33,6 @@ class ScryptCloudBackupEncryption: CloudBackupEncryption {
         private const val p = 1
         private const val r = 8
     }
-
 
     override suspend fun encryptBackup(data: UnencryptedBackupData, password: String): Result<EncryptedBackupData> {
         return runCatching {

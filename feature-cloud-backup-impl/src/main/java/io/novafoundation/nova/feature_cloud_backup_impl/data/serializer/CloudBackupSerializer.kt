@@ -36,8 +36,8 @@ internal class JsonCloudBackupSerializer(
     }
 
     override suspend fun deserializeBackup(backup: UnencryptedBackupData): Result<CloudBackup> {
-       return runCatching {
-           gson.fromJson(backup.decryptedData)
-       }
+        return runCatching {
+            gson.fromJson(backup.decryptedData)
+        }
     }
 }
