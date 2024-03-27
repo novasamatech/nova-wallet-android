@@ -14,6 +14,8 @@ import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
@@ -80,6 +82,14 @@ annotation class Caching
 
 @Module(includes = [ParallaxCardModule::class])
 class CommonModule {
+
+    @Provides
+    @ApplicationScope
+    fun provideGoogleApiAvailabilityProvider(
+        context: Context
+    ): GoogleApiAvailabilityProvider {
+        return RealGoogleApiAvailabilityProvider(context)
+    }
 
     @Provides
     @ApplicationScope

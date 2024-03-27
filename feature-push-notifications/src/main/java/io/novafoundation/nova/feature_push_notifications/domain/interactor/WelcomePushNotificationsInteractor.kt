@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.feature_push_notifications.data.GoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 
 interface WelcomePushNotificationsInteractor {
     fun needToShowWelcomeScreen(): Boolean

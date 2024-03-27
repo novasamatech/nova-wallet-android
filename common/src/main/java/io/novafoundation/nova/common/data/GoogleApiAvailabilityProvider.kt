@@ -1,13 +1,19 @@
-package io.novafoundation.nova.feature_push_notifications.data
+package io.novafoundation.nova.common.data
 
 import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 
-class GoogleApiAvailabilityProvider(
+interface GoogleApiAvailabilityProvider {
+
+    fun isAvailable(): Boolean
+}
+
+internal class RealGoogleApiAvailabilityProvider(
     val context: Context
-) {
-    fun isAvailable(): Boolean {
+) : GoogleApiAvailabilityProvider {
+
+    override fun isAvailable(): Boolean {
         val googleApiAvailability = GoogleApiAvailability.getInstance()
         val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
         return resultCode == ConnectionResult.SUCCESS

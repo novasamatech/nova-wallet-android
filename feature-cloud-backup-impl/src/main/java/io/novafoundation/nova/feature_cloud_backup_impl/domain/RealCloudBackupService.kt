@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CreateBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.EncryptedCloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
 import io.novafoundation.nova.feature_cloud_backup_impl.data.cloudStorage.CloudBackupStorage
+import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.CloudBackupSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -13,6 +14,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 internal class RealCloudBackupService(
     private val cloudBackupStorage: CloudBackupStorage,
+    private val cloudBackupSerializer: CloudBackupSerializer
 ) : CloudBackupService {
 
     override suspend fun validateCanCreateBackup(): PreCreateValidationStatus = withContext(Dispatchers.IO) {
@@ -23,8 +25,8 @@ internal class RealCloudBackupService(
         return Result.success(Unit)
     }
 
-    override suspend fun isCloudBackupExist(): Result<Boolean> {
-        return Result.success(false)
+    override suspend fun isCloudBackupExist(): Result<Boolean> = withContext(Dispatchers.IO) {
+        cloudBackupStorage.checkBackupExists()
     }
 
     override suspend fun isCloudBackupActivated(): Result<Boolean> {
@@ -48,6 +50,8 @@ internal class RealCloudBackupService(
     }
 
     private suspend fun validateCanCreateBackupInternal(): PreCreateValidationStatus {
+        if (!cloudBackupStorage.isCloudStorageServiceAvailable()) return PreCreateValidationStatus.BackupServiceUnavailable
+
         cloudBackupStorage.ensureUserAuthenticated().getOrNull() ?: return PreCreateValidationStatus.AuthenticationFailed
 
         val fileExists = cloudBackupStorage.checkBackupExists().getOrNull() ?: return PreCreateValidationStatus.OtherError
@@ -55,7 +59,18 @@ internal class RealCloudBackupService(
             return PreCreateValidationStatus.ExistingBackupFound
         }
 
+        val hasEnoughSize = hasEnoughSizeForBackup().getOrNull() ?: return PreCreateValidationStatus.OtherError
+        if (!hasEnoughSize) {
+            return PreCreateValidationStatus.NotEnoughSpace
+        }
+
         return PreCreateValidationStatus.Ok
+    }
+
+    private suspend fun hasEnoughSizeForBackup(): Result<Boolean> {
+        val neededBackupSize = cloudBackupSerializer.neededSizeForBackup()
+
+        return cloudBackupStorage.hasEnoughFreeStorage(neededBackupSize)
     }
 
     private class StubEncryptedCloudBackup : EncryptedCloudBackup {
