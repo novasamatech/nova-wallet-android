@@ -37,11 +37,8 @@ internal class GoogleDriveBackupStorage(
 ) : CloudBackupStorage {
 
     companion object {
-        // TODO json used for easier testing, replace it with binary blob before merging PR
-        private const val BACKUP_MIME_TYPE = "application/json"
-        private const val BACKUP_FILE_NAME = "novawallet_backup.json"
-//        private const val BACKUP_FILE_NAME = "novawallet_backup"
-//        private const val BACKUP_MIME_TYPE = "application/octet-stream"
+        private const val BACKUP_FILE_NAME = "novawallet_backup"
+        private const val BACKUP_MIME_TYPE = "application/octet-stream"
     }
 
     private val drive: Drive by lazy {
@@ -90,8 +87,8 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
-    private fun writeBackupFileToDrive(fileContent: String) {
-        val contentStream = ByteArrayContent(BACKUP_MIME_TYPE, fileContent.encodeToByteArray())
+    private fun writeBackupFileToDrive(fileContent: ByteArray) {
+        val contentStream = ByteArrayContent(BACKUP_MIME_TYPE, fileContent)
 
         val backupInCloud = getBackupFileFromCloud()
 

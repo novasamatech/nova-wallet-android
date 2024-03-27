@@ -30,16 +30,15 @@ internal class RealCloudBackupService(
     }
 
     override suspend fun writeBackupToCloud(request: WriteBackupRequest): Result<Unit> = withContext(Dispatchers.IO) {
-        storage.ensureUserAuthenticated()
-            .flatMap {
-                cloudBackupPreferences.enableSyncWithCloud()
+        storage.ensureUserAuthenticated().flatMap {
+            cloudBackupPreferences.enableSyncWithCloud()
 
-                prepareBackupForSaving(request.cloudBackup, request.password)
-            }
+            prepareBackupForSaving(request.cloudBackup, request.password)
+        }
             .flatMap {
                 storage.writeBackup(it)
             }.onFailure {
-                Log.w("CloudBackupService", it)
+                Log.e("CloudBackupService", "Failed to write backup to cloud", it)
             }
     }
 
