@@ -49,7 +49,9 @@ internal class RealCloudBackupService(
     }
 
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
-        return storage.fetchBackup().map {
+        return storage.ensureUserAuthenticated().flatMap {
+            storage.fetchBackup()
+        }.map {
             RealEncryptedCloudBackup(encryption, serializer, it)
         }.onFailure {
             Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
