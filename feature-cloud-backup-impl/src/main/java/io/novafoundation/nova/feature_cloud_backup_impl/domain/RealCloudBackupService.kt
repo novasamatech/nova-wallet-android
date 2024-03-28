@@ -2,11 +2,15 @@ package io.novafoundation.nova.feature_cloud_backup_impl.domain
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.flatMap
+import io.novafoundation.nova.common.utils.mapErrorNotInstance
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.EncryptedCloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.DeleteBackupError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
 import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedBackupData
 import io.novafoundation.nova.feature_cloud_backup_impl.data.cloudStorage.CloudBackupStorage
 import io.novafoundation.nova.feature_cloud_backup_impl.data.encryption.CloudBackupEncryption
@@ -37,6 +41,8 @@ internal class RealCloudBackupService(
                 storage.writeBackup(it)
             }.onFailure {
                 Log.e("CloudBackupService", "Failed to write backup to cloud", it)
+            }.mapErrorNotInstance<_, WriteBackupError> {
+                WriteBackupError.Other
             }
     }
 
@@ -55,11 +61,19 @@ internal class RealCloudBackupService(
             RealEncryptedCloudBackup(encryption, serializer, it)
         }.onFailure {
             Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
+        }.mapErrorNotInstance<_, FetchBackupError> {
+            FetchBackupError.Other
         }
     }
 
     override suspend fun deleteBackup(): Result<Unit> {
-        return Result.success(Unit)
+        return storage.ensureUserAuthenticated().flatMap {
+            storage.deleteBackup()
+        }.onFailure {
+            Log.e("CloudBackupService", "Failed to delete backup from the cloud", it)
+        }.mapErrorNotInstance<_, DeleteBackupError> {
+            DeleteBackupError.Other
+        }
     }
 
     private suspend fun prepareBackupForSaving(backup: CloudBackup, password: String): Result<EncryptedBackupData> {

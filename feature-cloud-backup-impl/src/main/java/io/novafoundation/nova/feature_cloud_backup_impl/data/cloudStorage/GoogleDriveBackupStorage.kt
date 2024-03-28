@@ -97,6 +97,12 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
+    override suspend fun deleteBackup(): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            deleteBackupFileFromDrive()
+        }
+    }
+
     private fun writeBackupFileToDrive(fileContent: ByteArray) {
         val contentStream = ByteArrayContent(BACKUP_MIME_TYPE, fileContent)
 
@@ -124,6 +130,14 @@ internal class GoogleDriveBackupStorage(
             .executeMediaAndDownloadTo(outputStream)
 
         return outputStream.toByteArray()
+    }
+
+    private fun deleteBackupFileFromDrive() {
+        val backupFile = getBackupFileFromCloud() ?: return
+
+        drive.files()
+            .delete(backupFile.id)
+            .execute()
     }
 
     private fun checkBackupExistsUnsafe(): Boolean {
