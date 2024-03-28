@@ -12,10 +12,12 @@ import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
+import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
+import com.google.api.services.drive.model.File
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.requireActivity
@@ -23,16 +25,23 @@ import io.novafoundation.nova.common.utils.InformationSize
 import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
+import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedBackupData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 
 internal class GoogleDriveBackupStorage(
     private val contextManager: ContextManager,
     private val systemCallExecutor: SystemCallExecutor,
     private val oauthClientId: String,
-    private val backupFileName: String = "novawallet_backup",
     private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
 ) : CloudBackupStorage {
+
+    companion object {
+        private const val BACKUP_FILE_NAME = "novawallet_backup"
+        private const val BACKUP_MIME_TYPE = "application/octet-stream"
+    }
 
     private val drive: Drive by lazy {
         createGoogleDriveService()
@@ -74,14 +83,61 @@ internal class GoogleDriveBackupStorage(
             }
     }
 
+    override suspend fun writeBackup(backup: EncryptedBackupData): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            writeBackupFileToDrive(backup.encryptedData)
+        }
+    }
+
+    override suspend fun fetchBackup(): Result<EncryptedBackupData> = withContext(Dispatchers.IO) {
+        runCatching {
+            val fileContent = readBackupFileFromDrive()
+
+            EncryptedBackupData(fileContent)
+        }
+    }
+
+    private fun writeBackupFileToDrive(fileContent: ByteArray) {
+        val contentStream = ByteArrayContent(BACKUP_MIME_TYPE, fileContent)
+
+        val backupInCloud = getBackupFileFromCloud()
+
+        if (backupInCloud != null) {
+            drive.files()
+                .update(backupInCloud.id, null, contentStream)
+                .execute()
+        } else {
+            val fileMetadata = File().apply { name = BACKUP_FILE_NAME }
+
+            drive.files().create(fileMetadata, contentStream)
+                .execute()
+        }
+    }
+
+    private fun readBackupFileFromDrive(): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+
+        val backupFile = getBackupFileFromCloud() ?: throw FetchBackupError.BackupNotFound
+
+        drive.files()
+            .get(backupFile.id)
+            .executeMediaAndDownloadTo(outputStream)
+
+        return outputStream.toByteArray()
+    }
+
     private fun checkBackupExistsUnsafe(): Boolean {
-        val result = drive.files().list()
+        return getBackupFileFromCloud() != null
+    }
+
+    private fun getBackupFileFromCloud(): File? {
+        return drive.files().list()
             .setQ(backupNameQuery())
             .setSpaces("drive")
             .setFields("files(id, name)")
             .execute()
-
-        return result.files.isNotEmpty()
+            .files
+            .firstOrNull()
     }
 
     private fun getRemainingSpace(): InformationSize {
@@ -98,7 +154,7 @@ internal class GoogleDriveBackupStorage(
     }
 
     private fun backupNameQuery(): String {
-        return "name = '" + backupFileName.replace("'", "\\'") + "' and trashed = false"
+        return "name = '" + BACKUP_FILE_NAME.replace("'", "\\'") + "' and trashed = false"
     }
 
     private fun createGoogleDriveService(): Drive {

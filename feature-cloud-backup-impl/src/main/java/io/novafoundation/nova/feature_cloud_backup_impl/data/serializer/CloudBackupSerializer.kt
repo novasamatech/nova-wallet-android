@@ -3,7 +3,9 @@ package io.novafoundation.nova.feature_cloud_backup_impl.data.serializer
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.InformationSize
 import io.novafoundation.nova.common.utils.InformationSize.Companion.megabytes
+import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
+import io.novafoundation.nova.feature_cloud_backup_impl.data.UnencryptedBackupData
 
 interface CloudBackupSerializer {
 
@@ -28,10 +30,14 @@ internal class JsonCloudBackupSerializer(
     }
 
     override suspend fun serializeBackup(backup: CloudBackup): Result<UnencryptedBackupData> {
-        TODO("Not yet implemented")
+        return runCatching {
+            UnencryptedBackupData(gson.toJson(backup))
+        }
     }
 
     override suspend fun deserializeBackup(backup: UnencryptedBackupData): Result<CloudBackup> {
-        TODO("Not yet implemented")
+        return runCatching {
+            gson.fromJson(backup.decryptedData)
+        }
     }
 }
