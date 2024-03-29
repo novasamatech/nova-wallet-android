@@ -1,24 +1,34 @@
 package io.novafoundation.nova.feature_cloud_backup_impl.data.serializer
 
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import io.novafoundation.nova.common.utils.ByteArrayHexAdapter
 import io.novafoundation.nova.common.utils.InformationSize
 import io.novafoundation.nova.common.utils.InformationSize.Companion.megabytes
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
-import io.novafoundation.nova.feature_cloud_backup_impl.data.UnencryptedBackupData
+import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedPrivateData
+import io.novafoundation.nova.feature_cloud_backup_impl.data.ReadyForStorageBackup
+import io.novafoundation.nova.feature_cloud_backup_impl.data.SerializedBackup
+import io.novafoundation.nova.feature_cloud_backup_impl.data.UnencryptedPrivateData
 
 interface CloudBackupSerializer {
 
     suspend fun neededSizeForBackup(): InformationSize
 
-    suspend fun serializeBackup(backup: CloudBackup): Result<UnencryptedBackupData>
+    suspend fun serializePrivateData(backup: CloudBackup): Result<SerializedBackup<UnencryptedPrivateData>>
 
-    suspend fun deserializeBackup(backup: UnencryptedBackupData): Result<CloudBackup>
+    suspend fun serializePublicData(backup: SerializedBackup<EncryptedPrivateData>): Result<ReadyForStorageBackup>
+
+    suspend fun deserializePublicData(backup: ReadyForStorageBackup): Result<SerializedBackup<EncryptedPrivateData>>
+
+    suspend fun deserializePrivateData(backup: SerializedBackup<UnencryptedPrivateData>): Result<CloudBackup>
 }
 
-internal class JsonCloudBackupSerializer(
-    private val gson: Gson,
-) : CloudBackupSerializer {
+internal class JsonCloudBackupSerializer() : CloudBackupSerializer {
+
+    private val gson = GsonBuilder()
+        .registerTypeHierarchyAdapter(ByteArray::class.java, ByteArrayHexAdapter())
+        .create()
 
     companion object {
 
@@ -29,15 +39,37 @@ internal class JsonCloudBackupSerializer(
         return neededSizeForBackup
     }
 
-    override suspend fun serializeBackup(backup: CloudBackup): Result<UnencryptedBackupData> {
+    override suspend fun serializePrivateData(backup: CloudBackup): Result<SerializedBackup<UnencryptedPrivateData>> {
         return runCatching {
-            UnencryptedBackupData(gson.toJson(backup))
+            val privateDataSerialized = gson.toJson(backup.privateData)
+
+            SerializedBackup(
+                publicData = backup.publicData,
+                privateData = UnencryptedPrivateData(privateDataSerialized)
+            )
         }
     }
 
-    override suspend fun deserializeBackup(backup: UnencryptedBackupData): Result<CloudBackup> {
+    override suspend fun serializePublicData(backup: SerializedBackup<EncryptedPrivateData>): Result<ReadyForStorageBackup> {
         return runCatching {
-            gson.fromJson(backup.decryptedData)
+            ReadyForStorageBackup(gson.toJson(backup))
+        }
+    }
+
+    override suspend fun deserializePublicData(backup: ReadyForStorageBackup): Result<SerializedBackup<EncryptedPrivateData>> {
+        return runCatching {
+            gson.fromJson(backup.value)
+        }
+    }
+
+    override suspend fun deserializePrivateData(backup: SerializedBackup<UnencryptedPrivateData>): Result<CloudBackup> {
+        return runCatching {
+            val privateData: CloudBackup.PrivateData = gson.fromJson(backup.privateData.unencryptedData)
+
+            CloudBackup(
+                publicData = backup.publicData,
+                privateData = privateData
+            )
         }
     }
 }
