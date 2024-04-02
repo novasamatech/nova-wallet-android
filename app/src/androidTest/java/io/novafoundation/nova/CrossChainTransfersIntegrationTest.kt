@@ -61,7 +61,7 @@ class CrossChainTransfersIntegrationTest : BaseIntegrationTest() {
     ) {
         runBlocking {
             val originChain = chainRegistry.findChain { it.name == from }!!
-            val asssetInOrigin = originChain.assets.find { it.symbol == what }!!
+            val asssetInOrigin = originChain.assets.find { it.symbol.toString() == what }!!
 
             val destinationChain = chainRegistry.findChain { it.name == to }!!
 
