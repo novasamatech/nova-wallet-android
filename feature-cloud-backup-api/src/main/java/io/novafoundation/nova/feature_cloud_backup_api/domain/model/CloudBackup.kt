@@ -9,6 +9,7 @@ class CloudBackup(
 )
 
 class CloudBackupWallet(
+    val id: Long,
     val substratePublicKey: ByteArray?,
     val substrateCryptoType: CryptoType?,
     val substrateAccountId: ByteArray?,
@@ -20,7 +21,6 @@ class CloudBackupWallet(
 ) {
 
     class ChainAccount(
-        val metaId: Long,
         val chainId: ChainId,
         val publicKey: ByteArray?,
         val accountId: ByteArray,
