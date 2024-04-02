@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -59,6 +59,6 @@ class CustomRebondFragment : BaseFragment<CustomRebondViewModel>() {
 
         viewModel.transferableFlow.observe(rebondTransferable::showAmount)
 
-        viewModel.showNextProgress.observe(rebondContinue::setProgress)
+        viewModel.showNextProgress.observe(rebondContinue::setProgressState)
     }
 }

@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -74,7 +74,7 @@ class ParachainStakingUnbondConfirmFragment : BaseFragment<ParachainStakingUnbon
         setupFeeLoading(viewModel, parachainStakingUnbondConfirmExtrinsicInfo.fee)
         observeHints(viewModel.hintsMixin, parachainStakingUnbondConfirmHints)
 
-        viewModel.showNextProgress.observe(parachainStakingUnbondConfirmConfirm::setProgress)
+        viewModel.showNextProgress.observe(parachainStakingUnbondConfirmConfirm::setProgressState)
 
         viewModel.currentAccountModelFlow.observe(parachainStakingUnbondConfirmExtrinsicInfo::setAccount)
         viewModel.walletFlow.observe(parachainStakingUnbondConfirmExtrinsicInfo::setWallet)

@@ -1,14 +1,20 @@
 package io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.finally
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 enum class CreateWalletState {
     SETUP_NAME,
@@ -17,8 +23,12 @@ enum class CreateWalletState {
 
 class StartCreateWalletViewModel(
     private val router: AccountRouter,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val startCreateWalletInteractor: StartCreateWalletInteractor
 ) : BaseViewModel() {
+
+    // Used to cancel the job when the user navigates back
+    private var cloudBackupValidationJob: Job? = null
 
     val nameInput = MutableStateFlow("")
 
@@ -33,6 +43,13 @@ class StartCreateWalletViewModel(
         }
     }.shareInBackground()
 
+    val titleText: Flow<String> = createWalletState.map {
+        when (it) {
+            CreateWalletState.SETUP_NAME -> resourceManager.getString(R.string.start_create_wallet_name_your_wallet)
+            CreateWalletState.CHOOSE_BACKUP_WAY -> resourceManager.getString(R.string.start_create_wallet_your_wallet_is_ready)
+        }
+    }.shareInBackground()
+
     val explanationText: Flow<String> = createWalletState.map {
         when (it) {
             CreateWalletState.SETUP_NAME -> resourceManager.getString(R.string.account_create_name_subtitle_v2_2_0)
@@ -40,10 +57,14 @@ class StartCreateWalletViewModel(
         }
     }.shareInBackground()
 
+    private val _cloudBackupSyncProgressFlow = MutableStateFlow(false)
+    val cloudBackupSyncProgressFlow: Flow<Boolean> = _cloudBackupSyncProgressFlow
+
     fun backClicked() {
         if (_createWalletState.value == CreateWalletState.SETUP_NAME) {
             router.back()
         } else {
+            cloudBackupValidationJob?.cancel()
             _createWalletState.value = CreateWalletState.SETUP_NAME
         }
     }
@@ -53,10 +74,27 @@ class StartCreateWalletViewModel(
     }
 
     fun cloudBackupClicked() {
-
+        cloudBackupValidationJob = launch {
+            runCatching {
+                _cloudBackupSyncProgressFlow.value = true
+                val validationResult = startCreateWalletInteractor.validateCanCreateBackup()
+                if (validationResult is PreCreateValidationStatus.Ok) {
+                    TODO("Open create cloud backup screen")
+                } else {
+                    val error = mapPreCreateValidationStatusToUi(resourceManager, validationResult, ::userHasExistingBackup)
+                    error?.let { showError(it) }
+                }
+            }.finally {
+                _cloudBackupSyncProgressFlow.value = false
+            }
+        }
     }
 
     fun manualBackupClicked() {
         router.openMnemonicScreen(null, AddAccountPayload.MetaAccount)
+    }
+
+    private fun userHasExistingBackup() {
+        TODO()
     }
 }

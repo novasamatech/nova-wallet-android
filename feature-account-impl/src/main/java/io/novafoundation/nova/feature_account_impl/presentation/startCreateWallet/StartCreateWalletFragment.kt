@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWa
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletManualBackupButton
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInput
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInputLayout
+import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletTitle
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletToolbar
 
 class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
@@ -60,13 +61,23 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
             startCreateWalletNameInputLayout.isEndIconVisible = it == CreateWalletState.SETUP_NAME
             startCreateWalletNameInput.isFocusable = it == CreateWalletState.SETUP_NAME
             startCreateWalletNameInput.isFocusableInTouchMode = it == CreateWalletState.SETUP_NAME
+
             startCreateWalletConfirmName.isVisible = it == CreateWalletState.SETUP_NAME
             startCreateWalletCloudBackupButton.isVisible = it == CreateWalletState.CHOOSE_BACKUP_WAY
             startCreateWalletManualBackupButton.isVisible = it == CreateWalletState.CHOOSE_BACKUP_WAY
         }
 
+        viewModel.titleText.observe {
+            startCreateWalletTitle.text = it
+        }
+
         viewModel.explanationText.observe {
             startCreateWalletExplanation.text = it
+        }
+
+        viewModel.cloudBackupSyncProgressFlow.observe {
+            startCreateWalletCloudBackupButton.showProgress(it)
+            startCreateWalletManualBackupButton.isEnabled = !it
         }
     }
 }

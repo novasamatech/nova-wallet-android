@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCo
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.di.StartCreateWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
@@ -137,7 +138,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
             ProxyFeatureApi::class,
             DbApi::class,
             VersionsFeatureApi::class,
-            Web3NamesApi::class
+            Web3NamesApi::class,
+            CloudBackupFeatureApi::class
         ]
     )
     interface AccountFeatureDependenciesComponent : AccountFeatureDependencies

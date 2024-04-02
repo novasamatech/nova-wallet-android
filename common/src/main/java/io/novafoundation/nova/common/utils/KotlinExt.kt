@@ -45,6 +45,12 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     )
 }
 
+inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
+    onSuccess { transform() }
+    onFailure { transform() }
+    return this
+}
+
 fun <K, V> List<Flow<Pair<K, V>>>.toMultiSubscription(expectedSize: Int): Flow<Map<K, V>> {
     return mergeIfMultiple()
         .runningFold(emptyMap<K, V>()) { accumulator, tokenIdWithBalance ->
