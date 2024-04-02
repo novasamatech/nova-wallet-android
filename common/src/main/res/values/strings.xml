@@ -1,5 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="common_not_available">Not available</string>
+    <string name="settings_push_notifications_only_available_with_google_services_error">Push notifications are only available for devices with Google services.</string>
+    <string name="settings_push_notifications_only_available_from_google_play_error">Push notifications are available only for the Nova Wallet version downloaded from Google Play.</string>
+
+    <string name="common_something_went_wrong_title">Something went wrong</string>
+    <string name="push_welcome_timeout_error_message">Please try again later by accessing notification settings from the Settings tab</string>
+
+    <plurals name="multiple_wallets_selection_min_button_text">
+        <item quantity="one">Select at least %d wallet</item>
+        <item quantity="other">Select at least %d wallets</item>
+    </plurals>
+
+    <string name="common_terms_and_conditions_formatting">Terms and Conditions</string>
+    <string name="common_privacy_policy_formatting">Privacy Policy</string>
+
+    <string name="push_template_message">Received +0.6068 KSM ($20.35) from Kusama staking</string>
+    <string name="push_template_app_name_and_time">Nova Wallet • now</string>
+
+    <string name="push_settings_no_selected_wallets">You won\'t receive notifications about Wallet Activities (Balances, Staking) because you haven\'t selected any wallet</string>
+
+    <string name="deep_linking_host" translatable="false">nova</string>
+    <string name="deep_linking_scheme" translatable="false">novawallet</string>
+
+    <string name="push_token_received_title">⬇️ Received %s</string>
+    <string name="push_token_received_no_account_name_title">⬇️ Received</string>
+    <string name="push_token_received_message">Received %s on %s</string>
+
+    <string name="push_token_sent_title">💸 Sent %s</string>
+    <string name="push_token_sent_no_account_name_title">💸 Sent</string>
+    <string name="push_token_sent_message">Sent %1$s to %2$s on %3$s</string>
+
+    <string name="push_staking_reward_single_account_title">⭐️ New reward</string>
+    <string name="push_staking_reward_many_accounts_title">⭐️ New reward %s</string>
+    <string name="push_staking_reward_message">Received %s from %s staking</string>
+
+    <string name="push_referendum_approved_title">✅ Referendum approved!</string>
+    <string name="push_referendum_approved_message">%1$s referendum #%2$s has ended and been approved 🎉</string>
+    <string name="push_referendum_rejected_title">❌ Referendum rejected!</string>
+    <string name="push_referendum_rejected_message">%1$s referendum #%2$s has ended and been rejected!</string>
+    <string name="push_referendum_status_changed_title">🗳️ Referendum status changed</string>
+    <string name="push_referendum_from_to_status_changed_message">%1$s Referendum #%2$s status changed from %3$s to %4$s</string>
+    <string name="push_referendum_to_status_changed_message">%1$s Referendum #%2$s status changed to %3$s</string>
+
+    <string name="referendum_status_in_queue">In queue</string>
+
+    <string name="push_new_update_title">A new update of Nova Wallet is available!</string>
+    <string name="push_new_update_message">Download Nova Wallet v%s to get all the new features!</string>
+    <string name="push_new_referendum_title">🗳️ New referendum</string>
+    <string name="push_new_referendum_message">%s Referendum #%s is now live!</string>
+
+    <plurals name="governance_select_tracks_min_tracks_error">
+        <item quantity="one">You need to select at least %d track</item>
+        <item quantity="other">You need to select at least %d tracks</item>
+    </plurals>
+
+    <string name="select_tracks_for">Select tracks for</string>
+    <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
+
+    <string name="default_notification_channel_id" translatable="false">default_notification_channel_id</string>
+    <string name="transactions_notification_channel_id" translatable="false">transactions_notification_channel_id</string>
+    <string name="governance_notification_channel_id" translatable="false">default_notifications_channel_id</string>
+    <string name="staking_notification_channel_id" translatable="false">staking_notification_channel_id</string>
+    <string name="default_notification_channel_name">Default Notification Channel</string>
+    <string name="transactions_notification_channel_name">Transactions Notification Channel</string>
+    <string name="governance_notification_channel_name">Governance Notification Channel</string>
+    <string name="staking_notification_channel_name">Staking Notifications Channel</string>
+
+    <string name="push_governance_settings_new_referendum">New Referendum</string>
+    <string name="push_governance_settings_referendum_update">Referendum Update</string>
+    <string name="push_governance_settings_delegate_votes">Delegate has voted</string>
+    <string name="common_clear">Clear</string>
+
+    <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
+    <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
+
+    <string name="push_settings_staking_rewards">Staking rewards</string>
+    <string name="push_settings_others">Others</string>
+
+    <string name="push_settings_received_tokens">Received tokens</string>
+    <string name="push_settings_sent_tokens">Sent tokens</string>
+    <string name="push_settings_balances">Balances</string>
+
+    <string name="push_settings_announcements">Nova announcements</string>
+
+    <string name="push_settings_enable">Enable notifications</string>
+    <string name="push_settings_wallets">Wallets</string>
+
+    <string name="common_retry_message">Something went wrong. Please try again</string>
+    <string name="common_push_notifications">Push notifications</string>
+
+    <string name="push_welcome_title">Don’t miss a thing!</string>
+    <string name="push_welcome_message">Get notified about Wallet operations, Governance updates, Staking activity and Security, so you’re always in the know</string>
+    <string name="push_welcome_enable_button">Enable push notifications</string>
+    <string name="push_welcome_cancel_button">Not now</string>
+    <string name="push_welcome_terms_and_conditions" formatted="false">By enabling push notifications, you agree to our %s and %s</string>
+
     <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>
 
     <string name="common_too_small_balance_title">Your balance is too small</string>

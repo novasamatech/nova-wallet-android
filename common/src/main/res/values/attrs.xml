@@ -297,4 +297,15 @@
         <attr name="android:inputType" />
     </declare-styleable>
 
+    <declare-styleable name="SettingsItemView">
+        <attr name="title" />
+        <attr name="settingValue" format="string" />
+        <attr name="icon" />
+    </declare-styleable>
+
+    <declare-styleable name="SettingsSwitcherView">
+        <attr name="title" />
+        <attr name="icon" />
+    </declare-styleable>
+
 </resources>

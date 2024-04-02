@@ -3,12 +3,11 @@ package io.novafoundation.nova.app.root.presentation
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.app.root.domain.RootInteractor
-import io.novafoundation.nova.app.root.presentation.deepLinks.CallbackEvent
-import io.novafoundation.nova.app.root.presentation.deepLinks.DeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -19,6 +18,9 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
@@ -44,7 +46,9 @@ class RootViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val deepLinkHandler: DeepLinkHandler,
     private val rootScope: RootScope,
-    private val compoundRequestBusHandler: CompoundRequestBusHandler
+    private val compoundRequestBusHandler: CompoundRequestBusHandler,
+    private val pushNotificationsInteractor: PushNotificationsInteractor,
+    private val externalServiceInitializer: ExternalServiceInitializer
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -78,6 +82,10 @@ class RootViewModel(
         }
 
         subscribeDeepLinkCallback()
+
+        syncPushSettingsIfNeeded()
+
+        externalServiceInitializer.initialize()
     }
 
     private fun obserBusEvents() {
@@ -129,6 +137,12 @@ class RootViewModel(
     private fun updatePhishingAddresses() {
         viewModelScope.launch {
             interactor.updatePhishingAddresses()
+        }
+    }
+
+    private fun syncPushSettingsIfNeeded() {
+        launch {
+            pushNotificationsInteractor.initialSyncSettings()
         }
     }
 

@@ -84,7 +84,7 @@
         android:id="@+id/selectDelegationTracks"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksFragment"
         android:label="SelectDelegationTracksFragment"
-        tools:layout="@layout/fragment_select_delegation_tracks">
+        tools:layout="@layout/fragment_select_tracks">
         <action
             android:id="@+id/action_selectDelegationTracks_to_newDelegationChooseAmountFragment"
             app:destination="@id/newDelegationChooseAmountFragment"
@@ -127,7 +127,7 @@
         tools:layout="@layout/fragment_new_delegation_confirm" />
 
     <fragment
-        tools:layout="@layout/fragment_select_delegation_tracks"
+        tools:layout="@layout/fragment_select_tracks"
         android:id="@+id/revokeDelegationChooseTracksFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksFragment"
         android:label="RevokeDelegationChooseTracksFragment" >

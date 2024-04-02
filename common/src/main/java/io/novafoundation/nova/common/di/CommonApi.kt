@@ -18,6 +18,8 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
+import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -136,6 +138,8 @@ interface CommonApi {
 
     fun descriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher
 
+    fun buildTypeProvider(): BuildTypeProvider
+
     val systemCallExecutor: SystemCallExecutor
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
@@ -159,4 +163,6 @@ interface CommonApi {
     val automaticInteractionGate: AutomaticInteractionGate
 
     val bannerVisibilityRepository: BannerVisibilityRepository
+
+    val provideActivityIntentProvider: ActivityIntentProvider
 }

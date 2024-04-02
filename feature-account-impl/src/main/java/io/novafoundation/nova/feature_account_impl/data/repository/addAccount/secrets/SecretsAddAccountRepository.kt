@@ -7,6 +7,8 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.Ba
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -17,16 +19,11 @@ abstract class SecretsAddAccountRepository<T>(
     private val accountDataSource: AccountDataSource,
     private val accountSecretsFactory: AccountSecretsFactory,
     private val chainRegistry: ChainRegistry,
-    private val proxySyncService: ProxySyncService
-) : BaseAddAccountRepository<T>(proxySyncService) {
+    proxySyncService: ProxySyncService,
+    metaAccountChangesEventBus: MetaAccountChangesEventBus
+) : BaseAddAccountRepository<T>(proxySyncService, metaAccountChangesEventBus) {
 
-    class Payload(
-        val derivationPaths: AdvancedEncryption.DerivationPaths,
-        val addAccountType: AddAccountType,
-        val accountSource: AccountSecretsFactory.AccountSource
-    )
-
-    protected final suspend fun pickCryptoType(addAccountType: AddAccountType, advancedEncryption: AdvancedEncryption): CryptoType {
+    protected suspend fun pickCryptoType(addAccountType: AddAccountType, advancedEncryption: AdvancedEncryption): CryptoType {
         val cryptoType = if (addAccountType is AddAccountType.ChainAccount && chainRegistry.getChain(addAccountType.chainId).isEthereumBased) {
             advancedEncryption.ethereumCryptoType
         } else {
@@ -38,11 +35,11 @@ abstract class SecretsAddAccountRepository<T>(
         return cryptoType
     }
 
-    protected final suspend fun addSecretsAccount(
+    protected suspend fun addSecretsAccount(
         derivationPaths: AdvancedEncryption.DerivationPaths,
         addAccountType: AddAccountType,
         accountSource: AccountSecretsFactory.AccountSource
-    ): Long = withContext(Dispatchers.Default) {
+    ): AddAccountResult = withContext(Dispatchers.Default) {
         when (addAccountType) {
             is AddAccountType.MetaAccount -> {
                 addMetaAccount(derivationPaths, accountSource, addAccountType)
@@ -58,14 +55,14 @@ abstract class SecretsAddAccountRepository<T>(
         derivationPaths: AdvancedEncryption.DerivationPaths,
         accountSource: AccountSecretsFactory.AccountSource,
         addAccountType: AddAccountType.MetaAccount
-    ): Long {
+    ): AddAccountResult {
         val (secrets, substrateCryptoType) = accountSecretsFactory.metaAccountSecrets(
             substrateDerivationPath = derivationPaths.substrate,
             ethereumDerivationPath = derivationPaths.ethereum,
             accountSource = accountSource
         )
 
-        return transformingInsertionErrors {
+        val metaId = transformingInsertionErrors {
             @Suppress("DEPRECATION")
             accountDataSource.insertMetaAccountFromSecrets(
                 name = addAccountType.name,
@@ -73,13 +70,15 @@ abstract class SecretsAddAccountRepository<T>(
                 secrets = secrets
             )
         }
+
+        return AddAccountResult.AccountAdded(metaId)
     }
 
     private suspend fun addChainAccount(
         addAccountType: AddAccountType.ChainAccount,
         derivationPaths: AdvancedEncryption.DerivationPaths,
         accountSource: AccountSecretsFactory.AccountSource
-    ): Long {
+    ): AddAccountResult {
         val chain = chainRegistry.getChain(addAccountType.chainId)
 
         val derivationPath = if (chain.isEthereumBased) derivationPaths.ethereum else derivationPaths.substrate
@@ -100,7 +99,7 @@ abstract class SecretsAddAccountRepository<T>(
             )
         }
 
-        return addAccountType.metaId
+        return AddAccountResult.AccountChanged(addAccountType.metaId)
     }
 
     private inline fun <R> transformingInsertionErrors(action: () -> R) = try {

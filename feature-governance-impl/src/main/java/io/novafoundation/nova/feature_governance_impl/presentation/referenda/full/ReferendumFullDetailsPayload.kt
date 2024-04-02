@@ -41,7 +41,10 @@ class ReferendumProposerPayload(val accountId: AccountId, val offChainName: Stri
 
 fun ReferendumCallPayload(referendumCall: ReferendumCall?): ReferendumCallPayload? {
     return when (referendumCall) {
-        is ReferendumCall.TreasuryRequest -> ReferendumCallPayload.TreasuryRequest(referendumCall.amount, referendumCall.beneficiary)
+        is ReferendumCall.TreasuryRequest -> ReferendumCallPayload.TreasuryRequest(
+            referendumCall.amount,
+            referendumCall.beneficiary
+        )
         null -> null
     }
 }

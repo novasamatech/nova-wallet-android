@@ -127,4 +127,6 @@ interface AccountRepository {
     suspend fun removeDeactivatedMetaAccounts()
 
     suspend fun getActiveMetaAccounts(): List<MetaAccount>
+
+    suspend fun getActiveMetaAccountsQuantity(): Int
 }

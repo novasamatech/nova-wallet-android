@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/push_settings_graph"
+    app:startDestination="@id/pushSettingsFragment">
+
+    <fragment
+        android:id="@+id/pushSettingsFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsFragment"
+        android:label="PushSettingsFragment"
+        tools:layout="@layout/fragment_push_settings">
+
+        <action
+            android:id="@+id/action_pushSettings_to_governanceSettings"
+            app:destination="@id/pushGovernanceFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_pushSettings_to_stakingSettings"
+            app:destination="@id/pushStakingSettings"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/pushGovernanceFragment"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsFragment"
+        android:label="PushGovernanceSettingsFragment"
+        tools:layout="@layout/fragment_push_governance_settings" />
+
+    <fragment
+        android:id="@+id/pushStakingSettings"
+        android:name="io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsFragment"
+        android:label="PushStakingSettingsFragment"
+        tools:layout="@layout/fragment_push_staking_settings" />
+
+</navigation>

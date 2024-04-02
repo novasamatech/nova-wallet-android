@@ -40,7 +40,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-
         removeSplashBackground()
 
         viewModel.restoredAfterConfigChange()
