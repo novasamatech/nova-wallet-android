@@ -12,7 +12,6 @@ import kotlin.math.roundToInt
 
 private const val DEFAULT_COLUMNS = 3
 
-
 class MnemonicContainerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
