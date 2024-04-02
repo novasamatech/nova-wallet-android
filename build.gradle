@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.9.5'
-        versionCode = 123
+        versionName = '7.10.0'
+        versionCode = 127
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -202,6 +202,7 @@ buildscript {
         firebaseBomDep = "com.google.firebase:firebase-bom:$firebaseBomVersion"
         firestoreDep = "com.google.firebase:firebase-firestore"
         firebaseCloudMessagingDep = "com.google.firebase:firebase-messaging"
+        firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     }
