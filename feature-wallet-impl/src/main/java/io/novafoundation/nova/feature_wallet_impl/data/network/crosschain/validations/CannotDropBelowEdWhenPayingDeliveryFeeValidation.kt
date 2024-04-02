@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.deliveryFeePart
 import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novasama.substrate_sdk_android.hash.isPositive
 
-class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
+class CannotDropBelowEdWhenPayingDeliveryFeeValidation(
     private val assetSourceRegistry: AssetSourceRegistry
 ) : AssetTransfersValidation {
 
@@ -35,17 +35,17 @@ class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
         val crossChainFeePlanks = value.crossChainFee?.networkFee?.amountByRequestedAccount.orZero()
 
         val sendingAmount = value.transfer.amountInPlanks + crossChainFeePlanks
-        val requiredAmountBeforePayingDeliveryFee = sendingAmount + networkFeePlanks + existentialDeposit
+        val requiredAmountWhenPayingDeliveryFee = sendingAmount + networkFeePlanks + deliveryFeePart + existentialDeposit
 
         val balanceCountedTowardsEd = value.originUsedAsset.balanceCountedTowardsEDInPlanks
 
         return when {
             !paysDeliveryFee -> valid()
 
-            requiredAmountBeforePayingDeliveryFee <= balanceCountedTowardsEd -> valid()
+            requiredAmountWhenPayingDeliveryFee <= balanceCountedTowardsEd -> valid()
 
             else -> {
-                val availableBalance = (balanceCountedTowardsEd - networkFeePlanks - crossChainFeePlanks - existentialDeposit).atLeastZero()
+                val availableBalance = (balanceCountedTowardsEd - networkFeePlanks - deliveryFeePart - crossChainFeePlanks - existentialDeposit).atLeastZero()
 
                 validationError(
                     ToStayAboveEdBeforePayingDeliveryFees(
@@ -60,4 +60,4 @@ class CannotDropBelowEdBeforePayingDeliveryFeeValidation(
 
 fun AssetTransfersValidationSystemBuilder.cannotDropBelowEdBeforePayingDeliveryFee(
     assetSourceRegistry: AssetSourceRegistry
-) = validate(CannotDropBelowEdBeforePayingDeliveryFeeValidation(assetSourceRegistry))
+) = validate(CannotDropBelowEdWhenPayingDeliveryFeeValidation(assetSourceRegistry))
