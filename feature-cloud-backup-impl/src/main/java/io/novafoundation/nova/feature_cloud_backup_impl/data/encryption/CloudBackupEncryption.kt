@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_cloud_backup_impl.data.encryption
 
 import io.novafoundation.nova.common.utils.dropBytes
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
-import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedBackupData
-import io.novafoundation.nova.feature_cloud_backup_impl.data.UnencryptedBackupData
+import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedPrivateData
+import io.novafoundation.nova.feature_cloud_backup_impl.data.UnencryptedPrivateData
 import io.novasama.substrate_sdk_android.encrypt.json.copyBytes
 import io.novasama.substrate_sdk_android.encrypt.xsalsa20poly1305.SecretBox
 import org.bouncycastle.crypto.generators.SCrypt
@@ -12,12 +12,12 @@ import java.util.Random
 
 interface CloudBackupEncryption {
 
-    suspend fun encryptBackup(data: UnencryptedBackupData, password: String): Result<EncryptedBackupData>
+    suspend fun encryptBackup(data: UnencryptedPrivateData, password: String): Result<EncryptedPrivateData>
 
     /**
      * @throws InvalidBackupPasswordError
      */
-    suspend fun decryptBackup(data: EncryptedBackupData, password: String): Result<UnencryptedBackupData>
+    suspend fun decryptBackup(data: EncryptedPrivateData, password: String): Result<UnencryptedPrivateData>
 }
 
 class ScryptCloudBackupEncryption : CloudBackupEncryption {
@@ -34,11 +34,11 @@ class ScryptCloudBackupEncryption : CloudBackupEncryption {
         private const val r = 8
     }
 
-    override suspend fun encryptBackup(data: UnencryptedBackupData, password: String): Result<EncryptedBackupData> {
+    override suspend fun encryptBackup(data: UnencryptedPrivateData, password: String): Result<EncryptedPrivateData> {
         return runCatching {
             val salt = generateSalt()
             val encryptionKey = generateScryptKey(password.encodeToByteArray(), salt)
-            val plaintext = data.decryptedData.encodeToByteArray()
+            val plaintext = data.unencryptedData.encodeToByteArray()
 
             val secretBox = SecretBox(encryptionKey)
             val nonce = secretBox.nonce(plaintext)
@@ -46,11 +46,11 @@ class ScryptCloudBackupEncryption : CloudBackupEncryption {
             val secret = secretBox.seal(nonce, plaintext)
             val encryptedData = salt + nonce + secret
 
-            EncryptedBackupData(encryptedData)
+            EncryptedPrivateData(encryptedData)
         }
     }
 
-    override suspend fun decryptBackup(data: EncryptedBackupData, password: String): Result<UnencryptedBackupData> {
+    override suspend fun decryptBackup(data: EncryptedPrivateData, password: String): Result<UnencryptedPrivateData> {
         return runCatching {
             val salt = data.encryptedData.copyBytes(from = 0, size = SALT_SIZE)
             val nonce = data.encryptedData.copyBytes(from = SALT_SIZE, size = NONCE_SIZE)
@@ -64,7 +64,7 @@ class ScryptCloudBackupEncryption : CloudBackupEncryption {
                 throw InvalidBackupPasswordError()
             }
 
-            UnencryptedBackupData(secret.decodeToString())
+            UnencryptedPrivateData(secret.decodeToString())
         }
     }
 
