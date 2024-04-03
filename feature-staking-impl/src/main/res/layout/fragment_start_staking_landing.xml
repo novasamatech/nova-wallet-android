@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="-1dp"
-        android:background="@drawable/bg_start_staking_button_container"
+        android:background="@drawable/bg_bottom_button_container"
         android:orientation="vertical"
         android:paddingHorizontal="17dp"
         android:paddingTop="16dp"

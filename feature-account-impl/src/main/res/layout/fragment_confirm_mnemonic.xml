@@ -59,7 +59,7 @@
                 android:overScrollMode="never"
                 android:paddingTop="8dp"
                 tools:layout_height="144dp"
-                tools:listitem="@layout/item_confirm_mnemonic_word" />
+                tools:listitem="@layout/item_backup_mnemonic_word" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
                 android:id="@+id/confirmMnemonicSource"
@@ -73,7 +73,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar"
                 app:showBackground="false"
-                tools:listitem="@layout/item_confirm_mnemonic_word" />
+                tools:listitem="@layout/item_backup_mnemonic_word" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

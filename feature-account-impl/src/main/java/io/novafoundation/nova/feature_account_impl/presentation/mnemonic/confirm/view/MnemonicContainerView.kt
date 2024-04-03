@@ -2,16 +2,15 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confir
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexWrap
-import com.google.android.flexbox.FlexboxLayoutManager
-import com.google.android.flexbox.JustifyContent
+import io.novafoundation.nova.common.utils.GridSpacingItemDecoration
 import io.novafoundation.nova.common.utils.useAttributes
-import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_impl.R
+import kotlinx.android.synthetic.main.view_mnemonic_card_view.view.mnemonicCardPhrase
+import kotlin.math.roundToInt
 
-private const val SHOW_BACKGROUND_DEFAULT = true
+private const val DEFAULT_COLUMNS = 3
 
 class MnemonicContainerView @JvmOverloads constructor(
     context: Context,
@@ -19,26 +18,25 @@ class MnemonicContainerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
+    private val _layoutManager = GridLayoutManager(context, DEFAULT_COLUMNS)
+    private var itemDecoration: ItemDecoration? = null
+
     init {
-        layoutManager = FlexboxLayoutManager(context, FlexDirection.ROW, FlexWrap.WRAP).apply {
-            justifyContent = JustifyContent.CENTER
-        }
+        layoutManager = _layoutManager
 
         attrs?.let(::applyAttrs)
     }
 
-    private fun setShowBackground(show: Boolean) {
-        val background = if (show) {
-            context.getRoundedCornerDrawable(fillColorRes = R.color.input_background)
-        } else {
-            null
-        }
-
-        setBackground(background)
+    fun setItemPadding(padding: Int) {
+        itemDecoration?.let { mnemonicCardPhrase.removeItemDecoration(it) }
+        itemDecoration = GridSpacingItemDecoration(_layoutManager, padding)
+        mnemonicCardPhrase.addItemDecoration(itemDecoration!!)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.MnemonicContainerView) {
-        val showBackground = it.getBoolean(R.styleable.MnemonicContainerView_showBackground, SHOW_BACKGROUND_DEFAULT)
-        setShowBackground(showBackground)
+        if (it.hasValue(R.styleable.MnemonicContainerView_paddingBetweenItems)) {
+            val padding = it.getDimension(R.styleable.MnemonicContainerView_paddingBetweenItems, 0f).roundToInt()
+            setItemPadding(padding)
+        }
     }
 }
