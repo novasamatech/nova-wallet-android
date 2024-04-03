@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_got_it">Got it</string>
+
+    <string name="create_cloud_backup_password_alert_title">Remember Backup Password</string>
+    <string name="create_cloud_backup_password_alert_subtitle">In the future, without backup password it is not possible to restore your wallets from Cloud Backup.\n%s</string>
+    <string name="create_cloud_backup_password_alert_subtitle_highlighted">This password cannot be recovered.</string>
+    <string name="create_cloud_backup_password_title">Create your backup password</string>
+    <string name="create_cloud_backup_password_subtitle">Please enter a password to access your backup anytime. The password can’t be recovered, be sure to remember it!</string>
+    <string name="create_cloud_backup_password_input_hint">Backup password</string>
+    <string name="create_cloud_backup_password_input_confirm_hint">Confirm password</string>
+    <string name="create_cloud_backup_password_requirement_min_chars">Min. 8 characters</string>
+    <string name="create_cloud_backup_password_requirement_numbers">Numbers</string>
+    <string name="create_cloud_backup_password_requirement_letters">Letters</string>
+    <string name="create_cloud_backup_password_requirement_passwords_match">Passwords match</string>
+    <string name="create_cloud_backup_password_requirement_enter_password">Enter password</string>
+
     <string name="common_connection_error_title">Connection Failed</string>
     <string name="common_connection_error_message">Please, check your connection or try again later</string>
 

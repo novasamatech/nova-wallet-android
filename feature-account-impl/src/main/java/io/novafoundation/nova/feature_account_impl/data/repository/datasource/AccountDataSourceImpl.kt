@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
@@ -32,8 +31,6 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
-import io.novasama.substrate_sdk_android.extensions.toAccountId
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +55,7 @@ class AccountDataSourceImpl(
     private val metaAccountDao: MetaAccountDao,
     private val chainRegistry: ChainRegistry,
     private val secretStoreV2: SecretStoreV2,
+    private val secretsMetaAccountLocalFactory: SecretsMetaAccountLocalFactory,
     secretStoreV1: SecretStoreV1,
     accountDataMigration: AccountDataMigration,
 ) : AccountDataSource, SecretStoreV1 by secretStoreV1 {
@@ -234,22 +232,7 @@ class AccountDataSourceImpl(
         substrateCryptoType: CryptoType,
         secrets: EncodableStruct<MetaAccountSecrets>
     ) = withContext(Dispatchers.Default) {
-        val substratePublicKey = secrets[MetaAccountSecrets.SubstrateKeypair][KeyPairSchema.PublicKey]
-        val ethereumPublicKey = secrets[MetaAccountSecrets.EthereumKeypair]?.get(KeyPairSchema.PublicKey)
-
-        val metaAccountLocal = MetaAccountLocal(
-            substratePublicKey = substratePublicKey,
-            substrateCryptoType = substrateCryptoType,
-            substrateAccountId = substratePublicKey.substrateAccountId(),
-            ethereumPublicKey = ethereumPublicKey,
-            ethereumAddress = ethereumPublicKey?.asEthereumPublicKey()?.toAccountId()?.value,
-            name = name,
-            parentMetaId = null,
-            isSelected = false,
-            position = metaAccountDao.nextAccountPosition(),
-            type = MetaAccountLocal.Type.SECRETS,
-            status = MetaAccountLocal.Status.ACTIVE
-        )
+        val metaAccountLocal = secretsMetaAccountLocalFactory.create(name, substrateCryptoType, secrets, metaAccountDao.nextAccountPosition())
 
         val metaId = metaAccountDao.insertMetaAccount(metaAccountLocal)
         secretStoreV2.putMetaAccountSecrets(metaId, secrets)

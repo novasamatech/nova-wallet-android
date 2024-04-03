@@ -46,6 +46,7 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.parallaxCard.BackingParallaxCardLruCache
@@ -138,6 +139,8 @@ interface CommonApi {
     fun bakingParallaxCardCache(): BackingParallaxCardLruCache
 
     fun descriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher
+
+    fun provideActionBottomSheetLauncher(): ActionBottomSheetLauncher
 
     fun progressDialogMixin(): ProgressDialogMixin
 

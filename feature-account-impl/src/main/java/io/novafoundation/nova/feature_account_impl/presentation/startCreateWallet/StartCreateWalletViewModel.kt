@@ -75,11 +75,12 @@ class StartCreateWalletViewModel(
 
     fun cloudBackupClicked() {
         cloudBackupValidationJob = launch {
+            val walletName = nameInput.value
             runCatching {
                 _cloudBackupSyncProgressFlow.value = true
                 val validationResult = startCreateWalletInteractor.validateCanCreateBackup()
                 if (validationResult is PreCreateValidationStatus.Ok) {
-                    TODO("Open create cloud backup screen")
+                    router.openCreateCloudBackupPassword(walletName)
                 } else {
                     val error = mapPreCreateValidationStatusToUi(resourceManager, validationResult, ::userHasExistingBackup)
                     error?.let { showError(it) }
