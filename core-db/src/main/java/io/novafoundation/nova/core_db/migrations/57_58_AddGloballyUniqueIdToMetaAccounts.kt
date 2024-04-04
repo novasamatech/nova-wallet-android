@@ -8,7 +8,7 @@ import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 val AddGloballyUniqueIdToMetaAccounts_57_58 = object : Migration(57, 58) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE meta_accounts ADD COLUMN globallyUniqueId TEXT NOT NULL")
+        database.execSQL("ALTER TABLE meta_accounts ADD COLUMN globallyUniqueId TEXT NOT NULL DEFAULT ''")
 
         val ids = database.getAllMetaAccountIds()
 
