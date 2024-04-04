@@ -55,6 +55,7 @@ jobs:
         id: extract_version
         run: |
           VERSION=${{ github.head_ref }}
+          VERSION=${VERSION/hotfix/rc} # Replace "hotfix" with "rc"
           echo "::set-output name=version::${VERSION#*rc/}"
 
       - uses: tibdex/github-app-token@v1
