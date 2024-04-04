@@ -24,8 +24,8 @@ abstract class BaseAddAccountRepository<T>(
 
     private fun AddAccountResult.toEvent(): Event {
         return when (this) {
-            is AddAccountResult.AccountAdded -> Event.AccountAdded(metaId)
-            is AddAccountResult.AccountChanged -> Event.AccountChanged(metaId)
+            is AddAccountResult.AccountAdded -> Event.AccountAdded(metaIds)
+            is AddAccountResult.AccountChanged -> Event.AccountChanged(metaIds)
         }
     }
 }

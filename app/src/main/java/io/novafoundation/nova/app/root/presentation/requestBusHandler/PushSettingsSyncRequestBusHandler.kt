@@ -17,7 +17,7 @@ class PushSettingsSyncRequestBusHandler(
         metaAccountChangesEventBus.observeEvent()
             .onEach { event ->
                 when (event) {
-                    is Event.AccountChanged -> pushNotificationsInteractor.onMetaAccountChanged(event.metaId)
+                    is Event.AccountChanged -> pushNotificationsInteractor.onMetaAccountChanged(event.metaIds)
                     is Event.AccountRemoved -> pushNotificationsInteractor.onMetaAccountRemoved(event.metaId)
                     else -> {}
                 }

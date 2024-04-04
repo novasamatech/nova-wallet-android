@@ -32,6 +32,13 @@ fun handleCloudBackupConnectionError(resourceManager: ResourceManager): TitleAnd
     )
 }
 
+fun handleCloudBackupNotFound(resourceManager: ResourceManager): TitleAndMessage {
+    return TitleAndMessage(
+        resourceManager.getString(R.string.cloud_backup_error_not_found_title),
+        resourceManager.getString(R.string.cloud_backup_error_not_found_message)
+    )
+}
+
 fun handleCloudBackupUnknownError(resourceManager: ResourceManager): TitleAndMessage {
     return TitleAndMessage(
         resourceManager.getString(R.string.cloud_backup_error_google_service_other_title),

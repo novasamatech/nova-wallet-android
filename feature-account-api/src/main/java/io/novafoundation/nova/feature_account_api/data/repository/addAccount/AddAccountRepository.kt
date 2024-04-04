@@ -7,9 +7,13 @@ interface AddAccountRepository<T> {
 
 sealed interface AddAccountResult {
 
-    val metaId: Long
+    val metaIds: List<Long>
 
-    class AccountAdded(override val metaId: Long) : AddAccountResult
+    class AccountAdded(override val metaIds: List<Long>) : AddAccountResult {
+        constructor(metaId: Long) : this(listOf(metaId))
+    }
 
-    class AccountChanged(override val metaId: Long) : AddAccountResult
+    class AccountChanged(override val metaIds: List<Long>) : AddAccountResult {
+        constructor(metaId: Long) : this(listOf(metaId))
+    }
 }

@@ -6,6 +6,8 @@ interface CloudBackupServiceUnavailable
 
 interface CloudBackupExistingBackupFound
 
+interface CloudBackupNotFound
+
 interface CloudBackupNotEnoughSpace
 
 interface CloudBackupConnectionError

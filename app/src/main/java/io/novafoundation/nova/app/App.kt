@@ -51,7 +51,7 @@ open class App : Application(), FeatureContainer {
 
         appComponent.inject(this)
 
-        initializeWaleltConnect()
+        initializeWalletConnect()
     }
 
     override fun <T> getFeature(key: Class<*>): T {
@@ -66,7 +66,7 @@ open class App : Application(), FeatureContainer {
         return appComponent
     }
 
-    private fun initializeWaleltConnect() {
+    private fun initializeWalletConnect() {
         val projectId = BuildConfig.WALLET_CONNECT_PROJECT_ID
         val relayUrl = "relay.walletconnect.com"
         val serverUrl = "wss://$relayUrl?projectId=$projectId"

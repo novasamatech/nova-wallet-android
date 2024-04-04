@@ -65,7 +65,7 @@ class RealCreateCloudBackupPasswordInteractor(
 
         return backupResult.onSuccess {
             val addAccountResult = localAddMetaAccountRepository.addAccount(LocalAddMetaAccountRepository.Payload(metaAccountLocal))
-            accountRepository.selectMetaAccount(addAccountResult.metaId)
+            accountRepository.selectMetaAccount(addAccountResult.metaIds.first())
         }
     }
 }
