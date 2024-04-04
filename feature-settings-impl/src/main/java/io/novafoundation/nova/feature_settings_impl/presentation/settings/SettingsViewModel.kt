@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class SettingsViewModel(
     private val languageUseCase: LanguageUseCase,
@@ -246,6 +247,8 @@ class SettingsViewModel(
 
     // TODO remove test code when implementing cloud backup settings screen
     fun cloudBackupClicked() = launch {
+        val walletId = UUID.randomUUID().toString()
+
         val sampleRequest = WriteBackupRequest(
             password = "test",
             cloudBackup = CloudBackup(
@@ -253,7 +256,7 @@ class SettingsViewModel(
                     modifiedAt = 0,
                     wallets = listOf(
                         CloudBackup.WalletPublicInfo(
-                            walletId = 0,
+                            walletId = walletId,
                             substratePublicKey = emptySubstrateAccountId(),
                             substrateCryptoType = CryptoType.SR25519,
                             name = "Test",
@@ -275,7 +278,7 @@ class SettingsViewModel(
                 privateData = CloudBackup.PrivateData(
                     wallets = listOf(
                         CloudBackup.WalletPrivateInfo(
-                            walletId = 0,
+                            walletId = walletId,
                             entropy = ByteArray(32),
                             substrate = CloudBackup.WalletPrivateInfo.SubstrateSecrets(
                                 seed = ByteArray(32),

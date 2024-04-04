@@ -20,7 +20,15 @@ class MetaAccountOrdering(
 )
 
 interface LightMetaAccount {
+
     val id: Long
+
+    /**
+     * In contrast to [id] which should only be unique **locally**, [globallyUniqueId] should be unique **globally**,
+     * meaning it should be unique across all application instances. This is useful to compare meta accounts from different application instances
+     */
+    val globallyUniqueId: String
+
     val substratePublicKey: ByteArray?
     val substrateCryptoType: CryptoType?
     val substrateAccountId: ByteArray?
@@ -42,6 +50,7 @@ interface LightMetaAccount {
 
 fun LightMetaAccount(
     id: Long,
+    globallyUniqueId: String,
     substratePublicKey: ByteArray?,
     substrateCryptoType: CryptoType?,
     substrateAccountId: ByteArray?,
@@ -50,9 +59,10 @@ fun LightMetaAccount(
     isSelected: Boolean,
     name: String,
     type: LightMetaAccount.Type,
-    status: LightMetaAccount.Status
+    status: LightMetaAccount.Status,
 ) = object : LightMetaAccount {
     override val id: Long = id
+    override val globallyUniqueId: String = globallyUniqueId
     override val substratePublicKey: ByteArray? = substratePublicKey
     override val substrateCryptoType: CryptoType? = substrateCryptoType
     override val substrateAccountId: ByteArray? = substrateAccountId
@@ -62,10 +72,12 @@ fun LightMetaAccount(
     override val name: String = name
     override val type: LightMetaAccount.Type = type
     override val status: LightMetaAccount.Status = status
+
 }
 
 class MetaAccount(
     override val id: Long,
+    override val globallyUniqueId: String,
     val chainAccounts: Map<ChainId, ChainAccount>,
     val proxy: ProxyAccount?,
     override val substratePublicKey: ByteArray?,
@@ -76,7 +88,7 @@ class MetaAccount(
     override val isSelected: Boolean,
     override val name: String,
     override val type: LightMetaAccount.Type,
-    override val status: LightMetaAccount.Status
+    override val status: LightMetaAccount.Status,
 ) : LightMetaAccount {
 
     class ChainAccount(
