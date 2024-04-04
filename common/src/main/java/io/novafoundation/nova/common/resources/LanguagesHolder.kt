@@ -14,8 +14,9 @@ class LanguagesHolder {
         private val PORTUGUESE = Language("pt")
         private val RUSSIAN = Language("ru")
         private val SPANISH = Language("es")
+        private val TURKISH = Language("tr")
 
-        private val availableLanguages = mutableListOf(ENGLISH, CHINESE, ITALIAN, PORTUGUESE, RUSSIAN, SPANISH)
+        private val availableLanguages = mutableListOf(ENGLISH, CHINESE, ITALIAN, PORTUGUESE, RUSSIAN, SPANISH, TURKISH)
     }
 
     fun getDefaultLanguage(): Language {

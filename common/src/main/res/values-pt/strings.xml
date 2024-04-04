@@ -230,6 +230,7 @@
     <string name="common_chain">Cadeia</string>
     <string name="common_change">Alterar</string>
     <string name="common_choose_network">Escolher rede</string>
+    <string name="common_clear">Limpar</string>
     <string name="common_close">Fechar</string>
     <string name="common_close_confirmation_message">Tem certeza de que deseja fechar esta tela?\nSuas alterações não serão aplicadas.</string>
     <string name="common_completed">Concluído</string>
@@ -313,6 +314,7 @@
     <string name="common_no_changes">Sem alterações</string>
     <string name="common_no_screenshot_message_v2_2_0">Vamos mostrar sua mnemônica. Certifique-se de que ninguém pode ver sua tela e não tire capturas de tela — elas podem ser coletadas por malwares de terceiros</string>
     <string name="common_none">Nenhum</string>
+    <string name="common_not_available">Não disponível</string>
     <string name="common_not_enough_funds_message">Desculpe, você não tem fundos suficientes para pagar a taxa de rede.</string>
     <string name="common_not_enough_funds_title">Saldo insuficiente</string>
     <string name="common_off">Desligado</string>
@@ -332,9 +334,11 @@
     <string name="common_permission_permissions_needed_message">As permissões solicitadas são necessárias para usar esta tela.</string>
     <string name="common_permission_permissions_needed_title">Permissões necessárias</string>
     <string name="common_price">Preço</string>
+    <string name="common_privacy_policy_formatting">Política de Privacidade</string>
     <string name="common_proceed">Prosseguir</string>
     <string name="common_proxy_deposit">Depósito de proxy</string>
     <string name="common_proxy_rewoke_access">Revogar acesso</string>
+    <string name="common_push_notifications">Notificações push</string>
     <string name="common_read_more">Ler mais</string>
     <string name="common_recommended">Recomendado</string>
     <string name="common_refresh_fee">Atualizar taxa</string>
@@ -343,6 +347,7 @@
     <string name="common_required">Obrigatório</string>
     <string name="common_reset">Redefinir</string>
     <string name="common_retry">Tentar novamente</string>
+    <string name="common_retry_message">Algo deu errado. Por favor, tente novamente</string>
     <string name="common_revoke">Revogar</string>
     <string name="common_save">Salvar</string>
     <string name="common_scan_qr_code">Escaneie o código QR</string>
@@ -358,9 +363,11 @@
     <string name="common_skip_process">Pular processo</string>
     <string name="common_some_tx_failed_message">Ocorreu um erro ao enviar algumas transações. Deseja tentar novamente?</string>
     <string name="common_some_tx_failed_title">Falha ao enviar algumas transações</string>
+    <string name="common_something_went_wrong_title">Algo deu errado</string>
     <string name="common_sort_by">Ordenar por</string>
     <string name="common_status">Status</string>
     <string name="common_substrate_address">Endereço Substrate</string>
+    <string name="common_terms_and_conditions_formatting">Termos e Condições</string>
     <string name="common_time_left">Tempo restante</string>
     <string name="common_title">Título</string>
     <string name="common_to_settings">Abrir Configurações</string>
@@ -485,7 +492,7 @@
     <string name="dapp_sign_error_unsupported_chain">Cadeia não suportada com hash de gênese %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Certifique-se de que a operação está correta</string>
     <string name="dapp_sign_extrinsic_failed">Falha ao assinar a operação solicitada</string>
-
+    
     <string name="deep_linking_chain_id_is_not_found">Cadeia não encontrada</string>
     <string name="deep_linking_domain_is_not_matched">Domínio do link %s não é permitido</string>
     <string name="deep_linking_governance_type_is_not_specified">Tipo de governança não especificado</string>
@@ -494,6 +501,7 @@
     <string name="deep_linking_invalid_derivation_path">Caminho de derivação inválido</string>
     <string name="deep_linking_invalid_mnemonic">Mnemônico não é válido</string>
     <string name="deep_linking_url_is_invalid">URL inválido</string>
+    <string name="default_notification_channel_name">Canal de Notificação Padrão</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Pesquisar por endereço ou nome</string>
     <string name="delegate_search_placeholder_empty">O formato do endereço é inválido. Certifique-se de que o endereço pertence à rede correta</string>
@@ -562,6 +570,11 @@
     <string name="fragment_swap_main_settings_pay_title">Você paga</string>
     <string name="fragment_swap_main_settings_receive_title">Você recebe</string>
     <string name="fragment_swap_main_settings_select_token">Selecione um token</string>
+    <string name="governance_notification_channel_name">Canal de Notificação da Governança</string>
+    <plurals name="governance_select_tracks_min_tracks_error">
+        <item quantity="one">Você precisa selecionar pelo menos %d trilha</item>
+        <item quantity="other">Você precisa selecionar pelo menos %d trilhas</item>
+    </plurals>
     <string name="governance_unlock">Desbloquear</string>
     <string name="history_v1.9.0">Histórico</string>
     <string name="identity_email_title">Email</string>
@@ -611,9 +624,14 @@
     <string name="ledher_import_select_address_title">Selecione a conta para adicionar à carteira</string>
     <string name="make_payout_transaction_sent">Transação de pagamento enviada</string>
     <string name="manage_assets_add_token">Adicionar token</string>
-
+    
     <string name="mnemonic_error_try_another_one">Por favor, tente outra.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">Frase secreta mnemônica inválida, por favor verifique mais uma vez a ordem das palavras</string>
+    <string name="multiple_wallets_selection_max_message">Você não pode selecionar mais do que %d carteiras</string>
+    <plurals name="multiple_wallets_selection_min_button_text">
+        <item quantity="one">Selecione pelo menos %d carteira</item>
+        <item quantity="other">Selecione pelo menos %d carteiras</item>
+    </plurals>
     <string name="network_fee">Taxa da rede</string>
     <string name="network_info_address">Endereço do nó</string>
     <string name="network_info_title">Informação do Nó</string>
@@ -690,6 +708,47 @@
     <string name="proxy_signing_warning_message">A transação será iniciada por %s como uma conta delegada. A taxa de rede será paga pela conta delegada.</string>
     <string name="proxy_signing_warning_title">Esta é uma conta delegada (Proxied)</string>
     <string name="proxy_wallet_type">%s proxy</string>
+    <string name="push_governance_settings_delegate_votes">Voto do delegado realizado</string>
+    <string name="push_governance_settings_new_referendum">Novo Referendo</string>
+    <string name="push_governance_settings_referendum_update">Atualização de Referendo</string>
+    <string name="push_new_referendum_message" formatted="false">%s Referendo #%s está agora ativo!</string>
+    <string name="push_new_referendum_title">🏛️ Novo referendo</string>
+    <string name="push_new_update_message">Baixe Nova Wallet v%s para obter todas as novas funcionalidades!</string>
+    <string name="push_new_update_title">Uma nova atualização da Nova Wallet está disponível!</string>
+    <string name="push_referendum_approved_message" formatted="false">%s referendo #%s terminou e foi aprovado 	ud83c	df89</string>
+    <string name="push_referendum_approved_title">✅ Referendo aprovado!</string>
+    <string name="push_referendum_from_to_status_changed_message" formatted="false">%s Referendo #%s alterou o status de %s para %s</string>
+    <string name="push_referendum_rejected_message" formatted="false">%s referendo #%s terminou e foi rejeitado!</string>
+    <string name="push_referendum_rejected_title">❌ Referendo rejeitado!</string>
+    <string name="push_referendum_status_changed_title">🏛️ Status do referendo alterado</string>
+    <string name="push_referendum_to_status_changed_message" formatted="false">%s Referendo #%s alterou o status para %s</string>
+    <string name="push_settings_announcements">Anúncios Nova</string>
+    <string name="push_settings_balances">Saldos</string>
+    <string name="push_settings_enable">Ativar notificações</string>
+    <string name="push_settings_no_selected_wallets">Você não receberá notificações sobre Atividades da Carteira (Saldos, Staking) porque você não selecionou nenhuma carteira</string>
+    <string name="push_settings_others">Outros</string>
+    <string name="push_settings_received_tokens">Tokens recebidos</string>
+    <string name="push_settings_sent_tokens">Tokens enviados</string>
+    <string name="push_settings_staking_rewards">Recompensas de Staking</string>
+    <string name="push_settings_wallets">Carteiras</string>
+    <string name="push_staking_reward_many_accounts_title">✨ Nova recompensa %s</string>
+    <string name="push_staking_reward_message" formatted="false">Recebido %s de staking %s</string>
+    <string name="push_staking_reward_single_account_title">✨ Nova recompensa</string>
+    <string name="push_template_app_name_and_time">Nova Wallet • agora</string>
+    <string name="push_template_message">Recebido +0.6068 KSM ($20.35) de staking Kusama</string>
+    <string name="push_token_received_message" formatted="false">Recebido %s em %s</string>
+    <string name="push_token_received_no_account_name_title">⬇️ Recebido</string>
+    <string name="push_token_received_title">⬇️ Recebido %s</string>
+    <string name="push_token_sent_message" formatted="false">Enviado %s para %s em %s</string>
+    <string name="push_token_sent_no_account_name_title">💸 Enviado</string>
+    <string name="push_token_sent_title">💸 Enviado %s</string>
+    <string name="push_wallets_title">Selecione até 3 carteiras para ser notificado quando houver atividade na carteira</string>
+    <string name="push_welcome_cancel_button">Agora não</string>
+    <string name="push_welcome_enable_button">Ativar notificações push</string>
+    <string name="push_welcome_message">Receba notificações sobre operações de carteira, atualizações de Governança, atividade de Staking e Segurança, para que você esteja sempre informado</string>
+    <string name="push_welcome_terms_and_conditions" formatted="false">Ao ativar as notificações push, você concorda com nossos %s e %s</string>
+    <string name="push_welcome_timeout_error_message">Por favor, tente novamente mais tarde acessando as configurações de notificação na aba Configurações</string>
+    <string name="push_welcome_title">Não perca nada!</string>
     <string name="recover_json_hint">Cole o json ou faça upload do arquivo…</string>
     <string name="recover_json_upload">Fazer upload de arquivo</string>
     <string name="recovery_json">Restaurar JSON</string>
@@ -738,6 +797,7 @@
     <string name="referendum_status_deciding">Decidindo</string>
     <string name="referendum_status_deciding_in">Decidirá em %s</string>
     <string name="referendum_status_executed">Executado</string>
+    <string name="referendum_status_in_queue">Na fila</string>
     <string name="referendum_status_in_queue_format" formatted="false">Na fila (%s de %s)</string>
     <string name="referendum_status_killed">Cancelado</string>
     <string name="referendum_status_not_passing">Não aprovado</string>
@@ -831,6 +891,8 @@
     <string name="select_delegation_tracks_unavailable_tracks">Faixas indisponíveis</string>
     <string name="select_ledger_location_enable_request_message">Nova precisa que a localização seja ativada para poder realizar a varredura Bluetooth para encontrar seu dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Por favor, ative a localização geográfica nas configurações do dispositivo</string>
+    <string name="select_tracks_for">Selecione faixas para</string>
+    <string name="selected_tracks_quantity" formatted="false">%d de %d</string>
     <string name="send_address_hint">Endereço ou w3n</string>
     <string name="send_recipient_system_account_message">O destinatário é uma conta do sistema. Não é controlado por nenhuma empresa ou indivíduo.\nVocê ainda deseja realizar esta transferência?</string>
     <string name="send_recipient_system_account_title">Os tokens serão perdidos</string>
@@ -843,6 +905,8 @@
     <string name="settings_pin_code_verification_confirmation_message">Cada operação de assinatura em carteiras com par de chaves (criada na nova wallet ou importada) deve exigir a verificação do PIN antes da construção da assinatura</string>
     <string name="settings_pin_code_verification_confirmation_title">Solicitar autenticação para assinatura de operações</string>
     <string name="settings_preferences">Preferências</string>
+    <string name="settings_push_notifications_only_available_from_google_play_error">As notificações push estão disponíveis apenas para a versão da Nova Wallet baixada do Google Play.</string>
+    <string name="settings_push_notifications_only_available_with_google_services_error">Notificações push estão disponíveis apenas para dispositivos com serviços Google.</string>
     <string name="settings_safe_mode_confirmation_message">A gravação de tela e capturas de tela não estarão disponíveis. O aplicativo minimizado não exibirá o conteúdo</string>
     <string name="settings_safe_mode_confirmation_title">Modo seguro</string>
     <string name="settings_security">Segurança</string>
@@ -865,7 +929,7 @@
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Tipo de staking não suportado</string>
     <string name="sr25519_selection_subtitle">sr25519 (recomendado)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-
+    
     <string name="staking_account_is_used_as_controller">A conta selecionada já está em uso como controladora</string>
     <string name="staking_action_add_proxy">Adicionar autoridade delegada (Proxy)</string>
     <string name="staking_action_your_proxies">Suas delegações</string>
@@ -960,6 +1024,7 @@
     <string name="staking_nominator_status_waiting">Aguardando a próxima Era</string>
     <string name="staking_nominator_status_waiting_format">aguardando a próxima era (%s)</string>
     <string name="staking_not_enough_balance_to_pay_proxy_deposit_message" formatted="false">Você não tem saldo suficiente para o depósito proxy de %s. Saldo disponível: %s</string>
+    <string name="staking_notification_channel_name">Canal de notificações de piquetagem</string>
     <string name="staking_parachain_collator">Colator</string>
     <string name="staking_parachain_collator_details_oversubscribed">O stake mínimo do colator é maior que a sua delegação. Você não receberá recompensas deste colator.</string>
     <string name="staking_parachain_collator_info">Informação do colator</string>
@@ -1259,6 +1324,7 @@
     <string name="transaction_status_completed">Concluído</string>
     <string name="transaction_status_failed">Falhou</string>
     <string name="transaction_status_pending">Pendente</string>
+    <string name="transactions_notification_channel_name">Canal de Notificação de Transações</string>
     <string name="transfer_history_income_from">De: %s</string>
     <string name="transfer_history_send_to">Para: %s</string>
     <string name="transfer_title">Transferência</string>
