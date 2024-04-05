@@ -12,5 +12,6 @@ sealed interface AddAccountResult {
     val metaId: Long
 
     class AccountAdded(override val metaId: Long) : AddAccountResult
+
     class AccountChanged(override val metaId: Long) : AddAccountResult
 }
