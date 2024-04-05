@@ -16,11 +16,11 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-      - name: Check if "rc" is present in github.ref
+      - name: Check if "rc" or "hotfix" is present in github.ref
         id: check_ref
         run: |
           echo ${{ github.head_ref || github.ref_name }}
-          if [[ "${{ github.head_ref || github.ref_name }}" == *"rc"* ]]; then
+          if [[ "${{ github.head_ref || github.ref_name }}" == "rc/"* || "${{ github.head_ref || github.ref_name }}" == "hotfix/"* ]]; then
             echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
           else
             echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
@@ -55,6 +55,7 @@ jobs:
         id: extract_version
         run: |
           VERSION=${{ github.head_ref }}
+          VERSION=${VERSION/hotfix/rc} # Replace "hotfix" with "rc"
           echo "::set-output name=version::${VERSION#*rc/}"
 
       - uses: tibdex/github-app-token@v1

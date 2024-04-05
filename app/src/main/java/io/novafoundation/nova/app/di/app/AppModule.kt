@@ -4,9 +4,11 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.App
+import io.novafoundation.nova.app.root.presentation.common.RealBuildTypeProvider
 import io.novafoundation.nova.app.root.presentation.common.RootActivityIntentProvider
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
+import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 
 @Module
 class AppModule {
@@ -20,4 +22,8 @@ class AppModule {
     @Provides
     @ApplicationScope
     fun provideRootActivityIntentProvider(context: Context): ActivityIntentProvider = RootActivityIntentProvider(context)
+
+    @Provides
+    @ApplicationScope
+    fun provideBuildTypeProvider(): BuildTypeProvider = RealBuildTypeProvider()
 }

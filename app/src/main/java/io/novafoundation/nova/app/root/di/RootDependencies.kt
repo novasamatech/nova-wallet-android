@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.di
 
+import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
@@ -81,6 +82,8 @@ interface RootDependencies {
     fun metaAccountChangesRequestBus(): MetaAccountChangesEventBus
 
     fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
+
+    fun context(): Context
 
     val systemCallExecutor: SystemCallExecutor
 
