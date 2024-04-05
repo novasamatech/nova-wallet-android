@@ -200,6 +200,13 @@
     <string name="choose_amount_fee">Комиссия</string>
     <string name="choose_amount_network_error">Сеть недоступна</string>
     <string name="choose_amount_to">Кому</string>
+    
+    
+    
+    
+    
+    
+    
     <string name="common_accept_terms">Примите условия...</string>
     <string name="common_account">Аккаунт</string>
     <string name="common_account_address">Адрес аккаунта</string>
@@ -502,6 +509,7 @@
     <string name="dapp_sign_error_unsupported_chain">Неподдерживаемый блокчейн с генезис хэшем %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Убедитесь, что операция правильная</string>
     <string name="dapp_sign_extrinsic_failed">Не удалось подписать запрошенную операцию</string>
+    
     <string name="deep_linking_chain_id_is_not_found">Сеть не найдена</string>
     <string name="deep_linking_domain_is_not_matched">Домен из ссылки %s не в списке разрешённых</string>
     <string name="deep_linking_governance_type_is_not_specified">Не указан тип управления</string>
@@ -634,6 +642,7 @@
     <string name="ledher_import_select_address_title">Выберите аккаунт для добавления в кошелёк</string>
     <string name="make_payout_transaction_sent">Транзакция на выплату отправлена</string>
     <string name="manage_assets_add_token">Добавить</string>
+    
     <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">Ваша мнемоника недействительна, пожалуйста, проверьте еще раз порядок слов</string>
     <string name="multiple_wallets_selection_max_message">Вы не можете выбрать более %d кошельков.</string>
@@ -673,7 +682,7 @@
     <string name="onboarding_privacy_policy">Политикой конфиденциальности</string>
     <string name="onboarding_restore_account">Импортировать аккаунт</string>
     <string name="onboarding_restore_wallet">У меня уже есть кошелёк</string>
-    <string name="onboarding_terms_and_conditions_1_v2_2_0">Продолжая вы соглашаетесь с нашими\nУсловиями использования и Политикой конфиденциальности</string>
+    <string name="onboarding_terms_and_conditions_1_v2_2_1">Продолжая, вы соглашаетесь с нашими\n%1$s и %2$s</string>
     <string name="onboarding_terms_and_conditions_2">Условиями использования</string>
     <string name="operations_swap_title">Обмен</string>
     <string name="parachain_staking_alerts_bond_more_message">Один из ваших коллаторов не генерирует награды</string>
@@ -942,6 +951,7 @@
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Неподдерживаемый тип стейкинга</string>
     <string name="sr25519_selection_subtitle">sr25519 (рекомендованный)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
+    
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_action_add_proxy">Делегировать полномочия (прокси)</string>
     <string name="staking_action_your_proxies">Ваши делегации</string>
