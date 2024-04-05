@@ -3,17 +3,14 @@ package io.novafoundation.nova.feature_account_api.data.repository.addAccount
 interface AddAccountRepository<T> {
 
     suspend fun addAccount(payload: T): AddAccountResult
+
+    suspend fun addAccounts(payloads: List<T>): List<AddAccountResult>
 }
 
 sealed interface AddAccountResult {
 
-    val metaIds: List<Long>
+    val metaId: Long
 
-    class AccountAdded(override val metaIds: List<Long>) : AddAccountResult {
-        constructor(metaId: Long) : this(listOf(metaId))
-    }
-
-    class AccountChanged(override val metaIds: List<Long>) : AddAccountResult {
-        constructor(metaId: Long) : this(listOf(metaId))
-    }
+    class AccountAdded(override val metaId: Long) : AddAccountResult
+    class AccountChanged(override val metaId: Long) : AddAccountResult
 }

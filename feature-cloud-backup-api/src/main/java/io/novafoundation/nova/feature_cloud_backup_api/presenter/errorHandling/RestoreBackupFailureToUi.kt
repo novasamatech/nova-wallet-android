@@ -1,15 +1,12 @@
-package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup
+package io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling
 
 import io.novafoundation.nova.common.base.TitleAndMessage
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
+import io.novafoundation.nova.feature_cloud_backup_api.R
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotFound
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupUnknownError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
-import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handleCloudBackupNotFound
-import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handleCloudBackupUnknownError
 
 fun mapRestoreBackupFailureToUi(
     resourceManager: ResourceManager,

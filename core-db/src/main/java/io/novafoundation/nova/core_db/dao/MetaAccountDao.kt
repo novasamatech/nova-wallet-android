@@ -92,9 +92,6 @@ interface MetaAccountDao {
     @Insert
     suspend fun insertMetaAccount(metaAccount: MetaAccountLocal): Long
 
-    @Insert
-    suspend fun insertMetaAccounts(metaAccounts: List<MetaAccountLocal>): List<Long>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChainAccount(chainAccount: ChainAccountLocal)
 

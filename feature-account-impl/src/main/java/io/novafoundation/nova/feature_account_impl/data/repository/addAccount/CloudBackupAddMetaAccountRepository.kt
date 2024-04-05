@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_impl.domain.common.mapLocalAccount
 import io.novafoundation.nova.feature_account_impl.domain.common.mapLocalChainAccountFromCloudBackup
 import io.novafoundation.nova.feature_account_impl.domain.common.mapLocalChainAccountsFromCloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupWallet
 
 class CloudBackupAddMetaAccountRepository(
     proxySyncService: ProxySyncService,
@@ -19,16 +20,14 @@ class CloudBackupAddMetaAccountRepository(
     metaAccountChangesEventBus
 ) {
 
-    class Payload(val cloudBackup: CloudBackup)
+    class Payload(val cloudBackupWallet: CloudBackupWallet)
 
     override suspend fun addAccountInternal(payload: Payload): AddAccountResult {
-        val addedMetaIds = payload.cloudBackup.wallets.map { wallet ->
-            val metaAccount = mapLocalAccountFromCloudBackup(wallet, metaAccountDao::nextAccountPosition)
-            metaAccountDao.insertMetaAndChainAccounts(metaAccount) {
-                mapLocalChainAccountsFromCloudBackup(it, wallet)
-            }
+        val metaAccount = mapLocalAccountFromCloudBackup(payload.cloudBackupWallet, metaAccountDao::nextAccountPosition)
+        val metaId = metaAccountDao.insertMetaAndChainAccounts(metaAccount) {
+            mapLocalChainAccountsFromCloudBackup(it, payload.cloudBackupWallet)
         }
 
-        return AddAccountResult.AccountAdded(addedMetaIds)
+        return AddAccountResult.AccountAdded(metaId)
     }
 }

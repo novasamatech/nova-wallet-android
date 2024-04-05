@@ -25,13 +25,6 @@ fun handleCloudBackupNotEnoughSpace(resourceManager: ResourceManager): TitleAndM
     )
 }
 
-fun handleCloudBackupConnectionError(resourceManager: ResourceManager): TitleAndMessage {
-    return TitleAndMessage(
-        resourceManager.getString(R.string.common_connection_error_title),
-        resourceManager.getString(R.string.common_connection_error_message)
-    )
-}
-
 fun handleCloudBackupNotFound(resourceManager: ResourceManager): TitleAndMessage {
     return TitleAndMessage(
         resourceManager.getString(R.string.cloud_backup_error_not_found_title),

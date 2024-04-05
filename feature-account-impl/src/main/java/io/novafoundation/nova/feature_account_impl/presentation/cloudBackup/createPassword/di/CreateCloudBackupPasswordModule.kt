@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.CreateCloudBackupPasswordPayload
@@ -26,7 +27,8 @@ class CreateCloudBackupPasswordModule {
         resourceManager: ResourceManager,
         interactor: CreateCloudBackupPasswordInteractor,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
-        payload: CreateCloudBackupPasswordPayload
+        payload: CreateCloudBackupPasswordPayload,
+        accountInteractor: AccountInteractor
     ): ViewModel {
         return CreateCloudBackupPasswordViewModel(
             router,
@@ -34,6 +36,7 @@ class CreateCloudBackupPasswordModule {
             interactor,
             actionBottomSheetLauncher,
             payload,
+            accountInteractor
         )
     }
 

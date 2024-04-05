@@ -22,4 +22,6 @@ interface OnboardingRouter {
     fun openStartImportPolkadotVault()
 
     fun openImportOptionsScreen()
+
+    fun openRestoreCloudBackup()
 }

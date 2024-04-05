@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapPreCreateValidationStatusToUi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

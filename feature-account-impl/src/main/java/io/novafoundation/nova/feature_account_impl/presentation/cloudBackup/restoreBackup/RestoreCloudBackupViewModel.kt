@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RestoreCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapDeleteBackupFailureToUi
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapRestoreBackupFailureToUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -108,15 +110,17 @@ class RestoreCloudBackupViewModel(
         launch {
             confirmationAwaitableAction.awaitAction(
                 ConfirmationDialogInfo(
-                    R.string.cloud_backup_delete_backup_confirmation_title,
-                    R.string.cloud_backup_delete_backup_confirmation_message
+                    title = R.string.cloud_backup_delete_backup_confirmation_title,
+                    message = R.string.cloud_backup_delete_backup_confirmation_message,
+                    positiveButton = R.string.restore_cloud_backup_delete_button,
+                    negativeButton = R.string.common_cancel
                 )
             )
 
             interactor.deleteCloudBackup()
                 .onSuccess { router.back() }
                 .onFailure { throwable ->
-                    val titleAndMessage = mapRestoreBackupFailureToUi(resourceManager, throwable)
+                    val titleAndMessage = mapDeleteBackupFailureToUi(resourceManager, throwable)
                     titleAndMessage?.let { showError(it) }
                 }
         }

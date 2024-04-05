@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="cloud_backup_delete_backup_confirmation_title">Ask authentication for operation signing</string>
-    <string name="cloud_backup_delete_backup_confirmation_message">Each sign operation on wallets with key pair (created in nova wallet or imported) should require PIN verification before constructing signature</string>
+    <string name="cloud_backup_not_found_title">Backup Not Found</string>
+    <string name="cloud_backup_not_found_subtitle">Unfortunately, Backup with your wallets has not been found.</string>
+
+    <string name="cloud_backup_delete_backup_confirmation_title">Are you sure you want to delete Cloud Backup?</string>
+    <string name="cloud_backup_delete_backup_confirmation_message">Current backup with your wallets will be permanently deleted!</string>
 
     <string name="restore_cloud_backup_delete_button">Delete Backup</string>
     <string name="restore_cloud_backup_delete_backup_title">Have you lost your password?</string>

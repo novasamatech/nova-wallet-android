@@ -31,6 +31,10 @@ class RealProxiedAddAccountRepository(
         return AddAccountResult.AccountAdded(metaId)
     }
 
+    override suspend fun addAccounts(payloads: List<Payload>): List<AddAccountResult> {
+        return payloads.map { addAccount(it) }
+    }
+
     private suspend fun createMetaAccount(
         payload: Payload,
         position: Int

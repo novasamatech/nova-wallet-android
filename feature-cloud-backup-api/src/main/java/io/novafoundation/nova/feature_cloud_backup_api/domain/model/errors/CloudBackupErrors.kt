@@ -10,6 +10,4 @@ interface CloudBackupNotFound
 
 interface CloudBackupNotEnoughSpace
 
-interface CloudBackupConnectionError
-
 interface CloudBackupUnknownError

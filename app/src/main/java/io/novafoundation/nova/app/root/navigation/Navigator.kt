@@ -152,6 +152,7 @@ class Navigator(
             R.id.finishImportParitySignerFragment -> navController?.navigate(R.id.action_finishImportParitySignerFragment_to_pincodeFragment, bundle)
             R.id.finishImportLedgerFragment -> navController?.navigate(R.id.action_finishImportLedgerFragment_to_pincodeFragment, bundle)
             R.id.createCloudBackupPasswordFragment -> navController?.navigate(R.id.action_createCloudBackupPasswordFragment_to_pincodeFragment, bundle)
+            R.id.restoreCloudBackupFragment -> navController?.navigate(R.id.action_restoreCloudBackupFragment_to_pincodeFragment, bundle)
         }
     }
 
@@ -551,6 +552,10 @@ class Navigator(
 
     override fun openStartImportLedger() {
         navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_ledger_graph)
+    }
+
+    override fun openRestoreCloudBackup() {
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_restoreCloudBackup)
     }
 
     override fun withPinCodeCheckRequired(
