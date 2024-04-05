@@ -72,7 +72,6 @@ fun LightMetaAccount(
     override val name: String = name
     override val type: LightMetaAccount.Type = type
     override val status: LightMetaAccount.Status = status
-
 }
 
 class MetaAccount(
