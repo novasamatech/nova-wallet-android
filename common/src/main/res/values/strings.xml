@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="cloud_backup_not_found_title">Backup Not Found</string>
-    <string name="cloud_backup_not_found_subtitle">Unfortunately, Backup with your wallets has not been found.</string>
+    <string name="import_wallet_cloud_backup_not_found_title">Backup Not Found</string>
+    <string name="import_wallet_cloud_backup_not_found_subtitle">Unfortunately, Backup with your wallets has not been found.</string>
 
     <string name="cloud_backup_delete_backup_confirmation_title">Are you sure you want to delete Cloud Backup?</string>
     <string name="cloud_backup_delete_backup_confirmation_message">Current backup with your wallets will be permanently deleted!</string>

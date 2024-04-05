@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.fixedSelectionOf
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVari
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCheckBackupAvailableFailureToUi
 import io.novafoundation.nova.feature_onboarding_api.domain.OnboardingInteractor
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.R
@@ -46,11 +48,11 @@ class ImportWalletOptionsViewModel(
                     if (isCloudBackupExist) {
                         router.openRestoreCloudBackup()
                     } else {
-                        showError(
-                            resourceManager.getString(R.string.cloud_backup_not_found_title),
-                            resourceManager.getString(R.string.cloud_backup_not_found_subtitle),
-                        )
+                        showBackupNotFoundError()
                     }
+                }.onFailure {
+                    val titleAndMessage = mapCheckBackupAvailableFailureToUi(resourceManager, it)
+                    titleAndMessage?.let { showError(titleAndMessage) }
                 }
         }
     }
@@ -80,5 +82,12 @@ class ImportWalletOptionsViewModel(
 
     private fun openImportType(importType: ImportType) {
         router.openImportAccountScreen(ImportAccountPayload(importType = importType, addAccountPayload = AddAccountPayload.MetaAccount))
+    }
+
+    private fun showBackupNotFoundError() {
+        showError(
+            resourceManager.getString(R.string.import_wallet_cloud_backup_not_found_title),
+            resourceManager.getString(R.string.import_wallet_cloud_backup_not_found_subtitle),
+        )
     }
 }

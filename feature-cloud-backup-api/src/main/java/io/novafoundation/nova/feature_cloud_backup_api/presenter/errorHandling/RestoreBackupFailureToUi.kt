@@ -33,7 +33,6 @@ fun mapDeleteBackupFailureToUi(
     throwable: Throwable
 ): TitleAndMessage? {
     return when (throwable) {
-
         is CloudBackupUnknownError -> handleCloudBackupUnknownError(resourceManager)
 
         else -> null

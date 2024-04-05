@@ -52,7 +52,6 @@ class RestoreCloudBackupFragment : BaseFragment<RestoreCloudBackupViewModel>() {
         observeActionBottomSheet(viewModel)
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.confirmationAwaitableAction)
 
-
         restoreCloudBackupInput.content.bindTo(viewModel.passwordFlow, lifecycleScope)
 
         viewModel.continueButtonState.observe { state ->

@@ -47,7 +47,9 @@ internal class RealCloudBackupService(
     }
 
     override suspend fun isCloudBackupExist(): Result<Boolean> = withContext(Dispatchers.IO) {
-        storage.checkBackupExists()
+        storage.ensureUserAuthenticated().flatMap {
+            storage.checkBackupExists()
+        }
     }
 
     override suspend fun isSyncWithCloudEnabled(): Boolean {
