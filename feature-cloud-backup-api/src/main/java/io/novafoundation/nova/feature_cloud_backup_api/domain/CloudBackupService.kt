@@ -9,6 +9,15 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.Delet
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
 
+/**
+ * Manages cloud backup storage, serialization and encryption
+ *
+ * The storing pipeline is the following:
+ *
+ * Backup -> serialize private data -> encrypt private data -> serialize public data + encrypted private
+ *
+ * This allows to access public data without accessing password
+ */
 interface CloudBackupService {
 
     /**

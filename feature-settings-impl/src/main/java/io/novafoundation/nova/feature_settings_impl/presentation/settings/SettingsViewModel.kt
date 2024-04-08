@@ -26,8 +26,8 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupWallet
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class SettingsViewModel(
     private val languageUseCase: LanguageUseCase,
@@ -246,29 +247,66 @@ class SettingsViewModel(
 
     // TODO remove test code when implementing cloud backup settings screen
     fun cloudBackupClicked() = launch {
+        val walletId = UUID.randomUUID().toString()
+
         val sampleRequest = WriteBackupRequest(
             password = "test",
             cloudBackup = CloudBackup(
-                modifiedAt = System.currentTimeMillis(),
-                wallets = listOf(
-                    CloudBackupWallet(
-                        id = 0,
-                        substratePublicKey = emptySubstrateAccountId(),
-                        substrateAccountId = emptySubstrateAccountId(),
-                        substrateCryptoType = CryptoType.SR25519,
-                        name = "Test",
-                        type = CloudBackupWallet.Type.SECRETS,
-                        chainAccounts = listOf(
-                            CloudBackupWallet.ChainAccount(
-                                chainId = Chain.Geneses.POLKADOT,
-                                publicKey = emptySubstrateAccountId(),
-                                accountId = emptySubstrateAccountId(),
-                                cryptoType = CryptoType.SR25519
-                            )
-                        ),
-                        ethereumAddress = null,
-                        ethereumPublicKey = null,
+                publicData = CloudBackup.PublicData(
+                    modifiedAt = 0,
+                    wallets = listOf(
+                        CloudBackup.WalletPublicInfo(
+                            walletId = walletId,
+                            substratePublicKey = emptySubstrateAccountId(),
+                            substrateCryptoType = CryptoType.SR25519,
+                            name = "Test",
+                            type = CloudBackup.WalletPublicInfo.Type.SECRETS,
+                            chainAccounts = listOf(
+                                CloudBackup.WalletPublicInfo.ChainAccountInfo(
+                                    chainId = Chain.Geneses.POLKADOT,
+                                    publicKey = emptySubstrateAccountId(),
+                                    accountId = emptySubstrateAccountId(),
+                                    cryptoType = CryptoType.SR25519
+                                )
+                            ),
+                            ethereumAddress = null,
+                            ethereumPublicKey = null,
+                            substrateAccountId = emptySubstrateAccountId()
+                        )
                     )
+                ),
+                privateData = CloudBackup.PrivateData(
+                    wallets = listOf(
+                        CloudBackup.WalletPrivateInfo(
+                            walletId = walletId,
+                            entropy = ByteArray(32),
+                            substrate = CloudBackup.WalletPrivateInfo.SubstrateSecrets(
+                                seed = ByteArray(32),
+                                keypair = CloudBackup.WalletPrivateInfo.KeyPairSecrets(
+                                    privateKey = ByteArray(32),
+                                    nonce = ByteArray(32)
+                                ),
+                                derivationPath = null
+                            ),
+                            ethereum = CloudBackup.WalletPrivateInfo.EthereumSecrets(
+                                privateKey = ByteArray(32),
+                                derivationPath = ""
+                            ),
+                            chainAccounts = listOf(
+                                CloudBackup.WalletPrivateInfo.ChainAccountSecrets(
+                                    chainId = Chain.Geneses.POLKADOT,
+                                    entropy = ByteArray(32),
+                                    seed = ByteArray(32),
+                                    keypair = CloudBackup.WalletPrivateInfo.KeyPairSecrets(
+                                        privateKey = ByteArray(32),
+                                        nonce = ByteArray(32)
+                                    ),
+                                    derivationPath = null
+                                )
+                            ),
+                            additional = emptyMap()
+                        )
+                    ),
                 )
             )
         )
@@ -279,12 +317,12 @@ class SettingsViewModel(
 
     // TODO remove test code when implementing cloud backup settings screen
     fun cloudBackupLongClicked() = launch {
-//        cloudBackupService.fetchAndDecryptExistingBackup(password = "test")
-//            .onSuccess { showMessage("Retrieved and decrypted backup with first wallet name: ${it.wallets.first().name}") }
-//            .onFailure { showMessage("Failed to retrieve and decrypt backup: ${it.message}") }
+        cloudBackupService.fetchAndDecryptExistingBackup(password = "test")
+            .onSuccess { showMessage("Retrieved and decrypted backup with entropy: ${it.privateData.wallets.first().entropy}") }
+            .onFailure { showMessage("Failed to retrieve and decrypt backup: ${it.message}") }
 
-        val result = cloudBackupService.deleteBackup()
-        showMessage("Delete backup status: $result")
+//        val result = cloudBackupService.deleteBackup()
+//        showMessage("Delete backup status: $result")
     }
 
     fun onResume() {

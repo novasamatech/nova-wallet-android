@@ -1,8 +1,28 @@
 package io.novafoundation.nova.common.utils
 
 import com.google.gson.Gson
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import java.lang.reflect.Type
 import java.math.BigInteger
+
+class ByteArrayHexAdapter : JsonSerializer<ByteArray>, JsonDeserializer<ByteArray> {
+
+    override fun serialize(src: ByteArray, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+        return JsonPrimitive(src.toHexString(withPrefix = true))
+    }
+
+    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ByteArray {
+        return json.asString.fromHex()
+    }
+}
 
 fun Any?.asGsonParsedNumberOrNull(): BigInteger? = when (this) {
     // gson parses integers as double when type is not specified
