@@ -104,10 +104,6 @@ class MnemonicCardView @JvmOverloads constructor(
         super.onDraw(canvas)
     }
 
-    override fun onDrawForeground(canvas: Canvas) {
-        super.onDrawForeground(canvas)
-    }
-
     override fun wordClicked(word: MnemonicWord) {
         wordClickedListener?.wordClicked(word)
     }

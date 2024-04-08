@@ -10,13 +10,15 @@ import io.novafoundation.nova.feature_account_impl.R
 import kotlinx.android.synthetic.main.view_mnemonic_card_view.view.mnemonicCardPhrase
 import kotlin.math.roundToInt
 
+private const val DEFAULT_COLUMNS = 3
+
 class MnemonicContainerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
-    private val _layoutManager = GridLayoutManager(context, 3)
+    private val _layoutManager = GridLayoutManager(context, DEFAULT_COLUMNS)
     private var itemDecoration: ItemDecoration? = null
 
     init {

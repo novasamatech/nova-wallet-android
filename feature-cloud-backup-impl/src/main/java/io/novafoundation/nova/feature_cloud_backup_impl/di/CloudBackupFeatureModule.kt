@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_cloud_backup_impl.di
 
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
@@ -40,10 +39,8 @@ internal class CloudBackupFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBackupSerializer(
-        gson: Gson
-    ): CloudBackupSerializer {
-        return JsonCloudBackupSerializer(gson)
+    fun provideBackupSerializer(): CloudBackupSerializer {
+        return JsonCloudBackupSerializer()
     }
 
     @Provides
