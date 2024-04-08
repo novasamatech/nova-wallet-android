@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletViewModel
 
@@ -20,11 +21,13 @@ class StartCreateWalletModule {
     @ViewModelKey(StartCreateWalletViewModel::class)
     fun provideViewModel(
         accountRouter: AccountRouter,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        startCreateWalletInteractor: StartCreateWalletInteractor
     ): ViewModel {
         return StartCreateWalletViewModel(
             accountRouter,
-            resourceManager
+            resourceManager,
+            startCreateWalletInteractor
         )
     }
 

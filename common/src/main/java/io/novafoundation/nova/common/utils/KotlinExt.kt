@@ -48,6 +48,11 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     )
 }
 
+inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
+    transform()
+    return this
+}
+
 @OptIn(ExperimentalContracts::class)
 inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable): Result<T> {
     contract {

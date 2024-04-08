@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -82,6 +82,6 @@ class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewMo
         viewModel.feeModelFlow.observe { confirmAddStakingProxyNetworkFee.showAmount(it) }
         viewModel.proxyAccountModel.observe { confirmAddStakingProxyDelegationAccount.showAddress(it) }
 
-        viewModel.validationProgressFlow.observe(confirmAddStakingProxyButton::setProgress)
+        viewModel.validationProgressFlow.observe(confirmAddStakingProxyButton::setProgressState)
     }
 }

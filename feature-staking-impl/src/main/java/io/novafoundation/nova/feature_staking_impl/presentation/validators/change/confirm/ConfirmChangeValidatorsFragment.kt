@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -68,7 +68,7 @@ class ConfirmChangeValidatorsFragment : BaseFragment<ConfirmChangeValidatorsView
         setupFeeLoading(viewModel, confirmChangeValidatorsFee)
         observeHints(viewModel.hintsMixin, confirmChangeValidatorsHints)
 
-        viewModel.showNextProgress.observe(confirmChangeValidatorsConfirm::setProgress)
+        viewModel.showNextProgress.observe(confirmChangeValidatorsConfirm::setProgressState)
 
         viewModel.currentAccountModelFlow.observe(confirmChangeValidatorsAccount::showAddress)
         viewModel.walletFlow.observe(confirmChangeValidatorsWallet::showWallet)

@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
@@ -96,7 +96,7 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
             newDelegationConfirmTransferableAmountChanges.setAmountChangeModel(it.transferableChange)
         }
 
-        viewModel.showNextProgress.observe(newDelegationConfirmConfirm::setProgress)
+        viewModel.showNextProgress.observe(newDelegationConfirmConfirm::setProgressState)
 
         viewModel.showTracksEvent.observeEvent { tracks ->
             TrackListBottomSheet(requireContext(), tracks).show()

@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.ButtonState
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -63,7 +63,7 @@ class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationView
         observeBrowserEvents(viewModel)
         observeRewardDestinationChooser(viewModel, selectRewardDestinationChooser)
 
-        viewModel.showNextProgress.observe(selectRewardDestinationContinue::setProgress)
+        viewModel.showNextProgress.observe(selectRewardDestinationContinue::setProgressState)
 
         viewModel.feeLiveData.observe(selectRewardDestinationFee::setFeeStatus)
 
