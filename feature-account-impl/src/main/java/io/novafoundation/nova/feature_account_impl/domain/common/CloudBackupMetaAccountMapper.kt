@@ -3,13 +3,11 @@ package io.novafoundation.nova.feature_account_impl.domain.common
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.derivationPath
-import io.novafoundation.nova.common.data.secrets.v2.entropy
 import io.novafoundation.nova.common.data.secrets.v2.ethereumDerivationPath
 import io.novafoundation.nova.common.data.secrets.v2.ethereumKeypair
 import io.novafoundation.nova.common.data.secrets.v2.keypair
 import io.novafoundation.nova.common.data.secrets.v2.nonce
 import io.novafoundation.nova.common.data.secrets.v2.privateKey
-import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.data.secrets.v2.substrateDerivationPath
 import io.novafoundation.nova.common.data.secrets.v2.substrateKeypair
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
