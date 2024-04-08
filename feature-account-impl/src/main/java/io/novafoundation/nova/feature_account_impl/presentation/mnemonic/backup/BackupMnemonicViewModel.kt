@@ -30,6 +30,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+private const val CONDITIONS_COUNT = 3
+const val CONDITION_ID_1 = 0
+const val CONDITION_ID_2 = 1
+const val CONDITION_ID_3 = 2
+
 class BackupMnemonicViewModel(
     private val interactor: AccountInteractor,
     private val exportMnemonicInteractor: ExportMnemonicInteractor,
@@ -66,7 +71,7 @@ class BackupMnemonicViewModel(
     }
 
     val continueButtonState = combine(mnemonicWasShown, conditionsState) { mnemonicShown, conditions ->
-        val allConditionsSelected = conditions.values.size == 3 && conditions.values.all { it }
+        val allConditionsSelected = conditions.values.size == CONDITIONS_COUNT && conditions.values.all { it }
         when {
             mnemonicShown && allConditionsSelected -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
             else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.backup_mnemonic_disabled_button))
