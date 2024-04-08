@@ -16,6 +16,7 @@ private const val MIN_PASSWORD_SYMBOLS = 8
 interface CreateCloudBackupPasswordInteractor {
 
     fun checkPasswords(password: String, confirmPassword: String): List<PasswordErrors>
+    
     suspend fun createAndBackupAccount(accountName: String, password: String): Result<Unit>
 }
 
