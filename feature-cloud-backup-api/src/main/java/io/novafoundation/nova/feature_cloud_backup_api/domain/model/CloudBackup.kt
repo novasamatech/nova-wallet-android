@@ -15,7 +15,7 @@ class CloudBackup(
     )
 
     class WalletPublicInfo(
-        val walletId: Long,
+        val walletId: String,
         val substratePublicKey: ByteArray?,
         val substrateAccountId: ByteArray?,
         val substrateCryptoType: CryptoType?,
@@ -43,10 +43,10 @@ class CloudBackup(
     )
 
     class WalletPrivateInfo(
-        val walletId: Long,
+        val walletId: String,
         val entropy: ByteArray?,
-        val substrate: SubstrateSecrets,
-        val ethereum: EthereumSecrets,
+        val substrate: SubstrateSecrets?,
+        val ethereum: EthereumSecrets?,
         val chainAccounts: List<ChainAccountSecrets>,
         /**
          * Stores additional secrets like derivation path for ledger chain accounts

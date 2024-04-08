@@ -248,7 +248,8 @@ class AccountDataSourceImpl(
             isSelected = false,
             position = metaAccountDao.nextAccountPosition(),
             type = MetaAccountLocal.Type.SECRETS,
-            status = MetaAccountLocal.Status.ACTIVE
+            status = MetaAccountLocal.Status.ACTIVE,
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
         )
 
         val metaId = metaAccountDao.insertMetaAccount(metaAccountLocal)

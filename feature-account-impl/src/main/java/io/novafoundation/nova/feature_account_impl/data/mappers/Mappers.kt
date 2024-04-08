@@ -132,6 +132,7 @@ fun mapMetaAccountLocalToMetaAccount(
     return with(joinedMetaAccountInfo.metaAccount) {
         MetaAccount(
             id = id,
+            globallyUniqueId = globallyUniqueId,
             chainAccounts = chainAccounts,
             proxy = proxyAccount,
             substratePublicKey = substratePublicKey,
@@ -153,6 +154,7 @@ fun mapMetaAccountLocalToLightMetaAccount(
     return with(metaAccountLocal) {
         LightMetaAccount(
             id = id,
+            globallyUniqueId = metaAccountLocal.globallyUniqueId,
             substratePublicKey = substratePublicKey,
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substrateAccountId,
