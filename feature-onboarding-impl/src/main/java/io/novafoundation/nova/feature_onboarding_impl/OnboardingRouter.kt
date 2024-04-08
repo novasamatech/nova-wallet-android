@@ -23,5 +23,5 @@ interface OnboardingRouter {
 
     fun openImportOptionsScreen()
 
-    fun openRestoreCloudBackup()
+    fun restoreCloudBackup()
 }

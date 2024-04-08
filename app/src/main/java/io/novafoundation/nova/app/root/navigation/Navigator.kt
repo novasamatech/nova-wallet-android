@@ -534,6 +534,13 @@ class Navigator(
         navController?.navigate(R.id.action_startCreateWalletFragment_to_createCloudBackupPasswordFragment, bundle)
     }
 
+    override fun restoreCloudBackup() {
+        when (navController?.currentDestination?.id) {
+            R.id.importWalletOptionsFragment -> navController?.navigate(R.id.action_importWalletOptionsFragment_to_restoreCloudBackup)
+            R.id.startCreateWalletFragment -> navController?.navigate(R.id.action_startCreateWalletFragment_to_resotreCloudBackupFragment)
+        }
+    }
+
     override fun openCreateWatchWallet() {
         navController?.navigate(R.id.action_importWalletOptionsFragment_to_createWatchWalletFragment)
     }
@@ -552,10 +559,6 @@ class Navigator(
 
     override fun openStartImportLedger() {
         navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_ledger_graph)
-    }
-
-    override fun openRestoreCloudBackup() {
-        navController?.navigate(R.id.action_importWalletOptionsFragment_to_restoreCloudBackup)
     }
 
     override fun withPinCodeCheckRequired(
