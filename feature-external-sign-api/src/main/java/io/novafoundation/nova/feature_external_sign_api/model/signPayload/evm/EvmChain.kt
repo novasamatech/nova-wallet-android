@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm
 
 import android.os.Parcelable
+import io.novafoundation.nova.common.utils.Precision
+import io.novafoundation.nova.common.utils.TokenSymbol
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -15,7 +17,7 @@ data class EvmChain(
     @Parcelize
     class NativeCurrency(
         val name: String,
-        val symbol: String,
-        val decimals: Int
+        val symbol: TokenSymbol,
+        val decimals: Precision
     ) : Parcelable
 }

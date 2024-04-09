@@ -5,6 +5,8 @@
     <string name="settings_push_notifications_only_available_with_google_services_error">Push notifications are only available for devices with Google services.</string>
     <string name="settings_push_notifications_only_available_from_google_play_error">Push notifications are available only for the Nova Wallet version downloaded from Google Play.</string>
 
+    <string name="onboarding_terms_and_conditions_1_v2_2_1">By continuing, you agree to our\n%1$s and %2$s</string>
+
     <string name="common_something_went_wrong_title">Something went wrong</string>
     <string name="push_welcome_timeout_error_message">Please try again later by accessing notification settings from the Settings tab</string>
 
@@ -1619,7 +1621,6 @@
     <string name="onboarding_privacy_policy">Privacy Policy</string>
     <string name="onboarding_restore_account">Import account</string>
     <string name="onboarding_restore_wallet">Already have a wallet</string>
-    <string name="onboarding_terms_and_conditions_1_v2_2_0">By continuing, you agree to our \nTerms and Conditions and Privacy Policy</string>
     <string name="onboarding_terms_and_conditions_2">Terms and Conditions</string>
     <string name="pincode_biometry_dialog_title">Biometry</string>
     <string name="pincode_changed_message">Pin code has been successfully changed</string>

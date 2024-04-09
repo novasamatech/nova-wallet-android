@@ -28,12 +28,6 @@ open class ParallaxCardView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), ParallaxCardBitmapBaking.OnBakingPreparedCallback {
 
-    private val gyroscopeListener = CardGyroscopeListener(
-        context,
-        TravelVector(DEVICE_ROTATION_ANGLE_RADIUS, DEVICE_ROTATION_ANGLE_RADIUS),
-        ::onGyroscopeRotation
-    )
-
     private val frostedGlassLayer: FrostedGlassLayer = FrostedGlassLayer()
     private val cardRect = RectF()
     private val cardPath = Path()
@@ -61,6 +55,23 @@ open class ParallaxCardView @JvmOverloads constructor(
 
     private val cardBackgroundBitmap: Bitmap
 
+    private var gyroscopeListenerCallback: ((TravelVector) -> Unit)? = { rotation: TravelVector ->
+        travelOffset = rotation
+
+        if (helper.isPrepared) {
+            updateHighlights()
+            updateFrostedGlassLayer()
+        }
+
+        invalidate()
+    }
+
+    private var gyroscopeListener: CardGyroscopeListener? = CardGyroscopeListener(
+        context,
+        TravelVector(DEVICE_ROTATION_ANGLE_RADIUS, DEVICE_ROTATION_ANGLE_RADIUS),
+        gyroscopeListenerCallback
+    )
+
     init {
         clipToPadding = false
 
@@ -82,14 +93,16 @@ open class ParallaxCardView @JvmOverloads constructor(
         setWillNotDraw(false)
 
         postDelayed({
-            gyroscopeListener.start()
+            gyroscopeListener?.start()
         }, 300) // Added small delay to avoid wrong parallax initial position
     }
 
-    override fun onViewRemoved(view: View?) {
-        super.onViewRemoved(view)
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
         helper.onViewRemove()
-        gyroscopeListener.cancel()
+        gyroscopeListener?.cancel()
+        gyroscopeListener = null
+        gyroscopeListenerCallback = null
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -160,17 +173,6 @@ open class ParallaxCardView @JvmOverloads constructor(
 
     override fun generateLayoutParams(p: ViewGroup.LayoutParams): ViewGroup.LayoutParams {
         return LayoutParams(p)
-    }
-
-    private fun onGyroscopeRotation(rotation: TravelVector) {
-        travelOffset = rotation
-
-        if (helper.isPrepared) {
-            updateHighlights()
-            updateFrostedGlassLayer()
-        }
-
-        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {

@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_assets.domain.tokens.add
 
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
+import io.novafoundation.nova.common.utils.asPrecision
+import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
@@ -77,8 +79,8 @@ class RealAddTokensInteractor(
             id = chainAssetIdOfErc20Token(customErc20Token.contract),
             priceId = priceId,
             chainId = customErc20Token.chainId,
-            symbol = customErc20Token.symbol,
-            precision = customErc20Token.decimals,
+            symbol = customErc20Token.symbol.asTokenSymbol(),
+            precision = customErc20Token.decimals.asPrecision(),
             buyProviders = emptyMap(),
             staking = emptyList(),
             type = Chain.Asset.Type.EvmErc20(customErc20Token.contract),

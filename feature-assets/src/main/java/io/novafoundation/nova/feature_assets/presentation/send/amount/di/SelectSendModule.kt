@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
@@ -37,7 +36,6 @@ class SelectSendModule {
         chainRegistry: ChainRegistry,
         interactor: WalletInteractor,
         sendInteractor: SendInteractor,
-        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         router: AssetsRouter,
         payload: SendPayload,
         initialRecipientAddress: String?,
@@ -57,7 +55,6 @@ class SelectSendModule {
             chainRegistry = chainRegistry,
             interactor = interactor,
             sendInteractor = sendInteractor,
-            metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             router = router,
             payload = payload,
             initialRecipientAddress = initialRecipientAddress,

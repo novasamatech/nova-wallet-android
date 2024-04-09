@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.view.parallaxCard.gyroscope
 
 import android.animation.TimeAnimator
+import android.animation.TimeAnimator.TimeListener
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -19,8 +20,8 @@ private val SENSOR_FREQUENCY_MICROSECONDS = (1.seconds.inWholeMicroseconds / 60)
 class CardGyroscopeListener(
     context: Context,
     private val deviceRotationAngle: TravelVector,
-    private val callback: (rotation: TravelVector) -> Unit
-) : SensorEventListener {
+    private var callback: ((rotation: TravelVector) -> Unit)?
+) {
 
     private val sensorManager = ContextCompat.getSystemService(context, SensorManager::class.java)
     private val timeAnimator = TimeAnimator()
@@ -33,43 +34,52 @@ class CardGyroscopeListener(
             val gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
             if (gyroscopeSensor != null) {
                 previousEventMillis = System.currentTimeMillis()
-                sensorManager.registerListener(this, gyroscopeSensor, SENSOR_FREQUENCY_MICROSECONDS)
-                timeAnimator.setTimeListener(::onTimerUpdate)
+                sensorManager.registerListener(sensorListener, gyroscopeSensor, SENSOR_FREQUENCY_MICROSECONDS)
+                timeAnimator.setTimeListener(timeListener)
                 timeAnimator.start()
             }
         }
     }
 
-    private fun onTimerUpdate(timeAnimator: TimeAnimator, totalTime: Long, deltaTime: Long) {
-        interpolatedRotation += (deviceRotation - interpolatedRotation) * INTERPOLATION_VELOCITY
-        callback(interpolatedRotation / deviceRotationAngle)
+    var sensorListener: SensorEventListener? = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+            val currentMillis = System.currentTimeMillis()
+            val dT = (currentMillis - previousEventMillis) / SECOND_IN_MILLIS
+            val yRadians = event.values[SENSOR_Y_INDEX] * dT.toDouble()
+            val xRadians = event.values[SENSOR_X_INDEX] * dT.toDouble()
+
+            // y and x are inverted due to the device orientation
+            deviceRotation += TravelVector(
+                x = Math.toDegrees(yRadians).toFloat(),
+                y = Math.toDegrees(xRadians).toFloat()
+            )
+
+            deviceRotation = deviceRotation.coerceIn(-deviceRotationAngle, deviceRotationAngle)
+
+            previousEventMillis = currentMillis
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    var timeListener: TimeListener? = object : TimeListener {
+
+        override fun onTimeUpdate(animation: TimeAnimator?, totalTime: Long, deltaTime: Long) {
+            interpolatedRotation += (deviceRotation - interpolatedRotation) * INTERPOLATION_VELOCITY
+            callback?.invoke(interpolatedRotation / deviceRotationAngle)
+        }
     }
 
     fun cancel() {
         if (sensorManager != null) {
             previousEventMillis = System.currentTimeMillis()
-            sensorManager.unregisterListener(this)
+            sensorManager.unregisterListener(sensorListener)
             timeAnimator.setTimeListener(null)
             timeAnimator.cancel()
+
+            sensorListener = null
+            timeListener = null
+            callback = null
         }
     }
-
-    override fun onSensorChanged(event: SensorEvent) {
-        val currentMillis = System.currentTimeMillis()
-        val dT = (currentMillis - previousEventMillis) / SECOND_IN_MILLIS
-        val yRadians = event.values[SENSOR_Y_INDEX] * dT.toDouble()
-        val xRadians = event.values[SENSOR_X_INDEX] * dT.toDouble()
-
-        // y and x are inverted due to the device orientation
-        deviceRotation += TravelVector(
-            x = Math.toDegrees(yRadians).toFloat(),
-            y = Math.toDegrees(xRadians).toFloat()
-        )
-
-        deviceRotation = deviceRotation.coerceIn(-deviceRotationAngle, deviceRotationAngle)
-
-        previousEventMillis = currentMillis
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 }

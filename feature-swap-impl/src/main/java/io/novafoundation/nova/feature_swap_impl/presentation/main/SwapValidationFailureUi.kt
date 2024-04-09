@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -48,9 +49,9 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
 
         NotEnoughFunds.ToPayFee -> resourceManager.notSufficientBalanceToPayFeeErrorMessage().asDefault()
 
-        InvalidSlippage -> TitleAndMessage(
+        is InvalidSlippage -> TitleAndMessage(
             resourceManager.getString(R.string.swap_invalid_slippage_failure_title),
-            resourceManager.getString(R.string.swap_invalid_slippage_failure_message)
+            resourceManager.getString(R.string.swap_invalid_slippage_failure_message, reason.minSlippage.format(), reason.maxSlippage.format())
         ).asDefault()
 
         is NewRateExceededSlippage -> TitleAndMessage(
