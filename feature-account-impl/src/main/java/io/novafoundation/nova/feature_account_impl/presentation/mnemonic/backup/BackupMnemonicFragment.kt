@@ -47,7 +47,6 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         backupMnemonicToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
         backupMnemonicToolbar.setRightActionClickListener { viewModel.optionsClicked() }
 
-        backupMnemonicPassphrase.onMnemonicShownListener { viewModel.onMnemonicShown() }
         buildConditions()
 
         backupMnemonicContinue.setOnClickListener { viewModel.nextClicked() }

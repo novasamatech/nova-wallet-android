@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>-->
+
+    <string name="confirm_mnemonic_not_matching_error_message">Invalid passphrase, please check one more time the words order</string>
+    <string name="confirm_mnemonic_disabled_button_state">Select the words...</string>
+
     <string name="existing_cloud_backup_found_button">Recover Wallets</string>
     <string name="existing_cloud_backup_found_title">Existing Cloud Backup found</string>
     <string name="existing_cloud_backup_found_subtitle">%s All of your wallets will be safely backed up in Google Drive.</string>
@@ -1473,7 +1478,6 @@
     <string name="account_add_already_exists_message">Account already exists. Please, try another one.</string>
     <string name="account_backup_secret_caption">Please make sure to write down your phrase correctly and legibly.</string>
     <string name="account_confirm_mnemonic">Confirm mnemonic</string>
-    <string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>
     <string name="account_confirm_mnemonic_title">Let’s double check it</string>
     <string name="account_confirmation_details">Choose words in the right order</string>
     <string name="account_create_account">Create a new account</string>
