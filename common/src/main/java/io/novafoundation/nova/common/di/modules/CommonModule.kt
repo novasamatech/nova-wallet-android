@@ -64,6 +64,8 @@ import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.RealActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.RealDescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
@@ -326,4 +328,8 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideProgressDialogMixin(): ProgressDialogMixin = RealProgressDialogMixin()
+
+    @Provides
+    @ApplicationScope
+    fun provideActionBottomSheetLauncher(): ActionBottomSheetLauncher = RealActionBottomSheetLauncher()
 }

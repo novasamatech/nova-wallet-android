@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLedgerAddAccountRepository
@@ -23,6 +24,20 @@ import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 
 @Module
 class AddAccountsModule {
+
+    @Provides
+    @FeatureScope
+    fun provideLocalAddMetaAccountRepository(
+        proxySyncService: ProxySyncService,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus,
+        metaAccountDao: MetaAccountDao,
+        secretStoreV2: SecretStoreV2
+    ) = LocalAddMetaAccountRepository(
+        proxySyncService,
+        metaAccountChangesEventBus,
+        metaAccountDao,
+        secretStoreV2
+    )
 
     @Provides
     @FeatureScope

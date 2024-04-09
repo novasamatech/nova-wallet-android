@@ -83,8 +83,23 @@ fun ChainAccountSecrets(
 val EncodableStruct<MetaAccountSecrets>.substrateDerivationPath
     get() = get(MetaAccountSecrets.SubstrateDerivationPath)
 
+val EncodableStruct<MetaAccountSecrets>.substrateKeypair
+    get() = get(MetaAccountSecrets.SubstrateKeypair)
+
 val EncodableStruct<MetaAccountSecrets>.ethereumDerivationPath
     get() = get(MetaAccountSecrets.EthereumDerivationPath)
 
+val EncodableStruct<MetaAccountSecrets>.ethereumKeypair
+    get() = get(MetaAccountSecrets.EthereumKeypair)
+
+val EncodableStruct<KeyPairSchema>.privateKey
+    get() = get(KeyPairSchema.PrivateKey)
+
+val EncodableStruct<KeyPairSchema>.nonce
+    get() = get(KeyPairSchema.Nonce)
+
 val EncodableStruct<ChainAccountSecrets>.derivationPath
     get() = get(ChainAccountSecrets.DerivationPath)
+
+val EncodableStruct<ChainAccountSecrets>.keypair
+    get() = get(ChainAccountSecrets.Keypair)

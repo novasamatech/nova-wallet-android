@@ -191,6 +191,10 @@ class PrimaryButton @JvmOverloads constructor(
         }
 
         val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
+        setAppearance(appearance)
+    }
+
+    fun setAppearance(appearance: Appearance) {
         setAppearance(appearance, cornerSizeDp = size.cornerSizeDp)
     }
 

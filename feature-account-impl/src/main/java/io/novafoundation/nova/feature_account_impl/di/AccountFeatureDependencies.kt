@@ -28,6 +28,7 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -123,6 +124,8 @@ interface AccountFeatureDependencies {
     fun getProxyRepository(): GetProxyRepository
 
     fun cloudBackupService(): CloudBackupService
+
+    fun provideActionBottomSheetLauncher(): ActionBottomSheetLauncher
 
     val systemCallExecutor: SystemCallExecutor
 
