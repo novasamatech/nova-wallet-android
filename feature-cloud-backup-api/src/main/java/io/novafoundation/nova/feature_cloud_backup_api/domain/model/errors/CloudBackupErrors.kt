@@ -11,3 +11,5 @@ interface CloudBackupNotFound
 interface CloudBackupNotEnoughSpace
 
 interface CloudBackupUnknownError
+
+interface CorruptedBackupError

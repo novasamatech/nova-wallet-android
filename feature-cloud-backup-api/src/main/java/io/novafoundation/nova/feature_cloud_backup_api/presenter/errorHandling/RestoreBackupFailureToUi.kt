@@ -6,11 +6,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_cloud_backup_api.R
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotFound
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupUnknownError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CorruptedBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
 
 fun mapRestoreBackupFailureToUi(
     resourceManager: ResourceManager,
-    throwable: Throwable
+    throwable: Throwable,
+    corruptedBackupFound: () -> Unit
 ): TitleAndMessage? {
     return when (throwable) {
         is InvalidBackupPasswordError -> {
@@ -18,6 +20,11 @@ fun mapRestoreBackupFailureToUi(
                 resourceManager.getString(R.string.cloud_backup_error_invalid_password_title),
                 resourceManager.getString(R.string.cloud_backup_error_invalid_password_message),
             )
+        }
+
+        is CorruptedBackupError -> {
+            corruptedBackupFound()
+            return null
         }
 
         is CloudBackupNotFound -> handleCloudBackupNotFound(resourceManager)

@@ -4,5 +4,7 @@ sealed class FetchBackupError : Throwable() {
 
     object BackupNotFound : FetchBackupError(), CloudBackupNotFound
 
+    object CorruptedBackup : FetchBackupError(), CorruptedBackupError
+
     object Other : FetchBackupError(), CloudBackupUnknownError
 }
