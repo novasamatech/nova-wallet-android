@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
@@ -85,6 +85,6 @@ class ConfirmReferendumVoteFragment : BaseFragment<ConfirmReferendumVoteViewMode
             confirmReferendumVoteTransferableAmountChanges.setAmountChangeModel(it.transferableChange)
         }
 
-        viewModel.showNextProgress.observe(confirmReferendumVoteConfirm::setProgress)
+        viewModel.showNextProgress.observe(confirmReferendumVoteConfirm::setProgressState)
     }
 }

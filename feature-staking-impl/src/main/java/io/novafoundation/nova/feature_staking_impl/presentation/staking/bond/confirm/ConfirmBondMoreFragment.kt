@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -70,7 +70,7 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
         setupExternalActions(viewModel)
         observeHints(viewModel.hintsMixin, confirmBondMoreHints)
 
-        viewModel.showNextProgress.observe(confirmBondMoreConfirm::setProgress)
+        viewModel.showNextProgress.observe(confirmBondMoreConfirm::setProgressState)
 
         viewModel.amountModelFlow.observe(confirmBondMoreAmount::setAmount)
 

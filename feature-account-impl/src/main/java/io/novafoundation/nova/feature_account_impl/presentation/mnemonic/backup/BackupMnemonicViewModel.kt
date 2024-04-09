@@ -31,6 +31,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 private const val CONDITIONS_SIZE = 3
+const val CONDITION_ID_1 = 0
+const val CONDITION_ID_2 = 1
+const val CONDITION_ID_3 = 2
 
 class BackupMnemonicViewModel(
     private val interactor: AccountInteractor,

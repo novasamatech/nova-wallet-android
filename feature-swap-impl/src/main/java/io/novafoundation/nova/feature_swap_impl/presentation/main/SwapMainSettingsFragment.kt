@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
@@ -136,7 +136,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             ).show()
         }
 
-        viewModel.validationProgress.observe(swapMainSettingsContinue::setProgress)
+        viewModel.validationProgress.observe(swapMainSettingsContinue::setProgressState)
 
         viewModel.getAssetInOptionsButtonState.observe(swapMainSettingsGetAssetIn::setState)
 

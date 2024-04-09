@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
@@ -84,7 +84,7 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
 
-        viewModel.showNextProgress.observe(confirmContributeConfirm::setProgress)
+        viewModel.showNextProgress.observe(confirmContributeConfirm::setProgressState)
 
         viewModel.assetModelFlow.observe {
             confirmContributeAmount.setAssetBalance(it.assetBalance)

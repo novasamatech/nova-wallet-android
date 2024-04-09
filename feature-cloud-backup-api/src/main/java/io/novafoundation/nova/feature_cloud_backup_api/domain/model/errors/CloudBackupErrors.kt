@@ -1,0 +1,13 @@
+package io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors
+
+interface CloudBackupAuthFailed
+
+interface CloudBackupServiceUnavailable
+
+interface CloudBackupExistingBackupFound
+
+interface CloudBackupNotEnoughSpace
+
+interface CloudBackupConnectionError
+
+interface CloudBackupUnknownError

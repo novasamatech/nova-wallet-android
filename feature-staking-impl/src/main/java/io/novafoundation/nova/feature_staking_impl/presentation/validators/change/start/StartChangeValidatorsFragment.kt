@@ -8,7 +8,7 @@ import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -58,7 +58,7 @@ class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewMode
         observeBrowserEvents(viewModel)
 
         viewModel.validatorsLoading.observe { loading ->
-            startChangeValidatorsRecommended.action.setProgress(loading)
+            startChangeValidatorsRecommended.action.setProgressState(loading)
             startChangeValidatorsCustom.setInProgress(loading)
         }
 

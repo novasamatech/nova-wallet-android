@@ -31,6 +31,7 @@ import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
+import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
@@ -120,6 +121,8 @@ interface AccountFeatureDependencies {
     fun computationalCache(): ComputationalCache
 
     fun getProxyRepository(): GetProxyRepository
+
+    fun cloudBackupService(): CloudBackupService
 
     val systemCallExecutor: SystemCallExecutor
 

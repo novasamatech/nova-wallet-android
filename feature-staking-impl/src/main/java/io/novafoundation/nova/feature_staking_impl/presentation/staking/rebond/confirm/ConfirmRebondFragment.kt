@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -68,7 +68,7 @@ class ConfirmRebondFragment : BaseFragment<ConfirmRebondViewModel>() {
         observeHints(viewModel.hintsMixin, confirmRebondHints)
         setupFeeLoading(viewModel, confirmRebondExtrinsicInformation.fee)
 
-        viewModel.showNextProgress.observe(confirmRebondConfirm::setProgress)
+        viewModel.showNextProgress.observe(confirmRebondConfirm::setProgressState)
 
         viewModel.amountModelFlow.observe(confirmRebondAmount::setAmount)
 

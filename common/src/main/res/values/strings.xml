@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="common_connection_error_title">Connection Failed</string>
+    <string name="common_connection_error_message">Please, check your connection or try again later</string>
+
+    <string name="cloud_backup_error_google_service_auth_failed_title">Google Drive authentication failed</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">Failed to connect to Google Drive due to an authentication issue. Please ensure you have entered the correct credentials. If the issue persists, try re-logging into your Google account.</string>
+
+    <string name="cloud_backup_error_google_service_other_title">Google Drive error</string>
+    <string name="cloud_backup_error_google_service_other_message">Unable to back up your secret to Google Drive. Please ensure you have Google Drive enabled with available storage space and try again</string>
+
+    <string name="cloud_backup_error_google_service_not_enough_space_title">Not Enough Storage</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_message">This device cannot be backed up because there is not enough Google Drive storage available. You can manage your storage in Google Drive.</string>
+
+    <string name="cloud_backup_error_google_service_not_found_title">Google Play services not found</string>
+    <string name="cloud_backup_error_google_service_not_found_message">Unfortunately, Google Drive is not working without Google Play services, which are missing on your device. Try to get Google Play services</string>
+
+    <string name="start_create_wallet_your_wallet_is_ready">Your wallet is ready</string>
     <string name="cloud_backup">Cloud Backup</string>
+    <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. Backup will make sure that your funds are safe and sound, and you can always restore your wallet anytime</string>
+    <string name="start_create_wallet_cloud_backup_btn">Back up to Cloud</string>
+    <string name="start_create_wallet_manual_backup_btn">Back up Manually</string>
 
     <string name="backup_mnemonic_attention_title">Prepare to save your wallet!</string>
     <string name="mnemonic_card_reveal_title">Tap to reveal</string>
