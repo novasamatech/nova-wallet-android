@@ -33,17 +33,13 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
-import kotlin.coroutines.coroutineContext
 
 class RealPooledBalanceUpdaterFactory(
     private val remoteStorageSource: StorageDataSource,
@@ -92,7 +88,6 @@ class PooledBalanceUpdater(
         return remoteStorageSource.subscribe(chain.id, storageSubscriptionBuilder) {
             val poolMemberFlow = metadata.nominationPools.poolMembers
                 .observe(accountId)
-                .shareIn(CoroutineScope(coroutineContext), SharingStarted.Lazily, replay = 1)
 
             val poolWithBalance = poolMemberFlow
                 .map { it?.poolId }
