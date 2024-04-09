@@ -1,16 +1,22 @@
 package io.novafoundation.nova.feature_account_api.data.events
 
-import io.novafoundation.nova.common.utils.bus.BaseEventBus
 import io.novafoundation.nova.common.utils.bus.EventBus
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 
-class MetaAccountChangesEventBus : BaseEventBus<MetaAccountChangesEventBus.Event>() {
+interface MetaAccountChangesEventBus: EventBus<MetaAccountChangesEventBus.Event> {
 
     sealed interface Event : EventBus.Event {
 
-        class AccountAdded(val metaId: Long) : Event
+        val metaId: Long
 
-        class AccountChanged(val metaId: Long) : Event
+        val metaAccountType: LightMetaAccount.Type
 
-        class AccountRemoved(val metaId: Long) : Event
+        class AccountAdded(override val metaId: Long, override val metaAccountType: LightMetaAccount.Type) : Event
+
+        class AccountStructureChanged(override val metaId: Long, override val metaAccountType: LightMetaAccount.Type) : Event
+
+        class AccountRemoved(override val metaId: Long, override val metaAccountType: LightMetaAccount.Type) : Event
+
+        class AccountNameChanged(override val metaId: Long, override val metaAccountType: LightMetaAccount.Type): Event
     }
 }

@@ -261,7 +261,7 @@ class SettingsViewModel(
                             substrateCryptoType = CryptoType.SR25519,
                             name = "Test",
                             type = CloudBackup.WalletPublicInfo.Type.SECRETS,
-                            chainAccounts = listOf(
+                            chainAccounts = setOf(
                                 CloudBackup.WalletPublicInfo.ChainAccountInfo(
                                     chainId = Chain.Geneses.POLKADOT,
                                     publicKey = emptySubstrateAccountId(),
@@ -283,21 +283,27 @@ class SettingsViewModel(
                             substrate = CloudBackup.WalletPrivateInfo.SubstrateSecrets(
                                 seed = ByteArray(32),
                                 keypair = CloudBackup.WalletPrivateInfo.KeyPairSecrets(
+                                    publicKey = ByteArray(32),
                                     privateKey = ByteArray(32),
                                     nonce = ByteArray(32)
                                 ),
                                 derivationPath = null
                             ),
                             ethereum = CloudBackup.WalletPrivateInfo.EthereumSecrets(
-                                privateKey = ByteArray(32),
-                                derivationPath = ""
+                                keypair = CloudBackup.WalletPrivateInfo.KeyPairSecrets(
+                                    publicKey = ByteArray(20),
+                                    privateKey = ByteArray(20),
+                                    nonce = null
+                                ),
+                                derivationPath = null
                             ),
                             chainAccounts = listOf(
                                 CloudBackup.WalletPrivateInfo.ChainAccountSecrets(
-                                    chainId = Chain.Geneses.POLKADOT,
+                                    accountId = ByteArray(32),
                                     entropy = ByteArray(32),
                                     seed = ByteArray(32),
                                     keypair = CloudBackup.WalletPrivateInfo.KeyPairSecrets(
+                                        publicKey = ByteArray(32),
                                         privateKey = ByteArray(32),
                                         nonce = ByteArray(32)
                                     ),

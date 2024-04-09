@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountIdsLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
@@ -89,6 +90,11 @@ interface MetaAccountDao {
         return metaId
     }
 
+    @Transaction
+    suspend fun withTransaction(action: suspend () -> Unit) {
+        action()
+    }
+
     @Insert
     suspend fun insertMetaAccount(metaAccount: MetaAccountLocal): Long
 
@@ -103,6 +109,9 @@ interface MetaAccountDao {
 
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
+
+    @Query("SELECT globallyUniqueId, id FROM meta_accounts")
+    suspend fun getMetaAccountIds(): List<MetaAccountIdsLocal>
 
     @Query("SELECT * FROM meta_accounts WHERE status = :status")
     @Transaction
@@ -146,6 +155,9 @@ interface MetaAccountDao {
     @Transaction
     suspend fun getJoinedMetaAccountInfo(metaId: Long): RelationJoinedMetaAccountInfo
 
+    @Query("SELECT type FROM meta_accounts WHERE id = :metaId")
+    suspend fun getMetaAccountType(metaId: Long): MetaAccountLocal.Type?
+
     @Query("SELECT * FROM meta_accounts WHERE isSelected = 1")
     @Transaction
     fun selectedMetaAccountInfoFlow(): Flow<RelationJoinedMetaAccountInfo?>
@@ -180,6 +192,20 @@ interface MetaAccountDao {
     """
     )
     suspend fun delete(metaId: Long)
+
+    @Query(
+        """
+        WITH RECURSIVE accounts_to_delete AS (
+            SELECT id, parentMetaId FROM meta_accounts WHERE id IN (:metaIds)
+            UNION ALL
+            SELECT m.id, m.parentMetaId
+            FROM meta_accounts m
+            JOIN accounts_to_delete r ON m.parentMetaId = r.id
+        )
+        DELETE FROM meta_accounts WHERE id IN (SELECT id FROM accounts_to_delete)
+    """
+    )
+    suspend fun delete(metaIds: List<Long>)
 
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")
     suspend fun nextAccountPosition(): Int

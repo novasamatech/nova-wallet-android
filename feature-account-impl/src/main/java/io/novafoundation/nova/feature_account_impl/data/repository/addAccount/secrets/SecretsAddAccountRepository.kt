@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.s
 
 import android.database.sqlite.SQLiteConstraintException
 import io.novafoundation.nova.core.model.CryptoType
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -19,9 +19,8 @@ abstract class SecretsAddAccountRepository<T>(
     private val accountDataSource: AccountDataSource,
     private val accountSecretsFactory: AccountSecretsFactory,
     private val chainRegistry: ChainRegistry,
-    proxySyncService: ProxySyncService,
     metaAccountChangesEventBus: MetaAccountChangesEventBus
-) : BaseAddAccountRepository<T>(proxySyncService, metaAccountChangesEventBus) {
+) : BaseAddAccountRepository<T>(metaAccountChangesEventBus) {
 
     protected suspend fun pickCryptoType(addAccountType: AddAccountType, advancedEncryption: AdvancedEncryption): CryptoType {
         val cryptoType = if (addAccountType is AddAccountType.ChainAccount && chainRegistry.getChain(addAccountType.chainId).isEthereumBased) {
@@ -71,7 +70,7 @@ abstract class SecretsAddAccountRepository<T>(
             )
         }
 
-        return AddAccountResult.AccountAdded(metaId)
+        return AddAccountResult.AccountAdded(metaId, LightMetaAccount.Type.SECRETS)
     }
 
     private suspend fun addChainAccount(
@@ -99,7 +98,7 @@ abstract class SecretsAddAccountRepository<T>(
             )
         }
 
-        return AddAccountResult.AccountChanged(addAccountType.metaId)
+        return AddAccountResult.AccountChanged(addAccountType.metaId, LightMetaAccount.Type.SECRETS)
     }
 
     private inline fun <R> transformingInsertionErrors(action: () -> R) = try {

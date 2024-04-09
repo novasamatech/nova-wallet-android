@@ -225,3 +225,6 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
         LightMetaAccount.Type.PROXIED -> false
     }
 }
+
+val LightMetaAccount.Type.isProxied: Boolean
+    get() = this == LightMetaAccount.Type.PROXIED

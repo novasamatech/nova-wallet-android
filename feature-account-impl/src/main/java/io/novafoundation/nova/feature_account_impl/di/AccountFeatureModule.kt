@@ -25,12 +25,16 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
@@ -46,11 +50,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.feature_account_impl.RealBiometricServiceFactory
+import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
+import io.novafoundation.nova.feature_account_impl.data.events.RealMetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
@@ -66,6 +74,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.di.modules.AdvancedEncryptionStoreModule
+import io.novafoundation.nova.feature_account_impl.di.modules.CloudBackupModule
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
@@ -76,12 +85,6 @@ import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInt
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
-import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
-import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
@@ -123,7 +126,8 @@ import javax.inject.Named
         ParitySignerModule::class,
         IdentityProviderModule::class,
         AdvancedEncryptionStoreModule::class,
-        AddAccountsModule::class
+        AddAccountsModule::class,
+        CloudBackupModule::class
     ]
 )
 class AccountFeatureModule {
@@ -173,7 +177,13 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMetaAccountChangesRequestBus() = MetaAccountChangesEventBus()
+    fun provideMetaAccountChangesRequestBus(
+        proxySyncService: ProxySyncService,
+        cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
+    ): MetaAccountChangesEventBus = RealMetaAccountChangesEventBus(
+        proxySyncService = proxySyncService,
+        cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker
+    )
 
     @Provides
     @FeatureScope

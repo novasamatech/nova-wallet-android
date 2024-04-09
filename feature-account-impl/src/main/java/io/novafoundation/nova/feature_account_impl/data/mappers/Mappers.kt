@@ -91,7 +91,7 @@ fun mapNodeLocalToNode(nodeLocal: NodeLocal): Node {
     }
 }
 
-private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
+fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
     return when (local) {
         MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
         MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
