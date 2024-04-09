@@ -19,7 +19,7 @@ class RealMetaAccountChangesEventBus(
     override suspend fun notify(event: MetaAccountChangesEventBus.Event) {
         super.notify(event)
 
-        cloudBackupAccountsModificationsTracker.recordAccountsModified(event.metaAccountType)
+        cloudBackupAccountsModificationsTracker.recordAccountModified(event.metaAccountType)
 
         when (event) {
             is MetaAccountChangesEventBus.Event.AccountAdded -> onAccountAdded(event.metaId, event.metaAccountType)

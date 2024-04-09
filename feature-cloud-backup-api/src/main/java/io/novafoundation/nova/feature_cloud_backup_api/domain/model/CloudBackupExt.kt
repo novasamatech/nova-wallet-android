@@ -15,6 +15,8 @@ class CloudBackupDiff(
     )
 }
 
+fun CloudBackupDiff.PerSourceDiff.isEmpty(): Boolean = added.isEmpty() && modified.isEmpty() && removed.isEmpty()
+
 /**
  * Finds the diff between local and cloud versions
  *

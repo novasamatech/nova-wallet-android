@@ -29,6 +29,7 @@ import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAcco
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isEmpty
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
@@ -139,6 +140,7 @@ class RealLocalAccountsCloudBackupFacade(
 
     override suspend fun applyBackupDiff(diff: CloudBackupDiff, cloudVersion: CloudBackup) {
         val localChangesToApply = diff.localChanges
+        if (localChangesToApply.isEmpty()) return
 
         val metaAccountsByUuid = getAllBackupableAccounts().associateBy { it.metaAccount.globallyUniqueId }
 
@@ -147,6 +149,8 @@ class RealLocalAccountsCloudBackupFacade(
             applyLocalAddition(localChangesToApply.added, cloudVersion)
             applyLocalModification(localChangesToApply.removed, cloudVersion)
         }
+
+        cloudBackupAccountsModificationsTracker.recordAccountsModified()
     }
 
     private suspend fun applyLocalRemoval(toRemove: List<CloudBackup.WalletPublicInfo>, metaAccountsByUUid: Map<String, JoinedMetaAccountInfo>) {

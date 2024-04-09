@@ -6,7 +6,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.isProxied
 
 interface CloudBackupAccountsModificationsTracker {
 
-    fun recordAccountsModified(modifiedAccountType: LightMetaAccount.Type)
+    fun recordAccountModified(modifiedAccountType: LightMetaAccount.Type)
+
+    fun recordAccountsModified()
 
     fun getAccountsLastModifiedAt(): Long
 }
@@ -24,13 +26,13 @@ class RealCloudBackupAccountsModificationsTracker(
 
     }
 
-    override fun recordAccountsModified(modifiedAccountType: LightMetaAccount.Type) {
+    override fun recordAccountModified(modifiedAccountType: LightMetaAccount.Type) {
       if (!modifiedAccountType.isProxied) {
           recordAccountsModified()
       }
     }
 
-    private fun recordAccountsModified() {
+    override fun recordAccountsModified() {
         preferences.putLong(MODIFIED_AT_KEY, System.currentTimeMillis())
     }
 
