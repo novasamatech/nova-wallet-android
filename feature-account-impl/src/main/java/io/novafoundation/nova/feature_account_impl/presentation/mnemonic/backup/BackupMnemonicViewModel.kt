@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.MnemonicWord
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -45,7 +44,6 @@ class BackupMnemonicViewModel(
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
-    private val mnemonicWasShown = MutableStateFlow(false)
     private val conditionsState = MutableStateFlow(mapOf<Int, Boolean>())
 
     private val advancedEncryptionSelectionStore = async {
@@ -70,10 +68,10 @@ class BackupMnemonicViewModel(
         }
     }.shareInBackground()
 
-    val continueButtonState = combine(mnemonicWasShown, conditionsState) { mnemonicShown, conditions ->
+    val continueButtonState = conditionsState.map { conditions ->
         val allConditionsSelected = conditions.values.size == CONDITIONS_SIZE && conditions.values.all { it }
         when {
-            mnemonicShown && allConditionsSelected -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
+            allConditionsSelected -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
             else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.backup_mnemonic_disabled_button))
         }
     }
@@ -119,10 +117,6 @@ class BackupMnemonicViewModel(
         )
 
         router.openConfirmMnemonicOnCreate(payload)
-    }
-
-    fun onMnemonicShown() {
-        mnemonicWasShown.value = true
     }
 
     fun conditionClicked(index: Int, isChecked: Boolean) {

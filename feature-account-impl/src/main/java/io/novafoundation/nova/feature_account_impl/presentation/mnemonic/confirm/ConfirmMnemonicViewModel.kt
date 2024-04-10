@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.added
 import io.novafoundation.nova.common.utils.modified
 import io.novafoundation.nova.common.utils.removed
-import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryption
@@ -46,8 +46,12 @@ class ConfirmMnemonicViewModel(
     private val _destinationWords = MutableStateFlow<List<MnemonicWord>>(emptyList())
     val destinationWords: Flow<List<MnemonicWord>> = _destinationWords
 
-    val nextButtonEnabled = destinationWords.map {
-        originMnemonic.size == it.size
+    val nextButtonState = destinationWords.map {
+        if (originMnemonic.size == it.size) {
+            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+        } else {
+            DescriptiveButtonState.Disabled(resourceManager.getString(R.string.confirm_mnemonic_disabled_button_state))
+        }
     }
 
     val skipVisible = payload.createExtras != null && config.allowShowingSkip
@@ -89,14 +93,11 @@ class ConfirmMnemonicViewModel(
     }
 
     fun continueClicked() {
-        val mnemonicFromDestination = _destinationWords.value.map(MnemonicWord::content)
-
-        if (mnemonicFromDestination == originMnemonic) {
-            proceed()
-        } else {
-            deviceVibrator.makeShortVibration()
-            _matchingMnemonicErrorAnimationEvent.sendEvent()
-        }
+        deviceVibrator.makeShortVibration()
+        showError(
+            resourceManager.getString(R.string.common_error_general_title),
+            resourceManager.getString(R.string.confirm_mnemonic_not_matching_error_message)
+        )
     }
 
     private fun List<MnemonicWord>.fixIndices(): List<MnemonicWord> {

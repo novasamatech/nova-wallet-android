@@ -100,7 +100,7 @@ class StartCreateWalletViewModel(
     }
 
     fun manualBackupClicked() {
-        router.openMnemonicScreen(null, AddAccountPayload.MetaAccount)
+        router.openMnemonicScreen(nameInput.value, AddAccountPayload.MetaAccount)
     }
 
     private fun userHasExistingBackup() {

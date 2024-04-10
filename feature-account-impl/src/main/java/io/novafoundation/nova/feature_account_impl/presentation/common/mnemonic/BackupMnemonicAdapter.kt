@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic
 
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -59,7 +60,7 @@ class BackupMnemonicAdapter(
         fun bindState(item: MnemonicWord) = with(containerView) {
             val hasWord = !item.removed
 
-            isEnabled = hasWord
+            setVisible(hasWord, falseState = View.INVISIBLE)
 
             itemConfirmMnemonicWord.setVisible(hasWord, falseState = View.INVISIBLE)
 
@@ -72,6 +73,7 @@ class BackupMnemonicAdapter(
 
         fun bindIndex(item: MnemonicWord) {
             containerView.itemConfirmMnemonicIndex.setTextOrHide(item.indexDisplay)
+            containerView.itemConfirmMnemonicWord.gravity = if (item.indexDisplay == null) Gravity.CENTER else Gravity.START
         }
     }
 
