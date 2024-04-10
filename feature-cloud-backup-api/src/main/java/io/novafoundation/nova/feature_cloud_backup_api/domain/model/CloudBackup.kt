@@ -25,7 +25,7 @@ data class CloudBackup(
         val name: String,
         val type: Type,
         val chainAccounts: Set<ChainAccountInfo>
-    ): Identifiable {
+    ) : Identifiable {
 
         override val identifier: String = walletId
 

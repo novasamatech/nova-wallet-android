@@ -36,7 +36,7 @@ class RealMetaAccountChangesEventBus(
     private fun onAccountRemoved(metaId: Long, type: LightMetaAccount.Type) {}
 
     private fun onAccountStructureChanged(metaId: Long, type: LightMetaAccount.Type) {
-       proxySyncService.get().startSyncingForMetaAccountChange(type)
+        proxySyncService.get().startSyncingForMetaAccountChange(type)
     }
 
     private fun onAccountNameChanged(metaId: Long) {}

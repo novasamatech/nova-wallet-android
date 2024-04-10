@@ -15,7 +15,7 @@ interface CloudBackupAccountsModificationsTracker {
 
 class RealCloudBackupAccountsModificationsTracker(
     private val preferences: Preferences
-): CloudBackupAccountsModificationsTracker {
+) : CloudBackupAccountsModificationsTracker {
 
     init {
         ensureInitialized()
@@ -23,13 +23,12 @@ class RealCloudBackupAccountsModificationsTracker(
 
     companion object {
         private const val MODIFIED_AT_KEY = "AccountsModificationsTracker.Key"
-
     }
 
     override fun recordAccountModified(modifiedAccountType: LightMetaAccount.Type) {
-      if (!modifiedAccountType.isProxied) {
-          recordAccountsModified()
-      }
+        if (!modifiedAccountType.isProxied) {
+            recordAccountsModified()
+        }
     }
 
     override fun recordAccountsModified() {
@@ -42,7 +41,7 @@ class RealCloudBackupAccountsModificationsTracker(
 
     private fun ensureInitialized() {
         if (!preferences.contains(MODIFIED_AT_KEY)) {
-           recordAccountsModified()
+            recordAccountsModified()
         }
     }
 }

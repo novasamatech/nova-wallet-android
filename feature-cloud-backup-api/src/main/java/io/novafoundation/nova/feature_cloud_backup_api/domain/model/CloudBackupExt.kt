@@ -66,7 +66,7 @@ fun CloudBackup.PublicData.localVsCloudDiff(
 
     val priority = priorityResolution.resolvePriority(localVersion, cloudVersion)
 
-    return when(priority) {
+    return when (priority) {
         Priority.LOCAL -> {
             // modified, added: local, deleted: cloud
             val cloudToLocalDiff = CollectionDiffer.findDiff(newItems = localVersion.wallets, oldItems = cloudVersion.wallets, forceUseNewItems = false)
@@ -105,13 +105,13 @@ fun CloudBackup.PublicData.localVsCloudDiff(
         Priority.EQUAL -> CloudBackupDiff(
             localChanges = CloudBackupDiff.PerSourceDiff(
                 added = emptyList(),
-                modified =  emptyList(),
-                removed =  emptyList()
+                modified = emptyList(),
+                removed = emptyList()
             ),
             cloudChanges = CloudBackupDiff.PerSourceDiff(
-                added =  emptyList(),
-                modified =  emptyList(),
-                removed =  emptyList()
+                added = emptyList(),
+                modified = emptyList(),
+                removed = emptyList()
             )
         )
     }

@@ -16,7 +16,6 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 const val TEST_MODIFIED_AT = 0L
 
 fun buildTestCloudBackup(builder: CloudBackupBuilder.() -> Unit): CloudBackup {
-
     return CloudBackupBuilder().apply(builder).build()
 }
 
@@ -225,7 +224,6 @@ class WalletPublicInfoBuilder(
     private var _name: String = ""
     private var _isSelected: Boolean = false
     private var _type: WalletPublicInfo.Type = WalletPublicInfo.Type.SECRETS
-
 
     fun chainAccount(chainId: ChainId, builder: WalletChainAccountInfoBuilder.() -> Unit) {
         val chainAccountLocal = WalletChainAccountInfoBuilder(chainId).apply(builder).build()

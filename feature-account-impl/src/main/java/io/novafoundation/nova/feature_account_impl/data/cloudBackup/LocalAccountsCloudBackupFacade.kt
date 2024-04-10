@@ -103,7 +103,6 @@ suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersion(cloud
     }
 }
 
-
 class RealLocalAccountsCloudBackupFacade(
     private val secretsStoreV2: SecretStoreV2,
     private val accountDao: MetaAccountDao,

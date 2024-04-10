@@ -117,6 +117,5 @@ val EncodableStruct<KeyPairSchema>.privateKey
 val EncodableStruct<KeyPairSchema>.publicKey
     get() = get(KeyPairSchema.PublicKey)
 
-
 val EncodableStruct<KeyPairSchema>.nonce
     get() = get(KeyPairSchema.Nonce)
