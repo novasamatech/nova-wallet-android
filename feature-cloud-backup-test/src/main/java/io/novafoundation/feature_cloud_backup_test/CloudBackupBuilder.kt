@@ -15,10 +15,15 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 
 const val TEST_MODIFIED_AT = 0L
 
+@DslMarker
+annotation class CloudBackupBuildDsl
+
+@CloudBackupBuildDsl
 fun buildTestCloudBackup(builder: CloudBackupBuilder.() -> Unit): CloudBackup {
     return CloudBackupBuilder().apply(builder).build()
 }
 
+@CloudBackupBuildDsl
 class CloudBackupBuilder {
 
     private var privateData: CloudBackup.PrivateData? = null
@@ -44,6 +49,7 @@ class CloudBackupBuilder {
     }
 }
 
+@CloudBackupBuildDsl
 class CloudBackupPublicDataBuilder {
 
     private var _modifiedAt: Long = TEST_MODIFIED_AT
@@ -65,6 +71,7 @@ class CloudBackupPublicDataBuilder {
     }
 }
 
+@CloudBackupBuildDsl
 class CloudBackupPrivateDataBuilder {
 
     private val wallets = mutableListOf<WalletPrivateInfo>()
@@ -82,6 +89,7 @@ class CloudBackupPrivateDataBuilder {
     }
 }
 
+@CloudBackupBuildDsl
 class WalletPrivateInfoBuilder(
     private val walletId: String,
 ) {
@@ -128,6 +136,7 @@ class WalletPrivateInfoBuilder(
     }
 }
 
+@CloudBackupBuildDsl
 class BackupSubstrateSecretsBuilder {
 
     private var _keypair: KeyPairSecrets = KeyPairSecrets(
@@ -155,6 +164,7 @@ class BackupSubstrateSecretsBuilder {
     }
 }
 
+@CloudBackupBuildDsl
 class BackupEthereumSecretsBuilder {
 
     private var _keypair: KeyPairSecrets = KeyPairSecrets(
@@ -177,6 +187,7 @@ class BackupEthereumSecretsBuilder {
     }
 }
 
+@CloudBackupBuildDsl
 class BackupChainAccountSecretsBuilder(private val accountId: AccountId) {
 
     private var _entropy: ByteArray? = null
@@ -210,6 +221,7 @@ class BackupChainAccountSecretsBuilder(private val accountId: AccountId) {
     }
 }
 
+@CloudBackupBuildDsl
 class WalletPublicInfoBuilder(
     private val walletId: String,
 ) {
@@ -277,6 +289,7 @@ class WalletPublicInfoBuilder(
     }
 }
 
+@CloudBackupBuildDsl
 class WalletChainAccountInfoBuilder(
     private val chainId: ChainId,
 ) {

@@ -13,8 +13,12 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import org.mockito.ArgumentMatchers.anyLong
 
+@DslMarker
+annotation class SecretStoreSdl
+
 object SecretStoreMocker {
 
+    @SecretStoreSdl
     suspend fun setupMocks(
         secretStoreV2: SecretStoreV2,
         mockBuilder: SecretStoreMockerBuilder.() -> Unit
@@ -48,6 +52,7 @@ class MockMetaAccountSecrets(
     val additional: Map<String, String>
 )
 
+@SecretStoreSdl
 class SecretStoreMockerBuilder() {
 
     private val secrets = mutableMapOf<Long, MockMetaAccountSecrets>()
@@ -67,6 +72,7 @@ class SecretStoreMockerBuilder() {
     }
 }
 
+@SecretStoreSdl
 class MetaAccountSecretsMockBuilder(
     private val metaId: Long,
 ) {
@@ -135,6 +141,7 @@ class MetaAccountSecretsMockBuilder(
     fun buildAdditional(): Map<String, String> = additional
 }
 
+@SecretStoreSdl
 class ChainAccountSecretsMockBuilder(
     private val metaId: Long,
 ) {

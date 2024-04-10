@@ -218,7 +218,6 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         }
 
                         ethereum {
-                            entropy(bytes32)
                             derivationPath(ethereumDerivationPath)
                             keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
                         }
@@ -245,7 +244,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
         SecretStoreMocker.setupMocks(secretStore) {}
 
         val localBackup = buildTestCloudBackup {
-            publicData {  }
+            publicData {
+            }
 
             privateData {  }
         }
@@ -281,7 +281,6 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         }
 
                         ethereum {
-                            entropy(bytes32)
                             derivationPath(ethereumDerivationPath)
                             keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
                         }
@@ -318,11 +317,295 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(metaAccountDao, never()).deleteChainAccounts(any())
     }
 
+    @Test
+    fun shouldApplyRemoveAccountDiff(): Unit = runBlocking {
+        LocalAccountsMocker.setupMocks(metaAccountDao) {
+            generateWallets(walletsCount = 1) { walletIndex, uuid, bytes32, bytes20 ->
+                metaAccount(walletIndex) {
+                    globallyUniqueId(uuid)
+
+                    substrateAccountId(bytes32)
+                    substrateCryptoType(CryptoType.SR25519)
+                    substratePublicKey(bytes32)
+
+                    ethereumPublicKey(bytes32)
+                    ethereumAddress(bytes20)
+
+                    chainAccount(chainId(walletIndex)) {
+                        publicKey(bytes32)
+                        accountId(bytes32)
+                        cryptoType(CryptoType.ED25519)
+                    }
+                }
+            }
+        }
+        SecretStoreMocker.setupMocks(secretStore) {
+            generateWallets(walletsCount = 1) { walletIndex, _, bytes32, _ ->
+                metaAccount(walletIndex) {
+                    entropy(bytes32)
+                    seed(bytes32)
+                    substrateKeypair(Sr25519Keypair(bytes32, bytes32, bytes32))
+
+                    ethereumKeypair(BaseKeypair(bytes32, bytes32))
+                    ethereumDerivationPath(ethereumDerivationPath)
+
+                    chainAccount(accountId = bytes32) {
+                        entropy(bytes32)
+                        seed(bytes32)
+                        derivationPath("//${walletIndex}")
+                        keypair(BaseKeypair(bytes32, bytes32))
+                    }
+                }
+            }
+        }
+
+        val localBackup = buildTestCloudBackup {
+            publicData {
+                generateWallets(walletsCount = 1) { index, uuid, bytes32, bytes20 ->
+                    wallet(uuid) {
+                        substrateAccountId(bytes32)
+                        substrateCryptoType(CryptoType.SR25519)
+                        substratePublicKey(bytes32)
+
+                        ethereumPublicKey(bytes32)
+                        ethereumAddress(bytes20)
+
+                        chainAccount(chainId(index)) {
+                            publicKey(bytes32)
+                            accountId(bytes32)
+                            cryptoType(CryptoType.ED25519)
+                        }
+                    }
+                }
+            }
+
+            privateData {
+                generateWallets(walletsCount = 1) { index, uuid, bytes32, _ ->
+                    wallet(uuid) {
+                        entropy(bytes32)
+
+                        substrate {
+                            seed(bytes32)
+                            keypair(KeyPairSecrets(bytes32, bytes32, bytes32))
+                        }
+
+                        ethereum {
+                            derivationPath(ethereumDerivationPath)
+                            keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
+                        }
+
+                        chainAccount(accountId = bytes32) {
+                            entropy(bytes32)
+                            seed(bytes32)
+                            derivationPath("//${index}")
+                            keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
+                        }
+                    }
+                }
+            }
+        }
+
+        val cloudBackup = buildTestCloudBackup {
+            publicData {  }
+
+            privateData {  }
+        }
+
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupPriorityResolutionStrategy.alwaysCloud())
+
+        facade.applyBackupDiff(diff, cloudBackup)
+
+        val bytes32 = bytes32of(0)
+        val chainAccountIds = listOf(bytes32)
+
+        verify(metaAccountDao).delete(singleMetaIdListOf(0))
+        verify(secretStore).clearSecrets(eq(0), byteArrayListEq(chainAccountIds))
+
+        // no additions happened
+        verify(secretStore, never()).putMetaAccountSecrets(anyLong(), any())
+        verify(secretStore, never()).putChainAccountSecrets(anyLong(), any(), any())
+        verify(metaAccountDao, never()).insertMetaAccount(any())
+        verify(metaAccountDao, never()).insertChainAccounts(any())
+
+        // no modifications happened
+        verify(metaAccountDao, never()).updateMetaAccount(any())
+    }
+
+    // Tests that we will apply chan account deletion and entropy change
+    @Test
+    fun shouldApplyModifyAccountDiff(): Unit = runBlocking {
+        val changedBytes32 = bytes32of(3)
+
+        LocalAccountsMocker.setupMocks(metaAccountDao) {
+            generateWallets(walletsCount = 1) { walletIndex, uuid, bytes32, bytes20 ->
+                metaAccount(walletIndex) {
+                    globallyUniqueId(uuid)
+
+                    substrateAccountId(bytes32)
+                    substrateCryptoType(CryptoType.SR25519)
+                    substratePublicKey(bytes32)
+
+                    ethereumPublicKey(bytes32)
+                    ethereumAddress(bytes20)
+
+                    chainAccount(chainId(walletIndex)) {
+                        publicKey(bytes32)
+                        accountId(bytes32)
+                        cryptoType(CryptoType.ED25519)
+                    }
+                }
+            }
+        }
+        SecretStoreMocker.setupMocks(secretStore) {
+            generateWallets(walletsCount = 1) { walletIndex, _, bytes32, _ ->
+                metaAccount(walletIndex) {
+                    entropy(bytes32)
+                    seed(bytes32)
+                    substrateKeypair(Sr25519Keypair(bytes32, bytes32, bytes32))
+
+                    ethereumKeypair(BaseKeypair(bytes32, bytes32))
+                    ethereumDerivationPath(ethereumDerivationPath)
+
+                    chainAccount(accountId = bytes32) {
+                        entropy(bytes32)
+                        seed(bytes32)
+                        derivationPath("//${walletIndex}")
+                        keypair(BaseKeypair(bytes32, bytes32))
+                    }
+                }
+            }
+        }
+
+        val localBackup = buildTestCloudBackup {
+            publicData {
+                generateWallets(walletsCount = 1) { index, uuid, bytes32, bytes20 ->
+                    wallet(uuid) {
+                        substrateAccountId(bytes32)
+                        substrateCryptoType(CryptoType.SR25519)
+                        substratePublicKey(bytes32)
+
+                        ethereumPublicKey(bytes32)
+                        ethereumAddress(bytes20)
+
+                        chainAccount(chainId(index)) {
+                            publicKey(bytes32)
+                            accountId(bytes32)
+                            cryptoType(CryptoType.ED25519)
+                        }
+                    }
+                }
+            }
+
+            privateData {
+                generateWallets(walletsCount = 1) { index, uuid, bytes32, _ ->
+                    wallet(uuid) {
+                        entropy(bytes32)
+
+                        substrate {
+                            seed(bytes32)
+                            keypair(KeyPairSecrets(bytes32, bytes32, bytes32))
+                        }
+
+                        ethereum {
+                            derivationPath(ethereumDerivationPath)
+                            keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
+                        }
+
+                        chainAccount(accountId = bytes32) {
+                            entropy(bytes32)
+                            seed(bytes32)
+                            derivationPath("//${index}")
+                            keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
+                        }
+                    }
+                }
+            }
+        }
+
+        val cloudBackup = buildTestCloudBackup {
+            publicData {
+                generateWallets(walletsCount = 1) { _, uuid, bytes32, bytes20 ->
+                    wallet(uuid) {
+                        substrateAccountId(changedBytes32)
+                        substrateCryptoType(CryptoType.SR25519)
+                        substratePublicKey(changedBytes32)
+
+                        ethereumPublicKey(bytes32)
+                        ethereumAddress(bytes20)
+                    }
+                }
+            }
+
+            privateData {
+                generateWallets(walletsCount = 1) { _, uuid, bytes32, _ ->
+                    wallet(uuid) {
+                        entropy(changedBytes32)
+
+                        substrate {
+                            seed(changedBytes32)
+                            keypair(KeyPairSecrets(changedBytes32, changedBytes32, changedBytes32))
+                        }
+
+                        ethereum {
+                            derivationPath(ethereumDerivationPath)
+                            keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
+                        }
+                    }
+                }
+            }
+        }
+
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupPriorityResolutionStrategy.alwaysCloud())
+
+        facade.applyBackupDiff(diff, cloudBackup)
+
+        val oldBytes32 = bytes32of(0)
+        val oldBytes20 = bytes20of(0)
+        val chainAccountIds = listOf(oldBytes32)
+        val uuid = walletUUid(0)
+
+        // Meta account got updated with new accountId but ethereum address stays the same
+        verify(metaAccountDao).updateMetaAccount(argThat {
+            it.globallyUniqueId == uuid && it.substrateAccountId.contentEquals(changedBytes32) &&
+                it.ethereumAddress.contentEquals(oldBytes20)
+        })
+
+        // Chain account was removed
+        verify(metaAccountDao).deleteChainAccounts(argThat {
+            it.size == 1 && it.single().accountId.contentEquals(oldBytes32)
+        })
+
+        // No new chain accounts were inserted
+        verify(metaAccountDao, never()).insertChainAccounts(any())
+
+        // Entropy was updated
+        verify(secretStore).putMetaAccountSecrets(eq(0), metaAccountSecretsWithEntropy(changedBytes32))
+
+        verify(secretStore).clearSecrets(eq(0), byteArrayListEq(chainAccountIds))
+
+        // No new chain account secrets were inserted
+        verify(secretStore, never()).putChainAccountSecrets(anyLong(), any(), any())
+
+        // no additions happened
+        verify(metaAccountDao, never()).insertMetaAccount(any())
+
+        // no deletes happened
+        verify(metaAccountDao, never()).delete(any<List<Long>>())
+    }
+
+    private fun singleMetaIdListOf(id: Long): List<Long> {
+        return argThat { it.size == 1 && it.single() == id }
+    }
+
     private fun chainAccountSecretsWithEntropy(entropy: ByteArray): EncodableStruct<ChainAccountSecrets> {
         return  argThat { it.entropy.contentEquals(entropy) }
     }
 
     private fun byteArrayEq(value: ByteArray): ByteArray = argThat { it.contentEquals(value) }
+
+    private fun byteArrayListEq(value: List<ByteArray>): List<ByteArray> = argThat {
+        value.zip(it).all { (expected, actual) -> expected.contentEquals(actual) }
+    }
 
     private fun metaAccountSecretsWithEntropy(entropy: ByteArray): EncodableStruct<MetaAccountSecrets> {
         return  argThat { it.entropy.contentEquals(entropy) }

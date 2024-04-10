@@ -242,11 +242,15 @@ class RealLocalAccountsCloudBackupFacade(
             accountDao.updateMetaAccount(updatedMetaAccountLocal)
 
             // Delete all previous ChainAccountLocal associated with currently processed meta account
-            accountDao.deleteChainAccounts(oldMetaAccountJoinInfo.chainAccounts)
+            if (oldMetaAccountJoinInfo.chainAccounts.isNotEmpty()) {
+                accountDao.deleteChainAccounts(oldMetaAccountJoinInfo.chainAccounts)
+            }
 
             // Insert all ChainAccountLocal from backup
             val updatedChainAccountsLocal = publicWalletInfo.getChainAccountsLocal(metaId)
-            accountDao.insertChainAccounts(updatedChainAccountsLocal)
+            if (updatedChainAccountsLocal.isNotEmpty()) {
+                accountDao.insertChainAccounts(updatedChainAccountsLocal)
+            }
 
             // Update meta account secrets
             val metaAccountSecrets = cloudVersion.getMetaAccountSecrets(publicWalletInfo.walletId)
@@ -287,7 +291,19 @@ class RealLocalAccountsCloudBackupFacade(
 
     private suspend fun getAllBackupableAccounts(): List<JoinedMetaAccountInfo> {
         return accountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
-            .filter { it.metaAccount.type != MetaAccountLocal.Type.PROXIED }
+            .filter { it.metaAccount.type.isBackupable() }
+    }
+
+    private fun MetaAccountLocal.Type.isBackupable(): Boolean {
+        return when (this) {
+            MetaAccountLocal.Type.SECRETS,
+            MetaAccountLocal.Type.WATCH_ONLY,
+            MetaAccountLocal.Type.PARITY_SIGNER,
+            MetaAccountLocal.Type.LEDGER,
+            MetaAccountLocal.Type.POLKADOT_VAULT -> true
+
+            MetaAccountLocal.Type.PROXIED -> false
+        }
     }
 
     private suspend fun preparePrivateBackupData(metaAccounts: List<JoinedMetaAccountInfo>): CloudBackup.PrivateData {

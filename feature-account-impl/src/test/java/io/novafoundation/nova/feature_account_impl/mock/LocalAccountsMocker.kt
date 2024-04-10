@@ -11,8 +11,12 @@ import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.whenever
 import kotlinx.coroutines.runBlocking
 
+@DslMarker
+annotation class LocalAccountsMockerDsl
+
 object LocalAccountsMocker {
 
+    @LocalAccountsMockerDsl
     suspend fun setupMocks(
         dao: MetaAccountDao,
         mockBuilder: LocalAccountsMockerBuilder.() -> Unit
@@ -41,6 +45,7 @@ object LocalAccountsMocker {
     }
 }
 
+@LocalAccountsMockerDsl
 class LocalAccountsMockerBuilder {
 
     private val metaAccounts = mutableListOf<JoinedMetaAccountInfo>()
@@ -54,6 +59,7 @@ class LocalAccountsMockerBuilder {
     }
 }
 
+@LocalAccountsMockerDsl
 class LocalMetaAccountMockBuilder(
     private val metaId: Long,
 ) {
@@ -147,6 +153,7 @@ class LocalMetaAccountMockBuilder(
     }
 }
 
+@LocalAccountsMockerDsl
 class LocalChainAccountMockBuilder(
     private val metaId: Long,
     private val chainId: ChainId,
