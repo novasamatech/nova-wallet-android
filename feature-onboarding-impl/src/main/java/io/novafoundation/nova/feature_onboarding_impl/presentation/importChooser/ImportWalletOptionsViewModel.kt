@@ -46,7 +46,7 @@ class ImportWalletOptionsViewModel(
             onboardingInteractor.checkCloudBackupIsExist()
                 .onSuccess { isCloudBackupExist ->
                     if (isCloudBackupExist) {
-                        router.openRestoreCloudBackup()
+                        router.restoreCloudBackup()
                     } else {
                         showBackupNotFoundError()
                     }

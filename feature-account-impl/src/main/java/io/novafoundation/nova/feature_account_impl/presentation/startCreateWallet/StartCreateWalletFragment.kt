@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -51,6 +52,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
     }
 
     override fun subscribe(viewModel: StartCreateWalletViewModel) {
+        observeActionBottomSheet(viewModel)
         startCreateWalletNameInput.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
 
         viewModel.confirmNameButtonState.observe { state ->

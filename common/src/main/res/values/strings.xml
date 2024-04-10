@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="existing_cloud_backup_found_button">Recover Wallets</string>
+    <string name="existing_cloud_backup_found_title">Existing Cloud Backup found</string>
+    <string name="existing_cloud_backup_found_subtitle">%s All of your wallets will be safely backed up in Google Drive.</string>
+    <string name="existing_cloud_backup_found_subtitle_highlight">Do you want to recover your wallets?</string>
+
     <string name="import_wallet_cloud_backup_not_found_title">Backup Not Found</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Unfortunately, Backup with your wallets has not been found.</string>
 
