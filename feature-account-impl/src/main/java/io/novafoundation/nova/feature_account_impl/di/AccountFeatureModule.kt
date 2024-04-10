@@ -181,7 +181,7 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideMetaAccountChangesRequestBus(
-        proxySyncService: ProxySyncService,
+        proxySyncService: dagger.Lazy<ProxySyncService>,
         cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
     ): MetaAccountChangesEventBus = RealMetaAccountChangesEventBus(
         proxySyncService = proxySyncService,

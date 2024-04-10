@@ -5,17 +5,17 @@ import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-class CloudBackup(
+data class CloudBackup(
     val publicData: PublicData,
     val privateData: PrivateData
 ) {
 
-    class PublicData(
+    data class PublicData(
         val modifiedAt: Long,
         val wallets: List<WalletPublicInfo>
     )
 
-    class WalletPublicInfo(
+    data class WalletPublicInfo(
         val walletId: String,
         val substratePublicKey: ByteArray?,
         val substrateAccountId: ByteArray?,
@@ -33,7 +33,7 @@ class CloudBackup(
             SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT
         }
 
-        class ChainAccountInfo(
+        data class ChainAccountInfo(
             val chainId: ChainId,
             val publicKey: ByteArray?,
             val accountId: ByteArray,
@@ -47,6 +47,14 @@ class CloudBackup(
                     publicKey.contentEquals(other.publicKey) &&
                     accountId.contentEquals(other.accountId) &&
                     cryptoType == other.cryptoType
+            }
+
+            override fun hashCode(): Int {
+                var result = chainId.hashCode()
+                result = 31 * result + (publicKey?.contentHashCode() ?: 0)
+                result = 31 * result + accountId.contentHashCode()
+                result = 31 * result + (cryptoType?.hashCode() ?: 0)
+                return result
             }
         }
 
@@ -79,11 +87,11 @@ class CloudBackup(
         }
     }
 
-    class PrivateData(
+    data class PrivateData(
         val wallets: List<WalletPrivateInfo>
     )
 
-    class WalletPrivateInfo(
+    data class WalletPrivateInfo(
         val walletId: String,
         val entropy: ByteArray?,
         val substrate: SubstrateSecrets?,
@@ -98,29 +106,137 @@ class CloudBackup(
 
         override val identifier: String = walletId
 
-        class ChainAccountSecrets(
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as WalletPrivateInfo
+
+            if (walletId != other.walletId) return false
+            if (entropy != null) {
+                if (other.entropy == null) return false
+                if (!entropy.contentEquals(other.entropy)) return false
+            } else if (other.entropy != null) return false
+            if (substrate != other.substrate) return false
+            if (ethereum != other.ethereum) return false
+            if (chainAccounts != other.chainAccounts) return false
+            if (additional != other.additional) return false
+            return identifier == other.identifier
+        }
+
+        override fun hashCode(): Int {
+            var result = walletId.hashCode()
+            result = 31 * result + (entropy?.contentHashCode() ?: 0)
+            result = 31 * result + (substrate?.hashCode() ?: 0)
+            result = 31 * result + (ethereum?.hashCode() ?: 0)
+            result = 31 * result + chainAccounts.hashCode()
+            result = 31 * result + additional.hashCode()
+            result = 31 * result + identifier.hashCode()
+            return result
+        }
+
+        data class ChainAccountSecrets(
             val accountId: ByteArray,
             val entropy: ByteArray?,
             val seed: ByteArray?,
             val keypair: KeyPairSecrets,
             val derivationPath: String?,
-        )
+        ) {
 
-        class SubstrateSecrets(
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as ChainAccountSecrets
+
+                if (!accountId.contentEquals(other.accountId)) return false
+                if (entropy != null) {
+                    if (other.entropy == null) return false
+                    if (!entropy.contentEquals(other.entropy)) return false
+                } else if (other.entropy != null) return false
+                if (seed != null) {
+                    if (other.seed == null) return false
+                    if (!seed.contentEquals(other.seed)) return false
+                } else if (other.seed != null) return false
+                if (keypair != other.keypair) return false
+                return derivationPath == other.derivationPath
+            }
+
+            override fun hashCode(): Int {
+                var result = accountId.contentHashCode()
+                result = 31 * result + (entropy?.contentHashCode() ?: 0)
+                result = 31 * result + (seed?.contentHashCode() ?: 0)
+                result = 31 * result + keypair.hashCode()
+                result = 31 * result + (derivationPath?.hashCode() ?: 0)
+                return result
+            }
+        }
+
+        data class SubstrateSecrets(
             val seed: ByteArray?,
             val keypair: KeyPairSecrets,
             val derivationPath: String?,
-        )
+        ) {
 
-        class EthereumSecrets(
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as SubstrateSecrets
+
+                if (seed != null) {
+                    if (other.seed == null) return false
+                    if (!seed.contentEquals(other.seed)) return false
+                } else if (other.seed != null) return false
+                if (keypair != other.keypair) return false
+                return derivationPath == other.derivationPath
+            }
+
+            override fun hashCode(): Int {
+                var result = seed?.contentHashCode() ?: 0
+                result = 31 * result + keypair.hashCode()
+                result = 31 * result + (derivationPath?.hashCode() ?: 0)
+                return result
+            }
+        }
+
+        data class EthereumSecrets(
             val keypair: KeyPairSecrets,
             val derivationPath: String?,
         )
 
-        class KeyPairSecrets(
+        data class KeyPairSecrets(
             val publicKey: ByteArray,
             val privateKey: ByteArray,
             val nonce: ByteArray?
-        )
+        ) {
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as KeyPairSecrets
+
+                if (!publicKey.contentEquals(other.publicKey)) return false
+                if (!privateKey.contentEquals(other.privateKey)) return false
+                if (nonce != null) {
+                    if (other.nonce == null) return false
+                    if (!nonce.contentEquals(other.nonce)) return false
+                } else if (other.nonce != null) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                var result = publicKey.contentHashCode()
+                result = 31 * result + privateKey.contentHashCode()
+                result = 31 * result + (nonce?.contentHashCode() ?: 0)
+                return result
+            }
+        }
     }
+}
+
+fun CloudBackup.WalletPrivateInfo.isCompletelyEmpty(): Boolean {
+    return entropy == null && substrate == null && ethereum == null && chainAccounts.isEmpty() && additional.isEmpty()
 }

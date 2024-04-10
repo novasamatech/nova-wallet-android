@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupA
  * Components from external modules can subscribe to this event bus on the upper level
  */
 class RealMetaAccountChangesEventBus(
-    private val proxySyncService: ProxySyncService,
+    private val proxySyncService: dagger.Lazy<ProxySyncService>,
     private val cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
 ) : BaseEventBus<MetaAccountChangesEventBus.Event>(), MetaAccountChangesEventBus {
 
@@ -30,13 +30,13 @@ class RealMetaAccountChangesEventBus(
     }
 
     private fun onAccountAdded(metaId: Long, type: LightMetaAccount.Type) {
-        proxySyncService.startSyncingForMetaAccountChange(type)
+        proxySyncService.get().startSyncingForMetaAccountChange(type)
     }
 
     private fun onAccountRemoved(metaId: Long, type: LightMetaAccount.Type) {}
 
     private fun onAccountStructureChanged(metaId: Long, type: LightMetaAccount.Type) {
-       proxySyncService.startSyncingForMetaAccountChange(type)
+       proxySyncService.get().startSyncingForMetaAccountChange(type)
     }
 
     private fun onAccountNameChanged(metaId: Long) {}

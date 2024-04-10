@@ -1,6 +1,7 @@
 package io.novafoundation.nova.core_db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -99,10 +100,16 @@ interface MetaAccountDao {
     suspend fun insertMetaAccount(metaAccount: MetaAccountLocal): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateMetaAccount(metaAccount: MetaAccountLocal): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChainAccount(chainAccount: ChainAccountLocal)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChainAccounts(chainAccounts: List<ChainAccountLocal>)
+
+    @Delete
+    suspend fun deleteChainAccounts(chainAccounts: List<ChainAccountLocal>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProxy(proxyLocal: ProxyAccountLocal)

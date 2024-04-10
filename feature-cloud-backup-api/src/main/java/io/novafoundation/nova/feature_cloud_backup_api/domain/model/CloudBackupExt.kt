@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_cloud_backup_api.domain.model
 
 import io.novafoundation.nova.common.utils.CollectionDiffer
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.BackupPriorityResolutionStrategy.Priority
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo
 
 class CloudBackupDiff(
@@ -17,48 +18,104 @@ class CloudBackupDiff(
 
 fun CloudBackupDiff.PerSourceDiff.isEmpty(): Boolean = added.isEmpty() && modified.isEmpty() && removed.isEmpty()
 
+fun interface BackupPriorityResolutionStrategy {
+
+    companion object {
+
+        fun byModifiedAt() = BackupPriorityResolutionStrategy { local, cloud ->
+            when {
+                cloud.isModifiedLaterThan(local) -> Priority.CLOUD
+                local.isModifiedLaterThan(cloud) -> Priority.LOCAL
+                else -> Priority.EQUAL
+            }
+        }
+
+        fun alwaysCloud() = BackupPriorityResolutionStrategy { _, _ ->
+            Priority.CLOUD
+        }
+    }
+
+    enum class Priority {
+        LOCAL, CLOUD, EQUAL
+    }
+
+    fun resolvePriority(localBackup: CloudBackup.PublicData, cloudBackup: CloudBackup.PublicData): Priority
+}
+
+/**
+ * @see [CloudBackup.PublicData.localVsCloudDiff]
+ */
+fun CloudBackup.localVsCloudDiff(
+    cloudVersion: CloudBackup,
+    priorityResolution: BackupPriorityResolutionStrategy = BackupPriorityResolutionStrategy.byModifiedAt()
+): CloudBackupDiff {
+    return publicData.localVsCloudDiff(cloudVersion.publicData, priorityResolution)
+}
+
 /**
  * Finds the diff between local and cloud versions
  *
  * [this] - Local snapshot
  * [cloudVersion] - Cloud snapshot
  */
-fun CloudBackup.PublicData.localVsCloudDiff(cloudVersion: CloudBackup.PublicData): CloudBackupDiff {
+fun CloudBackup.PublicData.localVsCloudDiff(
+    cloudVersion: CloudBackup.PublicData,
+    priorityResolution: BackupPriorityResolutionStrategy = BackupPriorityResolutionStrategy.byModifiedAt()
+): CloudBackupDiff {
     val localVersion = this
 
-    val localToCloudDiff = CollectionDiffer.findDiff(newItems = cloudVersion.wallets, oldItems = localVersion.wallets, forceUseNewItems = false)
+    val priority = priorityResolution.resolvePriority(localVersion, cloudVersion)
 
-    val isCloudInPriority = cloudVersion.isModifiedLaterThan(localVersion)
-    val isLocalInPriority = localVersion.isModifiedLaterThan(cloudVersion)
+    return when(priority) {
+        Priority.LOCAL -> {
+            // modified, added: local, deleted: cloud
+            val cloudToLocalDiff = CollectionDiffer.findDiff(newItems = localVersion.wallets, oldItems = cloudVersion.wallets, forceUseNewItems = false)
 
-    val unknownWalletsInCloud = localToCloudDiff.added
-    val modifiedWallets = localToCloudDiff.updated
-    val nonPresentWalletInCloud = localToCloudDiff.removed
+            CloudBackupDiff(
+                localChanges = CloudBackupDiff.PerSourceDiff(
+                    added = emptyList(),
+                    modified = emptyList(),
+                    removed = emptyList()
+                ),
+                cloudChanges = CloudBackupDiff.PerSourceDiff(
+                    added = cloudToLocalDiff.added,
+                    modified = cloudToLocalDiff.updated,
+                    removed = cloudToLocalDiff.removed
+                )
+            )
+        }
 
-    val walletsToAddLocally = unknownWalletsInCloud.takeNonEmptyIf(isCloudInPriority)
-    val walletsToRemoveFromCloud = unknownWalletsInCloud.takeNonEmptyIf(isLocalInPriority)
+        Priority.CLOUD -> {
+            // modified, added: cloud, deleted: local
+            val localToCloudDiff = CollectionDiffer.findDiff(newItems = cloudVersion.wallets, oldItems = localVersion.wallets, forceUseNewItems = false)
 
-    val walletsToModifyLocally = modifiedWallets.takeNonEmptyIf(isCloudInPriority)
-    val walletsToModifyInCloud = modifiedWallets.takeNonEmptyIf(isLocalInPriority)
-
-    val walletToRemoveLocally = nonPresentWalletInCloud.takeNonEmptyIf(isCloudInPriority)
-    val walletsToAddToCloud = nonPresentWalletInCloud.takeNonEmptyIf(isLocalInPriority)
-
-    return CloudBackupDiff(
-        localChanges = CloudBackupDiff.PerSourceDiff(
-            added = walletsToAddLocally,
-            modified = walletsToModifyLocally,
-            removed = walletToRemoveLocally
-        ),
-        cloudChanges = CloudBackupDiff.PerSourceDiff(
-            added = walletsToAddToCloud,
-            modified = walletsToModifyInCloud,
-            removed = walletsToRemoveFromCloud
+            CloudBackupDiff(
+                localChanges = CloudBackupDiff.PerSourceDiff(
+                    added = localToCloudDiff.added,
+                    modified = localToCloudDiff.updated,
+                    removed = localToCloudDiff.removed
+                ),
+                cloudChanges = CloudBackupDiff.PerSourceDiff(
+                    added = emptyList(),
+                    modified = emptyList(),
+                    removed = emptyList()
+                )
+            )
+        }
+        Priority.EQUAL -> CloudBackupDiff(
+            localChanges = CloudBackupDiff.PerSourceDiff(
+                added = emptyList(),
+                modified =  emptyList(),
+                removed =  emptyList()
+            ),
+            cloudChanges = CloudBackupDiff.PerSourceDiff(
+                added =  emptyList(),
+                modified =  emptyList(),
+                removed =  emptyList()
+            )
         )
-    )
+    }
 }
-
-private fun <T> List<T>.takeNonEmptyIf(condition: Boolean): List<T> = if (condition) this else emptyList()
 
 private fun CloudBackup.PublicData.isModifiedLaterThan(other: CloudBackup.PublicData): Boolean {
     return modifiedAt > other.modifiedAt

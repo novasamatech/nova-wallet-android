@@ -46,7 +46,6 @@ dependencies {
     implementation project(':feature-proxy-api')
     implementation project(':feature-cloud-backup-api')
     implementation project(':web3names')
-    implementation project(':feature-cloud-backup-api')
 
     implementation kotlinDep
 
@@ -86,4 +85,7 @@ dependencies {
 
     implementation insetterDep
     implementation flexBoxDep
+
+    testImplementation project(":test-shared")
+    testImplementation project(":feature-cloud-backup-test")
 }

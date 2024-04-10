@@ -29,7 +29,9 @@ import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAcco
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isEmpty
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.localVsCloudDiff
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
@@ -80,6 +82,25 @@ interface LocalAccountsCloudBackupFacade {
      * Important note: Should only be called as the result of direct user interaction!
      */
     suspend fun applyBackupDiff(diff: CloudBackupDiff, cloudVersion: CloudBackup)
+}
+
+/**
+ * Attempts to apply cloud backup version to current local application state in non-destructive manner
+ * Will do nothing if it is not possible to apply changes in non-destructive manner
+ *
+ * @return whether the attempt succeeded
+ */
+suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersion(cloudVersion: CloudBackup): Boolean {
+    val localSnapshot = publicBackupInfoFromLocalSnapshot()
+    val diff = localSnapshot.localVsCloudDiff(cloudVersion.publicData)
+
+    return if (canPerformNonDestructiveApply(diff)) {
+        applyBackupDiff(diff, cloudVersion)
+
+        true
+    } else {
+        false
+    }
 }
 
 
@@ -147,13 +168,15 @@ class RealLocalAccountsCloudBackupFacade(
         accountDao.withTransaction {
             applyLocalRemoval(localChangesToApply.removed, metaAccountsByUuid)
             applyLocalAddition(localChangesToApply.added, cloudVersion)
-            applyLocalModification(localChangesToApply.removed, cloudVersion)
+            applyLocalModification(localChangesToApply.modified, cloudVersion, metaAccountsByUuid)
         }
 
         cloudBackupAccountsModificationsTracker.recordAccountsModified()
     }
 
     private suspend fun applyLocalRemoval(toRemove: List<CloudBackup.WalletPublicInfo>, metaAccountsByUUid: Map<String, JoinedMetaAccountInfo>) {
+        if (toRemove.isEmpty()) return
+
         val localIds = toRemove.mapNotNull { metaAccountsByUUid[it.walletId]?.metaAccount?.id }
         accountDao.delete(localIds)
 
@@ -167,15 +190,20 @@ class RealLocalAccountsCloudBackupFacade(
 
     private suspend fun applyLocalAddition(toAdd: List<CloudBackup.WalletPublicInfo>, cloudBackup: CloudBackup) {
         toAdd.forEach { publicWalletInfo ->
-            val metaAccountLocal = publicWalletInfo.toMetaAccountLocal(accountPosition = accountDao.nextAccountPosition())
+            val metaAccountLocal = publicWalletInfo.toMetaAccountLocal(
+                accountPosition = accountDao.nextAccountPosition(),
+                localIdOverwrite = null,
+                isSelected = false
+            )
             val metaId = accountDao.insertMetaAccount(metaAccountLocal)
 
             val chainAccountsLocal = publicWalletInfo.getChainAccountsLocal(metaId)
             accountDao.insertChainAccounts(chainAccountsLocal)
 
-
-            val metaAccountSecrets = cloudBackup.getMetaAccountSecrets(publicWalletInfo.walletId) ?: return
-            secretsStoreV2.putMetaAccountSecrets(metaId, metaAccountSecrets)
+            val metaAccountSecrets = cloudBackup.getMetaAccountSecrets(publicWalletInfo.walletId)
+            metaAccountSecrets?.let {
+                secretsStoreV2.putMetaAccountSecrets(metaId, metaAccountSecrets)
+            }
 
             val chainAccountsSecrets = cloudBackup.getAllChainAccountSecrets(publicWalletInfo)
             chainAccountsSecrets.forEach { (accountId, secrets) ->
@@ -184,8 +212,59 @@ class RealLocalAccountsCloudBackupFacade(
         }
     }
 
-    private suspend fun applyLocalModification(toModify: List<CloudBackup.WalletPublicInfo>, cloudVersion: CloudBackup) {
-        // TODO valentin: apply backup modifications
+    /**
+     * Modification of each meta account is done in the following steps:
+     *
+     * Insert updated MetaAccountLocal
+     *
+     * Delete all previous ChainAccountLocal associated with currently processed meta account
+     * Insert all ChainAccountLocal from backup
+     *
+     * Update meta account secrets
+     * Delete all chain account secrets  associated with currently processed meta account
+     * Insert all chain account secrets from backup
+     */
+    private suspend fun applyLocalModification(
+        toModify: List<CloudBackup.WalletPublicInfo>,
+        cloudVersion: CloudBackup,
+        localMetaAccountsByUUid: Map<String, JoinedMetaAccountInfo>
+    ) {
+        toModify.forEach { publicWalletInfo ->
+            val oldMetaAccountJoinInfo = localMetaAccountsByUUid[publicWalletInfo.walletId] ?: return@forEach
+            val oldMetaAccountLocal = oldMetaAccountJoinInfo.metaAccount
+            val metaId = oldMetaAccountLocal.id
+
+            // Insert updated MetaAccountLocal
+            val updatedMetaAccountLocal = publicWalletInfo.toMetaAccountLocal(
+                accountPosition = oldMetaAccountLocal.position,
+                localIdOverwrite = metaId,
+                isSelected = oldMetaAccountLocal.isSelected
+            )
+            accountDao.updateMetaAccount(updatedMetaAccountLocal)
+
+            // Delete all previous ChainAccountLocal associated with currently processed meta account
+            accountDao.deleteChainAccounts(oldMetaAccountJoinInfo.chainAccounts)
+
+            // Insert all ChainAccountLocal from backup
+            val updatedChainAccountsLocal = publicWalletInfo.getChainAccountsLocal(metaId)
+            accountDao.insertChainAccounts(updatedChainAccountsLocal)
+
+            // Update meta account secrets
+            val metaAccountSecrets = cloudVersion.getMetaAccountSecrets(publicWalletInfo.walletId)
+            metaAccountSecrets?.let {
+                secretsStoreV2.putMetaAccountSecrets(metaId, metaAccountSecrets)
+            }
+
+            // Delete all chain account secrets  associated with currently processed meta account
+            val previousChainAccountIds = oldMetaAccountJoinInfo.chainAccounts.map { it.accountId }
+            secretsStoreV2.clearSecrets(metaId, previousChainAccountIds)
+
+            // Insert all chain account secrets from backup
+            val chainAccountsSecrets = cloudVersion.getAllChainAccountSecrets(publicWalletInfo)
+            chainAccountsSecrets.forEach { (accountId, secrets) ->
+                secretsStoreV2.putChainAccountSecrets(metaId, accountId.value, secrets)
+            }
+        }
     }
 
     private fun CloudBackup.getMetaAccountSecrets(uuid: String): EncodableStruct<MetaAccountSecrets>? {
@@ -313,10 +392,6 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private fun WalletPrivateInfo.isCompletelyEmpty(): Boolean {
-        return entropy == null && substrate == null && ethereum == null && chainAccounts.isEmpty() && additional.isEmpty()
-    }
-
     private fun List<JoinedMetaAccountInfo>.toBackupPublicData(
         modifiedAt: Long = cloudBackupAccountsModificationsTracker.getAccountsLastModifiedAt()
     ): CloudBackup.PublicData {
@@ -342,7 +417,8 @@ class RealLocalAccountsCloudBackupFacade(
 
     private fun CloudBackup.WalletPublicInfo.toMetaAccountLocal(
         accountPosition: Int,
-        localId: Long? = null
+        localIdOverwrite: Long?,
+        isSelected: Boolean
     ): MetaAccountLocal {
         return MetaAccountLocal(
             substratePublicKey = substratePublicKey,
@@ -354,12 +430,12 @@ class RealLocalAccountsCloudBackupFacade(
             type = type.toLocalWalletType(),
             globallyUniqueId = walletId,
             parentMetaId = null,
-            isSelected = false,
+            isSelected = isSelected,
             position = accountPosition,
             status = MetaAccountLocal.Status.ACTIVE
         ).also {
-            if (localId != null) {
-                it.id = localId
+            if (localIdOverwrite != null) {
+                it.id = localIdOverwrite
             }
         }
     }
