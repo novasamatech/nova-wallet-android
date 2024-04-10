@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="corrupted_backup_error_title">Backup found but empty or broken</string>
+    <string name="corrupted_backup_error_subtitle">An issue has been identified with your backup. You have the option to delete the current backup and create a new one. %s before proceeding.</string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Ensure you have saved Passphrases for all wallets</string>
     <!--<string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>-->
 
     <string name="confirm_mnemonic_not_matching_error_message">Invalid passphrase, please check one more time the words order</string>
@@ -17,7 +20,7 @@
     <string name="cloud_backup_delete_backup_confirmation_title">Are you sure you want to delete Cloud Backup?</string>
     <string name="cloud_backup_delete_backup_confirmation_message">Current backup with your wallets will be permanently deleted!</string>
 
-    <string name="restore_cloud_backup_delete_button">Delete Backup</string>
+    <string name="cloud_backup_delete_button">Delete Backup</string>
     <string name="restore_cloud_backup_delete_backup_title">Have you lost your password?</string>
     <string name="restore_cloud_backup_delete_backup_description">%s Your password is exclusively yours. Without your backup password it is not possible to restore your wallets from your iCloud.\n\nAlternatively, you can %s\n\nIf your password is irretrievably lost, then you can start a new backup by deleting the current backup. This will enable you to create a new password for a fresh Cloud Backup.</string>
     <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Unfortunately, it cannot be recovered.</string>

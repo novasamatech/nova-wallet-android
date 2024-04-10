@@ -64,12 +64,34 @@ class RestoreCloudBackupViewModel(
                 .onSuccess {
                     continueBasedOnCodeStatus()
                 }.onFailure { throwable ->
-                    val titleAndMessage = mapRestoreBackupFailureToUi(resourceManager, throwable)
+                    val titleAndMessage = mapRestoreBackupFailureToUi(
+                        resourceManager,
+                        throwable,
+                        ::corruptedBackupFound
+                    )
                     titleAndMessage?.let { showError(it) }
                 }
 
             _restoreBackupInProgress.value = false
         }
+    }
+
+    private fun corruptedBackupFound() {
+        actionBottomSheetLauncher.launchBottomSheet(
+            imageRes = R.drawable.ic_cloud_backup_error,
+            title = resourceManager.getString(R.string.corrupted_backup_error_title),
+            subtitle = with(resourceManager) {
+                val highlightedPart = getString(R.string.corrupted_backup_error_subtitle_highlighted)
+                    .addColor(getColor(R.color.text_primary))
+
+                getString(R.string.corrupted_backup_error_subtitle).spannableFormatting(highlightedPart)
+            },
+            neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
+            actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+                resourceManager.getString(R.string.cloud_backup_delete_button),
+                ::confirmCloudBackupDelete
+            )
+        )
     }
 
     fun toggleShowPassword() {
@@ -91,7 +113,7 @@ class RestoreCloudBackupViewModel(
             },
             neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
             actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
-                resourceManager.getString(R.string.restore_cloud_backup_delete_button),
+                resourceManager.getString(R.string.cloud_backup_delete_button),
                 ::confirmCloudBackupDelete
             )
         )
@@ -111,7 +133,7 @@ class RestoreCloudBackupViewModel(
                 ConfirmationDialogInfo(
                     title = R.string.cloud_backup_delete_backup_confirmation_title,
                     message = R.string.cloud_backup_delete_backup_confirmation_message,
-                    positiveButton = R.string.restore_cloud_backup_delete_button,
+                    positiveButton = R.string.cloud_backup_delete_button,
                     negativeButton = R.string.common_cancel
                 )
             )
