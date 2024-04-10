@@ -57,9 +57,9 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         backupMnemonicCondition2.text = buildCondition(R.string.backup_mnemonic_condition_2, R.string.backup_mnemonic_condition_2_highlight)
         backupMnemonicCondition3.text = buildCondition(R.string.backup_mnemonic_condition_3, R.string.backup_mnemonic_condition_3_highlight)
 
-        backupMnemonicCondition1.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(0, isChecked) }
-        backupMnemonicCondition2.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(1, isChecked) }
-        backupMnemonicCondition3.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(2, isChecked) }
+        backupMnemonicCondition1.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_1, isChecked) }
+        backupMnemonicCondition2.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_2, isChecked) }
+        backupMnemonicCondition3.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_3, isChecked) }
     }
 
     private fun buildCondition(termBaseResId: Int, termHighlightResId: Int): CharSequence {

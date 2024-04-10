@@ -4,6 +4,8 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.Inval
 
 interface EncryptedCloudBackup {
 
+    val publicData: CloudBackup.PublicData
+
     /**
      * @throws InvalidBackupPasswordError
      */

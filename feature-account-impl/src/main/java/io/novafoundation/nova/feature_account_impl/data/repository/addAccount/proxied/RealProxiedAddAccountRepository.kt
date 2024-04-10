@@ -52,7 +52,8 @@ class RealProxiedAddAccountRepository(
             isSelected = false,
             position = position,
             type = MetaAccountLocal.Type.PROXIED,
-            status = MetaAccountLocal.Status.ACTIVE
+            status = MetaAccountLocal.Status.ACTIVE,
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
         )
     }
 

@@ -16,6 +16,7 @@ private const val MIN_PASSWORD_SYMBOLS = 8
 interface CreateCloudBackupPasswordInteractor {
 
     fun checkPasswords(password: String, confirmPassword: String): List<PasswordErrors>
+
     suspend fun createAndBackupAccount(accountName: String, password: String): Result<Unit>
 }
 
@@ -58,13 +59,16 @@ class RealCreateCloudBackupPasswordInteractor(
         val cloudBackup = mapLocalAccountToCloudBackup(
             modificationTime = System.currentTimeMillis(),
             metaAccount = metaAccountLocal,
-            chainAccounts = emptyList()
+            chainAccounts = emptyList(),
+            baseSecrets = secrets,
+            chainAccountSecrets = emptyMap(),
+            additionalSecrets = emptyMap()
         )
 
         val backupResult = cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password))
 
         return backupResult.onSuccess {
-            val addAccountResult = localAddMetaAccountRepository.addAccount(LocalAddMetaAccountRepository.Payload(metaAccountLocal))
+            val addAccountResult = localAddMetaAccountRepository.addAccount(LocalAddMetaAccountRepository.Payload(metaAccountLocal, secrets))
             accountRepository.selectMetaAccount(addAccountResult.metaId)
         }
     }

@@ -31,11 +31,13 @@ class AddAccountsModule {
     fun provideLocalAddMetaAccountRepository(
         proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus,
-        metaAccountDao: MetaAccountDao
+        metaAccountDao: MetaAccountDao,
+        secretStoreV2: SecretStoreV2
     ) = LocalAddMetaAccountRepository(
         proxySyncService,
         metaAccountChangesEventBus,
-        metaAccountDao
+        metaAccountDao,
+        secretStoreV2
     )
 
     @Provides
