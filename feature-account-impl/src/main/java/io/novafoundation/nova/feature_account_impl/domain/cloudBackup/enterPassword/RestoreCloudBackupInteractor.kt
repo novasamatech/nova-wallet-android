@@ -21,7 +21,7 @@ class RealRestoreCloudBackupInteractor(
     override suspend fun restoreCloudBackup(password: String): Result<Unit> {
         return cloudBackupService.fetchAndDecryptExistingBackup(password)
             .map { cloudBackup ->
-                val payloads = cloudBackup.wallets.map {
+                val payloads = cloudBackup.publicData.wallets.map {
                     CloudBackupAddMetaAccountRepository.Payload(it)
                 }
                 val addAccountResult = addMetaAccountRepository.addAccounts(payloads)

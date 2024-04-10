@@ -114,7 +114,7 @@ private fun mapAccountTypeFromLocal(localType: MetaAccountLocal.Type): WalletPub
     }
 }
 
-suspend fun mapLocalAccountFromCloudBackup(wallet: CloudBackupWallet, metaAccountSortPosition: suspend () -> Int): MetaAccountLocal {
+suspend fun mapLocalAccountFromCloudBackup(wallet: WalletPublicInfo, metaAccountSortPosition: suspend () -> Int): MetaAccountLocal {
     return MetaAccountLocal(
         substratePublicKey = wallet.substratePublicKey,
         substrateCryptoType = wallet.substrateCryptoType,
@@ -126,17 +126,18 @@ suspend fun mapLocalAccountFromCloudBackup(wallet: CloudBackupWallet, metaAccoun
         isSelected = false,
         parentMetaId = null,
         status = MetaAccountLocal.Status.ACTIVE,
-        type = mapAccountTypeToLocal(wallet.type)
+        type = mapAccountTypeToLocal(wallet.type),
+        globallyUniqueId = wallet.walletId
     )
 }
 
-fun mapLocalChainAccountsFromCloudBackup(metaId: Long, account: CloudBackupWallet): List<ChainAccountLocal> {
+fun mapLocalChainAccountsFromCloudBackup(metaId: Long, account: WalletPublicInfo): List<ChainAccountLocal> {
     return account.chainAccounts.map {
         mapLocalChainAccountFromCloudBackup(metaId, it)
     }
 }
 
-fun mapLocalChainAccountFromCloudBackup(metaId: Long, account: CloudBackupWallet.ChainAccount): ChainAccountLocal {
+fun mapLocalChainAccountFromCloudBackup(metaId: Long, account: WalletPublicInfo.ChainAccountInfo): ChainAccountLocal {
     return ChainAccountLocal(
         metaId = metaId,
         chainId = account.chainId,
@@ -146,12 +147,12 @@ fun mapLocalChainAccountFromCloudBackup(metaId: Long, account: CloudBackupWallet
     )
 }
 
-private fun mapAccountTypeToLocal(localType: CloudBackupWallet.Type): MetaAccountLocal.Type {
+private fun mapAccountTypeToLocal(localType: WalletPublicInfo.Type): MetaAccountLocal.Type {
     return when (localType) {
-        CloudBackupWallet.Type.SECRETS -> MetaAccountLocal.Type.SECRETS
-        CloudBackupWallet.Type.WATCH_ONLY -> MetaAccountLocal.Type.WATCH_ONLY
-        CloudBackupWallet.Type.PARITY_SIGNER -> MetaAccountLocal.Type.PARITY_SIGNER
-        CloudBackupWallet.Type.LEDGER -> MetaAccountLocal.Type.LEDGER
-        CloudBackupWallet.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
+        WalletPublicInfo.Type.SECRETS -> MetaAccountLocal.Type.SECRETS
+        WalletPublicInfo.Type.WATCH_ONLY -> MetaAccountLocal.Type.WATCH_ONLY
+        WalletPublicInfo.Type.PARITY_SIGNER -> MetaAccountLocal.Type.PARITY_SIGNER
+        WalletPublicInfo.Type.LEDGER -> MetaAccountLocal.Type.LEDGER
+        WalletPublicInfo.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
     }
 }
