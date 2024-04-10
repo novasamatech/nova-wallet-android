@@ -113,3 +113,45 @@ private fun mapAccountTypeFromLocal(localType: MetaAccountLocal.Type): WalletPub
         MetaAccountLocal.Type.PROXIED -> throw IllegalStateException("Proxied accounts are not supported to backup")
     }
 }
+
+suspend fun mapLocalAccountFromCloudBackup(wallet: CloudBackupWallet, metaAccountSortPosition: suspend () -> Int): MetaAccountLocal {
+    return MetaAccountLocal(
+        substratePublicKey = wallet.substratePublicKey,
+        substrateCryptoType = wallet.substrateCryptoType,
+        substrateAccountId = wallet.substrateAccountId,
+        ethereumAddress = wallet.ethereumAddress,
+        ethereumPublicKey = wallet.ethereumPublicKey,
+        name = wallet.name,
+        position = metaAccountSortPosition(),
+        isSelected = false,
+        parentMetaId = null,
+        status = MetaAccountLocal.Status.ACTIVE,
+        type = mapAccountTypeToLocal(wallet.type)
+    )
+}
+
+fun mapLocalChainAccountsFromCloudBackup(metaId: Long, account: CloudBackupWallet): List<ChainAccountLocal> {
+    return account.chainAccounts.map {
+        mapLocalChainAccountFromCloudBackup(metaId, it)
+    }
+}
+
+fun mapLocalChainAccountFromCloudBackup(metaId: Long, account: CloudBackupWallet.ChainAccount): ChainAccountLocal {
+    return ChainAccountLocal(
+        metaId = metaId,
+        chainId = account.chainId,
+        publicKey = account.publicKey,
+        accountId = account.accountId,
+        cryptoType = account.cryptoType
+    )
+}
+
+private fun mapAccountTypeToLocal(localType: CloudBackupWallet.Type): MetaAccountLocal.Type {
+    return when (localType) {
+        CloudBackupWallet.Type.SECRETS -> MetaAccountLocal.Type.SECRETS
+        CloudBackupWallet.Type.WATCH_ONLY -> MetaAccountLocal.Type.WATCH_ONLY
+        CloudBackupWallet.Type.PARITY_SIGNER -> MetaAccountLocal.Type.PARITY_SIGNER
+        CloudBackupWallet.Type.LEDGER -> MetaAccountLocal.Type.LEDGER
+        CloudBackupWallet.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
+    }
+}

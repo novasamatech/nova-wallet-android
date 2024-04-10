@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
@@ -14,6 +12,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -83,8 +82,8 @@ class CreateCloudBackupPasswordFragment : BaseFragment<CreateCloudBackupPassword
         }
 
         viewModel.showPasswords.observe {
-            createCloudBackupPasswordInput.content.passwordInputType(it)
-            createCloudBackupPasswordConfirmInput.content.passwordInputType(it)
+            createCloudBackupPasswordInput.content.switchPasswordInputType(it)
+            createCloudBackupPasswordConfirmInput.content.switchPasswordInputType(it)
         }
     }
 
@@ -96,16 +95,5 @@ class CreateCloudBackupPasswordFragment : BaseFragment<CreateCloudBackupPassword
             setTextColorRes(R.color.text_secondary)
             setCompoundDrawableTint(R.color.icon_secondary)
         }
-    }
-
-    private fun EditText.passwordInputType(isPasswordVisible: Boolean) {
-        val selection = selectionEnd
-        inputType = if (isPasswordVisible) {
-            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-        } else {
-            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-
-        setSelection(selection)
     }
 }

@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="import_wallet_cloud_backup_not_found_title">Backup Not Found</string>
+    <string name="import_wallet_cloud_backup_not_found_subtitle">Unfortunately, Backup with your wallets has not been found.</string>
+
+    <string name="cloud_backup_delete_backup_confirmation_title">Are you sure you want to delete Cloud Backup?</string>
+    <string name="cloud_backup_delete_backup_confirmation_message">Current backup with your wallets will be permanently deleted!</string>
+
+    <string name="restore_cloud_backup_delete_button">Delete Backup</string>
+    <string name="restore_cloud_backup_delete_backup_title">Have you lost your password?</string>
+    <string name="restore_cloud_backup_delete_backup_description">%s Your password is exclusively yours. Without your backup password it is not possible to restore your wallets from your iCloud.\n\nAlternatively, you can %s\n\nIf your password is irretrievably lost, then you can start a new backup by deleting the current backup. This will enable you to create a new password for a fresh Cloud Backup.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Unfortunately, it cannot be recovered.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">restore your wallets by using your Passphrase.</string>
+
+    <string name="common_forgot_password">Forgot Password?</string>
+    <string name="restore_cloud_backup_title">Enter backup password</string>
+    <string name="restore_cloud_backup_subtitle">To restore your wallets, please enter the password you created during the backup process</string>
+
     <string name="common_got_it">Got it</string>
 
     <string name="create_cloud_backup_password_alert_title">Remember Backup Password</string>
@@ -14,13 +30,19 @@
     <string name="create_cloud_backup_password_requirement_numbers">Numbers</string>
     <string name="create_cloud_backup_password_requirement_letters">Letters</string>
     <string name="create_cloud_backup_password_requirement_passwords_match">Passwords match</string>
-    <string name="create_cloud_backup_password_requirement_enter_password">Enter password</string>
+    <string name="cloud_backup_enter_password">Enter password</string>
+
+    <string name="cloud_backup_error_invalid_password_title">Password is invalid</string>
+    <string name="cloud_backup_error_invalid_password_message">Please, check password correctness and try again.</string>
 
     <string name="common_connection_error_title">Connection Failed</string>
     <string name="common_connection_error_message">Please, check your connection or try again later</string>
 
+    <string name="cloud_backup_error_not_found_title">No Backups Found</string>
+    <string name="cloud_backup_error_not_found_message">Unfortunately, we have not found a backup to restore wallets</string>
+
     <string name="cloud_backup_error_google_service_auth_failed_title">Google Drive authentication failed</string>
-    <string name="cloud_backup_error_google_service_auth_failed_message">Failed to connect to Google Drive due to an authentication issue. Please ensure you have entered the correct credentials. If the issue persists, try re-logging into your Google account.</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">Failed to connect to Google Drive due to an authentication issue. Please ensure you have entered the correct credentials and granted Nova access to Google Drive</string>
 
     <string name="cloud_backup_error_google_service_other_title">Google Drive error</string>
     <string name="cloud_backup_error_google_service_other_message">Unable to back up your secret to Google Drive. Please ensure you have Google Drive enabled with available storage space and try again</string>

@@ -7,9 +7,9 @@ class MetaAccountChangesEventBus : BaseEventBus<MetaAccountChangesEventBus.Event
 
     sealed interface Event : EventBus.Event {
 
-        class AccountAdded(val metaId: Long) : Event
+        class AccountAdded(val metaIds: List<Long>) : Event
 
-        class AccountChanged(val metaId: Long) : Event
+        class AccountChanged(val metaIds: List<Long>) : Event
 
         class AccountRemoved(val metaId: Long) : Event
     }

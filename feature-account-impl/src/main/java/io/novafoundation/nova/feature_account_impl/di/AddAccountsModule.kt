@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.CloudBackupAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
@@ -137,5 +138,17 @@ class AddAccountsModule {
         secretStoreV2,
         proxySyncService,
         metaAccountChangesEventBus
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideCloudBackupAddMetaAccountRepository(
+        proxySyncService: ProxySyncService,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus,
+        metaAccountDao: MetaAccountDao
+    ) = CloudBackupAddMetaAccountRepository(
+        proxySyncService,
+        metaAccountChangesEventBus,
+        metaAccountDao
     )
 }

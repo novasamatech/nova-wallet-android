@@ -10,10 +10,12 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapWriteBackupFailureToUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -34,7 +36,8 @@ class CreateCloudBackupPasswordViewModel(
     private val resourceManager: ResourceManager,
     private val interactor: CreateCloudBackupPasswordInteractor,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val payload: CreateCloudBackupPasswordPayload
+    private val payload: CreateCloudBackupPasswordPayload,
+    private val accountInteractor: AccountInteractor,
 ) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     val passwordFlow = MutableStateFlow("")
@@ -61,7 +64,7 @@ class CreateCloudBackupPasswordViewModel(
         when {
             backupInProgress && passwordState.isRequirementsSatisfied -> DescriptiveButtonState.Loading
             passwordState.isRequirementsSatisfied -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
-            else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.create_cloud_backup_password_requirement_enter_password))
+            else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.cloud_backup_enter_password))
         }
     }.shareInBackground()
 
@@ -93,7 +96,7 @@ class CreateCloudBackupPasswordViewModel(
             val password = passwordFlow.value
             interactor.createAndBackupAccount(payload.walletName, password)
                 .onSuccess {
-                    router.openCreatePincode()
+                    continueBasedOnCodeStatus()
                 }.onFailure { throwable ->
                     val titleAndMessage = mapWriteBackupFailureToUi(resourceManager, throwable)
                     titleAndMessage?.let { showError(it) }
@@ -105,5 +108,13 @@ class CreateCloudBackupPasswordViewModel(
 
     fun toggleShowPassword() {
         _showPasswords.toggle()
+    }
+
+    private suspend fun continueBasedOnCodeStatus() {
+        if (accountInteractor.isCodeSet()) {
+            router.openMain()
+        } else {
+            router.openCreatePincode()
+        }
     }
 }

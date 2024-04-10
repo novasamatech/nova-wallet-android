@@ -24,7 +24,7 @@ interface PushNotificationsInteractor {
 
     fun isPushNotificationsAvailable(): Boolean
 
-    suspend fun onMetaAccountChanged(metaId: Long)
+    suspend fun onMetaAccountChanged(metaIds: List<Long>)
 
     suspend fun onMetaAccountRemoved(metaId: Long)
 }
@@ -67,9 +67,10 @@ class RealPushNotificationsInteractor(
         return pushNotificationsService.isPushNotificationsAvailable()
     }
 
-    override suspend fun onMetaAccountChanged(metaId: Long) {
+    override suspend fun onMetaAccountChanged(metaIds: List<Long>) {
         val pushSettings = pushSettingsProvider.getPushSettings()
-        if (metaId in pushSettings.subscribedMetaAccounts) {
+        metaIds.containsAll(pushSettings.subscribedMetaAccounts)
+        if (pushSettings.subscribedMetaAccounts.any { metaIds.contains(it) }) {
             val isPushEnabled = pushSettingsProvider.isPushNotificationsEnabled()
             updatePushSettings(isPushEnabled, pushSettings)
         }

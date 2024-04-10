@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_onboarding_api.domain
 
 interface OnboardingInteractor {
 
-    suspend fun connectToCloud(): Result<Unit>
+    suspend fun checkCloudBackupIsExist(): Result<Boolean>
 
-    fun isCloudAvailable(): Boolean
+    suspend fun isCloudBackupAvailableForImport(): Boolean
 }

@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.list.sel
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.di.CreateCloudBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup.di.RestoreCloudBackupComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
@@ -70,6 +71,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun backupMnemonicComponentFactory(): BackupMnemonicComponent.Factory
 
     fun createCloudBackupPasswordFactory(): CreateCloudBackupPasswordComponent.Factory
+
+    fun restoreCloudBackupFactory(): RestoreCloudBackupComponent.Factory
 
     fun pincodeComponentFactory(): PinCodeComponent.Factory
 

@@ -20,12 +20,38 @@ abstract class BaseAddAccountRepository<T>(
         return addAccountResult
     }
 
+    override suspend fun addAccounts(payloads: List<T>): List<AddAccountResult> {
+        val addAccountResults = payloads.map { addAccountInternal(it) }
+
+        proxySyncService.startSyncing()
+
+        addAccountResults.toEvents().forEach { metaAccountChangesEventBus.notify(it) }
+
+        return addAccountResults
+    }
+
     protected abstract suspend fun addAccountInternal(payload: T): AddAccountResult
 
     private fun AddAccountResult.toEvent(): Event {
         return when (this) {
-            is AddAccountResult.AccountAdded -> Event.AccountAdded(metaId)
-            is AddAccountResult.AccountChanged -> Event.AccountChanged(metaId)
+            is AddAccountResult.AccountAdded -> Event.AccountAdded(listOf(metaId))
+            is AddAccountResult.AccountChanged -> Event.AccountChanged(listOf(metaId))
+        }
+    }
+
+    private fun List<AddAccountResult>.toEvents(): List<Event> {
+        val addedAccounts = mutableListOf<Long>()
+        val changedAccounts = mutableListOf<Long>()
+        forEach {
+            when (it) {
+                is AddAccountResult.AccountAdded -> addedAccounts.add(it.metaId)
+                is AddAccountResult.AccountChanged -> changedAccounts.add(it.metaId)
+            }
+        }
+
+        return mutableListOf<Event>().apply {
+            if (addedAccounts.isNotEmpty()) add(Event.AccountAdded(addedAccounts))
+            if (changedAccounts.isNotEmpty()) add(Event.AccountChanged(changedAccounts))
         }
     }
 }
