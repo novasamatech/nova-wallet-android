@@ -19,4 +19,6 @@ interface SettingsRouter {
     fun openWalletConnectScan()
 
     fun openWalletConnectSessions()
+
+    fun openCloudBackupSettings()
 }

@@ -18,17 +18,11 @@ import io.novafoundation.nova.common.sequrity.biometry.BiometricResponse
 import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.biometry.mapBiometricErrors
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
-import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupWallet
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
@@ -36,8 +30,6 @@ import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
-import io.novafoundation.nova.runtime.ext.Geneses
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -59,8 +51,7 @@ class SettingsViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val twoFactorVerificationService: TwoFactorVerificationService,
     private val biometricService: BiometricService,
-    private val pushNotificationsInteractor: PushNotificationsInteractor,
-    private val cloudBackupService: CloudBackupService
+    private val pushNotificationsInteractor: PushNotificationsInteractor
 ) : BaseViewModel(), Browserable {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -244,47 +235,8 @@ class SettingsViewModel(
         }
     }
 
-    // TODO remove test code when implementing cloud backup settings screen
-    fun cloudBackupClicked() = launch {
-        val sampleRequest = WriteBackupRequest(
-            password = "test",
-            cloudBackup = CloudBackup(
-                modifiedAt = System.currentTimeMillis(),
-                wallets = listOf(
-                    CloudBackupWallet(
-                        id = 0,
-                        substratePublicKey = emptySubstrateAccountId(),
-                        substrateAccountId = emptySubstrateAccountId(),
-                        substrateCryptoType = CryptoType.SR25519,
-                        name = "Test",
-                        type = CloudBackupWallet.Type.SECRETS,
-                        chainAccounts = listOf(
-                            CloudBackupWallet.ChainAccount(
-                                chainId = Chain.Geneses.POLKADOT,
-                                publicKey = emptySubstrateAccountId(),
-                                accountId = emptySubstrateAccountId(),
-                                cryptoType = CryptoType.SR25519
-                            )
-                        ),
-                        ethereumAddress = null,
-                        ethereumPublicKey = null,
-                    )
-                )
-            )
-        )
-        val validationStatus = cloudBackupService.writeBackupToCloud(sampleRequest)
-
-        showMessage("Backup write status: $validationStatus")
-    }
-
-    // TODO remove test code when implementing cloud backup settings screen
-    fun cloudBackupLongClicked() = launch {
-//        cloudBackupService.fetchAndDecryptExistingBackup(password = "test")
-//            .onSuccess { showMessage("Retrieved and decrypted backup with first wallet name: ${it.wallets.first().name}") }
-//            .onFailure { showMessage("Failed to retrieve and decrypt backup: ${it.message}") }
-
-        val result = cloudBackupService.deleteBackup()
-        showMessage("Delete backup status: $result")
+    fun cloudBackupClicked() {
+        router.openCloudBackupSettings()
     }
 
     fun onResume() {

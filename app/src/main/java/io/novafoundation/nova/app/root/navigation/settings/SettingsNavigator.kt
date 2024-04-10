@@ -49,4 +49,8 @@ class SettingsNavigator(
     override fun openWalletConnectSessions() {
         walletConnectDelegate.openWalletConnectSessions(WalletConnectSessionsPayload(metaId = null))
     }
+
+    override fun openCloudBackupSettings() {
+        performNavigation(R.id.action_open_cloudBackupSettings)
+    }
 }

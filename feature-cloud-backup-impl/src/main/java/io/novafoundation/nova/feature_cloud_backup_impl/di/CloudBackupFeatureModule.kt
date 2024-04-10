@@ -19,6 +19,8 @@ import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.SharedP
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.CloudBackupSerializer
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.JsonCloudBackupSerializer
 import io.novafoundation.nova.feature_cloud_backup_impl.domain.RealCloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_impl.domain.settings.CloudBackupSettingsInteractor
+import io.novafoundation.nova.feature_cloud_backup_impl.domain.settings.RealCloudBackupSettingsInteractor
 
 @Module
 internal class CloudBackupFeatureModule {
@@ -72,5 +74,13 @@ internal class CloudBackupFeatureModule {
             encryption = encryption,
             cloudBackupPreferences = backupPreferences
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCloudBackupSettingsInteractor(
+        cloudBackupService: CloudBackupService
+    ): CloudBackupSettingsInteractor {
+        return RealCloudBackupSettingsInteractor(cloudBackupService)
     }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cloud_backup_settings_graph"
+    app:startDestination="@id/cloudBackupSettings">
+
+    <fragment
+        android:id="@+id/cloudBackupSettings"
+        android:name="io.novafoundation.nova.feature_cloud_backup_impl.presentation.settings.main.CloudBackupSettingsFragment"
+        android:label="CloudBackupSettingsFragment"/>
+
+</navigation>

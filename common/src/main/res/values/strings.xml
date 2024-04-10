@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="cloud_backup_state_synced_title">Backup Synced</string>
+    <string name="backup_settings_toolbar_title">Backup</string>
+    <string name="backup_settings_title">Google Drive</string>
+    <string name="backup_settings_subtitle">An encrypted copy of all your wallets are safely stored using your Google Drive. Even if you install Nova on a new device you will be able to easily access your wallets.</string>
+    <string name="backup_settings_manual_title">Manual</string>
+    <string name="backup_settings_manual_subtitle">You can manually write down your recovery phrase to be sure that everything is safe</string>
+    <string name="backup_settings_switcher_text">Back up to Google Drive</string>
+    <string name="backup_settings_manual_switcher_title">Back up manually</string>
+
     <string name="corrupted_backup_error_title">Backup found but empty or broken</string>
     <string name="corrupted_backup_error_subtitle">An issue has been identified with your backup. You have the option to delete the current backup and create a new one. %s before proceeding.</string>
     <string name="corrupted_backup_error_subtitle_highlighted">Ensure you have saved Passphrases for all wallets</string>

@@ -228,6 +228,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_cloudBackupSettings"
+        app:destination="@id/cloud_backup_settings_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_select_governance_tracks"
         app:destination="@id/selectGovernanceTracks"
         app:enterAnim="@anim/fragment_open_enter"
@@ -944,5 +952,7 @@
     <include app:graph="@navigation/staking_main_graph" />
 
     <include app:graph="@navigation/push_settings_graph" />
+
+    <include app:graph="@navigation/cloud_backup_settings_graph" />
 
 </navigation>
