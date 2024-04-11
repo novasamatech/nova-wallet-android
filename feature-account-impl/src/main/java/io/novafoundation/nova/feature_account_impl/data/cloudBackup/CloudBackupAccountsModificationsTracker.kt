@@ -2,9 +2,10 @@ package io.novafoundation.nova.feature_account_impl.data.cloudBackup
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.isProxied
 
 interface CloudBackupAccountsModificationsTracker {
+
+    fun recordAccountModified(modifiedAccountTypes: List<LightMetaAccount.Type>)
 
     fun recordAccountModified(modifiedAccountType: LightMetaAccount.Type)
 
@@ -26,7 +27,13 @@ class RealCloudBackupAccountsModificationsTracker(
     }
 
     override fun recordAccountModified(modifiedAccountType: LightMetaAccount.Type) {
-        if (!modifiedAccountType.isProxied) {
+        if (modifiedAccountType.isBackupable()) {
+            recordAccountsModified()
+        }
+    }
+
+    override fun recordAccountModified(modifiedAccountTypes: List<LightMetaAccount.Type>) {
+        if (modifiedAccountTypes.any { it.isBackupable() }) {
             recordAccountsModified()
         }
     }

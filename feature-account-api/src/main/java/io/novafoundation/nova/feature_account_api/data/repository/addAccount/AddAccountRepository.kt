@@ -5,8 +5,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 interface AddAccountRepository<T> {
 
     suspend fun addAccount(payload: T): AddAccountResult
-
-    suspend fun addAccounts(payloads: List<T>): List<AddAccountResult>
 }
 
 sealed interface AddAccountResult {

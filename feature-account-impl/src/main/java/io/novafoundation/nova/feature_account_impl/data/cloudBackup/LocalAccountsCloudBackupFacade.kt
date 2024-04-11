@@ -26,9 +26,17 @@ import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountAdded
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountNameChanged
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountRemoved
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountStructureChanged
+import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
+import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeFromLocal
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.localVsCloudDiff
@@ -90,16 +98,14 @@ interface LocalAccountsCloudBackupFacade {
  *
  * @return whether the attempt succeeded
  */
-suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersion(cloudVersion: CloudBackup): Boolean {
+suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudVersion: CloudBackup) {
     val localSnapshot = publicBackupInfoFromLocalSnapshot()
     val diff = localSnapshot.localVsCloudDiff(cloudVersion.publicData)
 
     return if (canPerformNonDestructiveApply(diff)) {
         applyBackupDiff(diff, cloudVersion)
-
-        true
     } else {
-        false
+        throw CannotApplyNonDestructiveDiff()
     }
 }
 
@@ -107,6 +113,7 @@ class RealLocalAccountsCloudBackupFacade(
     private val secretsStoreV2: SecretStoreV2,
     private val accountDao: MetaAccountDao,
     private val cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
+    private val metaAccountChangedEvents: MetaAccountChangesEventBus,
 ) : LocalAccountsCloudBackupFacade {
 
     override suspend fun fullBackupInfoFromLocalSnapshot(): CloudBackup {
@@ -164,31 +171,44 @@ class RealLocalAccountsCloudBackupFacade(
 
         val metaAccountsByUuid = getAllBackupableAccounts().associateBy { it.metaAccount.globallyUniqueId }
 
-        accountDao.withTransaction {
-            applyLocalRemoval(localChangesToApply.removed, metaAccountsByUuid)
-            applyLocalAddition(localChangesToApply.added, cloudVersion)
-            applyLocalModification(localChangesToApply.modified, cloudVersion, metaAccountsByUuid)
+        val changesEvent = buildChangesEvent {
+            accountDao.withTransaction {
+                addAll(applyLocalRemoval(localChangesToApply.removed, metaAccountsByUuid))
+                addAll(applyLocalAddition(localChangesToApply.added, cloudVersion))
+                addAll(applyLocalModification(localChangesToApply.modified, cloudVersion, metaAccountsByUuid))
+            }
         }
 
-        cloudBackupAccountsModificationsTracker.recordAccountsModified()
+        changesEvent?.let { metaAccountChangedEvents.notify(it) }
     }
 
-    private suspend fun applyLocalRemoval(toRemove: List<CloudBackup.WalletPublicInfo>, metaAccountsByUUid: Map<String, JoinedMetaAccountInfo>) {
-        if (toRemove.isEmpty()) return
+    private suspend fun applyLocalRemoval(
+        toRemove: List<CloudBackup.WalletPublicInfo>,
+        metaAccountsByUUid: Map<String, JoinedMetaAccountInfo>
+    ): List<AccountRemoved> {
+        if (toRemove.isEmpty()) return emptyList()
 
         val localIds = toRemove.mapNotNull { metaAccountsByUUid[it.walletId]?.metaAccount?.id }
         accountDao.delete(localIds)
 
-        toRemove.forEach {
-            val localWallet = metaAccountsByUUid[it.walletId] ?: return@forEach
+        return toRemove.mapNotNull {
+            val localWallet = metaAccountsByUUid[it.walletId] ?: return@mapNotNull null
             val chainAccountIds = localWallet.chainAccounts.map(ChainAccountLocal::accountId)
 
             secretsStoreV2.clearSecrets(localWallet.metaAccount.id, chainAccountIds)
+
+            AccountRemoved(
+                metaId = localWallet.metaAccount.id,
+                metaAccountType = mapMetaAccountTypeFromLocal(localWallet.metaAccount.type)
+            )
         }
     }
 
-    private suspend fun applyLocalAddition(toAdd: List<CloudBackup.WalletPublicInfo>, cloudBackup: CloudBackup) {
-        toAdd.forEach { publicWalletInfo ->
+    private suspend fun applyLocalAddition(
+        toAdd: List<CloudBackup.WalletPublicInfo>,
+        cloudBackup: CloudBackup
+    ): List<AccountAdded> {
+        return toAdd.map { publicWalletInfo ->
             val metaAccountLocal = publicWalletInfo.toMetaAccountLocal(
                 accountPosition = accountDao.nextAccountPosition(),
                 localIdOverwrite = null,
@@ -208,6 +228,11 @@ class RealLocalAccountsCloudBackupFacade(
             chainAccountsSecrets.forEach { (accountId, secrets) ->
                 secretsStoreV2.putChainAccountSecrets(metaId, accountId.value, secrets)
             }
+
+            AccountAdded(
+                metaId = metaId,
+                metaAccountType = mapMetaAccountTypeFromLocal(metaAccountLocal.type)
+            )
         }
     }
 
@@ -227,9 +252,14 @@ class RealLocalAccountsCloudBackupFacade(
         toModify: List<CloudBackup.WalletPublicInfo>,
         cloudVersion: CloudBackup,
         localMetaAccountsByUUid: Map<String, JoinedMetaAccountInfo>
-    ) {
-        toModify.forEach { publicWalletInfo ->
-            val oldMetaAccountJoinInfo = localMetaAccountsByUUid[publicWalletInfo.walletId] ?: return@forEach
+    ): List<MetaAccountChangesEventBus.Event> {
+        // There seems to be some bug in Kotlin compiler which prevents us to use `return flatMap` here:
+        // Some internal assertion in compiler fails with error "cannot cal suspend function without continuation"
+        // The closest issue I have found: https://youtrack.jetbrains.com/issue/KT-48319/JVM-IR-AssertionError-FUN-caused-by-suspend-lambda-inside-anonymous-function
+        val result = mutableListOf<MetaAccountChangesEventBus.Event>()
+
+        toModify.onEach { publicWalletInfo ->
+            val oldMetaAccountJoinInfo = localMetaAccountsByUUid[publicWalletInfo.walletId] ?: return@onEach
             val oldMetaAccountLocal = oldMetaAccountJoinInfo.metaAccount
             val metaId = oldMetaAccountLocal.id
 
@@ -267,7 +297,14 @@ class RealLocalAccountsCloudBackupFacade(
             chainAccountsSecrets.forEach { (accountId, secrets) ->
                 secretsStoreV2.putChainAccountSecrets(metaId, accountId.value, secrets)
             }
+
+            val metaAccountType = mapMetaAccountTypeFromLocal(oldMetaAccountLocal.type)
+
+            result.add(AccountStructureChanged(metaId = metaId, metaAccountType = metaAccountType))
+            result.add(AccountNameChanged(metaId = metaId, metaAccountType = metaAccountType))
         }
+
+        return result
     }
 
     private fun CloudBackup.getMetaAccountSecrets(uuid: String): EncodableStruct<MetaAccountSecrets>? {
@@ -292,18 +329,6 @@ class RealLocalAccountsCloudBackupFacade(
     private suspend fun getAllBackupableAccounts(): List<JoinedMetaAccountInfo> {
         return accountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
             .filter { it.metaAccount.type.isBackupable() }
-    }
-
-    private fun MetaAccountLocal.Type.isBackupable(): Boolean {
-        return when (this) {
-            MetaAccountLocal.Type.SECRETS,
-            MetaAccountLocal.Type.WATCH_ONLY,
-            MetaAccountLocal.Type.PARITY_SIGNER,
-            MetaAccountLocal.Type.LEDGER,
-            MetaAccountLocal.Type.POLKADOT_VAULT -> true
-
-            MetaAccountLocal.Type.PROXIED -> false
-        }
     }
 
     private suspend fun preparePrivateBackupData(metaAccounts: List<JoinedMetaAccountInfo>): CloudBackup.PrivateData {

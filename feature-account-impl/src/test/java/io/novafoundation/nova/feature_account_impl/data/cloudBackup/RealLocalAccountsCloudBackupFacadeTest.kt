@@ -10,6 +10,13 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountAdded
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountNameChanged
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountRemoved
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountStructureChanged
+import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.mock.LocalAccountsMocker
 import io.novafoundation.nova.feature_account_impl.mock.SecretStoreMocker
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.BackupPriorityResolutionStrategy
@@ -45,6 +52,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
     lateinit var cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker
 
     @Mock
+    lateinit var metaAccountChangesEventBus: MetaAccountChangesEventBus
+
+    @Mock
     lateinit var secretStore: SecretStoreV2
 
     lateinit var facade: RealLocalAccountsCloudBackupFacade
@@ -57,7 +67,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
         facade = RealLocalAccountsCloudBackupFacade(
             secretsStoreV2 = secretStore,
             accountDao = metaAccountDao,
-            cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker
+            cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker,
+            metaAccountChangedEvents = metaAccountChangesEventBus
         )
 
         whenever(cloudBackupAccountsModificationsTracker.getAccountsLastModifiedAt()).thenReturn(TEST_MODIFIED_AT)
@@ -315,6 +326,11 @@ class RealLocalAccountsCloudBackupFacadeTest {
         // no modifications happened
         verify(metaAccountDao, never()).updateMetaAccount(any())
         verify(metaAccountDao, never()).deleteChainAccounts(any())
+
+        val expectedEvent = buildChangesEvent {
+            add(AccountAdded(metaId = 0, LightMetaAccount.Type.SECRETS))
+        }
+        verifyEvent(expectedEvent)
     }
 
     @Test
@@ -429,6 +445,11 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
         // no modifications happened
         verify(metaAccountDao, never()).updateMetaAccount(any())
+
+        val expectedEvent = buildChangesEvent {
+            add(AccountRemoved(metaId = 0, LightMetaAccount.Type.SECRETS))
+        }
+        verifyEvent(expectedEvent)
     }
 
     // Tests that we will apply chan account deletion and entropy change
@@ -591,6 +612,20 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
         // no deletes happened
         verify(metaAccountDao, never()).delete(any<List<Long>>())
+
+        val expectedEvent = buildChangesEvent {
+            add(AccountStructureChanged(metaId = 0, LightMetaAccount.Type.SECRETS))
+            add(AccountNameChanged(metaId = 0, LightMetaAccount.Type.SECRETS))
+        }
+        verifyEvent(expectedEvent)
+    }
+
+    private suspend fun verifyEvent(event: MetaAccountChangesEventBus.Event?) {
+        if (event == null) {
+            verify(metaAccountChangesEventBus, never()).notify(any())
+        } else {
+            verify(metaAccountChangesEventBus).notify(eq(event))
+        }
     }
 
     private fun singleMetaIdListOf(id: Long): List<Long> {

@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.CloudBackupAddMetaAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.cloudBackup.LocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_impl.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackup
 
@@ -14,18 +15,18 @@ interface RestoreCloudBackupInteractor {
 
 class RealRestoreCloudBackupInteractor(
     private val cloudBackupService: CloudBackupService,
+    private val cloudBackupFacade: LocalAccountsCloudBackupFacade,
     private val accountRepository: AccountRepository,
-    private val addMetaAccountRepository: CloudBackupAddMetaAccountRepository
 ) : RestoreCloudBackupInteractor {
 
     override suspend fun restoreCloudBackup(password: String): Result<Unit> {
         return cloudBackupService.fetchAndDecryptExistingBackup(password)
-            .map { cloudBackup ->
-                val payloads = cloudBackup.publicData.wallets.map {
-                    CloudBackupAddMetaAccountRepository.Payload(it)
-                }
-                val addAccountResult = addMetaAccountRepository.addAccounts(payloads)
-                accountRepository.selectMetaAccount(addAccountResult.first().metaId)
+            .mapCatching { cloudBackup ->
+                // `CannotApplyNonDestructiveDiff` shouldn't actually happen here since it is a import for clean app but we should handle it anyway
+                cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup)
+
+                val firstSelectedMetaAccount = accountRepository.getActiveMetaAccounts().first()
+                accountRepository.selectMetaAccount(firstSelectedMetaAccount.id)
             }
     }
 

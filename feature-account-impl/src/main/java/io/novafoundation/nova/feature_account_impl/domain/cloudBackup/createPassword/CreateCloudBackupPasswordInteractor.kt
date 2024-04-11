@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPas
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.cloudBackup.LocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_impl.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.SecretsMetaAccountLocalFactory
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
-import io.novafoundation.nova.feature_account_impl.domain.common.mapLocalAccountToCloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 
@@ -27,7 +27,7 @@ class RealCreateCloudBackupPasswordInteractor(
     private val accountSecretsFactory: AccountSecretsFactory,
     private val secretsMetaAccountLocalFactory: SecretsMetaAccountLocalFactory,
     private val metaAccountDao: MetaAccountDao,
-    private val localAddMetaAccountRepository: LocalAddMetaAccountRepository
+    private val localAccountsCloudBackupFacade: LocalAccountsCloudBackupFacade,
 ) : CreateCloudBackupPasswordInteractor {
 
     override fun checkPasswords(password: String, confirmPassword: String): List<PasswordErrors> {
@@ -56,7 +56,7 @@ class RealCreateCloudBackupPasswordInteractor(
             accountSortPosition = metaAccountDao.nextAccountPosition()
         )
 
-        val cloudBackup = mapLocalAccountToCloudBackup(
+        val cloudBackup = localAccountsCloudBackupFacade.createCloudBackupFromInput(
             modificationTime = System.currentTimeMillis(),
             metaAccount = metaAccountLocal,
             chainAccounts = emptyList(),
@@ -65,11 +65,11 @@ class RealCreateCloudBackupPasswordInteractor(
             additionalSecrets = emptyMap()
         )
 
-        val backupResult = cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password))
+        return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
+            localAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup)
 
-        return backupResult.onSuccess {
-            val addAccountResult = localAddMetaAccountRepository.addAccount(LocalAddMetaAccountRepository.Payload(metaAccountLocal, secrets))
-            accountRepository.selectMetaAccount(addAccountResult.metaId)
+            val firstSelectedMetaAccount = accountRepository.getActiveMetaAccounts().first()
+            accountRepository.selectMetaAccount(firstSelectedMetaAccount.id)
         }
     }
 }
