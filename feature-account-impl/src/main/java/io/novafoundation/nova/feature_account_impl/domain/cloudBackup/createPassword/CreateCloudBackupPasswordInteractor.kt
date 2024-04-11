@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFa
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 
 private const val MIN_PASSWORD_SYMBOLS = 8
 
@@ -66,7 +67,7 @@ class RealCreateCloudBackupPasswordInteractor(
         )
 
         return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
-            localAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup)
+            localAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.overwriteLocal())
 
             val firstSelectedMetaAccount = accountRepository.getActiveMetaAccounts().first()
             accountRepository.selectMetaAccount(firstSelectedMetaAccount.id)

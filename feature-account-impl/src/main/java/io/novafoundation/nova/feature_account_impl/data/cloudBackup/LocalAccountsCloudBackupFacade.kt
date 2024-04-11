@@ -35,11 +35,12 @@ import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeFromLocal
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategyFactory
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isEmpty
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.localVsCloudDiff
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
@@ -98,12 +99,17 @@ interface LocalAccountsCloudBackupFacade {
  *
  * @return whether the attempt succeeded
  */
-suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudVersion: CloudBackup) {
+suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(
+    cloudVersion: CloudBackup,
+    diffStrategy: BackupDiffStrategyFactory
+) : CloudBackupDiff {
     val localSnapshot = publicBackupInfoFromLocalSnapshot()
-    val diff = localSnapshot.localVsCloudDiff(cloudVersion.publicData)
+    val diff = localSnapshot.localVsCloudDiff(cloudVersion.publicData, diffStrategy)
 
     return if (canPerformNonDestructiveApply(diff)) {
         applyBackupDiff(diff, cloudVersion)
+
+        diff
     } else {
         throw CannotApplyNonDestructiveDiff()
     }

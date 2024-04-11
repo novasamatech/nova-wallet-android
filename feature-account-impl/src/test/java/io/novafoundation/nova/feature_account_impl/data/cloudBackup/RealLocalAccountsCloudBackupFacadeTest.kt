@@ -19,9 +19,9 @@ import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.mock.LocalAccountsMocker
 import io.novafoundation.nova.feature_account_impl.mock.SecretStoreMocker
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.BackupPriorityResolutionStrategy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo.KeyPairSecrets
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.localVsCloudDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.argThat
 import io.novafoundation.nova.test_shared.eq
@@ -307,7 +307,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
             }
         }
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupPriorityResolutionStrategy.alwaysCloud())
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.overwriteLocal())
 
         facade.applyBackupDiff(diff, cloudBackup)
 
@@ -427,7 +427,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
             privateData {  }
         }
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupPriorityResolutionStrategy.alwaysCloud())
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.overwriteLocal())
 
         facade.applyBackupDiff(diff, cloudBackup)
 
@@ -576,7 +576,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
             }
         }
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupPriorityResolutionStrategy.alwaysCloud())
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.overwriteLocal())
 
         facade.applyBackupDiff(diff, cloudBackup)
 

@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_cloud_backup_api.domain.model
 
 import io.novafoundation.feature_cloud_backup_test.CloudBackupBuilder
 import io.novafoundation.feature_cloud_backup_test.buildTestCloudBackup
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
@@ -27,7 +30,7 @@ class CloudBackupExtKtTest {
 
         val walletOnlyPresentInCloud = cloudBackup.publicData.wallets.first()
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.cloudChanges.isEmpty())
         assertTrue(diff.localChanges.removed.isEmpty())
@@ -63,7 +66,7 @@ class CloudBackupExtKtTest {
 
         val walletOnlyPresentInCloud = cloudBackup.publicData.wallets[1]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.cloudChanges.isEmpty())
         assertTrue(diff.localChanges.removed.isEmpty())
@@ -99,7 +102,7 @@ class CloudBackupExtKtTest {
 
         val walletOnlyPresentLocally = localBackup.publicData.wallets[1]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.cloudChanges.isEmpty())
         assertTrue(diff.localChanges.added.isEmpty())
@@ -133,7 +136,7 @@ class CloudBackupExtKtTest {
 
         val modifiedLocally = cloudBackup.publicData.wallets[0]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.cloudChanges.isEmpty())
         assertTrue(diff.localChanges.removed.isEmpty())
@@ -165,7 +168,7 @@ class CloudBackupExtKtTest {
 
         val modifiedLocally = cloudBackup.publicData.wallets[0]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.cloudChanges.isEmpty())
         assertTrue(diff.localChanges.removed.isEmpty())
@@ -197,7 +200,7 @@ class CloudBackupExtKtTest {
 
         val toModifyLocally = cloudBackup.publicData.wallets[0]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.cloudChanges.isEmpty())
         assertTrue(diff.localChanges.removed.isEmpty())
@@ -233,7 +236,7 @@ class CloudBackupExtKtTest {
 
         val toModifyLocally = cloudBackup.publicData.wallets[0]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.cloudChanges.isEmpty())
         assertTrue(diff.localChanges.removed.isEmpty())
@@ -269,7 +272,7 @@ class CloudBackupExtKtTest {
 
         val walletOnlyPresentLocally = localBackup.publicData.wallets[1]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.localChanges.isEmpty())
         assertTrue(diff.cloudChanges.removed.isEmpty())
@@ -305,7 +308,7 @@ class CloudBackupExtKtTest {
 
         val walletOnlyPresentInCloud = cloudBackup.publicData.wallets[1]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.localChanges.isEmpty())
         assertTrue(diff.cloudChanges.added.isEmpty())
@@ -337,7 +340,7 @@ class CloudBackupExtKtTest {
 
         val toModifyInCloud = localBackup.publicData.wallets[0]
 
-        val diff = localBackup.localVsCloudDiff(cloudBackup)
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
         assertTrue(diff.localChanges.isEmpty())
         assertTrue(diff.cloudChanges.removed.isEmpty())
