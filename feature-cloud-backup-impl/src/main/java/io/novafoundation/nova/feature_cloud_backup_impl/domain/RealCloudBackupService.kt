@@ -11,7 +11,9 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupR
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.DeleteBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
-import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedBackupData
+import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedPrivateData
+import io.novafoundation.nova.feature_cloud_backup_impl.data.ReadyForStorageBackup
+import io.novafoundation.nova.feature_cloud_backup_impl.data.SerializedBackup
 import io.novafoundation.nova.feature_cloud_backup_impl.data.cloudStorage.CloudBackupStorage
 import io.novafoundation.nova.feature_cloud_backup_impl.data.encryption.CloudBackupEncryption
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.CloudBackupPreferences
@@ -57,15 +59,15 @@ internal class RealCloudBackupService(
     }
 
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
-        return storage.ensureUserAuthenticated().flatMap {
-            storage.fetchBackup()
-        }.map {
-            RealEncryptedCloudBackup(encryption, serializer, it)
-        }.onFailure {
-            Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
-        }.mapErrorNotInstance<_, FetchBackupError> {
-            FetchBackupError.Other
-        }
+        return storage.ensureUserAuthenticated()
+            .flatMap { storage.fetchBackup() }
+            .flatMap { serializer.deserializePublicData(it) }
+            .map { RealEncryptedCloudBackup(encryption, serializer, it) }
+            .onFailure {
+                Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
+            }.mapErrorNotInstance<_, FetchBackupError> {
+                FetchBackupError.Other
+            }
     }
 
     override suspend fun deleteBackup(): Result<Unit> {
@@ -78,10 +80,11 @@ internal class RealCloudBackupService(
         }
     }
 
-    private suspend fun prepareBackupForSaving(backup: CloudBackup, password: String): Result<EncryptedBackupData> {
-        return serializer.serializeBackup(backup).flatMap { unencryptedBackupData ->
-            encryption.encryptBackup(unencryptedBackupData, password)
-        }
+    private suspend fun prepareBackupForSaving(backup: CloudBackup, password: String): Result<ReadyForStorageBackup> {
+        return serializer.serializePrivateData(backup)
+            .flatMap { unencryptedBackupData -> encryption.encryptBackup(unencryptedBackupData.privateData, password) }
+            .map { SerializedBackup(backup.publicData, it) }
+            .flatMap { serializer.serializePublicData(it) }
     }
 
     private suspend fun CloudBackupStorage.ensureUserAuthenticated(): Result<Unit> {
@@ -119,12 +122,16 @@ internal class RealCloudBackupService(
     private class RealEncryptedCloudBackup(
         private val encryption: CloudBackupEncryption,
         private val serializer: CloudBackupSerializer,
-        private val encryptedBackupData: EncryptedBackupData,
+        private val encryptedBackup: SerializedBackup<EncryptedPrivateData>
     ) : EncryptedCloudBackup {
 
+        override val publicData: CloudBackup.PublicData = encryptedBackup.publicData
+
         override suspend fun decrypt(password: String): Result<CloudBackup> {
-            return encryption.decryptBackup(encryptedBackupData, password).flatMap {
-                serializer.deserializeBackup(it)
+            return encryption.decryptBackup(encryptedBackup.privateData, password).flatMap { privateData ->
+                val unencryptedBackup = SerializedBackup(encryptedBackup.publicData, privateData)
+
+                serializer.deserializePrivateData(unencryptedBackup)
             }
         }
     }

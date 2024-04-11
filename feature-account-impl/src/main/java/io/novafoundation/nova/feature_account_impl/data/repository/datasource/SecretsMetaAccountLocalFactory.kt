@@ -41,7 +41,8 @@ class RealSecretsMetaAccountLocalFactory : SecretsMetaAccountLocalFactory {
             isSelected = false,
             position = accountSortPosition,
             type = MetaAccountLocal.Type.SECRETS,
-            status = MetaAccountLocal.Status.ACTIVE
+            status = MetaAccountLocal.Status.ACTIVE,
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
         )
     }
 }

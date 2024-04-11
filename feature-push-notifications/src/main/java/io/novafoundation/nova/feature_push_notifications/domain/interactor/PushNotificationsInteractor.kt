@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
-import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
+import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
 import kotlinx.coroutines.flow.Flow
 
 interface PushNotificationsInteractor {
@@ -24,9 +24,7 @@ interface PushNotificationsInteractor {
 
     fun isPushNotificationsAvailable(): Boolean
 
-    suspend fun onMetaAccountChanged(metaIds: List<Long>)
-
-    suspend fun onMetaAccountRemoved(metaId: Long)
+    suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>)
 }
 
 class RealPushNotificationsInteractor(
@@ -67,27 +65,23 @@ class RealPushNotificationsInteractor(
         return pushNotificationsService.isPushNotificationsAvailable()
     }
 
-    override suspend fun onMetaAccountChanged(metaIds: List<Long>) {
-        val pushSettings = pushSettingsProvider.getPushSettings()
-        metaIds.containsAll(pushSettings.subscribedMetaAccounts)
-        if (pushSettings.subscribedMetaAccounts.any { metaIds.contains(it) }) {
-            val isPushEnabled = pushSettingsProvider.isPushNotificationsEnabled()
-            updatePushSettings(isPushEnabled, pushSettings)
-        }
-    }
+    override suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>) {
+        if (changed.isEmpty() || deleted.isEmpty()) return
 
-    override suspend fun onMetaAccountRemoved(metaId: Long) {
         val notificationsEnabled = pushSettingsProvider.isPushNotificationsEnabled()
         val noAccounts = accountRepository.getActiveMetaAccountsQuantity() == 0
         val pushSettings = pushSettingsProvider.getPushSettings()
 
-        if (notificationsEnabled && noAccounts) {
-            pushNotificationsService.updatePushSettings(false, null)
-        } else if (noAccounts) {
-            pushSettingsProvider.updateSettings(null)
-        } else if (pushSettings.subscribedMetaAccounts.contains(metaId)) {
-            val newPushSettings = pushSettings.copy(subscribedMetaAccounts = pushSettings.subscribedMetaAccounts - metaId)
-            pushNotificationsService.updatePushSettings(notificationsEnabled, newPushSettings)
+        val allAffected = (changed + deleted).toSet()
+        val subscribedAccountsAffected = pushSettings.subscribedMetaAccounts.intersect(allAffected).isNotEmpty()
+
+        when {
+            notificationsEnabled && noAccounts -> pushNotificationsService.updatePushSettings(enabled = false, pushSettings = null)
+            noAccounts -> pushSettingsProvider.updateSettings(pushWalletSettings = null)
+            subscribedAccountsAffected -> {
+                val newPushSettings = pushSettings.copy(subscribedMetaAccounts = pushSettings.subscribedMetaAccounts - deleted.toSet())
+                pushNotificationsService.updatePushSettings(notificationsEnabled, newPushSettings)
+            }
         }
     }
 }

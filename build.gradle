@@ -12,7 +12,7 @@ buildscript {
         minSdkVersion = 24
         targetSdkVersion = 33
 
-        kotlinVersion = '1.7.10'
+        kotlinVersion = '1.7.21'
 
         ktlintPinterestVersion = '0.47.0'
 

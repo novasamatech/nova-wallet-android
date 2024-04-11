@@ -26,7 +26,7 @@ import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
-import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedBackupData
+import io.novafoundation.nova.feature_cloud_backup_impl.data.ReadyForStorageBackup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -39,8 +39,8 @@ internal class GoogleDriveBackupStorage(
 ) : CloudBackupStorage {
 
     companion object {
-        private const val BACKUP_FILE_NAME = "novawallet_backup"
-        private const val BACKUP_MIME_TYPE = "application/octet-stream"
+        private const val BACKUP_FILE_NAME = "novawallet_backup.json"
+        private const val BACKUP_MIME_TYPE = "application/json"
     }
 
     private val drive: Drive by lazy {
@@ -83,17 +83,17 @@ internal class GoogleDriveBackupStorage(
             }
     }
 
-    override suspend fun writeBackup(backup: EncryptedBackupData): Result<Unit> = withContext(Dispatchers.IO) {
+    override suspend fun writeBackup(backup: ReadyForStorageBackup): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
-            writeBackupFileToDrive(backup.encryptedData)
+            writeBackupFileToDrive(backup.value)
         }
     }
 
-    override suspend fun fetchBackup(): Result<EncryptedBackupData> = withContext(Dispatchers.IO) {
+    override suspend fun fetchBackup(): Result<ReadyForStorageBackup> = withContext(Dispatchers.IO) {
         runCatching {
             val fileContent = readBackupFileFromDrive()
 
-            EncryptedBackupData(fileContent)
+            ReadyForStorageBackup(fileContent)
         }
     }
 
@@ -103,8 +103,8 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
-    private fun writeBackupFileToDrive(fileContent: ByteArray) {
-        val contentStream = ByteArrayContent(BACKUP_MIME_TYPE, fileContent)
+    private fun writeBackupFileToDrive(fileContent: String) {
+        val contentStream = ByteArrayContent(BACKUP_MIME_TYPE, fileContent.encodeToByteArray())
 
         val backupInCloud = getBackupFileFromCloud()
 
@@ -120,7 +120,7 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
-    private fun readBackupFileFromDrive(): ByteArray {
+    private fun readBackupFileFromDrive(): String {
         val outputStream = ByteArrayOutputStream()
 
         val backupFile = getBackupFileFromCloud() ?: throw FetchBackupError.BackupNotFound
@@ -129,7 +129,7 @@ internal class GoogleDriveBackupStorage(
             .get(backupFile.id)
             .executeMediaAndDownloadTo(outputStream)
 
-        return outputStream.toByteArray()
+        return outputStream.toString()
     }
 
     private fun deleteBackupFileFromDrive() {

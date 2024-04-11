@@ -13,3 +13,5 @@ interface CloudBackupNotEnoughSpace
 interface CloudBackupUnknownError
 
 interface CorruptedBackupError
+
+class CannotApplyNonDestructiveDiff() : Throwable()

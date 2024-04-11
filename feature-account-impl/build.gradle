@@ -85,4 +85,7 @@ dependencies {
 
     implementation insetterDep
     implementation flexBoxDep
+
+    testImplementation project(":test-shared")
+    testImplementation project(":feature-cloud-backup-test")
 }

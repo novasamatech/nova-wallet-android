@@ -49,8 +49,7 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
 }
 
 inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
-    onSuccess { transform() }
-    onFailure { transform() }
+    transform()
     return this
 }
 

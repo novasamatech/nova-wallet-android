@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.skipFirst
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -68,6 +69,7 @@ class WalletDetailsViewModel(
     private fun syncNameChangesWithDb() {
         accountNameFlow
             .filter { it.isNotEmpty() }
+            .skipFirst() // first one will be account's original name
             .debounce(UPDATE_NAME_INTERVAL_SECONDS.seconds)
             .onEach { interactor.updateName(metaId, it) }
             .launchIn(viewModelScope)
