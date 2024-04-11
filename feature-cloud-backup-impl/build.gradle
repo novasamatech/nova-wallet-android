@@ -49,4 +49,5 @@ dependencies {
     implementation googleDriveDep
 
     testImplementation project(':test-shared')
+    testImplementation project(":feature-cloud-backup-test")
 }

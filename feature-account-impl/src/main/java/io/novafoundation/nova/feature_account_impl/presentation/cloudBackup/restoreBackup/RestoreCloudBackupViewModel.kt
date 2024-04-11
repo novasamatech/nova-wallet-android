@@ -64,6 +64,7 @@ class RestoreCloudBackupViewModel(
                 .onSuccess {
                     continueBasedOnCodeStatus()
                 }.onFailure { throwable ->
+                    // TODO Antony: Handle CannotApplyNonDestructiveDiff
                     val titleAndMessage = mapRestoreBackupFailureToUi(
                         resourceManager,
                         throwable,

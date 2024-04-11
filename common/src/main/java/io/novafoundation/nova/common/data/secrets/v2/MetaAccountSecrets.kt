@@ -83,23 +83,39 @@ fun ChainAccountSecrets(
 val EncodableStruct<MetaAccountSecrets>.substrateDerivationPath
     get() = get(MetaAccountSecrets.SubstrateDerivationPath)
 
-val EncodableStruct<MetaAccountSecrets>.substrateKeypair
-    get() = get(MetaAccountSecrets.SubstrateKeypair)
-
 val EncodableStruct<MetaAccountSecrets>.ethereumDerivationPath
     get() = get(MetaAccountSecrets.EthereumDerivationPath)
+
+val EncodableStruct<MetaAccountSecrets>.entropy
+    get() = get(MetaAccountSecrets.Entropy)
+
+val EncodableStruct<MetaAccountSecrets>.seed
+    get() = get(MetaAccountSecrets.Seed)
+
+val EncodableStruct<MetaAccountSecrets>.substrateKeypair
+    get() = get(MetaAccountSecrets.SubstrateKeypair)
 
 val EncodableStruct<MetaAccountSecrets>.ethereumKeypair
     get() = get(MetaAccountSecrets.EthereumKeypair)
 
-val EncodableStruct<KeyPairSchema>.privateKey
-    get() = get(KeyPairSchema.PrivateKey)
-
-val EncodableStruct<KeyPairSchema>.nonce
-    get() = get(KeyPairSchema.Nonce)
-
 val EncodableStruct<ChainAccountSecrets>.derivationPath
     get() = get(ChainAccountSecrets.DerivationPath)
 
+@get:JvmName("chainAccountEntropy")
+val EncodableStruct<ChainAccountSecrets>.entropy
+    get() = get(ChainAccountSecrets.Entropy)
+
+@get:JvmName("chainAccountSeed")
+val EncodableStruct<ChainAccountSecrets>.seed
+    get() = get(ChainAccountSecrets.Seed)
+
 val EncodableStruct<ChainAccountSecrets>.keypair
     get() = get(ChainAccountSecrets.Keypair)
+val EncodableStruct<KeyPairSchema>.privateKey
+    get() = get(KeyPairSchema.PrivateKey)
+
+val EncodableStruct<KeyPairSchema>.publicKey
+    get() = get(KeyPairSchema.PublicKey)
+
+val EncodableStruct<KeyPairSchema>.nonce
+    get() = get(KeyPairSchema.Nonce)
