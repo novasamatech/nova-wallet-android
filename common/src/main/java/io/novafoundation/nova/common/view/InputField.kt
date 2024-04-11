@@ -5,9 +5,20 @@ import android.text.InputType
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
+import androidx.core.view.setPadding
 import com.google.android.material.textfield.TextInputLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
+import io.novafoundation.nova.common.view.shape.getInputBackground
+import kotlin.math.roundToInt
+
+enum class BackgroundMode {
+    INPUT_STATE,
+    SOLID,
+    CUSTOM,
+}
 
 class InputField @JvmOverloads constructor(
     context: Context,
@@ -34,6 +45,31 @@ class InputField @JvmOverloads constructor(
 
         val text = typedArray.getString(R.styleable.InputField_android_text)
         content.setText(text)
+
+        content.setPadding(
+            typedArray.getDimension(R.styleable.InputField_editTextPaddingStart, content.paddingLeft.toFloat()).roundToInt(),
+            typedArray.getDimension(R.styleable.InputField_editTextPaddingTop, content.paddingTop.toFloat()).roundToInt(),
+            typedArray.getDimension(R.styleable.InputField_editTextPaddingEnd, content.paddingRight.toFloat()).roundToInt(),
+            typedArray.getDimension(R.styleable.InputField_editTextPaddingBottom, content.paddingBottom.toFloat()).roundToInt()
+        )
+
+        val contentHint = typedArray.getString(R.styleable.InputField_editTextHint)
+        if (contentHint != null) {
+            hint = null
+            content.hint = contentHint
+        }
+
+        val backgroundMode = typedArray.getEnum(R.styleable.InputField_backgroundMode, BackgroundMode.INPUT_STATE)
+        when (backgroundMode) {
+            BackgroundMode.INPUT_STATE -> content.background = context.getCornersStateDrawable()
+            BackgroundMode.SOLID -> content.background = context.getInputBackground()
+            BackgroundMode.CUSTOM -> {}
+        }
+
+        val textAppearanceRes = typedArray.getResourceIdOrNull(R.styleable.InputField_android_textAppearance)
+        if (textAppearanceRes != null) {
+            content.setTextAppearance(textAppearanceRes)
+        }
 
         typedArray.recycle()
     }

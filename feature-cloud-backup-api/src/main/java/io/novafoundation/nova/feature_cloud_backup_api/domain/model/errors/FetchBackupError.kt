@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors
 
 sealed class FetchBackupError : Throwable() {
 
-    object BackupNotFound : FetchBackupError()
+    object BackupNotFound : FetchBackupError(), CloudBackupNotFound
 
-    object Other : FetchBackupError()
+    object CorruptedBackup : FetchBackupError(), CorruptedBackupError
+
+    object Other : FetchBackupError(), CloudBackupUnknownError
 }

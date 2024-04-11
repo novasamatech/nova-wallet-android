@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -365,4 +366,15 @@ fun ShimmerFrameLayout.setShimmerShown(shown: Boolean) {
     } else {
         hideShimmer()
     }
+}
+
+fun EditText.switchPasswordInputType(isPasswordVisible: Boolean) {
+    val selection = selectionEnd
+    inputType = if (isPasswordVisible) {
+        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+    } else {
+        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+    }
+
+    setSelection(selection)
 }

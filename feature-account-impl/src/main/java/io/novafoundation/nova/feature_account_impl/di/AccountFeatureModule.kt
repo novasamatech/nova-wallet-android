@@ -85,7 +85,21 @@ import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInt
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.CloudBackupAddMetaAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.RealSecretsMetaAccountLocalFactory
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.SecretsMetaAccountLocalFactory
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.RealCreateCloudBackupPasswordInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RealRestoreCloudBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RestoreCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.RealStartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -223,6 +237,48 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideCreateCloudBackupPasswordInteractor(
+        cloudBackupService: CloudBackupService,
+        accountRepository: AccountRepository,
+        encryptionDefaults: EncryptionDefaults,
+        accountSecretsFactory: AccountSecretsFactory,
+        secretsMetaAccountLocalFactory: SecretsMetaAccountLocalFactory,
+        metaAccountDao: MetaAccountDao,
+        localAddMetaAccountRepository: LocalAddMetaAccountRepository
+    ): CreateCloudBackupPasswordInteractor {
+        return RealCreateCloudBackupPasswordInteractor(
+            cloudBackupService,
+            accountRepository,
+            encryptionDefaults,
+            accountSecretsFactory,
+            secretsMetaAccountLocalFactory,
+            metaAccountDao,
+            localAddMetaAccountRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideRestoreCloudBackupInteractor(
+        cloudBackupService: CloudBackupService,
+        accountRepository: AccountRepository,
+        addMetaAccountRepository: CloudBackupAddMetaAccountRepository
+    ): RestoreCloudBackupInteractor {
+        return RealRestoreCloudBackupInteractor(
+            cloudBackupService,
+            accountRepository,
+            addMetaAccountRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSecretsMetaAccountLocalFactory(): SecretsMetaAccountLocalFactory {
+        return RealSecretsMetaAccountLocalFactory()
+    }
+
+    @Provides
+    @FeatureScope
     fun provideAccountDataSource(
         preferences: Preferences,
         encryptedPreferences: EncryptedPreferences,
@@ -231,6 +287,7 @@ class AccountFeatureModule {
         accountDataMigration: AccountDataMigration,
         metaAccountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
+        secretsMetaAccountLocalFactory: SecretsMetaAccountLocalFactory,
         secretStoreV2: SecretStoreV2,
     ): AccountDataSource {
         return AccountDataSourceImpl(
@@ -240,6 +297,7 @@ class AccountFeatureModule {
             metaAccountDao,
             chainRegistry,
             secretStoreV2,
+            secretsMetaAccountLocalFactory,
             secretStoreV1,
             accountDataMigration
         )

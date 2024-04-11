@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.GridSpacingItemDecoration
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.view_mnemonic_card_view.view.mnemonicCardPhrase
 import kotlin.math.roundToInt
 
 private const val DEFAULT_COLUMNS = 3
@@ -28,9 +27,9 @@ class MnemonicContainerView @JvmOverloads constructor(
     }
 
     fun setItemPadding(padding: Int) {
-        itemDecoration?.let { mnemonicCardPhrase.removeItemDecoration(it) }
+        itemDecoration?.let { removeItemDecoration(it) }
         itemDecoration = GridSpacingItemDecoration(_layoutManager, padding)
-        mnemonicCardPhrase.addItemDecoration(itemDecoration!!)
+        itemDecoration?.let { addItemDecoration(it) }
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.MnemonicContainerView) {

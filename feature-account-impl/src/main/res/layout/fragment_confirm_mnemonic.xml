@@ -29,37 +29,22 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                style="@style/TextAppearance.NovaFoundation.Bold.Title3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:textColor="@color/text_primary"
+                android:layout_marginTop="46dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/account_confirm_mnemonic_title" />
+                android:layout_gravity="center_horizontal"
+                android:text="@string/account_confirm_mnemonic_title"
+                android:textColor="@color/text_primary" />
 
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/account_confirm_mnemonic_subtitle"
-                android:textColor="@color/text_secondary" />
-
-            <io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
+            <io.novafoundation.nova.feature_account_impl.presentation.view.mnemonic.MnemonicCardView
                 android:id="@+id/confirmMnemonicDestination"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:minHeight="184dp"
-                android:overScrollMode="never"
-                android:paddingTop="8dp"
-                tools:layout_height="144dp"
-                tools:listitem="@layout/item_backup_mnemonic_word" />
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
                 android:id="@+id/confirmMnemonicSource"
@@ -72,11 +57,12 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                app:paddingBetweenItems="12dp"
                 app:showBackground="false"
                 tools:listitem="@layout/item_backup_mnemonic_word" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
 
+    </androidx.core.widget.NestedScrollView>
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/conformMnemonicSkip"
@@ -102,9 +88,9 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
         android:enabled="false"
-        android:text="@string/common_continue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/common_continue" />
 
 </LinearLayout>

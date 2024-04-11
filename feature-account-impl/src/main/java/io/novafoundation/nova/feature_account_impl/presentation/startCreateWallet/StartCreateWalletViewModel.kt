@@ -4,12 +4,19 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.addColor
 import io.novafoundation.nova.common.utils.finally
+import io.novafoundation.nova.common.utils.formatting.spannable.spannableFormatting
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.primary
+import io.novafoundation.nova.common.view.bottomSheet.action.secondary
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapPreCreateValidationStatusToUi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +31,9 @@ enum class CreateWalletState {
 class StartCreateWalletViewModel(
     private val router: AccountRouter,
     private val resourceManager: ResourceManager,
-    private val startCreateWalletInteractor: StartCreateWalletInteractor
-) : BaseViewModel() {
+    private val startCreateWalletInteractor: StartCreateWalletInteractor,
+    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     // Used to cancel the job when the user navigates back
     private var cloudBackupValidationJob: Job? = null
@@ -75,11 +83,12 @@ class StartCreateWalletViewModel(
 
     fun cloudBackupClicked() {
         cloudBackupValidationJob = launch {
+            val walletName = nameInput.value
             runCatching {
                 _cloudBackupSyncProgressFlow.value = true
                 val validationResult = startCreateWalletInteractor.validateCanCreateBackup()
                 if (validationResult is PreCreateValidationStatus.Ok) {
-                    TODO("Open create cloud backup screen")
+                    router.openCreateCloudBackupPassword(walletName)
                 } else {
                     val error = mapPreCreateValidationStatusToUi(resourceManager, validationResult, ::userHasExistingBackup)
                     error?.let { showError(it) }
@@ -91,10 +100,28 @@ class StartCreateWalletViewModel(
     }
 
     fun manualBackupClicked() {
-        router.openMnemonicScreen(null, AddAccountPayload.MetaAccount)
+        router.openMnemonicScreen(nameInput.value, AddAccountPayload.MetaAccount)
     }
 
     private fun userHasExistingBackup() {
-        TODO()
+        actionBottomSheetLauncher.launchBottomSheet(
+            imageRes = R.drawable.ic_cloud_backup_sync,
+            title = resourceManager.getString(R.string.existing_cloud_backup_found_title),
+            subtitle = with(resourceManager) {
+                val highlightedPart = getString(R.string.existing_cloud_backup_found_subtitle_highlight)
+                    .addColor(getColor(R.color.text_primary))
+
+                getString(R.string.existing_cloud_backup_found_subtitle).spannableFormatting(highlightedPart)
+            },
+            neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
+            actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
+                resourceManager.getString(R.string.existing_cloud_backup_found_button),
+                ::openImportCloudBackup
+            )
+        )
+    }
+
+    private fun openImportCloudBackup() {
+        router.restoreCloudBackup()
     }
 }

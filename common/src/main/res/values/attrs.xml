@@ -66,6 +66,17 @@
     <declare-styleable name="InputField">
         <attr name="android:inputType" />
         <attr name="android:text" />
+        <attr name="editTextHint" format="string" />
+        <attr name="android:textAppearance" />
+        <attr name="editTextPaddingStart" format="dimension" />
+        <attr name="editTextPaddingEnd" format="dimension" />
+        <attr name="editTextPaddingTop" format="dimension" />
+        <attr name="editTextPaddingBottom" format="dimension" />
+        <attr name="backgroundMode" format="enum">
+            <enum name="inputState" value="0" />
+            <enum name="solid" value="1" />
+            <enum name="custom" value="2" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="AmountView">
