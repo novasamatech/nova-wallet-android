@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.Sourced
 class SyncWithCloudStrategy(
     localTimestamp: Long,
     cloudTimestamp: Long
-): BackupDiffStrategy {
+) : BackupDiffStrategy {
 
     private val cloudInPriority = cloudTimestamp > localTimestamp
     private val localInPriority = localTimestamp > cloudTimestamp
@@ -24,11 +24,11 @@ class SyncWithCloudStrategy(
     }
 
     override fun shouldRemoveLocally(walletsOnlyPresentLocally: SourcedBackupChanges<LocalWallets>): Boolean {
-       return cloudInPriority
+        return cloudInPriority
     }
 
     override fun shouldAddToCloud(walletsOnlyPresentLocally: SourcedBackupChanges<LocalWallets>): Boolean {
-       return localInPriority
+        return localInPriority
     }
 
     override fun shouldModifyLocally(modifiedInCloud: SourcedBackupChanges<WalletsFromCloud>): Boolean {

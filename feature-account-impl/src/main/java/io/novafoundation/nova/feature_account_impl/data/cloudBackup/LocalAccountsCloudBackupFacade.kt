@@ -102,7 +102,7 @@ interface LocalAccountsCloudBackupFacade {
 suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(
     cloudVersion: CloudBackup,
     diffStrategy: BackupDiffStrategyFactory
-) : CloudBackupDiff {
+): CloudBackupDiff {
     val localSnapshot = publicBackupInfoFromLocalSnapshot()
     val diff = localSnapshot.localVsCloudDiff(cloudVersion.publicData, diffStrategy)
 

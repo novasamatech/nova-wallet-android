@@ -26,7 +26,6 @@ class CloudBackupDiff(
 
 fun CloudBackupDiff.PerSourceDiff.isEmpty(): Boolean = added.isEmpty() && modified.isEmpty() && removed.isEmpty()
 
-
 /**
  * @see [CloudBackup.PublicData.localVsCloudDiff]
  */
@@ -36,7 +35,6 @@ fun CloudBackup.localVsCloudDiff(
 ): CloudBackupDiff {
     return publicData.localVsCloudDiff(cloudVersion.publicData, strategyFactory)
 }
-
 
 /**
  * Finds the diff between local and cloud versions

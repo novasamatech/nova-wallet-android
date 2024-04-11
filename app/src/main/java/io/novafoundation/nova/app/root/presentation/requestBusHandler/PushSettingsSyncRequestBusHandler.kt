@@ -25,7 +25,7 @@ class PushSettingsSyncRequestBusHandler(
                     onRemoved = { it.takeMetaIdUnlessTypeIs(LightMetaAccount.Type.PROXIED) }
                 )
 
-               pushNotificationsInteractor.onMetaAccountChange(changed = changed, deleted = removed)
+                pushNotificationsInteractor.onMetaAccountChange(changed = changed, deleted = removed)
             }.launchIn(scope)
     }
 }

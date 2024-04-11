@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.Sourced
 class ImportFromCloudStrategy : BackupDiffStrategy {
 
     override fun shouldAddLocally(walletsOnlyPresentInCloud: SourcedBackupChanges<SourcedBackupChanges.WalletsFromCloud>): Boolean {
-       return true
+        return true
     }
 
     override fun shouldRemoveFromCloud(walletsOnlyPresentInCloud: SourcedBackupChanges<SourcedBackupChanges.WalletsFromCloud>): Boolean {
@@ -17,7 +17,7 @@ class ImportFromCloudStrategy : BackupDiffStrategy {
     }
 
     override fun shouldRemoveLocally(walletsOnlyPresentLocally: SourcedBackupChanges<SourcedBackupChanges.LocalWallets>): Boolean {
-       return false
+        return false
     }
 
     override fun shouldAddToCloud(walletsOnlyPresentLocally: SourcedBackupChanges<SourcedBackupChanges.LocalWallets>): Boolean {

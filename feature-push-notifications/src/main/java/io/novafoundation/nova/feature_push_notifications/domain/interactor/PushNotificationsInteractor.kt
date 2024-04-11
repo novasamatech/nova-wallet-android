@@ -76,7 +76,7 @@ class RealPushNotificationsInteractor(
         val subscribedAccountsAffected = pushSettings.subscribedMetaAccounts.intersect(allAffected).isNotEmpty()
 
         when {
-            notificationsEnabled && noAccounts ->  pushNotificationsService.updatePushSettings(enabled = false, pushSettings = null)
+            notificationsEnabled && noAccounts -> pushNotificationsService.updatePushSettings(enabled = false, pushSettings = null)
             noAccounts -> pushSettingsProvider.updateSettings(pushWalletSettings = null)
             subscribedAccountsAffected -> {
                 val newPushSettings = pushSettings.copy(subscribedMetaAccounts = pushSettings.subscribedMetaAccounts - deleted.toSet())

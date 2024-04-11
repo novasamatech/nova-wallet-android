@@ -20,14 +20,14 @@ class OverwriteLocalStrategy : BackupDiffStrategy {
     }
 
     override fun shouldAddToCloud(walletsOnlyPresentLocally: SourcedBackupChanges<SourcedBackupChanges.LocalWallets>): Boolean {
-       return false
+        return false
     }
 
     override fun shouldModifyLocally(modifiedInCloud: SourcedBackupChanges<SourcedBackupChanges.WalletsFromCloud>): Boolean {
-       return true
+        return true
     }
 
     override fun shouldModifyInCloud(modifiedLocally: SourcedBackupChanges<SourcedBackupChanges.LocalWallets>): Boolean {
-       return false
+        return false
     }
 }

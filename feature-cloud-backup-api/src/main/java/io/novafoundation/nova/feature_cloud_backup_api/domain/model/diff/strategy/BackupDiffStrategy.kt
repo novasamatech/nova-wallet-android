@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy
 
-
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.SourcedBackupChanges
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.SourcedBackupChanges.LocalWallets
