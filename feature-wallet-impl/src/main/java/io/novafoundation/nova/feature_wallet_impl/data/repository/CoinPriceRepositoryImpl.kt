@@ -7,13 +7,12 @@ import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteData
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
-import java.util.Calendar
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-private const val START_SYNCING_YEAR = 2010
+private val MAX_ALLOWED_PRICE_RANGE = 365.days
 private const val BASE_OFFSET = 1
 
 class CoinPriceRepositoryImpl(
@@ -66,11 +65,9 @@ class CoinPriceRepositoryImpl(
     }
 
     private suspend fun loadAndCacheForAllTime(priceId: String, currency: Currency): List<HistoricalCoinRate> {
-        val startCalendar = Calendar.getInstance()
-        startCalendar.set(START_SYNCING_YEAR, 0, 0)
-        val from = startCalendar.time.time.milliseconds.inWholeSeconds
-        val to = System.currentTimeMillis().milliseconds.inWholeSeconds
-        val coinRate = remoteCoinPriceDataSource.getCoinPriceRange(priceId, currency, from, to)
+        val to = System.currentTimeMillis().milliseconds
+        val from = to - MAX_ALLOWED_PRICE_RANGE
+        val coinRate = remoteCoinPriceDataSource.getCoinPriceRange(priceId, currency, from.inWholeSeconds, to.inWholeSeconds)
         if (coinRate.isNotEmpty()) {
             cacheCoinPriceDataSource.updateCoinPrice(priceId, currency, coinRate)
         }
