@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_cloud_backup_impl.data.encryption.CloudBac
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.CloudBackupPreferences
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.enableSyncWithCloud
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.CloudBackupSerializer
-import java.util.*
+import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -88,10 +88,6 @@ internal class RealCloudBackupService(
 
     override fun observeLastSyncedTime(): Flow<Date?> {
         return cloudBackupPreferences.observeLastSyncedTime()
-    }
-
-    override fun observeCloudBackupEnabled(): Flow<Boolean> {
-        return cloudBackupPreferences.observeCloudBackupEnabled()
     }
 
     override suspend fun setLastSyncedTime(date: Date) {

@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupR
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.DeleteBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
-import java.util.*
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -61,8 +61,6 @@ interface CloudBackupService {
      * Observe last synced backup time on device
      */
     fun observeLastSyncedTime(): Flow<Date?>
-
-    fun observeCloudBackupEnabled(): Flow<Boolean>
 
     suspend fun setLastSyncedTime(date: Date)
 }

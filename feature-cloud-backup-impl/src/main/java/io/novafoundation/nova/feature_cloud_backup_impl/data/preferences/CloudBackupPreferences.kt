@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_cloud_backup_impl.data.preferences
 
 import io.novafoundation.nova.common.data.storage.Preferences
-import java.util.*
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -12,8 +12,6 @@ interface CloudBackupPreferences {
     suspend fun setSyncWithCloudEnabled(enabled: Boolean)
 
     fun observeLastSyncedTime(): Flow<Date?>
-
-    fun observeCloudBackupEnabled(): Flow<Boolean>
 
     suspend fun setLastSyncedTime(date: Date)
 }
@@ -46,10 +44,6 @@ internal class SharedPrefsCloudBackupPreferences(
                 null
             }
         }
-    }
-
-    override fun observeCloudBackupEnabled(): Flow<Boolean> {
-        return preferences.booleanFlow(SYNC_WITH_CLOUD_ENABLED_KEY, BACKUP_ENABLED_DEFAULT)
     }
 
     override suspend fun setLastSyncedTime(date: Date) {

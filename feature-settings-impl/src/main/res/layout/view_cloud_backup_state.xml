@@ -16,7 +16,6 @@
             android:id="@+id/backupStateImg"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/bg_cloud_backup_status_waiting"
             android:scaleType="centerInside"
             android:src="@drawable/ic_cloud_backup_status_disabled"
             app:layout_constraintBottom_toBottomOf="parent"

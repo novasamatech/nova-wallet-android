@@ -87,7 +87,7 @@ class CloudBackupSettingsViewModel(
         launch {
             if (cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()) {
                 isSyncing.value = true
-                syncBackupInternal(onBackupNotFound = { /* run create backup, make throwable state empty */ })
+                syncBackupInternal(onBackupNotFound = { /* run create backup using existing password, make throwable state empty */ })
                 isSyncing.value = false
             }
         }
