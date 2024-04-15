@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_cloud_backup_impl.presentation.CloudBackupRouter
-import io.novafoundation.nova.feature_cloud_backup_impl.presentation.settings.main.di.CloudBackupSettingsComponent
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -20,8 +19,6 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 )
 @FeatureScope
 interface CloudBackupFeatureComponent : CloudBackupFeatureApi {
-
-    fun cloudBackupSettings(): CloudBackupSettingsComponent.Factory
 
     @Component.Factory
     interface Factory {

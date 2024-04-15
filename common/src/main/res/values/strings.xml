@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="cloud_backup_settings_disabled_state_subtitle">Turn it on to create a wallets backup</string>
+    <string name="cloud_backup_settings_last_sync">Last sync: %s at %s</string>
+    <string name="cloud_backup_settings_not_auth_button">Sign In to Google Drive</string>
+    <string name="cloud_backup_settings_deprecated_password_button">Enter Backup Password</string>
+    <string name="cloud_backup_settings_corrupted_backup_button">Review Backup Updates</string>
+    <string name="cloud_backup_settings_other_errors_button">Review Google Drive Issue</string>
+    <string name="cloud_backup_settings_backup_errors_button">Review Backup Error</string>
+
+    <string name="cloud_backup_state_syncing_title">Backup Syncing...</string>
+    <string name="cloud_backup_state_disabled_title">Backup Disabled</string>
+    <string name="cloud_backup_state_unsynced_title">Backup Unsynced</string>
     <string name="cloud_backup_state_synced_title">Backup Synced</string>
     <string name="backup_settings_toolbar_title">Backup</string>
     <string name="backup_settings_title">Google Drive</string>

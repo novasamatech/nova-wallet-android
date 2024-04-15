@@ -128,7 +128,7 @@
 
     <fragment
         android:id="@+id/createCloudBackupPasswordFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.CreateCloudBackupPasswordFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordFragment"
         android:label="CreateCloudBackupPasswordFragment"
         tools:layout="@layout/fragment_create_cloud_backup_password">
 

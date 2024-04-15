@@ -3,11 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cloud_backup_settings_graph"
-    app:startDestination="@id/cloudBackupSettings">
+    app:startDestination="@id/cloudBackupSettingsFragment">
 
     <fragment
-        android:id="@+id/cloudBackupSettings"
-        android:name="io.novafoundation.nova.feature_cloud_backup_impl.presentation.settings.main.CloudBackupSettingsFragment"
-        android:label="CloudBackupSettingsFragment"/>
+        android:id="@+id/cloudBackupSettingsFragment"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.CloudBackupSettingsFragment"
+        android:label="CloudBackupSettingsFragment">
+
+        <action
+            android:id="@+id/action_cloudBackupSettings_to_syncWalletsBackupPasswordFragment"
+            app:destination="@id/syncWalletsBackupPassword"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/syncWalletsBackupPassword"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.SyncWalletsBackupPasswordFragment"
+        android:label="SyncWalletsBackupPasswordFragment" />
 
 </navigation>

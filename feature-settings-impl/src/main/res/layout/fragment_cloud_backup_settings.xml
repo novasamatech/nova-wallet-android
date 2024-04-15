@@ -56,66 +56,12 @@
 
             </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
-            <io.novafoundation.nova.common.view.settings.SettingsGroupView
+            <io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.views.CloudBackupStateView
+                android:id="@+id/cloudBackupStateView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:id="@+id/backupSettingsStateImg"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_cloud_backup_disabled_circle"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_cloud_backup_status_disabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/backupSettingsStateTitle"
-                        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="@string/cloud_backup_state_synced_title"
-                        android:textColor="@color/text_primary"
-                        app:layout_constraintStart_toEndOf="@+id/backupSettingsStateImg"
-                        app:layout_constraintTop_toTopOf="@+id/backupSettingsStateImg" />
-
-                    <TextView
-                        android:id="@+id/backupSettingsStateSubtitle"
-                        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:textColor="@color/text_secondary"
-                        app:layout_constraintBottom_toBottomOf="@+id/backupSettingsStateImg"
-                        app:layout_constraintStart_toEndOf="@+id/backupSettingsStateImg"
-                        tools:text="Last sync: 12 Mar 2024 at 12:03" />
-
-                    <ImageView
-                        android:id="@+id/backupSettingsMoreButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_more_horizontal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/icon_primary" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="16dp" />
 
             <TextView
                 style="@style/TextAppearance.NovaFoundation.Bold.Title3"

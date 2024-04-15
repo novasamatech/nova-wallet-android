@@ -24,7 +24,6 @@ android {
 dependencies {
     implementation coroutinesDep
     implementation project(':runtime')
-    implementation project(":feature-account-api")
     implementation project(":common")
 
     implementation androidDep

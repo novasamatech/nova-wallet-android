@@ -21,7 +21,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.list.mul
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.di.CreateCloudBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.di.CreateWalletBackupPasswordComponent
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.di.SyncWalletsBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup.di.RestoreCloudBackupComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
@@ -70,7 +72,9 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun backupMnemonicComponentFactory(): BackupMnemonicComponent.Factory
 
-    fun createCloudBackupPasswordFactory(): CreateCloudBackupPasswordComponent.Factory
+    fun createWalletBackupPasswordFactory(): CreateWalletBackupPasswordComponent.Factory
+
+    fun syncWalletsBackupPasswordFactory(): SyncWalletsBackupPasswordComponent.Factory
 
     fun restoreCloudBackupFactory(): RestoreCloudBackupComponent.Factory
 
@@ -132,6 +136,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
             @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,
             @BindsInstance pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
+            @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

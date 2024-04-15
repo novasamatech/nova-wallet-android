@@ -14,4 +14,6 @@ interface CloudBackupUnknownError
 
 interface CorruptedBackupError
 
-class CannotApplyNonDestructiveDiff() : Throwable()
+interface CloudBackupWrongPassword
+
+class CannotApplyNonDestructiveDiff : Throwable()

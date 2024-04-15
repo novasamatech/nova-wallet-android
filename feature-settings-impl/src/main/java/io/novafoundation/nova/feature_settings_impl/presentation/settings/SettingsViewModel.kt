@@ -23,10 +23,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
-import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
-import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackup
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
@@ -41,7 +37,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class SettingsViewModel(
     private val languageUseCase: LanguageUseCase,

@@ -8,6 +8,8 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupR
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.DeleteBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
+import java.util.*
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Manages cloud backup storage, serialization and encryption
@@ -43,6 +45,8 @@ interface CloudBackupService {
      */
     suspend fun isSyncWithCloudEnabled(): Boolean
 
+    suspend fun setSyncingBackupEnabled(enable: Boolean)
+
     /**
      * @throws FetchBackupError
      */
@@ -52,6 +56,15 @@ interface CloudBackupService {
      * @throws DeleteBackupError
      */
     suspend fun deleteBackup(): Result<Unit>
+
+    /**
+     * Observe last synced backup time on device
+     */
+    fun observeLastSyncedTime(): Flow<Date?>
+
+    fun observeCloudBackupEnabled(): Flow<Boolean>
+
+    suspend fun setLastSyncedTime(date: Date)
 }
 
 suspend fun CloudBackupService.fetchAndDecryptExistingBackup(password: String): Result<CloudBackup> {

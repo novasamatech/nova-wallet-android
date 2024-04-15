@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.cloudBackup
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.KeyPairSchema
@@ -26,20 +25,13 @@ import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountAdded
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountNameChanged
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountRemoved
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountStructureChanged
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeFromLocal
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategyFactory
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
@@ -47,73 +39,6 @@ import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
-
-interface LocalAccountsCloudBackupFacade {
-
-    /**
-     * Constructs full backup instance, including sensitive information
-     * Should only be used when full backup instance is needed, for example when writing backup to cloud. Otherwise use [publicBackupInfoFromLocalSnapshot]
-     *
-     * Important note: Should only be called as the result of direct user interaction!
-     * We don't want to exposure secrets to RAM until user explicitly directs app to do so
-     */
-    suspend fun fullBackupInfoFromLocalSnapshot(): CloudBackup
-
-    /**
-     * Constructs partial backup instance, including only the public information (addresses, metadata e.t.c)
-     *
-     * Can be used without direct user interaction (e.g. in background) to compare backup states between local and remote sources
-     */
-    suspend fun publicBackupInfoFromLocalSnapshot(): CloudBackup.PublicData
-
-    /**
-     * Creates a backup from external input. Useful for creating initial backup
-     */
-    suspend fun createCloudBackupFromInput(
-        modificationTime: Long,
-        metaAccount: MetaAccountLocal,
-        chainAccounts: List<ChainAccountLocal>,
-        baseSecrets: EncodableStruct<MetaAccountSecrets>,
-        chainAccountSecrets: Map<String, EncodableStruct<ChainAccountSecrets>>,
-        additionalSecrets: Map<String, String>
-    ): CloudBackup
-
-    /**
-     * Check if it is possible to apply given [diff] to local state in non-destructive manner
-     * In other words, whether it is possible to apply backup without notifying the user
-     */
-    suspend fun canPerformNonDestructiveApply(diff: CloudBackupDiff): Boolean
-
-    /**
-     * Applies cloud version of the backup to the local state.
-     * This is a destructive action as may overwrite or delete secrets stored in the app
-     *
-     * Important note: Should only be called as the result of direct user interaction!
-     */
-    suspend fun applyBackupDiff(diff: CloudBackupDiff, cloudVersion: CloudBackup)
-}
-
-/**
- * Attempts to apply cloud backup version to current local application state in non-destructive manner
- * Will do nothing if it is not possible to apply changes in non-destructive manner
- *
- * @return whether the attempt succeeded
- */
-suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(
-    cloudVersion: CloudBackup,
-    diffStrategy: BackupDiffStrategyFactory
-): CloudBackupDiff {
-    val localSnapshot = publicBackupInfoFromLocalSnapshot()
-    val diff = localSnapshot.localVsCloudDiff(cloudVersion.publicData, diffStrategy)
-
-    return if (canPerformNonDestructiveApply(diff)) {
-        applyBackupDiff(diff, cloudVersion)
-
-        diff
-    } else {
-        throw CannotApplyNonDestructiveDiff()
-    }
-}
 
 class RealLocalAccountsCloudBackupFacade(
     private val secretsStoreV2: SecretStoreV2,
@@ -145,12 +70,18 @@ class RealLocalAccountsCloudBackupFacade(
         chainAccountSecrets: Map<ChainId, EncodableStruct<ChainAccountSecrets>>,
         additionalSecrets: Map<String, String>
     ): CloudBackup {
-        val wrappedMetaAccount = listOf(RelationJoinedMetaAccountInfo(metaAccount, chainAccounts, null))
+        val wrappedMetaAccount = listOf(
+            RelationJoinedMetaAccountInfo(
+                metaAccount,
+                chainAccounts,
+                null
+            )
+        )
 
         val backupChainAccounts = chainAccounts.mapNotNull { chainAccountLocal ->
             chainAccountSecrets[chainAccountLocal.chainId]?.toBackupSecrets(chainAccountLocal.accountId)
         }
-        val walletPrivateInfo = WalletPrivateInfo(
+        val walletPrivateInfo = CloudBackup.WalletPrivateInfo(
             walletId = metaAccount.globallyUniqueId,
             entropy = baseSecrets.entropy,
             substrate = baseSecrets.getSubstrateBackupSecrets(),
@@ -181,7 +112,13 @@ class RealLocalAccountsCloudBackupFacade(
             accountDao.withTransaction {
                 addAll(applyLocalRemoval(localChangesToApply.removed, metaAccountsByUuid))
                 addAll(applyLocalAddition(localChangesToApply.added, cloudVersion))
-                addAll(applyLocalModification(localChangesToApply.modified, cloudVersion, metaAccountsByUuid))
+                addAll(
+                    applyLocalModification(
+                        localChangesToApply.modified,
+                        cloudVersion,
+                        metaAccountsByUuid
+                    )
+                )
             }
         }
 
@@ -191,7 +128,7 @@ class RealLocalAccountsCloudBackupFacade(
     private suspend fun applyLocalRemoval(
         toRemove: List<CloudBackup.WalletPublicInfo>,
         metaAccountsByUUid: Map<String, JoinedMetaAccountInfo>
-    ): List<AccountRemoved> {
+    ): List<MetaAccountChangesEventBus.Event.AccountRemoved> {
         if (toRemove.isEmpty()) return emptyList()
 
         val localIds = toRemove.mapNotNull { metaAccountsByUUid[it.walletId]?.metaAccount?.id }
@@ -203,7 +140,7 @@ class RealLocalAccountsCloudBackupFacade(
 
             secretsStoreV2.clearSecrets(localWallet.metaAccount.id, chainAccountIds)
 
-            AccountRemoved(
+            MetaAccountChangesEventBus.Event.AccountRemoved(
                 metaId = localWallet.metaAccount.id,
                 metaAccountType = mapMetaAccountTypeFromLocal(localWallet.metaAccount.type)
             )
@@ -213,7 +150,7 @@ class RealLocalAccountsCloudBackupFacade(
     private suspend fun applyLocalAddition(
         toAdd: List<CloudBackup.WalletPublicInfo>,
         cloudBackup: CloudBackup
-    ): List<AccountAdded> {
+    ): List<MetaAccountChangesEventBus.Event.AccountAdded> {
         return toAdd.map { publicWalletInfo ->
             val metaAccountLocal = publicWalletInfo.toMetaAccountLocal(
                 accountPosition = accountDao.nextAccountPosition(),
@@ -235,7 +172,7 @@ class RealLocalAccountsCloudBackupFacade(
                 secretsStoreV2.putChainAccountSecrets(metaId, accountId.value, secrets)
             }
 
-            AccountAdded(
+            MetaAccountChangesEventBus.Event.AccountAdded(
                 metaId = metaId,
                 metaAccountType = mapMetaAccountTypeFromLocal(metaAccountLocal.type)
             )
@@ -306,8 +243,18 @@ class RealLocalAccountsCloudBackupFacade(
 
             val metaAccountType = mapMetaAccountTypeFromLocal(oldMetaAccountLocal.type)
 
-            result.add(AccountStructureChanged(metaId = metaId, metaAccountType = metaAccountType))
-            result.add(AccountNameChanged(metaId = metaId, metaAccountType = metaAccountType))
+            result.add(
+                MetaAccountChangesEventBus.Event.AccountStructureChanged(
+                    metaId = metaId,
+                    metaAccountType = metaAccountType
+                )
+            )
+            result.add(
+                MetaAccountChangesEventBus.Event.AccountNameChanged(
+                    metaId = metaId,
+                    metaAccountType = metaAccountType
+                )
+            )
         }
 
         return result
@@ -325,7 +272,7 @@ class RealLocalAccountsCloudBackupFacade(
         return walletPublicInfo.chainAccounts.associateBy(
             keySelector = { it.accountId.intoKey() },
             valueTransform = { chainAccountPublicInfo ->
-                val chainAccountSecrets = chainAccountsSecretsByAccountId[chainAccountPublicInfo.accountId]
+                val chainAccountSecrets = chainAccountsSecretsByAccountId[chainAccountPublicInfo.accountId.intoKey()]
 
                 chainAccountSecrets?.toLocalSecrets()
             }
@@ -345,11 +292,11 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private suspend fun prepareWalletPrivateInfo(joinedMetaAccountInfo: JoinedMetaAccountInfo): WalletPrivateInfo {
+    private suspend fun prepareWalletPrivateInfo(joinedMetaAccountInfo: JoinedMetaAccountInfo): CloudBackup.WalletPrivateInfo {
         val metaId = joinedMetaAccountInfo.metaAccount.id
         val baseSecrets = secretsStoreV2.getMetaAccountSecrets(metaId)
 
-        return WalletPrivateInfo(
+        return CloudBackup.WalletPrivateInfo(
             walletId = joinedMetaAccountInfo.metaAccount.globallyUniqueId,
             entropy = baseSecrets?.entropy,
             substrate = baseSecrets.getSubstrateBackupSecrets(),
@@ -365,14 +312,14 @@ class RealLocalAccountsCloudBackupFacade(
         return secretsStoreV2.allKnownAdditionalSecrets(metaAccountLocal.id)
     }
 
-    private suspend fun prepareChainAccountPrivateInfo(metaAccount: Long, chainAccountId: AccountId): WalletPrivateInfo.ChainAccountSecrets? {
+    private suspend fun prepareChainAccountPrivateInfo(metaAccount: Long, chainAccountId: AccountId): CloudBackup.WalletPrivateInfo.ChainAccountSecrets? {
         val secrets = secretsStoreV2.getChainAccountSecrets(metaAccount, chainAccountId) ?: return null
 
         return secrets.toBackupSecrets(chainAccountId)
     }
 
-    private fun EncodableStruct<ChainAccountSecrets>.toBackupSecrets(chainAccountId: ByteArray): WalletPrivateInfo.ChainAccountSecrets {
-        return WalletPrivateInfo.ChainAccountSecrets(
+    private fun EncodableStruct<ChainAccountSecrets>.toBackupSecrets(chainAccountId: ByteArray): CloudBackup.WalletPrivateInfo.ChainAccountSecrets {
+        return CloudBackup.WalletPrivateInfo.ChainAccountSecrets(
             accountId = chainAccountId,
             entropy = entropy,
             seed = seed,
@@ -381,7 +328,7 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private fun WalletPrivateInfo.ChainAccountSecrets.toLocalSecrets(): EncodableStruct<ChainAccountSecrets> {
+    private fun CloudBackup.WalletPrivateInfo.ChainAccountSecrets.toLocalSecrets(): EncodableStruct<ChainAccountSecrets> {
         return ChainAccountSecrets(
             entropy = entropy,
             seed = seed,
@@ -390,7 +337,7 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private fun WalletPrivateInfo.KeyPairSecrets.toLocalKeyPair(): Keypair {
+    private fun CloudBackup.WalletPrivateInfo.KeyPairSecrets.toLocalKeyPair(): Keypair {
         val nonce = nonce
 
         return if (nonce != null) {
@@ -400,7 +347,7 @@ class RealLocalAccountsCloudBackupFacade(
         }
     }
 
-    private fun WalletPrivateInfo.getLocalMetaAccountSecrets(): EncodableStruct<MetaAccountSecrets>? {
+    private fun CloudBackup.WalletPrivateInfo.getLocalMetaAccountSecrets(): EncodableStruct<MetaAccountSecrets>? {
         return MetaAccountSecrets(
             entropy = entropy,
             seed = substrate?.seed,
@@ -411,27 +358,27 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private fun EncodableStruct<MetaAccountSecrets>?.getEthereumBackupSecrets(): WalletPrivateInfo.EthereumSecrets? {
+    private fun EncodableStruct<MetaAccountSecrets>?.getEthereumBackupSecrets(): CloudBackup.WalletPrivateInfo.EthereumSecrets? {
         if (this == null) return null
 
-        return WalletPrivateInfo.EthereumSecrets(
+        return CloudBackup.WalletPrivateInfo.EthereumSecrets(
             keypair = ethereumKeypair?.toBackupKeypairSecrets() ?: return null,
             derivationPath = ethereumDerivationPath
         )
     }
 
-    private fun EncodableStruct<MetaAccountSecrets>?.getSubstrateBackupSecrets(): WalletPrivateInfo.SubstrateSecrets? {
+    private fun EncodableStruct<MetaAccountSecrets>?.getSubstrateBackupSecrets(): CloudBackup.WalletPrivateInfo.SubstrateSecrets? {
         if (this == null) return null
 
-        return WalletPrivateInfo.SubstrateSecrets(
+        return CloudBackup.WalletPrivateInfo.SubstrateSecrets(
             seed = seed,
             keypair = substrateKeypair.toBackupKeypairSecrets(),
             derivationPath = substrateDerivationPath
         )
     }
 
-    private fun EncodableStruct<KeyPairSchema>.toBackupKeypairSecrets(): WalletPrivateInfo.KeyPairSecrets {
-        return WalletPrivateInfo.KeyPairSecrets(
+    private fun EncodableStruct<KeyPairSchema>.toBackupKeypairSecrets(): CloudBackup.WalletPrivateInfo.KeyPairSecrets {
+        return CloudBackup.WalletPrivateInfo.KeyPairSecrets(
             publicKey = publicKey,
             privateKey = privateKey,
             nonce = nonce

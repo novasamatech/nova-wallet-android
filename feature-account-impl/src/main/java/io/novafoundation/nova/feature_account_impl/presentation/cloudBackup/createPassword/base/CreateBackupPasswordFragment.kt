@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword
+package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.base
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setCompoundDrawableTint
@@ -15,9 +14,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordConfirmInput
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordContinue
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordInput
@@ -27,17 +24,7 @@ import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.crea
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordPasswordsMatch
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordToolbar
 
-class CreateCloudBackupPasswordFragment : BaseFragment<CreateCloudBackupPasswordViewModel>() {
-
-    companion object {
-        private const val KEY_PAYLOAD = "cloud_backup_password_payload"
-
-        fun getBundle(payload: CreateCloudBackupPasswordPayload): Bundle {
-            return Bundle().apply {
-                putParcelable(KEY_PAYLOAD, payload)
-            }
-        }
-    }
+abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> : BaseFragment<T>() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,14 +44,7 @@ class CreateCloudBackupPasswordFragment : BaseFragment<CreateCloudBackupPassword
         createCloudBackupPasswordContinue.prepareForProgress(viewLifecycleOwner)
     }
 
-    override fun inject() {
-        FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
-            .createCloudBackupPasswordFactory()
-            .create(this, argument(KEY_PAYLOAD))
-            .inject(this)
-    }
-
-    override fun subscribe(viewModel: CreateCloudBackupPasswordViewModel) {
+    override fun subscribe(viewModel: T) {
         observeActionBottomSheet(viewModel)
 
         createCloudBackupPasswordInput.content.bindTo(viewModel.passwordFlow, lifecycleScope)

@@ -1,7 +1,6 @@
-package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword
+package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.base
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.addColor
@@ -10,16 +9,13 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapWriteBackupFailureToUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 
 class PasswordInputState(
     val containsMinSymbols: Boolean,
@@ -31,13 +27,11 @@ class PasswordInputState(
     val isRequirementsSatisfied = containsMinSymbols && hasLetters && hasNumbers && passwordsMatch
 }
 
-class CreateCloudBackupPasswordViewModel(
-    private val router: AccountRouter,
-    private val resourceManager: ResourceManager,
-    private val interactor: CreateCloudBackupPasswordInteractor,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val payload: CreateCloudBackupPasswordPayload,
-    private val accountInteractor: AccountInteractor,
+abstract class BackupCreatePasswordViewModel(
+    protected val router: AccountRouter,
+    protected val resourceManager: ResourceManager,
+    protected val interactor: CreateCloudBackupPasswordInteractor,
+    private val actionBottomSheetLauncher: ActionBottomSheetLauncher
 ) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     val passwordFlow = MutableStateFlow("")
@@ -57,8 +51,7 @@ class CreateCloudBackupPasswordViewModel(
         )
     }.shareInBackground()
 
-    private val _backupInProgress = MutableStateFlow(false)
-    private val backupInProgress: Flow<Boolean> = _backupInProgress
+    protected val backupInProgress = MutableStateFlow(false)
 
     val continueButtonState = combine(passwordStateFlow, backupInProgress) { passwordState, backupInProgress ->
         when {
@@ -70,6 +63,20 @@ class CreateCloudBackupPasswordViewModel(
 
     init {
         showPasswordWarningDialog()
+    }
+
+    abstract fun continueClicked()
+
+    open fun backClicked() {
+        router.back()
+    }
+
+    fun toggleShowPassword() {
+        _showPasswords.toggle()
+    }
+
+    fun showProgress(show: Boolean) {
+        backupInProgress.value = show
     }
 
     private fun showPasswordWarningDialog() {
@@ -84,38 +91,5 @@ class CreateCloudBackupPasswordViewModel(
             },
             actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(resourceManager.getString(R.string.common_got_it))
         )
-    }
-
-    fun backClicked() {
-        router.back()
-    }
-
-    fun continueClicked() {
-        launch {
-            _backupInProgress.value = true
-            val password = passwordFlow.value
-            interactor.createAndBackupAccount(payload.walletName, password)
-                .onSuccess {
-                    continueBasedOnCodeStatus()
-                }.onFailure { throwable ->
-                    // TODO Antony: Handle CannotApplyNonDestructiveDiff
-                    val titleAndMessage = mapWriteBackupFailureToUi(resourceManager, throwable)
-                    titleAndMessage?.let { showError(it) }
-                }
-
-            _backupInProgress.value = false
-        }
-    }
-
-    fun toggleShowPassword() {
-        _showPasswords.toggle()
-    }
-
-    private suspend fun continueBasedOnCodeStatus() {
-        if (accountInteractor.isCodeSet()) {
-            router.openMain()
-        } else {
-            router.openCreatePincode()
-        }
     }
 }

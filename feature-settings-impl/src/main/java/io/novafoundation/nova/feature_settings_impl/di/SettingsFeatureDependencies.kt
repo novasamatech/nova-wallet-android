@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
@@ -47,4 +48,6 @@ interface SettingsFeatureDependencies {
     fun context(): Context
 
     val cloudBackupService: CloudBackupService
+
+    val cloudBackupFacade: LocalAccountsCloudBackupFacade
 }
