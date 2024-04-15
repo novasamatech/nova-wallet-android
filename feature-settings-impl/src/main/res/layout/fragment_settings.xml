@@ -117,7 +117,7 @@
                 android:id="@+id/settingsCloudBackup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_buy_outline"
+                app:icon="@drawable/ic_cloud_backup"
                 app:title="@string/cloud_backup" />
 
             <io.novafoundation.nova.common.view.settings.SettingsSwitcherView

@@ -83,7 +83,6 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
 
         settingsCloudBackup.setOnClickListener { viewModel.cloudBackupClicked() }
-        settingsCloudBackup.setOnLongClickListener { viewModel.cloudBackupLongClicked(); true; }
 
         settingsWalletConnect.setOnClickListener { viewModel.walletConnectClicked() }
 

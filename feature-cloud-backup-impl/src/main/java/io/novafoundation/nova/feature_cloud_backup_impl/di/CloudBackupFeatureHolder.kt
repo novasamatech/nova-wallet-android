@@ -4,11 +4,13 @@ import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
+import io.novafoundation.nova.feature_cloud_backup_impl.presentation.CloudBackupRouter
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
 @ApplicationScope
 class CloudBackupFeatureHolder @Inject constructor(
+    private val cloudBackupRouter: CloudBackupRouter,
     featureContainer: FeatureContainer,
 ) : FeatureApiHolder(featureContainer) {
 
@@ -19,6 +21,6 @@ class CloudBackupFeatureHolder @Inject constructor(
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .build()
         return DaggerCloudBackupFeatureComponent.factory()
-            .create(dependencies)
+            .create(cloudBackupRouter, dependencies)
     }
 }

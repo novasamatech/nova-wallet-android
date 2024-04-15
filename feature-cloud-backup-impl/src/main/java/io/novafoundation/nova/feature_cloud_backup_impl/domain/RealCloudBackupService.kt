@@ -19,7 +19,9 @@ import io.novafoundation.nova.feature_cloud_backup_impl.data.encryption.CloudBac
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.CloudBackupPreferences
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.enableSyncWithCloud
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.CloudBackupSerializer
+import java.util.Date
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 internal class RealCloudBackupService(
@@ -58,6 +60,10 @@ internal class RealCloudBackupService(
         return cloudBackupPreferences.syncWithCloudEnabled()
     }
 
+    override suspend fun setSyncingBackupEnabled(enable: Boolean) {
+        cloudBackupPreferences.setSyncWithCloudEnabled(enable)
+    }
+
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
         return storage.ensureUserAuthenticated()
             .flatMap { storage.fetchBackup() }
@@ -78,6 +84,14 @@ internal class RealCloudBackupService(
         }.mapErrorNotInstance<_, DeleteBackupError> {
             DeleteBackupError.Other
         }
+    }
+
+    override fun observeLastSyncedTime(): Flow<Date?> {
+        return cloudBackupPreferences.observeLastSyncedTime()
+    }
+
+    override suspend fun setLastSyncedTime(date: Date) {
+        cloudBackupPreferences.setLastSyncedTime(date)
     }
 
     private suspend fun prepareBackupForSaving(backup: CloudBackup, password: String): Result<ReadyForStorageBackup> {

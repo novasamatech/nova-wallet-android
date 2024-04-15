@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.di
 
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.polkadot
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
@@ -59,6 +61,10 @@ interface AccountFeatureApi {
     fun encryptionDefaults(): EncryptionDefaults
 
     fun proxyExtrinsicValidationRequestBus(): ProxyExtrinsicValidationRequestBus
+
+    fun cloudBackupFacade(): LocalAccountsCloudBackupFacade
+
+    fun syncWalletsBackupPasswordCommunicator(): SyncWalletsBackupPasswordCommunicator
 
     val addressInputMixinFactory: AddressInputMixinFactory
 

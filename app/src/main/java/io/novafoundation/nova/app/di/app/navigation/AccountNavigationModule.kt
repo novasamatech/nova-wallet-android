@@ -8,6 +8,7 @@ import io.novafoundation.nova.app.root.navigation.account.PolkadotVaultVariantSi
 import io.novafoundation.nova.app.root.navigation.account.SelectAddressCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectMultipleWalletsCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectWalletCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.cloudBackup.SyncWalletsBackupPasswordCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.pincode.PinCodeTwoFactorVerificationCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
 @Module
@@ -56,4 +58,11 @@ class AccountNavigationModule {
     @ApplicationScope
     @Provides
     fun provideAccountRouter(navigator: Navigator): AccountRouter = navigator
+
+    @Provides
+    @ApplicationScope
+    fun providePushGovernanceSettingsCommunicator(
+        router: AccountRouter,
+        navigationHolder: NavigationHolder
+    ): SyncWalletsBackupPasswordCommunicator = SyncWalletsBackupPasswordCommunicatorImpl(router, navigationHolder)
 }

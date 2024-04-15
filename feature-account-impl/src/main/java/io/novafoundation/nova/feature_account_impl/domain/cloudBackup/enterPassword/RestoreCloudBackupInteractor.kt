@@ -2,13 +2,14 @@ package io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPass
 
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_impl.data.cloudBackup.LocalAccountsCloudBackupFacade
-import io.novafoundation.nova.feature_account_impl.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
+import java.util.Date
 
 interface RestoreCloudBackupInteractor {
 
@@ -31,6 +32,7 @@ class RealRestoreCloudBackupInteractor(
 
                 val firstSelectedMetaAccount = accountRepository.getActiveMetaAccounts().first()
                 accountRepository.selectMetaAccount(firstSelectedMetaAccount.id)
+                cloudBackupService.setLastSyncedTime(Date())
 
                 diff
             }.flatMap { diff ->

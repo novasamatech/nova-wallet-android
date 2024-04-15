@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_settings_impl
 
-interface SettingsRouter {
+import io.novafoundation.nova.common.navigation.ReturnableRouter
+
+interface SettingsRouter : ReturnableRouter {
 
     fun openWallets()
 
@@ -19,4 +21,6 @@ interface SettingsRouter {
     fun openWalletConnectScan()
 
     fun openWalletConnectSessions()
+
+    fun openCloudBackupSettings()
 }

@@ -18,8 +18,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.CreateCloudBackupPasswordFragment
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.CreateCloudBackupPasswordPayload
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordFragment
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateBackupPasswordPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
@@ -529,7 +529,7 @@ class Navigator(
     }
 
     override fun openCreateCloudBackupPassword(walletName: String) {
-        val bundle = CreateCloudBackupPasswordFragment.getBundle(CreateCloudBackupPasswordPayload(walletName))
+        val bundle = CreateWalletBackupPasswordFragment.getBundle(CreateBackupPasswordPayload(walletName))
 
         navController?.navigate(R.id.action_startCreateWalletFragment_to_createCloudBackupPasswordFragment, bundle)
     }
@@ -539,6 +539,10 @@ class Navigator(
             R.id.importWalletOptionsFragment -> navController?.navigate(R.id.action_importWalletOptionsFragment_to_restoreCloudBackup)
             R.id.startCreateWalletFragment -> navController?.navigate(R.id.action_startCreateWalletFragment_to_resotreCloudBackupFragment)
         }
+    }
+
+    override fun openSyncWalletsBackupPassword() {
+        performNavigation(R.id.action_cloudBackupSettings_to_syncWalletsBackupPasswordFragment)
     }
 
     override fun openCreateWatchWallet() {

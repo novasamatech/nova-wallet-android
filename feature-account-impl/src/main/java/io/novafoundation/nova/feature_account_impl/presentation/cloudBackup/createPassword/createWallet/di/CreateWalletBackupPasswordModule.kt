@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.di
+package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -13,24 +13,24 @@ import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLa
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.CreateCloudBackupPasswordPayload
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.CreateCloudBackupPasswordViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateBackupPasswordPayload
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordViewModel
 
 @Module(includes = [ViewModelModule::class])
-class CreateCloudBackupPasswordModule {
+class CreateWalletBackupPasswordModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(CreateCloudBackupPasswordViewModel::class)
+    @ViewModelKey(CreateWalletBackupPasswordViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
         resourceManager: ResourceManager,
         interactor: CreateCloudBackupPasswordInteractor,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
-        payload: CreateCloudBackupPasswordPayload,
+        payload: CreateBackupPasswordPayload,
         accountInteractor: AccountInteractor
     ): ViewModel {
-        return CreateCloudBackupPasswordViewModel(
+        return CreateWalletBackupPasswordViewModel(
             router,
             resourceManager,
             interactor,
@@ -44,10 +44,10 @@ class CreateCloudBackupPasswordModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): CreateCloudBackupPasswordViewModel {
+    ): CreateWalletBackupPasswordViewModel {
         return ViewModelProvider(
             fragment,
             viewModelFactory
-        ).get(CreateCloudBackupPasswordViewModel::class.java)
+        ).get(CreateWalletBackupPasswordViewModel::class.java)
     }
 }
