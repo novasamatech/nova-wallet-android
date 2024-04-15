@@ -68,3 +68,7 @@ interface CloudBackupService {
 suspend fun CloudBackupService.fetchAndDecryptExistingBackup(password: String): Result<CloudBackup> {
     return fetchBackup().flatMap { it.decrypt(password) }
 }
+
+suspend fun CloudBackupService.setLastSyncedTimeAsNow() {
+    setLastSyncedTime(Date())
+}

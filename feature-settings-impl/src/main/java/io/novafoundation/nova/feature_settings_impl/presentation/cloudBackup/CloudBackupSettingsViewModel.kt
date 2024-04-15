@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordRequester
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotFound
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupWrongPassword
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCloudBackupSyncFailed
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
@@ -54,7 +56,6 @@ class CloudBackupSettingsViewModel(
                 cloudBackupEnabled.value = false
                 cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(false)
             } else {
-                isSyncing.value = true
                 cloudBackupEnabled.value = true
                 syncBackupInternal(
                     onBackupNotFound = {
@@ -86,9 +87,9 @@ class CloudBackupSettingsViewModel(
     private fun initSyncCloudBackupState() {
         launch {
             if (cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()) {
-                isSyncing.value = true
-                syncBackupInternal(onBackupNotFound = { /* run create backup using existing password, make throwable state empty */ })
-                isSyncing.value = false
+                syncBackupInternal(onBackupNotFound = {
+                    /* TODO: run create backup using existing password */
+                })
             }
         }
     }
@@ -104,7 +105,12 @@ class CloudBackupSettingsViewModel(
             .onFailure { throwable ->
                 errorState.value = throwable
 
-                val titleAndMessage = mapCloudBackupSyncFailed(resourceManager, throwable, onBackupNotFound, onPasswordDeprecated)
+                when (throwable) {
+                    is CloudBackupNotFound -> onBackupNotFound?.invoke()
+                    is CloudBackupWrongPassword -> onPasswordDeprecated?.invoke()
+                }
+
+                val titleAndMessage = mapCloudBackupSyncFailed(resourceManager, throwable)
                 titleAndMessage?.let { showError(it) }
             }
 

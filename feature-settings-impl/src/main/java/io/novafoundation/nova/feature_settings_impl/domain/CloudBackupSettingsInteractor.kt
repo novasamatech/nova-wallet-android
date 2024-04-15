@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestr
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
+import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 
@@ -32,7 +33,7 @@ class RealCloudBackupSettingsInteractor(
         return cloudBackupService.fetchAndDecryptExistingBackup("q1234567") // TODO: remove hardcoded password
             .mapCatching { cloudBackup ->
                 cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.importFromCloud())
-                cloudBackupService.setLastSyncedTime(Date())
+                cloudBackupService.setLastSyncedTimeAsNow()
             }
     }
 

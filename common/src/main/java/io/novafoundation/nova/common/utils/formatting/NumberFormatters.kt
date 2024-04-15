@@ -138,8 +138,8 @@ fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
     }
 }
 
-fun Date.formatTime(resourceManager: ResourceManager): String {
-    return resourceManager.formatTime(time)
+fun ResourceManager.formatTime(data: Date): String {
+    return formatTime(data.time)
 }
 
 fun Long.formatDaysSinceEpoch(context: Context): String? {

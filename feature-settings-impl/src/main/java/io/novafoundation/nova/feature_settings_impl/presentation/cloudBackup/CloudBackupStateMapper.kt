@@ -60,7 +60,7 @@ private fun mapCloudBackupStateSubtitle(
     lastSync != null -> resourceManager.getString(
         R.string.cloud_backup_settings_last_sync,
         lastSync.formatDateSinceEpoch(resourceManager),
-        lastSync.formatTime(resourceManager)
+        resourceManager.formatTime(lastSync)
     )
 
     else -> null

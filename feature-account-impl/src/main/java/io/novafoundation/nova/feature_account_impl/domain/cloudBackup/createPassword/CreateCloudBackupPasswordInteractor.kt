@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPass
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
-import java.util.Date
+import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 
 private const val MIN_PASSWORD_SYMBOLS = 8
 
@@ -70,8 +70,9 @@ class RealCreateCloudBackupPasswordInteractor(
         )
 
         return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
+            cloudBackupService.setLastSyncedTimeAsNow()
+
             localAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.overwriteLocal())
-            cloudBackupService.setLastSyncedTime(Date())
 
             val firstSelectedMetaAccount = accountRepository.getActiveMetaAccounts().first()
             accountRepository.selectMetaAccount(firstSelectedMetaAccount.id)
@@ -81,8 +82,9 @@ class RealCreateCloudBackupPasswordInteractor(
     override suspend fun syncWalletsBackup(password: String): Result<Unit> {
         val cloudBackup = localAccountsCloudBackupFacade.fullBackupInfoFromLocalSnapshot()
         return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
+            cloudBackupService.setLastSyncedTimeAsNow()
+
             localAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.overwriteLocal())
-            cloudBackupService.setLastSyncedTime(Date())
         }
     }
 }
