@@ -11,7 +11,7 @@ interface SubSquareV2Api {
     @GET
     suspend fun getReferendumPreviews(
         @Url url: String,
-        @Query("page_size") pageSize: Int = 1000
+        @Query("page_size") pageSize: Int = 100
     ): ReferendaPreviewV2Response
 
     @GET
