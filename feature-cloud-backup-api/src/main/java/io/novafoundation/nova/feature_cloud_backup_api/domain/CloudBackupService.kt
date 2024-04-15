@@ -7,9 +7,10 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateVal
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.DeleteBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
-import java.util.Date
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 /**
  * Manages cloud backup storage, serialization and encryption
@@ -65,6 +66,10 @@ interface CloudBackupService {
     suspend fun setLastSyncedTime(date: Date)
 }
 
+/**
+ * @throws FetchBackupError
+ * @throws InvalidBackupPasswordError
+ */
 suspend fun CloudBackupService.fetchAndDecryptExistingBackup(password: String): Result<CloudBackup> {
     return fetchBackup().flatMap { it.decrypt(password) }
 }

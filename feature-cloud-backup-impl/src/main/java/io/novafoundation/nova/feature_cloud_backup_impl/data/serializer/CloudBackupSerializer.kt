@@ -58,13 +58,23 @@ internal class JsonCloudBackupSerializer() : CloudBackupSerializer {
 
     override suspend fun deserializePublicData(backup: ReadyForStorageBackup): Result<SerializedBackup<EncryptedPrivateData>> {
         return runCatching {
-            gson.fromJson(backup.value)
+            gson.fromJson<SerializedBackup<EncryptedPrivateData>>(backup.value).also {
+                // Gson doesn't fail on missing fields so we do some preliminary checks here
+                requireNotNull(it.publicData)
+                requireNotNull(it.privateData)
+
+                // Do not allow empty backups
+                require(it.publicData.wallets.isNotEmpty())
+            }
         }
     }
 
     override suspend fun deserializePrivateData(backup: SerializedBackup<UnencryptedPrivateData>): Result<CloudBackup> {
         return runCatching {
-            val privateData: CloudBackup.PrivateData = gson.fromJson(backup.privateData.unencryptedData)
+            val privateData: CloudBackup.PrivateData = gson.fromJson<CloudBackup.PrivateData>(backup.privateData.unencryptedData).also {
+                // Gson doesn't fail on missing fields so we do some preliminary checks here
+                requireNotNull(it.wallets)
+            }
 
             CloudBackup(
                 publicData = backup.publicData,
