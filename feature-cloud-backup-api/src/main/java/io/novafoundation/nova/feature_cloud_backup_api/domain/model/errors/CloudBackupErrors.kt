@@ -18,4 +18,4 @@ interface CloudBackupWrongPassword
 
 class CannotApplyNonDestructiveDiff : Throwable()
 
-class PasswordNotSaved: Throwable()
+class PasswordNotSaved : Throwable()

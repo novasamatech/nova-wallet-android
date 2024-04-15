@@ -90,11 +90,11 @@ private fun mapCloudBackupProblemButton(
     if (!backupEnabled) return null
     if (syncingInProgress) return null
 
-    return when(syncOutcome) {
+    return when (syncOutcome) {
         BackupSyncOutcome.Ok -> null
         BackupSyncOutcome.CorruptedBackup -> resourceManager.getString(R.string.cloud_backup_settings_backup_errors_button)
         BackupSyncOutcome.DestructiveDiff -> resourceManager.getString(R.string.cloud_backup_settings_corrupted_backup_button)
-        BackupSyncOutcome.UnknownPassword ->resourceManager.getString(R.string.cloud_backup_settings_deprecated_password_button)
+        BackupSyncOutcome.UnknownPassword -> resourceManager.getString(R.string.cloud_backup_settings_deprecated_password_button)
         BackupSyncOutcome.OtherStorageIssue -> resourceManager.getString(R.string.cloud_backup_settings_other_errors_button)
         BackupSyncOutcome.StorageAuthFailed -> resourceManager.getString(R.string.cloud_backup_settings_not_auth_button)
         BackupSyncOutcome.UnknownError -> resourceManager.getString(R.string.cloud_backup_settings_backup_errors_button)

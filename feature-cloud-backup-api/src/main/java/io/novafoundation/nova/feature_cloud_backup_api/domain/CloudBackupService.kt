@@ -63,7 +63,6 @@ suspend fun CloudBackupService.fetchAndDecryptExistingBackup(password: String): 
     return fetchBackup().flatMap { it.decrypt(password) }
 }
 
-
 /**
  * @throws PasswordNotSaved
  * @throws FetchBackupError

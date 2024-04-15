@@ -61,7 +61,6 @@ internal class RealCloudBackupService(
         }
     }
 
-
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
         return withContext(Dispatchers.IO) {
             storage.ensureUserAuthenticated()

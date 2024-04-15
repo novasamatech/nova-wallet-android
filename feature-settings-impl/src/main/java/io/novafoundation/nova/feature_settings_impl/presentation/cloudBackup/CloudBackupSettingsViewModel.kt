@@ -102,7 +102,7 @@ class CloudBackupSettingsViewModel(
             if (cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()) {
                 syncBackupInternal(
                     onSuccess = {},
-                    onBackupNotFound = {/* TODO: run create backup using existing password */ },
+                    onBackupNotFound = { /* TODO: run create backup using existing password */ },
                     onUnknownPassword = {},
                     onOtherError = {}
                 )
@@ -111,13 +111,13 @@ class CloudBackupSettingsViewModel(
     }
 
     private fun Throwable.toEnableBackupSyncState(): BackupSyncOutcome {
-        return when(this) {
+        return when (this) {
             is PasswordNotSaved, is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
             is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok // not found backup is ok when we enable backup
             is FetchBackupError.CorruptedBackup -> BackupSyncOutcome.CorruptedBackup
             is FetchBackupError.Other -> BackupSyncOutcome.UnknownError
             is CloudBackupAuthFailed -> BackupSyncOutcome.StorageAuthFailed
-            else ->  BackupSyncOutcome.UnknownError
+            else -> BackupSyncOutcome.UnknownError
         }
     }
 
@@ -151,21 +151,20 @@ class CloudBackupSettingsViewModel(
 
 sealed class BackupSyncOutcome {
 
-    object Ok: BackupSyncOutcome()
+    object Ok : BackupSyncOutcome()
 
     object UnknownPassword : BackupSyncOutcome()
 
     object DestructiveDiff : BackupSyncOutcome()
 
-    object StorageAuthFailed  : BackupSyncOutcome()
+    object StorageAuthFailed : BackupSyncOutcome()
 
-    object OtherStorageIssue:  BackupSyncOutcome()
+    object OtherStorageIssue : BackupSyncOutcome()
 
     object CorruptedBackup : BackupSyncOutcome()
 
     object UnknownError : BackupSyncOutcome()
 }
-
 
 fun BackupSyncOutcome.isError(): Boolean {
     return this != BackupSyncOutcome.Ok
