@@ -17,3 +17,5 @@ interface CorruptedBackupError
 interface CloudBackupWrongPassword
 
 class CannotApplyNonDestructiveDiff : Throwable()
+
+class PasswordNotSaved: Throwable()
