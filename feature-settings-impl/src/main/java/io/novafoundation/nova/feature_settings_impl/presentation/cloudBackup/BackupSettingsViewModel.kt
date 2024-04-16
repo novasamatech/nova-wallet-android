@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.crea
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupAuthFailed
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotFound
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupWrongPassword
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CorruptedBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeleteBackupAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitDeleteBackupConfirmation
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
@@ -111,13 +110,13 @@ class BackupSettingsViewModel(
     }
 
     fun cloudBackupManageClicked() {
-        val reason = errorState.value
+        when (syncedState.value) {
+            BackupSyncOutcome.Ok,
+            BackupSyncOutcome.StorageAuthFailed -> return
 
-        when (reason) {
-            is CloudBackupAuthFailed -> return
-
-            is CloudBackupWrongPassword,
-            is CorruptedBackupError -> {
+            BackupSyncOutcome.UnknownPassword,
+            BackupSyncOutcome.CorruptedBackup,
+            BackupSyncOutcome.OtherStorageIssue -> {
                 listSelectorMixin.showSelector(
                     R.string.manage_cloud_backup,
                     listOf(manageBackupDeleteBackupItem())
@@ -153,7 +152,8 @@ class BackupSettingsViewModel(
     private fun Throwable.toEnableBackupSyncState(): BackupSyncOutcome {
         return when (this) {
             is PasswordNotSaved, is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
-            is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok // not found backup is ok when we enable backup
+            // not found backup is ok when we enable backup and when we start initial sync since we will create a new backup
+            is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok
             is FetchBackupError.CorruptedBackup -> BackupSyncOutcome.CorruptedBackup
             is FetchBackupError.Other -> BackupSyncOutcome.UnknownError
             is CloudBackupAuthFailed -> BackupSyncOutcome.StorageAuthFailed
