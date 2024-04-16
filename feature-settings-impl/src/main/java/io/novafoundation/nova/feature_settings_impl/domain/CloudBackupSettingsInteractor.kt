@@ -1,13 +1,14 @@
 package io.novafoundation.nova.feature_settings_impl.domain
 
+import io.novafoundation.nova.common.utils.finally
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
-import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackup
+import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
-import java.util.Date
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 interface CloudBackupSettingsInteractor {
 
@@ -27,23 +28,26 @@ class RealCloudBackupSettingsInteractor(
 ) : CloudBackupSettingsInteractor {
 
     override fun observeLastSyncedTime(): Flow<Date?> {
-        return cloudBackupService.observeLastSyncedTime()
+        return cloudBackupService.session.lastSyncedTimeFlow()
     }
 
     override suspend fun syncCloudBackup(): Result<Unit> {
-        return cloudBackupService.fetchAndDecryptExistingBackup("q1234567") // TODO: remove hardcoded password
+        return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
             .mapCatching { cloudBackup ->
-                cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.importFromCloud())
-                cloudBackupService.setLastSyncedTimeAsNow()
+                cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.syncWithCloud())
+
+                Unit
+            }.finally {
+                cloudBackupService.session.setLastSyncedTimeAsNow()
             }
     }
 
     override suspend fun setCloudBackupSyncEnabled(enable: Boolean) {
-        cloudBackupService.setSyncingBackupEnabled(enable)
+        cloudBackupService.session.setSyncingBackupEnabled(enable)
     }
 
     override suspend fun isSyncCloudBackupEnabled(): Boolean {
-        return cloudBackupService.isSyncWithCloudEnabled()
+        return cloudBackupService.session.isSyncWithCloudEnabled()
     }
 
     override suspend fun deleteCloudBackup(): Result<Unit> {

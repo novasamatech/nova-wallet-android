@@ -36,7 +36,7 @@ class RestoreCloudBackupViewModel(
 
     val passwordFlow = MutableStateFlow("")
 
-    val _showPassword = MutableStateFlow(false)
+    private val _showPassword = MutableStateFlow(false)
     val showPassword: Flow<Boolean> = _showPassword
 
     private val _restoreBackupInProgress = MutableStateFlow(false)

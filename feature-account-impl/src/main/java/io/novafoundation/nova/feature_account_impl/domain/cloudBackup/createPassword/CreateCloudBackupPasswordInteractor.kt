@@ -1,17 +1,17 @@
 package io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword
 
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
-import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.SecretsMetaAccountLocalFactory
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.domain.initEnabledBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
-import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 
 private const val MIN_PASSWORD_SYMBOLS = 8
 
@@ -21,7 +21,7 @@ interface CreateCloudBackupPasswordInteractor {
 
     suspend fun createAndBackupAccount(accountName: String, password: String): Result<Unit>
 
-    suspend fun syncWalletsBackup(password: String): Result<Unit>
+    suspend fun uploadInitialBackup(password: String): Result<Unit>
 }
 
 class RealCreateCloudBackupPasswordInteractor(
@@ -70,7 +70,7 @@ class RealCreateCloudBackupPasswordInteractor(
         )
 
         return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
-            cloudBackupService.setLastSyncedTimeAsNow()
+            cloudBackupService.session.initEnabledBackup(password)
 
             localAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.overwriteLocal())
 
@@ -79,12 +79,10 @@ class RealCreateCloudBackupPasswordInteractor(
         }
     }
 
-    override suspend fun syncWalletsBackup(password: String): Result<Unit> {
+    override suspend fun uploadInitialBackup(password: String): Result<Unit> {
         val cloudBackup = localAccountsCloudBackupFacade.fullBackupInfoFromLocalSnapshot()
-        return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
-            cloudBackupService.setLastSyncedTimeAsNow()
-
-            localAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.overwriteLocal())
+        return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).onSuccess {
+            cloudBackupService.session.initEnabledBackup(password)
         }
     }
 }

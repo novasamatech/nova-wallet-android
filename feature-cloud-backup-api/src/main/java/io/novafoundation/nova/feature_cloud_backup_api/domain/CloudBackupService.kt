@@ -7,9 +7,9 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateVal
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.DeleteBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.PasswordNotSaved
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
-import java.util.Date
-import kotlinx.coroutines.flow.Flow
 
 /**
  * Manages cloud backup storage, serialization and encryption
@@ -21,6 +21,11 @@ import kotlinx.coroutines.flow.Flow
  * This allows to access public data without accessing password
  */
 interface CloudBackupService {
+
+    /**
+     * Current user preferences, state known for cloud backup related functionality
+     */
+    val session: CloudBackupSession
 
     /**
      * Checks conditions for creating initial backup
@@ -40,14 +45,6 @@ interface CloudBackupService {
     suspend fun isCloudBackupExist(): Result<Boolean>
 
     /**
-     * Check if user enabled sync with cloud backup in the current application instance
-     * Enabling this means that the app should write changes of local state to backup on addition, modification or delegation of accounts
-     */
-    suspend fun isSyncWithCloudEnabled(): Boolean
-
-    suspend fun setSyncingBackupEnabled(enable: Boolean)
-
-    /**
      * @throws FetchBackupError
      */
     suspend fun fetchBackup(): Result<EncryptedCloudBackup>
@@ -56,19 +53,25 @@ interface CloudBackupService {
      * @throws DeleteBackupError
      */
     suspend fun deleteBackup(): Result<Unit>
-
-    /**
-     * Observe last synced backup time on device
-     */
-    fun observeLastSyncedTime(): Flow<Date?>
-
-    suspend fun setLastSyncedTime(date: Date)
 }
 
+/**
+ * @throws FetchBackupError
+ * @throws InvalidBackupPasswordError
+ */
 suspend fun CloudBackupService.fetchAndDecryptExistingBackup(password: String): Result<CloudBackup> {
     return fetchBackup().flatMap { it.decrypt(password) }
 }
 
-suspend fun CloudBackupService.setLastSyncedTimeAsNow() {
-    setLastSyncedTime(Date())
+/**
+ * @throws PasswordNotSaved
+ * @throws FetchBackupError
+ * @throws InvalidBackupPasswordError
+ */
+suspend fun CloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword(): Result<CloudBackup> {
+    return session.getSavedPassword().flatMap { savedPassword ->
+        fetchBackup().flatMap { encryptedBackup ->
+            encryptedBackup.decrypt(savedPassword)
+        }
+    }
 }

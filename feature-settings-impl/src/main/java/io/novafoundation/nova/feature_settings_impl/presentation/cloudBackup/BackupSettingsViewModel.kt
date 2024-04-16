@@ -20,6 +20,9 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.Cloud
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CorruptedBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeleteBackupAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitDeleteBackupConfirmation
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.PasswordNotSaved
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCloudBackupSyncFailed
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapDeleteBackupFailureToUi
 import io.novafoundation.nova.feature_settings_impl.R
@@ -46,15 +49,17 @@ class BackupSettingsViewModel(
     val listSelectorMixin = listSelectorMixinFactory.create(viewModelScope)
 
     private val isSyncing = MutableStateFlow(false)
-    private val errorState = MutableStateFlow<Throwable?>(null)
 
-    val lastSync = cloudBackupSettingsInteractor.observeLastSyncedTime()
+    private val syncedState = MutableStateFlow<BackupSyncOutcome>(BackupSyncOutcome.Ok)
+
+    private val lastSync = cloudBackupSettingsInteractor.observeLastSyncedTime()
+
     val cloudBackupEnabled = MutableStateFlow(false)
 
     val cloudBackupStateModel: Flow<CloudBackupStateModel> = combine(
         cloudBackupEnabled,
         isSyncing,
-        errorState,
+        syncedState,
         lastSync
     ) { backupEnabled, syncingInProgress, state, lastSync ->
         mapCloudBackupStateModel(resourceManager, backupEnabled, syncingInProgress, state, lastSync)
@@ -79,17 +84,24 @@ class BackupSettingsViewModel(
                 cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(false)
             } else {
                 cloudBackupEnabled.value = true
+
                 syncBackupInternal(
+                    onSuccess = {
+                        cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(true)
+                    },
                     onBackupNotFound = {
                         syncWalletsBackupPasswordCommunicator.awaitResponse(SyncWalletsBackupPasswordRequester.EmptyRequest)
+                        // cloudBackupSyncEnabled is set by syncWalletsBackup flow
                         cloudBackupEnabled.value = cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()
-                        errorState.value = null
+                        syncedState.value = BackupSyncOutcome.Ok
                     },
-                    onPasswordDeprecated = { cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(true) }
-                )
-                    .onSuccess {
+                    onUnknownPassword = {
+                        cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(true)
+                    },
+                    onOtherError = {
                         cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(true)
                     }
+                )
             }
         }
     }
@@ -128,27 +140,45 @@ class BackupSettingsViewModel(
     private fun initSyncCloudBackupState() {
         launch {
             if (cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()) {
-                syncBackupInternal(onBackupNotFound = {
-                    /* TODO: run create backup using existing password */
-                })
+                syncBackupInternal(
+                    onSuccess = {},
+                    onBackupNotFound = { /* TODO: run create backup using existing password */ },
+                    onUnknownPassword = {},
+                    onOtherError = {}
+                )
             }
         }
     }
 
+    private fun Throwable.toEnableBackupSyncState(): BackupSyncOutcome {
+        return when (this) {
+            is PasswordNotSaved, is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
+            is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok // not found backup is ok when we enable backup
+            is FetchBackupError.CorruptedBackup -> BackupSyncOutcome.CorruptedBackup
+            is FetchBackupError.Other -> BackupSyncOutcome.UnknownError
+            is CloudBackupAuthFailed -> BackupSyncOutcome.StorageAuthFailed
+            else -> BackupSyncOutcome.UnknownError
+        }
+    }
+
     private suspend fun syncBackupInternal(
-        onBackupNotFound: (suspend () -> Unit)? = null,
-        onPasswordDeprecated: (suspend () -> Unit)? = null
-    ): Result<Unit> {
+        onSuccess: suspend () -> Unit,
+        onBackupNotFound: suspend () -> Unit,
+        onUnknownPassword: suspend () -> Unit,
+        onOtherError: suspend () -> Unit,
+    ) {
         isSyncing.value = true
 
-        val result = cloudBackupSettingsInteractor.syncCloudBackup()
-            .onSuccess { errorState.value = null }
+        cloudBackupSettingsInteractor.syncCloudBackup()
+            .onSuccess { syncedState.value = BackupSyncOutcome.Ok; onSuccess() }
             .onFailure { throwable ->
-                errorState.value = throwable
+                syncedState.value = throwable.toEnableBackupSyncState()
 
+                // TODO Antony: handle `PasswordNotSaved`
                 when (throwable) {
-                    is CloudBackupNotFound -> onBackupNotFound?.invoke()
-                    is CloudBackupWrongPassword -> onPasswordDeprecated?.invoke()
+                    is CloudBackupNotFound -> onBackupNotFound.invoke()
+                    is CloudBackupWrongPassword, is PasswordNotSaved -> onUnknownPassword.invoke()
+                    else -> onOtherError.invoke()
                 }
 
                 val titleAndMessage = mapCloudBackupSyncFailed(resourceManager, throwable)
@@ -156,7 +186,6 @@ class BackupSettingsViewModel(
             }
 
         isSyncing.value = false
-        return result
     }
 
     private fun manageBackupChangePasswordItem(): ListSelectorMixin.Item {
@@ -204,4 +233,25 @@ class BackupSettingsViewModel(
             }
         }
     }
+}
+
+sealed class BackupSyncOutcome {
+
+    object Ok : BackupSyncOutcome()
+
+    object UnknownPassword : BackupSyncOutcome()
+
+    object DestructiveDiff : BackupSyncOutcome()
+
+    object StorageAuthFailed : BackupSyncOutcome()
+
+    object OtherStorageIssue : BackupSyncOutcome()
+
+    object CorruptedBackup : BackupSyncOutcome()
+
+    object UnknownError : BackupSyncOutcome()
+}
+
+fun BackupSyncOutcome.isError(): Boolean {
+    return this != BackupSyncOutcome.Ok
 }

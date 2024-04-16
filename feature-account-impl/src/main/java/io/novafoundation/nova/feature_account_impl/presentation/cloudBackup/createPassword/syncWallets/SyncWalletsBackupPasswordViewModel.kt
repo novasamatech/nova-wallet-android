@@ -28,7 +28,7 @@ class SyncWalletsBackupPasswordViewModel(
         launch {
             showProgress(true)
             val password = passwordFlow.value
-            interactor.syncWalletsBackup(password)
+            interactor.uploadInitialBackup(password)
                 .onSuccess {
                     syncWalletsBackupPasswordCommunicator.respond(SyncWalletsBackupPasswordResponder.Response(isSyncingSuccessful = true))
                     router.back()
