@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="deleting_backup_progress">Deleting a backup...</string>
     <string name="cloud_backup_delete_action_title">Backup will be deleted from Google Drive</string>
     <string name="cloud_backup_delete_action_subtitle">%s and remember to always keep them offline to restore them anytime. You can do this in the Backup Settings.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Please write down all your wallet’s Passphrases before proceeding</string>

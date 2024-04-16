@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInf
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
@@ -34,6 +36,7 @@ class BackupSettingsViewModel(
     private val cloudBackupSettingsInteractor: CloudBackupSettingsInteractor,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    val progressDialogMixin: ProgressDialogMixin,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     listSelectorMixinFactory: ListSelectorMixin.Factory
 ) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -188,15 +191,17 @@ class BackupSettingsViewModel(
         launch {
             confirmationAwaitableAction.awaitDeleteBackupConfirmation()
 
-            cloudBackupSettingsInteractor.deleteCloudBackup()
-                .onSuccess {
-                    cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(false)
-                    cloudBackupEnabled.value = false
-                }
-                .onFailure { throwable ->
-                    val titleAndMessage = mapDeleteBackupFailureToUi(resourceManager, throwable)
-                    titleAndMessage?.let { showError(it) }
-                }
+            progressDialogMixin.startProgress(R.string.deleting_backup_progress) {
+                cloudBackupSettingsInteractor.deleteCloudBackup()
+                    .onSuccess {
+                        cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(false)
+                        cloudBackupEnabled.value = false
+                    }
+                    .onFailure { throwable ->
+                        val titleAndMessage = mapDeleteBackupFailureToUi(resourceManager, throwable)
+                        titleAndMessage?.let { showError(it) }
+                    }
+            }
         }
     }
 }

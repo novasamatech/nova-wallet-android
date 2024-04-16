@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
@@ -49,6 +50,7 @@ class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: BackupSettingsViewModel) {
+        observeProgressDialog(viewModel.progressDialogMixin)
         observeActionBottomSheet(viewModel)
         setupListSelectorMixin(viewModel.listSelectorMixin)
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.confirmationAwaitableAction)

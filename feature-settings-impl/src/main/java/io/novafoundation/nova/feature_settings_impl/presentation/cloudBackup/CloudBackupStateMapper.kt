@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.Cloud
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotEnoughSpace
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupUnknownError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupWrongPassword
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CorruptedBackupError
 import io.novafoundation.nova.feature_settings_impl.R
 import java.util.Date
 
@@ -77,8 +76,6 @@ private fun mapCloudBackupClickability(
 
     return when (errorState) {
         is CloudBackupAuthFailed -> false
-        is CloudBackupWrongPassword -> false
-        is CorruptedBackupError -> false
 
         else -> true
     }
