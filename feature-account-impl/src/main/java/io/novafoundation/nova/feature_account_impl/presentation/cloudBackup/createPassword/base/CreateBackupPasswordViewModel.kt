@@ -3,12 +3,8 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.cre
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.addColor
-import io.novafoundation.nova.common.utils.formatting.spannable.spannableFormatting
 import io.novafoundation.nova.common.utils.toggle
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
-import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors

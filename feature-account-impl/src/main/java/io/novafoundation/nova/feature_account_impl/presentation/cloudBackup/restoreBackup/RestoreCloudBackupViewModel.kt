@@ -7,13 +7,8 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInf
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.addColor
-import io.novafoundation.nova.common.utils.formatting.spannable.spannableFormatting
 import io.novafoundation.nova.common.utils.toggle
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
-import io.novafoundation.nova.common.view.bottomSheet.action.negative
-import io.novafoundation.nova.common.view.bottomSheet.action.secondary
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RestoreCloudBackupInteractor

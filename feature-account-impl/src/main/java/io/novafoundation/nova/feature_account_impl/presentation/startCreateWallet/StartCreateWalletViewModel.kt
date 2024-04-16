@@ -4,13 +4,8 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.addColor
 import io.novafoundation.nova.common.utils.finally
-import io.novafoundation.nova.common.utils.formatting.spannable.spannableFormatting
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
-import io.novafoundation.nova.common.view.bottomSheet.action.primary
-import io.novafoundation.nova.common.view.bottomSheet.action.secondary
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
