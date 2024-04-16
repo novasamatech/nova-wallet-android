@@ -49,6 +49,7 @@ import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
+import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.common.view.parallaxCard.BackingParallaxCardLruCache
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
@@ -143,6 +144,8 @@ interface CommonApi {
     fun provideActionBottomSheetLauncher(): ActionBottomSheetLauncher
 
     fun progressDialogMixin(): ProgressDialogMixin
+
+    fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory
 
     val systemCallExecutor: SystemCallExecutor
 

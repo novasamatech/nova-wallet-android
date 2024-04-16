@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="cloud_backup_delete_action_title">Backup will be deleted from Google Drive</string>
+    <string name="cloud_backup_delete_action_subtitle">%s and remember to always keep them offline to restore them anytime. You can do this in the Backup Settings.</string>
+    <string name="cloud_backup_delete_action_subtitle_highlighted">Please write down all your wallet’s Passphrases before proceeding</string>
+
+    <string name="manage_cloud_backup">Manage backup</string>
+
+    <string name="backup_settings_delete_backup">Delete backup</string>
+
+    <!--<string name="account_export_password_change">Change password</string>-->
+    <string name="common_change_password">Change password</string>
 
     <string name="cloud_backup_settings_disabled_state_subtitle">Turn it on to create a wallets backup</string>
     <string name="cloud_backup_settings_last_sync">Last sync: %s at %s</string>
@@ -1521,7 +1531,6 @@
     <string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>
     <string name="account_export_json_password_title">Set a new password</string>
     <string name="account_export_json_title">Save your secret and store it in a safe place</string>
-    <string name="account_export_password_change">Change password</string>
     <string name="account_export_seed_title">Write down your secret and store it in a safe place</string>
     <string name="account_import_invalid_keystore">Invalid restore json. Please, make sure that input contains valid json.</string>
     <string name="account_import_invalid_seed">Seed is invalid. Please, make sure that your input contains 64 hex symbols.</string>

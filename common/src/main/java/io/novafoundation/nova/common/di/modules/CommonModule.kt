@@ -70,6 +70,8 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.common.view.bottomSheet.description.RealDescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.input.chooser.RealListChooserMixinFactory
+import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.common.view.input.selector.RealListSelectorMixinFactory
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
 import java.security.SecureRandom
@@ -332,4 +334,8 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideActionBottomSheetLauncher(): ActionBottomSheetLauncher = RealActionBottomSheetLauncher()
+
+    @Provides
+    @ApplicationScope
+    fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory = RealListSelectorMixinFactory()
 }

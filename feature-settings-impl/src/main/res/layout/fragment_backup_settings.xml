@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/cloudBackupSettingsToolbar"
+        android:id="@+id/backupSettingsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cloudBackupSettingsToolbar">
+        app:layout_constraintTop_toBottomOf="@id/backupSettingsToolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,7 +49,7 @@
                 android:layout_marginTop="16dp">
 
                 <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
-                    android:id="@+id/cloudBackupSettingsSwitcher"
+                    android:id="@+id/backupSettingsSwitcher"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/backup_settings_switcher_text" />
@@ -57,7 +57,7 @@
             </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
             <io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.views.CloudBackupStateView
-                android:id="@+id/cloudBackupStateView"
+                android:id="@+id/backupStateView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -88,7 +88,7 @@
                 android:layout_marginTop="16dp">
 
                 <io.novafoundation.nova.common.view.settings.SettingsItemView
-                    android:id="@+id/cloudBackupSettingsManualBtn"
+                    android:id="@+id/backupSettingsManualBtn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/backup_settings_manual_switcher_title" />

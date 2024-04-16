@@ -29,7 +29,7 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
 
     fun settingsComponentFactory(): SettingsComponent.Factory
 
-    fun cloudBackupSettings(): CloudBackupSettingsComponent.Factory
+    fun backupSettings(): CloudBackupSettingsComponent.Factory
 
     @Component.Factory
     interface Factory {
