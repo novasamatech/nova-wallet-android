@@ -26,6 +26,7 @@ import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
+import io.novafoundation.nova.feature_cloud_backup_impl.BuildConfig
 import io.novafoundation.nova.feature_cloud_backup_impl.data.ReadyForStorageBackup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,10 +37,10 @@ internal class GoogleDriveBackupStorage(
     private val systemCallExecutor: SystemCallExecutor,
     private val oauthClientId: String,
     private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
+    private val debug: Boolean = BuildConfig.DEBUG
 ) : CloudBackupStorage {
 
     companion object {
-        private const val BACKUP_FILE_NAME = "novawallet_backup.json"
         private const val BACKUP_MIME_TYPE = "application/json"
     }
 
@@ -113,7 +114,7 @@ internal class GoogleDriveBackupStorage(
                 .update(backupInCloud.id, null, contentStream)
                 .execute()
         } else {
-            val fileMetadata = File().apply { name = BACKUP_FILE_NAME }
+            val fileMetadata = File().apply { name = backupFileName() }
 
             drive.files().create(fileMetadata, contentStream)
                 .execute()
@@ -168,7 +169,7 @@ internal class GoogleDriveBackupStorage(
     }
 
     private fun backupNameQuery(): String {
-        return "name = '" + BACKUP_FILE_NAME.replace("'", "\\'") + "' and trashed = false"
+        return "name = '" + backupFileName().replace("'", "\\'") + "' and trashed = false"
     }
 
     private fun createGoogleDriveService(): Drive {
@@ -183,6 +184,14 @@ internal class GoogleDriveBackupStorage(
     }
 
     private fun driveScope(): String = DriveScopes.DRIVE
+
+    private fun backupFileName(): String {
+        return if (debug) {
+            "novawallet_backup_debug.json"
+        } else {
+            "novawallet_backup.json"
+        }
+    }
 }
 
 private class GoogleSignInSystemCall(

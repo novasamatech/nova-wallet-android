@@ -2,14 +2,17 @@ package io.novafoundation.nova.feature_cloud_backup_impl.domain
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.flatMap
+import io.novafoundation.nova.common.utils.mapError
 import io.novafoundation.nova.common.utils.mapErrorNotInstance
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupSession
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.EncryptedCloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.DeleteBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.PasswordNotSaved
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.WriteBackupError
 import io.novafoundation.nova.feature_cloud_backup_impl.data.EncryptedPrivateData
 import io.novafoundation.nova.feature_cloud_backup_impl.data.ReadyForStorageBackup
@@ -19,10 +22,10 @@ import io.novafoundation.nova.feature_cloud_backup_impl.data.encryption.CloudBac
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.CloudBackupPreferences
 import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.enableSyncWithCloud
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.CloudBackupSerializer
-import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 internal class RealCloudBackupService(
     private val storage: CloudBackupStorage,
@@ -30,6 +33,8 @@ internal class RealCloudBackupService(
     private val encryption: CloudBackupEncryption,
     private val cloudBackupPreferences: CloudBackupPreferences,
 ) : CloudBackupService {
+
+    override val session: CloudBackupSession = RealCloudBackupSession()
 
     override suspend fun validateCanCreateBackup(): PreCreateValidationStatus = withContext(Dispatchers.IO) {
         validateCanCreateBackupInternal()
@@ -56,24 +61,21 @@ internal class RealCloudBackupService(
         }
     }
 
-    override suspend fun isSyncWithCloudEnabled(): Boolean {
-        return cloudBackupPreferences.syncWithCloudEnabled()
-    }
-
-    override suspend fun setSyncingBackupEnabled(enable: Boolean) {
-        cloudBackupPreferences.setSyncWithCloudEnabled(enable)
-    }
-
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
-        return storage.ensureUserAuthenticated()
-            .flatMap { storage.fetchBackup() }
-            .flatMap { serializer.deserializePublicData(it) }
-            .map { RealEncryptedCloudBackup(encryption, serializer, it) }
-            .onFailure {
-                Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
-            }.mapErrorNotInstance<_, FetchBackupError> {
-                FetchBackupError.Other
-            }
+        return withContext(Dispatchers.IO) {
+            storage.ensureUserAuthenticated()
+                .flatMap { storage.fetchBackup() }
+                .flatMap {
+                    serializer.deserializePublicData(it)
+                        .mapError { FetchBackupError.CorruptedBackup }
+                }
+                .map { RealEncryptedCloudBackup(encryption, serializer, it) }
+                .onFailure {
+                    Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
+                }.mapErrorNotInstance<_, FetchBackupError> {
+                    FetchBackupError.Other
+                }
+        }
     }
 
     override suspend fun deleteBackup(): Result<Unit> {
@@ -84,14 +86,6 @@ internal class RealCloudBackupService(
         }.mapErrorNotInstance<_, DeleteBackupError> {
             DeleteBackupError.Other
         }
-    }
-
-    override fun observeLastSyncedTime(): Flow<Date?> {
-        return cloudBackupPreferences.observeLastSyncedTime()
-    }
-
-    override suspend fun setLastSyncedTime(date: Date) {
-        cloudBackupPreferences.setLastSyncedTime(date)
     }
 
     private suspend fun prepareBackupForSaving(backup: CloudBackup, password: String): Result<ReadyForStorageBackup> {
@@ -146,7 +140,37 @@ internal class RealCloudBackupService(
                 val unencryptedBackup = SerializedBackup(encryptedBackup.publicData, privateData)
 
                 serializer.deserializePrivateData(unencryptedBackup)
+                    .mapError { FetchBackupError.CorruptedBackup }
             }
+        }
+    }
+
+    private inner class RealCloudBackupSession : CloudBackupSession {
+
+        override suspend fun isSyncWithCloudEnabled(): Boolean {
+            return cloudBackupPreferences.syncWithCloudEnabled()
+        }
+
+        override suspend fun setSyncingBackupEnabled(enable: Boolean) {
+            cloudBackupPreferences.setSyncWithCloudEnabled(enable)
+        }
+
+        override fun lastSyncedTimeFlow(): Flow<Date?> {
+            return cloudBackupPreferences.observeLastSyncedTime()
+        }
+
+        override suspend fun setLastSyncedTime(date: Date) {
+            cloudBackupPreferences.setLastSyncedTime(date)
+        }
+
+        override suspend fun getSavedPassword(): Result<String> {
+            return runCatching {
+                cloudBackupPreferences.getSavedPassword() ?: throw PasswordNotSaved()
+            }
+        }
+
+        override suspend fun setSavedPassword(password: String) {
+            cloudBackupPreferences.setSavedPassword(password)
         }
     }
 }
