@@ -101,8 +101,6 @@ class WalletPrivateInfoBuilder(
 
     private val chainAccounts = mutableListOf<ChainAccountSecrets>()
 
-    private var additional = mapOf<String, String>()
-
     fun entropy(value: ByteArray) {
         _entropy = value
     }
@@ -120,10 +118,6 @@ class WalletPrivateInfoBuilder(
         chainAccounts.add(element)
     }
 
-    fun additional(builder: MutableMap<String, String>.() -> Unit) {
-        additional = buildMap(builder)
-    }
-
     fun build(): WalletPrivateInfo {
         return WalletPrivateInfo(
             entropy = _entropy,
@@ -131,7 +125,6 @@ class WalletPrivateInfoBuilder(
             substrate = substrate,
             ethereum = ethereum,
             chainAccounts = chainAccounts,
-            additional = additional
         )
     }
 }
@@ -192,11 +185,7 @@ class BackupChainAccountSecretsBuilder(private val accountId: AccountId) {
 
     private var _entropy: ByteArray? = null
 
-    private var _keypair: KeyPairSecrets = KeyPairSecrets(
-        privateKey = ByteArray(32),
-        publicKey = ByteArray(32),
-        nonce = ByteArray(32)
-    )
+    private var _keypair: KeyPairSecrets? = null
     private var _seed: ByteArray? = null
     private var _derivationPath: String? = null
 
@@ -214,6 +203,14 @@ class BackupChainAccountSecretsBuilder(private val accountId: AccountId) {
 
     fun keypair(keypair: KeyPairSecrets) {
         _keypair = keypair
+    }
+
+    fun keypairFromIndex(index: Int) {
+        _keypair = KeyPairSecrets(
+            privateKey = ByteArray(32) { index.toByte() },
+            publicKey = ByteArray(32) { index.toByte() },
+            nonce = ByteArray(32) { index.toByte() }
+        )
     }
 
     fun build(): ChainAccountSecrets {
@@ -294,9 +291,9 @@ class WalletChainAccountInfoBuilder(
     private val chainId: ChainId,
 ) {
 
-    private var _publicKey: ByteArray? = ByteArray(32)
+    private var _publicKey: ByteArray? = null
     private var _accountId: ByteArray = ByteArray(32)
-    private var _cryptoType: CryptoType? = CryptoType.SR25519
+    private var _cryptoType: CryptoType? = null
 
     fun publicKey(value: ByteArray) {
         _publicKey = value

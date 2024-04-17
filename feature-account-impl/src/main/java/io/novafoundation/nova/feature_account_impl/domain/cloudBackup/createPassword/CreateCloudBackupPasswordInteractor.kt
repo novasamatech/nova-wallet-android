@@ -60,13 +60,9 @@ class RealCreateCloudBackupPasswordInteractor(
             accountSortPosition = metaAccountDao.nextAccountPosition()
         )
 
-        val cloudBackup = localAccountsCloudBackupFacade.createCloudBackupFromInput(
-            modificationTime = System.currentTimeMillis(),
+        val cloudBackup = localAccountsCloudBackupFacade.constructCloudBackupForFirstWallet(
             metaAccount = metaAccountLocal,
-            chainAccounts = emptyList(),
             baseSecrets = secrets,
-            chainAccountSecrets = emptyMap(),
-            additionalSecrets = emptyMap()
         )
 
         return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
