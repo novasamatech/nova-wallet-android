@@ -19,6 +19,8 @@ interface EnterCloudBackupInteractor {
     suspend fun deleteCloudBackup(): Result<Unit>
 
     suspend fun confirmCloudBackupPassword(password: String): Result<Unit>
+
+    suspend fun restoreCloudBackupPassword(password: String): Result<Unit>
 }
 
 class RealEnterCloudBackupInteractor(
@@ -62,5 +64,11 @@ class RealEnterCloudBackupInteractor(
                     throw InvalidBackupPasswordError()
                 }
             }
+    }
+
+    override suspend fun restoreCloudBackupPassword(password: String): Result<Unit> {
+        return cloudBackupService.fetchAndDecryptExistingBackup(password)
+            .onSuccess { cloudBackupService.session.setSavedPassword(password) }
+            .map { Unit }
     }
 }

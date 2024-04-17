@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -20,6 +21,7 @@ class SettingsFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+    private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
     private val router: SettingsRouter,
 ) : FeatureApiHolder(featureContainer) {
 
@@ -39,6 +41,7 @@ class SettingsFeatureHolder @Inject constructor(
                 router = router,
                 syncWalletsBackupPasswordCommunicator = syncWalletsBackupPasswordCommunicator,
                 changeBackupPasswordCommunicator = changeBackupPasswordCommunicator,
+                restoreBackupPasswordCommunicator = restoreBackupPasswordCommunicator,
                 deps = accountFeatureDependencies
             )
     }

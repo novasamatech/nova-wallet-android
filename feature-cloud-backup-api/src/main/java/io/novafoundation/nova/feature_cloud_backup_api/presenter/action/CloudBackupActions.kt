@@ -105,3 +105,21 @@ fun ActionBottomSheetLauncher.launchExistingCloudBackupAction(resourceManager: R
         )
     )
 }
+
+fun ActionBottomSheetLauncher.launchDeprecatedPasswordAction(resourceManager: ResourceManager, onEnterPasswordClick: () -> Unit) {
+    launchBottomSheet(
+        imageRes = R.drawable.ic_cloud_backup_password,
+        title = resourceManager.getString(R.string.deprecated_cloud_backup_password_title),
+        subtitle = with(resourceManager) {
+            val highlightedPart = getString(R.string.deprecated_cloud_backup_password_subtitle_highlight)
+                .addColor(getColor(R.color.text_primary))
+
+            getString(R.string.deprecated_cloud_backup_password_subtitle).spannableFormatting(highlightedPart)
+        },
+        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_not_now)),
+        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
+            resourceManager.getString(R.string.cloud_backup_enter_password),
+            onEnterPasswordClick
+        )
+    )
+}

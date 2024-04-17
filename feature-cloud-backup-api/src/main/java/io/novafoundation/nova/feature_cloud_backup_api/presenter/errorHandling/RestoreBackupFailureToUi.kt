@@ -50,3 +50,22 @@ fun mapCheckPasswordFailureToUi(
         else -> null
     }
 }
+
+fun mapRestorePasswordFailureToUi(
+    resourceManager: ResourceManager,
+    throwable: Throwable,
+    corruptedBackupFound: () -> Unit
+): TitleAndMessage? {
+    return when (throwable) {
+        is InvalidBackupPasswordError -> handleCloudBackupInvalidPassword(resourceManager)
+
+        is CorruptedBackupError -> {
+            corruptedBackupFound()
+            null
+        }
+
+        is CloudBackupNotFound -> handleCloudBackupNotFound(resourceManager)
+
+        else -> handleCloudBackupUnknownError(resourceManager)
+    }
+}

@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="push_welcome_cancel_button">Not now</string>-->
+    <string name="common_not_now">Not now</string>
+
+    <string name="deprecated_cloud_backup_password_title">Backup password was changed</string>
+    <string name="deprecated_cloud_backup_password_subtitle">Your backup password was previously updated. To continue using Cloud Backup, %s</string>
+    <string name="deprecated_cloud_backup_password_subtitle_highlight">please enter the new backup password.</string>
+
+    <string name="restore_cloud_backup_password_title">Your backup password was previously updated. To continue using Cloud Backup, please enter the new backup password.</string>
+
     <string name="change_cloud_backup_password_title">Update backup password</string>
     <string name="change_cloud_backup_password_subtitle">Please enter a password that will be used to recover your wallets from cloud backup. This password can\'t be recovered in the future, so be sure to remember it!</string>
 
@@ -242,7 +251,6 @@
     <string name="push_welcome_title">Don’t miss a thing!</string>
     <string name="push_welcome_message">Get notified about Wallet operations, Governance updates, Staking activity and Security, so you’re always in the know</string>
     <string name="push_welcome_enable_button">Enable push notifications</string>
-    <string name="push_welcome_cancel_button">Not now</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">By enabling push notifications, you agree to our %s and %s</string>
 
     <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>

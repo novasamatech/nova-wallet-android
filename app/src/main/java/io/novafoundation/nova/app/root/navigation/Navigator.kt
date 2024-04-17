@@ -549,6 +549,10 @@ class Navigator(
         performNavigation(R.id.action_cloudBackupSettings_to_checkCloudBackupPasswordFragment)
     }
 
+    override fun openRestoreBackupPassword() {
+        performNavigation(R.id.action_cloudBackupSettings_to_restoreCloudBackupPasswordFragment)
+    }
+
     override fun openChangeBackupPassword() {
         performNavigation(R.id.action_checkCloudBackupPasswordFragment_to_changeBackupPasswordFragment)
     }

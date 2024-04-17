@@ -9,6 +9,7 @@ import io.novafoundation.nova.app.root.navigation.account.SelectAddressCommunica
 import io.novafoundation.nova.app.root.navigation.account.SelectMultipleWalletsCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.account.SelectWalletCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.cloudBackup.ChangeBackupPasswordCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.cloudBackup.RestoreBackupPasswordCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.cloudBackup.SyncWalletsBackupPasswordCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.pincode.PinCodeTwoFactorVerificationCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -16,6 +17,7 @@ import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerif
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -74,4 +76,11 @@ class AccountNavigationModule {
         router: AccountRouter,
         navigationHolder: NavigationHolder
     ): ChangeBackupPasswordCommunicator = ChangeBackupPasswordCommunicatorImpl(router, navigationHolder)
+
+    @Provides
+    @ApplicationScope
+    fun provideRestoreBackupPasswordCommunicator(
+        router: AccountRouter,
+        navigationHolder: NavigationHolder
+    ): RestoreBackupPasswordCommunicator = RestoreBackupPasswordCommunicatorImpl(router, navigationHolder)
 }

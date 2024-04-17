@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.crea
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.di.SyncWalletsBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.di.CheckCloudBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restoreBackup.di.RestoreCloudBackupComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restorePassword.di.RestoreCloudBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
@@ -84,6 +86,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun restoreCloudBackupFactory(): RestoreCloudBackupComponent.Factory
 
     fun checkCloudBackupPasswordFactory(): CheckCloudBackupPasswordComponent.Factory
+
+    fun restoreCloudBackupPasswordFactory(): RestoreCloudBackupPasswordComponent.Factory
 
     fun pincodeComponentFactory(): PinCodeComponent.Factory
 
@@ -145,6 +149,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
             @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
             @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+            @BindsInstance restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

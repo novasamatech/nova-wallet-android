@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -39,6 +40,7 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
             @BindsInstance router: SettingsRouter,
             @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
             @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+            @BindsInstance restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
             deps: SettingsFeatureDependencies
         ): SettingsFeatureComponent
     }
