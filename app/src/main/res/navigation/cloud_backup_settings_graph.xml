@@ -17,11 +17,41 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_cloudBackupSettings_to_checkCloudBackupPasswordFragment"
+            app:destination="@id/checkCloudBackupPasswordFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/syncWalletsBackupPassword"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.SyncWalletsBackupPasswordFragment"
         android:label="SyncWalletsBackupPasswordFragment" />
+
+    <fragment
+        android:id="@+id/checkCloudBackupPasswordFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.CheckCloudBackupPasswordFragment"
+        android:label="CheckCloudBackupPasswordFragment">
+
+        <action
+            android:id="@+id/action_checkCloudBackupPasswordFragment_to_changeBackupPasswordFragment"
+            app:destination="@id/changeBackupPasswordFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/checkCloudBackupPasswordFragment"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/changeBackupPasswordFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.changePassword.ChangeBackupPasswordFragment"
+        android:label="ChangeBackupPasswordFragment"/>
 
 </navigation>

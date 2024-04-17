@@ -545,6 +545,14 @@ class Navigator(
         performNavigation(R.id.action_cloudBackupSettings_to_syncWalletsBackupPasswordFragment)
     }
 
+    override fun openChangeBackupPasswordFlow() {
+        performNavigation(R.id.action_cloudBackupSettings_to_checkCloudBackupPasswordFragment)
+    }
+
+    override fun openChangeBackupPassword() {
+        performNavigation(R.id.action_checkCloudBackupPasswordFragment_to_changeBackupPasswordFragment)
+    }
+
     override fun openCreateWatchWallet() {
         navController?.navigate(R.id.action_importWalletOptionsFragment_to_createWatchWalletFragment)
     }

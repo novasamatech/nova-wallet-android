@@ -91,8 +91,8 @@ import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryp
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.RealCreateCloudBackupPasswordInteractor
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RealRestoreCloudBackupInteractor
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RestoreCloudBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RealEnterCloudBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.RealStartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -256,8 +256,8 @@ class AccountFeatureModule {
         cloudBackupService: CloudBackupService,
         cloudBackupFacade: LocalAccountsCloudBackupFacade,
         accountRepository: AccountRepository
-    ): RestoreCloudBackupInteractor {
-        return RealRestoreCloudBackupInteractor(
+    ): EnterCloudBackupInteractor {
+        return RealEnterCloudBackupInteractor(
             cloudBackupService = cloudBackupService,
             cloudBackupFacade = cloudBackupFacade,
             accountRepository = accountRepository

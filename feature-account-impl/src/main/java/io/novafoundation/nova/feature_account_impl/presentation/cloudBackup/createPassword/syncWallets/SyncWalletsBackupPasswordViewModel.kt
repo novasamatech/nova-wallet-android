@@ -24,22 +24,16 @@ class SyncWalletsBackupPasswordViewModel(
     actionBottomSheetLauncher
 ) {
 
-    override fun continueClicked() {
-        launch {
-            showProgress(true)
-            val password = passwordFlow.value
-            interactor.uploadInitialBackup(password)
-                .onSuccess {
-                    syncWalletsBackupPasswordCommunicator.respond(SyncWalletsBackupPasswordResponder.Response(isSyncingSuccessful = true))
-                    router.back()
-                }.onFailure { throwable ->
-                    // TODO Antony: Handle CannotApplyNonDestructiveDiff
-                    val titleAndMessage = mapWriteBackupFailureToUi(resourceManager, throwable)
-                    titleAndMessage?.let { showError(it) }
-                }
-
-            showProgress(false)
-        }
+    override suspend fun internalContinueClicked(password: String) {
+        interactor.uploadInitialBackup(password)
+            .onSuccess {
+                syncWalletsBackupPasswordCommunicator.respond(SyncWalletsBackupPasswordResponder.Response(isSyncingSuccessful = true))
+                router.back()
+            }.onFailure { throwable ->
+                // TODO Antony: Handle CannotApplyNonDestructiveDiff
+                val titleAndMessage = mapWriteBackupFailureToUi(resourceManager, throwable)
+                titleAndMessage?.let { showError(it) }
+            }
     }
 
     override fun backClicked() {

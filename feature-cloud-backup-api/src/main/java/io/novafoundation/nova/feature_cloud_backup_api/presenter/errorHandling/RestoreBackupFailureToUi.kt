@@ -15,12 +15,7 @@ fun mapRestoreBackupFailureToUi(
     corruptedBackupFound: () -> Unit
 ): TitleAndMessage? {
     return when (throwable) {
-        is InvalidBackupPasswordError -> {
-            TitleAndMessage(
-                resourceManager.getString(R.string.cloud_backup_error_invalid_password_title),
-                resourceManager.getString(R.string.cloud_backup_error_invalid_password_message),
-            )
-        }
+        is InvalidBackupPasswordError -> handleCloudBackupInvalidPassword(resourceManager)
 
         is CorruptedBackupError -> {
             corruptedBackupFound()
@@ -41,6 +36,17 @@ fun mapDeleteBackupFailureToUi(
 ): TitleAndMessage? {
     return when (throwable) {
         is CloudBackupUnknownError -> handleCloudBackupUnknownError(resourceManager)
+
+        else -> null
+    }
+}
+
+fun mapCheckPasswordFailureToUi(
+    resourceManager: ResourceManager,
+    throwable: Throwable
+): TitleAndMessage? {
+    return when (throwable) {
+        is InvalidBackupPasswordError -> handleCloudBackupInvalidPassword(resourceManager)
 
         else -> null
     }

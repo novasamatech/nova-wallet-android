@@ -22,6 +22,8 @@ interface CreateCloudBackupPasswordInteractor {
     suspend fun createAndBackupAccount(accountName: String, password: String): Result<Unit>
 
     suspend fun uploadInitialBackup(password: String): Result<Unit>
+
+    suspend fun changePasswordAndSyncBackup(password: String): Result<Unit>
 }
 
 class RealCreateCloudBackupPasswordInteractor(
@@ -82,6 +84,13 @@ class RealCreateCloudBackupPasswordInteractor(
     override suspend fun uploadInitialBackup(password: String): Result<Unit> {
         val cloudBackup = localAccountsCloudBackupFacade.fullBackupInfoFromLocalSnapshot()
         return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).onSuccess {
+            cloudBackupService.session.initEnabledBackup(password)
+        }
+    }
+
+    override suspend fun changePasswordAndSyncBackup(password: String): Result<Unit> {
+        val cloudBackup = localAccountsCloudBackupFacade.fullBackupInfoFromLocalSnapshot()
+        return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
             cloudBackupService.session.initEnabledBackup(password)
         }
     }

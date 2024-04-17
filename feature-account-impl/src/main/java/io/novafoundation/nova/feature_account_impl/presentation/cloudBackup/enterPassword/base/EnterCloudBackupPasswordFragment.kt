@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup
+package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.base
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,12 +16,17 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.enterBackupPasswordSubtitle
+import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.enterBackupPasswordTitle
 import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupContinueBtn
 import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupForgotPassword
 import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupInput
 import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupToolbar
 
-class RestoreCloudBackupFragment : BaseFragment<RestoreCloudBackupViewModel>() {
+abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordViewModel> : BaseFragment<T>() {
+
+    abstract val titleRes: Int
+    abstract val subtitleRes: Int
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,20 +40,16 @@ class RestoreCloudBackupFragment : BaseFragment<RestoreCloudBackupViewModel>() {
         restoreCloudBackupToolbar.applyStatusBarInsets()
         restoreCloudBackupToolbar.setHomeButtonListener { viewModel.backClicked() }
 
+        enterBackupPasswordTitle.setText(titleRes)
+        enterBackupPasswordSubtitle.setText(subtitleRes)
+
         restoreCloudBackupContinueBtn.prepareForProgress(viewLifecycleOwner)
         restoreCloudBackupContinueBtn.setOnClickListener { viewModel.continueClicked() }
         restoreCloudBackupInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }
         restoreCloudBackupForgotPassword.setOnClickListener { viewModel.forgotPasswordClicked() }
     }
 
-    override fun inject() {
-        FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
-            .restoreCloudBackupFactory()
-            .create(this)
-            .inject(this)
-    }
-
-    override fun subscribe(viewModel: RestoreCloudBackupViewModel) {
+    override fun subscribe(viewModel: T) {
         observeActionBottomSheet(viewModel)
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.confirmationAwaitableAction)
 

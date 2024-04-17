@@ -15,6 +15,8 @@ import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_impl.R
+import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createBackupPasswordSubtitle
+import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createBackupPasswordTitle
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordConfirmInput
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordContinue
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordInput
@@ -25,6 +27,9 @@ import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.crea
 import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordToolbar
 
 abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> : BaseFragment<T>() {
+
+    abstract val titleRes: Int
+    abstract val subtitleRes: Int
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +42,9 @@ abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> :
     override fun initViews() {
         createCloudBackupPasswordToolbar.applyStatusBarInsets()
         createCloudBackupPasswordToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        createBackupPasswordTitle.setText(titleRes)
+        createBackupPasswordSubtitle.setText(subtitleRes)
 
         createCloudBackupPasswordContinue.setOnClickListener { viewModel.continueClicked() }
         createCloudBackupPasswordInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }

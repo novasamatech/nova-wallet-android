@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup.di
+package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -12,30 +12,28 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RestoreCloudBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup.RestoreCloudBackupViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.CheckCloudBackupPasswordViewModel
 
 @Module(includes = [ViewModelModule::class])
-class RestoreCloudBackupModule {
+class CheckCloudBackupPasswordModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(RestoreCloudBackupViewModel::class)
+    @ViewModelKey(CheckCloudBackupPasswordViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
         resourceManager: ResourceManager,
-        interactor: RestoreCloudBackupInteractor,
-        accountInteractor: AccountInteractor,
+        interactor: EnterCloudBackupInteractor,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
-        return RestoreCloudBackupViewModel(
+        return CheckCloudBackupPasswordViewModel(
             router,
             resourceManager,
             interactor,
             actionBottomSheetLauncher,
-            accountInteractor,
             actionAwaitableMixinFactory
         )
     }
@@ -44,10 +42,10 @@ class RestoreCloudBackupModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): RestoreCloudBackupViewModel {
+    ): CheckCloudBackupPasswordViewModel {
         return ViewModelProvider(
             fragment,
             viewModelFactory
-        ).get(RestoreCloudBackupViewModel::class.java)
+        ).get(CheckCloudBackupPasswordViewModel::class.java)
     }
 }
