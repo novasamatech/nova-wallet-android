@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R

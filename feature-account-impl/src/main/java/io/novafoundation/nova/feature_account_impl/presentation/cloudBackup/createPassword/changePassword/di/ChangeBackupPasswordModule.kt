@@ -11,11 +11,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
-import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.changePassword.ChangeBackupPasswordViewModel
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.SyncWalletsBackupPasswordViewModel
 
 @Module(includes = [ViewModelModule::class])
 class ChangeBackupPasswordModule {

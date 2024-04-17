@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPass
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.base.BackupCreatePasswordViewModel
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapWriteBackupFailureToUi
-import kotlinx.coroutines.launch
 
 class CreateWalletBackupPasswordViewModel(
     router: AccountRouter,
