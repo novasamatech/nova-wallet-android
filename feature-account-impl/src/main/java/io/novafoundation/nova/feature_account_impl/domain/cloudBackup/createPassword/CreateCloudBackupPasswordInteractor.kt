@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword
 
+import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
@@ -9,6 +10,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Se
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword
 import io.novafoundation.nova.feature_cloud_backup_api.domain.initEnabledBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
@@ -23,7 +25,7 @@ interface CreateCloudBackupPasswordInteractor {
 
     suspend fun uploadInitialBackup(password: String): Result<Unit>
 
-    suspend fun changePasswordAndSyncBackup(password: String): Result<Unit>
+    suspend fun changePassword(password: String): Result<Unit>
 }
 
 class RealCreateCloudBackupPasswordInteractor(
@@ -88,10 +90,12 @@ class RealCreateCloudBackupPasswordInteractor(
         }
     }
 
-    override suspend fun changePasswordAndSyncBackup(password: String): Result<Unit> {
-        val cloudBackup = localAccountsCloudBackupFacade.fullBackupInfoFromLocalSnapshot()
-        return cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password)).mapCatching {
-            cloudBackupService.session.initEnabledBackup(password)
-        }
+    override suspend fun changePassword(password: String): Result<Unit> {
+        return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
+            .flatMap { cloudBackup ->
+                cloudBackupService.writeBackupToCloud(WriteBackupRequest(cloudBackup, password))
+            }.map {
+                cloudBackupService.session.setSavedPassword(password)
+            }
     }
 }

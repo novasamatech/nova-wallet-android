@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.chan
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.base.BackupCreatePasswordViewModel
-import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapWriteBackupFailureToUi
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapChangePasswordValidationStatusToUi
 
 class ChangeBackupPasswordViewModel(
     router: AccountRouter,
@@ -24,14 +24,13 @@ class ChangeBackupPasswordViewModel(
 ) {
 
     override suspend fun internalContinueClicked(password: String) {
-        interactor.changePasswordAndSyncBackup(password)
+        interactor.changePassword(password)
             .onSuccess {
                 changeBackupPasswordCommunicator.respond(ChangeBackupPasswordResponder.Success)
                 router.back()
             }.onFailure { throwable ->
-                // TODO Antony: Handle CannotApplyNonDestructiveDiff
-                val titleAndMessage = mapWriteBackupFailureToUi(resourceManager, throwable)
-                titleAndMessage?.let { showError(it) }
+                val titleAndMessage = mapChangePasswordValidationStatusToUi(resourceManager, throwable)
+                showError(titleAndMessage)
             }
     }
 }
