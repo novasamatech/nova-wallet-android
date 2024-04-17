@@ -27,6 +27,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
@@ -141,7 +143,7 @@ class RpcCalls(
      *  @param blockNumber - if null, then the  best block hash is returned
      */
     suspend fun getBlockHash(chainId: ChainId, blockNumber: BlockNumber? = null): String {
-        return socketFor(chainId).executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
+        return socketFor(chainId).getBlockHash(blockNumber)
     }
 
     suspend fun getStorageSize(chainId: ChainId, storageKey: String): BigInteger {
@@ -158,4 +160,24 @@ class RpcCalls(
             weight = bindWeight(asStruct["weight"])
         )
     }
+}
+
+suspend fun SocketService.getBlockHash(blockNumber: BlockNumber? = null): String {
+    return executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
+}
+
+suspend fun SocketService.systemChain(): String {
+    return executeAsync(SystemChainRequest(), mapper = pojo<String>().nonNull())
+}
+
+suspend fun SocketService.stateGetMetadata(): String {
+    return executeAsync(GetMetadataRequest, mapper = pojo<String>().nonNull())
+}
+
+suspend fun SocketService.systemChainType(): String {
+    return executeAsync(SystemChainTypeRequest(), mapper = pojo<String>().nonNull())
+}
+
+suspend fun SocketService.systemProperties(): SystemProperties {
+    return executeAsync(SystemPropertiesRequest(), mapper = pojo<SystemProperties>().nonNull())
 }

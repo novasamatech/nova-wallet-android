@@ -17,11 +17,13 @@ import org.junit.Before
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-open class BaseIntegrationTest {
+open class BaseIntegrationTest(private val allowChainRegistryConnections: Boolean = true) {
 
     protected val context: Context = ApplicationProvider.getApplicationContext()
 
     protected val runtimeApi = FeatureUtils.getFeature<RuntimeComponent>(context, RuntimeApi::class.java)
+
+    protected val commonApi = FeatureUtils.getCommonApi(context)
 
     val chainRegistry = runtimeApi.chainRegistry()
 
@@ -29,7 +31,11 @@ open class BaseIntegrationTest {
 
     @Before
     fun setup() = runBlocking {
-        externalRequirementFlow.emit(ChainConnection.ExternalRequirement.ALLOWED)
+        if (allowChainRegistryConnections) {
+            externalRequirementFlow.emit(ChainConnection.ExternalRequirement.ALLOWED)
+        } else {
+            externalRequirementFlow.emit(ChainConnection.ExternalRequirement.STOPPED)
+        }
     }
 
     protected fun runTest(action: suspend CoroutineScope.() -> Unit) {
