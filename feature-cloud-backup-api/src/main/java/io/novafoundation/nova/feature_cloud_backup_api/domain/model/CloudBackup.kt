@@ -36,7 +36,7 @@ data class CloudBackup(
             val chainId: ChainId,
             val publicKey: ByteArray?,
             val accountId: ByteArray,
-            val cryptoType: CryptoType?,
+            val cryptoType: ChainAccountCryptoType?,
         ) {
 
             override fun equals(other: Any?): Boolean {
@@ -54,6 +54,10 @@ data class CloudBackup(
                 result = 31 * result + accountId.contentHashCode()
                 result = 31 * result + (cryptoType?.hashCode() ?: 0)
                 return result
+            }
+
+            enum class ChainAccountCryptoType {
+                SR25519, ED25519, ECDSA, ETHEREUM
             }
         }
 

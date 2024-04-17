@@ -21,8 +21,11 @@ import io.novafoundation.nova.feature_account_impl.mock.LocalAccountsMocker
 import io.novafoundation.nova.feature_account_impl.mock.SecretStoreMocker
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo.KeyPairSecrets
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo.ChainAccountInfo.ChainAccountCryptoType
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.argThat
@@ -32,12 +35,14 @@ import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -61,6 +66,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
     lateinit var facade: RealLocalAccountsCloudBackupFacade
 
+    @Mock
+    lateinit var chainRegistry: ChainRegistry
+
     private val ethereumDerivationPath = "//44//60//0/0/0"
 
 
@@ -70,7 +78,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
             secretsStoreV2 = secretStore,
             accountDao = metaAccountDao,
             cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker,
-            metaAccountChangedEvents = metaAccountChangesEventBus
+            metaAccountChangedEvents = metaAccountChangesEventBus,
+            chainRegistry = chainRegistry
+
         )
 
         whenever(cloudBackupAccountsModificationsTracker.getAccountsLastModifiedAt()).thenReturn(TEST_MODIFIED_AT)
@@ -79,6 +89,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
     @Test
     fun fullBackupInfoForDefaultBuilderConfiguration() = runBlocking {
         val uuid = "id"
+
+        allChainsAreEvm(false)
 
         LocalAccountsMocker.setupMocks(metaAccountDao) {
             metaAccount(0) {
@@ -110,6 +122,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
         val uuid = "id"
 
         val zero32Bytes = ByteArray(32)
+
+        allChainsAreEvm(false)
 
         LocalAccountsMocker.setupMocks(metaAccountDao) {
             metaAccount(0) {
@@ -158,6 +172,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
     @Test
     fun shouldConstructFullBackupOfMultipleWallets() = runBlocking {
         val walletsCount = 3
+
+        allChainsAreEvm(false)
 
         LocalAccountsMocker.setupMocks(metaAccountDao) {
             generateWallets(walletsCount) { walletIndex, uuid, bytes32, bytes20 ->
@@ -214,7 +230,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(chainId(index)) {
                             publicKey(bytes32)
                             accountId(bytes32)
-                            cryptoType(CryptoType.ED25519)
+                            cryptoType(ChainAccountCryptoType.ED25519)
                         }
                     }
                 }
@@ -261,6 +277,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
         val ledgerDerivationPathSecretName = expectedLedgerDerivationPathKey(chainId = chainId)
 
+        allChainsAreEvm(false)
+
         LocalAccountsMocker.setupMocks(metaAccountDao) {
             metaAccount(metaId) {
                 globallyUniqueId(uuid)
@@ -306,9 +324,64 @@ class RealLocalAccountsCloudBackupFacadeTest {
     }
 
     @Test
+    fun shouldConstructFullBackupOfEvmChainAccount() = runBlocking {
+        val uuid = "id"
+
+        val zero32Bytes = ByteArray(32)
+        val chainId = chainId(0)
+        val metaId = 0L
+
+        allChainsAreEvm(true)
+
+        LocalAccountsMocker.setupMocks(metaAccountDao) {
+            metaAccount(metaId) {
+                globallyUniqueId(uuid)
+
+                chainAccount(chainId) {
+                    accountId(zero32Bytes)
+                    cryptoType(CryptoType.ECDSA)
+                }
+            }
+        }
+
+        SecretStoreMocker.setupMocks(secretStore) {
+            metaAccount(metaId) {
+                chainAccount(accountId = zero32Bytes) {
+                    keypair(BaseKeypair(zero32Bytes, zero32Bytes))
+                }
+            }
+        }
+
+        val expectedCloudBackup = buildTestCloudBackup {
+            publicData {
+                wallet(uuid) {
+                    chainAccount(chainId) {
+                        accountId(zero32Bytes)
+                        cryptoType(ChainAccountCryptoType.ETHEREUM)
+                    }
+                }
+            }
+
+            privateData {
+                wallet(uuid) {
+                    chainAccount(zero32Bytes) {
+                        keypair(KeyPairSecrets(zero32Bytes, zero32Bytes, nonce = null))
+                    }
+                }
+            }
+        }
+
+        val actualCloudBackup = facade.fullBackupInfoFromLocalSnapshot()
+
+        assertEquals(expectedCloudBackup, actualCloudBackup)
+    }
+
+    @Test
     fun shouldApplyAddAccountDiff() = runBlocking {
         LocalAccountsMocker.setupMocks(metaAccountDao) {}
         SecretStoreMocker.setupMocks(secretStore) {}
+
+        allChainsAreEvm(false)
 
         val localBackup = buildTestCloudBackup {
             publicData {
@@ -331,7 +404,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(chainId(index)) {
                             publicKey(bytes32)
                             accountId(bytes32)
-                            cryptoType(CryptoType.ED25519)
+                            cryptoType(ChainAccountCryptoType.ED25519)
                         }
                     }
                 }
@@ -394,6 +467,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
     @Test
     fun shouldApplyRemoveAccountDiff(): Unit = runBlocking {
+        allChainsAreEvm(false)
+
         LocalAccountsMocker.setupMocks(metaAccountDao) {
             generateWallets(walletsCount = 1) { walletIndex, uuid, bytes32, bytes20 ->
                 metaAccount(walletIndex) {
@@ -448,7 +523,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(chainId(index)) {
                             publicKey(bytes32)
                             accountId(bytes32)
-                            cryptoType(CryptoType.ED25519)
+                            cryptoType(ChainAccountCryptoType.ED25519)
                         }
                     }
                 }
@@ -517,6 +592,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
     fun shouldApplyModifyAccountDiff(): Unit = runBlocking {
         val changedBytes32 = bytes32of(3)
 
+        allChainsAreEvm(false)
+
         LocalAccountsMocker.setupMocks(metaAccountDao) {
             generateWallets(walletsCount = 1) { walletIndex, uuid, bytes32, bytes20 ->
                 metaAccount(walletIndex) {
@@ -571,7 +648,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(chainId(index)) {
                             publicKey(bytes32)
                             accountId(bytes32)
-                            cryptoType(CryptoType.ED25519)
+                            cryptoType(ChainAccountCryptoType.ED25519)
                         }
                     }
                 }
@@ -685,6 +762,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
     @Test
     fun shouldSaveLedgerAccountSecrets(): Unit = runBlocking {
+        allChainsAreEvm(false)
+
         LocalAccountsMocker.setupMocks(metaAccountDao) {
         }
 
@@ -767,6 +846,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
         val changedDerivationPath = "//3"
 
         val additionalSecretKey = expectedLedgerDerivationPathKey(chainId)
+
+        allChainsAreEvm(false)
 
         LocalAccountsMocker.setupMocks(metaAccountDao) {
             generateWallets(walletsCount = 1) { walletIndex, uuid, bytes32, _ ->
@@ -882,6 +963,61 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verifyEvent(expectedEvent)
     }
 
+    @Test
+    fun shouldAddEvmChainAccount() = runBlocking {
+        LocalAccountsMocker.setupMocks(metaAccountDao) {}
+        SecretStoreMocker.setupMocks(secretStore) {}
+
+        allChainsAreEvm(true)
+
+        val localBackup = buildTestCloudBackup {
+            publicData {
+            }
+
+            privateData { }
+        }
+
+        val cloudBackup = buildTestCloudBackup {
+            publicData {
+                generateWallets(walletsCount = 1) { index, uuid, bytes32, _ ->
+                    wallet(uuid) {
+                        chainAccount(chainId(index)) {
+                            publicKey(bytes32)
+                            accountId(bytes32)
+                            cryptoType(ChainAccountCryptoType.ETHEREUM)
+                        }
+                    }
+                }
+            }
+
+            privateData {
+                generateWallets(walletsCount = 1) { index, uuid, bytes32, _ ->
+                    wallet(uuid) {
+                        chainAccount(accountId = bytes32) {
+                            entropy(bytes32)
+                            seed(bytes32)
+                            derivationPath("//${index}")
+                            keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
+                        }
+                    }
+                }
+            }
+        }
+
+        val diff = localBackup.localVsCloudDiff(cloudBackup, BackupDiffStrategy.overwriteLocal())
+
+        facade.applyBackupDiff(diff, cloudBackup)
+
+        val bytes32 = bytes32of(0)
+
+        verify(metaAccountDao).insertMetaAccount(metaAccountWithUuid(walletUUid(0)))
+        verify(metaAccountDao).insertChainAccounts(argThat {
+            val item = it.single()
+
+            item.accountId.contentEquals(bytes32) && item.cryptoType == CryptoType.ECDSA
+        })
+    }
+
     private suspend fun verifyEvent(event: MetaAccountChangesEventBus.Event?) {
         if (event == null) {
             verify(metaAccountChangesEventBus, never()).notify(any())
@@ -942,4 +1078,38 @@ class RealLocalAccountsCloudBackupFacadeTest {
     private fun bytes20of(byte: Int) = ByteArray(20) { byte.toByte() }
 
     private fun chainId(idx: Long) = "0x${idx}"
+
+    private suspend fun chainIsEvm(chainId: ChainId, isEvm: Boolean) {
+        return chainsAreEvm(mapOf(chainId to isEvm))
+    }
+
+    private suspend fun chainsAreEvm(isEvm: Map<ChainId, Boolean>) {
+        val chainsById = isEvm.mapValues { (chainId, isEvm) ->
+            val chainMock = Mockito.mock(Chain::class.java)
+            whenever(chainMock.isEthereumBased).thenReturn(isEvm)
+
+            chainMock
+        }
+        val chainsFlow = MutableSharedFlow<Map<ChainId, Chain>>(replay = 1)
+        chainsFlow.emit(chainsById)
+
+        whenever(chainRegistry.chainsById).thenReturn(chainsFlow)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private suspend fun allChainsAreEvm(isEvm: Boolean) {
+        val chainsById: Map<ChainId, Chain> = Mockito.mock(Map::class.java) as Map<ChainId, Chain>
+        whenever(chainsById.get(any())).thenAnswer {
+            val chainMock = Mockito.mock(Chain::class.java)
+
+            whenever(chainMock.isEthereumBased).thenReturn(isEvm)
+
+            chainMock
+        }
+
+        val chainsFlow = MutableSharedFlow<Map<ChainId, Chain>>(replay = 1)
+        chainsFlow.emit(chainsById)
+
+        whenever(chainRegistry.chainsById).thenReturn(chainsFlow)
+    }
 }

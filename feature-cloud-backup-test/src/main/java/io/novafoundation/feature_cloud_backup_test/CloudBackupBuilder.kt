@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo.SubstrateSecrets
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo.ChainAccountInfo
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo.ChainAccountInfo.ChainAccountCryptoType
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -293,7 +294,7 @@ class WalletChainAccountInfoBuilder(
 
     private var _publicKey: ByteArray? = null
     private var _accountId: ByteArray = ByteArray(32)
-    private var _cryptoType: CryptoType? = null
+    private var _cryptoType: ChainAccountCryptoType? = null
 
     fun publicKey(value: ByteArray) {
         _publicKey = value
@@ -303,7 +304,7 @@ class WalletChainAccountInfoBuilder(
         _accountId = value
     }
 
-    fun cryptoType(cryptoType: CryptoType) {
+    fun cryptoType(cryptoType: ChainAccountCryptoType) {
         _cryptoType = cryptoType
     }
 
