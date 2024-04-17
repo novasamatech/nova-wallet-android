@@ -343,7 +343,9 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private suspend fun prepareChainAccountsFromAdditionalSecrets(metaAccountLocal: JoinedMetaAccountInfo): List<CloudBackup.WalletPrivateInfo.ChainAccountSecrets> {
+    private suspend fun prepareChainAccountsFromAdditionalSecrets(
+        metaAccountLocal: JoinedMetaAccountInfo
+    ): List<CloudBackup.WalletPrivateInfo.ChainAccountSecrets> {
         return when (metaAccountLocal.metaAccount.type) {
             MetaAccountLocal.Type.LEDGER -> prepareLedgerChainAccountSecrets(metaAccountLocal)
 
