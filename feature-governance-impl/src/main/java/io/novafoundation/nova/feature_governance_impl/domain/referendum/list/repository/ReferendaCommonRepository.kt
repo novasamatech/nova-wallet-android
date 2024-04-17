@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -15,7 +16,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.hash
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
-import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumPreview
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
@@ -37,13 +37,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
-import java.math.BigInteger
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import java.math.BigInteger
 
 class ReferendaState(
     val voting: Map<TrackId, Voting>,
@@ -78,13 +79,12 @@ class RealReferendaCommonRepository(
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
 
-        return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
+        return combine(
+            governanceSource.referendaOffChainInfoFlow(chain),
+            chainStateRepository.currentBlockNumberFlow(chain.id)
+        ) { offChainInfo, currentBlockNumber ->
             coroutineScope {
                 val onChainReferenda = async { governanceSource.referenda.getAllOnChainReferenda(chain.id) }
-                val offChainInfo = async {
-                    governanceSource.offChainInfo.referendumPreviews(chain)
-                        .associateBy(OffChainReferendumPreview::referendumId)
-                }
                 val electorate = async { governanceSource.referenda.electorate(chain.id) }
 
                 val onChainVoting = async { voter?.accountId?.let { governanceSource.convictionVoting.votingFor(it, chain.id) }.orEmpty() }
@@ -97,7 +97,7 @@ class RealReferendaCommonRepository(
                     selectedGovernanceOption = governanceOption,
                     tracksById = tracksById,
                     currentBlockNumber = currentBlockNumber,
-                    offChainInfo = offChainInfo.await(),
+                    offChainInfo = offChainInfo,
                     electorate = electorate.await()
                 )
 
@@ -118,13 +118,12 @@ class RealReferendaCommonRepository(
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
 
-        return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
+        return combine(
+            governanceSource.referendaOffChainInfoFlow(chain),
+            chainStateRepository.currentBlockNumberFlow(chain.id)
+        ) { offChainInfo, currentBlockNumber ->
             coroutineScope {
                 val onChainReferenda = async { governanceSource.referenda.getAllOnChainReferenda(chain.id) }
-                val offChainInfo = async {
-                    governanceSource.offChainInfo.referendumPreviews(chain)
-                        .associateBy(OffChainReferendumPreview::referendumId)
-                }
                 val electorate = async { governanceSource.referenda.electorate(chain.id) }
 
                 val onChainVoting = async { governanceSource.convictionVoting.votingFor(voter.accountId, chain.id) }
@@ -137,13 +136,24 @@ class RealReferendaCommonRepository(
                     selectedGovernanceOption = selectedGovernanceOption,
                     tracksById = tracksById,
                     currentBlockNumber = currentBlockNumber,
-                    offChainInfo = offChainInfo.await(),
+                    offChainInfo = offChainInfo,
                     electorate = electorate.await()
                 )
 
                 val sorting = referendaSortingProvider.getReferendumSorting()
                 referenda.onlyVoted().sortedWith(sorting)
             }
+        }
+    }
+
+    private fun GovernanceSource.referendaOffChainInfoFlow(chain: Chain): Flow<Map<ReferendumId, OffChainReferendumPreview>> {
+        return flow {
+            emit(emptyMap())
+
+            val offChainInfo = offChainInfo.referendumPreviews(chain)
+                .associateBy(OffChainReferendumPreview::referendumId)
+
+            emit(offChainInfo)
         }
     }
 
@@ -302,6 +312,7 @@ class RealReferendaCommonRepository(
                             ReferendumProposal.Hash(hashHex.requireHexPrefix())
                         }
                     }
+
                     null -> null
                 }
             }
