@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
@@ -31,6 +32,7 @@ class CloudBackupSettingsModule {
         cloudBackupSettingsInteractor: CloudBackupSettingsInteractor,
         syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
         changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+        restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
         progressDialogMixin: ProgressDialogMixin,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -42,6 +44,7 @@ class CloudBackupSettingsModule {
             cloudBackupSettingsInteractor,
             syncWalletsBackupPasswordCommunicator,
             changeBackupPasswordCommunicator,
+            restoreBackupPasswordCommunicator,
             actionBottomSheetLauncher,
             progressDialogMixin,
             actionAwaitableMixinFactory,

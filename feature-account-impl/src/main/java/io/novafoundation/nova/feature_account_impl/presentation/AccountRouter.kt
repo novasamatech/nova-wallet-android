@@ -85,5 +85,7 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openChangeBackupPasswordFlow()
 
+    fun openRestoreBackupPassword()
+
     fun openChangeBackupPassword()
 }

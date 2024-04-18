@@ -14,6 +14,8 @@ import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLa
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordRequester
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordRequester
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordRequester
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupAuthFailed
@@ -23,6 +25,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.aw
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.PasswordNotSaved
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeprecatedPasswordAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCloudBackupSyncFailed
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapDeleteBackupFailureToUi
 import io.novafoundation.nova.feature_settings_impl.R
@@ -41,6 +44,7 @@ class BackupSettingsViewModel(
     private val cloudBackupSettingsInteractor: CloudBackupSettingsInteractor,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+    private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
     val progressDialogMixin: ProgressDialogMixin,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -70,19 +74,11 @@ class BackupSettingsViewModel(
 
     init {
         syncCloudBackupState()
-        observeChangeBackupPasswordResult()
+        observeRequesterResults()
 
         launch {
             cloudBackupEnabled.value = cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()
         }
-    }
-
-    private fun observeChangeBackupPasswordResult() {
-        changeBackupPasswordCommunicator.responseFlow
-            .onEach {
-                syncCloudBackupState()
-            }
-            .launchIn(this)
     }
 
     fun backClicked() {
@@ -147,7 +143,11 @@ class BackupSettingsViewModel(
     }
 
     fun problemButtonClicked() {
-        TODO()
+        when (syncedState.value) {
+            BackupSyncOutcome.UnknownPassword -> openRestorePassword()
+
+            else -> {}
+        }
     }
 
     private fun syncCloudBackupState() {
@@ -195,7 +195,11 @@ class BackupSettingsViewModel(
                     else -> onOtherError.invoke()
                 }
 
-                val titleAndMessage = mapCloudBackupSyncFailed(resourceManager, throwable)
+                val titleAndMessage = mapCloudBackupSyncFailed(
+                    resourceManager,
+                    throwable,
+                    onPasswordDeprecated = { actionBottomSheetLauncher.launchDeprecatedPasswordAction(resourceManager, ::openRestorePassword) }
+                )
                 titleAndMessage?.let { showError(it) }
             }
 
@@ -228,6 +232,22 @@ class BackupSettingsViewModel(
 
     private fun onDeleteBackupClicked() {
         actionBottomSheetLauncher.launchDeleteBackupAction(resourceManager, ::confirmCloudBackupDelete)
+    }
+
+    private fun observeRequesterResults() {
+        changeBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
+        restoreBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
+    }
+
+    private fun Flow<Any>.syncBackupOnEach() {
+        this.onEach {
+            syncCloudBackupState()
+        }
+            .launchIn(this@BackupSettingsViewModel)
+    }
+
+    private fun openRestorePassword() {
+        restoreBackupPasswordCommunicator.openRequest(RestoreBackupPasswordRequester.EmptyRequest)
     }
 
     private fun confirmCloudBackupDelete() {
