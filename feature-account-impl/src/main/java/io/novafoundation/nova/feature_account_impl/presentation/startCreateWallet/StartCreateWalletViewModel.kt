@@ -4,18 +4,14 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.addColor
 import io.novafoundation.nova.common.utils.finally
-import io.novafoundation.nova.common.utils.formatting.spannable.spannableFormatting
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
-import io.novafoundation.nova.common.view.bottomSheet.action.primary
-import io.novafoundation.nova.common.view.bottomSheet.action.secondary
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchExistingCloudBackupAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapPreCreateValidationStatusToUi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -104,21 +100,7 @@ class StartCreateWalletViewModel(
     }
 
     private fun userHasExistingBackup() {
-        actionBottomSheetLauncher.launchBottomSheet(
-            imageRes = R.drawable.ic_cloud_backup_sync,
-            title = resourceManager.getString(R.string.existing_cloud_backup_found_title),
-            subtitle = with(resourceManager) {
-                val highlightedPart = getString(R.string.existing_cloud_backup_found_subtitle_highlight)
-                    .addColor(getColor(R.color.text_primary))
-
-                getString(R.string.existing_cloud_backup_found_subtitle).spannableFormatting(highlightedPart)
-            },
-            neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
-            actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
-                resourceManager.getString(R.string.existing_cloud_backup_found_button),
-                ::openImportCloudBackup
-            )
-        )
+        actionBottomSheetLauncher.launchExistingCloudBackupAction(resourceManager, ::openImportCloudBackup)
     }
 
     private fun openImportCloudBackup() {

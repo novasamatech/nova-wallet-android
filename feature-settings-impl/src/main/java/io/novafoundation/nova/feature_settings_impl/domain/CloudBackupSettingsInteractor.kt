@@ -19,6 +19,7 @@ interface CloudBackupSettingsInteractor {
     suspend fun syncCloudBackup(): Result<Unit>
 
     suspend fun setCloudBackupSyncEnabled(enable: Boolean)
+    suspend fun deleteCloudBackup(): Result<Unit>
 }
 
 class RealCloudBackupSettingsInteractor(
@@ -47,5 +48,9 @@ class RealCloudBackupSettingsInteractor(
 
     override suspend fun isSyncCloudBackupEnabled(): Boolean {
         return cloudBackupService.session.isSyncWithCloudEnabled()
+    }
+
+    override suspend fun deleteCloudBackup(): Result<Unit> {
+        return cloudBackupService.deleteBackup()
     }
 }

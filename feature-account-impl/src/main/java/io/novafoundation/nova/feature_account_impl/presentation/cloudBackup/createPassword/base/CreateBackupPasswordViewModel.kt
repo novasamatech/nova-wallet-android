@@ -3,16 +3,13 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.cre
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.addColor
-import io.novafoundation.nova.common.utils.formatting.spannable.spannableFormatting
 import io.novafoundation.nova.common.utils.toggle
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
-import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchRememberPasswordWarning
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -80,16 +77,6 @@ abstract class BackupCreatePasswordViewModel(
     }
 
     private fun showPasswordWarningDialog() {
-        actionBottomSheetLauncher.launchBottomSheet(
-            imageRes = R.drawable.ic_cloud_backup_lock,
-            title = resourceManager.getString(R.string.create_cloud_backup_password_alert_title),
-            subtitle = with(resourceManager) {
-                val highlightedPart = getString(R.string.create_cloud_backup_password_alert_subtitle_highlighted)
-                    .addColor(getColor(R.color.text_primary))
-
-                getString(R.string.create_cloud_backup_password_alert_subtitle).spannableFormatting(highlightedPart)
-            },
-            actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(resourceManager.getString(R.string.common_got_it))
-        )
+        actionBottomSheetLauncher.launchRememberPasswordWarning(resourceManager)
     }
 }

@@ -68,15 +68,14 @@ private fun mapCloudBackupClickability(
     if (!backupEnabled) return false
     if (syncingInProgress) return false
 
-    // TODO Antony: check and adapt if needed when implementing each individual state handling
     return when (syncOutcome) {
         BackupSyncOutcome.Ok,
         BackupSyncOutcome.DestructiveDiff,
         BackupSyncOutcome.UnknownPassword,
         BackupSyncOutcome.CorruptedBackup,
+        BackupSyncOutcome.OtherStorageIssue,
         BackupSyncOutcome.UnknownError -> true
 
-        BackupSyncOutcome.OtherStorageIssue,
         BackupSyncOutcome.StorageAuthFailed -> false
     }
 }
