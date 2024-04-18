@@ -10,19 +10,22 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.initEnabledBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
 
-interface RestoreCloudBackupInteractor {
+interface EnterCloudBackupInteractor {
 
     suspend fun restoreCloudBackup(password: String): Result<Unit>
 
     suspend fun deleteCloudBackup(): Result<Unit>
+
+    suspend fun confirmCloudBackupPassword(password: String): Result<Unit>
 }
 
-class RealRestoreCloudBackupInteractor(
+class RealEnterCloudBackupInteractor(
     private val cloudBackupService: CloudBackupService,
     private val cloudBackupFacade: LocalAccountsCloudBackupFacade,
     private val accountRepository: AccountRepository,
-) : RestoreCloudBackupInteractor {
+) : EnterCloudBackupInteractor {
 
     override suspend fun restoreCloudBackup(password: String): Result<Unit> {
         return cloudBackupService.fetchAndDecryptExistingBackup(password)
@@ -50,5 +53,14 @@ class RealRestoreCloudBackupInteractor(
 
     override suspend fun deleteCloudBackup(): Result<Unit> {
         return cloudBackupService.deleteBackup()
+    }
+
+    override suspend fun confirmCloudBackupPassword(password: String): Result<Unit> {
+        return cloudBackupService.session.getSavedPassword()
+            .mapCatching {
+                if (it != password) {
+                    throw InvalidBackupPasswordError()
+                }
+            }
     }
 }

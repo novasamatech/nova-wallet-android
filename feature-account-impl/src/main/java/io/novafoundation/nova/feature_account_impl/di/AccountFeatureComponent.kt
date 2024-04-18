@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -23,8 +24,10 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.list.swi
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.di.CreateWalletBackupPasswordComponent
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.changePassword.di.ChangeBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.di.SyncWalletsBackupPasswordComponent
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup.di.RestoreCloudBackupComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.di.CheckCloudBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restoreBackup.di.RestoreCloudBackupComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
@@ -76,7 +79,11 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun syncWalletsBackupPasswordFactory(): SyncWalletsBackupPasswordComponent.Factory
 
+    fun changeBackupPasswordComponentFactory(): ChangeBackupPasswordComponent.Factory
+
     fun restoreCloudBackupFactory(): RestoreCloudBackupComponent.Factory
+
+    fun checkCloudBackupPasswordFactory(): CheckCloudBackupPasswordComponent.Factory
 
     fun pincodeComponentFactory(): PinCodeComponent.Factory
 
@@ -137,6 +144,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,
             @BindsInstance pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
             @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
+            @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

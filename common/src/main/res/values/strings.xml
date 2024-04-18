@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="change_cloud_backup_password_title">Update backup password</string>
+    <string name="change_cloud_backup_password_subtitle">Please enter a password that will be used to recover your wallets from cloud backup. This password can\'t be recovered in the future, so be sure to remember it!</string>
+
+    <string name="confirm_cloud_backup_password_title">Enter current backup password</string>
+    <string name="confirm_cloud_backup_password_subtitle">Please enter the password you created during the backup process</string>
+
     <string name="deleting_backup_progress">Deleting a backup...</string>
     <string name="cloud_backup_delete_action_title">Backup will be deleted from Google Drive</string>
     <string name="cloud_backup_delete_action_subtitle">%s and remember to always keep them offline to restore them anytime. You can do this in the Backup Settings.</string>

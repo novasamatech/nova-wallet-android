@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerif
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -30,7 +31,8 @@ class AccountFeatureHolder @Inject constructor(
     private val selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
     private val selectWalletCommunicator: SelectWalletCommunicator,
     private val pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
-    private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator
+    private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
+    private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -55,6 +57,7 @@ class AccountFeatureHolder @Inject constructor(
                 selectWalletCommunicator = selectWalletCommunicator,
                 pinCodeTwoFactorVerificationCommunicator = pinCodeTwoFactorVerificationCommunicator,
                 syncWalletsBackupPasswordCommunicator = syncWalletsBackupPasswordCommunicator,
+                changeBackupPasswordCommunicator = changeBackupPasswordCommunicator,
                 deps = accountFeatureDependencies
             )
     }

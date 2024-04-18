@@ -38,3 +38,10 @@ fun handleCloudBackupUnknownError(resourceManager: ResourceManager): TitleAndMes
         resourceManager.getString(R.string.cloud_backup_error_google_service_other_message)
     )
 }
+
+fun handleCloudBackupInvalidPassword(resourceManager: ResourceManager): TitleAndMessage {
+    return TitleAndMessage(
+        resourceManager.getString(R.string.cloud_backup_error_invalid_password_title),
+        resourceManager.getString(R.string.cloud_backup_error_invalid_password_message),
+    )
+}

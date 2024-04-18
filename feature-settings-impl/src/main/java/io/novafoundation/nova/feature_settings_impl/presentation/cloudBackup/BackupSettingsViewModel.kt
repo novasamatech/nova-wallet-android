@@ -12,11 +12,12 @@ import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordRequester
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordRequester
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupAuthFailed
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotFound
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupWrongPassword
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeleteBackupAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitDeleteBackupConfirmation
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
@@ -30,6 +31,8 @@ import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class BackupSettingsViewModel(
@@ -37,6 +40,7 @@ class BackupSettingsViewModel(
     private val router: SettingsRouter,
     private val cloudBackupSettingsInteractor: CloudBackupSettingsInteractor,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
+    private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
     val progressDialogMixin: ProgressDialogMixin,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -65,11 +69,20 @@ class BackupSettingsViewModel(
     }
 
     init {
-        initSyncCloudBackupState()
+        syncCloudBackupState()
+        observeChangeBackupPasswordResult()
 
         launch {
             cloudBackupEnabled.value = cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()
         }
+    }
+
+    private fun observeChangeBackupPasswordResult() {
+        changeBackupPasswordCommunicator.responseFlow
+            .onEach {
+                syncCloudBackupState()
+            }
+            .launchIn(this)
     }
 
     fun backClicked() {
@@ -111,7 +124,6 @@ class BackupSettingsViewModel(
 
     fun cloudBackupManageClicked() {
         when (syncedState.value) {
-            BackupSyncOutcome.Ok,
             BackupSyncOutcome.StorageAuthFailed -> return
 
             BackupSyncOutcome.UnknownPassword,
@@ -138,7 +150,7 @@ class BackupSettingsViewModel(
         TODO()
     }
 
-    private fun initSyncCloudBackupState() {
+    private fun syncCloudBackupState() {
         launch {
             if (cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()) {
                 syncBackupInternal(
@@ -179,7 +191,7 @@ class BackupSettingsViewModel(
                 // TODO Antony: handle `PasswordNotSaved`
                 when (throwable) {
                     is CloudBackupNotFound -> onBackupNotFound.invoke()
-                    is CloudBackupWrongPassword, is PasswordNotSaved -> onUnknownPassword.invoke()
+                    is InvalidBackupPasswordError, is PasswordNotSaved -> onUnknownPassword.invoke()
                     else -> onOtherError.invoke()
                 }
 
@@ -211,7 +223,7 @@ class BackupSettingsViewModel(
     }
 
     private fun onChangePasswordClicked() {
-        TODO()
+        changeBackupPasswordCommunicator.openRequest(ChangeBackupPasswordRequester.EmptyRequest)
     }
 
     private fun onDeleteBackupClicked() {

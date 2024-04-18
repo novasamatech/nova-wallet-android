@@ -82,4 +82,8 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun restoreCloudBackup()
 
     fun openSyncWalletsBackupPassword()
+
+    fun openChangeBackupPasswordFlow()
+
+    fun openChangeBackupPassword()
 }

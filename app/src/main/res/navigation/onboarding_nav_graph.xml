@@ -145,7 +145,7 @@
 
     <fragment
         android:id="@+id/restoreCloudBackupFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.restoreBackup.RestoreCloudBackupFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restoreBackup.RestoreCloudBackupFragment"
         android:label="RestoreCloudBackupFragment"
         tools:layout="@layout/fragment_restore_cloud_backup">
 

@@ -19,6 +19,7 @@ interface CloudBackupSettingsInteractor {
     suspend fun syncCloudBackup(): Result<Unit>
 
     suspend fun setCloudBackupSyncEnabled(enable: Boolean)
+
     suspend fun deleteCloudBackup(): Result<Unit>
 }
 

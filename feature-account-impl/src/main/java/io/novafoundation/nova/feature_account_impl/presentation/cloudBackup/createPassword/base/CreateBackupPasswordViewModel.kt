@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchRe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class PasswordInputState(
     val containsMinSymbols: Boolean,
@@ -62,7 +63,15 @@ abstract class BackupCreatePasswordViewModel(
         showPasswordWarningDialog()
     }
 
-    abstract fun continueClicked()
+    fun continueClicked() {
+        launch {
+            backupInProgress.value = true
+            internalContinueClicked(passwordFlow.value)
+            backupInProgress.value = false
+        }
+    }
+
+    abstract suspend fun internalContinueClicked(password: String)
 
     open fun backClicked() {
         router.back()
@@ -70,10 +79,6 @@ abstract class BackupCreatePasswordViewModel(
 
     fun toggleShowPassword() {
         _showPasswords.toggle()
-    }
-
-    fun showProgress(show: Boolean) {
-        backupInProgress.value = show
     }
 
     private fun showPasswordWarningDialog() {

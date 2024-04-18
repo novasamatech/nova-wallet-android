@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -22,13 +19,8 @@ class CreateWalletBackupPasswordFragment : CreateBackupPasswordFragment<CreateWa
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_create_cloud_backup_password, container, false)
-    }
+    override val titleRes: Int = R.string.create_cloud_backup_password_title
+    override val subtitleRes: Int = R.string.create_cloud_backup_password_subtitle
 
     override fun inject() {
         FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)

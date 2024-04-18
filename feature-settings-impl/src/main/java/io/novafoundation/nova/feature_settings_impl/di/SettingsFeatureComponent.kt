@@ -5,6 +5,7 @@ import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -37,6 +38,7 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
         fun create(
             @BindsInstance router: SettingsRouter,
             @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
+            @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
             deps: SettingsFeatureDependencies
         ): SettingsFeatureComponent
     }
