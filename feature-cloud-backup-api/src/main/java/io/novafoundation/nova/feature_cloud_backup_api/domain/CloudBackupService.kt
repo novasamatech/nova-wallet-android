@@ -69,9 +69,9 @@ suspend fun CloudBackupService.fetchAndDecryptExistingBackup(password: String): 
  * @throws InvalidBackupPasswordError
  */
 suspend fun CloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword(): Result<CloudBackup> {
-    return fetchBackup()
-        .flatMap { encryptedBackup ->
-            val password = session.getSavedPassword().getOrThrow()
+    return fetchBackup().flatMap { encryptedBackup ->
+        session.getSavedPassword().flatMap { password ->
             encryptedBackup.decrypt(password)
         }
+    }
 }
