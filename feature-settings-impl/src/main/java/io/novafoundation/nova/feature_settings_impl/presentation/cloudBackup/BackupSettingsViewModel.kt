@@ -123,7 +123,9 @@ class BackupSettingsViewModel(
                 )
             }
 
-            else -> {
+            BackupSyncOutcome.Ok,
+            BackupSyncOutcome.DestructiveDiff,
+            BackupSyncOutcome.UnknownError -> {
                 listSelectorMixin.showSelector(
                     R.string.manage_cloud_backup,
                     listOf(manageBackupChangePasswordItem(), manageBackupDeleteBackupItem())
@@ -221,17 +223,21 @@ class BackupSettingsViewModel(
             confirmationAwaitableAction.awaitDeleteBackupConfirmation()
 
             progressDialogMixin.startProgress(R.string.deleting_backup_progress) {
-                cloudBackupSettingsInteractor.deleteCloudBackup()
-                    .onSuccess {
-                        cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(false)
-                        cloudBackupEnabled.value = false
-                    }
-                    .onFailure { throwable ->
-                        val titleAndMessage = mapDeleteBackupFailureToUi(resourceManager, throwable)
-                        titleAndMessage?.let { showError(it) }
-                    }
+                runDeleteBackup()
             }
         }
+    }
+
+    private suspend fun runDeleteBackup() {
+        cloudBackupSettingsInteractor.deleteCloudBackup()
+            .onSuccess {
+                cloudBackupSettingsInteractor.setCloudBackupSyncEnabled(false)
+                cloudBackupEnabled.value = false
+            }
+            .onFailure { throwable ->
+                val titleAndMessage = mapDeleteBackupFailureToUi(resourceManager, throwable)
+                titleAndMessage?.let { showError(it) }
+            }
     }
 }
 
