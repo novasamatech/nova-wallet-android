@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_cloud_backup_api.domain.model
 
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -37,7 +36,7 @@ data class CloudBackup(
             val chainId: ChainId,
             val publicKey: ByteArray?,
             val accountId: ByteArray,
-            val cryptoType: CryptoType?,
+            val cryptoType: ChainAccountCryptoType?,
         ) {
 
             override fun equals(other: Any?): Boolean {
@@ -55,6 +54,10 @@ data class CloudBackup(
                 result = 31 * result + accountId.contentHashCode()
                 result = 31 * result + (cryptoType?.hashCode() ?: 0)
                 return result
+            }
+
+            enum class ChainAccountCryptoType {
+                SR25519, ED25519, ECDSA, ETHEREUM
             }
         }
 
@@ -97,11 +100,6 @@ data class CloudBackup(
         val substrate: SubstrateSecrets?,
         val ethereum: EthereumSecrets?,
         val chainAccounts: List<ChainAccountSecrets>,
-        /**
-         * Stores additional secrets like derivation path for ledger chain accounts
-         * @see SecretStoreV2.getAdditionalMetaAccountSecret
-         */
-        val additional: Map<String, String>
     ) : Identifiable {
 
         override val identifier: String = walletId
@@ -120,7 +118,6 @@ data class CloudBackup(
             if (substrate != other.substrate) return false
             if (ethereum != other.ethereum) return false
             if (chainAccounts != other.chainAccounts) return false
-            if (additional != other.additional) return false
             return identifier == other.identifier
         }
 
@@ -130,7 +127,6 @@ data class CloudBackup(
             result = 31 * result + (substrate?.hashCode() ?: 0)
             result = 31 * result + (ethereum?.hashCode() ?: 0)
             result = 31 * result + chainAccounts.hashCode()
-            result = 31 * result + additional.hashCode()
             result = 31 * result + identifier.hashCode()
             return result
         }
@@ -139,7 +135,7 @@ data class CloudBackup(
             val accountId: ByteArray,
             val entropy: ByteArray?,
             val seed: ByteArray?,
-            val keypair: KeyPairSecrets,
+            val keypair: KeyPairSecrets?,
             val derivationPath: String?,
         ) {
 
@@ -166,7 +162,7 @@ data class CloudBackup(
                 var result = accountId.contentHashCode()
                 result = 31 * result + (entropy?.contentHashCode() ?: 0)
                 result = 31 * result + (seed?.contentHashCode() ?: 0)
-                result = 31 * result + keypair.hashCode()
+                result = 31 * result + (keypair?.hashCode() ?: 0)
                 result = 31 * result + (derivationPath?.hashCode() ?: 0)
                 return result
             }
@@ -238,5 +234,5 @@ data class CloudBackup(
 }
 
 fun CloudBackup.WalletPrivateInfo.isCompletelyEmpty(): Boolean {
-    return entropy == null && substrate == null && ethereum == null && chainAccounts.isEmpty() && additional.isEmpty()
+    return entropy == null && substrate == null && ethereum == null && chainAccounts.isEmpty()
 }

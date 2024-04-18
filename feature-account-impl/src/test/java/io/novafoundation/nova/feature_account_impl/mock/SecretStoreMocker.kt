@@ -38,10 +38,11 @@ object SecretStoreMocker {
             allSecrets[id]?.chainAccounts?.get(accountId.intoKey())
         }
 
-        whenever(secretStoreV2.allKnownAdditionalSecrets(anyLong())).then { invocation ->
+        whenever(secretStoreV2.getAdditionalMetaAccountSecret(anyLong(), any())).then { invocation ->
             val id = invocation.arguments.first() as Long
+            val secretName = invocation.arguments[1] as String
 
-            allSecrets[id]?.additional.orEmpty()
+            allSecrets[id]?.additional?.get(secretName)
         }
     }
 }

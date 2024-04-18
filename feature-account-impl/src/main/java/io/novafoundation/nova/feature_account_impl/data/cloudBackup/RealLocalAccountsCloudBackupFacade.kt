@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.data.secrets.v2.substrateKeypair
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.mapToSet
+import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
@@ -30,10 +31,15 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeFromLocal
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo.ChainAccountInfo.ChainAccountCryptoType
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
@@ -45,6 +51,7 @@ class RealLocalAccountsCloudBackupFacade(
     private val accountDao: MetaAccountDao,
     private val cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
     private val metaAccountChangedEvents: MetaAccountChangesEventBus,
+    private val chainRegistry: ChainRegistry,
 ) : LocalAccountsCloudBackupFacade {
 
     override suspend fun fullBackupInfoFromLocalSnapshot(): CloudBackup {
@@ -62,36 +69,28 @@ class RealLocalAccountsCloudBackupFacade(
         return allBackupableAccounts.toBackupPublicData()
     }
 
-    override suspend fun createCloudBackupFromInput(
-        modificationTime: Long,
+    override suspend fun constructCloudBackupForFirstWallet(
         metaAccount: MetaAccountLocal,
-        chainAccounts: List<ChainAccountLocal>,
         baseSecrets: EncodableStruct<MetaAccountSecrets>,
-        chainAccountSecrets: Map<ChainId, EncodableStruct<ChainAccountSecrets>>,
-        additionalSecrets: Map<String, String>
     ): CloudBackup {
         val wrappedMetaAccount = listOf(
             RelationJoinedMetaAccountInfo(
-                metaAccount,
-                chainAccounts,
-                null
+                metaAccount = metaAccount,
+                chainAccounts = emptyList(),
+                proxyAccountLocal = null
             )
         )
 
-        val backupChainAccounts = chainAccounts.mapNotNull { chainAccountLocal ->
-            chainAccountSecrets[chainAccountLocal.chainId]?.toBackupSecrets(chainAccountLocal.accountId)
-        }
         val walletPrivateInfo = CloudBackup.WalletPrivateInfo(
             walletId = metaAccount.globallyUniqueId,
             entropy = baseSecrets.entropy,
             substrate = baseSecrets.getSubstrateBackupSecrets(),
             ethereum = baseSecrets.getEthereumBackupSecrets(),
-            chainAccounts = backupChainAccounts,
-            additional = additionalSecrets
+            chainAccounts = emptyList(),
         )
 
         return CloudBackup(
-            publicData = wrappedMetaAccount.toBackupPublicData(modifiedAt = modificationTime),
+            publicData = wrappedMetaAccount.toBackupPublicData(modifiedAt = System.currentTimeMillis()),
             privateData = CloudBackup.PrivateData(
                 wallets = listOf(walletPrivateInfo)
             )
@@ -172,6 +171,11 @@ class RealLocalAccountsCloudBackupFacade(
                 secretsStoreV2.putChainAccountSecrets(metaId, accountId.value, secrets)
             }
 
+            val additional = cloudBackup.getAllAdditionalSecrets(publicWalletInfo)
+            additional.forEach { (secretName, secretValue) ->
+                secretsStoreV2.putAdditionalMetaAccountSecret(metaId, secretName, secretValue)
+            }
+
             MetaAccountChangesEventBus.Event.AccountAdded(
                 metaId = metaId,
                 metaAccountType = mapMetaAccountTypeFromLocal(metaAccountLocal.type)
@@ -241,6 +245,11 @@ class RealLocalAccountsCloudBackupFacade(
                 secretsStoreV2.putChainAccountSecrets(metaId, accountId.value, secrets)
             }
 
+            val additional = cloudVersion.getAllAdditionalSecrets(publicWalletInfo)
+            additional.forEach { (secretName, secretValue) ->
+                secretsStoreV2.putAdditionalMetaAccountSecret(metaId, secretName, secretValue)
+            }
+
             val metaAccountType = mapMetaAccountTypeFromLocal(oldMetaAccountLocal.type)
 
             result.add(
@@ -279,6 +288,29 @@ class RealLocalAccountsCloudBackupFacade(
         ).filterNotNull()
     }
 
+    private fun CloudBackup.getAllAdditionalSecrets(walletPublicInfo: CloudBackup.WalletPublicInfo): Map<String, String> {
+        val privateInfo = privateData.wallets.findById(walletPublicInfo.walletId) ?: return emptyMap()
+        val chainAccountsSecretsByAccountId = privateInfo.chainAccounts.associateBy { it.accountId.intoKey() }
+
+        fun getAllLedgerAdditionalSecrets(): Map<String, String> {
+            return walletPublicInfo.chainAccounts.mapNotNull { publicInfo ->
+                val derivationPath = chainAccountsSecretsByAccountId[publicInfo.accountId.intoKey()]?.derivationPath ?: return@mapNotNull null
+                val secretName = LedgerDerivationPath.derivationPathSecretKey(publicInfo.chainId)
+
+                secretName to derivationPath
+            }.toMap()
+        }
+
+        return when (walletPublicInfo.type) {
+            CloudBackup.WalletPublicInfo.Type.LEDGER -> getAllLedgerAdditionalSecrets()
+
+            CloudBackup.WalletPublicInfo.Type.SECRETS,
+            CloudBackup.WalletPublicInfo.Type.WATCH_ONLY,
+            CloudBackup.WalletPublicInfo.Type.PARITY_SIGNER,
+            CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT -> emptyMap()
+        }
+    }
+
     private suspend fun getAllBackupableAccounts(): List<JoinedMetaAccountInfo> {
         return accountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
             .filter { it.metaAccount.type.isBackupable() }
@@ -296,20 +328,48 @@ class RealLocalAccountsCloudBackupFacade(
         val metaId = joinedMetaAccountInfo.metaAccount.id
         val baseSecrets = secretsStoreV2.getMetaAccountSecrets(metaId)
 
+        val chainAccountsFromChainSecrets = joinedMetaAccountInfo.chainAccounts
+            .mapToSet { it.accountId.intoKey() } // multiple chain accounts might refer to the same account id - remove duplicates
+            .mapNotNull { prepareChainAccountPrivateInfo(metaId, it.value) }
+
+        val chainAccountFromAdditionalSecrets = prepareChainAccountsFromAdditionalSecrets(joinedMetaAccountInfo)
+
         return CloudBackup.WalletPrivateInfo(
             walletId = joinedMetaAccountInfo.metaAccount.globallyUniqueId,
             entropy = baseSecrets?.entropy,
             substrate = baseSecrets.getSubstrateBackupSecrets(),
             ethereum = baseSecrets.getEthereumBackupSecrets(),
-            chainAccounts = joinedMetaAccountInfo.chainAccounts
-                .mapToSet { it.accountId.intoKey() } // multiple chain accounts might refer to the same account id - remove duplicates
-                .mapNotNull { prepareChainAccountPrivateInfo(metaId, it.value) },
-            additional = prepareAdditional(joinedMetaAccountInfo.metaAccount)
+            chainAccounts = chainAccountsFromChainSecrets + chainAccountFromAdditionalSecrets,
         )
     }
 
-    private suspend fun prepareAdditional(metaAccountLocal: MetaAccountLocal): Map<String, String> {
-        return secretsStoreV2.allKnownAdditionalSecrets(metaAccountLocal.id)
+    private suspend fun prepareChainAccountsFromAdditionalSecrets(
+        metaAccountLocal: JoinedMetaAccountInfo
+    ): List<CloudBackup.WalletPrivateInfo.ChainAccountSecrets> {
+        return when (metaAccountLocal.metaAccount.type) {
+            MetaAccountLocal.Type.LEDGER -> prepareLedgerChainAccountSecrets(metaAccountLocal)
+
+            MetaAccountLocal.Type.SECRETS,
+            MetaAccountLocal.Type.WATCH_ONLY,
+            MetaAccountLocal.Type.PARITY_SIGNER,
+            MetaAccountLocal.Type.POLKADOT_VAULT,
+            MetaAccountLocal.Type.PROXIED -> emptyList()
+        }
+    }
+
+    private suspend fun prepareLedgerChainAccountSecrets(ledgerAccountLocal: JoinedMetaAccountInfo): List<CloudBackup.WalletPrivateInfo.ChainAccountSecrets> {
+        return ledgerAccountLocal.chainAccounts.map { chainAccountLocal ->
+            val ledgerDerivationPathKey = LedgerDerivationPath.derivationPathSecretKey(chainAccountLocal.chainId)
+            val ledgerDerivationPath = secretsStoreV2.getAdditionalMetaAccountSecret(ledgerAccountLocal.metaAccount.id, ledgerDerivationPathKey)
+
+            CloudBackup.WalletPrivateInfo.ChainAccountSecrets(
+                accountId = chainAccountLocal.accountId,
+                entropy = null,
+                seed = null,
+                keypair = null,
+                derivationPath = ledgerDerivationPath
+            )
+        }
     }
 
     private suspend fun prepareChainAccountPrivateInfo(metaAccount: Long, chainAccountId: AccountId): CloudBackup.WalletPrivateInfo.ChainAccountSecrets? {
@@ -328,12 +388,12 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private fun CloudBackup.WalletPrivateInfo.ChainAccountSecrets.toLocalSecrets(): EncodableStruct<ChainAccountSecrets> {
+    private fun CloudBackup.WalletPrivateInfo.ChainAccountSecrets.toLocalSecrets(): EncodableStruct<ChainAccountSecrets>? {
         return ChainAccountSecrets(
             entropy = entropy,
             seed = seed,
             derivationPath = derivationPath,
-            keyPair = keypair.toLocalKeyPair()
+            keyPair = keypair?.toLocalKeyPair() ?: return null
         )
     }
 
@@ -385,16 +445,20 @@ class RealLocalAccountsCloudBackupFacade(
         )
     }
 
-    private fun List<JoinedMetaAccountInfo>.toBackupPublicData(
+    private suspend fun List<JoinedMetaAccountInfo>.toBackupPublicData(
         modifiedAt: Long = cloudBackupAccountsModificationsTracker.getAccountsLastModifiedAt()
     ): CloudBackup.PublicData {
+        val chainsById = chainRegistry.chainsById()
+
         return CloudBackup.PublicData(
             modifiedAt = modifiedAt,
-            wallets = mapNotNull { it.toBackupPublicInfo() },
+            wallets = mapNotNull { it.toBackupPublicInfo(chainsById) },
         )
     }
 
-    private fun JoinedMetaAccountInfo.toBackupPublicInfo(): CloudBackup.WalletPublicInfo? {
+    private fun JoinedMetaAccountInfo.toBackupPublicInfo(
+        chainsById: ChainsById,
+    ): CloudBackup.WalletPublicInfo? {
         return CloudBackup.WalletPublicInfo(
             walletId = metaAccount.globallyUniqueId,
             substratePublicKey = metaAccount.substratePublicKey,
@@ -404,7 +468,7 @@ class RealLocalAccountsCloudBackupFacade(
             ethereumPublicKey = metaAccount.ethereumPublicKey,
             name = metaAccount.name,
             type = metaAccount.type.toBackupWalletType() ?: return null,
-            chainAccounts = chainAccounts.mapToSet { chainAccount -> chainAccount.toBackupPublicChainAccount() }
+            chainAccounts = chainAccounts.mapToSet { chainAccount -> chainAccount.toBackupPublicChainAccount(chainsById) }
         )
     }
 
@@ -440,17 +504,17 @@ class RealLocalAccountsCloudBackupFacade(
                 chainId = it.chainId,
                 publicKey = it.publicKey,
                 accountId = it.accountId,
-                cryptoType = it.cryptoType
+                cryptoType = it.cryptoType?.toCryptoType()
             )
         }
     }
 
-    private fun ChainAccountLocal.toBackupPublicChainAccount(): CloudBackup.WalletPublicInfo.ChainAccountInfo {
+    private fun ChainAccountLocal.toBackupPublicChainAccount(chainsById: ChainsById): CloudBackup.WalletPublicInfo.ChainAccountInfo {
         return CloudBackup.WalletPublicInfo.ChainAccountInfo(
             chainId = chainId,
             publicKey = publicKey,
             accountId = accountId,
-            cryptoType = cryptoType
+            cryptoType = cryptoType?.toBackupChainAccountCryptoType(chainsById, chainId)
         )
     }
 
@@ -473,5 +537,29 @@ class RealLocalAccountsCloudBackupFacade(
             CloudBackup.WalletPublicInfo.Type.LEDGER -> MetaAccountLocal.Type.LEDGER
             CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
         }
+    }
+
+    private fun ChainAccountCryptoType.toCryptoType(): CryptoType {
+        return when (this) {
+            ChainAccountCryptoType.SR25519 -> CryptoType.SR25519
+            ChainAccountCryptoType.ED25519 -> CryptoType.ED25519
+            ChainAccountCryptoType.ECDSA, ChainAccountCryptoType.ETHEREUM -> CryptoType.ECDSA
+        }
+    }
+
+    private fun CryptoType.toBackupChainAccountCryptoType(chainsById: ChainsById, chainId: ChainId): ChainAccountCryptoType? {
+        val isEvm = chainsById.isEVM(chainId) ?: return null
+
+        if (isEvm) return ChainAccountCryptoType.ETHEREUM
+
+        return when (this) {
+            CryptoType.SR25519 -> ChainAccountCryptoType.SR25519
+            CryptoType.ED25519 -> ChainAccountCryptoType.ED25519
+            CryptoType.ECDSA -> ChainAccountCryptoType.ECDSA
+        }
+    }
+
+    private fun ChainsById.isEVM(chainId: ChainId): Boolean? {
+        return get(chainId)?.isEthereumBased
     }
 }
