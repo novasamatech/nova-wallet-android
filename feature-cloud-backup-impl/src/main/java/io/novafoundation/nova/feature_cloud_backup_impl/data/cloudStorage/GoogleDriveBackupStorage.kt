@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.requireActivity
 import io.novafoundation.nova.common.utils.InformationSize
 import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
+import io.novafoundation.nova.common.utils.mapErrorNotInstance
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
@@ -89,6 +90,13 @@ internal class GoogleDriveBackupStorage(
             val fileContent = readBackupFileFromDrive()
 
             ReadyForStorageBackup(fileContent)
+        }.mapErrorNotInstance<_, FetchBackupError> {
+            when (it) {
+                is UserRecoverableAuthException,
+                is UserRecoverableAuthIOException -> FetchBackupError.AuthFailed
+
+                else -> it
+            }
         }
     }
 
