@@ -41,6 +41,7 @@ internal class GoogleDriveBackupStorage(
 ) : CloudBackupStorage {
 
     companion object {
+
         private const val BACKUP_MIME_TYPE = "application/json"
     }
 
@@ -49,7 +50,7 @@ internal class GoogleDriveBackupStorage(
     }
 
     override suspend fun hasEnoughFreeStorage(neededSize: InformationSize): Result<Boolean> = withContext(Dispatchers.IO) {
-        runCatching {
+        runCatchingRecoveringAuthErrors {
             val remainingSpaceInDrive = getRemainingSpace()
 
             remainingSpaceInDrive >= neededSize
@@ -72,26 +73,19 @@ internal class GoogleDriveBackupStorage(
     }
 
     override suspend fun checkBackupExists(): Result<Boolean> = withContext(Dispatchers.IO) {
-        runCatching { checkBackupExistsUnsafe() }
-            .recoverCatching {
-                when (it) {
-                    is UserRecoverableAuthException -> it.askForConsent()
-                    is UserRecoverableAuthIOException -> it.cause?.askForConsent()
-                    else -> throw it
-                }
-
-                checkBackupExistsUnsafe()
-            }
+        runCatchingRecoveringAuthErrors {
+            checkBackupExistsUnsafe()
+        }
     }
 
     override suspend fun writeBackup(backup: ReadyForStorageBackup): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
+        runCatchingRecoveringAuthErrors {
             writeBackupFileToDrive(backup.value)
         }
     }
 
     override suspend fun fetchBackup(): Result<ReadyForStorageBackup> = withContext(Dispatchers.IO) {
-        runCatching {
+        runCatchingRecoveringAuthErrors {
             val fileContent = readBackupFileFromDrive()
 
             ReadyForStorageBackup(fileContent)
@@ -99,9 +93,22 @@ internal class GoogleDriveBackupStorage(
     }
 
     override suspend fun deleteBackup(): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
+        runCatchingRecoveringAuthErrors {
             deleteBackupFileFromDrive()
         }
+    }
+
+    private suspend fun <T> runCatchingRecoveringAuthErrors(action: suspend () -> T): Result<T> {
+        return runCatching { action() }
+            .recoverCatching {
+                when (it) {
+                    is UserRecoverableAuthException -> it.askForConsent()
+                    is UserRecoverableAuthIOException -> it.cause?.askForConsent()
+                    else -> throw it
+                }
+
+                action()
+            }
     }
 
     private fun writeBackupFileToDrive(fileContent: String) {
