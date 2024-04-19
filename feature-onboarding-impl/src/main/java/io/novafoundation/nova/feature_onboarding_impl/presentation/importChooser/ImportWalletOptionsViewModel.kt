@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.fixedSelectionOf
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
@@ -26,7 +27,8 @@ class ImportWalletOptionsViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val onboardingInteractor: OnboardingInteractor,
     val progressDialogMixin: ProgressDialogMixin,
-) : BaseViewModel() {
+    customDialogProvider: CustomDialogDisplayer.Presentation
+) : BaseViewModel(), CustomDialogDisplayer.Presentation by customDialogProvider {
 
     val selectHardwareWallet = actionAwaitableMixinFactory.fixedSelectionOf<HardwareWalletModel>()
 
@@ -51,8 +53,8 @@ class ImportWalletOptionsViewModel(
                         showBackupNotFoundError()
                     }
                 }.onFailure {
-                    val titleAndMessage = mapCheckBackupAvailableFailureToUi(resourceManager, it)
-                    titleAndMessage?.let { showError(titleAndMessage) }
+                    val payload = mapCheckBackupAvailableFailureToUi(resourceManager, it, ::initSignIn)
+                    displayDialogOrNothing(payload)
                 }
         }
     }
@@ -82,6 +84,12 @@ class ImportWalletOptionsViewModel(
 
     private fun openImportType(importType: ImportType) {
         router.openImportAccountScreen(ImportAccountPayload(importType = importType, addAccountPayload = AddAccountPayload.MetaAccount))
+    }
+
+    private fun initSignIn() {
+        launch {
+            onboardingInteractor.signInToCloud()
+        }
     }
 
     private fun showBackupNotFoundError() {

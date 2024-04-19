@@ -63,7 +63,7 @@ internal class GoogleDriveBackupStorage(
     override suspend fun isUserAuthenticated(): Boolean = withContext(Dispatchers.IO) {
         val account = GoogleSignIn.getLastSignedInAccount(contextManager.getApplicationContext())
 
-        account != null
+        account?.isExpired == false
     }
 
     override suspend fun authenticateUser(): Result<Unit> = withContext(Dispatchers.IO) {

@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.base.showError
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.finally
@@ -29,7 +30,10 @@ class StartCreateWalletViewModel(
     private val resourceManager: ResourceManager,
     private val startCreateWalletInteractor: StartCreateWalletInteractor,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncher {
+    customDialogProvider: CustomDialogDisplayer.Presentation
+) : BaseViewModel(),
+    ActionBottomSheetLauncher by actionBottomSheetLauncher,
+    CustomDialogDisplayer.Presentation by customDialogProvider {
 
     // Used to cancel the job when the user navigates back
     private var cloudBackupValidationJob: Job? = null
@@ -86,8 +90,8 @@ class StartCreateWalletViewModel(
                 if (validationResult is PreCreateValidationStatus.Ok) {
                     router.openCreateCloudBackupPassword(walletName)
                 } else {
-                    val error = mapPreCreateValidationStatusToUi(resourceManager, validationResult, ::userHasExistingBackup)
-                    error?.let { showError(it) }
+                    val payload = mapPreCreateValidationStatusToUi(resourceManager, validationResult, ::userHasExistingBackup, ::initSignIn)
+                    displayDialogOrNothing(payload)
                 }
             }.finally {
                 _cloudBackupSyncProgressFlow.value = false
@@ -105,5 +109,11 @@ class StartCreateWalletViewModel(
 
     private fun openImportCloudBackup() {
         router.restoreCloudBackup()
+    }
+
+    private fun initSignIn() {
+        launch {
+            startCreateWalletInteractor.signInToCloud()
+        }
     }
 }

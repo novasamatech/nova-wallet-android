@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
@@ -52,6 +53,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
     }
 
     override fun subscribe(viewModel: StartCreateWalletViewModel) {
+        setupCustomDialogDisplayer(viewModel)
         observeActionBottomSheet(viewModel)
         startCreateWalletNameInput.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
 

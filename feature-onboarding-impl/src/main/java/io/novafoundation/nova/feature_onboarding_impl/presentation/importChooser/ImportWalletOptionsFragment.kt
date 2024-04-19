@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.common.utils.setVisible
@@ -49,6 +50,7 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel>()
     }
 
     override fun subscribe(viewModel: ImportWalletOptionsViewModel) {
+        setupCustomDialogDisplayer(viewModel)
         observeProgressDialog(viewModel.progressDialogMixin)
 
         viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {

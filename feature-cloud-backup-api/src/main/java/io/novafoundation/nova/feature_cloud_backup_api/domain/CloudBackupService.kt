@@ -53,6 +53,8 @@ interface CloudBackupService {
      * @throws DeleteBackupError
      */
     suspend fun deleteBackup(): Result<Unit>
+
+    suspend fun signInToCloud(): Result<Unit>
 }
 
 /**

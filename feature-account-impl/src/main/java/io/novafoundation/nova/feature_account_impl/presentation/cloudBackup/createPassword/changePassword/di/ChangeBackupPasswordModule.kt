@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
@@ -26,14 +27,16 @@ class ChangeBackupPasswordModule {
         resourceManager: ResourceManager,
         interactor: CreateCloudBackupPasswordInteractor,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
-        changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator
+        changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+        customDialogProvider: CustomDialogDisplayer.Presentation
     ): ViewModel {
         return ChangeBackupPasswordViewModel(
             router,
             resourceManager,
             interactor,
             actionBottomSheetLauncher,
-            changeBackupPasswordCommunicator
+            changeBackupPasswordCommunicator,
+            customDialogProvider
         )
     }
 

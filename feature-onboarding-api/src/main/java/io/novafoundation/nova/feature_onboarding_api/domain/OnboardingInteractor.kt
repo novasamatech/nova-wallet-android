@@ -5,4 +5,6 @@ interface OnboardingInteractor {
     suspend fun checkCloudBackupIsExist(): Result<Boolean>
 
     suspend fun isCloudBackupAvailableForImport(): Boolean
+
+    suspend fun signInToCloud(): Result<Unit>
 }

@@ -14,4 +14,8 @@ class OnboardingInteractorImpl(
     override suspend fun isCloudBackupAvailableForImport(): Boolean {
         return !cloudBackupService.session.isSyncWithCloudEnabled()
     }
+
+    override suspend fun signInToCloud(): Result<Unit> {
+        return cloudBackupService.signInToCloud()
+    }
 }

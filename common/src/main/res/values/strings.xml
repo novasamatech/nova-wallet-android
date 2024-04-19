@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_sign_in">Sign In</string>
+
     <!--<string name="push_welcome_cancel_button">Not now</string>-->
     <string name="common_not_now">Not now</string>
 

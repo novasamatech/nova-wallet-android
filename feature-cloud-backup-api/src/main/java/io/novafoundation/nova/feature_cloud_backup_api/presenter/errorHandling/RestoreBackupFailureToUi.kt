@@ -7,6 +7,9 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.Cloud
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupUnknownError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CorruptedBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.handleCloudBackupInvalidPassword
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.handleCloudBackupNotFound
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.handleCloudBackupUnknownError
 
 fun mapRestoreBackupFailureToUi(
     resourceManager: ResourceManager,
