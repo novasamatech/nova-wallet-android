@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.se
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.list.toListWithHeaders
@@ -263,17 +264,6 @@ class BackupSettingsViewModel(
         isSyncing.value = false
     }
 
-    private suspend inline fun runActionAndSync(action: (Result<Unit>) -> Unit) {
-        isSyncing.value = true
-
-        val result = cloudBackupSettingsInteractor.syncCloudBackup()
-            .handleSyncBackupResult()
-
-        action(result)
-
-        isSyncing.value = false
-    }
-
     private fun Result<Unit>.handleSyncBackupResult(): Result<Unit> {
         return onSuccess { syncedState.value = BackupSyncOutcome.Ok; }
             .onFailure { throwable ->
@@ -384,7 +374,7 @@ class BackupSettingsViewModel(
 
             AccountDiffRVItem(
                 id = account.walletId,
-                icon = addressIconGenerator.createAddressIcon(walletSeed, 32),
+                icon = addressIconGenerator.createAddressIcon(walletSeed, 32, backgroundColorRes = BACKGROUND_TRANSPARENT),
                 title = account.name,
                 state = stateText,
                 stateColorRes = stateColorRes,
