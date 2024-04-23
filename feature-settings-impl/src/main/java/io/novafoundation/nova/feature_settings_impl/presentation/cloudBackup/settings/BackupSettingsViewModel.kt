@@ -1,8 +1,11 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup
+package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.showError
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
@@ -10,31 +13,45 @@ import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
 import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordRequester
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordRequester
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordRequester
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotFound
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeleteBackupAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitDeleteBackupConfirmation
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.PasswordNotSaved
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupChangesAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCorruptedBackupFoundAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeprecatedPasswordAction
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitBackupDestructiveChangesConfirmation
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.showCloudBackupUnknownError
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCloudBackupSyncFailed
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapDeleteBackupFailureToUi
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapWriteBackupFailureToUi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.model.CloudBackupChangedAccount
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.CloudBackupDiffBottomSheet
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.CloudBackupDiffGroupRVItem
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.AccountDiffRVItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -50,6 +67,9 @@ class BackupSettingsViewModel(
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
     private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
+    private val addressIconGenerator: AddressIconGenerator,
+    private val walletUiUseCase: WalletUiUseCase,
     val progressDialogMixin: ProgressDialogMixin,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     listSelectorMixinFactory: ListSelectorMixin.Factory,
@@ -58,7 +78,9 @@ class BackupSettingsViewModel(
     ActionBottomSheetLauncher by actionBottomSheetLauncher,
     CustomDialogDisplayer.Presentation by customDialogProvider {
 
-    val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
+    val negativeConfirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
+
+    val neutralConfirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
     val listSelectorMixin = listSelectorMixinFactory.create(viewModelScope)
 
@@ -78,6 +100,9 @@ class BackupSettingsViewModel(
     ) { backupEnabled, syncingInProgress, state, lastSync ->
         mapCloudBackupStateModel(resourceManager, backupEnabled, syncingInProgress, state, lastSync)
     }
+
+    private val _cloudBackupChangesLiveData = MutableLiveData<Event<CloudBackupDiffBottomSheet.Payload>>()
+    val cloudBackupChangesLiveData = _cloudBackupChangesLiveData
 
     init {
         syncCloudBackupState()
@@ -134,11 +159,11 @@ class BackupSettingsViewModel(
     }
 
     fun problemButtonClicked() {
-        when (syncedState.value) {
+        when (val value = syncedState.value) {
             BackupSyncOutcome.UnknownPassword -> showPasswordDeprecatedActionDialog()
 
             BackupSyncOutcome.CorruptedBackup -> showCorruptedBackupActionDialog()
-            BackupSyncOutcome.DestructiveDiff -> {}
+            is BackupSyncOutcome.DestructiveDiff -> openCloudBackupDiffScreen(value.cloudBackupDiff)
             BackupSyncOutcome.StorageAuthFailed -> initSignInToCloud()
 
             BackupSyncOutcome.OtherStorageIssue,
@@ -148,10 +173,39 @@ class BackupSettingsViewModel(
         }
     }
 
+    fun applyBackupDestructiveChanges() {
+        launch {
+            neutralConfirmationAwaitableAction.awaitBackupDestructiveChangesConfirmation()
+
+            cloudBackupSettingsInteractor.applyBackupAccountDiff()
+                .onSuccess { syncCloudBackupState() }
+                .onFailure { showError(mapWriteBackupFailureToUi(resourceManager, it)) }
+        }
+    }
+
+    private fun openDestructiveDiffAction(diff: CloudBackupDiff) {
+        actionBottomSheetLauncher.launchCloudBackupChangesAction(resourceManager) {
+            openCloudBackupDiffScreen(diff)
+        }
+    }
+
+    private fun openCloudBackupDiffScreen(diff: CloudBackupDiff) {
+        launch {
+            val sortedDiff = cloudBackupSettingsInteractor.prepareSortedLocalChangesFromDiff(diff)
+            val cloudBackupChangesList = sortedDiff.toListWithHeaders(
+                keyMapper = { type, _ -> accountTypePresentationMapper.mapTypeToChipLabel(type)?.let { CloudBackupDiffGroupRVItem(it) } },
+                valueMapper = { mapMetaAccountDiffToUi(it) }
+            )
+
+            _cloudBackupChangesLiveData.value = CloudBackupDiffBottomSheet.Payload(cloudBackupChangesList).event()
+        }
+    }
+
     private fun Throwable.toEnableBackupSyncState(): BackupSyncOutcome {
         return when (this) {
             is PasswordNotSaved, is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
             // not found backup is ok when we enable backup and when we start initial sync since we will create a new backup
+            is CannotApplyNonDestructiveDiff -> BackupSyncOutcome.DestructiveDiff(cloudBackupDiff)
             is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok
             is FetchBackupError.CorruptedBackup -> BackupSyncOutcome.CorruptedBackup
             is FetchBackupError.Other -> BackupSyncOutcome.UnknownError
@@ -209,6 +263,17 @@ class BackupSettingsViewModel(
         isSyncing.value = false
     }
 
+    private suspend inline fun runActionAndSync(action: (Result<Unit>) -> Unit) {
+        isSyncing.value = true
+
+        val result = cloudBackupSettingsInteractor.syncCloudBackup()
+            .handleSyncBackupResult()
+
+        action(result)
+
+        isSyncing.value = false
+    }
+
     private fun Result<Unit>.handleSyncBackupResult(): Result<Unit> {
         return onSuccess { syncedState.value = BackupSyncOutcome.Ok; }
             .onFailure { throwable ->
@@ -221,6 +286,7 @@ class BackupSettingsViewModel(
         val payload = mapCloudBackupSyncFailed(
             resourceManager,
             throwable,
+            onDestructiveBackupFound = ::openDestructiveDiffAction,
             onPasswordDeprecated = ::showPasswordDeprecatedActionDialog,
             onCorruptedBackup = ::showCorruptedBackupActionDialog,
             initSignIn = ::initSignInToCloud
@@ -260,6 +326,7 @@ class BackupSettingsViewModel(
     private fun observeRequesterResults() {
         changeBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
         restoreBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
+        syncWalletsBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
     }
 
     private fun Flow<Any>.syncBackupOnEach() {
@@ -290,7 +357,7 @@ class BackupSettingsViewModel(
 
     private fun confirmCloudBackupDelete() {
         launch {
-            confirmationAwaitableAction.awaitDeleteBackupConfirmation()
+            negativeConfirmationAwaitableAction.awaitDeleteBackupConfirmation()
 
             progressDialogMixin.startProgress(R.string.deleting_backup_progress) {
                 cloudBackupSettingsInteractor.deleteCloudBackup()
@@ -305,25 +372,41 @@ class BackupSettingsViewModel(
             }
         }
     }
-}
 
-sealed class BackupSyncOutcome {
+    private suspend fun mapMetaAccountDiffToUi(changedAccount: CloudBackupChangedAccount): AccountDiffRVItem {
+        return with(changedAccount) {
+            val (stateText, stateColorRes, stateIconRes) = mapChangingTypeToUi(changingType)
+            val walletSeed = walletUiUseCase.walletSeed(
+                account.substrateAccountId,
+                account.ethereumAddress,
+                account.chainAccounts.map(CloudBackup.WalletPublicInfo.ChainAccountInfo::accountId)
+            )
 
-    object Ok : BackupSyncOutcome()
+            AccountDiffRVItem(
+                id = account.walletId,
+                icon = addressIconGenerator.createAddressIcon(walletSeed, 32),
+                title = account.name,
+                state = stateText,
+                stateColorRes = stateColorRes,
+                stateIconRes = stateIconRes
+            )
+        }
+    }
 
-    object UnknownPassword : BackupSyncOutcome()
+    private fun mapChangingTypeToUi(type: CloudBackupChangedAccount.ChangingType): Triple<String, Int, Int?> {
+        return when (type) {
+            CloudBackupChangedAccount.ChangingType.ADDED -> Triple(resourceManager.getString(R.string.state_new), R.color.text_secondary, null)
+            CloudBackupChangedAccount.ChangingType.REMOVED -> Triple(
+                resourceManager.getString(R.string.state_removed),
+                R.color.text_negative,
+                R.drawable.ic_red_cross
+            )
 
-    object DestructiveDiff : BackupSyncOutcome()
-
-    object StorageAuthFailed : BackupSyncOutcome()
-
-    object OtherStorageIssue : BackupSyncOutcome()
-
-    object CorruptedBackup : BackupSyncOutcome()
-
-    object UnknownError : BackupSyncOutcome()
-}
-
-fun BackupSyncOutcome.isError(): Boolean {
-    return this != BackupSyncOutcome.Ok
+            CloudBackupChangedAccount.ChangingType.CHANGED -> Triple(
+                resourceManager.getString(R.string.state_changed),
+                R.color.text_warning,
+                R.drawable.ic_warning_filled
+            )
+        }
+    }
 }

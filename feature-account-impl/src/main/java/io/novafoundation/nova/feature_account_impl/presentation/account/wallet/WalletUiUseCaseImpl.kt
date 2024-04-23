@@ -76,6 +76,20 @@ class WalletUiUseCaseImpl(
         )
     }
 
+    override fun walletSeed(substrateAccountId: AccountId?, ethereumAccountId: AccountId?, chainAccountIds: List<AccountId>): AccountId {
+        return when {
+            substrateAccountId != null -> substrateAccountId
+            ethereumAccountId != null -> ethereumAccountId
+
+            // if both default accounts are null there MUST be at least one chain account. Otherwise it's an invalid state
+            else -> {
+                chainAccountIds
+                    .sortedWith(ByteArrayComparator())
+                    .first()
+            }
+        }
+    }
+
     private suspend fun maybeGenerateIcon(accountId: AccountId, shouldGenerate: Boolean): Drawable? {
         return if (shouldGenerate) {
             generateWalletIcon(seed = accountId, iconSize = SIZE_MEDIUM, transparentBackground = true)
@@ -93,17 +107,6 @@ class WalletUiUseCaseImpl(
     }
 
     private fun MetaAccount.walletIconSeed(): ByteArray {
-        return when {
-            substrateAccountId != null -> substrateAccountId!!
-            ethereumAddress != null -> ethereumAddress!!
-
-            // if both default accounts are null there MUST be at least one chain account. Otherwise wallet is in invalid state
-            else -> {
-                chainAccounts.values
-                    .map(ChainAccount::accountId)
-                    .sortedWith(ByteArrayComparator())
-                    .first()
-            }
-        }
+        return walletSeed(substrateAccountId, ethereumAddress, chainAccounts.values.map(ChainAccount::accountId))
     }
 }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.di
+package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -14,12 +15,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
-import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.BackupSettingsViewModel
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.BackupSettingsViewModel
 
 @Module(includes = [ViewModelModule::class])
 class CloudBackupSettingsModule {
@@ -35,6 +38,9 @@ class CloudBackupSettingsModule {
         changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
         restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        accountTypePresentationMapper: MetaAccountTypePresentationMapper,
+        addressIconGenerator: AddressIconGenerator,
+        walletUiUseCase: WalletUiUseCase,
         progressDialogMixin: ProgressDialogMixin,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         listSelectorMixinFactory: ListSelectorMixin.Factory,
@@ -48,6 +54,9 @@ class CloudBackupSettingsModule {
             changeBackupPasswordCommunicator,
             restoreBackupPasswordCommunicator,
             actionBottomSheetLauncher,
+            accountTypePresentationMapper,
+            addressIconGenerator,
+            walletUiUseCase,
             progressDialogMixin,
             actionAwaitableMixinFactory,
             listSelectorMixinFactory,

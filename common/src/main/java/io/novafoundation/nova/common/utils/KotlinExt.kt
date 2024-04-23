@@ -48,6 +48,11 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     )
 }
 
+inline fun <T, R> Result<T>.flatMapCatching(transform: (T) -> Result<R>): Result<R> {
+    return mapCatching { transform(it) }
+        .flatMap { it }
+}
+
 inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
     transform()
     return this

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.account.wallet
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 class WalletModel(val metaId: Long, val name: String, val icon: Drawable?) {
@@ -23,4 +24,6 @@ interface WalletUiUseCase {
     suspend fun walletIcon(metaAccount: MetaAccount, iconSize: Int = AddressIconGenerator.SIZE_MEDIUM, transparentBackground: Boolean = true): Drawable
 
     suspend fun walletUiFor(metaAccount: MetaAccount): WalletModel
+
+    fun walletSeed(substrateAccountId: AccountId?, ethereumAccountId: AccountId?, chainAccountIds: List<AccountId>): AccountId
 }

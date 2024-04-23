@@ -123,3 +123,18 @@ fun ActionBottomSheetLauncher.launchDeprecatedPasswordAction(resourceManager: Re
         )
     )
 }
+
+fun ActionBottomSheetLauncher.launchCloudBackupChangesAction(resourceManager: ResourceManager, onReviewClicked: () -> Unit) {
+    launchBottomSheet(
+        imageRes = R.drawable.ic_cloud_backup_warning,
+        title = resourceManager.getString(R.string.cloud_backup_destructive_changes_action_title),
+        subtitle = resourceManager.getString(R.string.cloud_backup_destructive_changes_action_subtitle),
+        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
+            resourceManager.getString(R.string.common_not_now)
+        ),
+        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+            resourceManager.getString(R.string.cloud_backup_destructive_changes_button),
+            onReviewClicked
+        )
+    )
+}

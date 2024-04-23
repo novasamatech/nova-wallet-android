@@ -14,3 +14,14 @@ suspend fun ConfirmationAwaitable<ConfirmationDialogInfo>.awaitDeleteBackupConfi
         )
     )
 }
+
+suspend fun ConfirmationAwaitable<ConfirmationDialogInfo>.awaitBackupDestructiveChangesConfirmation() {
+    awaitAction(
+        ConfirmationDialogInfo(
+            title = R.string.cloud_backup_destructive_changes_confirmation_title,
+            message = R.string.cloud_backup_destructive_changes_confirmation_subtitle,
+            positiveButton = R.string.common_apply,
+            negativeButton = R.string.common_cancel
+        )
+    )
+}

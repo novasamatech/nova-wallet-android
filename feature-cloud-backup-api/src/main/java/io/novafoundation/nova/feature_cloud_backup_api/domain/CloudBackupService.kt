@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_cloud_backup_api.domain
 
 import io.novafoundation.nova.common.utils.flatMap
+import io.novafoundation.nova.common.utils.flatMapCatching
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.EncryptedCloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
@@ -72,7 +73,7 @@ suspend fun CloudBackupService.fetchAndDecryptExistingBackup(password: String): 
  */
 suspend fun CloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword(): Result<CloudBackup> {
     return fetchBackup()
-        .flatMap { encryptedBackup ->
+        .flatMapCatching { encryptedBackup ->
             val password = session.getSavedPassword().getOrThrow()
             encryptedBackup.decrypt(password)
         }

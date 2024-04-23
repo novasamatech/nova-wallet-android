@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/cloudBackupSettingsFragment"
-        android:name="io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.BackupSettingsFragment"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.BackupSettingsFragment"
         android:label="CloudBackupSettingsFragment">
 
         <action
@@ -33,6 +33,7 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
     <fragment

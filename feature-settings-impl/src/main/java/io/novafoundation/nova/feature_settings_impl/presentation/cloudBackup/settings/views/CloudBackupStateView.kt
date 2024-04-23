@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.views
+package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.views
 
 import android.content.Context
 import android.util.AttributeSet

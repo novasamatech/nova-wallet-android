@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_settings_impl.di
 
 import android.content.Context
+import coil.ImageLoader
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
@@ -14,6 +16,8 @@ import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLa
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -44,6 +48,14 @@ interface SettingsFeatureDependencies {
     val pushNotificationsInteractor: PushNotificationsInteractor
 
     val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
+
+    val imageLoader: ImageLoader
+
+    val metaAccountTypePresentationMapper: MetaAccountTypePresentationMapper
+
+    val addressIconGenerator: AddressIconGenerator
+
+    val walletUiUseCase: WalletUiUseCase
 
     fun biometricServiceFactory(): BiometricServiceFactory
 
