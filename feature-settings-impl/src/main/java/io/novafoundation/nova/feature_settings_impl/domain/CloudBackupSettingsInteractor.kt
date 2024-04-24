@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.domain
 
+import io.novafoundation.nova.common.utils.finally
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
@@ -43,7 +44,7 @@ class RealCloudBackupSettingsInteractor(
                 cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
                 Unit
-            }.onSuccess {
+            }.finally {
                 cloudBackupService.session.setLastSyncedTimeAsNow()
             }
     }
