@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -39,7 +38,6 @@ class CloudBackupSettingsModule {
         restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
         accountTypePresentationMapper: MetaAccountTypePresentationMapper,
-        addressIconGenerator: AddressIconGenerator,
         walletUiUseCase: WalletUiUseCase,
         progressDialogMixin: ProgressDialogMixin,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -55,7 +53,6 @@ class CloudBackupSettingsModule {
             restoreBackupPasswordCommunicator,
             actionBottomSheetLauncher,
             accountTypePresentationMapper,
-            addressIconGenerator,
             walletUiUseCase,
             progressDialogMixin,
             actionAwaitableMixinFactory,

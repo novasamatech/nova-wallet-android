@@ -21,9 +21,15 @@ interface WalletUiUseCase {
 
     suspend fun selectedWalletUi(): WalletModel
 
+    suspend fun walletIcon(
+        substrateAccountId: AccountId?,
+        ethereumAccountId: AccountId?,
+        chainAccountIds: List<AccountId>,
+        iconSize: Int = AddressIconGenerator.SIZE_MEDIUM,
+        transparentBackground: Boolean = true
+    ): Drawable
+
     suspend fun walletIcon(metaAccount: MetaAccount, iconSize: Int = AddressIconGenerator.SIZE_MEDIUM, transparentBackground: Boolean = true): Drawable
 
     suspend fun walletUiFor(metaAccount: MetaAccount): WalletModel
-
-    fun walletSeed(substrateAccountId: AccountId?, ethereumAccountId: AccountId?, chainAccountIds: List<AccountId>): AccountId
 }

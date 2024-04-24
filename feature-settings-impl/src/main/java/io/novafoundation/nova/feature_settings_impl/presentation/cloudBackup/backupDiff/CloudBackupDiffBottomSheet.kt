@@ -4,6 +4,7 @@ import android.content.Context
 import io.novafoundation.nova.common.utils.addColor
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.CloudBackupDiffAdapter
 import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffApply
@@ -13,11 +14,11 @@ import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffSubtitle
 
 class CloudBackupDiffBottomSheet(
     context: Context,
-    payload: Payload,
-    onApply: () -> Unit,
+    private val payload: Payload,
+    onApply: (CloudBackupDiff) -> Unit,
 ) : BaseBottomSheet(context) {
 
-    class Payload(val diffList: List<Any>)
+    class Payload(val diffList: List<Any>, val cloudBackupDiff: CloudBackupDiff)
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         CloudBackupDiffAdapter()
@@ -30,7 +31,7 @@ class CloudBackupDiffBottomSheet(
 
         backupDiffCancel.setOnClickListener { dismiss() }
         backupDiffApply.setOnClickListener {
-            onApply()
+            onApply(payload.cloudBackupDiff)
             dismiss()
         }
         adapter.submitList(payload.diffList)

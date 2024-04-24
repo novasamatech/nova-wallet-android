@@ -59,6 +59,18 @@ class WalletUiUseCaseImpl(
     }
 
     override suspend fun walletIcon(
+        substrateAccountId: AccountId?,
+        ethereumAccountId: AccountId?,
+        chainAccountIds: List<AccountId>,
+        iconSize: Int,
+        transparentBackground: Boolean
+    ): Drawable {
+        val seed = walletSeed(substrateAccountId, ethereumAccountId, chainAccountIds)
+
+        return generateWalletIcon(seed, iconSize, transparentBackground)
+    }
+
+    override suspend fun walletIcon(
         metaAccount: MetaAccount,
         iconSize: Int,
         transparentBackground: Boolean
@@ -76,20 +88,6 @@ class WalletUiUseCaseImpl(
         )
     }
 
-    override fun walletSeed(substrateAccountId: AccountId?, ethereumAccountId: AccountId?, chainAccountIds: List<AccountId>): AccountId {
-        return when {
-            substrateAccountId != null -> substrateAccountId
-            ethereumAccountId != null -> ethereumAccountId
-
-            // if both default accounts are null there MUST be at least one chain account. Otherwise it's an invalid state
-            else -> {
-                chainAccountIds
-                    .sortedWith(ByteArrayComparator())
-                    .first()
-            }
-        }
-    }
-
     private suspend fun maybeGenerateIcon(accountId: AccountId, shouldGenerate: Boolean): Drawable? {
         return if (shouldGenerate) {
             generateWalletIcon(seed = accountId, iconSize = SIZE_MEDIUM, transparentBackground = true)
@@ -104,6 +102,20 @@ class WalletUiUseCaseImpl(
             sizeInDp = iconSize,
             backgroundColorRes = if (transparentBackground) BACKGROUND_TRANSPARENT else BACKGROUND_DEFAULT
         )
+    }
+
+    private fun walletSeed(substrateAccountId: AccountId?, ethereumAccountId: AccountId?, chainAccountIds: List<AccountId>): AccountId {
+        return when {
+            substrateAccountId != null -> substrateAccountId
+            ethereumAccountId != null -> ethereumAccountId
+
+            // if both default accounts are null there MUST be at least one chain account. Otherwise it's an invalid state
+            else -> {
+                chainAccountIds
+                    .sortedWith(ByteArrayComparator())
+                    .first()
+            }
+        }
     }
 
     private fun MetaAccount.walletIconSeed(): ByteArray {

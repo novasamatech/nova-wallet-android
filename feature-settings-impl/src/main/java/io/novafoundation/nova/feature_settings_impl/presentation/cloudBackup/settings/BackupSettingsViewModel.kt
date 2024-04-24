@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.se
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.list.toListWithHeaders
@@ -69,7 +67,6 @@ class BackupSettingsViewModel(
     private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
-    private val addressIconGenerator: AddressIconGenerator,
     private val walletUiUseCase: WalletUiUseCase,
     val progressDialogMixin: ProgressDialogMixin,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -85,7 +82,8 @@ class BackupSettingsViewModel(
 
     val listSelectorMixin = listSelectorMixinFactory.create(viewModelScope)
 
-    private val isSyncing = MutableStateFlow(false)
+    private val _isSyncing = MutableStateFlow(false)
+    val isSyncing: Flow<Boolean> = _isSyncing
 
     private val syncedState = MutableStateFlow<BackupSyncOutcome>(BackupSyncOutcome.Ok)
 
@@ -95,7 +93,7 @@ class BackupSettingsViewModel(
 
     val cloudBackupStateModel: Flow<CloudBackupStateModel> = combine(
         cloudBackupEnabled,
-        isSyncing,
+        _isSyncing,
         syncedState,
         lastSync
     ) { backupEnabled, syncingInProgress, state, lastSync ->
@@ -132,11 +130,11 @@ class BackupSettingsViewModel(
     }
 
     fun manualBackupClicked() {
-        TODO()
+        showError("Not implemented yet")
     }
 
     fun cloudBackupManageClicked() {
-        if (isSyncing.value) return
+        if (_isSyncing.value) return
 
         when (syncedState.value) {
             BackupSyncOutcome.StorageAuthFailed -> return
@@ -174,13 +172,17 @@ class BackupSettingsViewModel(
         }
     }
 
-    fun applyBackupDestructiveChanges() {
+    fun applyBackupDestructiveChanges(cloudBackupDiff: CloudBackupDiff) {
         launch {
             neutralConfirmationAwaitableAction.awaitBackupDestructiveChangesConfirmation()
 
-            cloudBackupSettingsInteractor.applyBackupAccountDiff()
-                .onSuccess { syncCloudBackupState() }
+            _isSyncing.value = true
+
+            cloudBackupSettingsInteractor.applyBackupAccountDiff(cloudBackupDiff)
+                .onSuccess { syncedState.value = BackupSyncOutcome.Ok }
                 .onFailure { showError(mapWriteBackupFailureToUi(resourceManager, it)) }
+
+            _isSyncing.value = false
         }
     }
 
@@ -198,7 +200,7 @@ class BackupSettingsViewModel(
                 valueMapper = { mapMetaAccountDiffToUi(it) }
             )
 
-            _cloudBackupChangesLiveData.value = CloudBackupDiffBottomSheet.Payload(cloudBackupChangesList).event()
+            _cloudBackupChangesLiveData.value = CloudBackupDiffBottomSheet.Payload(cloudBackupChangesList, diff).event()
         }
     }
 
@@ -254,14 +256,14 @@ class BackupSettingsViewModel(
     }
 
     private suspend inline fun runSyncWithProgress(action: (Result<Unit>) -> Unit) {
-        isSyncing.value = true
+        _isSyncing.value = true
 
         val result = cloudBackupSettingsInteractor.syncCloudBackup()
             .handleSyncBackupResult()
 
         action(result)
 
-        isSyncing.value = false
+        _isSyncing.value = false
     }
 
     private fun Result<Unit>.handleSyncBackupResult(): Result<Unit> {
@@ -366,7 +368,7 @@ class BackupSettingsViewModel(
     private suspend fun mapMetaAccountDiffToUi(changedAccount: CloudBackupChangedAccount): AccountDiffRVItem {
         return with(changedAccount) {
             val (stateText, stateColorRes, stateIconRes) = mapChangingTypeToUi(changingType)
-            val walletSeed = walletUiUseCase.walletSeed(
+            val walletIcon = walletUiUseCase.walletIcon(
                 account.substrateAccountId,
                 account.ethereumAddress,
                 account.chainAccounts.map(CloudBackup.WalletPublicInfo.ChainAccountInfo::accountId)
@@ -374,7 +376,7 @@ class BackupSettingsViewModel(
 
             AccountDiffRVItem(
                 id = account.walletId,
-                icon = addressIconGenerator.createAddressIcon(walletSeed, 32, backgroundColorRes = BACKGROUND_TRANSPARENT),
+                icon = walletIcon,
                 title = account.name,
                 state = stateText,
                 stateColorRes = stateColorRes,

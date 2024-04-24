@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 import io.novafoundation.nova.feature_settings_impl.domain.model.CloudBackupChangedAccount
@@ -37,7 +36,7 @@ interface CloudBackupSettingsInteractor {
 
     fun prepareSortedLocalChangesFromDiff(cloudBackupDiff: CloudBackupDiff): GroupedList<LightMetaAccount.Type, CloudBackupChangedAccount>
 
-    suspend fun applyBackupAccountDiff(): Result<Unit>
+    suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff): Result<Unit>
 }
 
 class RealCloudBackupSettingsInteractor(
@@ -92,12 +91,10 @@ class RealCloudBackupSettingsInteractor(
             .toSortedMap(metaAccountTypeComparator())
     }
 
-    override suspend fun applyBackupAccountDiff(): Result<Unit> {
+    override suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff): Result<Unit> {
         return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
             .mapCatching { cloudBackup ->
-                val localSnapshot = cloudBackupFacade.fullBackupInfoFromLocalSnapshot()
-                val diff = localSnapshot.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
-                cloudBackupFacade.applyBackupDiff(diff, cloudBackup)
+                cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
                 cloudBackupService.session.setLastSyncedTimeAsNow()
 
                 // TODO: Rewrite cloud backup
