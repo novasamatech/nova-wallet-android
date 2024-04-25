@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.metaAccountTypeComparator
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
@@ -36,7 +37,7 @@ interface CloudBackupSettingsInteractor {
 
     fun prepareSortedLocalChangesFromDiff(cloudBackupDiff: CloudBackupDiff): GroupedList<LightMetaAccount.Type, CloudBackupChangedAccount>
 
-    suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff): Result<Unit>
+    suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff, cloudBackup: CloudBackup): Result<Unit>
 }
 
 class RealCloudBackupSettingsInteractor(
@@ -91,14 +92,13 @@ class RealCloudBackupSettingsInteractor(
             .toSortedMap(metaAccountTypeComparator())
     }
 
-    override suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff): Result<Unit> {
-        return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
-            .mapCatching { cloudBackup ->
-                cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
-                cloudBackupService.session.setLastSyncedTimeAsNow()
+    override suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff, cloudBackup: CloudBackup): Result<Unit> {
+        return runCatching {
+            cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
+            cloudBackupService.session.setLastSyncedTimeAsNow()
+        }
 
-                // TODO: Rewrite cloud backup
-            }
+        // TODO: Rewrite cloud backup
     }
 
     private fun localAccountChangesFromDiff(diff: CloudBackupDiff.PerSourceDiff): List<CloudBackupChangedAccount> {

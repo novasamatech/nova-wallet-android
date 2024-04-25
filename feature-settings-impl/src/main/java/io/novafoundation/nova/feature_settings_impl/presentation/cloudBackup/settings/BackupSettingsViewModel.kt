@@ -162,7 +162,7 @@ class BackupSettingsViewModel(
             BackupSyncOutcome.UnknownPassword -> showPasswordDeprecatedActionDialog()
 
             BackupSyncOutcome.CorruptedBackup -> showCorruptedBackupActionDialog()
-            is BackupSyncOutcome.DestructiveDiff -> openCloudBackupDiffScreen(value.cloudBackupDiff)
+            is BackupSyncOutcome.DestructiveDiff -> openCloudBackupDiffScreen(value.cloudBackupDiff, value.cloudBackup)
             BackupSyncOutcome.StorageAuthFailed -> initSignInToCloud()
 
             BackupSyncOutcome.OtherStorageIssue,
@@ -172,13 +172,13 @@ class BackupSettingsViewModel(
         }
     }
 
-    fun applyBackupDestructiveChanges(cloudBackupDiff: CloudBackupDiff) {
+    fun applyBackupDestructiveChanges(cloudBackupDiff: CloudBackupDiff, cloudBackup: CloudBackup) {
         launch {
             neutralConfirmationAwaitableAction.awaitBackupDestructiveChangesConfirmation()
 
             _isSyncing.value = true
 
-            cloudBackupSettingsInteractor.applyBackupAccountDiff(cloudBackupDiff)
+            cloudBackupSettingsInteractor.applyBackupAccountDiff(cloudBackupDiff, cloudBackup)
                 .onSuccess { syncedState.value = BackupSyncOutcome.Ok }
                 .onFailure { showError(mapWriteBackupFailureToUi(resourceManager, it)) }
 
@@ -186,13 +186,13 @@ class BackupSettingsViewModel(
         }
     }
 
-    private fun openDestructiveDiffAction(diff: CloudBackupDiff) {
+    private fun openDestructiveDiffAction(diff: CloudBackupDiff, cloudBackup: CloudBackup) {
         actionBottomSheetLauncher.launchCloudBackupChangesAction(resourceManager) {
-            openCloudBackupDiffScreen(diff)
+            openCloudBackupDiffScreen(diff, cloudBackup)
         }
     }
 
-    private fun openCloudBackupDiffScreen(diff: CloudBackupDiff) {
+    private fun openCloudBackupDiffScreen(diff: CloudBackupDiff, cloudBackup: CloudBackup) {
         launch {
             val sortedDiff = cloudBackupSettingsInteractor.prepareSortedLocalChangesFromDiff(diff)
             val cloudBackupChangesList = sortedDiff.toListWithHeaders(
@@ -200,7 +200,7 @@ class BackupSettingsViewModel(
                 valueMapper = { mapMetaAccountDiffToUi(it) }
             )
 
-            _cloudBackupChangesLiveData.value = CloudBackupDiffBottomSheet.Payload(cloudBackupChangesList, diff).event()
+            _cloudBackupChangesLiveData.value = CloudBackupDiffBottomSheet.Payload(cloudBackupChangesList, diff, cloudBackup).event()
         }
     }
 
@@ -208,7 +208,7 @@ class BackupSettingsViewModel(
         return when (this) {
             is PasswordNotSaved, is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
             // not found backup is ok when we enable backup and when we start initial sync since we will create a new backup
-            is CannotApplyNonDestructiveDiff -> BackupSyncOutcome.DestructiveDiff(cloudBackupDiff)
+            is CannotApplyNonDestructiveDiff -> BackupSyncOutcome.DestructiveDiff(cloudBackupDiff, cloudBackup)
             is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok
             is FetchBackupError.CorruptedBackup -> BackupSyncOutcome.CorruptedBackup
             is FetchBackupError.Other -> BackupSyncOutcome.UnknownError
