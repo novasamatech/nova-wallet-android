@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.utils.finally
+import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +23,10 @@ interface CloudBackupSettingsInteractor {
     suspend fun setCloudBackupSyncEnabled(enable: Boolean)
 
     suspend fun deleteCloudBackup(): Result<Unit>
+
+    suspend fun writeLocalBackupToCloud(): Result<Unit>
+
+    suspend fun signInToCloud(): Result<Unit>
 }
 
 class RealCloudBackupSettingsInteractor(
@@ -53,5 +59,17 @@ class RealCloudBackupSettingsInteractor(
 
     override suspend fun deleteCloudBackup(): Result<Unit> {
         return cloudBackupService.deleteBackup()
+    }
+
+    override suspend fun writeLocalBackupToCloud(): Result<Unit> {
+        return cloudBackupService.session.getSavedPassword()
+            .flatMap { password ->
+                val localSnapshot = cloudBackupFacade.fullBackupInfoFromLocalSnapshot()
+                cloudBackupService.writeBackupToCloud(WriteBackupRequest(localSnapshot, password))
+            }
+    }
+
+    override suspend fun signInToCloud(): Result<Unit> {
+        return cloudBackupService.signInToCloud()
     }
 }

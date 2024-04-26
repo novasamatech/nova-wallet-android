@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
@@ -36,7 +37,8 @@ class CloudBackupSettingsModule {
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
         progressDialogMixin: ProgressDialogMixin,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        listSelectorMixinFactory: ListSelectorMixin.Factory
+        listSelectorMixinFactory: ListSelectorMixin.Factory,
+        customDialogProvider: CustomDialogDisplayer.Presentation
     ): ViewModel {
         return BackupSettingsViewModel(
             resourceManager,
@@ -48,7 +50,8 @@ class CloudBackupSettingsModule {
             actionBottomSheetLauncher,
             progressDialogMixin,
             actionAwaitableMixinFactory,
-            listSelectorMixinFactory
+            listSelectorMixinFactory,
+            customDialogProvider
         )
     }
 

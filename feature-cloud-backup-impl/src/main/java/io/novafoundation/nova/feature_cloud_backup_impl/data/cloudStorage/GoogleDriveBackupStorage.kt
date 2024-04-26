@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.requireActivity
 import io.novafoundation.nova.common.utils.InformationSize
 import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
+import io.novafoundation.nova.common.utils.mapErrorNotInstance
 import io.novafoundation.nova.common.utils.systemCall.SystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
@@ -41,6 +42,7 @@ internal class GoogleDriveBackupStorage(
 ) : CloudBackupStorage {
 
     companion object {
+
         private const val BACKUP_MIME_TYPE = "application/json"
     }
 
@@ -49,7 +51,7 @@ internal class GoogleDriveBackupStorage(
     }
 
     override suspend fun hasEnoughFreeStorage(neededSize: InformationSize): Result<Boolean> = withContext(Dispatchers.IO) {
-        runCatching {
+        runCatchingRecoveringAuthErrors {
             val remainingSpaceInDrive = getRemainingSpace()
 
             remainingSpaceInDrive >= neededSize
@@ -72,7 +74,40 @@ internal class GoogleDriveBackupStorage(
     }
 
     override suspend fun checkBackupExists(): Result<Boolean> = withContext(Dispatchers.IO) {
-        runCatching { checkBackupExistsUnsafe() }
+        runCatchingRecoveringAuthErrors {
+            checkBackupExistsUnsafe()
+        }
+    }
+
+    override suspend fun writeBackup(backup: ReadyForStorageBackup): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatchingRecoveringAuthErrors {
+            writeBackupFileToDrive(backup.value)
+        }
+    }
+
+    override suspend fun fetchBackup(): Result<ReadyForStorageBackup> = withContext(Dispatchers.IO) {
+        runCatchingRecoveringAuthErrors {
+            val fileContent = readBackupFileFromDrive()
+
+            ReadyForStorageBackup(fileContent)
+        }.mapErrorNotInstance<_, FetchBackupError> {
+            when (it) {
+                is UserRecoverableAuthException,
+                is UserRecoverableAuthIOException -> FetchBackupError.AuthFailed
+
+                else -> it
+            }
+        }
+    }
+
+    override suspend fun deleteBackup(): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatchingRecoveringAuthErrors {
+            deleteBackupFileFromDrive()
+        }
+    }
+
+    private suspend fun <T> runCatchingRecoveringAuthErrors(action: suspend () -> T): Result<T> {
+        return runCatching { action() }
             .recoverCatching {
                 when (it) {
                     is UserRecoverableAuthException -> it.askForConsent()
@@ -80,28 +115,8 @@ internal class GoogleDriveBackupStorage(
                     else -> throw it
                 }
 
-                checkBackupExistsUnsafe()
+                action()
             }
-    }
-
-    override suspend fun writeBackup(backup: ReadyForStorageBackup): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
-            writeBackupFileToDrive(backup.value)
-        }
-    }
-
-    override suspend fun fetchBackup(): Result<ReadyForStorageBackup> = withContext(Dispatchers.IO) {
-        runCatching {
-            val fileContent = readBackupFileFromDrive()
-
-            ReadyForStorageBackup(fileContent)
-        }
-    }
-
-    override suspend fun deleteBackup(): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
-            deleteBackupFileFromDrive()
-        }
     }
 
     private fun writeBackupFileToDrive(fileContent: String) {

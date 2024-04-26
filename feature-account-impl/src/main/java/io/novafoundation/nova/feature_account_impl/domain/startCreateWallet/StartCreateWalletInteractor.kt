@@ -6,6 +6,8 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateVal
 interface StartCreateWalletInteractor {
 
     suspend fun validateCanCreateBackup(): PreCreateValidationStatus
+
+    suspend fun signInToCloud(): Result<Unit>
 }
 
 class RealStartCreateWalletInteractor(
@@ -14,5 +16,9 @@ class RealStartCreateWalletInteractor(
 
     override suspend fun validateCanCreateBackup(): PreCreateValidationStatus {
         return cloudBackupService.validateCanCreateBackup()
+    }
+
+    override suspend fun signInToCloud(): Result<Unit> {
+        return cloudBackupService.signInToCloud()
     }
 }

@@ -56,14 +56,16 @@ internal class RealCloudBackupService(
     }
 
     override suspend fun isCloudBackupExist(): Result<Boolean> = withContext(Dispatchers.IO) {
-        storage.ensureUserAuthenticated().flatMap {
-            storage.checkBackupExists()
-        }
+        storage.ensureUserAuthenticated()
+            .flatMap {
+                storage.checkBackupExists()
+            }
     }
 
     override suspend fun fetchBackup(): Result<EncryptedCloudBackup> {
         return withContext(Dispatchers.IO) {
             storage.ensureUserAuthenticated()
+                .mapErrorNotInstance<_, FetchBackupError> { FetchBackupError.AuthFailed }
                 .flatMap { storage.fetchBackup() }
                 .flatMap {
                     serializer.deserializePublicData(it)
@@ -72,9 +74,7 @@ internal class RealCloudBackupService(
                 .map { RealEncryptedCloudBackup(encryption, serializer, it) }
                 .onFailure {
                     Log.e("CloudBackupService", "Failed to read backup from the cloud", it)
-                }.mapErrorNotInstance<_, FetchBackupError> {
-                    FetchBackupError.Other
-                }
+                }.mapErrorNotInstance<_, FetchBackupError> { FetchBackupError.Other }
         }
     }
 
@@ -86,6 +86,10 @@ internal class RealCloudBackupService(
         }.mapErrorNotInstance<_, DeleteBackupError> {
             DeleteBackupError.Other
         }
+    }
+
+    override suspend fun signInToCloud(): Result<Unit> {
+        return storage.authenticateUser()
     }
 
     private suspend fun prepareBackupForSaving(backup: CloudBackup, password: String): Result<ReadyForStorageBackup> {

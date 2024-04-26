@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.feature_onboarding_api.domain.OnboardingInteractor
@@ -26,14 +27,16 @@ class ImportWalletOptionsModule {
         router: OnboardingRouter,
         actionAwaitableMixin: ActionAwaitableMixin.Factory,
         progressDialogMixin: ProgressDialogMixin,
-        onboardingInteractor: OnboardingInteractor
+        onboardingInteractor: OnboardingInteractor,
+        customDialogProvider: CustomDialogDisplayer.Presentation
     ): ViewModel {
         return ImportWalletOptionsViewModel(
             resourceManager,
             router,
             actionAwaitableMixin,
             onboardingInteractor,
-            progressDialogMixin
+            progressDialogMixin,
+            customDialogProvider
         )
     }
 

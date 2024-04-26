@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
@@ -25,12 +26,14 @@ class StartCreateWalletModule {
         resourceManager: ResourceManager,
         startCreateWalletInteractor: StartCreateWalletInteractor,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        customDialogProvider: CustomDialogDisplayer.Presentation
     ): ViewModel {
         return StartCreateWalletViewModel(
             accountRouter,
             resourceManager,
             startCreateWalletInteractor,
-            actionBottomSheetLauncher
+            actionBottomSheetLauncher,
+            customDialogProvider
         )
     }
 

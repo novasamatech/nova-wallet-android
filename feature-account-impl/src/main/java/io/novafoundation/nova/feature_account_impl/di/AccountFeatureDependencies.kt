@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -126,6 +127,8 @@ interface AccountFeatureDependencies {
     fun cloudBackupService(): CloudBackupService
 
     fun provideActionBottomSheetLauncher(): ActionBottomSheetLauncher
+
+    fun customDialogProvider(): CustomDialogDisplayer.Presentation
 
     val systemCallExecutor: SystemCallExecutor
 

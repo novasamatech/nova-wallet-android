@@ -26,6 +26,8 @@ interface CreateCloudBackupPasswordInteractor {
     suspend fun uploadInitialBackup(password: String): Result<Unit>
 
     suspend fun changePassword(password: String): Result<Unit>
+
+    suspend fun signInToCloud(): Result<Unit>
 }
 
 class RealCreateCloudBackupPasswordInteractor(
@@ -93,5 +95,9 @@ class RealCreateCloudBackupPasswordInteractor(
             }.map {
                 cloudBackupService.session.setSavedPassword(password)
             }
+    }
+
+    override suspend fun signInToCloud(): Result<Unit> {
+        return cloudBackupService.signInToCloud()
     }
 }
