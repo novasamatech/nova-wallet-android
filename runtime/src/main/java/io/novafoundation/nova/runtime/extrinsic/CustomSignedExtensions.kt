@@ -29,7 +29,6 @@ object CustomSignedExtensions {
                     signedExtra = BigInteger.ZERO
                 )
             }
-
         };
 
         abstract fun createPayload(): SignedExtensionValue
