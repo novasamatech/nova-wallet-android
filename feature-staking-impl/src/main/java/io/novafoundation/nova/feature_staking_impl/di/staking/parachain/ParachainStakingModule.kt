@@ -9,8 +9,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.collators.FixedKnownNovaCollators
-import io.novafoundation.nova.feature_staking_impl.data.collators.KnownNovaCollators
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RealRoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
@@ -26,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.TuringStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start.StartParachainStakingFlowModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing.TuringStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.unbond.ParachainStakingUnbondModule
@@ -147,14 +146,10 @@ class ParachainStakingModule {
 
     @Provides
     @FeatureScope
-    fun provideKnownNovaCollators(): KnownNovaCollators = FixedKnownNovaCollators()
-
-    @Provides
-    @FeatureScope
     fun provideCollatorRecommendatorFactory(
         collatorProvider: CollatorProvider,
         computationalCache: ComputationalCache,
-        knownNovaCollators: KnownNovaCollators
+        knownNovaCollators: KnownNovaValidators
     ) = CollatorRecommendatorFactory(collatorProvider, computationalCache, knownNovaCollators)
 
     @Provides
