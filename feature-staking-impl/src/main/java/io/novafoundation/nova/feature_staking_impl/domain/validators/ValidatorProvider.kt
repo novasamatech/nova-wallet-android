@@ -44,9 +44,10 @@ class ValidatorProvider(
         val chain = stakingOption.assetWithChain.chain
         val chainId = chain.id
 
+        val novaValidatorIds = knownNovaValidators.getValidatorIds(chainId).toSet()
         val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
-        val requestedValidatorIds = sources.allValidatorIds(chainId, electedValidatorExposures)
+        val requestedValidatorIds = sources.allValidatorIds(chainId, electedValidatorExposures, novaValidatorIds)
         // we always need validator prefs for elected validators to construct reward calculator
         val validatorIdsToQueryPrefs = electedValidatorExposures.keys + requestedValidatorIds
 
@@ -74,7 +75,8 @@ class ValidatorProvider(
                 electedInfo = electedInfo,
                 prefs = validatorPrefs[accountIdHex],
                 identity = identities[accountIdHex],
-                address = chain.addressOf(accountIdHex.fromHex())
+                address = chain.addressOf(accountIdHex.fromHex()),
+                isNovaValidator = accountIdHex in novaValidatorIds
             )
         }
     }
@@ -89,31 +91,36 @@ class ValidatorProvider(
 
         val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
 
+        val novaValidatorIds = knownNovaValidators.getValidatorIds(chainId).toSet()
+
         return Validator(
             slashed = slashes.getOrDefault(accountId, false),
             accountIdHex = accountId,
             address = address,
             prefs = prefs,
             identity = identity,
-            electedInfo = null
+            electedInfo = null,
+            isNovaValidator = accountId in novaValidatorIds
         )
     }
 
     private fun List<ValidatorSource>.allValidatorIds(
         chainId: ChainId,
-        electedExposures: AccountIdMap<Exposure>
+        electedExposures: AccountIdMap<Exposure>,
+        novaValidatorIds: Set<String>,
     ): Set<String> {
-        return foldToSet { it.validatorIds(chainId, electedExposures) }
+        return foldToSet { it.validatorIds(chainId, electedExposures, novaValidatorIds) }
     }
 
     private fun ValidatorSource.validatorIds(
         chainId: ChainId,
-        electedExposures: AccountIdMap<Exposure>
+        electedExposures: AccountIdMap<Exposure>,
+        novaValidatorIds: Set<String>,
     ): Set<String> {
         return when (this) {
             is ValidatorSource.Custom -> validatorIds
             ValidatorSource.Elected -> electedExposures.keys
-            ValidatorSource.NovaValidators -> knownNovaValidators.getValidatorIds(chainId)
+            ValidatorSource.NovaValidators -> novaValidatorIds
         }
     }
 }

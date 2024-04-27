@@ -17,6 +17,8 @@ object RemoveClusteringPostprocessor : RecommendationPostProcessor {
         val clusterCounter = mutableMapOf<OnChainIdentity, Int>()
 
         return original.filter { validator ->
+            if (validator.shouldSkipClusteringFiltering()) return@filter true
+
             validator.clusterIdentity()?.let {
                 val currentCounter = clusterCounter.getOrDefault(it, 0)
 
@@ -37,5 +39,9 @@ object RemoveClusteringPostprocessor : RecommendationPostProcessor {
             is ChildIdentity -> validatorIdentity.parentIdentity
             else -> null
         }
+    }
+
+    private fun Validator.shouldSkipClusteringFiltering(): Boolean {
+        return isNovaValidator
     }
 }

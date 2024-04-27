@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -37,7 +36,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQuer
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
-import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
@@ -65,8 +63,9 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
-import io.novafoundation.nova.feature_staking_impl.data.validators.FixedKnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
+import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteKnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -83,6 +82,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.RealStakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.StakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RealRemoveStakingProxyInteractor
@@ -305,7 +306,16 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideKnownNovaValidators(): KnownNovaValidators = FixedKnownNovaValidators()
+    fun provideNovaValidatorsApi(apiCreator: NetworkApiCreator): NovaValidatorsApi {
+        return apiCreator.create(NovaValidatorsApi::class.java)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideKnownNovaValidators(
+        novaValidatorsApi: NovaValidatorsApi,
+        chainRegistry: ChainRegistry
+    ): KnownNovaValidators = RemoteKnownNovaValidators(novaValidatorsApi, chainRegistry)
 
     @Provides
     @FeatureScope
