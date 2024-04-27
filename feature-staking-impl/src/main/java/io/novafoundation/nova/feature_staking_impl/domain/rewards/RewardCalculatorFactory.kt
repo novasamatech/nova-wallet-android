@@ -81,6 +81,8 @@ class RewardCalculatorFactory(
     private fun InflationConfig.Companion.create(chainId: ChainId, activePublicParachains: Int?): InflationConfig {
         return when (chainId) {
             Chain.Geneses.POLKADOT -> Polkadot(activePublicParachains)
+            // TODO Add Avail Main-net genesis once it is known
+            Chain.Geneses.AVAIL_TURING_TESTNET -> Avail()
             else -> Default(activePublicParachains)
         }
     }
