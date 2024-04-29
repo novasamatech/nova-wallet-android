@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_account_api.data.cloudBackup
 
-import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
-import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
@@ -32,13 +30,9 @@ interface LocalAccountsCloudBackupFacade {
     /**
      * Creates a backup from external input. Useful for creating initial backup
      */
-    suspend fun createCloudBackupFromInput(
-        modificationTime: Long,
+    suspend fun constructCloudBackupForFirstWallet(
         metaAccount: MetaAccountLocal,
-        chainAccounts: List<ChainAccountLocal>,
         baseSecrets: EncodableStruct<MetaAccountSecrets>,
-        chainAccountSecrets: Map<String, EncodableStruct<ChainAccountSecrets>>,
-        additionalSecrets: Map<String, String>
     ): CloudBackup
 
     /**
