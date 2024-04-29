@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -36,7 +36,7 @@ class CloudBackupSettingsModule {
         syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
         changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
         restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
-        actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         accountTypePresentationMapper: MetaAccountTypePresentationMapper,
         walletUiUseCase: WalletUiUseCase,
         progressDialogMixin: ProgressDialogMixin,
@@ -51,7 +51,7 @@ class CloudBackupSettingsModule {
             syncWalletsBackupPasswordCommunicator,
             changeBackupPasswordCommunicator,
             restoreBackupPasswordCommunicator,
-            actionBottomSheetLauncher,
+            actionBottomSheetLauncherFactory,
             accountTypePresentationMapper,
             walletUiUseCase,
             progressDialogMixin,

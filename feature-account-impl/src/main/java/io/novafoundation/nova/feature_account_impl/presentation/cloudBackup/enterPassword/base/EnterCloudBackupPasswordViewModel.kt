@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -24,9 +25,9 @@ abstract class EnterCloudBackupPasswordViewModel(
     internal val router: AccountRouter,
     internal val resourceManager: ResourceManager,
     internal val interactor: EnterCloudBackupInteractor,
-    internal val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    internal val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncher {
+) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create() {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
@@ -67,7 +68,7 @@ abstract class EnterCloudBackupPasswordViewModel(
     }
 
     fun forgotPasswordClicked() {
-        actionBottomSheetLauncher.launchBackupLostPasswordAction(resourceManager, ::confirmCloudBackupDelete)
+        launchBackupLostPasswordAction(resourceManager, ::confirmCloudBackupDelete)
     }
 
     internal fun confirmCloudBackupDelete() {

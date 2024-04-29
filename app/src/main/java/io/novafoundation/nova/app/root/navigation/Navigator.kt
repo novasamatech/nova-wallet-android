@@ -414,6 +414,10 @@ class Navigator(
         performNavigation(R.id.action_open_pushNotificationsWelcome)
     }
 
+    override fun openCloudBackupSettings() {
+        performNavigation(R.id.action_open_cloudBackupSettings)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {

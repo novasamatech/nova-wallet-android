@@ -25,6 +25,7 @@ import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.CLOUD_BACKUP_APPLY_SOURCE
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
@@ -122,7 +123,7 @@ class RealLocalAccountsCloudBackupFacade(
             }
         }
 
-        changesEvent?.let { metaAccountChangedEvents.notify(it) }
+        changesEvent?.let { metaAccountChangedEvents.notify(it, source = CLOUD_BACKUP_APPLY_SOURCE) }
     }
 
     private suspend fun applyLocalRemoval(

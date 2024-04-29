@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -63,7 +63,7 @@ interface SettingsFeatureDependencies {
 
     fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory
 
-    fun actionBottomSheetLauncher(): ActionBottomSheetLauncher
+    fun actionBottomSheetLauncherFactory(): ActionBottomSheetLauncherFactory
 
     fun progressDialogMixin(): ProgressDialogMixin
 

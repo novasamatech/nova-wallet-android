@@ -622,9 +622,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
     private suspend fun verifyEvent(event: MetaAccountChangesEventBus.Event?) {
         if (event == null) {
-            verify(metaAccountChangesEventBus, never()).notify(any())
+            verify(metaAccountChangesEventBus, never()).notify(any(), source = null)
         } else {
-            verify(metaAccountChangesEventBus).notify(eq(event))
+            verify(metaAccountChangesEventBus).notify(eq(event), source = null)
         }
     }
 

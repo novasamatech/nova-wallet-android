@@ -17,4 +17,8 @@ class RestoreCloudBackupFragment : EnterCloudBackupPasswordFragment<RestoreCloud
             .create(this)
             .inject(this)
     }
+
+    override fun subscribe(viewModel: RestoreCloudBackupViewModel) {
+        super.subscribe(viewModel)
+    }
 }

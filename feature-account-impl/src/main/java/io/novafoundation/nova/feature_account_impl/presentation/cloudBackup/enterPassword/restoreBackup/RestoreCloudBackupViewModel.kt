@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.ent
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -16,25 +16,23 @@ class RestoreCloudBackupViewModel(
     router: AccountRouter,
     resourceManager: ResourceManager,
     interactor: EnterCloudBackupInteractor,
-    actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : EnterCloudBackupPasswordViewModel(
     router,
     resourceManager,
     interactor,
-    actionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory,
     actionAwaitableMixinFactory
 ) {
 
     override suspend fun continueInternal(password: String) {
         interactor.restoreCloudBackup(password)
-            .onSuccess {
-                continueBasedOnCodeStatus()
-            }.onFailure { throwable ->
-                // TODO Antony: Handle CannotApplyNonDestructiveDiff
+            .onSuccess { continueBasedOnCodeStatus() }
+            .onFailure {
                 val titleAndMessage = mapRestoreBackupFailureToUi(
                     resourceManager,
-                    throwable,
+                    it,
                     ::corruptedBackupFound
                 )
                 titleAndMessage?.let { showError(it) }
@@ -42,7 +40,7 @@ class RestoreCloudBackupViewModel(
     }
 
     private fun corruptedBackupFound() {
-        actionBottomSheetLauncher.launchCorruptedBackupFoundAction(resourceManager, ::confirmCloudBackupDelete)
+        launchCorruptedBackupFoundAction(resourceManager, ::confirmCloudBackupDelete)
     }
 
     private suspend fun continueBasedOnCodeStatus() {

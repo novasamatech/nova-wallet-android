@@ -115,4 +115,10 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel>(), ChainAccou
     override fun chainAccountClicked(item: AccountInChainUi) {
         viewModel.chainAccountClicked(item)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        viewModel.onDestroy()
+    }
 }

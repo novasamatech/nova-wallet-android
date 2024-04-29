@@ -12,7 +12,7 @@ abstract class BaseAddAccountRepository<T>(
     final override suspend fun addAccount(payload: T): AddAccountResult {
         val addAccountResult = addAccountInternal(payload)
 
-        metaAccountChangesEventBus.notify(addAccountResult.toEvent())
+        metaAccountChangesEventBus.notify(addAccountResult.toEvent(), source = null)
 
         return addAccountResult
     }

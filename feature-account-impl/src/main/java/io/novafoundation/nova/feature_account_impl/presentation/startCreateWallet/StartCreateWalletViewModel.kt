@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.finally
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
@@ -29,10 +30,10 @@ class StartCreateWalletViewModel(
     private val router: AccountRouter,
     private val resourceManager: ResourceManager,
     private val startCreateWalletInteractor: StartCreateWalletInteractor,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     customDialogProvider: CustomDialogDisplayer.Presentation
 ) : BaseViewModel(),
-    ActionBottomSheetLauncher by actionBottomSheetLauncher,
+    ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create(),
     CustomDialogDisplayer.Presentation by customDialogProvider {
 
     // Used to cancel the job when the user navigates back
@@ -104,7 +105,7 @@ class StartCreateWalletViewModel(
     }
 
     private fun userHasExistingBackup() {
-        actionBottomSheetLauncher.launchExistingCloudBackupAction(resourceManager, ::openImportCloudBackup)
+        launchExistingCloudBackupAction(resourceManager, ::openImportCloudBackup)
     }
 
     private fun openImportCloudBackup() {

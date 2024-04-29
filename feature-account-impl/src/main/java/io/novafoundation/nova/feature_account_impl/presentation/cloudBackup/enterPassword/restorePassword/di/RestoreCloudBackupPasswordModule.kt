@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -26,7 +26,7 @@ class RestoreCloudBackupPasswordModule {
         router: AccountRouter,
         resourceManager: ResourceManager,
         interactor: EnterCloudBackupInteractor,
-        actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
     ): ViewModel {
@@ -34,7 +34,7 @@ class RestoreCloudBackupPasswordModule {
             router,
             resourceManager,
             interactor,
-            actionBottomSheetLauncher,
+            actionBottomSheetLauncherFactory,
             actionAwaitableMixinFactory,
             restoreBackupPasswordCommunicator
         )

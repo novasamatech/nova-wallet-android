@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.ent
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.base.EnterCloudBackupPasswordViewModel
@@ -13,13 +13,13 @@ class CheckCloudBackupPasswordViewModel(
     router: AccountRouter,
     resourceManager: ResourceManager,
     interactor: EnterCloudBackupInteractor,
-    actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : EnterCloudBackupPasswordViewModel(
     router,
     resourceManager,
     interactor,
-    actionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory,
     actionAwaitableMixinFactory
 ) {
 

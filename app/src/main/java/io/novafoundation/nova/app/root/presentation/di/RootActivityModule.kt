@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.app.root.di.RootActionBottomSheetLauncher
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.RootViewModel
@@ -17,6 +18,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
@@ -53,7 +55,8 @@ class RootActivityModule {
         deepLinkHandler: RootDeepLinkHandler,
         rootScope: RootScope,
         compoundRequestBusHandler: CompoundRequestBusHandler,
-        pushNotificationsInteractor: PushNotificationsInteractor
+        pushNotificationsInteractor: PushNotificationsInteractor,
+        @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -71,7 +74,8 @@ class RootActivityModule {
             deepLinkHandler,
             rootScope,
             compoundRequestBusHandler,
-            pushNotificationsInteractor
+            pushNotificationsInteractor,
+            actionBottomSheetLauncher
         )
     }
 

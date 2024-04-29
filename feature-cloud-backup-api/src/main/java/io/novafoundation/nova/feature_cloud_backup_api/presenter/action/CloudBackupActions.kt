@@ -138,3 +138,21 @@ fun ActionBottomSheetLauncher.launchCloudBackupChangesAction(resourceManager: Re
         )
     )
 }
+
+fun ActionBottomSheetLauncher.launchCloudBackupDestructiveChangesNotApplied(
+    resourceManager: ResourceManager,
+    onReviewClicked: () -> Unit
+) {
+    launchBottomSheet(
+        imageRes = R.drawable.ic_cloud_backup_warning,
+        title = resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_title),
+        subtitle = resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_subtitle),
+        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
+            resourceManager.getString(R.string.common_not_now)
+        ),
+        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+            resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_button),
+            onReviewClicked
+        )
+    )
+}

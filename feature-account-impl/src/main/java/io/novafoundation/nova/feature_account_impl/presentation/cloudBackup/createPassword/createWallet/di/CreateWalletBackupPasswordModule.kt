@@ -9,7 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -26,7 +26,7 @@ class CreateWalletBackupPasswordModule {
         router: AccountRouter,
         resourceManager: ResourceManager,
         interactor: CreateCloudBackupPasswordInteractor,
-        actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         payload: CreateBackupPasswordPayload,
         accountInteractor: AccountInteractor
     ): ViewModel {
@@ -34,7 +34,7 @@ class CreateWalletBackupPasswordModule {
             router,
             resourceManager,
             interactor,
-            actionBottomSheetLauncher,
+            actionBottomSheetLauncherFactory,
             payload,
             accountInteractor
         )

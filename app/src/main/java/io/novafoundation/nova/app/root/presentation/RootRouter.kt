@@ -9,4 +9,6 @@ interface RootRouter {
     fun openUpdateNotifications()
 
     fun openPushWelcome()
+
+    fun openCloudBackupSettings()
 }
