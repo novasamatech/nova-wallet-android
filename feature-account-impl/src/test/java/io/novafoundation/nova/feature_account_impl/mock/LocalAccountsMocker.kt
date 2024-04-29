@@ -159,9 +159,9 @@ class LocalChainAccountMockBuilder(
     private val chainId: ChainId,
 ) {
 
-    private var _publicKey = ByteArray(32)
+    private var _publicKey: ByteArray? = null
     private var _accountId = ByteArray(32)
-    private var _cryptoType = CryptoType.SR25519
+    private var _cryptoType: CryptoType? = null
 
     fun publicKey(value: ByteArray) {
         _publicKey = value

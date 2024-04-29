@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.list.GroupedList
+import io.novafoundation.nova.common.utils.finally
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
@@ -9,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.metaAccountTypeComparator
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
@@ -36,7 +38,7 @@ interface CloudBackupSettingsInteractor {
 
     fun prepareSortedLocalChangesFromDiff(cloudBackupDiff: CloudBackupDiff): GroupedList<LightMetaAccount.Type, CloudBackupChangedAccount>
 
-    suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff): Result<Unit>
+    suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff, cloudBackup: CloudBackup): Result<Unit>
 }
 
 class RealCloudBackupSettingsInteractor(
@@ -54,7 +56,7 @@ class RealCloudBackupSettingsInteractor(
                 cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.syncWithCloud())
             }.flatMap {
                 writeLocalBackupToCloud()
-            }.onSuccess {
+            }.finally {
                 cloudBackupService.session.setLastSyncedTimeAsNow()
             }
     }
@@ -90,14 +92,13 @@ class RealCloudBackupSettingsInteractor(
             .toSortedMap(metaAccountTypeComparator())
     }
 
-    override suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff): Result<Unit> {
-        return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
-            .mapCatching { cloudBackup ->
-                cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
-                cloudBackupService.session.setLastSyncedTimeAsNow()
-            }.flatMap {
-                writeLocalBackupToCloud()
-            }
+    override suspend fun applyBackupAccountDiff(cloudBackupDiff: CloudBackupDiff, cloudBackup: CloudBackup): Result<Unit> {
+        return runCatching {
+            cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
+            cloudBackupService.session.setLastSyncedTimeAsNow()
+        }.flatMap {
+            writeLocalBackupToCloud()
+        }
     }
 
     private fun localAccountChangesFromDiff(diff: CloudBackupDiff.PerSourceDiff): List<CloudBackupChangedAccount> {

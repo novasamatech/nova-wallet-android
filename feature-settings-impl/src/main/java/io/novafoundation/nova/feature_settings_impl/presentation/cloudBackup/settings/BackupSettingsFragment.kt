@@ -76,7 +76,7 @@ class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel>() {
         val bottomSheet = CloudBackupDiffBottomSheet(
             requireContext(),
             payload,
-            onApply = { viewModel.applyBackupDestructiveChanges(it) }
+            onApply = { diff, cloudBackup -> viewModel.applyBackupDestructiveChanges(diff, cloudBackup) }
         )
 
         bottomSheet.show()
