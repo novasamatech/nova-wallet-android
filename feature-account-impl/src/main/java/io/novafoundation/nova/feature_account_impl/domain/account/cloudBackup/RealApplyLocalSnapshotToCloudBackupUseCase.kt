@@ -36,7 +36,7 @@ class RealApplyLocalSnapshotToCloudBackupUseCase(
                             cloudBackupService.session.setLastSyncedTimeAsNow()
                         }
                 } else {
-                    return Result.failure(CannotApplyNonDestructiveDiff(diff))
+                    return Result.failure(CannotApplyNonDestructiveDiff(diff, cloudBackup))
                 }
             }
     }
