@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="cloud_backup_destructive_changes_confirmation_title">Are you sure that you want to apply these changes?</string>
+    <string name="cloud_backup_destructive_changes_confirmation_subtitle">If you have not manually written down your Passphrase for wallets that will be removed, then those wallets and all of their assets will be permanently and irretrievably lost forever.</string>
+
+    <string name="cloud_backup_destructive_changes_action_title">Cloud Backup changes found</string>
+    <string name="cloud_backup_destructive_changes_action_subtitle">At the moment your backup is not synchronized. Please review these updates.</string>
+    <string name="cloud_backup_destructive_changes_button">Review Updates</string>
+
+    <string name="state_new">New</string>
+    <string name="state_changed">Modified</string>
+    <string name="state_removed">Removed</string>
+
+    <string name="backup_diff_title">Apply Backup Updates?</string>
+    <string name="backup_diff_subtitle">Before proceeding with changes, %s for modified and removed wallets!</string>
+    <string name="backup_diff_subtitle_highlighted">ensure you\'ve saved Passphrases</string>
     <string name="common_sign_in">Sign In</string>
 
     <!--<string name="push_welcome_cancel_button">Not now</string>-->

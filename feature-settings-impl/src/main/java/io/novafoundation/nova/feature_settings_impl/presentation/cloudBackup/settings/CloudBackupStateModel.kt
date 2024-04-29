@@ -1,6 +1,6 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup
+package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings
 
-import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.views.CloudBackupStateView
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.views.CloudBackupStateView
 
 class CloudBackupStateModel(
     val stateImg: Int?,

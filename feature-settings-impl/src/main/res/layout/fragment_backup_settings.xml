@@ -56,7 +56,7 @@
 
             </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
-            <io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.views.CloudBackupStateView
+            <io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.views.CloudBackupStateView
                 android:id="@+id/backupStateView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

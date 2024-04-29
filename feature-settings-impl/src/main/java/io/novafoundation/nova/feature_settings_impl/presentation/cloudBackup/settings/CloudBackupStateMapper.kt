@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup
+package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.formatDateSinceEpoch
@@ -70,7 +70,7 @@ private fun mapCloudBackupClickability(
 
     return when (syncOutcome) {
         BackupSyncOutcome.Ok,
-        BackupSyncOutcome.DestructiveDiff,
+        is BackupSyncOutcome.DestructiveDiff,
         BackupSyncOutcome.UnknownPassword,
         BackupSyncOutcome.CorruptedBackup,
         BackupSyncOutcome.OtherStorageIssue,
@@ -92,7 +92,7 @@ private fun mapCloudBackupProblemButton(
     return when (syncOutcome) {
         BackupSyncOutcome.Ok -> null
         BackupSyncOutcome.CorruptedBackup -> resourceManager.getString(R.string.cloud_backup_settings_backup_errors_button)
-        BackupSyncOutcome.DestructiveDiff -> resourceManager.getString(R.string.cloud_backup_settings_corrupted_backup_button)
+        is BackupSyncOutcome.DestructiveDiff -> resourceManager.getString(R.string.cloud_backup_settings_corrupted_backup_button)
         BackupSyncOutcome.UnknownPassword -> resourceManager.getString(R.string.cloud_backup_settings_deprecated_password_button)
         BackupSyncOutcome.OtherStorageIssue -> resourceManager.getString(R.string.cloud_backup_settings_other_errors_button)
         BackupSyncOutcome.StorageAuthFailed -> resourceManager.getString(R.string.cloud_backup_settings_not_auth_button)

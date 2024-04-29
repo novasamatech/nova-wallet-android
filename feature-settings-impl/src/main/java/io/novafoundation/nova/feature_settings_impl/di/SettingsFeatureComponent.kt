@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
-import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.di.CloudBackupSettingsComponent
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di.CloudBackupSettingsComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi

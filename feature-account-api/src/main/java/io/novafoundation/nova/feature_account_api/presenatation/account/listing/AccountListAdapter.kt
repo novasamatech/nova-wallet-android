@@ -17,7 +17,7 @@ class AccountsAdapter(
     imageLoader = imageLoader,
     diffCallback = AccountDiffCallback(AccountChipGroupRvItem::class.java),
     groupFactory = { AccountChipHolder(ChipLabelView(it.context)) },
-    groupBinder = { holder, item -> (holder as AccountChipHolder).bind(item) },
+    groupBinder = { holder, item -> (holder as AccountChipHolder).bind(item.chipLabelModel) },
     chainBorderColor = chainBorderColor,
     initialMode = initialMode
 )

@@ -97,9 +97,10 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Real
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
@@ -486,7 +487,7 @@ class AccountFeatureModule {
     fun provideAccountTypePresentationMapper(
         resourceManager: ResourceManager,
         polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-    ) = MetaAccountTypePresentationMapper(resourceManager, polkadotVaultVariantConfigProvider)
+    ): MetaAccountTypePresentationMapper = RealMetaAccountTypePresentationMapper(resourceManager, polkadotVaultVariantConfigProvider)
 
     @Provides
     @FeatureScope

@@ -4,17 +4,23 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.ChipLabelModel
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrThrow
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountChipGroupRvItem
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.R
 
-class MetaAccountTypePresentationMapper(
+class RealMetaAccountTypePresentationMapper(
     private val resourceManager: ResourceManager,
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-) {
+) : MetaAccountTypePresentationMapper {
 
-    fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
-        val chipLabelModel = when (type) {
+    override fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
+        return mapTypeToChipLabel(type)
+            ?.let { AccountChipGroupRvItem(it) }
+    }
+
+    override fun mapTypeToChipLabel(type: LightMetaAccount.Type): ChipLabelModel? {
+        return when (type) {
             LightMetaAccount.Type.SECRETS -> null
             LightMetaAccount.Type.WATCH_ONLY -> ChipLabelModel(
                 iconRes = R.drawable.ic_watch_only_filled,
@@ -40,7 +46,5 @@ class MetaAccountTypePresentationMapper(
                 title = resourceManager.getString(R.string.account_proxieds)
             )
         }
-
-        return chipLabelModel?.let { AccountChipGroupRvItem(it) }
     }
 }

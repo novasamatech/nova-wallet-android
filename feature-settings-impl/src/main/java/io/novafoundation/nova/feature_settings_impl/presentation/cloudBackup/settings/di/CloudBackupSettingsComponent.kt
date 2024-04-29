@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.di
+package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.BackupSettingsFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.BackupSettingsFragment
 
 @Subcomponent(
     modules = [

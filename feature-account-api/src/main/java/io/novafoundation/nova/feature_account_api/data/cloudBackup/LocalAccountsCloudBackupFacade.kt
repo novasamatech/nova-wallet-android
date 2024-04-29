@@ -68,6 +68,6 @@ suspend fun LocalAccountsCloudBackupFacade.applyNonDestructiveCloudVersionOrThro
 
         diff
     } else {
-        throw CannotApplyNonDestructiveDiff()
+        throw CannotApplyNonDestructiveDiff(diff, cloudVersion)
     }
 }

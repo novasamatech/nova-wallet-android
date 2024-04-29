@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
@@ -77,6 +78,8 @@ interface AccountFeatureApi {
     val signSharedState: SigningSharedState
 
     val onChainIdentityRepository: OnChainIdentityRepository
+
+    val metaAccountTypePresentationMapper: MetaAccountTypePresentationMapper
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup
+package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.CloudBackupDiffBottomSheet
 import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsManualBtn
 import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsSwitcher
 import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsToolbar
@@ -55,7 +56,8 @@ class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel>() {
         observeProgressDialog(viewModel.progressDialogMixin)
         observeActionBottomSheet(viewModel)
         setupListSelectorMixin(viewModel.listSelectorMixin)
-        setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.confirmationAwaitableAction)
+        setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.negativeConfirmationAwaitableAction)
+        setupConfirmationDialog(R.style.AccentAlertDialogTheme, viewModel.neutralConfirmationAwaitableAction)
 
         viewModel.cloudBackupEnabled.observe { enabled ->
             backupSettingsSwitcher.setChecked(enabled)
@@ -64,5 +66,19 @@ class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel>() {
         viewModel.cloudBackupStateModel.observe { state ->
             backupStateView.setState(state)
         }
+
+        viewModel.cloudBackupChangesLiveData.observeEvent {
+            showBackupDiffBottomSheet(it)
+        }
+    }
+
+    private fun showBackupDiffBottomSheet(payload: CloudBackupDiffBottomSheet.Payload) {
+        val bottomSheet = CloudBackupDiffBottomSheet(
+            requireContext(),
+            payload,
+            onApply = { diff, cloudBackup -> viewModel.applyBackupDestructiveChanges(diff, cloudBackup) }
+        )
+
+        bottomSheet.show()
     }
 }
