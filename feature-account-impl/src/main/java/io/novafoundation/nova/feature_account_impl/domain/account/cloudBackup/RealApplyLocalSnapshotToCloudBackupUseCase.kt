@@ -5,6 +5,8 @@ import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccounts
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isNotDestructive
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff
@@ -24,7 +26,11 @@ class RealApplyLocalSnapshotToCloudBackupUseCase(
                 val localCloudBackupSnapshot = localAccountsCloudBackupFacade.fullBackupInfoFromLocalSnapshot()
                 val diff = localCloudBackupSnapshot.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
-                if (localAccountsCloudBackupFacade.canPerformNonDestructiveApply(diff)) {
+                // If there are no changes to apply we can finish it
+                if (diff.cloudChanges.isEmpty()) return Result.success(Unit)
+
+                // If we don't have destructive local changes, we can apply the diff to cloud
+                if (diff.localChanges.isNotDestructive()) {
                     cloudBackupService.writeCloudBackupWithSavedPassword(localCloudBackupSnapshot)
                         .onSuccess {
                             cloudBackupService.session.setLastSyncedTimeAsNow()

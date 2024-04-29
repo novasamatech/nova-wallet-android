@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isNotDestructive
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.keypair.BaseKeypair
@@ -100,7 +101,7 @@ class RealLocalAccountsCloudBackupFacade(
     }
 
     override suspend fun canPerformNonDestructiveApply(diff: CloudBackupDiff): Boolean {
-        return diff.localChanges.modified.isEmpty() && diff.localChanges.removed.isEmpty()
+        return diff.localChanges.isNotDestructive()
     }
 
     override suspend fun applyBackupDiff(diff: CloudBackupDiff, cloudVersion: CloudBackup) {

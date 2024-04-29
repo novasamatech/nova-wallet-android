@@ -52,9 +52,8 @@ class RealCloudBackupSettingsInteractor(
         return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
             .mapCatching { cloudBackup ->
                 cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.syncWithCloud())
-
-                // TODO: Rewrite cloud backup
-                Unit
+            }.flatMap {
+                writeLocalBackupToCloud()
             }.onSuccess {
                 cloudBackupService.session.setLastSyncedTimeAsNow()
             }
@@ -96,8 +95,8 @@ class RealCloudBackupSettingsInteractor(
             .mapCatching { cloudBackup ->
                 cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
                 cloudBackupService.session.setLastSyncedTimeAsNow()
-
-                // TODO: Rewrite cloud backup
+            }.flatMap {
+                writeLocalBackupToCloud()
             }
     }
 
