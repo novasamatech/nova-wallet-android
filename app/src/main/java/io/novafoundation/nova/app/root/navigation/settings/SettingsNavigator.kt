@@ -53,4 +53,8 @@ class SettingsNavigator(
     override fun openCloudBackupSettings() {
         performNavigation(R.id.action_open_cloudBackupSettings)
     }
+
+    override fun openManualBackup() {
+        performNavigation(R.id.action_open_manualBackupSelectWallet)
+    }
 }

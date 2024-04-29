@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/manual_backup_select_wallet_graph"
+    app:startDestination="@id/manualBackupSelectWallet">
+
+    <fragment
+        android:id="@+id/manualBackupSelectWallet"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.ManualBackupSelectWalletFragment"
+        android:label="ManualBackupSelectWalletFragment">
+
+    </fragment>
+
+</navigation>
