@@ -611,8 +611,9 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideManualBackupInteractor(
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry
     ): ManualBackupInteractor {
-        return RealManualBackupInteractor(accountRepository)
+        return RealManualBackupInteractor(accountRepository, chainRegistry)
     }
 }

@@ -100,6 +100,11 @@ class Toolbar @JvmOverloads constructor(
         rightActionContainer.setVisible(!visible)
     }
 
+    fun setTitleIcon(drawable: Drawable?) {
+        titleTv.compoundDrawablePadding = 8.dp(context)
+        titleTv.setCompoundDrawables(drawable, null, null, null)
+    }
+
     fun setTitle(title: CharSequence?) {
         titleTv.text = title
     }

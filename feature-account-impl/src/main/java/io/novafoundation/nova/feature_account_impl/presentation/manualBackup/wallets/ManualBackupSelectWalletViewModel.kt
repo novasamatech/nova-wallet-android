@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.manualBackup
+package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets
 
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_BIG
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import kotlinx.coroutines.launch
 
 class ManualBackupSelectWalletViewModel(
     private val router: AccountRouter,
@@ -24,7 +25,14 @@ class ManualBackupSelectWalletViewModel(
     val walletsUI = wallets.mapList { mapMetaAccountToUI(it) }
 
     fun walletClicked(accountModel: AccountUi) {
-        showError("Not implemented")
+        launch {
+            val metaAccount = manualBackupInteractor.getMetaAccount(accountModel.id)
+            if (metaAccount.chainAccounts.isEmpty()) {
+                showError("Not implemented for case with default account only")
+            } else {
+                router.openManualBackupSelectAccount(accountModel.id)
+            }
+        }
     }
 
     private suspend fun mapMetaAccountToUI(metaAccount: MetaAccount): AccountUi {

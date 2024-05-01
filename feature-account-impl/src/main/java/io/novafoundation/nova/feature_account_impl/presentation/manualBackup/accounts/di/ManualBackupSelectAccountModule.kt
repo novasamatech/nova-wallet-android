@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.di
+package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -12,25 +12,28 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.ManualBackupSelectWalletViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountViewModel
 
 @Module(includes = [ViewModelModule::class])
-class ManualBackupSelectWalletModule {
+class ManualBackupSelectAccountModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(ManualBackupSelectWalletViewModel::class)
+    @ViewModelKey(ManualBackupSelectAccountViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
         resourceManager: ResourceManager,
         manualBackupInteractor: ManualBackupInteractor,
-        walletUiUseCase: WalletUiUseCase
+        walletUiUseCase: WalletUiUseCase,
+        payload: ManualBackupSelectAccountPayload
     ): ViewModel {
-        return ManualBackupSelectWalletViewModel(
+        return ManualBackupSelectAccountViewModel(
             router,
             resourceManager,
             manualBackupInteractor,
-            walletUiUseCase
+            walletUiUseCase,
+            payload
         )
     }
 
@@ -38,10 +41,10 @@ class ManualBackupSelectWalletModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): ManualBackupSelectWalletViewModel {
+    ): ManualBackupSelectAccountViewModel {
         return ViewModelProvider(
             fragment,
             viewModelFactory
-        ).get(ManualBackupSelectWalletViewModel::class.java)
+        ).get(ManualBackupSelectAccountViewModel::class.java)
     }
 }

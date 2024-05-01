@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemManualBackupGroupTitle"
+    style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="24dp"
+    android:layout_marginBottom="8dp"
+    android:ellipsize="end"
+    android:layout_marginHorizontal="16dp"
+    android:includeFontPadding="false"
+    android:singleLine="true"
+    android:textAllCaps="true"
+    android:textColor="@color/text_secondary"
+    tools:text="Polkadot" />
