@@ -324,7 +324,7 @@ object ChainGeneses {
     const val HYDRA_DX = "afdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d"
 
     const val AVAIL_TURING_TESTNET = "d3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70"
-    const val AVAIL= "128ea318539862c0a06b745981300d527c1041c6f3388a8c49565559e3ea3d10"
+    const val AVAIL = "128ea318539862c0a06b745981300d527c1041c6f3388a8c49565559e3ea3d10"
 }
 
 object ChainIds {
