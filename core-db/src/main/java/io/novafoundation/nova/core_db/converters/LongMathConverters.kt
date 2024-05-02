@@ -24,10 +24,10 @@ class LongMathConverters {
     @TypeConverter
     fun toBigInteger(balance: String?): BigInteger? {
         return balance?.let {
-            // BigInteger.toString() may sometimes return value in scientific notation which cant be parsed by BigInteger constructor
-            // I've got one such case but weren't able to reproduce it with exact same number
-            // Ideally we need to research why and when it happens and maybe switch to more reliable bigInt -> string conversion
-            // Meanwhile, we retry with BigDecimal constructor in case of failure
+            // When using aggregates like SUM in SQL queries, SQLite might return the result in a scientific notation especially if aggregation is done
+            // BigInteger, which is stored as a string and SQLite casts it to REAL which causing the scientific notation on big numbers
+            // This can be avoided by adjusting the query but we keep the fallback to BigDecimal parsing here anyways to avoid unpleasant crashes
+            // It doesn't bring much impact since try-catch doesn't have an overhead unless the exception is thrown
             try {
                 BigInteger(it)
             } catch (e: NumberFormatException) {

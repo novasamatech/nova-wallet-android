@@ -21,7 +21,8 @@ object CustomSignedExtensions {
             }
         },
 
-        // Signed extension for Avail related to Data Availability Transactions. We set it to 0 (provide)
+        // Signed extension for Avail related to Data Availability Transactions.
+        // We set it to 0 which is the default value provided by Avail team
         CHECK_APP_ID("CheckAppId") {
 
             override fun createPayload(): SignedExtensionValue {
