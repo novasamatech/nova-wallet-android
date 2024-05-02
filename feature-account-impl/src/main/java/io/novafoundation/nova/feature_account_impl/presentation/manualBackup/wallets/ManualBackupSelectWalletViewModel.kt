@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
 import kotlinx.coroutines.launch
 
 class ManualBackupSelectWalletViewModel(
@@ -28,7 +29,7 @@ class ManualBackupSelectWalletViewModel(
         launch {
             val metaAccount = manualBackupInteractor.getMetaAccount(accountModel.id)
             if (metaAccount.chainAccounts.isEmpty()) {
-                showError("Not implemented for case with default account only")
+                router.openManualBackupConditions(ManualBackupAccountToBackupPayload.DefaultAccount(metaId = accountModel.id))
             } else {
                 router.openManualBackupSelectAccount(accountModel.id)
             }

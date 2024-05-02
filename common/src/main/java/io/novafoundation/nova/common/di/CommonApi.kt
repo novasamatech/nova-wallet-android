@@ -25,6 +25,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
@@ -146,6 +147,8 @@ interface CommonApi {
     fun progressDialogMixin(): ProgressDialogMixin
 
     fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory
+
+    fun provideConditionMixinFactory(): ConditionMixinFactory
 
     val systemCallExecutor: SystemCallExecutor
 

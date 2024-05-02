@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="manual_backup_warning_disabled_button">Review &amp; Accept to Continue</string>
+
+    <string name="manual_backup_warning_title">Do not share your passphrase!</string>
+    <string name="manual_backup_warning_subtitle">Please read the following carefully before viewing your backup</string>
+    <string name="manual_backup_warning_condition_1">This passphrase gives you total and permanent access to all connected wallets and the funds within them.\n%s</string>
+    <string name="manual_backup_warning_condition_1_highlight">DO NOT SHARE IT.</string>
+    <string name="manual_backup_warning_condition_2">Do not enter your Passphrase into any form or website.\n%s</string>
+    <string name="manual_backup_warning_condition_2_highlight">FUNDS MAY BE LOST FOREVER.</string>
+    <string name="manual_backup_warning_condition_3">Support or admins will never request your Passphrase under any circumstances.\n%s</string>
+    <string name="manual_backup_warning_condition_3_highlight">BEWARE OF IMPERSONATORS.</string>
+
     <string name="manual_backup_select_account_default_key_title">Accounts with default key</string>
     <string name="manual_backup_select_account_custom_key_title">Accounts with custom key</string>
     <string name="manual_backup_select_account_default_key_account">Default accounts</string>

@@ -53,9 +53,9 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     private fun buildConditions() {
-        backupMnemonicCondition1.text = buildCondition(R.string.backup_mnemonic_condition_1, R.string.backup_mnemonic_condition_1_highlight)
-        backupMnemonicCondition2.text = buildCondition(R.string.backup_mnemonic_condition_2, R.string.backup_mnemonic_condition_2_highlight)
-        backupMnemonicCondition3.text = buildCondition(R.string.backup_mnemonic_condition_3, R.string.backup_mnemonic_condition_3_highlight)
+        backupMnemonicCondition1.setText(buildCondition(R.string.backup_mnemonic_condition_1, R.string.backup_mnemonic_condition_1_highlight))
+        backupMnemonicCondition2.setText(buildCondition(R.string.backup_mnemonic_condition_2, R.string.backup_mnemonic_condition_2_highlight))
+        backupMnemonicCondition3.setText(buildCondition(R.string.backup_mnemonic_condition_3, R.string.backup_mnemonic_condition_3_highlight))
 
         backupMnemonicCondition1.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_1, isChecked) }
         backupMnemonicCondition2.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_2, isChecked) }
@@ -81,7 +81,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun subscribe(viewModel: BackupMnemonicViewModel) {
-        viewModel.continueButtonState.observe(backupMnemonicContinue::setState)
+        viewModel.conditionMixin.buttonState.observe(backupMnemonicContinue::setState)
 
         viewModel.showMnemonicWarningDialog.observeEvent {
             showMnemonicWarning()

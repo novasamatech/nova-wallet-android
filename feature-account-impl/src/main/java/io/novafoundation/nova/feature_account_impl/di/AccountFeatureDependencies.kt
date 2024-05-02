@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -129,6 +130,8 @@ interface AccountFeatureDependencies {
     fun provideActionBottomSheetLauncherFactory(): ActionBottomSheetLauncherFactory
 
     fun customDialogProvider(): CustomDialogDisplayer.Presentation
+
+    fun provideConditionMixinFactory(): ConditionMixinFactory
 
     val systemCallExecutor: SystemCallExecutor
 

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountGroupRVItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountRVItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupRVItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
 import kotlinx.coroutines.flow.map
 
 class ManualBackupSelectAccountViewModel(
@@ -33,7 +34,13 @@ class ManualBackupSelectAccountViewModel(
     }
 
     fun walletClicked(accountModel: ManualBackupAccountRVItem) {
-        showError("Not implemented")
+        val payload = if (accountModel.chainId == null) {
+            ManualBackupAccountToBackupPayload.DefaultAccount(metaId = this.payload.metaId)
+        } else {
+            ManualBackupAccountToBackupPayload.ChainAccount(metaId = this.payload.metaId, chainId = accountModel.chainId)
+        }
+
+        router.openManualBackupConditions(payload)
     }
 
     fun backClicked() {

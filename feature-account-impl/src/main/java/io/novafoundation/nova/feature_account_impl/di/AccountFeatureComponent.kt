@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.importing.di.Imp
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.di.ManualBackupSelectAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets.di.ManualBackupSelectWalletComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.di.ManualBackupWarningComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.di.SelectWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.di.BackupMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.di.ConfirmMnemonicComponent
@@ -139,6 +140,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun startCreateWallet(): StartCreateWalletComponent.Factory
 
     fun manualBackupSelectWallet(): ManualBackupSelectWalletComponent.Factory
+
+    fun manualBackupWarning(): ManualBackupWarningComponent.Factory
 
     fun manualBackupSelectAccount(): ManualBackupSelectAccountComponent.Factory
 

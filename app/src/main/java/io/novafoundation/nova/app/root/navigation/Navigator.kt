@@ -28,6 +28,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.E
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment
@@ -566,6 +568,24 @@ class Navigator(
     override fun openManualBackupSelectAccount(metaId: Long) {
         val bundle = ManualBackupSelectAccountFragment.bundle(ManualBackupSelectAccountPayload(metaId))
         performNavigation(R.id.action_manualBackupSelectWalletFragment_to_manualBackupSelectAccountFragment, bundle)
+    }
+
+    override fun openManualBackupConditions(payload: ManualBackupAccountToBackupPayload) {
+        val bundle = ManualBackupWarningFragment.bundle(payload)
+
+        val pinCodePayload = PinCodeAction.Check(
+            NavComponentDelayedNavigation(R.id.action_manualBackupPincodeFragment_to_manualBackupWarning, bundle),
+            ToolbarConfiguration()
+        )
+        val pinCodeBundle = PincodeFragment.getPinCodeBundle(pinCodePayload)
+
+        performNavigation(
+            cases = arrayOf(
+                R.id.manualBackupSelectWallet to R.id.action_manualBackupSelectWallet_to_pincode_check,
+                R.id.manualBackupSelectAccount to R.id.action_manualBackupSelectAccount_to_pincode_check
+            ),
+            args = pinCodeBundle
+        )
     }
 
     override fun openCreateWatchWallet() {

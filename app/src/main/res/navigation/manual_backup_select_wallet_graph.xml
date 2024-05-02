@@ -18,12 +18,51 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_manualBackupSelectWallet_to_pincode_check"
+            app:destination="@+id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
     <fragment
         android:id="@+id/manualBackupSelectAccount"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment"
         android:label="ManualBackupSelectAccountFragment">
+
+        <action
+            android:id="@+id/action_manualBackupSelectAccount_to_pincode_check"
+            app:destination="@+id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/pincodeFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
+        android:label="fragment_pincode"
+        tools:layout="@layout/fragment_pincode">
+
+        <action
+            android:id="@+id/action_manualBackupPincodeFragment_to_manualBackupWarning"
+            app:destination="@+id/manualBackupWarning"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/manualBackupWarning"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningFragment"
+        android:label="ManualBackupWarningFragment">
 
     </fragment>
 

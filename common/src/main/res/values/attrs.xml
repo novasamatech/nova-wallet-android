@@ -319,4 +319,10 @@
         <attr name="icon" />
     </declare-styleable>
 
+    <declare-styleable name="WarningCheckBox">
+        <attr name="android:icon" />
+        <attr name="iconTint" />
+        <attr name="android:text" />
+    </declare-styleable>
+
 </resources>

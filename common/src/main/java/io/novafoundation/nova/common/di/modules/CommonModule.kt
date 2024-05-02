@@ -35,6 +35,8 @@ import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableProvider
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.mixin.condition.RealConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -338,4 +340,10 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory = RealListSelectorMixinFactory()
+
+    @Provides
+    @ApplicationScope
+    fun provideConditionMixinFactory(resourceManager: ResourceManager): ConditionMixinFactory {
+        return RealConditionMixinFactory(resourceManager)
+    }
 }
