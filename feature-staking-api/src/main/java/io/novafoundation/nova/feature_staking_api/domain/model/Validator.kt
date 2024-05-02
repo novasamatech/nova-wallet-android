@@ -16,6 +16,7 @@ class Validator(
     val prefs: ValidatorPrefs?,
     val electedInfo: ElectedInfo?,
     val identity: OnChainIdentity?,
+    val isNovaValidator: Boolean
 ) : Identifiable {
 
     class ElectedInfo(
