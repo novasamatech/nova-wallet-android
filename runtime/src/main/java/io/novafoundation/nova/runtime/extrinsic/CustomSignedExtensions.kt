@@ -19,6 +19,17 @@ object CustomSignedExtensions {
                     signedExtra = assetTxPaymentPayload(assetId = null)
                 )
             }
+        },
+
+        // Signed extension for Avail related to Data Availability Transactions.
+        // We set it to 0 which is the default value provided by Avail team
+        CHECK_APP_ID("CheckAppId") {
+
+            override fun createPayload(): SignedExtensionValue {
+                return SignedExtensionValue(
+                    signedExtra = BigInteger.ZERO
+                )
+            }
         };
 
         abstract fun createPayload(): SignedExtensionValue
