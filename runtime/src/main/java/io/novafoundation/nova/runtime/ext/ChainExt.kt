@@ -325,6 +325,8 @@ object ChainGeneses {
 
     const val AVAIL_TURING_TESTNET = "d3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70"
     const val AVAIL = "128ea318539862c0a06b745981300d527c1041c6f3388a8c49565559e3ea3d10"
+
+    const val VARA = "fe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763"
 }
 
 object ChainIds {
