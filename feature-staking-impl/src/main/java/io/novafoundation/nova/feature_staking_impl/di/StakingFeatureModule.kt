@@ -45,12 +45,14 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRe
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingVersioningRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealVaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingVersioningRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.VaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
@@ -297,12 +299,23 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideVaraRepository(chainRegistry: ChainRegistry): VaraRepository = RealVaraRepository(chainRegistry)
+
+    @Provides
+    @FeatureScope
     fun provideRewardCalculatorFactory(
         repository: StakingRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
         stakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
         parasRepository: ParasRepository,
-    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, stakingSharedComputation, parasRepository)
+        varaRepository: VaraRepository
+    ) = RewardCalculatorFactory(
+        stakingRepository = repository,
+        totalIssuanceRepository = totalIssuanceRepository,
+        shareStakingSharedComputation = stakingSharedComputation,
+        parasRepository = parasRepository,
+        varaRepository = varaRepository
+    )
 
     @Provides
     @FeatureScope
