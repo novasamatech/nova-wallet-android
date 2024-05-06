@@ -149,7 +149,7 @@ class BackupSettingsViewModel(
             }
 
             BackupSyncOutcome.Ok,
-            BackupSyncOutcome.DestructiveDiff,
+            is BackupSyncOutcome.DestructiveDiff,
             BackupSyncOutcome.UnknownError -> {
                 listSelectorMixin.showSelector(
                     R.string.manage_cloud_backup,
