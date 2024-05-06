@@ -26,6 +26,8 @@ class CloudBackupDiff(
 
 fun CloudBackupDiff.PerSourceDiff.isEmpty(): Boolean = added.isEmpty() && modified.isEmpty() && removed.isEmpty()
 
+fun CloudBackupDiff.PerSourceDiff.isNotEmpty(): Boolean = added.isEmpty() && modified.isEmpty() && removed.isEmpty()
+
 fun CloudBackupDiff.PerSourceDiff.isDestructive(): Boolean = removed.isNotEmpty() || modified.isNotEmpty()
 
 fun CloudBackupDiff.PerSourceDiff.isNotDestructive(): Boolean = !isDestructive()
