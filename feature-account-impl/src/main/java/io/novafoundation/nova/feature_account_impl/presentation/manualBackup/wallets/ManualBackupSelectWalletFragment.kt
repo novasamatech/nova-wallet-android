@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.manualBackup
+package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets
 
 import android.os.Bundle
 import android.view.LayoutInflater

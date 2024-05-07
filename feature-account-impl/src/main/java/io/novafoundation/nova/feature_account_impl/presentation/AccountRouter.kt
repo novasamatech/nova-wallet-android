@@ -88,4 +88,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openRestoreBackupPassword()
 
     fun openChangeBackupPassword()
+
+    fun openManualBackupSelectAccount(metaId: Long)
 }

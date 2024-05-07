@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.c
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment
@@ -559,6 +561,11 @@ class Navigator(
 
     override fun openChangeBackupPassword() {
         performNavigation(R.id.action_checkCloudBackupPasswordFragment_to_changeBackupPasswordFragment)
+    }
+
+    override fun openManualBackupSelectAccount(metaId: Long) {
+        val bundle = ManualBackupSelectAccountFragment.bundle(ManualBackupSelectAccountPayload(metaId))
+        performNavigation(R.id.action_manualBackupSelectWalletFragment_to_manualBackupSelectAccountFragment, bundle)
     }
 
     override fun openCreateWatchWallet() {

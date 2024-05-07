@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.manualBackup
+package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets
 
 import coil.ImageLoader
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountDiffCallback

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="manual_backup_select_account_default_key_title">Accounts with default key</string>
+    <string name="manual_backup_select_account_custom_key_title">Accounts with custom key</string>
+    <string name="manual_backup_select_account_default_key_account">Default accounts</string>
+    <string name="manual_backup_select_account_default_key_account_subtitle_more_chains">%s, +%d others</string>
+    <string name="manual_backup_select_account_header">Select the key to back up</string>
+
     <string name="manual_backup_select_wallet_header">Select a wallet to back up</string>
     <string name="cloud_backup_destructive_changes_not_applied_title">Wallet changes failed to update in the Cloud Backup</string>
     <string name="cloud_backup_destructive_changes_not_applied_subtitle">At the moment your backup is not synchronized. Please review the issue.</string>

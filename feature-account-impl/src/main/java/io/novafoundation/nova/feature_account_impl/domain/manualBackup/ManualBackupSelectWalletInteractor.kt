@@ -9,17 +9,24 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PROXIED
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 
-interface ManualBackupInteractor {
+interface ManualBackupSelectWalletInteractor {
+
     suspend fun getBackupableMetaAccounts(): List<MetaAccount>
+
+    suspend fun getMetaAccount(id: Long): MetaAccount
 }
 
-class RealManualBackupInteractor(
+class RealManualBackupSelectWalletInteractor(
     private val accountRepository: AccountRepository
-) : ManualBackupInteractor {
+) : ManualBackupSelectWalletInteractor {
 
     override suspend fun getBackupableMetaAccounts(): List<MetaAccount> {
         return accountRepository.getActiveMetaAccounts()
             .filter { it.isBackupable() }
+    }
+
+    override suspend fun getMetaAccount(id: Long): MetaAccount {
+        return accountRepository.getMetaAccount(id)
     }
 
     private fun MetaAccount.isBackupable(): Boolean {
