@@ -10,7 +10,7 @@ import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
-import java.math.BigInteger
+import java.math.BigDecimal
 
 interface VaraRepository {
 
@@ -22,7 +22,9 @@ class RealVaraRepository(
 ) : VaraRepository {
 
     override suspend fun getVaraInflation(chainId: ChainId): Perbill {
-        return chainRegistry.getSocket(chainId).inflationInfo().inflation.asPerQuintill()
+        return chainRegistry.getSocket(chainId).inflationInfo().inflation
+            .toBigInteger()
+            .asPerQuintill()
     }
 
     private suspend fun SocketService.inflationInfo(): InflationInfo {
@@ -34,5 +36,5 @@ class RealVaraRepository(
         params = emptyList()
     )
 
-    private class InflationInfo(val inflation: BigInteger)
+    private class InflationInfo(val inflation: BigDecimal)
 }
