@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
-import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountViewModel
@@ -24,14 +24,14 @@ class ManualBackupSelectAccountModule {
     fun provideViewModel(
         router: AccountRouter,
         resourceManager: ResourceManager,
-        manualBackupInteractor: ManualBackupInteractor,
+        manualBackupSelectAccountInteractor: ManualBackupSelectAccountInteractor,
         walletUiUseCase: WalletUiUseCase,
         payload: ManualBackupSelectAccountPayload
     ): ViewModel {
         return ManualBackupSelectAccountViewModel(
             router,
             resourceManager,
-            manualBackupInteractor,
+            manualBackupSelectAccountInteractor,
             walletUiUseCase,
             payload
         )

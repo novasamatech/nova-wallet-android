@@ -88,7 +88,7 @@ class WalletDetailsViewModel(
         }
     }
 
-    fun onDestroy() {
+    override fun onCleared() {
         // Launch it in root scope to avoid coroutine cancellation
         rootScope.launch {
             val newAccountName = accountNameFlow.value
