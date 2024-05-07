@@ -35,6 +35,7 @@ class BackupMnemonicModule {
         conditionMixinFactory: ConditionMixinFactory
     ): ViewModel {
         return BackupMnemonicViewModel(
+            resourceManager,
             interactor,
             exportMnemonicInteractor,
             router,

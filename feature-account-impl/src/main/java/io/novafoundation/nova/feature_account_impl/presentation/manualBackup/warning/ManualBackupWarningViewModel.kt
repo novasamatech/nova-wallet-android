@@ -3,15 +3,14 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wa
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.mixin.condition.buttonState
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
 
-const val CONDITION_ID_1 = 0
-const val CONDITION_ID_2 = 1
-const val CONDITION_ID_3 = 2
-
 class ManualBackupWarningViewModel(
+    private val resourceManager: ResourceManager,
     private val router: AccountRouter,
     private val conditionMixinFactory: ConditionMixinFactory,
     private val payload: ManualBackupAccountToBackupPayload
@@ -19,16 +18,15 @@ class ManualBackupWarningViewModel(
 
     val conditionMixin = conditionMixinFactory.createConditionMixin(
         coroutineScope = viewModelScope,
-        conditionsCount = 3,
-        enabledButtonText = R.string.common_confirm,
-        disabledButtonText = R.string.manual_backup_warning_disabled_button
+        conditionsCount = 3
     )
+
+    val buttonState = conditionMixin.buttonState(
+        enabledState = resourceManager.getString(R.string.common_confirm),
+        disabledState = resourceManager.getString(R.string.manual_backup_warning_disabled_button)
+    ).shareInBackground()
 
     fun backClicked() {
         router.back()
-    }
-
-    fun conditionClicked(conditionIndex: Int, checked: Boolean) {
-        conditionMixin.checkCondition(conditionIndex, checked)
     }
 }

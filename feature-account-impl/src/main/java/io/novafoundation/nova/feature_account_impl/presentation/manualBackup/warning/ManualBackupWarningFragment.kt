@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.condition.setupConditions
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
@@ -52,9 +53,11 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>()
         manualBackupWarningCondition2.setText(buildCondition(R.string.manual_backup_warning_condition_2, R.string.manual_backup_warning_condition_2_highlight))
         manualBackupWarningCondition3.setText(buildCondition(R.string.manual_backup_warning_condition_3, R.string.manual_backup_warning_condition_3_highlight))
 
-        manualBackupWarningCondition1.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_1, isChecked) }
-        manualBackupWarningCondition2.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_2, isChecked) }
-        manualBackupWarningCondition3.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_3, isChecked) }
+        viewModel.conditionMixin.setupConditions(
+            manualBackupWarningCondition1,
+            manualBackupWarningCondition2,
+            manualBackupWarningCondition3
+        )
     }
 
     private fun buildCondition(termBaseResId: Int, termHighlightResId: Int): CharSequence {
@@ -76,7 +79,7 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>()
     }
 
     override fun subscribe(viewModel: ManualBackupWarningViewModel) {
-        viewModel.conditionMixin.buttonState.observe {
+        viewModel.buttonState.observe {
             manualBackupWarningButtonContinue.setState(it)
         }
     }

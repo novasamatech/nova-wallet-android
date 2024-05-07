@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningViewModel
@@ -20,11 +21,13 @@ class ManualBackupWarningModule {
     @IntoMap
     @ViewModelKey(ManualBackupWarningViewModel::class)
     fun provideViewModel(
+        resourceManager: ResourceManager,
         router: AccountRouter,
         conditionMixinFactory: ConditionMixinFactory,
         payload: ManualBackupAccountToBackupPayload
     ): ViewModel {
         return ManualBackupWarningViewModel(
+            resourceManager,
             router,
             conditionMixinFactory,
             payload

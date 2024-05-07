@@ -6,6 +6,7 @@ import android.widget.CompoundButton
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.CheckableListener
 import io.novafoundation.nova.common.utils.getColorOrNull
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setImageResourceOrHide
@@ -18,7 +19,7 @@ class WarningCheckBox @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr), CheckableListener {
 
     init {
         inflate(context, R.layout.view_warning_checkbox, this)
@@ -42,7 +43,7 @@ class WarningCheckBox @JvmOverloads constructor(
         warningCheckBoxIcon.setImageResourceOrHide(iconRes)
     }
 
-    fun setOnCheckedChangeListener(listener: CompoundButton.OnCheckedChangeListener) {
+    override fun setOnCheckedChangeListener(listener: CompoundButton.OnCheckedChangeListener) {
         warningCheckBoxCheckBox.setOnCheckedChangeListener(listener)
     }
 
@@ -54,5 +55,17 @@ class WarningCheckBox @JvmOverloads constructor(
         setIcon(iconRes)
         iconTint?.let(::setIconTintColor)
         setText(text)
+    }
+
+    override fun setChecked(checked: Boolean) {
+        warningCheckBoxCheckBox.isChecked = checked
+    }
+
+    override fun isChecked(): Boolean {
+        return warningCheckBoxCheckBox.isChecked
+    }
+
+    override fun toggle() {
+        warningCheckBoxCheckBox.toggle()
     }
 }
