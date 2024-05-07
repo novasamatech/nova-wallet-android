@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.condition.setupConditions
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.toSpannable
@@ -53,13 +54,15 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     private fun buildConditions() {
-        backupMnemonicCondition1.text = buildCondition(R.string.backup_mnemonic_condition_1, R.string.backup_mnemonic_condition_1_highlight)
-        backupMnemonicCondition2.text = buildCondition(R.string.backup_mnemonic_condition_2, R.string.backup_mnemonic_condition_2_highlight)
-        backupMnemonicCondition3.text = buildCondition(R.string.backup_mnemonic_condition_3, R.string.backup_mnemonic_condition_3_highlight)
+        backupMnemonicCondition1.setText(buildCondition(R.string.backup_mnemonic_condition_1, R.string.backup_mnemonic_condition_1_highlight))
+        backupMnemonicCondition2.setText(buildCondition(R.string.backup_mnemonic_condition_2, R.string.backup_mnemonic_condition_2_highlight))
+        backupMnemonicCondition3.setText(buildCondition(R.string.backup_mnemonic_condition_3, R.string.backup_mnemonic_condition_3_highlight))
 
-        backupMnemonicCondition1.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_1, isChecked) }
-        backupMnemonicCondition2.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_2, isChecked) }
-        backupMnemonicCondition3.setOnCheckedChangeListener { _, isChecked -> viewModel.conditionClicked(CONDITION_ID_3, isChecked) }
+        viewModel.conditionMixin.setupConditions(
+            backupMnemonicCondition1,
+            backupMnemonicCondition2,
+            backupMnemonicCondition3
+        )
     }
 
     private fun buildCondition(termBaseResId: Int, termHighlightResId: Int): CharSequence {
@@ -81,7 +84,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun subscribe(viewModel: BackupMnemonicViewModel) {
-        viewModel.continueButtonState.observe(backupMnemonicContinue::setState)
+        viewModel.buttonState.observe(backupMnemonicContinue::setState)
 
         viewModel.showMnemonicWarningDialog.observeEvent {
             showMnemonicWarning()

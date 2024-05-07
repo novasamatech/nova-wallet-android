@@ -358,6 +358,13 @@ fun ImageView.setImageResource(@DrawableRes imageRes: Int?) = if (imageRes == nu
     setImageResource(imageRes)
 }
 
+fun ImageView.setImageResourceOrHide(@DrawableRes imageRes: Int?) = if (imageRes == null) {
+    makeGone()
+} else {
+    makeVisible()
+    setImageResource(imageRes)
+}
+
 fun EditText.moveCursorToTheEnd() = setSelection(length())
 
 fun ShimmerFrameLayout.setShimmerShown(shown: Boolean) {

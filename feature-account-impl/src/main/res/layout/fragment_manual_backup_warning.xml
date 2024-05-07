@@ -3,83 +3,94 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/secondary_screen_background"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/backupMnemonicToolbar"
+        android:id="@+id/manualBackupWarningToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:iconRight="@drawable/ic_options"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingBottom="24dp"
-        app:layout_constraintBottom_toTopOf="@+id/startStakingLandingButtonContainer"
-        app:layout_constraintTop_toBottomOf="@id/backupMnemonicToolbar"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="16dp">
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/manualBackupWarningButtonContainer"
+        app:layout_constraintTop_toBottomOf="@id/manualBackupWarningToolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_warning"
+                android:padding="8dp"
+                android:src="@drawable/ic_warning_filled" />
+
             <TextView
-                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-                android:layout_width="match_parent"
+                style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="46dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:text="@string/account_backup_mnemonic_title"
-                android:textColor="@color/text_primary" />
+                android:text="@string/manual_backup_warning_title"
+                android:textColor="@color/text_warning" />
 
-            <io.novafoundation.nova.feature_account_impl.presentation.view.mnemonic.MnemonicCardView
-                android:id="@+id/backupMnemonicPassphrase"
-                android:layout_width="match_parent"
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
-                app:showRevealContainer="true" />
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/manual_backup_warning_subtitle"
+                android:textColor="@color/text_secondary" />
 
             <io.novafoundation.nova.common.view.WarningCheckBox
-                android:id="@+id/backupMnemonicCondition1"
+                android:id="@+id/manualBackupWarningCondition1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
-                tools:text="@string/backup_mnemonic_condition_1" />
+                android:icon="@drawable/ic_manual_backup_eye"
+                app:iconTint="@color/icon_warning"
+                tools:text="@string/manual_backup_warning_condition_1" />
 
             <io.novafoundation.nova.common.view.WarningCheckBox
-                android:id="@+id/backupMnemonicCondition2"
+                android:id="@+id/manualBackupWarningCondition2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                tools:text="@string/backup_mnemonic_condition_2" />
+                android:layout_marginTop="12dp"
+                android:icon="@drawable/ic_manual_backup_funds"
+                app:iconTint="@color/icon_warning"
+                tools:text="@string/manual_backup_warning_condition_2" />
 
             <io.novafoundation.nova.common.view.WarningCheckBox
-                android:id="@+id/backupMnemonicCondition3"
+                android:id="@+id/manualBackupWarningCondition3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                tools:text="@string/backup_mnemonic_condition_3" />
+                android:layout_marginTop="12dp"
+                android:icon="@drawable/ic_manual_backup_person"
+                app:iconTint="@color/icon_warning"
+                tools:text="@string/manual_backup_warning_condition_3" />
 
         </LinearLayout>
 
     </ScrollView>
 
     <FrameLayout
-        android:id="@+id/startStakingLandingButtonContainer"
+        android:id="@+id/manualBackupWarningButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="-1dp"
@@ -92,18 +103,17 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/backupMnemonicContinue"
+            android:id="@+id/manualBackupWarningButtonContinue"
             style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="24dp"
-            android:text="@string/common_continue"
             app:appearance="primaryTransparent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="16dp" />
+            tools:layout_editor_absoluteX="16dp"
+            tools:text="@string/common_continue" />
 
     </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

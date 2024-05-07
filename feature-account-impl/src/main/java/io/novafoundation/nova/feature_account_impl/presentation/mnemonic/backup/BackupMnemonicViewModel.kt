@@ -2,8 +2,10 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.DescriptiveButtonState
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.mixin.condition.buttonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -11,7 +13,6 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.sendEvent
-import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryptionModel
 import io.novafoundation.nova.feature_account_impl.R
@@ -24,27 +25,30 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload.CreateExtras
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.MnemonicWord
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-private const val CONDITIONS_SIZE = 3
-const val CONDITION_ID_1 = 0
-const val CONDITION_ID_2 = 1
-const val CONDITION_ID_3 = 2
-
 class BackupMnemonicViewModel(
+    private val resourceManager: ResourceManager,
     private val interactor: AccountInteractor,
     private val exportMnemonicInteractor: ExportMnemonicInteractor,
     private val router: AccountRouter,
     private val payload: BackupMnemonicPayload,
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     private val advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
-    private val resourceManager: ResourceManager
+    private val conditionMixinFactory: ConditionMixinFactory,
 ) : BaseViewModel() {
 
-    private val conditionsState = MutableStateFlow(mapOf<Int, Boolean>())
+    val conditionMixin = conditionMixinFactory.createConditionMixin(
+        coroutineScope = viewModelScope,
+        conditionsCount = 3
+    )
+
+    val buttonState = conditionMixin.buttonState(
+        enabledState = resourceManager.getString(R.string.common_confirm),
+        disabledState = resourceManager.getString(R.string.backup_mnemonic_disabled_button)
+    ).shareInBackground()
 
     private val advancedEncryptionSelectionStore = async {
         advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope)
@@ -67,16 +71,6 @@ class BackupMnemonicViewModel(
             MnemonicWord(id = index, content = word, indexDisplay = index.plus(1).format(), removed = false)
         }
     }.shareInBackground()
-
-    val continueButtonState = conditionsState.map { conditions ->
-        val allConditionsSelected = conditions.values.size == CONDITIONS_SIZE && conditions.values.all { it }
-        when {
-            allConditionsSelected -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
-            else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.backup_mnemonic_disabled_button))
-        }
-    }
-        .inBackground()
-        .share()
 
     init {
         _showMnemonicWarningDialog.sendEvent()
@@ -117,9 +111,5 @@ class BackupMnemonicViewModel(
         )
 
         router.openConfirmMnemonicOnCreate(payload)
-    }
-
-    fun conditionClicked(index: Int, isChecked: Boolean) {
-        conditionsState.updateValue { it + (index to isChecked) }
     }
 }
