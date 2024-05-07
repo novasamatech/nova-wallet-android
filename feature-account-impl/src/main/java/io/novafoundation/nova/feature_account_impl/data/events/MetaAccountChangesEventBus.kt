@@ -14,11 +14,11 @@ import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupA
  */
 class RealMetaAccountChangesEventBus(
     private val proxySyncService: dagger.Lazy<ProxySyncService>,
-    private val cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
+    private val cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker
 ) : BaseEventBus<MetaAccountChangesEventBus.Event>(), MetaAccountChangesEventBus {
 
-    override suspend fun notify(event: MetaAccountChangesEventBus.Event) {
-        super.notify(event)
+    override suspend fun notify(event: MetaAccountChangesEventBus.Event, source: String?) {
+        super.notify(event, source)
 
         cloudBackupAccountsModificationsTracker.recordAccountModified(event.allAffectedMetaAccountTypes())
 

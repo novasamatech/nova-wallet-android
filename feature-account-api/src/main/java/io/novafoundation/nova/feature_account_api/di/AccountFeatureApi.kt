@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
@@ -104,4 +105,6 @@ interface AccountFeatureApi {
     val selectAddressMixinFactory: SelectAddressMixin.Factory
 
     val metaAccountChangesEventBus: MetaAccountChangesEventBus
+
+    val applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase
 }

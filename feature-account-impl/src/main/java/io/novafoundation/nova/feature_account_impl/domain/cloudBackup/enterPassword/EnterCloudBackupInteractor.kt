@@ -26,7 +26,7 @@ interface EnterCloudBackupInteractor {
 class RealEnterCloudBackupInteractor(
     private val cloudBackupService: CloudBackupService,
     private val cloudBackupFacade: LocalAccountsCloudBackupFacade,
-    private val accountRepository: AccountRepository,
+    private val accountRepository: AccountRepository
 ) : EnterCloudBackupInteractor {
 
     override suspend fun restoreCloudBackup(password: String): Result<Unit> {
@@ -68,7 +68,6 @@ class RealEnterCloudBackupInteractor(
 
     override suspend fun restoreCloudBackupPassword(password: String): Result<Unit> {
         return cloudBackupService.fetchAndDecryptExistingBackup(password)
-            .onSuccess { cloudBackupService.session.setSavedPassword(password) }
-            .map { Unit }
+            .map { cloudBackupService.session.setSavedPassword(password) }
     }
 }

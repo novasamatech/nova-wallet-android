@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -55,6 +56,7 @@ class AccountDetailsModule {
     @IntoMap
     @ViewModelKey(WalletDetailsViewModel::class)
     fun provideViewModel(
+        rootScope: RootScope,
         interactor: WalletDetailsInteractor,
         router: AccountRouter,
         metaId: Long,
@@ -65,6 +67,7 @@ class AccountDetailsModule {
         walletDetailsMixinFactory: WalletDetailsMixinFactory
     ): ViewModel {
         return WalletDetailsViewModel(
+            rootScope = rootScope,
             interactor = interactor,
             accountRouter = router,
             metaId = metaId,

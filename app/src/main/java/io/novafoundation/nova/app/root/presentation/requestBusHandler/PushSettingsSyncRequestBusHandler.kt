@@ -17,11 +17,11 @@ class PushSettingsSyncRequestBusHandler(
 
     override fun observe() {
         metaAccountChangesEventBus.observeEvent()
-            .onEach { event ->
-                val changed = event.collect(
+            .onEach { sourceEvent ->
+                val changed = sourceEvent.event.collect(
                     onStructureChanged = { it.takeMetaIdUnlessTypeIs(LightMetaAccount.Type.PROXIED) }
                 )
-                val removed = event.collect(
+                val removed = sourceEvent.event.collect(
                     onRemoved = { it.takeMetaIdUnlessTypeIs(LightMetaAccount.Type.PROXIED) }
                 )
 

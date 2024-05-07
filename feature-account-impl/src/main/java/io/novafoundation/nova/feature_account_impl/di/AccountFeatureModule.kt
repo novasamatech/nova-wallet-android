@@ -58,6 +58,7 @@ import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.feature_account_impl.RealBiometricServiceFactory
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.events.RealMetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
@@ -98,6 +99,7 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Star
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
@@ -590,5 +592,17 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideStartCreateWalletInteractor(cloudBackupService: CloudBackupService): StartCreateWalletInteractor {
         return RealStartCreateWalletInteractor(cloudBackupService)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideApplyLocalSnapshotToCloudBackupUseCase(
+        localAccountsCloudBackupFacade: LocalAccountsCloudBackupFacade,
+        cloudBackupService: CloudBackupService
+    ): ApplyLocalSnapshotToCloudBackupUseCase {
+        return RealApplyLocalSnapshotToCloudBackupUseCase(
+            localAccountsCloudBackupFacade,
+            cloudBackupService
+        )
     }
 }

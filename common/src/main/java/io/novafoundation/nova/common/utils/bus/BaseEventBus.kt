@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 abstract class BaseEventBus<T : EventBus.Event> : EventBus<T> {
 
-    private val eventFlow = MutableSharedFlow<T>()
+    private val eventFlow = MutableSharedFlow<EventBus.SourceEvent<T>>()
 
-    override suspend fun notify(event: T) {
-        eventFlow.emit(event)
+    override suspend fun notify(event: T, source: String?) {
+        eventFlow.emit(EventBus.SourceEvent(event, source))
     }
 
-    override fun observeEvent(): Flow<T> {
+    override fun observeEvent(): Flow<EventBus.SourceEvent<T>> {
         return eventFlow
     }
 }

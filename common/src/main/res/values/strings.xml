@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="cloud_backup_destructive_changes_not_applied_title">Wallet changes failed to update in the Cloud Backup</string>
+    <string name="cloud_backup_destructive_changes_not_applied_subtitle">At the moment your backup is not synchronized. Please review the issue.</string>
+    <string name="cloud_backup_destructive_changes_not_applied_button">Review the Issue</string>
+
     <string name="cloud_backup_destructive_changes_confirmation_title">Are you sure that you want to apply these changes?</string>
     <string name="cloud_backup_destructive_changes_confirmation_subtitle">If you have not manually written down your Passphrase for wallets that will be removed, then those wallets and all of their assets will be permanently and irretrievably lost forever.</string>
 

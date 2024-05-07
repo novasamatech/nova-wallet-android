@@ -26,6 +26,7 @@ import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.CLOUD_BACKUP_APPLY_SOURCE
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
@@ -34,6 +35,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo.ChainAccountInfo.ChainAccountCryptoType
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isEmpty
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isNotDestructive
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.isCompletelyEmpty
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -98,7 +100,7 @@ class RealLocalAccountsCloudBackupFacade(
     }
 
     override suspend fun canPerformNonDestructiveApply(diff: CloudBackupDiff): Boolean {
-        return diff.localChanges.modified.isEmpty() && diff.localChanges.removed.isEmpty()
+        return diff.localChanges.isNotDestructive()
     }
 
     override suspend fun applyBackupDiff(diff: CloudBackupDiff, cloudVersion: CloudBackup) {
@@ -121,7 +123,7 @@ class RealLocalAccountsCloudBackupFacade(
             }
         }
 
-        changesEvent?.let { metaAccountChangedEvents.notify(it) }
+        changesEvent?.let { metaAccountChangedEvents.notify(it, source = CLOUD_BACKUP_APPLY_SOURCE) }
     }
 
     private suspend fun applyLocalRemoval(

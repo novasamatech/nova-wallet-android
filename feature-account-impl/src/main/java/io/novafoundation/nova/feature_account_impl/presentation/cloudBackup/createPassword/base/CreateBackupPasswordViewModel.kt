@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
@@ -29,8 +30,8 @@ abstract class BackupCreatePasswordViewModel(
     protected val router: AccountRouter,
     protected val resourceManager: ResourceManager,
     protected val interactor: CreateCloudBackupPasswordInteractor,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher
-) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncher {
+    private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+) : BaseViewModel(), ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create() {
 
     val passwordFlow = MutableStateFlow("")
     val passwordConfirmFlow = MutableStateFlow("")
@@ -82,6 +83,6 @@ abstract class BackupCreatePasswordViewModel(
     }
 
     private fun showPasswordWarningDialog() {
-        actionBottomSheetLauncher.launchRememberPasswordWarning(resourceManager)
+        launchRememberPasswordWarning(resourceManager)
     }
 }

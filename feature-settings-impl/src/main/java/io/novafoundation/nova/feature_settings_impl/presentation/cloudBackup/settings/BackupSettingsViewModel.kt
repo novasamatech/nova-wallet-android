@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -65,7 +66,7 @@ class BackupSettingsViewModel(
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
     private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     private val walletUiUseCase: WalletUiUseCase,
     val progressDialogMixin: ProgressDialogMixin,
@@ -73,7 +74,7 @@ class BackupSettingsViewModel(
     listSelectorMixinFactory: ListSelectorMixin.Factory,
     customDialogProvider: CustomDialogDisplayer.Presentation
 ) : BaseViewModel(),
-    ActionBottomSheetLauncher by actionBottomSheetLauncher,
+    ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create(),
     CustomDialogDisplayer.Presentation by customDialogProvider {
 
     val negativeConfirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -189,7 +190,7 @@ class BackupSettingsViewModel(
     }
 
     private fun openDestructiveDiffAction(diff: CloudBackupDiff, cloudBackup: CloudBackup) {
-        actionBottomSheetLauncher.launchCloudBackupChangesAction(resourceManager) {
+        launchCloudBackupChangesAction(resourceManager) {
             openCloudBackupDiffScreen(diff, cloudBackup)
         }
     }
@@ -314,7 +315,7 @@ class BackupSettingsViewModel(
     }
 
     private fun onDeleteBackupClicked() {
-        actionBottomSheetLauncher.launchDeleteBackupAction(resourceManager, ::confirmCloudBackupDelete)
+        launchDeleteBackupAction(resourceManager, ::confirmCloudBackupDelete)
     }
 
     private fun observeRequesterResults() {
@@ -331,11 +332,11 @@ class BackupSettingsViewModel(
     }
 
     private fun showPasswordDeprecatedActionDialog() {
-        actionBottomSheetLauncher.launchDeprecatedPasswordAction(resourceManager, ::openRestorePassword)
+        launchDeprecatedPasswordAction(resourceManager, ::openRestorePassword)
     }
 
     private fun showCorruptedBackupActionDialog() {
-        actionBottomSheetLauncher.launchCorruptedBackupFoundAction(resourceManager, ::confirmCloudBackupDelete)
+        launchCorruptedBackupFoundAction(resourceManager, ::confirmCloudBackupDelete)
     }
 
     private fun openRestorePassword() {

@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExi
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isNotEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 import io.novafoundation.nova.feature_settings_impl.domain.model.CloudBackupChangedAccount
@@ -54,9 +55,12 @@ class RealCloudBackupSettingsInteractor(
         return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
             .mapCatching { cloudBackup ->
                 cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.syncWithCloud())
-
-                // TODO: Rewrite cloud backup
-                Unit
+            }.flatMap {
+                if (it.cloudChanges.isNotEmpty()) {
+                    writeLocalBackupToCloud()
+                } else {
+                    Result.success(Unit)
+                }
             }.finally {
                 cloudBackupService.session.setLastSyncedTimeAsNow()
             }
@@ -97,9 +101,13 @@ class RealCloudBackupSettingsInteractor(
         return runCatching {
             cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
             cloudBackupService.session.setLastSyncedTimeAsNow()
+        }.flatMap {
+            if (cloudBackupDiff.cloudChanges.isNotEmpty()) {
+                writeLocalBackupToCloud()
+            } else {
+                Result.success(Unit)
+            }
         }
-
-        // TODO: Rewrite cloud backup
     }
 
     private fun localAccountChangesFromDiff(diff: CloudBackupDiff.PerSourceDiff): List<CloudBackupChangedAccount> {

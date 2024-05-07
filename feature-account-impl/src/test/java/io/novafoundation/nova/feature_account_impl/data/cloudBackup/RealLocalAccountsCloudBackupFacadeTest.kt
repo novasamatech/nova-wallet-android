@@ -10,6 +10,7 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.CLOUD_BACKUP_APPLY_SOURCE
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountAdded
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountNameChanged
@@ -1020,9 +1021,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
     private suspend fun verifyEvent(event: MetaAccountChangesEventBus.Event?) {
         if (event == null) {
-            verify(metaAccountChangesEventBus, never()).notify(any())
+            verify(metaAccountChangesEventBus, never()).notify(any(), source = eq(CLOUD_BACKUP_APPLY_SOURCE))
         } else {
-            verify(metaAccountChangesEventBus).notify(eq(event))
+            verify(metaAccountChangesEventBus).notify(eq(event), source = eq(CLOUD_BACKUP_APPLY_SOURCE))
         }
     }
 

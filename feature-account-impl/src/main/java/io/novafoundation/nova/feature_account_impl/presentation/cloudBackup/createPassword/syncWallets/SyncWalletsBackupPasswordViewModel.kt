@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.cre
 
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordResponder
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
@@ -14,13 +14,13 @@ class SyncWalletsBackupPasswordViewModel(
     router: AccountRouter,
     resourceManager: ResourceManager,
     interactor: CreateCloudBackupPasswordInteractor,
-    actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator
 ) : BackupCreatePasswordViewModel(
     router,
     resourceManager,
     interactor,
-    actionBottomSheetLauncher
+    actionBottomSheetLauncherFactory
 ) {
 
     override suspend fun internalContinueClicked(password: String) {
@@ -29,9 +29,8 @@ class SyncWalletsBackupPasswordViewModel(
                 syncWalletsBackupPasswordCommunicator.respond(SyncWalletsBackupPasswordResponder.Response(isSyncingSuccessful = true))
                 router.back()
             }.onFailure { throwable ->
-                // TODO Antony: Handle CannotApplyNonDestructiveDiff
                 val titleAndMessage = mapWriteBackupFailureToUi(resourceManager, throwable)
-                titleAndMessage?.let { showError(it) }
+                showError(titleAndMessage)
             }
     }
 

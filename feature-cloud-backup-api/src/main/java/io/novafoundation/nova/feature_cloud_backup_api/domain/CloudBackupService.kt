@@ -77,3 +77,10 @@ suspend fun CloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword():
         }
     }
 }
+
+suspend fun CloudBackupService.writeCloudBackupWithSavedPassword(cloudBackup: CloudBackup): Result<Unit> {
+    return session.getSavedPassword()
+        .flatMap { password ->
+            writeBackupToCloud(WriteBackupRequest(cloudBackup, password))
+        }
+}

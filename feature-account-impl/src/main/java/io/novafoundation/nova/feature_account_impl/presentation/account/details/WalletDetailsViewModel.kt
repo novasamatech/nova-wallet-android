@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.skipFirst
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -18,16 +18,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
-
-private const val UPDATE_NAME_INTERVAL_SECONDS = 1L
 
 class WalletDetailsViewModel(
+    private val rootScope: RootScope,
     private val interactor: WalletDetailsInteractor,
     private val accountRouter: AccountRouter,
     private val metaId: Long,
@@ -42,6 +36,8 @@ class WalletDetailsViewModel(
     AddAccountLauncherMixin by addAccountLauncherMixin {
 
     val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId) }
+
+    private val startAccountName = async { walletDetailsMixin().metaAccount.name }
 
     val accountNameFlow: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -58,21 +54,10 @@ class WalletDetailsViewModel(
         launch {
             accountNameFlow.emit(walletDetailsMixin().metaAccount.name)
         }
-
-        syncNameChangesWithDb()
     }
 
     fun backClicked() {
         accountRouter.back()
-    }
-
-    private fun syncNameChangesWithDb() {
-        accountNameFlow
-            .filter { it.isNotEmpty() }
-            .skipFirst() // first one will be account's original name
-            .debounce(UPDATE_NAME_INTERVAL_SECONDS.seconds)
-            .onEach { interactor.updateName(metaId, it) }
-            .launchIn(viewModelScope)
     }
 
     fun chainAccountClicked(item: AccountInChainUi) = launch {
@@ -100,6 +85,16 @@ class WalletDetailsViewModel(
     fun changeChainAccountClicked(inChain: Chain) {
         launch {
             addAccountLauncherMixin.initiateLaunch(inChain, walletDetailsMixin().metaAccount)
+        }
+    }
+
+    override fun onCleared() {
+        // Launch it in root scope to avoid coroutine cancellation
+        rootScope.launch {
+            val newAccountName = accountNameFlow.value
+            if (startAccountName() != newAccountName) {
+                interactor.updateName(metaId, newAccountName)
+            }
         }
     }
 

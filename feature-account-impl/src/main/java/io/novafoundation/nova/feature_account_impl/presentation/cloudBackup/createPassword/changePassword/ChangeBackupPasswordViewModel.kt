@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.cre
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordResponder
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
@@ -16,14 +16,14 @@ class ChangeBackupPasswordViewModel(
     router: AccountRouter,
     resourceManager: ResourceManager,
     interactor: CreateCloudBackupPasswordInteractor,
-    actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
     customDialogProvider: CustomDialogDisplayer.Presentation
 ) : BackupCreatePasswordViewModel(
     router,
     resourceManager,
     interactor,
-    actionBottomSheetLauncher
+    actionBottomSheetLauncherFactory
 ),
     CustomDialogDisplayer.Presentation by customDialogProvider {
 

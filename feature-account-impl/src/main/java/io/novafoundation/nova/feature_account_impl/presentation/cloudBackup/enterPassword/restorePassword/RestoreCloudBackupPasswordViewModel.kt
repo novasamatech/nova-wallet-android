@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.ent
 import io.novafoundation.nova.common.base.showError
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordResponder
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
@@ -16,14 +16,14 @@ class RestoreCloudBackupPasswordViewModel(
     router: AccountRouter,
     resourceManager: ResourceManager,
     interactor: EnterCloudBackupInteractor,
-    actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
 ) : EnterCloudBackupPasswordViewModel(
     router,
     resourceManager,
     interactor,
-    actionBottomSheetLauncher,
+    actionBottomSheetLauncherFactory,
     actionAwaitableMixinFactory
 ) {
 
@@ -39,6 +39,6 @@ class RestoreCloudBackupPasswordViewModel(
     }
 
     private fun corruptedBackupFound() {
-        actionBottomSheetLauncher.launchCorruptedBackupFoundAction(resourceManager, ::confirmCloudBackupDelete)
+        launchCorruptedBackupFoundAction(resourceManager, ::confirmCloudBackupDelete)
     }
 }

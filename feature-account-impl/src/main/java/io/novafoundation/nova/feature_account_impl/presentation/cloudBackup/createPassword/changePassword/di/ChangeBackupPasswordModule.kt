@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -26,7 +26,7 @@ class ChangeBackupPasswordModule {
         router: AccountRouter,
         resourceManager: ResourceManager,
         interactor: CreateCloudBackupPasswordInteractor,
-        actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
         customDialogProvider: CustomDialogDisplayer.Presentation
     ): ViewModel {
@@ -34,7 +34,7 @@ class ChangeBackupPasswordModule {
             router,
             resourceManager,
             interactor,
-            actionBottomSheetLauncher,
+            actionBottomSheetLauncherFactory,
             changeBackupPasswordCommunicator,
             customDialogProvider
         )

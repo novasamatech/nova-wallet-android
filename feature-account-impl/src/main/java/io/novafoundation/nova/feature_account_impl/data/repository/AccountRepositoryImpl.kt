@@ -162,7 +162,7 @@ class AccountRepositoryImpl(
         val metaAccountType = requireNotNull(accountDataSource.getMetaAccountType(metaId))
         val event = Event.AccountNameChanged(metaId, metaAccountType)
 
-        metaAccountChangesEventBus.notify(event)
+        metaAccountChangesEventBus.notify(event, source = null)
     }
 
     override suspend fun isAccountSelected(): Boolean {
@@ -174,7 +174,7 @@ class AccountRepositoryImpl(
 
         accountDataSource.deleteMetaAccount(metaId)
 
-        metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId, metaAccountType))
+        metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId, metaAccountType), source = null)
     }
 
     override suspend fun getAccounts(): List<Account> {

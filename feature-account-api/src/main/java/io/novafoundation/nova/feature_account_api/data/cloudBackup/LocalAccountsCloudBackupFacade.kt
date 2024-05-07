@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strateg
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 
+const val CLOUD_BACKUP_APPLY_SOURCE = "CLOUD_BACKUP_APPLY_SOURCE"
+
 interface LocalAccountsCloudBackupFacade {
 
     /**
