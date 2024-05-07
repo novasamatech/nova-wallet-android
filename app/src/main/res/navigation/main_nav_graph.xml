@@ -237,7 +237,7 @@
 
     <action
         android:id="@+id/action_open_manualBackupSelectWallet"
-        app:destination="@id/manual_backup_select_wallet_graph"
+        app:destination="@id/manual_backup_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -963,6 +963,6 @@
 
     <include app:graph="@navigation/cloud_backup_settings_graph" />
 
-    <include app:graph="@navigation/manual_backup_select_wallet_graph" />
+    <include app:graph="@navigation/manual_backup_graph" />
 
 </navigation>
