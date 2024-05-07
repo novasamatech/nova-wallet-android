@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://api.subquery.network/sq/nova-wallet/subquery-staking\""
+        buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config_dev.json\""
     }
 
     buildTypes {
@@ -22,7 +22,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://api.subquery.network/sq/nova-wallet/subquery-staking\""
+            buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config.json\""
         }
     }
 
