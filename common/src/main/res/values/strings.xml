@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="manual_backup_select_wallet_header">Select a wallet to back up</string>
     <string name="cloud_backup_destructive_changes_not_applied_title">Wallet changes failed to update in the Cloud Backup</string>
     <string name="cloud_backup_destructive_changes_not_applied_subtitle">At the moment your backup is not synchronized. Please review the issue.</string>
     <string name="cloud_backup_destructive_changes_not_applied_button">Review the Issue</string>

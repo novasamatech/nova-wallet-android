@@ -100,6 +100,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
@@ -604,5 +606,13 @@ class AccountFeatureModule {
             localAccountsCloudBackupFacade,
             cloudBackupService
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideManualBackupInteractor(
+        accountRepository: AccountRepository
+    ): ManualBackupInteractor {
+        return RealManualBackupInteractor(accountRepository)
     }
 }

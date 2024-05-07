@@ -236,6 +236,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_manualBackupSelectWallet"
+        app:destination="@id/manual_backup_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_select_governance_tracks"
         app:destination="@id/selectGovernanceTracks"
         app:enterAnim="@anim/fragment_open_enter"
@@ -886,10 +894,10 @@
         android:label="SelectWalletFragment" />
 
     <fragment
-        app:useAdd="true"
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
-        android:label="WalletConnectApproveSessionFragment" />
+        android:label="WalletConnectApproveSessionFragment"
+        app:useAdd="true" />
 
     <fragment
         android:id="@+id/validatorDetailsFragment"
@@ -954,5 +962,7 @@
     <include app:graph="@navigation/push_settings_graph" />
 
     <include app:graph="@navigation/cloud_backup_settings_graph" />
+
+    <include app:graph="@navigation/manual_backup_graph" />
 
 </navigation>

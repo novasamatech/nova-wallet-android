@@ -131,7 +131,7 @@ class BackupSettingsViewModel(
     }
 
     fun manualBackupClicked() {
-        showError("Not implemented yet")
+        router.openManualBackup()
     }
 
     fun cloudBackupManageClicked() {

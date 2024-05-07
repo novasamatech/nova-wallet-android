@@ -23,4 +23,6 @@ interface SettingsRouter : ReturnableRouter {
     fun openWalletConnectSessions()
 
     fun openCloudBackupSettings()
+
+    fun openManualBackup()
 }
