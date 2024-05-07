@@ -8,9 +8,8 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
-import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets.ManualBackupSelectWalletViewModel
 
@@ -22,14 +21,12 @@ class ManualBackupSelectWalletModule {
     @ViewModelKey(ManualBackupSelectWalletViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
-        resourceManager: ResourceManager,
-        manualBackupInteractor: ManualBackupInteractor,
+        manualBackupSelectWalletInteractor: ManualBackupSelectWalletInteractor,
         walletUiUseCase: WalletUiUseCase
     ): ViewModel {
         return ManualBackupSelectWalletViewModel(
             router,
-            resourceManager,
-            manualBackupInteractor,
+            manualBackupSelectWalletInteractor,
             walletUiUseCase
         )
     }

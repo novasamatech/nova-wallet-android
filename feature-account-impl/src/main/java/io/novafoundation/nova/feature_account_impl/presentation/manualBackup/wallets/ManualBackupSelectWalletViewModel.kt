@@ -2,31 +2,29 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wa
 
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_BIG
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
-import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import kotlinx.coroutines.launch
 
 class ManualBackupSelectWalletViewModel(
     private val router: AccountRouter,
-    private val resourceManager: ResourceManager,
-    private val manualBackupInteractor: ManualBackupInteractor,
+    private val manualBackupSelectWalletInteractor: ManualBackupSelectWalletInteractor,
     private val walletUiUseCase: WalletUiUseCase
 ) : BaseViewModel() {
 
-    private val wallets = flowOf { manualBackupInteractor.getBackupableMetaAccounts() }
+    private val wallets = flowOf { manualBackupSelectWalletInteractor.getBackupableMetaAccounts() }
         .shareInBackground()
 
     val walletsUI = wallets.mapList { mapMetaAccountToUI(it) }
 
     fun walletClicked(accountModel: AccountUi) {
         launch {
-            val metaAccount = manualBackupInteractor.getMetaAccount(accountModel.id)
+            val metaAccount = manualBackupSelectWalletInteractor.getMetaAccount(accountModel.id)
             if (metaAccount.chainAccounts.isEmpty()) {
                 showError("Not implemented for case with default account only")
             } else {
