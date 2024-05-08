@@ -43,7 +43,7 @@ dependencies {
 }
 
 cargo {
-    module = "bindings/"
+    module = "rust/"
     libname = "hydra_dx_math_java"
     targets = ["arm", "arm64", "x86", "x86_64"]
     profile = "release"
