@@ -21,14 +21,17 @@ import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.AdditionalSignedExtras
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.SignedExtras
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
@@ -120,6 +123,14 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
     write(writer, value)
 
     return stream.toByteArray()
+}
+
+fun SignerPayloadExtrinsic.encodedSignedExtras(): ByteArray {
+    return SignedExtras.bytes(runtime, signedExtras)
+}
+
+fun SignerPayloadExtrinsic.encodedAdditionalSigned(): ByteArray {
+    return AdditionalSignedExtras.bytes(runtime, additionalSignedExtras)
 }
 
 fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) =
