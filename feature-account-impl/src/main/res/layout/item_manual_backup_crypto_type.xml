@@ -31,6 +31,7 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="@string/common_secret_derivation_path"
         android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"

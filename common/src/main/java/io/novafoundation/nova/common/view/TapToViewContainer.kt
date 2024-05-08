@@ -62,22 +62,31 @@ open class TapToViewContainer @JvmOverloads constructor(
         setWillNotDraw(false)
     }
 
+    /**
+     * Support two states to expand hidden content when it becomes visible
+     */
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         if (isContentVisible) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         } else {
             val width = MeasureSpec.getSize(widthMeasureSpec)
-
-            // Set set the height of the view as tapToViewContainer background height considering the width of the view
-            val tapToViewBackgroundHeight = tapToViewContainer.background?.intrinsicHeight ?: 0
-            val tabToViewBackgroundWidth = tapToViewContainer.background?.intrinsicWidth ?: 0
-            val height = tapToViewBackgroundHeight * (width.toFloat() / tabToViewBackgroundWidth.toFloat())
+            val height = measureTapToViewContainerBackground(width)
 
             val widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
-            val heightSpec = MeasureSpec.makeMeasureSpec(height.roundToInt(), MeasureSpec.EXACTLY)
+            val heightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
 
             super.onMeasure(widthSpec, heightSpec)
         }
+    }
+
+    /**
+     * Measure the height of the tap to view container background based on the its background aspect ratio
+     */
+    private fun measureTapToViewContainerBackground(width: Int): Int {
+        val tapToViewBackgroundHeight = tapToViewContainer.background?.intrinsicHeight ?: 0
+        val tabToViewBackgroundWidth = tapToViewContainer.background?.intrinsicWidth ?: 0
+        val height = tapToViewBackgroundHeight * (width.toFloat() / tabToViewBackgroundWidth.toFloat())
+        return height.roundToInt()
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -88,7 +97,7 @@ open class TapToViewContainer @JvmOverloads constructor(
     }
 
     /**
-     * To add a view to the container that we want to hide
+     * To add views to the container that we want to hide
      */
     override fun addView(child: View, params: ViewGroup.LayoutParams) {
         if (child.id == R.id.tapToViewContainer || child.id == R.id.tapToViewHiddenContent) {
