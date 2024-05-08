@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.events.collect
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.isProxied
+import io.novafoundation.nova.feature_account_impl.data.cloudBackup.isBackupable
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupDestructiveChangesNotApplied
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
@@ -49,7 +49,7 @@ class CloudBackupSyncRequestBusHandler(
             onNameChanged = { it.metaAccountType }
         )
 
-        return potentialTriggers.any { !it.isProxied }
+        return potentialTriggers.any { it.isBackupable() }
     }
 
     private suspend fun showDestructiveChangesNotAppliedDialog() {

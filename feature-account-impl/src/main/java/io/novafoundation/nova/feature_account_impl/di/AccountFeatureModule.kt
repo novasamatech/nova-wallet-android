@@ -102,8 +102,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.common.l
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportPrivateKeyInteractor
-import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
-import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectWalletInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupSelectAccountInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupSelectWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
@@ -615,11 +617,19 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideManualBackupInteractor(
+    fun provideManualBackupSelectAccountInteractor(
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry
-    ): ManualBackupInteractor {
-        return RealManualBackupInteractor(accountRepository, chainRegistry)
+    ): ManualBackupSelectAccountInteractor {
+        return RealManualBackupSelectAccountInteractor(accountRepository, chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideManualBackupSelectWalletInteractor(
+        accountRepository: AccountRepository
+    ): ManualBackupSelectWalletInteractor {
+        return RealManualBackupSelectWalletInteractor(accountRepository)
     }
 
     @Provides

@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.mixin.condition.buttonState
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
@@ -27,11 +29,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-const val CONDITION_ID_1 = 0
-const val CONDITION_ID_2 = 1
-const val CONDITION_ID_3 = 2
-
 class BackupMnemonicViewModel(
+    private val resourceManager: ResourceManager,
     private val interactor: AccountInteractor,
     private val exportMnemonicInteractor: ExportMnemonicInteractor,
     private val router: AccountRouter,
@@ -43,10 +42,13 @@ class BackupMnemonicViewModel(
 
     val conditionMixin = conditionMixinFactory.createConditionMixin(
         coroutineScope = viewModelScope,
-        conditionsCount = 3,
-        enabledButtonText = R.string.common_confirm,
-        disabledButtonText = R.string.backup_mnemonic_disabled_button
+        conditionsCount = 3
     )
+
+    val buttonState = conditionMixin.buttonState(
+        enabledState = resourceManager.getString(R.string.common_confirm),
+        disabledState = resourceManager.getString(R.string.backup_mnemonic_disabled_button)
+    ).shareInBackground()
 
     private val advancedEncryptionSelectionStore = async {
         advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope)
@@ -109,9 +111,5 @@ class BackupMnemonicViewModel(
         )
 
         router.openConfirmMnemonicOnCreate(payload)
-    }
-
-    fun conditionClicked(index: Int, isChecked: Boolean) {
-        conditionMixin.checkCondition(index, isChecked)
     }
 }

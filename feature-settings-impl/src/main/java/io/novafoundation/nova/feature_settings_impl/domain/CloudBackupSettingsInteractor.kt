@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExi
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupRequest
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isNotEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
 import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 import io.novafoundation.nova.feature_settings_impl.domain.model.CloudBackupChangedAccount
@@ -55,7 +56,11 @@ class RealCloudBackupSettingsInteractor(
             .mapCatching { cloudBackup ->
                 cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.syncWithCloud())
             }.flatMap {
-                writeLocalBackupToCloud()
+                if (it.cloudChanges.isNotEmpty()) {
+                    writeLocalBackupToCloud()
+                } else {
+                    Result.success(Unit)
+                }
             }.finally {
                 cloudBackupService.session.setLastSyncedTimeAsNow()
             }
@@ -97,7 +102,11 @@ class RealCloudBackupSettingsInteractor(
             cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
             cloudBackupService.session.setLastSyncedTimeAsNow()
         }.flatMap {
-            writeLocalBackupToCloud()
+            if (cloudBackupDiff.cloudChanges.isNotEmpty()) {
+                writeLocalBackupToCloud()
+            } else {
+                Result.success(Unit)
+            }
         }
     }
 

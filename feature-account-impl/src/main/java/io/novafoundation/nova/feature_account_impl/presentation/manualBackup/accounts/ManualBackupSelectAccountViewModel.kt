@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.MetaAccountChains
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountGroupRvItem
@@ -17,12 +17,12 @@ import kotlinx.coroutines.flow.map
 class ManualBackupSelectAccountViewModel(
     private val router: AccountRouter,
     private val resourceManager: ResourceManager,
-    private val manualBackupInteractor: ManualBackupInteractor,
+    private val manualBackupSelectAccountInteractor: ManualBackupSelectAccountInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val payload: ManualBackupSelectAccountPayload
 ) : BaseViewModel() {
 
-    private val metaAccountChains = manualBackupInteractor.sortedMetaAccountChains(payload.metaId)
+    private val metaAccountChains = manualBackupSelectAccountInteractor.sortedMetaAccountChains(payload.metaId)
         .shareInBackground()
 
     val walletModel = metaAccountChains.map { metaAccountChains ->
