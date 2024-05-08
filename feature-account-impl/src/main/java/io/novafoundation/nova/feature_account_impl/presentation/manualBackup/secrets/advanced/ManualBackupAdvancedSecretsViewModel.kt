@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.se
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.walletUiFlowFor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
@@ -12,8 +10,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.com
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.ManualBackupSecretsAdapterItemFactory
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 
 class ManualBackupAdvancedSecretsViewModel(
     private val resourceManager: ResourceManager,

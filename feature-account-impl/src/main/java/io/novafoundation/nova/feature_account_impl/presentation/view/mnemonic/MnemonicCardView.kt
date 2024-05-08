@@ -30,6 +30,8 @@ class MnemonicCardView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_mnemonic_card_view, this)
 
+        setTitleOrHide(context.getString(R.string.common_tap_to_reveal_title))
+        setSubtitleOrHide(context.getString(R.string.mnemonic_card_reveal_subtitle))
         setBackgroundResource(R.drawable.ic_parallax_card_background)
         setTapToViewBackground(R.drawable.ic_mnemonic_card_blur)
         setCardCornerRadius(12.dpF)

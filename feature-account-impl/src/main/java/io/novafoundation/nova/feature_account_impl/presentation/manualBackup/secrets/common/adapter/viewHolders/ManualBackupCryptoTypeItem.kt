@@ -8,7 +8,6 @@ import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manual
 import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsDerivationPath
 import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsDerivationPathLabel
 
-
 data class ManualBackupCryptoTypeRvItem(
     val network: String,
     val cryptoTypeTitle: String,

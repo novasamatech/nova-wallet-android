@@ -10,7 +10,6 @@ import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.web3j.abi.datatypes.Bool
 
 class ExportMnemonicInteractor(
     private val accountRepository: AccountRepository,

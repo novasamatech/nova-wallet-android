@@ -1,12 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
 import android.view.View
-import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.ManualBackupItemHandler
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 import kotlinx.android.synthetic.main.item_manual_backup_json.view.manualBackupSecretsJsonButton
-
 
 class ManualBackupJsonRvItem : ManualBackupSecretsRvItem {
 

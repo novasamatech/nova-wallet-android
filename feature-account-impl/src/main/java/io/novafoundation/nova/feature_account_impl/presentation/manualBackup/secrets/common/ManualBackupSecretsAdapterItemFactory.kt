@@ -146,7 +146,6 @@ class RealManualBackupSecretsAdapterItemFactory(
         )
     }
 
-
     private suspend fun createAdditionalSecretsInternal(
         networkName: String,
         isEthereumBased: Boolean,

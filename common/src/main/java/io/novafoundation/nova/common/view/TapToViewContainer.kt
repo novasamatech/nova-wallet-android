@@ -1,8 +1,6 @@
 package io.novafoundation.nova.common.view
 
-import android.animation.Animator.AnimatorListener
 import android.animation.LayoutTransition
-import android.animation.TimeAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -14,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
-import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dpF
@@ -27,7 +24,6 @@ import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewH
 import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewSbutitle
 import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewTitle
 import kotlin.math.roundToInt
-
 
 private const val SUPER_STATE = "super_state"
 private const val REVEAL_CONTAINER_VISIBILITY = "reveal_container_visibility"
