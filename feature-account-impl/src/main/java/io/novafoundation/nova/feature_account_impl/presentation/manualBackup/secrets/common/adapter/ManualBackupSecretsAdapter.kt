@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter
+package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter
 
 import android.annotation.SuppressLint
 import android.view.ViewGroup
@@ -6,22 +6,22 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupChainRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupChainViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupCryptoTypeRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupCryptoTypeViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupJsonRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupJsonViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupMnemonicRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupMnemonicViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupSeedRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupSeedViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupSubtitleRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupSubtitleViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupTitleRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.ManualBackupTitleViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.models.ManualBackupSecretsRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.models.ManualBackupSecretsViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupChainRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupChainViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupCryptoTypeRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupCryptoTypeViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupJsonRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupJsonViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupMnemonicRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupMnemonicViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupSeedRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupSeedViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupSubtitleRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupSubtitleViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupTitleRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupTitleViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 
 private const val TITLE_VIEW_TYPE = 0
 private const val SUBTITLE_VIEW_TYPE = 1

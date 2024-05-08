@@ -10,6 +10,7 @@ import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.web3j.abi.datatypes.Bool
 
 class ExportMnemonicInteractor(
     private val accountRepository: AccountRepository,
@@ -46,4 +47,14 @@ suspend fun ExportMnemonicInteractor.getMnemonicOrNull(metaId: Long, chainId: Ch
             getMnemonic(metaId, chainId)
         }
     }.getOrNull()
+}
+
+suspend fun ExportMnemonicInteractor.hasMnemonic(metaId: Long, chainId: ChainId?): Boolean {
+    return runCatching {
+        if (chainId == null) {
+            getMnemonic(metaId)
+        } else {
+            getMnemonic(metaId, chainId)
+        }
+    }.getOrNull() != null
 }

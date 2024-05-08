@@ -37,7 +37,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.d
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.di.ManualBackupSelectAccountComponent
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.di.ManualBackupSecretsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.di.ManualBackupAdvancedSecretsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.main.di.ManualBackupSecretsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets.di.ManualBackupSelectWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.di.ManualBackupWarningComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.di.SelectWalletComponent
@@ -147,6 +148,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun manualBackupSecrets(): ManualBackupSecretsComponent.Factory
 
     fun manualBackupSelectAccount(): ManualBackupSelectAccountComponent.Factory
+
+    fun manualBackupAdvancedSecrets(): ManualBackupAdvancedSecretsComponent.Factory
 
     @Component.Factory
     interface Factory {

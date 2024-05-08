@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.di
+package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -11,29 +11,27 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.ManualBackupAdvancedSecretsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.ManualBackupSecretsAdapterItemFactory
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.ManualBackupSecretsViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.ManualBackupSecretsAdapterItemFactory
 
 @Module(includes = [ViewModelModule::class])
-class ManualBackupSecretsModule {
+class ManualBackupAdvancedSecretsModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(ManualBackupSecretsViewModel::class)
+    @ViewModelKey(ManualBackupAdvancedSecretsViewModel::class)
     fun provideViewModel(
         resourceManager: ResourceManager,
         router: AccountRouter,
         payload: ManualBackupCommonPayload,
-        secretsAdapterItemFactory: ManualBackupSecretsAdapterItemFactory,
-        walletUiUseCase: WalletUiUseCase
+        secretsAdapterItemFactory: ManualBackupSecretsAdapterItemFactory
     ): ViewModel {
-        return ManualBackupSecretsViewModel(
+        return ManualBackupAdvancedSecretsViewModel(
             resourceManager,
             router,
             payload,
-            secretsAdapterItemFactory,
-            walletUiUseCase
+            secretsAdapterItemFactory
         )
     }
 
@@ -41,10 +39,10 @@ class ManualBackupSecretsModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): ManualBackupSecretsViewModel {
+    ): ManualBackupAdvancedSecretsViewModel {
         return ViewModelProvider(
             fragment,
             viewModelFactory
-        ).get(ManualBackupSecretsViewModel::class.java)
+        ).get(ManualBackupAdvancedSecretsViewModel::class.java)
     }
 }

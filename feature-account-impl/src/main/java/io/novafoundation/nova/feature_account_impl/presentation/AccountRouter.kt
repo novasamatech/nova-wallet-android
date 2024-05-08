@@ -95,4 +95,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openManualBackupConditions(payload: ManualBackupCommonPayload)
 
     fun openManualBackupSecrets(payload: ManualBackupCommonPayload)
+
+    fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload)
 }

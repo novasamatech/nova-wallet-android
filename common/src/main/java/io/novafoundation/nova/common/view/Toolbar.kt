@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
@@ -123,6 +124,16 @@ class Toolbar @JvmOverloads constructor(
 
     fun setHomeButtonListener(listener: (View) -> Unit) {
         backImg.setOnClickListener(listener)
+    }
+
+    fun hideRightAction() {
+        rightImg.makeGone()
+        rightText.makeGone()
+    }
+
+    fun setRightIconRes(@DrawableRes iconRes: Int) {
+        val drawable = ContextCompat.getDrawable(context, iconRes)
+        drawable?.let { setRightIconDrawable(it) }
     }
 
     fun setRightIconDrawable(assetIconDrawable: Drawable) {

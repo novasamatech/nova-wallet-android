@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders
+package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
 import android.view.View
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.ManualBackupItemHandler
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.models.ManualBackupSecretsRvItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.models.ManualBackupSecretsViewHolder
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.ManualBackupItemHandler
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
 import kotlinx.android.synthetic.main.item_manual_backup_mnemonic.view.manualBackupSecretsMnemonic
 
 data class ManualBackupMnemonicRvItem(
