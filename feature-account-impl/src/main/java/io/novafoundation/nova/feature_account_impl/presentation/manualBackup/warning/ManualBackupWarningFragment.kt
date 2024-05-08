@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningButtonContinue
 import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition1
 import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition2
@@ -27,7 +27,7 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>()
 
         private const val KEY_PAYLOAD = "payload"
 
-        fun bundle(payload: ManualBackupAccountToBackupPayload) = Bundle().apply {
+        fun bundle(payload: ManualBackupCommonPayload) = Bundle().apply {
             putParcelable(KEY_PAYLOAD, payload)
         }
     }
@@ -43,6 +43,8 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>()
     override fun initViews() {
         manualBackupWarningToolbar.applyStatusBarInsets()
         manualBackupWarningToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        manualBackupWarningButtonContinue.setOnClickListener { viewModel.continueClicked() }
 
         buildConditions()
     }

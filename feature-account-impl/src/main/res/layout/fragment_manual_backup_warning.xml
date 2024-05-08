@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:paddingBottom="16dp"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@+id/manualBackupWarningButtonContainer"
         app:layout_constraintTop_toBottomOf="@id/manualBackupWarningToolbar">
 

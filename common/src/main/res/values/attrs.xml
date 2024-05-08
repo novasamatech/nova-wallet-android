@@ -48,6 +48,7 @@
         <attr name="textIcon" format="reference|color" />
         <attr name="enabled" format="boolean" />
         <attr name="android:singleLine" />
+        <attr name="messageColor" format="color" />
 
         <attr name="messageStyle" format="reference" />
         <attr name="labelStyle" format="reference" />
@@ -323,6 +324,13 @@
         <attr name="android:icon" />
         <attr name="iconTint" />
         <attr name="android:text" />
+    </declare-styleable>
+
+    <declare-styleable name="TapToViewContainer">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="cornerRadius" />
+        <attr name="tapToViewBackground" format="reference" />
     </declare-styleable>
 
 </resources>

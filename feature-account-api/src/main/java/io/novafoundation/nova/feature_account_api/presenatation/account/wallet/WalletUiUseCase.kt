@@ -19,6 +19,8 @@ interface WalletUiUseCase {
 
     fun walletUiFlow(metaId: Long, showAddressIcon: Boolean = false): Flow<WalletModel>
 
+    fun walletUiFlow(metaId: Long, chainId: String, showAddressIcon: Boolean = false): Flow<WalletModel>
+
     suspend fun selectedWalletUi(): WalletModel
 
     suspend fun walletIcon(
@@ -32,4 +34,12 @@ interface WalletUiUseCase {
     suspend fun walletIcon(metaAccount: MetaAccount, iconSize: Int = AddressIconGenerator.SIZE_MEDIUM, transparentBackground: Boolean = true): Drawable
 
     suspend fun walletUiFor(metaAccount: MetaAccount): WalletModel
+}
+
+fun WalletUiUseCase.walletUiFlowFor(metaId: Long, chainId: String?, showAddressIcon: Boolean = false): Flow<WalletModel> {
+    return if (chainId == null) {
+        walletUiFlow(metaId, showAddressIcon)
+    } else {
+        walletUiFlow(metaId, chainId, showAddressIcon)
+    }
 }

@@ -29,4 +29,21 @@ class ExportMnemonicInteractor(
 
         MnemonicCreator.fromEntropy(entropy)
     }
+
+    suspend fun getMnemonic(metaId: Long): Mnemonic = withContext(Dispatchers.Default) {
+        val entropy = secretStoreV2.getMetaAccountSecrets(metaId)?.entropy
+            ?: error("No mnemonic found for account $metaId")
+
+        MnemonicCreator.fromEntropy(entropy)
+    }
+}
+
+suspend fun ExportMnemonicInteractor.getMnemonicOrNull(metaId: Long, chainId: ChainId?): Mnemonic? {
+    return runCatching {
+        if (chainId == null) {
+            getMnemonic(metaId)
+        } else {
+            getMnemonic(metaId, chainId)
+        }
+    }.getOrNull()
 }

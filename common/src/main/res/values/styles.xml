@@ -565,4 +565,5 @@
 
         <item name="android:textColor">@color/text_secondary</item>
     </style>
+
 </resources>

@@ -64,6 +64,20 @@
         android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningFragment"
         android:label="ManualBackupWarningFragment">
 
+        <action
+            android:id="@+id/action_manualBackupWarning_to_manualBackupSecrets"
+            app:destination="@+id/manualBackupSecrets"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
+    <fragment
+        android:id="@+id/manualBackupSecrets"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.ManualBackupSecretsFragment"
+        android:label="ManualBackupSecretsFragment">
+
+    </fragment>
 </navigation>

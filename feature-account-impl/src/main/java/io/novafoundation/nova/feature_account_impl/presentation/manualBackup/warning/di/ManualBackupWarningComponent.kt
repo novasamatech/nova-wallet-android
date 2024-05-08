@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningFragment
 
 @Subcomponent(
@@ -20,7 +20,7 @@ interface ManualBackupWarningComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: ManualBackupAccountToBackupPayload
+            @BindsInstance payload: ManualBackupCommonPayload
         ): ManualBackupWarningComponent
     }
 

@@ -10,8 +10,10 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount.ChainAccount
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.mapLatest
 class WalletUiUseCaseImpl(
     private val accountRepository: AccountRepository,
     private val addressIconGenerator: AddressIconGenerator,
+    private val chainRegistry: ChainRegistry
 ) : WalletUiUseCase {
 
     override fun selectedWalletUiFlow(
@@ -39,6 +42,20 @@ class WalletUiUseCaseImpl(
         return flowOf {
             val metaAccount = accountRepository.getMetaAccount(metaId)
             val icon = maybeGenerateIcon(accountId = metaAccount.walletIconSeed(), shouldGenerate = showAddressIcon)
+
+            WalletModel(
+                metaId = metaId,
+                name = metaAccount.name,
+                icon = icon
+            )
+        }
+    }
+
+    override fun walletUiFlow(metaId: Long, chainId: String, showAddressIcon: Boolean): Flow<WalletModel> {
+        return flowOf {
+            val metaAccount = accountRepository.getMetaAccount(metaId)
+            val chain = chainRegistry.getChain(chainId)
+            val icon = maybeGenerateIcon(accountId = metaAccount.accountIdIn(chain)!!, shouldGenerate = showAddressIcon)
 
             WalletModel(
                 metaId = metaId,

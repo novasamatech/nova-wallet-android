@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 
 const val CONDITION_ID_1 = 0
 const val CONDITION_ID_2 = 1
@@ -14,7 +14,7 @@ const val CONDITION_ID_3 = 2
 class ManualBackupWarningViewModel(
     private val router: AccountRouter,
     private val conditionMixinFactory: ConditionMixinFactory,
-    private val payload: ManualBackupAccountToBackupPayload
+    private val payload: ManualBackupCommonPayload
 ) : BaseViewModel() {
 
     val conditionMixin = conditionMixinFactory.createConditionMixin(
@@ -23,6 +23,10 @@ class ManualBackupWarningViewModel(
         enabledButtonText = R.string.common_confirm,
         disabledButtonText = R.string.manual_backup_warning_disabled_button
     )
+
+    fun continueClicked() {
+        router.openManualBackupSecrets(payload)
+    }
 
     fun backClicked() {
         router.back()

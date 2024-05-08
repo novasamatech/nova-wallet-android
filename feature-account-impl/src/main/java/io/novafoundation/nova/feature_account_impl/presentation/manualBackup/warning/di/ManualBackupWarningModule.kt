@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -22,7 +22,7 @@ class ManualBackupWarningModule {
     fun provideViewModel(
         router: AccountRouter,
         conditionMixinFactory: ConditionMixinFactory,
-        payload: ManualBackupAccountToBackupPayload
+        payload: ManualBackupCommonPayload
     ): ViewModel {
         return ManualBackupWarningViewModel(
             router,
