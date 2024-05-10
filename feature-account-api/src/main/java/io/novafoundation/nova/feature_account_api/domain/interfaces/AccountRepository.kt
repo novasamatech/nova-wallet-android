@@ -129,4 +129,6 @@ interface AccountRepository {
     suspend fun getActiveMetaAccounts(): List<MetaAccount>
 
     suspend fun getActiveMetaAccountsQuantity(): Int
+    
+    suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
 }

@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.getChainIdOrNull
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.toExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.ManualBackupSecretsAdapterItemFactory
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
@@ -24,6 +25,10 @@ class ManualBackupAdvancedSecretsViewModel(
     fun onTapToRevealClicked(item: ManualBackupSecretsVisibilityRvItem) {
         // It's not necessary to update the list, because the item will play a show animation. We just need to update its state
         item.makeShown()
+    }
+
+    fun exportJsonClicked() {
+        router.exportJsonAction(payload.toExportPayload())
     }
 
     fun backClicked() {

@@ -1,7 +1,6 @@
-package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password
+package io.novafoundation.nova.feature_account_impl.presentation.exporting.json
 
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -14,20 +13,20 @@ import io.novafoundation.nova.feature_account_impl.domain.account.export.json.va
 import io.novafoundation.nova.feature_account_impl.domain.account.export.json.validations.mapExportJsonPasswordValidationFailureToUi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class ExportJsonPasswordViewModel(
+class ExportJsonViewModel(
     private val router: AccountRouter,
     private val interactor: ExportJsonInteractor,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: ExportJsonPasswordValidationSystem,
     private val payload: ExportPayload,
-) : BaseViewModel(),
+) : ExportViewModel(),
     Validatable by validationExecutor {
 
     val passwordFlow = MutableStateFlow("")
@@ -43,10 +42,11 @@ class ExportJsonPasswordViewModel(
         when {
             jsonGenerationInProgress -> DescriptiveButtonState.Loading
             password.isBlank() || confirmation.isBlank() -> DescriptiveButtonState.Disabled(
-                resourceManager.getString(R.string.common_input_error_set_password)
+                resourceManager.getString(R.string.common_enter_password)
             )
+
             else -> DescriptiveButtonState.Enabled(
-                resourceManager.getString(R.string.common_continue)
+                resourceManager.getString(R.string.export_json_download_btn)
             )
         }
     }
@@ -74,12 +74,13 @@ class ExportJsonPasswordViewModel(
     }
 
     private fun tryGenerateJson(password: String) = launch {
-        interactor.generateRestoreJson(payload.metaId, payload.chainId, password)
-            .onSuccess {
-                val confirmPayload = ExportJsonConfirmPayload(payload, it)
+        val generateRestoreJsonResult = when (payload) {
+            is ExportPayload.ChainAccount -> interactor.generateRestoreJson(payload.metaId, payload.chainId, password)
+            is ExportPayload.MetaAccount -> interactor.generateRestoreJson(payload.metaId, password)
+        }
 
-                router.openExportJsonConfirm(confirmPayload)
-            }
+        generateRestoreJsonResult
+            .onSuccess { exportText(it) }
             .onFailure { it.message?.let(::showError) }
 
         jsonGenerationInProgressFlow.value = false

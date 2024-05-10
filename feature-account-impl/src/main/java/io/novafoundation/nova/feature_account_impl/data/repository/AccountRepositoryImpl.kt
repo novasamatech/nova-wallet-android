@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetB
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryption
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
@@ -256,6 +258,25 @@ class AccountRepositoryImpl(
                 multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
                 genesisHash = chain.genesisHash.orEmpty(),
                 address = address
+            )
+        }
+    }
+
+    override suspend fun generateRestoreJson(
+        metaAccount: MetaAccount,
+        password: String,
+    ): String {
+        return withContext(Dispatchers.Default) {
+            val secrets = secretStoreV2.getMetaAccountSecrets(metaAccount.id)!!
+
+            jsonSeedEncoder.generate(
+                keypair = secrets.keypair(ethereum = false),
+                seed = secrets.seed,
+                password = password,
+                name = metaAccount.name,
+                multiChainEncryption = metaAccount.multiChainEncryption()!!,
+                genesisHash = "",
+                address = metaAccount.defaultSubstrateAddress!!
             )
         }
     }

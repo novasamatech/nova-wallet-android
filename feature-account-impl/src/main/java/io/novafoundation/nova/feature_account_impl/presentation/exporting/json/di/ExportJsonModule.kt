@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di
+package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -14,14 +14,14 @@ import io.novafoundation.nova.feature_account_impl.domain.account.export.json.Ex
 import io.novafoundation.nova.feature_account_impl.domain.account.export.json.validations.ExportJsonPasswordValidationSystem
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonViewModel
 
 @Module(includes = [ViewModelModule::class, ValidationsModule::class])
-class ExportJsonPasswordModule {
+class ExportJsonModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(ExportJsonPasswordViewModel::class)
+    @ViewModelKey(ExportJsonViewModel::class)
     fun provideViewModel(
         router: AccountRouter,
         accountInteractor: ExportJsonInteractor,
@@ -30,7 +30,7 @@ class ExportJsonPasswordModule {
         resourceManager: ResourceManager,
         payload: ExportPayload
     ): ViewModel {
-        return ExportJsonPasswordViewModel(
+        return ExportJsonViewModel(
             router,
             accountInteractor,
             resourceManager,
@@ -41,7 +41,7 @@ class ExportJsonPasswordModule {
     }
 
     @Provides
-    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): ExportJsonPasswordViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(ExportJsonPasswordViewModel::class.java)
+    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): ExportJsonViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(ExportJsonViewModel::class.java)
     }
 }

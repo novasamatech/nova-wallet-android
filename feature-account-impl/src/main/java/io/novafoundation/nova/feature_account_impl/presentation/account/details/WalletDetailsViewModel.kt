@@ -99,12 +99,12 @@ class WalletDetailsViewModel(
     }
 
     private fun exportTypeChosen(type: SecretType, chain: Chain) {
-        val exportPayload = ExportPayload(metaId, chain.id)
+        val exportPayload = ExportPayload.ChainAccount(metaId, chain.id)
 
         val navigationAction = when (type) {
-            SecretType.MNEMONIC -> accountRouter.exportMnemonicAction(exportPayload)
-            SecretType.SEED -> accountRouter.exportSeedAction(exportPayload)
-            SecretType.JSON -> accountRouter.exportJsonPasswordAction(exportPayload)
+            SecretType.MNEMONIC -> accountRouter.getExportMnemonicDelayedNavigation(exportPayload)
+            SecretType.SEED -> accountRouter.getExportSeedDelayedNavigation(exportPayload)
+            SecretType.JSON -> accountRouter.getExportJsonDelayedNavigation(exportPayload)
         }
 
         accountRouter.withPinCodeCheckRequired(navigationAction)

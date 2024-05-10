@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.Export
 class ExportSeedViewModel(
     private val router: AccountRouter,
     private val interactor: ExportPrivateKeyInteractor,
-    private val exportPayload: ExportPayload,
+    private val exportPayload: ExportPayload.ChainAccount,
 ) : ExportViewModel() {
 
     val seedFlow = flowOf {

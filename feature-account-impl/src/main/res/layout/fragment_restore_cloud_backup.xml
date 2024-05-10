@@ -41,25 +41,13 @@
             tools:text="@string/restore_cloud_backup_subtitle" />
 
         <io.novafoundation.nova.common.view.InputField
+            style="@style/Widget.Nova.Input.Password"
             android:id="@+id/restoreCloudBackupInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="24dp"
-            android:inputType="textPassword"
-            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-            app:backgroundMode="solid"
-            app:editTextHint="@string/account_import_password_placeholder"
-            app:editTextPaddingBottom="8dp"
-            app:editTextPaddingEnd="16dp"
-            app:editTextPaddingStart="12dp"
-            app:editTextPaddingTop="8dp"
-            app:endIconDrawable="@drawable/ic_eye_show"
-            app:endIconMode="custom"
-            app:endIconTint="@color/chip_icon"
-            app:hintAnimationEnabled="false"
-            app:hintEnabled="false"
-            app:hintTextColor="@color/hint_text" />
+            app:editTextHint="@string/account_import_password_placeholder"/>
 
         <TextView
             android:id="@+id/restoreCloudBackupForgotPassword"
@@ -83,7 +71,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="24dp"
         android:enabled="false"
-        android:text="@string/cloud_backup_enter_password"
+        android:text="@string/common_enter_password"
         app:appearance="primaryTransparent"
         app:layout_constraintBottom_toBottomOf="parent" />
 

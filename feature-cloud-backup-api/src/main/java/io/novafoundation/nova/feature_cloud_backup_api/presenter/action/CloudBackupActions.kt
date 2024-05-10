@@ -118,7 +118,7 @@ fun ActionBottomSheetLauncher.launchDeprecatedPasswordAction(resourceManager: Re
         },
         neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_not_now)),
         actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
-            resourceManager.getString(R.string.cloud_backup_enter_password),
+            resourceManager.getString(R.string.common_enter_password),
             onEnterPasswordClick
         )
     )

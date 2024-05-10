@@ -56,7 +56,7 @@ abstract class BackupCreatePasswordViewModel(
         when {
             backupInProgress && passwordState.isRequirementsSatisfied -> DescriptiveButtonState.Loading
             passwordState.isRequirementsSatisfied -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
-            else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.cloud_backup_enter_password))
+            else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_password))
         }
     }.shareInBackground()
 

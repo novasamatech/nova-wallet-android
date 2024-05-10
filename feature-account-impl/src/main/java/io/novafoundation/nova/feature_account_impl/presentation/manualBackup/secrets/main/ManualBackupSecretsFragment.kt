@@ -79,7 +79,7 @@ class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel>()
     }
 
     override fun onExportJsonClick(item: ManualBackupJsonRvItem) {
-        showError("Not implemented yet")
+        viewModel.exportJsonClicked()
     }
 
     override fun onTapToRevealClicked(item: ManualBackupSecretsVisibilityRvItem) {

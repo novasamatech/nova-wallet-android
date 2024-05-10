@@ -30,9 +30,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.crea
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.di.CheckCloudBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restoreBackup.di.RestoreCloudBackupComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restorePassword.di.RestoreCloudBackupPasswordComponent
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ShareCompletedReceiver
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.di.ExportJsonComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
@@ -122,9 +121,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun exportSeedFactory(): ExportSeedComponent.Factory
 
-    fun exportJsonPasswordFactory(): ExportJsonPasswordComponent.Factory
-
-    fun exportJsonConfirmFactory(): ExportJsonConfirmComponent.Factory
+    fun exportJsonPasswordFactory(): ExportJsonComponent.Factory
 
     fun inject(receiver: ShareCompletedReceiver)
 
