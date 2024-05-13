@@ -14,7 +14,7 @@ class ValidatorRecommender(
 ) {
 
     suspend fun recommendations(settings: RecommendationSettings) = withContext(Dispatchers.Default) {
-        val all =  availableValidators.applyFiltersAdaptingToEmptyResult(settings.allFilters)
+        val all = availableValidators.applyFiltersAdaptingToEmptyResult(settings.allFilters)
             .sortedWith(settings.sorting)
 
         val postprocessed = settings.postProcessors.fold(all) { acc, postProcessor ->
@@ -40,7 +40,7 @@ class ValidatorRecommender(
     }
 
     private fun List<Validator>.applyFiltersAdaptingToEmptyResult(filters: List<RecommendationFilter>): List<Validator> {
-        var filtered =  applyFilters(filters)
+        var filtered = applyFilters(filters)
 
         if (filtered.isEmpty()) {
             val weakenedFilters = filters.filterNot { it.canIgnoreWhenNoApplicableCandidatesFound() }
