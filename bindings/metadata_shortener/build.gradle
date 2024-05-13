@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
 android {
+    namespace 'io.novafoundation.nova.metadata_shortener'
     compileSdkVersion rootProject.compileSdkVersion
 
     ndkVersion "26.1.10909125"
@@ -43,8 +44,8 @@ dependencies {
 }
 
 cargo {
-    module = "bindings/"
-    libname = "hydra_dx_math_java"
+    module = "rust/"
+    libname = "metadata_shortener_java"
     targets = ["arm", "arm64", "x86", "x86_64"]
     profile = "release"
 }

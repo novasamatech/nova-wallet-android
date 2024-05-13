@@ -237,6 +237,8 @@ dependencies {
     implementation project(':feature-push-notifications')
     implementation project(':feature-deep-linking')
 
+    implementation project(':bindings:metadata_shortener')
+
     implementation kotlinDep
 
     implementation biometricDep
