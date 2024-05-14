@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWa
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletManualBackupButton
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInput
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInputLayout
+import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletSyncWithCloudEnabled
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletTitle
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletToolbar
 
@@ -53,6 +54,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
         startCreateWalletManualBackupButton.setOnClickListener { viewModel.manualBackupClicked() }
 
         startCreateWalletCloudBackupButton.prepareForProgress(viewLifecycleOwner)
+        startCreateWalletConfirmName.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -72,7 +74,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
         }
 
         viewModel.isSyncWithCloudEnabled.observe {
-            startCreateWalletCloudBackupButton.isVisible = it
+            startCreateWalletSyncWithCloudEnabled.isVisible = it
         }
 
         viewModel.createWalletState.observe {

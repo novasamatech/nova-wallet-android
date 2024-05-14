@@ -68,7 +68,7 @@ class RealCloudBackupChangingWarningMixin(
         var isAutoContinueChecked = false
 
         launchBottomSheet(
-            imageRes = R.drawable.ic_cloud_backup_sync,
+            imageRes = R.drawable.ic_cloud_backup_add,
             title = resourceManager.getString(R.string.cloud_backup_will_be_changed_title),
             subtitle = resourceManager.getString(R.string.cloud_backup_will_be_changed_subtitle),
             neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
