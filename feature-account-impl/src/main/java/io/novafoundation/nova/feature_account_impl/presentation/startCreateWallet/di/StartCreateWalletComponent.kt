@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletFragment
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
 
 @Subcomponent(
     modules = [
@@ -19,6 +20,7 @@ interface StartCreateWalletComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
+            @BindsInstance payload: StartCreateWalletPayload
         ): StartCreateWalletComponent
     }
 

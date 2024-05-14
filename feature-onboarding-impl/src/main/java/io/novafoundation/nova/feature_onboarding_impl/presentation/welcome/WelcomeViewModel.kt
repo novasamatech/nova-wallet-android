@@ -29,7 +29,7 @@ class WelcomeViewModel(
 
     fun createAccountClicked() {
         when (addAccountPayload) {
-            is AddAccountPayload.MetaAccount -> router.openCreateAccount()
+            is AddAccountPayload.MetaAccount -> router.openCreateFirstWallet()
             is AddAccountPayload.ChainAccount -> router.openMnemonicScreen(accountName = null, addAccountPayload)
         }
     }

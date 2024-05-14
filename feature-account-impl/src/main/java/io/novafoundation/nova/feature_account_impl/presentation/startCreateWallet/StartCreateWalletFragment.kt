@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletCloudBackupButton
@@ -26,6 +27,16 @@ import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWa
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletToolbar
 
 class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
+
+    companion object {
+        private const val KEY_PAYLOAD = "display_back"
+
+        fun bundle(payload: StartCreateWalletPayload): Bundle {
+            return Bundle().apply {
+                putParcelable(KEY_PAYLOAD, payload)
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_start_create_wallet, container, false)
@@ -48,7 +59,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
     override fun inject() {
         FeatureUtils.getFeature<AccountFeatureComponent>(context!!, AccountFeatureApi::class.java)
             .startCreateWallet()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
@@ -61,14 +72,16 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
             startCreateWalletConfirmName.setState(state)
         }
 
+        viewModel.isSyncWithCloudEnabled.observe {
+            startCreateWalletCloudBackupButton.isVisible = it
+        }
+
         viewModel.createWalletState.observe {
             startCreateWalletNameInputLayout.isEndIconVisible = it == CreateWalletState.SETUP_NAME
             startCreateWalletNameInput.isFocusable = it == CreateWalletState.SETUP_NAME
             startCreateWalletNameInput.isFocusableInTouchMode = it == CreateWalletState.SETUP_NAME
 
             startCreateWalletConfirmName.isVisible = it == CreateWalletState.SETUP_NAME
-            startCreateWalletCloudBackupButton.isVisible = it == CreateWalletState.CHOOSE_BACKUP_WAY
-            startCreateWalletManualBackupButton.isVisible = it == CreateWalletState.CHOOSE_BACKUP_WAY
         }
 
         viewModel.titleText.observe {
@@ -82,6 +95,14 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
         viewModel.cloudBackupSyncProgressFlow.observe {
             startCreateWalletCloudBackupButton.showProgress(it)
             startCreateWalletManualBackupButton.isEnabled = !it
+        }
+
+        viewModel.showCloudBackupButton.observe {
+            startCreateWalletCloudBackupButton.isVisible = it
+        }
+
+        viewModel.showManualBackupButton.observe {
+            startCreateWalletManualBackupButton.isVisible = it
         }
     }
 }

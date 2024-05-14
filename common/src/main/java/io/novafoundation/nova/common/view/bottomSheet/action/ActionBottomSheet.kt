@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.view.bottomSheet.action
 
 import android.content.Context
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -9,6 +10,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.view.PrimaryButton
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
+import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetCheckBox
 import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetImage
 import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetNeutralBtn
 import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetPositiveBtn
@@ -25,13 +27,21 @@ class ActionBottomSheet(
         val title: CharSequence,
         val subtitle: CharSequence,
         val actionButtonPreferences: ButtonPreferences,
-        val neutralButtonPreferences: ButtonPreferences? = null
+        val neutralButtonPreferences: ButtonPreferences? = null,
+        val checkBoxPreferences: CheckBoxPreferences? = null
     )
 
     class ButtonPreferences(
         val text: CharSequence,
         val style: PrimaryButton.Appearance,
         val onClick: (() -> Unit)? = null
+    ) {
+        companion object
+    }
+
+    class CheckBoxPreferences(
+        val text: CharSequence,
+        val onCheckChanged: ((Boolean) -> Unit)? = null
     ) {
         companion object
     }
@@ -50,6 +60,10 @@ class ActionBottomSheet(
 
     private val actionButton: PrimaryButton
         get() = actionBottomSheetPositiveBtn
+
+    private val checkBox: CheckBox
+        get() = actionBottomSheetCheckBox
+
 
     init {
         setContentView(R.layout.bottom_sheet_action)
@@ -77,6 +91,13 @@ class ActionBottomSheet(
                 }
             }
         } ?: neutralButton.makeGone()
+
+        payload.checkBoxPreferences?.let { preferences ->
+            checkBox.text = preferences.text
+            checkBox.setOnCheckedChangeListener { _, isChecked ->
+                preferences.onCheckChanged?.invoke(isChecked)
+            }
+        } ?: checkBox.makeGone()
     }
 }
 

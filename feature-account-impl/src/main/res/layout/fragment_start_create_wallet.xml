@@ -43,6 +43,40 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <LinearLayout
+            android:id="@+id/startCreateWalletSyncWithCloudEnabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:minHeight="22dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            app:layout_cardBackgroundColor="@color/input_background"
+            app:layout_cardBorderColor="@color/container_border"
+            app:layout_cardRadius="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_checkmark_circle_16"
+                app:tint="@color/chip_icon" />
+
+            <TextView
+                android:id="@+id/viewAssetsTotalBalanceLocked"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:gravity="center_vertical"
+                android:text="@string/cloud_backup"
+                android:textColor="@color/chip_text" />
+
+        </LinearLayout>
+
         <TextView
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"

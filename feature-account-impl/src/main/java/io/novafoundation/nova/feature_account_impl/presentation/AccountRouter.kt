@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
 
 interface AccountRouter : SecureRouter, ReturnableRouter {
 
@@ -36,7 +37,7 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openNodes()
 
-    fun openAddAccount(payload: AddAccountPayload)
+    fun openCreateWallet(payload: StartCreateWalletPayload)
 
     fun openWalletDetails(metaId: Long)
 
@@ -58,6 +59,8 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun exportJsonAction(exportPayload: ExportPayload)
 
     fun openImportAccountScreen(payload: ImportAccountPayload)
+
+    fun openImportOptionsScreen()
 
     fun returnToWallet()
 
@@ -96,4 +99,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openManualBackupSecrets(payload: ManualBackupCommonPayload)
 
     fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload)
+
+    fun finishCreateWalletFlow()
 }

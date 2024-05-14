@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/create_wallet_nav_graph"
+    app:startDestination="@id/startCreateWalletFragment">
+
+    <fragment
+        android:id="@+id/startCreateWalletFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletFragment"
+        android:label="StartCreateWalletFragment"
+        tools:layout="@layout/fragment_create_wallet_name">
+
+        <action
+            android:id="@+id/action_startCreateWalletFragment_to_mnemonic_nav_graph"
+            app:destination="@id/mnemonic_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_startCreateWalletFragment_to_createCloudBackupPasswordFragment"
+            app:destination="@id/createCloudBackupPasswordFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_startCreateWalletFragment_to_resotreCloudBackupFragment"
+            app:destination="@id/restore_cloud_backup_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_finish_startCreateWalletFragment"
+            app:destination="@id/startCreateWalletFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/createCloudBackupPasswordFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordFragment"
+        android:label="CreateCloudBackupPasswordFragment"
+        tools:layout="@layout/fragment_create_cloud_backup_password">
+
+        <action
+            android:id="@+id/action_createCloudBackupPasswordFragment_to_pincodeFragment"
+            app:destination="@id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <include app:graph="@navigation/mnemonic_nav_graph" />
+    <include app:graph="@navigation/restore_cloud_backup_nav_graph" />
+
+</navigation>
