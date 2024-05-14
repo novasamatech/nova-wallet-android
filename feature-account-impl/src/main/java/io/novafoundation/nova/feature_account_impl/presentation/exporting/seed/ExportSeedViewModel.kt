@@ -15,7 +15,11 @@ class ExportSeedViewModel(
 ) : ExportViewModel() {
 
     val seedFlow = flowOf {
-        interactor.getAccountSeed(exportPayload.metaId, exportPayload.chainId)
+        if (interactor.isEthereumBased(exportPayload.chainId)) {
+            interactor.getEthereumPrivateKey(exportPayload.metaId, exportPayload.chainId)
+        } else {
+            interactor.getAccountSeed(exportPayload.metaId, exportPayload.chainId)
+        }
     }
         .inBackground()
         .share()
