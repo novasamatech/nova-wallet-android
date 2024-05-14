@@ -980,4 +980,8 @@
 
     <include app:graph="@navigation/manual_backup_graph" />
 
+    <include app:graph="@navigation/import_wallet_options_nav_graph" />
+
+    <include app:graph="@navigation/create_wallet_nav_graph" />
+
 </navigation>

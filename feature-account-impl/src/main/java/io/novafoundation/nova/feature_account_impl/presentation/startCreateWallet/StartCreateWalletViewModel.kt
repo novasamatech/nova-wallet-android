@@ -43,6 +43,9 @@ class StartCreateWalletViewModel(
     // Used to cancel the job when the user navigates back
     private var cloudBackupValidationJob: Job? = null
 
+    private val _progressFlow = MutableStateFlow(false)
+    val progressFlow: Flow<Boolean> = _progressFlow
+
     private val _createWalletState = MutableStateFlow(CreateWalletState.SETUP_NAME)
     val createWalletState: Flow<CreateWalletState> = _createWalletState
 
@@ -50,11 +53,11 @@ class StartCreateWalletViewModel(
 
     val isSyncWithCloudEnabled = flowOf { startCreateWalletInteractor.isSyncWithCloudEnabled() }
 
-    val confirmNameButtonState: Flow<DescriptiveButtonState> = nameInput.map { name ->
-        if (name.isEmpty()) {
-            DescriptiveButtonState.Disabled(resourceManager.getString(R.string.start_create_wallet_enter_wallet_name))
-        } else {
-            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
+    val continueButtonState: Flow<DescriptiveButtonState> = combine(progressFlow, nameInput) { progress, name ->
+        when {
+            progress -> DescriptiveButtonState.Loading
+            name.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.start_create_wallet_enter_wallet_name))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }.shareInBackground()
 
@@ -83,9 +86,6 @@ class StartCreateWalletViewModel(
         }
     }.shareInBackground()
 
-    private val _cloudBackupSyncProgressFlow = MutableStateFlow(false)
-    val cloudBackupSyncProgressFlow: Flow<Boolean> = _cloudBackupSyncProgressFlow
-
     fun backClicked() {
         if (_createWalletState.value == CreateWalletState.SETUP_NAME) {
             router.back()
@@ -98,9 +98,11 @@ class StartCreateWalletViewModel(
     fun confirmNameClicked() {
         launch {
             if (startCreateWalletInteractor.isSyncWithCloudEnabled()) {
-                startCreateWalletInteractor.createWallet(nameInput.value)
-                    .onSuccess { router.finishCreateWalletFlow() }
+                _progressFlow.value = true
+                startCreateWalletInteractor.createWalletAndSelect(nameInput.value)
+                    .onSuccess { router.openMain() }
                     .onFailure { error -> showError(error) }
+                _progressFlow.value = false
             } else {
                 _createWalletState.value = CreateWalletState.CHOOSE_BACKUP_WAY
             }
@@ -111,7 +113,7 @@ class StartCreateWalletViewModel(
         cloudBackupValidationJob = launch {
             val walletName = nameInput.value
             runCatching {
-                _cloudBackupSyncProgressFlow.value = true
+                _progressFlow.value = true
                 val validationResult = startCreateWalletInteractor.validateCanCreateBackup()
                 if (validationResult is PreCreateValidationStatus.Ok) {
                     router.openCreateCloudBackupPassword(walletName)
@@ -120,7 +122,7 @@ class StartCreateWalletViewModel(
                     displayDialogOrNothing(payload)
                 }
             }.finally {
-                _cloudBackupSyncProgressFlow.value = false
+                _progressFlow.value = false
             }
         }
     }

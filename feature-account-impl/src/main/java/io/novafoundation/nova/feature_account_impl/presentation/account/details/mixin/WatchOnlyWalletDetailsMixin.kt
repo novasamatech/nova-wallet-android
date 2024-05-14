@@ -43,7 +43,7 @@ class WatchOnlyWalletDetailsMixin(
         )
     }
 
-    override suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain> {
+    override suspend fun chainProjectionsFlow(): GroupedList<AccountInChain.From, AccountInChain> {
         return interactor.getChainProjections(metaAccount, interactor.getAllChains(), hasAccountComparator().withChainComparator())
     }
 

@@ -27,7 +27,6 @@ class LedgerWalletDetailsMixin(
     private val interactor: WalletDetailsInteractor,
     metaAccount: MetaAccount
 ) : WalletDetailsMixin(
-    interactor,
     metaAccount
 ) {
 
@@ -45,7 +44,7 @@ class LedgerWalletDetailsMixin(
         )
     }
 
-    override suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain> {
+    override fun chainProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> {
         val ledgerSupportedChainIds = SubstrateApplicationConfig.all().mapToSet { it.chainId }
         val chains = interactor.getAllChains()
             .filter { it.id in ledgerSupportedChainIds }

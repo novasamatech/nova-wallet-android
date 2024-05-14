@@ -546,10 +546,6 @@ class Navigator(
         navigationHolder.finishApp()
     }
 
-    override fun finishCreateWalletFlow() {
-        navController?.navigate(R.id.action_finish_startCreateWalletFragment)
-    }
-
     override fun openCreateCloudBackupPassword(walletName: String) {
         val bundle = CreateWalletBackupPasswordFragment.getBundle(CreateBackupPasswordPayload(walletName))
 

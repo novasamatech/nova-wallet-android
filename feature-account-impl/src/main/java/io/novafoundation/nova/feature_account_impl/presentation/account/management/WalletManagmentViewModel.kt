@@ -85,7 +85,7 @@ class WalletManagmentViewModel(
         return ListSelectorMixin.Item(
             R.drawable.ic_add_circle_outline,
             R.color.icon_primary,
-            R.string.wallet_management_create_account_btn,
+            R.string.account_create_account,
             R.color.text_primary,
             ::onCreateNewWalletClicked
         )
@@ -95,7 +95,7 @@ class WalletManagmentViewModel(
         return ListSelectorMixin.Item(
             R.drawable.ic_import,
             R.color.icon_primary,
-            R.string.wallet_management_import_account_btn,
+            R.string.account_export_existing,
             R.color.text_primary,
             ::onImportWalletClicked
         )

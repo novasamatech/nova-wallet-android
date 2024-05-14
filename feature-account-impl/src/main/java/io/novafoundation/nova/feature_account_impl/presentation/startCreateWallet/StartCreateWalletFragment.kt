@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletCloudBackupButton
@@ -68,7 +67,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
         observeActionBottomSheet(viewModel)
         startCreateWalletNameInput.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
 
-        viewModel.confirmNameButtonState.observe { state ->
+        viewModel.continueButtonState.observe { state ->
             startCreateWalletConfirmName.setState(state)
         }
 
@@ -92,7 +91,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
             startCreateWalletExplanation.text = it
         }
 
-        viewModel.cloudBackupSyncProgressFlow.observe {
+        viewModel.progressFlow.observe {
             startCreateWalletCloudBackupButton.showProgress(it)
             startCreateWalletManualBackupButton.isEnabled = !it
         }

@@ -7,8 +7,11 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_cloud_backup_impl.BuildConfig
 import io.novafoundation.nova.feature_cloud_backup_impl.data.cloudStorage.CloudBackupStorage
 import io.novafoundation.nova.feature_cloud_backup_impl.data.cloudStorage.GoogleDriveBackupStorage
@@ -19,6 +22,7 @@ import io.novafoundation.nova.feature_cloud_backup_impl.data.preferences.SharedP
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.CloudBackupSerializer
 import io.novafoundation.nova.feature_cloud_backup_impl.data.serializer.JsonCloudBackupSerializer
 import io.novafoundation.nova.feature_cloud_backup_impl.domain.RealCloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_impl.presentation.mixin.RealCloudBackupChangingWarningMixinFactory
 
 @Module
 internal class CloudBackupFeatureModule {
@@ -69,6 +73,22 @@ internal class CloudBackupFeatureModule {
             serializer = backupSerializer,
             encryption = encryption,
             cloudBackupPreferences = backupPreferences
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCloudBackupChangingWarningMixinFactory(
+        preferences: Preferences,
+        resourceManager: ResourceManager,
+        cloudBackupService: CloudBackupService,
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+    ): CloudBackupChangingWarningMixinFactory {
+        return RealCloudBackupChangingWarningMixinFactory(
+            preferences,
+            resourceManager,
+            cloudBackupService,
+            actionBottomSheetLauncherFactory
         )
     }
 }

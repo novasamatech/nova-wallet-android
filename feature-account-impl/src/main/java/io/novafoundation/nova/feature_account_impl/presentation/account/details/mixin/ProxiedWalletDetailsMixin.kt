@@ -53,7 +53,7 @@ class ProxiedWalletDetailsMixin(
         )
     }
 
-    override suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain> {
+    override suspend fun chainProjectionsFlow(): GroupedList<AccountInChain.From, AccountInChain> {
         val proxiedChainIds = metaAccount.chainAccounts.keys
         val chains = interactor.getAllChains()
             .filter { it.id in proxiedChainIds }

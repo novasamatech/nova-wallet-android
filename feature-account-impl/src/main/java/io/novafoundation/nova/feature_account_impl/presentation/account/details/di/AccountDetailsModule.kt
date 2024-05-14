@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -63,7 +64,7 @@ class AccountDetailsModule {
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
-        addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
+        addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
         walletDetailsMixinFactory: WalletDetailsMixinFactory
     ): ViewModel {
         return WalletDetailsViewModel(
@@ -74,7 +75,7 @@ class AccountDetailsModule {
             externalActions = externalActions,
             chainRegistry = chainRegistry,
             importTypeChooserMixin = importTypeChooserMixin,
-            addAccountLauncherMixin = addAccountLauncherMixin,
+            addAccountLauncherPresentationFactory = addAccountLauncherPresentationFactory,
             walletDetailsMixinFactory = walletDetailsMixinFactory
         )
     }

@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Wallet
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -28,12 +28,13 @@ class WalletDetailsViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
     private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
-    private val addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
+    private val addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
     private val walletDetailsMixinFactory: WalletDetailsMixinFactory
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    ImportTypeChooserMixin by importTypeChooserMixin,
-    AddAccountLauncherMixin by addAccountLauncherMixin {
+    ImportTypeChooserMixin by importTypeChooserMixin {
+
+    val addAccountLauncherMixin = addAccountLauncherPresentationFactory.create(viewModelScope)
 
     val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId) }
 

@@ -3,9 +3,10 @@ package io.novafoundation.nova.feature_account_impl.domain.startCreateWallet
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
-import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 interface StartCreateWalletInteractor {
 
@@ -15,12 +16,13 @@ interface StartCreateWalletInteractor {
 
     suspend fun isSyncWithCloudEnabled(): Boolean
 
-    suspend fun createWallet(name: String): Result<Unit>
+    suspend fun createWalletAndSelect(name: String): Result<Unit>
 }
 
 class RealStartCreateWalletInteractor(
     private val cloudBackupService: CloudBackupService,
     private val addAccountInteractor: AddAccountInteractor,
+    private val accountRepository: AccountRepository
 ) : StartCreateWalletInteractor {
 
     override suspend fun validateCanCreateBackup(): PreCreateValidationStatus {
@@ -35,7 +37,9 @@ class RealStartCreateWalletInteractor(
         return cloudBackupService.session.isSyncWithCloudEnabled()
     }
 
-    override suspend fun createWallet(name: String): Result<Unit> {
-        return addAccountInteractor.createMetaAccountWithRecommendedSettings(AddAccountType.MetaAccount(name))
+    override suspend fun createWalletAndSelect(name: String): Result<Unit> {
+        return withContext(Dispatchers.Default) {
+            addAccountInteractor.createMetaAccountWithRecommendedSettings(AddAccountType.MetaAccount(name))
+        }
     }
 }

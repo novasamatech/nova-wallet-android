@@ -46,6 +46,8 @@
         style="@style/Widget.Nova.Checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:minHeight="40dp"
         android:paddingStart="8dp"
         android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:textColor="@color/text_secondary"

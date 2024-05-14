@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 abstract class WalletDetailsMixin(
-    private val interactor: WalletDetailsInteractor,
     val metaAccount: MetaAccount
 ) {
 
@@ -22,7 +21,7 @@ abstract class WalletDetailsMixin(
 
     abstract val typeAlert: Flow<AccountTypeAlert?>
 
-    val chainAccountProjections: Flow<List<Any>> = flowOf { getChainProjections() }
+    val chainAccountProjections: Flow<List<Any>> = chainProjectionsFlow()
         .map { groupedList ->
             groupedList.toListWithHeaders(
                 keyMapper = { type, _ -> mapAccountHeader(type) },
@@ -30,7 +29,7 @@ abstract class WalletDetailsMixin(
             )
         }
 
-    abstract suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain>
+    abstract fun chainProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>>
 
     abstract suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader?
 
