@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 
 class AutomaticMultiStakingSelectionType(
     private val candidates: List<SingleStakingProperties>,
@@ -41,7 +40,8 @@ class AutomaticMultiStakingSelectionType(
     }
 
     override suspend fun updateSelectionFor(stake: Balance) {
-        val selection = selectionFor(stake)
+        val selection = selectionFor(stake) ?: return
+
         val recommendableSelection = RecommendableMultiStakingSelection(
             source = SelectionTypeSource.Automatic,
             selection = selection
@@ -50,22 +50,17 @@ class AutomaticMultiStakingSelectionType(
         selectionStore.updateSelection(recommendableSelection)
     }
 
-    private suspend fun selectionFor(stake: Balance): StartMultiStakingSelection {
-        val candidatesWithMinStakes = candidates.map { it to it.minStake() }
+    private suspend fun selectionFor(stake: Balance): StartMultiStakingSelection? {
+        val candidate = candidates.firstAllowingToStake(stake) ?: candidates.findWithMinimumStake()
 
-        val result = candidatesWithMinStakes.sortedWith(
-            // Prioritize sources that fit user min stake
-            compareBy<Pair<SingleStakingProperties, Balance>> { (_, minStake) -> minStake <= stake }
-                // If user stake is so low he cant stake with neither source, take the most affordable ones
-                .thenBy { (_, minStake) -> minStake }
-        ).tryFindNonNull { (candidate, _) ->
-            candidate.recommendation.recommendedSelection(stake)
-        }
+        return candidate.recommendation.recommendedSelection(stake)
+    }
 
-        // TODO in the extreme situation no source can provide recommendation, crash
-        // We can handle it better but it would require deeper changes in presentation layer
-        return requireNotNull(result) {
-            "No recommendations is available"
-        }
+    private suspend fun List<SingleStakingProperties>.firstAllowingToStake(stake: Balance): SingleStakingProperties? {
+        return find { it.minStake() <= stake }
+    }
+
+    private suspend fun List<SingleStakingProperties>.findWithMinimumStake(): SingleStakingProperties {
+        return minBy { it.minStake() }
     }
 }
