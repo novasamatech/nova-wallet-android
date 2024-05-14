@@ -10,7 +10,6 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.eq
 import io.novafoundation.nova.test_shared.whenever
-import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
 import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
@@ -28,6 +27,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
@@ -56,6 +56,12 @@ class RuntimeSyncServiceTest {
     @Mock
     private lateinit var runtimeFilesCache: RuntimeFilesCache
 
+    @Mock
+    private lateinit var runtimeMetadataFetcher: RuntimeMetadataFetcher
+
+    @Mock
+    private lateinit var cacheMigrator: RuntimeCacheMigrator
+
     private lateinit var service: RuntimeSyncService
 
     @Before
@@ -63,9 +69,11 @@ class RuntimeSyncServiceTest {
         whenever(testConnection.socketService).thenReturn(socket)
         whenever(socket.jsonMapper).thenReturn(Gson())
         whenever(typesFetcher.getTypes(any())).thenReturn(TEST_TYPES)
-        socketAnswersRequest(GetMetadataRequest, "Stub")
 
-        service = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao)
+        whenever(runtimeMetadataFetcher.fetchRawMetadata(any())).thenReturn(RawRuntimeMetadata(metadataContent = byteArrayOf(0), isOpaque = false))
+        whenever(cacheMigrator.needsMetadataFetch(anyInt())).thenReturn(false)
+
+        service = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao, runtimeMetadataFetcher, cacheMigrator)
     }
 
     @Test
@@ -271,7 +279,7 @@ class RuntimeSyncServiceTest {
     }
 
     private suspend fun chainDaoReturnsRuntimeInfo(remoteVersion: Int, syncedVersion: Int) {
-        whenever(chainDao.runtimeInfo(any())).thenReturn(ChainRuntimeInfoLocal("1", syncedVersion, remoteVersion, null))
+        whenever(chainDao.runtimeInfo(any())).thenReturn(ChainRuntimeInfoLocal("1", syncedVersion, remoteVersion, null, localMigratorVersion = 1))
     }
 
     private suspend fun RuntimeSyncService.awaitSync(chainId: String) = syncResultFlow(chainId).first()

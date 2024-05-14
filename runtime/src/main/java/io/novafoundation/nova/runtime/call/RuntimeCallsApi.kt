@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.call
 
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.runtime.network.rpc.StateCallRequest
+import io.novafoundation.nova.runtime.network.rpc.stateCall
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -9,8 +10,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.registry.TypeRegist
 import io.novasama.substrate_sdk_android.runtime.definitions.registry.getOrThrow
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
-import io.novasama.substrate_sdk_android.wsrpc.executeAsync
-import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 
 typealias RuntimeTypeName = String
 typealias RuntimeTypeValue = Any?
@@ -52,7 +51,7 @@ internal class RealRuntimeCallsApi(
         val data = encodeArguments(arguments)
 
         val request = StateCallRequest(runtimeApiName, data)
-        val response = socketService.executeAsync(request, mapper = pojo<String>()).result
+        val response = socketService.stateCall(request)
 
         val decoded = decodeResponse(response, returnType)
 

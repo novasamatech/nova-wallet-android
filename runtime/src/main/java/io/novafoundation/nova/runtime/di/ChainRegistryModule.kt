@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -22,8 +23,10 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeCacheMigrator
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
+import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeMetadataFetcher
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
@@ -76,9 +79,22 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideRuntimeMetadataFetcher(): RuntimeMetadataFetcher {
+        return RuntimeMetadataFetcher()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideRuntimeCacheMigrator(): RuntimeCacheMigrator {
+        return RuntimeCacheMigrator()
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideRuntimeFilesCache(
         fileProvider: FileProvider,
-    ) = RuntimeFilesCache(fileProvider)
+        preferences: Preferences
+    ) = RuntimeFilesCache(fileProvider, preferences)
 
     @Provides
     @ApplicationScope
@@ -92,7 +108,15 @@ class ChainRegistryModule {
         typesFetcher: TypesFetcher,
         runtimeFilesCache: RuntimeFilesCache,
         chainDao: ChainDao,
-    ) = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao)
+        runtimeCacheMigrator: RuntimeCacheMigrator,
+        runtimeMetadataFetcher: RuntimeMetadataFetcher
+    ) = RuntimeSyncService(
+        typesFetcher = typesFetcher,
+        runtimeFilesCache = runtimeFilesCache,
+        chainDao = chainDao,
+        runtimeMetadataFetcher = runtimeMetadataFetcher,
+        cacheMigrator = runtimeCacheMigrator
+    )
 
     @Provides
     @ApplicationScope

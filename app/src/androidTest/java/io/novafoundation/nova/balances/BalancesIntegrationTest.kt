@@ -126,7 +126,7 @@ class BalancesIntegrationTest(
 
     private suspend fun testFeeLoadingAsync(chain: Chain) {
         return coroutineScope {
-            withTimeout(80.seconds) {
+            withTimeout(10.seconds) {
                 extrinsicService.estimateFee(chain, testTransactionOrigin()) {
                     systemRemark(byteArrayOf(0))
 
