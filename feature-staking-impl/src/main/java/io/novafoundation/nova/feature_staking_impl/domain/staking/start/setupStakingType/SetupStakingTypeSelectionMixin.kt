@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType
 
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
@@ -12,10 +11,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct.DirectStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolSelection
-import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import java.math.BigInteger
 
 class SetupStakingTypeSelectionMixinFactory(
     private val currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
@@ -68,10 +67,13 @@ class SetupStakingTypeSelectionMixin(
             .recommendation
             .recommendedSelection(selection.stake)
 
+        // Content is not recommended if recommendation does not exist
+        val contentRecommended = recommendedSelection?.isSettingsEquals(selection) ?: false
+
         currentSelectionStoreProvider.getSelectionStore(scope)
             .updateSelection(
                 RecommendableMultiStakingSelection(
-                    SelectionTypeSource.Manual(contentRecommended = recommendedSelection.isSettingsEquals(selection)),
+                    SelectionTypeSource.Manual(contentRecommended = contentRecommended),
                     selection
                 )
             )
@@ -80,7 +82,7 @@ class SetupStakingTypeSelectionMixin(
     suspend fun selectRecommended(viewModelScope: CoroutineScope, stakingOption: StakingOption, amount: BigInteger) {
         val recommendedSelection = singleStakingPropertiesFactory.createProperties(scope, stakingOption)
             .recommendation
-            .recommendedSelection(amount)
+            .recommendedSelection(amount) ?: return
 
         val recommendableMultiStakingSelection = RecommendableMultiStakingSelection(
             source = SelectionTypeSource.Manual(contentRecommended = true),

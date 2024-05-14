@@ -43,8 +43,8 @@ private class RealNominationPoolRecommender(
 
     override val recommendations = constructRecommendationList()
 
-    override fun recommendedPool(): NominationPool {
-        return recommendations.first()
+    override fun recommendedPool(): NominationPool? {
+        return recommendations.firstOrNull()
     }
 
     private fun constructRecommendationList(): List<NominationPool> {
