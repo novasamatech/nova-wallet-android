@@ -77,7 +77,8 @@ class RealCloudBackupChangingWarningMixin(
                 onClick = {
                     preferences.putBoolean(KEY_CLOUD_BACKUP_WARNING_SHOWN, isAutoContinueChecked)
                     onConfirm()
-                }),
+                }
+            ),
             checkBoxPreferences = ActionBottomSheet.CheckBoxPreferences(
                 text = resourceManager.getString(R.string.common_check_box_auto_continue),
                 onCheckChanged = { isChecked -> isAutoContinueChecked = isChecked }

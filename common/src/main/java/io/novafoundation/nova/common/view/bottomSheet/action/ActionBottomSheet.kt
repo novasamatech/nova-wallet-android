@@ -64,7 +64,6 @@ class ActionBottomSheet(
     private val checkBox: CheckBox
         get() = actionBottomSheetCheckBox
 
-
     init {
         setContentView(R.layout.bottom_sheet_action)
 

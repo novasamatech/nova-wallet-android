@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Wallet
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasAccountComparator
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.notHasAccountComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
 import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
