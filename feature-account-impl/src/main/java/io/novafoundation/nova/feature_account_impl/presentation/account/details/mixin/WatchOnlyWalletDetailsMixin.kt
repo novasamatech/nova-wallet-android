@@ -26,7 +26,6 @@ class WatchOnlyWalletDetailsMixin(
     private val interactor: WalletDetailsInteractor,
     metaAccount: MetaAccount
 ) : WalletDetailsMixin(
-    interactor,
     metaAccount
 ) {
     private val accountFormatter = accountFormatterFactory.create(baseAccountTitleFormatter(resourceManager))
@@ -43,8 +42,8 @@ class WatchOnlyWalletDetailsMixin(
         )
     }
 
-    override suspend fun chainProjectionsFlow(): GroupedList<AccountInChain.From, AccountInChain> {
-        return interactor.getChainProjections(metaAccount, interactor.getAllChains(), hasAccountComparator().withChainComparator())
+    override suspend fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> {
+        return interactor.chainProjectionsFlow(metaAccount.id, interactor.getAllChains(), hasAccountComparator().withChainComparator())
     }
 
     override suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader? {

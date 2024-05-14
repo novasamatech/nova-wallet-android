@@ -29,7 +29,6 @@ class ProxiedWalletDetailsMixin(
     private val proxyFormatter: ProxyFormatter,
     metaAccount: MetaAccount
 ) : WalletDetailsMixin(
-    interactor,
     metaAccount
 ) {
     private val accountFormatter = accountFormatterFactory.create(baseAccountTitleFormatter(resourceManager))
@@ -53,11 +52,11 @@ class ProxiedWalletDetailsMixin(
         )
     }
 
-    override suspend fun chainProjectionsFlow(): GroupedList<AccountInChain.From, AccountInChain> {
+    override suspend fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> {
         val proxiedChainIds = metaAccount.chainAccounts.keys
         val chains = interactor.getAllChains()
             .filter { it.id in proxiedChainIds }
-        return interactor.getChainProjections(metaAccount, chains, hasAccountComparator().withChainComparator())
+        return interactor.chainProjectionsFlow(metaAccount.id, chains, hasAccountComparator().withChainComparator())
     }
 
     override suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader? {

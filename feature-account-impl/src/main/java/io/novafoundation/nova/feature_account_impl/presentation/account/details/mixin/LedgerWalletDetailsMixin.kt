@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Accoun
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasAccountComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.notHasAccountComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
@@ -44,14 +45,14 @@ class LedgerWalletDetailsMixin(
         )
     }
 
-    override fun chainProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> {
+    override suspend fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> {
         val ledgerSupportedChainIds = SubstrateApplicationConfig.all().mapToSet { it.chainId }
         val chains = interactor.getAllChains()
             .filter { it.id in ledgerSupportedChainIds }
-        return interactor.getChainProjections(
-            metaAccount,
+        return interactor.chainProjectionsFlow(
+            metaAccount.id,
             chains,
-            notHasAccountComparator().withChainComparator()
+            hasAccountComparator().withChainComparator()
         )
     }
 
