@@ -14,14 +14,12 @@ fun mapCheckBackupAvailableFailureToUi(
     resourceManager: ResourceManager,
     throwable: Throwable,
     initSignIn: () -> Unit
-): CustomDialogDisplayer.Payload? {
+): CustomDialogDisplayer.Payload {
     return when (throwable) {
         is CloudBackupAuthFailed -> handleCloudBackupAuthFailed(resourceManager, initSignIn)
 
         is CloudBackupServiceUnavailable -> handleCloudBackupServiceUnavailable(resourceManager).toCustomDialogPayload(resourceManager)
 
-        is CloudBackupUnknownError -> handleCloudBackupUnknownError(resourceManager).toCustomDialogPayload(resourceManager)
-
-        else -> null
+        else -> handleCloudBackupUnknownError(resourceManager).toCustomDialogPayload(resourceManager)
     }
 }
