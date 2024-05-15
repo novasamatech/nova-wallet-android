@@ -154,7 +154,7 @@ fun MetaAccount.publicKeyIn(chain: Chain): ByteArray? {
     }
 }
 
-fun MetaAccount.multiChainEncryption(): MultiChainEncryption? {
+fun MetaAccount.substrateMultiChainEncryption(): MultiChainEncryption? {
     return substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
 }
 

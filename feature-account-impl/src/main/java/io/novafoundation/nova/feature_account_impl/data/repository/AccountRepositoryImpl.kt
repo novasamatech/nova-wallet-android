@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrderi
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
-import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryption
+import io.novafoundation.nova.feature_account_api.domain.model.substrateMultiChainEncryption
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
@@ -274,7 +274,7 @@ class AccountRepositoryImpl(
                 seed = secrets.seed,
                 password = password,
                 name = metaAccount.name,
-                multiChainEncryption = metaAccount.multiChainEncryption()!!,
+                multiChainEncryption = metaAccount.substrateMultiChainEncryption()!!,
                 genesisHash = "",
                 address = metaAccount.defaultSubstrateAddress!!
             )
