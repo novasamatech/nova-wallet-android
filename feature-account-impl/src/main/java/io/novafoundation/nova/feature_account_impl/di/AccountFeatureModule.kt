@@ -635,9 +635,15 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideCommonExportSecretsInteractor(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2
     ): CommonExportSecretsInteractor {
-        return RealCommonExportSecretsInteractor(secretStoreV2)
+        return RealCommonExportSecretsInteractor(
+            accountRepository,
+            chainRegistry,
+            secretStoreV2
+        )
     }
 
     @Provides

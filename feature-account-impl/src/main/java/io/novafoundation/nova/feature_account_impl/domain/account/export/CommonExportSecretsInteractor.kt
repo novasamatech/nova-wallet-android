@@ -10,8 +10,10 @@ import io.novafoundation.nova.common.data.secrets.v2.privateKey
 import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.data.secrets.v2.substrateDerivationPath
 import io.novafoundation.nova.common.data.secrets.v2.substrateKeypair
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
@@ -40,11 +42,26 @@ interface CommonExportSecretsInteractor {
     suspend fun hasEthereumSecrets(metaAccount: MetaAccount): Boolean
 
     suspend fun hasSubstrateSecrets(metaAccount: MetaAccount): Boolean
+
+    suspend fun hasMnemonic(metaId: Long, chainIdOrNull: String?): Boolean
 }
 
 class RealCommonExportSecretsInteractor(
+    private val accountRepository: AccountRepository,
+    private val chainRegistry: ChainRegistry,
     private val secretStoreV2: SecretStoreV2
 ) : CommonExportSecretsInteractor {
+
+    override suspend fun hasMnemonic(metaId: Long, chainIdOrNull: String?): Boolean = withContext(Dispatchers.Default) {
+        val metaAccount = accountRepository.getMetaAccount(metaId)
+        val chain = chainIdOrNull?.let { chainRegistry.getChain(it) }
+
+        if (chain == null) {
+            getMetaAccountMnemonic(metaAccount) != null
+        } else {
+            getChainAccountMnemonic(metaAccount, chain) != null
+        }
+    }
 
     override suspend fun getMetaAccountMnemonic(
         metaAccount: MetaAccount

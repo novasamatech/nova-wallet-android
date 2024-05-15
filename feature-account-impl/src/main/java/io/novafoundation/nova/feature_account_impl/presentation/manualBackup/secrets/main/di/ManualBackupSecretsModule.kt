@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
-import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.ManualBackupSecretsAdapterItemFactory
@@ -26,7 +26,7 @@ class ManualBackupSecretsModule {
         resourceManager: ResourceManager,
         router: AccountRouter,
         payload: ManualBackupCommonPayload,
-        exportMnemonicInteractor: ExportMnemonicInteractor,
+        commonExportSecretsInteractor: CommonExportSecretsInteractor,
         secretsAdapterItemFactory: ManualBackupSecretsAdapterItemFactory,
         walletUiUseCase: WalletUiUseCase
     ): ViewModel {
@@ -34,7 +34,7 @@ class ManualBackupSecretsModule {
             resourceManager,
             router,
             payload,
-            exportMnemonicInteractor,
+            commonExportSecretsInteractor,
             secretsAdapterItemFactory,
             walletUiUseCase
         )

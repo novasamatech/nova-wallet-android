@@ -6,8 +6,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.walletUiFlowFor
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
-import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.hasMnemonic
+import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.ManualBackupSecretsAdapterItemFactory
@@ -19,14 +18,14 @@ class ManualBackupSecretsViewModel(
     private val resourceManager: ResourceManager,
     private val router: AccountRouter,
     private val payload: ManualBackupCommonPayload,
-    private val exportMnemonicInteractor: ExportMnemonicInteractor,
+    private val commonExportSecretsInteractor: CommonExportSecretsInteractor,
     private val secretsAdapterItemFactory: ManualBackupSecretsAdapterItemFactory,
     private val walletUiUseCase: WalletUiUseCase
 ) : BaseViewModel() {
 
     val walletModel = walletUiUseCase.walletUiFlowFor(payload.metaId, payload.getChainIdOrNull(), showAddressIcon = true)
 
-    val advancedSecretsBtnAvailable = flowOf { exportMnemonicInteractor.hasMnemonic(payload.metaId, payload.getChainIdOrNull()) }
+    val advancedSecretsBtnAvailable = flowOf { commonExportSecretsInteractor.hasMnemonic(payload.metaId, payload.getChainIdOrNull()) }
         .shareInBackground()
 
     val exportList = flowOf { buildSecrets() }
