@@ -46,6 +46,7 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel>() {
         conformMnemonicContinue.setOnClickListener { viewModel.continueClicked() }
 
         confirmMnemonicSource.adapter = sourceAdapter
+        confirmMnemonicDestination.setWordClickedListener(viewModel::destinationWordClicked)
     }
 
     override fun inject() {
