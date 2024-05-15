@@ -100,8 +100,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
-import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
-import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportPrivateKeyInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.export.RealCommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectWalletInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupSelectAccountInteractor
@@ -634,21 +634,25 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideCommonExportSecretsInteractor(
+        secretStoreV2: SecretStoreV2
+    ): CommonExportSecretsInteractor {
+        return RealCommonExportSecretsInteractor(secretStoreV2)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideManualBackupSecretsAdapterItemFactory(
         resourceManager: ResourceManager,
         accountRepository: AccountRepository,
-        secretsStoreV2: SecretStoreV2,
         chainRegistry: ChainRegistry,
-        exportMnemonicInteractor: ExportMnemonicInteractor,
-        exportPrivateKeyInteractor: ExportPrivateKeyInteractor
+        commonExportSecretsInteractor: CommonExportSecretsInteractor
     ): ManualBackupSecretsAdapterItemFactory {
         return RealManualBackupSecretsAdapterItemFactory(
             resourceManager,
             accountRepository,
-            secretsStoreV2,
             chainRegistry,
-            exportMnemonicInteractor,
-            exportPrivateKeyInteractor
+            commonExportSecretsInteractor
         )
     }
 }

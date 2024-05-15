@@ -72,10 +72,9 @@ open class TapToViewContainer @JvmOverloads constructor(
             val width = MeasureSpec.getSize(widthMeasureSpec)
             val height = measureTapToViewContainerBackground(width)
 
-            val widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
             val heightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
 
-            super.onMeasure(widthSpec, heightSpec)
+            super.onMeasure(widthMeasureSpec, heightSpec)
         }
     }
 

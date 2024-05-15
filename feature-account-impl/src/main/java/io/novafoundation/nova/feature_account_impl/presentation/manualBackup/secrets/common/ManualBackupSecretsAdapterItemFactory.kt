@@ -1,27 +1,19 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common
 
-import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.derivationPath
-import io.novafoundation.nova.common.data.secrets.v2.ethereumDerivationPath
-import io.novafoundation.nova.common.data.secrets.v2.ethereumKeypair
-import io.novafoundation.nova.common.data.secrets.v2.substrateDerivationPath
-import io.novafoundation.nova.common.data.secrets.v2.substrateKeypair
+import io.novafoundation.nova.common.data.secrets.v2.privateKey
+import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
+import io.novafoundation.nova.feature_account_api.data.secrets.derivationPath
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.cryptoTypeIn
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapCryptoTypeToCryptoTypeSubtitle
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapCryptoTypeToCryptoTypeTitle
-import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
-import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.getMnemonicOrNull
-import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportPrivateKeyInteractor
-import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.getAccountSeedOrNull
-import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.getEthereumPrivateKeyOrNull
+import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupChainRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupCryptoTypeRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupJsonRvItem
@@ -32,7 +24,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.scale.EncodableStruct
 
 interface ManualBackupSecretsAdapterItemFactory {
 
@@ -50,10 +41,8 @@ interface ManualBackupSecretsAdapterItemFactory {
 class RealManualBackupSecretsAdapterItemFactory(
     private val resourceManager: ResourceManager,
     private val accountRepository: AccountRepository,
-    private val secretsStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
-    private val exportMnemonicInteractor: ExportMnemonicInteractor,
-    private val exportPrivateKeyInteractor: ExportPrivateKeyInteractor
+    private val exportSecretsInteractor: CommonExportSecretsInteractor,
 ) : ManualBackupSecretsAdapterItemFactory {
 
     override suspend fun createChainItem(chainId: String): ManualBackupSecretsRvItem {
@@ -70,7 +59,13 @@ class RealManualBackupSecretsAdapterItemFactory(
     }
 
     override suspend fun createMnemonic(metaId: Long, chainId: String?): ManualBackupSecretsRvItem? {
-        val mnemonic = exportMnemonicInteractor.getMnemonicOrNull(metaId, chainId)
+        val metaAccount = accountRepository.getMetaAccount(metaId)
+        val chain = chainId?.let { chainRegistry.getChain(it) }
+        val mnemonic = if (chain == null) {
+            exportSecretsInteractor.getMetaAccountMnemonic(metaAccount)
+        } else {
+            exportSecretsInteractor.getChainAccountMnemonic(metaAccount, chain)
+        }
         return mnemonic?.let { ManualBackupMnemonicRvItem(it.wordList, isShown = false) }
     }
 
@@ -81,68 +76,60 @@ class RealManualBackupSecretsAdapterItemFactory(
             val chain = chainRegistry.getChain(chainIdOrNull)
             addChainAdditionalSecrets(metaAccount, chain)
         } else {
-            val metaAccountSecrets = secretsStoreV2.getMetaAccountSecrets(metaId)
+            addDefaultAccountSecrets(metaAccount)
+        }
+    }
 
-            // We are waiting that substrate metaAccount has secrets but anyway handle if it null
-            if (metaAccountSecrets?.substrateKeypair != null) {
-                addSubstrateAdditionalSecrets(metaAccount, metaAccountSecrets)
-            }
+    private suspend fun MutableList<ManualBackupSecretsRvItem>.addDefaultAccountSecrets(metaAccount: MetaAccount) {
+        if (exportSecretsInteractor.hasSubstrateSecrets(metaAccount)) {
+            addSubstrateAdditionalSecrets(metaAccount)
+        }
 
-            if (metaAccountSecrets?.ethereumKeypair != null) {
-                addEthereumAdditionalSecrets(metaAccount, metaAccountSecrets)
-            }
+        if (exportSecretsInteractor.hasEthereumSecrets(metaAccount)) {
+            addEthereumAdditionalSecrets(metaAccount)
         }
     }
 
     private suspend fun MutableList<ManualBackupSecretsRvItem>.addChainAdditionalSecrets(metaAccount: MetaAccount, chain: Chain) {
         val privateKey = if (chain.isEthereumBased) {
-            exportPrivateKeyInteractor.getEthereumPrivateKey(metaAccount.id, chain.id)
+            exportSecretsInteractor.getChainAccountPrivateKey(metaAccount, chain)
         } else {
-            exportPrivateKeyInteractor.getAccountSeedOrNull(metaAccount.id, chain.id)
+            exportSecretsInteractor.getChainAccountSeed(metaAccount, chain)
         }
 
         this += createAdditionalSecretsInternal(
             networkName = chain.name,
             isEthereumBased = chain.isEthereumBased,
             privateKey = privateKey,
-            jsonExportSupported = !chain.isEthereumBased,
             cryptoType = metaAccount.cryptoTypeIn(chain),
-            derivationPath = secretsStoreV2.getAccountSecrets(metaAccount, chain).rightOrNull()?.derivationPath,
+            derivationPath = exportSecretsInteractor.getDerivationPath(metaAccount, chain),
             showCryptoType = privateKey != null
         )
     }
 
-    private suspend fun MutableList<ManualBackupSecretsRvItem>.addSubstrateAdditionalSecrets(
-        metaAccount: MetaAccount,
-        metaAccountSecrets: EncodableStruct<MetaAccountSecrets>
-    ) {
-        val privateKey = exportPrivateKeyInteractor.getAccountSeedOrNull(metaAccount.id)
+    private suspend fun MutableList<ManualBackupSecretsRvItem>.addSubstrateAdditionalSecrets(metaAccount: MetaAccount) {
+        val seed = exportSecretsInteractor.getMetaAccountSeed(metaAccount)
 
         this += createAdditionalSecretsInternal(
             networkName = resourceManager.getString(R.string.common_network_polkadot),
             isEthereumBased = false,
-            privateKey = privateKey,
-            jsonExportSupported = true,
+            privateKey = seed,
             cryptoType = metaAccount.substrateCryptoType,
-            derivationPath = metaAccountSecrets.substrateDerivationPath,
-            showCryptoType = privateKey != null
+            derivationPath = exportSecretsInteractor.getDerivationPath(metaAccount, ethereum = false),
+            showCryptoType = seed != null
         )
     }
 
-    private suspend fun MutableList<ManualBackupSecretsRvItem>.addEthereumAdditionalSecrets(
-        metaAccount: MetaAccount,
-        metaAccountSecrets: EncodableStruct<MetaAccountSecrets>
-    ) {
-        val seed = exportPrivateKeyInteractor.getEthereumPrivateKeyOrNull(metaAccount.id)
+    private suspend fun MutableList<ManualBackupSecretsRvItem>.addEthereumAdditionalSecrets(metaAccount: MetaAccount) {
+        val privateKey = exportSecretsInteractor.getMetaAccountEthereumPrivateKey(metaAccount)
 
         this += createAdditionalSecretsInternal(
             networkName = resourceManager.getString(R.string.common_network_ethereum),
             isEthereumBased = true,
-            privateKey = seed,
-            jsonExportSupported = true,
+            privateKey = privateKey,
             cryptoType = CryptoType.ECDSA,
-            derivationPath = metaAccountSecrets.ethereumDerivationPath,
-            showCryptoType = seed != null
+            derivationPath = exportSecretsInteractor.getDerivationPath(metaAccount, ethereum = true),
+            showCryptoType = privateKey != null
         )
     }
 
@@ -150,7 +137,6 @@ class RealManualBackupSecretsAdapterItemFactory(
         networkName: String,
         isEthereumBased: Boolean,
         privateKey: String?,
-        jsonExportSupported: Boolean,
         cryptoType: CryptoType?, // We are waiting cryptoType is not null in this case but handle it since metaAccount.substrateCryptoType can be null
         derivationPath: String?,
         showCryptoType: Boolean
@@ -166,7 +152,7 @@ class RealManualBackupSecretsAdapterItemFactory(
             add(ManualBackupSeedRvItem(label = label, seed = privateKey, isShown = false))
         }
 
-        if (jsonExportSupported) {
+        if (!isEthereumBased) {
             add(ManualBackupJsonRvItem())
         }
 

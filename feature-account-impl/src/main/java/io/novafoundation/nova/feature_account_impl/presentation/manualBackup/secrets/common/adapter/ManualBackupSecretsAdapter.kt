@@ -48,8 +48,8 @@ class ManualBackupSecretsAdapter(
         }
     }
 
-    override fun onBindViewHolder(languageViewHolder: ManualBackupSecretsViewHolder, position: Int) {
-        languageViewHolder.bind(getItem(position))
+    override fun onBindViewHolder(viewHolder: ManualBackupSecretsViewHolder, position: Int) {
+        viewHolder.bind(getItem(position))
     }
 
     override fun getItemViewType(position: Int): Int {

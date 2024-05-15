@@ -122,16 +122,6 @@ suspend fun SecretStoreV2.getAccountSecrets(
     }
 }
 
-fun AccountSecrets.ethereumKeyPair(): EncodableStruct<KeyPairSchema>? = fold(
-    left = { it[MetaAccountSecrets.EthereumKeypair] },
-    right = { it[ChainAccountSecrets.Keypair] }
-)
-
-fun AccountSecrets.substrateKeyPair(): EncodableStruct<KeyPairSchema>? = fold(
-    left = { it[MetaAccountSecrets.EthereumKeypair] },
-    right = { it[ChainAccountSecrets.Keypair] }
-)
-
 fun AccountSecrets.seed(): ByteArray? = fold(
     left = { it[MetaAccountSecrets.Seed] },
     right = { it[ChainAccountSecrets.Seed] }
