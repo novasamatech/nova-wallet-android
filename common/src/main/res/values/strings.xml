@@ -181,7 +181,8 @@
 
     <string name="start_create_wallet_your_wallet_is_ready">Your wallet is ready</string>
     <string name="cloud_backup">Cloud Backup</string>
-    <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. Backup will make sure that your funds are safe and sound, and you can always restore your wallet anytime</string>
+    <string name="start_create_wallet_set_wallet_name_explanation">This will only be visible to you and you can edit it later.</string>
+    <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. This makes sure that your funds are safe and secure. Backups allow you to restore your wallet at any time.</string>
     <string name="start_create_wallet_cloud_backup_btn">Back up to Cloud</string>
     <string name="start_create_wallet_manual_backup_btn">Back up Manually</string>
 
@@ -207,7 +208,7 @@
     <string name="account_backup_mnemonic_title">Write down your Passphrase</string>
 
     <string name="start_create_wallet_input_hint">My new wallet</string>
-    <string name="start_create_wallet_name_your_wallet">Name your wallet</string>
+    <string name="start_create_wallet_name_your_wallet">Give your wallet a name</string>
     <string name="start_create_wallet_enter_wallet_name">Enter wallet name</string>
 
     <string name="common_cloud_backup">Cloud backup</string>

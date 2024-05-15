@@ -81,7 +81,7 @@ class StartCreateWalletViewModel(
 
     val explanationText: Flow<String> = createWalletState.map {
         when (it) {
-            CreateWalletState.SETUP_NAME -> resourceManager.getString(R.string.account_create_name_subtitle_v2_2_0)
+            CreateWalletState.SETUP_NAME -> resourceManager.getString(R.string.start_create_wallet_set_wallet_name_explanation)
             CreateWalletState.CHOOSE_BACKUP_WAY -> resourceManager.getString(R.string.start_create_wallet_backup_ready_explanation)
         }
     }.shareInBackground()

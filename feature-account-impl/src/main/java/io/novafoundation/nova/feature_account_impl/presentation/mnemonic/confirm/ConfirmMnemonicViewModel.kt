@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.added
 import io.novafoundation.nova.common.utils.modified
 import io.novafoundation.nova.common.utils.removed
-import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryption
