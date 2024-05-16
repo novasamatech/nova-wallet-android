@@ -23,5 +23,5 @@ interface SingleStakingProperties {
 
 interface SingleStakingRecommendation {
 
-    suspend fun recommendedSelection(stake: Balance): StartMultiStakingSelection
+    suspend fun recommendedSelection(stake: Balance): StartMultiStakingSelection?
 }

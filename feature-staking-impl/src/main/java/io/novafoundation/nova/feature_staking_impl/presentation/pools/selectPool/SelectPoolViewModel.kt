@@ -22,13 +22,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.Poo
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
-import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.math.BigInteger
 
 class SelectPoolViewModel(
     private val router: StakingRouter,
@@ -68,7 +68,9 @@ class SelectPoolViewModel(
 
     val fillWithRecommendedEnabled = combine(nominationPoolRecommenderFlow, editableSelection) { recommender, selection ->
         val selectedPool = selection.selection.asPoolSelection()?.pool
-        recommender.recommendedPool().id != selectedPool?.id
+        val recommendedPool = recommender.recommendedPool()
+
+        recommendedPool != null && recommendedPool.id != selectedPool?.id
     }
         .share()
 
@@ -99,7 +101,7 @@ class SelectPoolViewModel(
 
     fun selectRecommended() {
         launch {
-            val recommendedPool = nominationPoolRecommenderFlow.first().recommendedPool()
+            val recommendedPool = nominationPoolRecommenderFlow.first().recommendedPool() ?: return@launch
             setupStakingTypeSelectionMixin.selectNominationPoolAndApply(recommendedPool, stakingOption())
             router.finishSetupPoolFlow()
         }
