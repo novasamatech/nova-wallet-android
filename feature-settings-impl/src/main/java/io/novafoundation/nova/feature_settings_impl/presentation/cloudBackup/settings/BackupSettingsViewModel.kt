@@ -162,7 +162,7 @@ class BackupSettingsViewModel(
 
     fun problemButtonClicked() {
         when (val value = syncedState.value) {
-            BackupSyncOutcome.UnknownPassword -> showPasswordDeprecatedActionDialog()
+            BackupSyncOutcome.UnknownPassword -> openRestorePassword()
 
             BackupSyncOutcome.CorruptedBackup -> showCorruptedBackupActionDialog()
             is BackupSyncOutcome.DestructiveDiff -> openCloudBackupDiffScreen(value.cloudBackupDiff, value.cloudBackup)
