@@ -28,7 +28,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.E
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.ManualBackupAdvancedSecretsFragment
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.main.ManualBackupSecretsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicPayload
@@ -570,7 +572,7 @@ class Navigator(
         performNavigation(R.id.action_manualBackupSelectWalletFragment_to_manualBackupSelectAccountFragment, bundle)
     }
 
-    override fun openManualBackupConditions(payload: ManualBackupAccountToBackupPayload) {
+    override fun openManualBackupConditions(payload: ManualBackupCommonPayload) {
         val bundle = ManualBackupWarningFragment.bundle(payload)
 
         val pinCodePayload = PinCodeAction.Check(
@@ -586,6 +588,16 @@ class Navigator(
             ),
             args = pinCodeBundle
         )
+    }
+
+    override fun openManualBackupSecrets(payload: ManualBackupCommonPayload) {
+        val bundle = ManualBackupSecretsFragment.bundle(payload)
+        performNavigation(R.id.action_manualBackupWarning_to_manualBackupSecrets, bundle)
+    }
+
+    override fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload) {
+        val bundle = ManualBackupAdvancedSecretsFragment.bundle(payload)
+        performNavigation(R.id.action_manualBackupSecrets_to_manualBackupAdvancedSecrets, bundle)
     }
 
     override fun openCreateWatchWallet() {

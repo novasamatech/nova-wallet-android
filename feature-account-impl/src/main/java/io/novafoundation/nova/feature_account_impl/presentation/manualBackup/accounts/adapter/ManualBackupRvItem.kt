@@ -2,15 +2,15 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.ac
 
 import io.novafoundation.nova.common.utils.images.Icon
 
-interface ManualBackupRVItem
+interface ManualBackupRvItem
 
-class ManualBackupAccountGroupRVItem(
+class ManualBackupAccountGroupRvItem(
     val text: String
-) : ManualBackupRVItem
+) : ManualBackupRvItem
 
-class ManualBackupAccountRVItem(
+class ManualBackupAccountRvItem(
     val chainId: String?, // It's null for default account
     val icon: Icon,
     val title: String,
     val subtitle: String?,
-) : ManualBackupRVItem
+) : ManualBackupRvItem

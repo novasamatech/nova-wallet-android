@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="16dp">
+
+    <TextView
+        android:id="@+id/manualBackupSecretsJsonTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recovery_json"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/manualBackupSecretsJsonButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/json_export_btn"
+        app:appearance="accentSecondaryTransparent"
+        app:layout_constraintTop_toBottomOf="@id/manualBackupSecretsJsonTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

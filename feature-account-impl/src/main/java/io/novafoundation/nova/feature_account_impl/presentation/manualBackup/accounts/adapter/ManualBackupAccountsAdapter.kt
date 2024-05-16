@@ -21,10 +21,10 @@ import kotlinx.android.synthetic.main.item_backup_account_header.view.itemManual
 class ManualBackupAccountsAdapter(
     private val imageLoader: ImageLoader,
     private val accountHandler: AccountHandler
-) : GroupedListAdapter<ManualBackupAccountGroupRVItem, ManualBackupAccountRVItem>(AccountDiffCallback()) {
+) : GroupedListAdapter<ManualBackupAccountGroupRvItem, ManualBackupAccountRvItem>(AccountDiffCallback()) {
 
     interface AccountHandler {
-        fun onAccountClicked(account: ManualBackupAccountRVItem)
+        fun onAccountClicked(account: ManualBackupAccountRvItem)
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -35,18 +35,18 @@ class ManualBackupAccountsAdapter(
         return ManualBackupAccountViewHolder(parent.inflateChild(R.layout.item_backup_account), imageLoader, accountHandler)
     }
 
-    override fun bindGroup(holder: GroupedListHolder, group: ManualBackupAccountGroupRVItem) {
+    override fun bindGroup(holder: GroupedListHolder, group: ManualBackupAccountGroupRvItem) {
         (holder as ManualBackupGroupViewHolder).bind(group)
     }
 
-    override fun bindChild(holder: GroupedListHolder, child: ManualBackupAccountRVItem) {
+    override fun bindChild(holder: GroupedListHolder, child: ManualBackupAccountRvItem) {
         (holder as ManualBackupAccountViewHolder).bind(child)
     }
 }
 
 class ManualBackupGroupViewHolder(view: View) : GroupedListHolder(view) {
 
-    fun bind(item: ManualBackupAccountGroupRVItem) {
+    fun bind(item: ManualBackupAccountGroupRvItem) {
         itemView.itemManualBackupGroupTitle.text = item.text
     }
 }
@@ -57,7 +57,7 @@ class ManualBackupAccountViewHolder(
     private val accountHandler: ManualBackupAccountsAdapter.AccountHandler
 ) : GroupedListHolder(view) {
 
-    fun bind(item: ManualBackupAccountRVItem) {
+    fun bind(item: ManualBackupAccountRvItem) {
         with(itemView) {
             itemManualBackupAccountContainer.background = context.addRipple(context.getBlockDrawable())
             itemManualBackupAccountIcon.setIcon(item.icon, imageLoader)
@@ -68,21 +68,21 @@ class ManualBackupAccountViewHolder(
     }
 }
 
-class AccountDiffCallback : BaseGroupedDiffCallback<ManualBackupAccountGroupRVItem, ManualBackupAccountRVItem>(ManualBackupAccountGroupRVItem::class.java) {
+class AccountDiffCallback : BaseGroupedDiffCallback<ManualBackupAccountGroupRvItem, ManualBackupAccountRvItem>(ManualBackupAccountGroupRvItem::class.java) {
 
-    override fun areGroupItemsTheSame(oldItem: ManualBackupAccountGroupRVItem, newItem: ManualBackupAccountGroupRVItem): Boolean {
+    override fun areGroupItemsTheSame(oldItem: ManualBackupAccountGroupRvItem, newItem: ManualBackupAccountGroupRvItem): Boolean {
         return oldItem.text == newItem.text
     }
 
-    override fun areGroupContentsTheSame(oldItem: ManualBackupAccountGroupRVItem, newItem: ManualBackupAccountGroupRVItem): Boolean {
+    override fun areGroupContentsTheSame(oldItem: ManualBackupAccountGroupRvItem, newItem: ManualBackupAccountGroupRvItem): Boolean {
         return true
     }
 
-    override fun areChildItemsTheSame(oldItem: ManualBackupAccountRVItem, newItem: ManualBackupAccountRVItem): Boolean {
+    override fun areChildItemsTheSame(oldItem: ManualBackupAccountRvItem, newItem: ManualBackupAccountRvItem): Boolean {
         return oldItem.title == newItem.title
     }
 
-    override fun areChildContentsTheSame(oldItem: ManualBackupAccountRVItem, newItem: ManualBackupAccountRVItem): Boolean {
+    override fun areChildContentsTheSame(oldItem: ManualBackupAccountRvItem, newItem: ManualBackupAccountRvItem): Boolean {
         return true
     }
 }

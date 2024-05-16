@@ -8,10 +8,10 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.MetaAccountChains
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountGroupRVItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountRVItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupRVItem
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupAccountToBackupPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountGroupRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupRvItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import kotlinx.coroutines.flow.map
 
 class ManualBackupSelectAccountViewModel(
@@ -33,11 +33,11 @@ class ManualBackupSelectAccountViewModel(
         mapMetaAccountToUI(metaAccountChains)
     }
 
-    fun walletClicked(accountModel: ManualBackupAccountRVItem) {
+    fun walletClicked(accountModel: ManualBackupAccountRvItem) {
         val payload = if (accountModel.chainId == null) {
-            ManualBackupAccountToBackupPayload.DefaultAccount(metaId = this.payload.metaId)
+            ManualBackupCommonPayload.DefaultAccount(metaId = this.payload.metaId)
         } else {
-            ManualBackupAccountToBackupPayload.ChainAccount(metaId = this.payload.metaId, chainId = accountModel.chainId)
+            ManualBackupCommonPayload.ChainAccount(metaId = this.payload.metaId, chainId = accountModel.chainId)
         }
 
         router.openManualBackupConditions(payload)
@@ -49,10 +49,10 @@ class ManualBackupSelectAccountViewModel(
 
     private fun mapMetaAccountToUI(
         metaAccountChains: MetaAccountChains
-    ): List<ManualBackupRVItem> {
+    ): List<ManualBackupRvItem> {
         return buildList {
             if (metaAccountChains.defaultChains.isNotEmpty()) {
-                this += ManualBackupAccountGroupRVItem(resourceManager.getString(R.string.manual_backup_select_account_default_key_title))
+                this += ManualBackupAccountGroupRvItem(resourceManager.getString(R.string.manual_backup_select_account_default_key_title))
 
                 val firstChains = metaAccountChains.defaultChains.take(2)
                     .joinToString { it.name }
@@ -63,7 +63,7 @@ class ManualBackupSelectAccountViewModel(
                     firstChains
                 }
 
-                this += ManualBackupAccountRVItem(
+                this += ManualBackupAccountRvItem(
                     chainId = null, // It's null for default account
                     icon = resourceManager.getDrawable(R.drawable.ic_nova_logo).asIcon(),
                     title = resourceManager.getString(R.string.manual_backup_select_account_default_key_account),
@@ -72,10 +72,10 @@ class ManualBackupSelectAccountViewModel(
             }
 
             if (metaAccountChains.customChains.isNotEmpty()) {
-                this += ManualBackupAccountGroupRVItem(resourceManager.getString(R.string.manual_backup_select_account_custom_key_title))
+                this += ManualBackupAccountGroupRvItem(resourceManager.getString(R.string.manual_backup_select_account_custom_key_title))
 
                 metaAccountChains.customChains.forEach { chain ->
-                    this += ManualBackupAccountRVItem(
+                    this += ManualBackupAccountRvItem(
                         chainId = chain.id,
                         icon = chain.icon.asIcon(),
                         title = chain.name,

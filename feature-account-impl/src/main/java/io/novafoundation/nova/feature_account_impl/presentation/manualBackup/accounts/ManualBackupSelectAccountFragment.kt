@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountRVItem
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountsAdapter
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_manual_backup_select_wallet.manualBackupWalletsList
@@ -90,7 +90,7 @@ class ManualBackupSelectAccountFragment : BaseFragment<ManualBackupSelectAccount
         }
     }
 
-    override fun onAccountClicked(account: ManualBackupAccountRVItem) {
+    override fun onAccountClicked(account: ManualBackupAccountRvItem) {
         viewModel.walletClicked(account)
     }
 }

@@ -100,6 +100,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
+import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.export.RealCommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectWalletInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupSelectAccountInteractor
@@ -114,6 +116,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.add
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.language.RealLanguageUseCase
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.ManualBackupSecretsAdapterItemFactory
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.RealManualBackupSecretsAdapterItemFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
@@ -446,9 +450,10 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideWalletUiUseCase(
         accountRepository: AccountRepository,
-        addressIconGenerator: AddressIconGenerator
+        addressIconGenerator: AddressIconGenerator,
+        chainRegistry: ChainRegistry
     ): WalletUiUseCase {
-        return WalletUiUseCaseImpl(accountRepository, addressIconGenerator)
+        return WalletUiUseCaseImpl(accountRepository, addressIconGenerator, chainRegistry)
     }
 
     @Provides
@@ -625,5 +630,35 @@ class AccountFeatureModule {
         accountRepository: AccountRepository
     ): ManualBackupSelectWalletInteractor {
         return RealManualBackupSelectWalletInteractor(accountRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCommonExportSecretsInteractor(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        secretStoreV2: SecretStoreV2
+    ): CommonExportSecretsInteractor {
+        return RealCommonExportSecretsInteractor(
+            accountRepository,
+            chainRegistry,
+            secretStoreV2
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideManualBackupSecretsAdapterItemFactory(
+        resourceManager: ResourceManager,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        commonExportSecretsInteractor: CommonExportSecretsInteractor
+    ): ManualBackupSecretsAdapterItemFactory {
+        return RealManualBackupSecretsAdapterItemFactory(
+            resourceManager,
+            accountRepository,
+            chainRegistry,
+            commonExportSecretsInteractor
+        )
     }
 }
