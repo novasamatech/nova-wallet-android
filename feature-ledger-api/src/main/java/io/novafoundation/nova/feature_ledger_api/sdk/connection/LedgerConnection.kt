@@ -7,8 +7,11 @@ import kotlinx.coroutines.flow.first
 interface LedgerConnection {
 
     enum class Type {
-        BLE
+        BLE,
+        USB
     }
+
+    val channel: Short?
 
     val type: Type
 

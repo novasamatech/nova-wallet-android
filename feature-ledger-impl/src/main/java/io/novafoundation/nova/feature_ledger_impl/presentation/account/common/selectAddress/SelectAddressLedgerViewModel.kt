@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -139,6 +140,7 @@ abstract class SelectAddressLedgerViewModel(
                     .onSuccess {
                         loadedAccounts.value = loadedAccounts.value.added(it)
                     }.onFailure {
+                        Log.d("Ledger", "Error", it)
                         handleLedgerError(it) { loadNewAccount() }
                     }
             }
