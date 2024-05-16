@@ -140,7 +140,7 @@ class RuntimeProvider(
                     NoRuntimeVersionException -> {
                         Log.w(this@RuntimeProvider.LOG_TAG, "Runtime version for $chainId was not found in database")
                     } // pass
-                    else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
+                    else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId)", it)
                 }
             }
 

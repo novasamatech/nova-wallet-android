@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.dropBytes
 import io.novafoundation.nova.common.utils.dropBytesLast
 import io.novafoundation.nova.common.utils.isValidSS58Address
 import io.novafoundation.nova.common.utils.toBigEndianU16
+import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
@@ -13,7 +14,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Subst
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
-import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.NO
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.DisplayVerificationDialog.YES
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -55,9 +55,9 @@ private fun SignPayloadType(chunkIndex: Int, total: Int): SignPayloadType {
     }
 }
 
-const val PUBLIC_KEY_LENGTH = 32
-const val RESPONSE_CODE_LENGTH = 2
-const val CHUNK_SIZE = 250
+private const val PUBLIC_KEY_LENGTH = 32
+private const val RESPONSE_CODE_LENGTH = 2
+private const val CHUNK_SIZE = 250
 
 class RealSubstrateLedgerApplication(
     private val transport: LedgerTransport,

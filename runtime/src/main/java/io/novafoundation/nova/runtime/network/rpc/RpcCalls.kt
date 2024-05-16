@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.extrinsicHash
+import io.novafoundation.nova.common.utils.fromHex
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.feeViaRuntimeCall
@@ -27,6 +28,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.scale.dataType.DataType
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
@@ -158,4 +161,17 @@ class RpcCalls(
             weight = bindWeight(asStruct["weight"])
         )
     }
+}
+
+suspend fun SocketService.stateCall(request: StateCallRequest): String? {
+    return executeAsync(request, mapper = pojo<String>()).result
+}
+
+suspend fun <T> SocketService.stateCall(request: StateCallRequest, returnType: DataType<T>): T {
+    val rawResult = stateCall(request)
+    requireNotNull(rawResult) {
+        "Unexpected state call null response"
+    }
+
+    return returnType.fromHex(rawResult)
 }

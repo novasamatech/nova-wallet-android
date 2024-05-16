@@ -9,10 +9,6 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
-import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
-import io.novasama.substrate_sdk_android.wsrpc.executeAsync
-import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
-import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,6 +36,8 @@ class RuntimeSyncService(
     private val typesFetcher: TypesFetcher,
     private val runtimeFilesCache: RuntimeFilesCache,
     private val chainDao: ChainDao,
+    private val runtimeMetadataFetcher: RuntimeMetadataFetcher,
+    private val cacheMigrator: RuntimeCacheMigrator,
     maxConcurrentUpdates: Int = 8,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
@@ -123,13 +121,13 @@ class RuntimeSyncService(
         val shouldSyncMetadata = runtimeInfo.shouldSyncMetadata() || forceFullSync
 
         val metadataHash = if (shouldSyncMetadata) {
-            val runtimeMetadata = syncInfo.connection.socketService.executeAsync(GetMetadataRequest, mapper = pojo<String>().nonNull())
+            val runtimeMetadata = runtimeMetadataFetcher.fetchRawMetadata(chainId, syncInfo.connection.socketService)
 
             runtimeFilesCache.saveChainMetadata(chainId, runtimeMetadata)
 
-            chainDao.updateSyncedRuntimeVersion(chainId, runtimeInfo.remoteVersion)
+            chainDao.updateSyncedRuntimeVersion(chainId, runtimeInfo.remoteVersion, cacheMigrator.latestVersion())
 
-            runtimeMetadata.md5()
+            runtimeMetadata.metadataContent.md5()
         } else {
             null
         }
@@ -159,5 +157,5 @@ class RuntimeSyncService(
         syncingChains.remove(chainId)
     }
 
-    private fun ChainRuntimeInfoLocal.shouldSyncMetadata() = syncedVersion != remoteVersion
+    private fun ChainRuntimeInfoLocal.shouldSyncMetadata() = syncedVersion != remoteVersion || cacheMigrator.needsMetadataFetch(localMigratorVersion)
 }

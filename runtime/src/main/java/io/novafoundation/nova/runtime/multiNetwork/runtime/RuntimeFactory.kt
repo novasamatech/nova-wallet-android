@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.runtime
 
+import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.md5
 import io.novafoundation.nova.common.utils.newLimitedThreadPoolExecutor
@@ -22,7 +23,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.v14.typeMapping.def
 import io.novasama.substrate_sdk_android.runtime.definitions.v14.typeMapping.plus
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadataReader
 import io.novasama.substrate_sdk_android.runtime.metadata.builder.VersionedRuntimeBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.v14.RuntimeMetadataSchemaV14
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -74,11 +74,15 @@ class RuntimeFactory(
 
         val metadataReader = RuntimeMetadataReader.read(runtimeMetadataRaw)
 
+        Log.d("RuntimeFactory", "Constructing metadata of version ${metadataReader.metadataVersion} for chain $chainId")
+
+        val schema = metadataReader.metadataPostV14.schema
+
         val typePreset = if (metadataReader.metadataVersion < 14) {
             v13Preset()
         } else {
             TypesParserV14.parse(
-                lookup = metadataReader.metadata[RuntimeMetadataSchemaV14.lookup],
+                lookup = metadataReader.metadata[schema.lookup],
                 typePreset = v14Preset(),
                 typeMapping = allSiTypeMappings()
             )
@@ -104,12 +108,20 @@ class RuntimeFactory(
 
         ConstructedRuntime(
             runtime = RuntimeSnapshot(typeRegistry, runtimeMetadata),
-            metadataHash = runtimeMetadataRaw.md5(),
+            metadataHash = runtimeMetadataRaw.metadataContent.md5(),
             baseTypesHash = baseHash,
             ownTypesHash = ownHash,
             runtimeVersion = runtimeVersion,
             typesUsage = typesUsage
         )
+    }
+
+    private fun RuntimeMetadataReader.Companion.read(rawRuntimeMetadata: RawRuntimeMetadata): RuntimeMetadataReader {
+        return if (rawRuntimeMetadata.isOpaque) {
+            readOpaque(rawRuntimeMetadata.metadataContent)
+        } else {
+            read(rawRuntimeMetadata.metadataContent)
+        }
     }
 
     private suspend fun constructBaseAndChainTypes(

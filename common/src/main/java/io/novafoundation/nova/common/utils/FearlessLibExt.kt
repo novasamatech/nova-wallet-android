@@ -369,6 +369,7 @@ fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEnt
         ?.let { storage?.get(it) } ?: throw NoSuchElementException()
 
 object Modules {
+
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
     const val BALANCES = "Balances"
