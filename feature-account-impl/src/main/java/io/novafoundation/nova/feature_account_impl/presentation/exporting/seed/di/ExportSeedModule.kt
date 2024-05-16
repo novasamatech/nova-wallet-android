@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportPrivateKeyInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
@@ -20,11 +21,13 @@ class ExportSeedModule {
     @IntoMap
     @ViewModelKey(ExportSeedViewModel::class)
     fun provideViewModel(
+        resourceManager: ResourceManager,
         router: AccountRouter,
         interactor: ExportPrivateKeyInteractor,
         payload: ExportPayload.ChainAccount,
     ): ViewModel {
         return ExportSeedViewModel(
+            resourceManager,
             router,
             interactor,
             payload

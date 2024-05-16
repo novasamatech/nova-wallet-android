@@ -19,6 +19,10 @@ class ExportPrivateKeyInteractor(
     private val chainRegistry: ChainRegistry,
 ) {
 
+    suspend fun isEthereumBased(chainId: ChainId): Boolean {
+        return chainRegistry.getChain(chainId).isEthereumBased
+    }
+
     suspend fun getAccountSeed(
         metaId: Long,
         chainId: ChainId,
