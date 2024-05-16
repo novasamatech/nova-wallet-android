@@ -43,7 +43,7 @@ abstract class EnterCloudBackupPasswordViewModel(
         when {
             backupInProgress -> DescriptiveButtonState.Loading
             password.isNotEmpty() -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
-            else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.cloud_backup_enter_password))
+            else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_password))
         }
     }.shareInBackground()
 

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common
 
 import android.os.Parcelable
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import kotlinx.android.parcel.Parcelize
 
 sealed interface ManualBackupCommonPayload : Parcelable {
@@ -29,4 +30,11 @@ fun ManualBackupCommonPayload.getChainIdOrNull(): String? {
 
 fun ManualBackupCommonPayload.requireChainId(): String {
     return (this as ManualBackupCommonPayload.ChainAccount).chainId
+}
+
+fun ManualBackupCommonPayload.toExportPayload(): ExportPayload {
+    return when (this) {
+        is ManualBackupCommonPayload.DefaultAccount -> ExportPayload.MetaAccount(metaId)
+        is ManualBackupCommonPayload.ChainAccount -> ExportPayload.ChainAccount(metaId, chainId)
+    }
 }

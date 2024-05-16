@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di
+package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.di
 
 import dagger.Module
 import dagger.Provides

@@ -482,6 +482,22 @@
         <item name="android:textCursorDrawable">@null</item>
     </style>
 
+    <style name="Widget.Nova.Input.Password" parent="">
+        <item name="android:textColorHint">@color/hint_text</item>
+        <item name="android:inputType">textPassword</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.SubHeadline</item>
+        <item name="backgroundMode">solid</item>
+        <item name="editTextPaddingBottom">8dp</item>
+        <item name="editTextPaddingEnd">16dp</item>
+        <item name="editTextPaddingStart">12dp</item>
+        <item name="editTextPaddingTop">8dp</item>
+        <item name="passwordToggleEnabled">true</item>
+        <item name="passwordToggleTint">@color/chip_icon</item>
+        <item name="hintAnimationEnabled">false</item>
+        <item name="hintEnabled">false</item>
+        <item name="hintTextColor">@color/hint_text</item>
+    </style>
+
     <!-- Input -->
 
     <!-- Dialog -->

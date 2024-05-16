@@ -21,9 +21,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordFragment
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateBackupPasswordPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordFragment
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment
@@ -472,29 +470,29 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_userContributionsFragment)
     }
 
-    override fun exportMnemonicAction(exportPayload: ExportPayload): DelayedNavigation {
+    override fun getExportMnemonicDelayedNavigation(exportPayload: ExportPayload.ChainAccount): DelayedNavigation {
         val payload = BackupMnemonicPayload.Confirm(exportPayload.chainId, exportPayload.metaId)
         val extras = BackupMnemonicFragment.getBundle(payload)
 
         return NavComponentDelayedNavigation(R.id.action_open_mnemonic_nav_graph, extras)
     }
 
-    override fun exportSeedAction(exportPayload: ExportPayload): DelayedNavigation {
+    override fun getExportSeedDelayedNavigation(exportPayload: ExportPayload.ChainAccount): DelayedNavigation {
         val extras = ExportSeedFragment.getBundle(exportPayload)
 
         return NavComponentDelayedNavigation(R.id.action_export_seed, extras)
     }
 
-    override fun exportJsonPasswordAction(exportPayload: ExportPayload): DelayedNavigation {
-        val extras = ExportJsonPasswordFragment.getBundle(exportPayload)
+    override fun getExportJsonDelayedNavigation(exportPayload: ExportPayload): DelayedNavigation {
+        val extras = ExportJsonFragment.getBundle(exportPayload)
 
         return NavComponentDelayedNavigation(R.id.action_export_json, extras)
     }
 
-    override fun openExportJsonConfirm(payload: ExportJsonConfirmPayload) {
-        val extras = ExportJsonConfirmFragment.getBundle(payload)
+    override fun exportJsonAction(exportPayload: ExportPayload) {
+        val extras = ExportJsonFragment.getBundle(exportPayload)
 
-        navController?.navigate(R.id.action_exportJsonPasswordFragment_to_exportJsonConfirmFragment, extras)
+        navController?.navigate(R.id.action_export_json, extras)
     }
 
     override fun finishExportFlow() {

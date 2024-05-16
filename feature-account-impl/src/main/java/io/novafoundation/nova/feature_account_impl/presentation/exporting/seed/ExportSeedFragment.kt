@@ -20,7 +20,7 @@ private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
 
     companion object {
-        fun getBundle(exportPayload: ExportPayload): Bundle {
+        fun getBundle(exportPayload: ExportPayload.ChainAccount): Bundle {
             return Bundle().apply {
                 putParcelable(PAYLOAD_KEY, exportPayload)
             }

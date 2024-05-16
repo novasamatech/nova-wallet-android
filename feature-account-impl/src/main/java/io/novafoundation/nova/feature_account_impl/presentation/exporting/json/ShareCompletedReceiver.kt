@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm
+package io.novafoundation.nova.feature_account_impl.presentation.exporting.json
 
 import android.content.BroadcastReceiver
 import android.content.Context

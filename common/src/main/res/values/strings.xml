@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+
+    <!--<string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>-->
+    <string name="account_export_json_password_subtitle">This password is required to encrypt your account and is used alongside this JSON file to restore your wallet.</string>
+
+    <string name="export_json_download_btn">Download Restore JSON</string>
+
+    <!--<string name="cloud_backup_enter_password">Enter password</string>-->
+
+    <!--<string name="common_input_error_set_password">Set a password…</string>-->
+    <string name="common_enter_password">Enter password</string>
+
     <string name="common_network_polkadot">Polkadot</string>
     <string name="common_network_ethereum">Ethereum</string>
 
@@ -138,7 +149,6 @@
     <string name="create_cloud_backup_password_requirement_numbers">Numbers</string>
     <string name="create_cloud_backup_password_requirement_letters">Letters</string>
     <string name="create_cloud_backup_password_requirement_passwords_match">Passwords match</string>
-    <string name="cloud_backup_enter_password">Enter password</string>
 
     <string name="cloud_backup_error_invalid_password_title">Password is invalid</string>
     <string name="cloud_backup_error_invalid_password_message">Please, check password correctness and try again.</string>
@@ -1592,7 +1602,6 @@
     <string name="account_ethereum_derivation_path">Ethereum secret derivation path</string>
     <string name="account_export">Export account</string>
     <string name="account_export_action">Export</string>
-    <string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>
     <string name="account_export_json_password_title">Set a new password</string>
     <string name="account_export_json_title">Save your secret and store it in a safe place</string>
     <string name="account_export_seed_title">Write down your secret and store it in a safe place</string>
@@ -1679,7 +1688,6 @@
     </plurals>
     <string name="common_i_understand">I understand</string>
     <string name="common_info">Info</string>
-    <string name="common_input_error_set_password">Set a password…</string>
     <string name="common_learn_more">Learn more</string>
     <string name="common_learn_more_v2_2_0">Find out more about</string>
     <string name="common_left">%s left</string>

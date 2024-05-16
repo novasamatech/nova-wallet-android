@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.ManualBackupSecretsAdapterItemFactory
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.getChainIdOrNull
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.toExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
 
@@ -38,6 +39,10 @@ class ManualBackupSecretsViewModel(
 
     fun advancedSecretsClicked() {
         router.openManualBackupAdvancedSecrets(payload)
+    }
+
+    fun exportJsonClicked() {
+        router.exportJsonAction(payload.toExportPayload())
     }
 
     fun backClicked() {

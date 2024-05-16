@@ -22,7 +22,7 @@ class ExportSeedModule {
     fun provideViewModel(
         router: AccountRouter,
         interactor: ExportPrivateKeyInteractor,
-        payload: ExportPayload,
+        payload: ExportPayload.ChainAccount,
     ): ViewModel {
         return ExportSeedViewModel(
             router,
