@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
@@ -20,7 +19,7 @@ abstract class WalletDetailsMixin(
 
     abstract val typeAlert: Flow<AccountTypeAlert?>
 
-    val chainAccountProjections: Flow<List<Any>> = flowOfAll { accountProjectionsFlow() }
+    val chainAccountProjections: Flow<List<Any>> = accountProjectionsFlow()
         .map { groupedList ->
             groupedList.toListWithHeaders(
                 keyMapper = { type, _ -> mapAccountHeader(type) },
@@ -28,7 +27,7 @@ abstract class WalletDetailsMixin(
             )
         }
 
-    abstract suspend fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>>
+    abstract fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>>
 
     abstract suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader?
 
