@@ -18,7 +18,6 @@ import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 
-
 class LegacySubstrateLedgerApplication(
     private val transport: LedgerTransport,
     private val ledgerRepository: LedgerRepository,
@@ -32,7 +31,7 @@ class LegacySubstrateLedgerApplication(
         confirmAddress: Boolean
     ): LedgerSubstrateAccount {
         val applicationConfig = supportedApplications.getConfig(chainId)
-        val displayVerificationDialog = if (confirmAddress) SubstrateLedgerAppCommon.DisplayVerificationDialog.YES else SubstrateLedgerAppCommon.DisplayVerificationDialog.NO
+        val displayVerificationDialog = SubstrateLedgerAppCommon.DisplayVerificationDialog.fromBoolean(confirmAddress)
 
         val derivationPath = buildDerivationPath(applicationConfig.coin, accountIndex)
         val encodedDerivationPath = SubstrateLedgerAppCommon.encodeDerivationPath(derivationPath)

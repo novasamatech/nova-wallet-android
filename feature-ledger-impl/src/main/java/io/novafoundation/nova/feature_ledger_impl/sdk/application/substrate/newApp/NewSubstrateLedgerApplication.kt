@@ -34,7 +34,7 @@ abstract class NewSubstrateLedgerApplication(
     abstract suspend fun getDerivationPath(metaId: Long, chainId: ChainId): String
 
     override suspend fun getAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int, confirmAddress: Boolean): LedgerSubstrateAccount {
-        val displayVerificationDialog = if (confirmAddress) SubstrateLedgerAppCommon.DisplayVerificationDialog.YES else SubstrateLedgerAppCommon.DisplayVerificationDialog.NO
+        val displayVerificationDialog = SubstrateLedgerAppCommon.DisplayVerificationDialog.fromBoolean(confirmAddress)
 
         val derivationPath = getDerivationPath(chainId, accountIndex)
         val encodedDerivationPath = encodeDerivationPath(derivationPath)

@@ -15,7 +15,7 @@ class MigrationSubstrateLedgerApplication(
     metadataShortenerService: MetadataShortenerService,
     private val ledgerRepository: LedgerRepository,
     private val legacyApplicationConfigs: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all()
-): NewSubstrateLedgerApplication(transport, chainRegistry, metadataShortenerService) {
+) : NewSubstrateLedgerApplication(transport, chainRegistry, metadataShortenerService) {
 
     override val cla: UByte = CLA
 
@@ -26,7 +26,7 @@ class MigrationSubstrateLedgerApplication(
     }
 
     override suspend fun getDerivationPath(metaId: Long, chainId: ChainId): String {
-       return ledgerRepository.getChainAccountDerivationPath(metaId, chainId)
+        return ledgerRepository.getChainAccountDerivationPath(metaId, chainId)
     }
 
     companion object {

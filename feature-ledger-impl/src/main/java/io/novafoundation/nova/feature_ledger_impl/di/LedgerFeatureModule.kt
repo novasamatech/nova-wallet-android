@@ -74,7 +74,7 @@ class LedgerFeatureModule {
     @Provides
     @FeatureScope
     fun provideUsbDeviceDiscoveryService(
-       contextManager: ContextManager
+        contextManager: ContextManager
     ) = UsbLedgerDeviceDiscoveryService(contextManager)
 
     @Provides

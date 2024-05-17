@@ -87,6 +87,6 @@ class RuntimeFilesCache(
     }
 
     private fun isMetadataOpaqueKey(chainId: String): String {
-        return "RuntimeFilesCache.opaqueMetadata.${chainId}"
+        return "RuntimeFilesCache.opaqueMetadata.$chainId"
     }
 }

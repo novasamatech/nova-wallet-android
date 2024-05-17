@@ -20,7 +20,7 @@ interface MetadataShortenerService {
 class RealMetadataShortenerService(
     private val chainRegistry: ChainRegistry,
     private val rpcCalls: RpcCalls,
-): MetadataShortenerService {
+) : MetadataShortenerService {
 
     override suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ByteArray {
         val chainId = payloadExtrinsic.genesisHash.toHexString(withPrefix = false)

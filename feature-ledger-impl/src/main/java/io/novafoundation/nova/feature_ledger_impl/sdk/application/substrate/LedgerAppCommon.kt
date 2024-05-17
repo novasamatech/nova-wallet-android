@@ -20,7 +20,6 @@ object SubstrateLedgerAppCommon {
 
     const val CHUNK_SIZE = 250
 
-
     private const val PUBLIC_KEY_LENGTH = 32
     private const val RESPONSE_CODE_LENGTH = 2
 
@@ -39,7 +38,18 @@ object SubstrateLedgerAppCommon {
     }
 
     enum class DisplayVerificationDialog(val code: UByte) {
-        YES(0x01u), NO(0x00u)
+        YES(0x01u), NO(0x00u);
+
+        companion object {
+
+            fun fromBoolean(shouldVerify: Boolean): DisplayVerificationDialog {
+                return if (shouldVerify) {
+                    SubstrateLedgerAppCommon.DisplayVerificationDialog.YES
+                } else {
+                    SubstrateLedgerAppCommon.DisplayVerificationDialog.NO
+                }
+            }
+        }
     }
 
     enum class SignPayloadType(val code: UByte) {
@@ -142,4 +152,3 @@ object SubstrateLedgerAppCommon {
         }
     }
 }
-

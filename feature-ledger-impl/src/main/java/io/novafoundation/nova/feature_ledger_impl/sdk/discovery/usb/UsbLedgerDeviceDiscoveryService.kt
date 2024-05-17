@@ -19,7 +19,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 class UsbLedgerDeviceDiscoveryService(
     private val contextManager: ContextManager
-): LedgerDeviceDiscoveryService {
+) : LedgerDeviceDiscoveryService {
 
     private val appContext = contextManager.getApplicationContext()
 
