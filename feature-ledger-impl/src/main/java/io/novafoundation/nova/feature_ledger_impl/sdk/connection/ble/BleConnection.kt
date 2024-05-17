@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble
 
 import android.bluetooth.BluetoothDevice
+import android.util.Log
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.LedgerConnection
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.awaitConnected
 import kotlinx.coroutines.channels.Channel
@@ -20,6 +21,8 @@ class BleConnection(
     @Volatile
     private var _receiveChannel = newChannel()
     private val receiveChannelLock = Any()
+
+    override val channel: Short? = null
 
     override suspend fun connect(): Result<Unit> = runCatching {
         bleManager.connect(bluetoothDevice).suspend()
@@ -57,6 +60,10 @@ class BleConnection(
 
     override fun onDataReceived(device: BluetoothDevice, data: Data) {
         ensureCorrectDevice()
+
+        data.value?.let {
+            Log.w("Ledger", "Read non empty bytes from usb: ${it.joinToString()}")
+        }
 
         data.value?.let(receiveChannel::trySend)
     }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.chunked
 import io.novafoundation.nova.common.utils.dropBytes
 import io.novafoundation.nova.common.utils.dropBytesLast
@@ -85,6 +86,8 @@ class RealSubstrateLedgerApplication(
             data = encodedDerivationPath,
             device = device
         )
+
+        Log.w("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
 
         return parseAccountResponse(rawResponse, derivationPath)
     }
@@ -186,6 +189,9 @@ class RealSubstrateLedgerApplication(
         val responseData = raw.dropBytesLast(RESPONSE_CODE_LENGTH)
 
         val responseCode = responseCodeData.toBigEndianU16()
+
+        Log.d("Ledger", "Ledger response code: $responseCode")
+
         val response = LedgerApplicationResponse.fromCode(responseCode)
 
         if (response != LedgerApplicationResponse.NO_ERROR) {
