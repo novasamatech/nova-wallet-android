@@ -36,7 +36,8 @@ import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 import io.novasama.substrate_sdk_android.wsrpc.request.DeliveryType
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.author.SubmitAndWatchExtrinsicRequest
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.author.SubmitExtrinsicRequest
-import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersionFull
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersionRequest
 import io.novasama.substrate_sdk_android.wsrpc.subscriptionFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -106,10 +107,8 @@ class RpcCalls(
         return doubleResult.toInt().toBigInteger()
     }
 
-    suspend fun getRuntimeVersion(chainId: ChainId): RuntimeVersion {
-        val request = StateRuntimeVersionRequest()
-
-        return socketFor(chainId).executeAsync(request, mapper = pojo<RuntimeVersion>().nonNull())
+    suspend fun getRuntimeVersion(chainId: ChainId): RuntimeVersionFull {
+        return socketFor(chainId).executeAsync(RuntimeVersionRequest(), mapper = pojo<RuntimeVersionFull>().nonNull())
     }
 
     /**

@@ -267,6 +267,8 @@ suspend inline fun ChainRegistry.findChainsById(predicate: (Chain) -> Boolean): 
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
+suspend fun ChainRegistry.getRawMetadata(chainId: String) = getRuntimeProvider(chainId).getRaw()
+
 suspend fun ChainRegistry.getSocket(chainId: String): SocketService = getConnection(chainId).socketService
 
 suspend fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getConnectionOrNull(chainId)?.socketService

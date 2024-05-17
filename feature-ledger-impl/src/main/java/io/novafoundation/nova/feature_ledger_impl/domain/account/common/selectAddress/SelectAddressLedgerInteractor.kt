@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress
 
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp.LegacySubstrateLedgerApplication
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -28,7 +29,8 @@ interface SelectAddressLedgerInteractor {
 }
 
 class RealSelectAddressLedgerInteractor(
-    private val substrateLedgerApplication: SubstrateLedgerApplication,
+    private val legacyApp: LegacySubstrateLedgerApplication,
+    private val migrationApp: MigrationSubstrateLedgerApplication,
     private val ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : SelectAddressLedgerInteractor {
@@ -39,7 +41,7 @@ class RealSelectAddressLedgerInteractor(
 
     override suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int) = runCatching {
         val device = findDevice(deviceId)
-        val ledgerAccount = substrateLedgerApplication.getAccount(device, chain.id, accountIndex, confirmAddress = false)
+        val ledgerAccount = migrationApp.getAccount(device, chain.id, accountIndex, confirmAddress = false)
 
         val utilityAsset = chain.utilityAsset
 
@@ -54,7 +56,7 @@ class RealSelectAddressLedgerInteractor(
     override suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int): Result<Unit> = kotlin.runCatching {
         val device = findDevice(deviceId)
 
-        substrateLedgerApplication.getAccount(device, chain.id, accountIndex, confirmAddress = true)
+        migrationApp.getAccount(device, chain.id, accountIndex, confirmAddress = true)
     }
 
     private suspend fun findDevice(deviceId: String): LedgerDevice {

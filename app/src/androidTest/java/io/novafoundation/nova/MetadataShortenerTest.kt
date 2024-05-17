@@ -1,8 +1,8 @@
 package io.novafoundation.nova;
 
 import android.util.Log
-import io.novafoundation.nova.common.utils.encodedAdditionalSigned
-import io.novafoundation.nova.common.utils.encodedSignedExtras
+import io.novafoundation.nova.common.utils.encodedIncludedInExtrinsic
+import io.novafoundation.nova.common.utils.encodedIncludedInSignature
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.metadata_shortener.MetadataShortener
 import io.novafoundation.nova.runtime.ext.Geneses
@@ -33,9 +33,14 @@ class MetadataShortenerTest : BaseIntegrationTest() {
         val polkadot = chainRegistry.getChain(Chain.Geneses.POLKADOT)
         val runtimeMetadataBytes = runtimeMetadata.fromHex()
 
+        val dot = polkadot.utilityAsset
+
+        val specVersion = 1_002_000
+        val specName = "polkadot"
+
         val signer = TestSigner { payload ->
-            val signedExtras = payload.encodedSignedExtras()
-            val additionalSigned = payload.encodedAdditionalSigned()
+            val signedExtras = payload.encodedIncludedInExtrinsic()
+            val additionalSigned = payload.encodedIncludedInSignature()
 
             Log.d("MetadataShortenerTest", "Signed extras: ${signedExtras.toHexString()}")
             Log.d("MetadataShortenerTest", "Additional signed: ${additionalSigned.toHexString()}")
@@ -45,7 +50,12 @@ class MetadataShortenerTest : BaseIntegrationTest() {
                 payload.encodedCallData(),
                 signedExtras,
                 additionalSigned,
-                runtimeMetadataBytes
+                runtimeMetadataBytes,
+                specVersion,
+                specName,
+                polkadot.addressPrefix,
+                dot.precision.value,
+                dot.symbol.value
             )
 
             Log.d("MetadataShortenerTest", "Generated proof of size ${proof.size / 1024.0} KB: ${proof.toHexString()}")

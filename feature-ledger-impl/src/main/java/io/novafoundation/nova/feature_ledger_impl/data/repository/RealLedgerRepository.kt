@@ -15,4 +15,11 @@ class RealLedgerRepository(
         return secretStoreV2.getAdditionalMetaAccountSecret(metaId, key)
             ?: throw IllegalStateException("Cannot find Ledger derivation path for chain $chainId in meta account $metaId")
     }
+
+    override suspend fun getGenericDerivationPath(metaId: Long): String {
+        val key = LedgerDerivationPath.genericDerivationPathSecretKey()
+
+        return secretStoreV2.getAdditionalMetaAccountSecret(metaId, key)
+            ?: throw IllegalStateException("Cannot find Ledger generic derivation path for meta account $metaId")
+    }
 }

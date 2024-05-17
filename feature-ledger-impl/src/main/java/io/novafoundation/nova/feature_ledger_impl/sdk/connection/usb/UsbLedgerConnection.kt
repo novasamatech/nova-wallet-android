@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.connection.awaitConnected
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.BaseLedgerConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -82,7 +83,7 @@ class UsbLedgerConnection(
 
         while (true) {
             val responseBuffer = ByteArray(mtu())
-            val result = usbConnection!!.bulkTransfer(endpointIn!!, responseBuffer, responseBuffer.size, 1000)
+            val result = usbConnection!!.bulkTransfer(endpointIn!!, responseBuffer, responseBuffer.size, 50)
 
             when {
                 result > 0 -> {
@@ -91,10 +92,11 @@ class UsbLedgerConnection(
                     somethingRead = true
                 }
                 somethingRead -> {
-                    Log.w("Ledger", "Read empty bytes, stopping pollsing")
+                    Log.w("Ledger", "Read empty bytes, stopping polling")
                     break
                 }
                 else -> {
+                    delay(50)
                     Log.w("Ledger", "Read empty bytes, waiting for at least one response packet")
                 }
             }

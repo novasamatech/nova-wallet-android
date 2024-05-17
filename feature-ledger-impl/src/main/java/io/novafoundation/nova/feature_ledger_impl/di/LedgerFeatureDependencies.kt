@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.di
 import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
@@ -20,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 
 interface LedgerFeatureDependencies {
 
@@ -62,4 +64,8 @@ interface LedgerFeatureDependencies {
     val selectedAccountUseCase: SelectedAccountUseCase
 
     val ledgerAddAccountRepository: LedgerAddAccountRepository
+
+    val apiCreator: NetworkApiCreator
+
+    val rpcCalls: RpcCalls
 }

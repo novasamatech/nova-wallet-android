@@ -37,6 +37,7 @@ dependencies {
     implementation project(':feature-wallet-api')
     implementation project(":common")
     implementation project(":runtime")
+    implementation project(":bindings:metadata_shortener")
 
     implementation materialDep
 

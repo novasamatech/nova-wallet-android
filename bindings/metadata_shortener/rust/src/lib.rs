@@ -10,8 +10,15 @@ use jni::{errors::Result as JniResult, sys::jint};
 use jni::objects::{JClass, JString};
 use jni::sys::jbyteArray;
 use jni::JNIEnv;
-use merkleized_metadata::{generate_metadata_digest, generate_proof_for_extrinsic_parts, ExtraInfo, SignedExtrinsicData};
+use merkleized_metadata::{generate_metadata_digest, generate_proof_for_extrinsic_parts, ExtraInfo, SignedExtrinsicData, FrameMetadataPrepared, Proof, ExtrinsicMetadata};
 use std::ptr;
+
+#[derive(Encode)]
+pub struct MetadataProof {
+    proof: Proof,
+    extrinsic: ExtrinsicMetadata,
+    extra_info: ExtraInfo,
+}
 
 macro_rules! r#try_or_throw {
     ($jni_env: ident, $expr:expr, $ret: expr) => {
@@ -44,6 +51,11 @@ fn Java_io_novafoundation_nova_metadata_1shortener_MetadataShortener_generate_1e
     signed_extras: jbyteArray,
     additional_signed: jbyteArray,
     metadata: jbyteArray,
+    spec_version: jint,
+    spec_name: JString,
+    base58_prefix: jint,
+    decimals: jint,
+    token_symbol: JString,
 ) -> jbyteArray {
     let Some(metadata) = decode_metadata(&jni_env, metadata) else {
         return ptr::null_mut();
@@ -61,7 +73,27 @@ fn Java_io_novafoundation_nova_metadata_1shortener_MetadataShortener_generate_1e
         included_in_signed_data: included_in_signed_data.as_slice(),
     };
 
-    let Ok(proof) =
+    let spec_version = spec_version as u32;
+    let spec_name = try_or_throw_null!(jni_env, jni_env.get_string(spec_name));
+    let base58_prefix = base58_prefix as u16;
+    let decimals = decimals as u8;
+    let token_symbol = try_or_throw_null!(jni_env, jni_env.get_string(token_symbol));
+
+    let extra_info = ExtraInfo {
+        spec_version: spec_version,
+        spec_name: spec_name.into(),
+        base58_prefix: base58_prefix,
+        decimals: decimals,
+        token_symbol: token_symbol.into(),
+    };
+
+     let extrinsic_metadata = FrameMetadataPrepared::prepare(&metadata)
+        .unwrap()
+        .as_type_information()
+        .unwrap()
+        .extrinsic_metadata;
+
+    let Ok(registry_proof) =
         generate_proof_for_extrinsic_parts(call_vec.as_slice(), Some(signed_ext_data), &metadata)
     else {
         jni_env
@@ -70,7 +102,13 @@ fn Java_io_novafoundation_nova_metadata_1shortener_MetadataShortener_generate_1e
         return ptr::null_mut();
     };
 
-    let prood_encoded = proof.encode();
+    let meta_proof = MetadataProof {
+                 proof: registry_proof,
+                 extrinsic: extrinsic_metadata,
+                 extra_info: extra_info,
+             };
+
+    let prood_encoded = meta_proof.encode();
 
     try_or_throw_null!(
         jni_env,
