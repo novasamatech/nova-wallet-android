@@ -43,11 +43,7 @@ object SubstrateLedgerAppCommon {
         companion object {
 
             fun fromBoolean(shouldVerify: Boolean): DisplayVerificationDialog {
-                return if (shouldVerify) {
-                    SubstrateLedgerAppCommon.DisplayVerificationDialog.YES
-                } else {
-                    SubstrateLedgerAppCommon.DisplayVerificationDialog.NO
-                }
+                return if (shouldVerify) YES else NO
             }
         }
     }
