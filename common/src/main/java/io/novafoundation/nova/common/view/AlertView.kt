@@ -16,6 +16,9 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
+import kotlinx.android.synthetic.main.view_alert.view.alertActionArrow
+import kotlinx.android.synthetic.main.view_alert.view.alertActionContent
+import kotlinx.android.synthetic.main.view_alert.view.alertActionGroup
 import kotlinx.android.synthetic.main.view_alert.view.alertIcon
 import kotlinx.android.synthetic.main.view_alert.view.alertMessage
 import kotlinx.android.synthetic.main.view_alert.view.alertSubMessage
@@ -63,6 +66,17 @@ class AlertView @JvmOverloads constructor(
         alertSubMessage.setTextOrHide(text)
     }
 
+    fun setActionText(actionText: String?) {
+        alertActionGroup.letOrHide(actionText) { text ->
+            alertActionContent.text = text
+        }
+    }
+
+    fun setOnActionClickedListener(listener: () -> Unit) {
+        alertActionContent.setOnClickListener { listener() }
+        alertActionArrow.setOnClickListener { listener() }
+    }
+
     fun setModel(maybeModel: SimpleAlertModel?) = letOrHide(maybeModel) { model ->
         setMessage(model)
     }
@@ -88,6 +102,12 @@ class AlertView @JvmOverloads constructor(
 
         val text = it.getString(R.styleable.AlertView_android_text)
         text?.let(::setMessage)
+
+        val description = it.getString(R.styleable.AlertView_AlertView_description)
+        setSubMessage(description)
+
+        val action = it.getString(R.styleable.AlertView_AlertView_action)
+        setActionText(action)
     }
 
     private fun styleFromPreset(preset: StylePreset) = when (preset) {

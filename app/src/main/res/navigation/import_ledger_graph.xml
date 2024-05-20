@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/startImportLedgerFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.start.StartImportLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.StartImportLedgerFragment"
         android:label="StartImportLedgerFragment">
 
         <action
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/fillWalletImportLedgerFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.fillWallet.FillWalletImportLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.FillWalletImportLedgerFragment"
         android:label="FillWalletImportLedgerFragment">
 
         <action
@@ -42,7 +42,7 @@
 
     <fragment
         android:id="@+id/selectLedgerImportFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectLedger.SelectLedgerImportFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerImportFragment"
         android:label="SelectLedgerImportFragment">
 
         <action
@@ -56,7 +56,7 @@
 
     <fragment
         android:id="@+id/selectAddressImportLedgerFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectAddress.SelectAddressImportLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectAddress.SelectAddressImportLedgerFragment"
         android:label="SelectAddressImportLedgerFragment" >
 
         <action
@@ -70,7 +70,7 @@
 
     <fragment
         android:id="@+id/finishImportLedgerFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.finish.FinishImportLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.finish.FinishImportLedgerFragment"
         android:label="FinishImportLedgerFragment">
 
         <action

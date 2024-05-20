@@ -99,6 +99,7 @@ fun FixedListBottomSheet.textItem(
     @DrawableRes iconRes: Int,
     title: String,
     showArrow: Boolean = false,
+    applyIconTint: Boolean = true,
     onClick: (View) -> Unit,
 ) {
     item(R.layout.item_sheet_iconic_label) { view ->
@@ -109,7 +110,7 @@ fun FixedListBottomSheet.textItem(
         view.itemExternalActionContent.setDrawableStart(
             drawableRes = iconRes,
             widthInDp = 24,
-            tint = R.color.icon_primary,
+            tint = R.color.icon_primary.takeIf { applyIconTint },
             paddingInDp = 12
         )
 
@@ -172,9 +173,16 @@ fun FixedListBottomSheet.textItem(
     @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
     showArrow: Boolean = false,
+    applyIconTint: Boolean = true,
     onClick: (View) -> Unit
 ) {
-    textItem(iconRes, context.getString(titleRes), showArrow, onClick)
+    textItem(
+        iconRes = iconRes,
+        title = context.getString(titleRes),
+        showArrow = showArrow,
+        applyIconTint = applyIconTint,
+        onClick = onClick
+    )
 }
 
 fun FixedListBottomSheet.switcherItem(

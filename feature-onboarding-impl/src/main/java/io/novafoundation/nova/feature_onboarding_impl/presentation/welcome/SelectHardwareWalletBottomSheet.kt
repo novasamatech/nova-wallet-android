@@ -33,9 +33,17 @@ class SelectHardwareWalletBottomSheet(
 
         textItem(
             iconRes = R.drawable.ic_ledger,
-            titleRes = R.string.account_ledger_nano_x,
+            titleRes = R.string.account_ledger_nano_x_generic,
             showArrow = true,
-            onClick = { onSuccess(HardwareWalletModel.LedgerNanoX) }
+            onClick = { onSuccess(HardwareWalletModel.LedgerGeneric) }
+        )
+
+        textItem(
+            iconRes = R.drawable.ic_ledger_legacy,
+            titleRes = R.string.account_ledger_nano_x_legacy,
+            showArrow = true,
+            applyIconTint = false,
+            onClick = { onSuccess(HardwareWalletModel.LedgerLegacy) }
         )
 
         polkadotVaultItem(PolkadotVaultVariant.PARITY_SIGNER)
