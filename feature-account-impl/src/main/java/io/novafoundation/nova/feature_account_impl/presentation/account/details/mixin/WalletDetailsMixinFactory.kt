@@ -22,7 +22,7 @@ class WalletDetailsMixinFactory(
 
             Type.WATCH_ONLY -> WatchOnlyWalletDetailsMixin(resourceManager, accountFormatterFactory, interactor, metaAccount)
 
-            Type.LEDGER -> LedgerWalletDetailsMixin(resourceManager, accountFormatterFactory, interactor, metaAccount)
+            Type.LEDGER_LEGACY -> LedgerWalletDetailsMixin(resourceManager, accountFormatterFactory, interactor, metaAccount)
 
             Type.PARITY_SIGNER,
             Type.POLKADOT_VAULT -> PolkadotVaultWalletDetailsMixin(
@@ -34,6 +34,9 @@ class WalletDetailsMixinFactory(
             )
 
             Type.PROXIED -> ProxiedWalletDetailsMixin(resourceManager, accountFormatterFactory, interactor, proxyFormatter, metaAccount)
+
+            // TODO generic ledger wallet details
+            Type.LEDGER -> LedgerWalletDetailsMixin(resourceManager, accountFormatterFactory, interactor, metaAccount)
         }
     }
 }

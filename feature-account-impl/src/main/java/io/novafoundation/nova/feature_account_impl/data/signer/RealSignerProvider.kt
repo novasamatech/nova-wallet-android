@@ -36,7 +36,8 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.WATCH_ONLY,
             LightMetaAccount.Type.PARITY_SIGNER,
             LightMetaAccount.Type.POLKADOT_VAULT,
-            LightMetaAccount.Type.LEDGER -> DefaultFeeSigner(metaAccount, chain)
+            LightMetaAccount.Type.LEDGER,
+            LightMetaAccount.Type.LEDGER_LEGACY -> DefaultFeeSigner(metaAccount, chain)
 
             LightMetaAccount.Type.PROXIED -> proxiedFeeSignerFactory.create(metaAccount, chain, this)
         }
@@ -48,7 +49,9 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.WATCH_ONLY -> watchOnlySigner.create(metaAccount)
             LightMetaAccount.Type.PARITY_SIGNER -> polkadotVaultSignerFactory.createParitySigner(metaAccount)
             LightMetaAccount.Type.POLKADOT_VAULT -> polkadotVaultSignerFactory.createPolkadotVault(metaAccount)
+            // TODO ledger signing
             LightMetaAccount.Type.LEDGER -> ledgerSignerFactory.create(metaAccount)
+            LightMetaAccount.Type.LEDGER_LEGACY -> ledgerSignerFactory.create(metaAccount)
             LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount, this, isRoot)
         }
     }

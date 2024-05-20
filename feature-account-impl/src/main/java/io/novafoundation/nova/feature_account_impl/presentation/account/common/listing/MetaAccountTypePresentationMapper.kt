@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.common.
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.ChipLabelModel
+import io.novafoundation.nova.common.view.TintedIcon
+import io.novafoundation.nova.common.view.TintedIcon.Companion.asTintedIcon
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrThrow
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountChipGroupRvItem
@@ -14,33 +16,44 @@ class MetaAccountTypePresentationMapper(
 ) {
 
     fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
-        val chipLabelModel = when (type) {
+        val icon = iconFor(type)
+
+        val label = when (type) {
             LightMetaAccount.Type.SECRETS -> null
-            LightMetaAccount.Type.WATCH_ONLY -> ChipLabelModel(
-                iconRes = R.drawable.ic_watch_only_filled,
-                title = resourceManager.getString(R.string.account_watch_only)
-            )
+            LightMetaAccount.Type.WATCH_ONLY -> resourceManager.getString(R.string.account_watch_only)
 
             LightMetaAccount.Type.PARITY_SIGNER, LightMetaAccount.Type.POLKADOT_VAULT -> {
                 val config = polkadotVaultVariantConfigProvider.variantConfigFor(type.asPolkadotVaultVariantOrThrow())
-
-                ChipLabelModel(
-                    iconRes = config.common.iconRes,
-                    title = resourceManager.getString(config.common.nameRes)
-                )
+                resourceManager.getString(config.common.nameRes)
             }
 
-            LightMetaAccount.Type.LEDGER -> ChipLabelModel(
-                iconRes = R.drawable.ic_ledger,
-                title = resourceManager.getString(R.string.common_ledger)
-            )
+            LightMetaAccount.Type.LEDGER_LEGACY -> resourceManager.getString(R.string.accounts_ledger_legacy)
 
-            LightMetaAccount.Type.PROXIED -> ChipLabelModel(
-                iconRes = R.drawable.ic_proxy,
-                title = resourceManager.getString(R.string.account_proxieds)
-            )
+            LightMetaAccount.Type.LEDGER -> resourceManager.getString(R.string.common_ledger)
+
+            LightMetaAccount.Type.PROXIED -> resourceManager.getString(R.string.account_proxieds)
         }
 
-        return chipLabelModel?.let { AccountChipGroupRvItem(it) }
+        return if (icon != null && label != null) {
+            AccountChipGroupRvItem(ChipLabelModel(icon, label))
+        } else {
+            null
+        }
+    }
+
+    fun iconFor(type: LightMetaAccount.Type): TintedIcon? {
+        return when (type) {
+            LightMetaAccount.Type.SECRETS -> null
+            LightMetaAccount.Type.WATCH_ONLY -> R.drawable.ic_watch_only_filled.asTintedIcon(canApplyOwnTint = true)
+            LightMetaAccount.Type.PARITY_SIGNER,  LightMetaAccount.Type.POLKADOT_VAULT -> {
+                val config = polkadotVaultVariantConfigProvider.variantConfigFor(type.asPolkadotVaultVariantOrThrow())
+
+                config.common.iconRes.asTintedIcon(canApplyOwnTint = true)
+            }
+
+            LightMetaAccount.Type.LEDGER_LEGACY -> R.drawable.ic_ledger_legacy.asTintedIcon(canApplyOwnTint = false)
+            LightMetaAccount.Type.LEDGER -> R.drawable.ic_ledger.asTintedIcon(canApplyOwnTint = true)
+            LightMetaAccount.Type.PROXIED -> R.drawable.ic_proxy.asTintedIcon(canApplyOwnTint = true)
+        }
     }
 }

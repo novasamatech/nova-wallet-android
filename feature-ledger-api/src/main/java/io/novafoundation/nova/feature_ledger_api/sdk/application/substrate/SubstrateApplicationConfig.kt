@@ -2,16 +2,18 @@ package io.novafoundation.nova.feature_ledger_api.sdk.application.substrate
 
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.BuildConfig
 
 class SubstrateApplicationConfig(
     val chainId: String,
     val coin: Int,
     val cla: UByte
 ) {
+
     companion object {
 
         private val ALL by lazy {
-            listOf(
+            listOfNotNull(
                 SubstrateApplicationConfig(chainId = Chain.Geneses.POLKADOT, coin = 354, cla = 0x90u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.KUSAMA, coin = 434, cla = 0x99u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.STATEMINT, coin = 354, cla = 0x96u),
@@ -26,12 +28,16 @@ class SubstrateApplicationConfig(
                 SubstrateApplicationConfig(chainId = Chain.Geneses.ALEPH_ZERO, coin = 643, cla = 0xa4u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.POLKADEX, coin = 799, cla = 0xa0u),
 
-                // TODO for testing with our own testnet - remove before production
-                SubstrateApplicationConfig(chainId = "d67c91ca75c199ff1ee9555567dfad21b9033165c39977170ec8d3f6c1fa433c", coin = 354, cla = 0x90u),
-                )
+                novasamaLedgerTestnetFakeApp()
+            )
         }
 
         fun all() = ALL
+
+        private fun novasamaLedgerTestnetFakeApp(): SubstrateApplicationConfig? {
+            return SubstrateApplicationConfig(chainId = "d67c91ca75c199ff1ee9555567dfad21b9033165c39977170ec8d3f6c1fa433c", coin = 354, cla = 0x90u)
+                .takeIf { BuildConfig.DEBUG }
+        }
     }
 }
 

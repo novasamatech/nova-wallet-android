@@ -32,7 +32,13 @@ interface LightMetaAccount {
     val status: LightMetaAccount.Status
 
     enum class Type {
-        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT, PROXIED
+        SECRETS,
+        WATCH_ONLY,
+        PARITY_SIGNER,
+        LEDGER_LEGACY,
+        LEDGER,
+        POLKADOT_VAULT,
+        PROXIED
     }
 
     enum class Status {
@@ -208,6 +214,7 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
         LightMetaAccount.Type.SECRETS,
         LightMetaAccount.Type.WATCH_ONLY,
         LightMetaAccount.Type.PARITY_SIGNER,
+        LightMetaAccount.Type.LEDGER_LEGACY,
         LightMetaAccount.Type.LEDGER,
         LightMetaAccount.Type.POLKADOT_VAULT -> true
 
