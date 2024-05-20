@@ -16,16 +16,14 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.SingleSheetLedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp.LegacySubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.metadata.MetadataShortenerService
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.metadata.RealMetadataShortenerService
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.LedgerBleManager
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.CompoundLedgerDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleLedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.usb.UsbLedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.transport.ChunkedLedgerTransport
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 
 @Module
 class LedgerFeatureModule {
@@ -110,14 +108,5 @@ class LedgerFeatureModule {
             ledgerDeviceDiscoveryService = ledgerDeviceDiscoveryService,
             assetSourceRegistry = assetSourceRegistry
         )
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideMetadataShortenerService(
-        chainRegistry: ChainRegistry,
-        rpcCalls: RpcCalls,
-    ): MetadataShortenerService {
-        return RealMetadataShortenerService(chainRegistry, rpcCalls)
     }
 }

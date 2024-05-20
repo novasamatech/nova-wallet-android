@@ -25,7 +25,10 @@ class SubstrateApplicationConfig(
                 SubstrateApplicationConfig(chainId = Chain.Geneses.ASTAR, coin = 810, cla = 0xa9u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.ALEPH_ZERO, coin = 643, cla = 0xa4u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.POLKADEX, coin = 799, cla = 0xa0u),
-            )
+
+                // TODO for testing with our own testnet - remove before production
+                SubstrateApplicationConfig(chainId = "d67c91ca75c199ff1ee9555567dfad21b9033165c39977170ec8d3f6c1fa433c", coin = 354, cla = 0x90u),
+                )
         }
 
         fun all() = ALL

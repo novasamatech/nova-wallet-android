@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 
@@ -68,4 +69,6 @@ interface LedgerFeatureDependencies {
     val apiCreator: NetworkApiCreator
 
     val rpcCalls: RpcCalls
+
+    val metadataShortenerService: MetadataShortenerService
 }

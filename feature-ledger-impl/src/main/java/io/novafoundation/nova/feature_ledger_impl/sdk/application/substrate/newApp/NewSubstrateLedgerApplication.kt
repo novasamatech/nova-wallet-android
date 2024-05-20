@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Subs
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.defaultCryptoScheme
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.encodeDerivationPath
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.parseAccountResponse
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.metadata.MetadataShortenerService
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
