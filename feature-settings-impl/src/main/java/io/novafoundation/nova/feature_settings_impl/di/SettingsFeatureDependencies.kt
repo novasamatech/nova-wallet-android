@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_settings_impl.di
 
 import android.content.Context
+import coil.ImageLoader
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -14,8 +15,13 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface SettingsFeatureDependencies {
+
+    val imageLoader: ImageLoader
+
+    val chainRegistry: ChainRegistry
 
     val languageUseCase: LanguageUseCase
 

@@ -1,8 +1,12 @@
 package io.novafoundation.nova.feature_settings_impl
 
-interface SettingsRouter {
+import io.novafoundation.nova.common.navigation.ReturnableRouter
+
+interface SettingsRouter : ReturnableRouter {
 
     fun openWallets()
+
+    fun openNetworks()
 
     fun openPushNotificationSettings()
 

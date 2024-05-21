@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFea
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
+import io.novafoundation.nova.runtime.di.RuntimeApi
 
 import javax.inject.Inject
 
@@ -21,6 +22,7 @@ class SettingsFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val accountFeatureDependencies = DaggerSettingsFeatureComponent_SettingsFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .runtimeApi(getFeature(RuntimeApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))

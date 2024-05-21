@@ -85,6 +85,10 @@ class ChainRegistry(
         syncBaseTypesIfNeeded()
     }
 
+    fun getConnectionInstantlyOrNull(chainId: String): ChainConnection? {
+        return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
+    }
+
     suspend fun getConnection(chainId: String): ChainConnection {
         requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 

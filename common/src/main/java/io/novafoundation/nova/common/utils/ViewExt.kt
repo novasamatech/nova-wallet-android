@@ -29,7 +29,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
@@ -365,4 +368,10 @@ fun ShimmerFrameLayout.setShimmerShown(shown: Boolean) {
     } else {
         hideShimmer()
     }
+}
+
+fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharSequence) {
+    TabLayoutMediator(this, viewPager) { tab, position ->
+        tab.text = tabText(position)
+    }.attach()
 }

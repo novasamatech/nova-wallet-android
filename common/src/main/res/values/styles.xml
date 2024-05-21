@@ -565,4 +565,8 @@
 
         <item name="android:textColor">@color/text_secondary</item>
     </style>
+
+    <style name="SegmentedTabTextAppearance" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+        <item name="textAllCaps">false</item>
+    </style>
 </resources>

@@ -148,6 +148,7 @@ class ChainConnection internal constructor(
     }
 
     private fun State.needsAutobalance() = this is State.WaitingForReconnect && attempt > 1
+
     override fun onRpcResponseReceived(rpcResponse: RpcResponse): ResponseDelivery {
         val error = rpcResponse.error
 
@@ -160,5 +161,9 @@ class ChainConnection internal constructor(
         } else {
             ResponseDelivery.DELIVER_TO_SENDER
         }
+    }
+
+    fun getCurrentState(): State {
+        return state.value
     }
 }

@@ -308,4 +308,10 @@
         <attr name="icon" />
     </declare-styleable>
 
+    <declare-styleable name="SegmentedTabLayout">
+        <attr name="tabIndicatorFullHeight" format="boolean"/>
+        <attr name="tabIndicatorMargin" format="dimension"/>
+        <attr name="backgroundCornerRadius" format="dimension"/>
+    </declare-styleable>
+
 </resources>
