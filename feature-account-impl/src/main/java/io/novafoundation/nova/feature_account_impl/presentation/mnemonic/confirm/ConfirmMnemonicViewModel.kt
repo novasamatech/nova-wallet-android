@@ -1,12 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.added
 import io.novafoundation.nova.common.utils.modified
 import io.novafoundation.nova.common.utils.removed
@@ -56,9 +53,6 @@ class ConfirmMnemonicViewModel(
 
     val skipVisible = payload.createExtras != null && config.allowShowingSkip
 
-    private val _matchingMnemonicErrorAnimationEvent = MutableLiveData<Event<Unit>>()
-    val matchingMnemonicErrorAnimationEvent: LiveData<Event<Unit>> = _matchingMnemonicErrorAnimationEvent
-
     fun homeButtonClicked() {
         router.back()
     }
@@ -93,11 +87,17 @@ class ConfirmMnemonicViewModel(
     }
 
     fun continueClicked() {
-        deviceVibrator.makeShortVibration()
-        showError(
-            resourceManager.getString(R.string.common_error_general_title),
-            resourceManager.getString(R.string.confirm_mnemonic_not_matching_error_message)
-        )
+        val mnemonicFromDestination = _destinationWords.value.map(MnemonicWord::content)
+
+        if (mnemonicFromDestination == originMnemonic) {
+            proceed()
+        } else {
+            deviceVibrator.makeShortVibration()
+            showError(
+                resourceManager.getString(R.string.common_error_general_title),
+                resourceManager.getString(R.string.confirm_mnemonic_not_matching_error_message)
+            )
+        }
     }
 
     private fun List<MnemonicWord>.fixIndices(): List<MnemonicWord> {
@@ -163,10 +163,6 @@ class ConfirmMnemonicViewModel(
         }
 
         showError(title, message)
-    }
-
-    fun matchingErrorAnimationCompleted() {
-        reset()
     }
 
     private suspend fun continueBasedOnCodeStatus() {

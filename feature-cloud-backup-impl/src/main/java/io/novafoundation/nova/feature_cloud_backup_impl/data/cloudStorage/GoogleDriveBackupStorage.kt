@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.Task
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.google.api.client.http.ByteArrayContent
+import com.google.api.client.http.HttpResponseException
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
@@ -141,9 +142,17 @@ internal class GoogleDriveBackupStorage(
 
         val backupFile = getBackupFileFromCloud() ?: throw FetchBackupError.BackupNotFound
 
-        drive.files()
-            .get(backupFile.id)
-            .executeMediaAndDownloadTo(outputStream)
+        try {
+            drive.files()
+                .get(backupFile.id)
+                .executeMediaAndDownloadTo(outputStream)
+        } catch (e: HttpResponseException) {
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/416
+            // Not handle 416 error, to handle it as corrupted backup
+            if (e.statusCode != 416) {
+                throw e
+            }
+        }
 
         return outputStream.toString()
     }
