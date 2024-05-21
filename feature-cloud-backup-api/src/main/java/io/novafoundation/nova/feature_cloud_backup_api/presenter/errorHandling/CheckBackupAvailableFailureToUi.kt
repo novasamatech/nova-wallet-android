@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.mixin.api.toCustomDialogPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupAuthFailed
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupServiceUnavailable
-import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupUnknownError
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.handleCloudBackupAuthFailed
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.handleCloudBackupServiceUnavailable
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.handleCloudBackupUnknownError
