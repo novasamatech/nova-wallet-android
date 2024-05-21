@@ -111,8 +111,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.RealAddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.language.RealLanguageUseCase
@@ -122,6 +122,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.R
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -396,11 +397,13 @@ class AccountFeatureModule {
         jsonAddAccountRepository: JsonAddAccountRepository,
         seedAddAccountRepository: SeedAddAccountRepository,
         accountRepository: AccountRepository,
+        advancedEncryptionInteractor: AdvancedEncryptionInteractor
     ) = AddAccountInteractor(
         mnemonicAddAccountRepository,
         jsonAddAccountRepository,
         seedAddAccountRepository,
-        accountRepository
+        accountRepository,
+        advancedEncryptionInteractor
     )
 
     @Provides
@@ -416,14 +419,20 @@ class AccountFeatureModule {
     fun provideImportTypeChooserMixin(): ImportTypeChooserMixin.Presentation = ImportTypeChooserProvider()
 
     @Provides
-    fun provideAddAccountLauncherMixin(
+    fun provideAddAccountLauncherPresentationFactory(
+        cloudBackupService: CloudBackupService,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         resourceManager: ResourceManager,
         router: AccountRouter,
-    ): AddAccountLauncherMixin.Presentation = AddAccountLauncherProvider(
+        addAccountInteractor: AddAccountInteractor,
+        cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
+    ): AddAccountLauncherPresentationFactory = RealAddAccountLauncherPresentationFactory(
+        cloudBackupService = cloudBackupService,
         importTypeChooserMixin = importTypeChooserMixin,
         resourceManager = resourceManager,
-        router = router
+        router = router,
+        addAccountInteractor = addAccountInteractor,
+        cloudBackupChangingWarningMixinFactory = cloudBackupChangingWarningMixinFactory
     )
 
     @Provides
@@ -599,8 +608,12 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStartCreateWalletInteractor(cloudBackupService: CloudBackupService): StartCreateWalletInteractor {
-        return RealStartCreateWalletInteractor(cloudBackupService)
+    fun provideStartCreateWalletInteractor(
+        cloudBackupService: CloudBackupService,
+        addAccountInteractor: AddAccountInteractor,
+        accountRepository: AccountRepository
+    ): StartCreateWalletInteractor {
+        return RealStartCreateWalletInteractor(cloudBackupService, addAccountInteractor, accountRepository)
     }
 
     @Provides

@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCheckBackupAvailableFailureToUi
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_onboarding_api.domain.OnboardingInteractor
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.R
@@ -27,8 +28,11 @@ class ImportWalletOptionsViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val onboardingInteractor: OnboardingInteractor,
     val progressDialogMixin: ProgressDialogMixin,
-    customDialogProvider: CustomDialogDisplayer.Presentation
+    customDialogProvider: CustomDialogDisplayer.Presentation,
+    cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
 ) : BaseViewModel(), CustomDialogDisplayer.Presentation by customDialogProvider {
+
+    val cloudBackupChangingWarningMixin = cloudBackupChangingWarningMixinFactory.create(this)
 
     val selectHardwareWallet = actionAwaitableMixinFactory.fixedSelectionOf<HardwareWalletModel>()
 
@@ -59,19 +63,25 @@ class ImportWalletOptionsViewModel(
         }
     }
 
-    fun importHardwareClicked() = launch {
-        when (val selection = selectHardwareWallet.awaitAction()) {
-            HardwareWalletModel.LedgerNanoX -> router.openStartImportLedger()
+    fun importHardwareClicked() {
+        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+            launch {
+                when (val selection = selectHardwareWallet.awaitAction()) {
+                    HardwareWalletModel.LedgerNanoX -> router.openStartImportLedger()
 
-            is HardwareWalletModel.PolkadotVault -> when (selection.variant) {
-                PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()
-                PolkadotVaultVariant.PARITY_SIGNER -> router.openStartImportParitySigner()
+                    is HardwareWalletModel.PolkadotVault -> when (selection.variant) {
+                        PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()
+                        PolkadotVaultVariant.PARITY_SIGNER -> router.openStartImportParitySigner()
+                    }
+                }
             }
         }
     }
 
     fun importWatchOnlyClicked() {
-        router.openCreateWatchWallet()
+        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+            router.openCreateWatchWallet()
+        }
     }
 
     fun importRawSeedClicked() {
@@ -83,7 +93,9 @@ class ImportWalletOptionsViewModel(
     }
 
     private fun openImportType(importType: ImportType) {
-        router.openImportAccountScreen(ImportAccountPayload(importType = importType, addAccountPayload = AddAccountPayload.MetaAccount))
+        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+            router.openImportAccountScreen(ImportAccountPayload(importType = importType, addAccountPayload = AddAccountPayload.MetaAccount))
+        }
     }
 
     private fun initSignIn() {

@@ -6,18 +6,21 @@ import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.finally
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload.FlowType
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.PreCreateValidationStatus
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchExistingCloudBackupAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapPreCreateValidationStatusToUi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -31,6 +34,7 @@ class StartCreateWalletViewModel(
     private val resourceManager: ResourceManager,
     private val startCreateWalletInteractor: StartCreateWalletInteractor,
     private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
+    private val payload: StartCreateWalletPayload,
     customDialogProvider: CustomDialogDisplayer.Presentation
 ) : BaseViewModel(),
     ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create(),
@@ -39,17 +43,33 @@ class StartCreateWalletViewModel(
     // Used to cancel the job when the user navigates back
     private var cloudBackupValidationJob: Job? = null
 
-    val nameInput = MutableStateFlow("")
+    private val _progressFlow = MutableStateFlow(false)
+    val progressFlow: Flow<Boolean> = _progressFlow
 
     private val _createWalletState = MutableStateFlow(CreateWalletState.SETUP_NAME)
     val createWalletState: Flow<CreateWalletState> = _createWalletState
 
-    val confirmNameButtonState: Flow<DescriptiveButtonState> = nameInput.map { name ->
-        if (name.isEmpty()) {
-            DescriptiveButtonState.Disabled(resourceManager.getString(R.string.start_create_wallet_enter_wallet_name))
-        } else {
-            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
+    val nameInput = MutableStateFlow("")
+
+    val isSyncWithCloudEnabled = flowOf { startCreateWalletInteractor.isSyncWithCloudEnabled() }
+
+    val continueButtonState: Flow<DescriptiveButtonState> = combine(progressFlow, nameInput) { progress, name ->
+        when {
+            progress -> DescriptiveButtonState.Loading
+            name.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.start_create_wallet_enter_wallet_name))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
+    }.shareInBackground()
+
+    val showCloudBackupButton: Flow<Boolean> = createWalletState.map { state ->
+        when (state) {
+            CreateWalletState.SETUP_NAME -> false
+            CreateWalletState.CHOOSE_BACKUP_WAY -> payload.flowType == FlowType.FIRST_WALLET
+        }
+    }.shareInBackground()
+
+    val showManualBackupButton: Flow<Boolean> = createWalletState.map { state ->
+        state == CreateWalletState.CHOOSE_BACKUP_WAY
     }.shareInBackground()
 
     val titleText: Flow<String> = createWalletState.map {
@@ -66,9 +86,6 @@ class StartCreateWalletViewModel(
         }
     }.shareInBackground()
 
-    private val _cloudBackupSyncProgressFlow = MutableStateFlow(false)
-    val cloudBackupSyncProgressFlow: Flow<Boolean> = _cloudBackupSyncProgressFlow
-
     fun backClicked() {
         if (_createWalletState.value == CreateWalletState.SETUP_NAME) {
             router.back()
@@ -79,14 +96,24 @@ class StartCreateWalletViewModel(
     }
 
     fun confirmNameClicked() {
-        _createWalletState.value = CreateWalletState.CHOOSE_BACKUP_WAY
+        launch {
+            if (startCreateWalletInteractor.isSyncWithCloudEnabled()) {
+                _progressFlow.value = true
+                startCreateWalletInteractor.createWalletAndSelect(nameInput.value)
+                    .onSuccess { router.openMain() }
+                    .onFailure { error -> showError(error) }
+                _progressFlow.value = false
+            } else {
+                _createWalletState.value = CreateWalletState.CHOOSE_BACKUP_WAY
+            }
+        }
     }
 
     fun cloudBackupClicked() {
         cloudBackupValidationJob = launch {
             val walletName = nameInput.value
             runCatching {
-                _cloudBackupSyncProgressFlow.value = true
+                _progressFlow.value = true
                 val validationResult = startCreateWalletInteractor.validateCanCreateBackup()
                 if (validationResult is PreCreateValidationStatus.Ok) {
                     router.openCreateCloudBackupPassword(walletName)
@@ -95,7 +122,7 @@ class StartCreateWalletViewModel(
                     displayDialogOrNothing(payload)
                 }
             }.finally {
-                _cloudBackupSyncProgressFlow.value = false
+                _progressFlow.value = false
             }
         }
     }

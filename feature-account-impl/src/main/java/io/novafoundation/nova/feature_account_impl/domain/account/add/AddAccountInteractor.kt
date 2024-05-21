@@ -8,13 +8,21 @@ import io.novafoundation.nova.feature_account_api.domain.account.advancedEncrypt
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 
 class AddAccountInteractor(
     private val mnemonicAddAccountRepository: MnemonicAddAccountRepository,
     private val jsonAddAccountRepository: JsonAddAccountRepository,
     private val seedAddAccountRepository: SeedAddAccountRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val advancedEncryptionInteractor: AdvancedEncryptionInteractor
 ) {
+
+    suspend fun createMetaAccountWithRecommendedSettings(addAccountType: AddAccountType): Result<Unit> {
+        val mnemonic = accountRepository.generateMnemonic()
+        val advancedEncryption = advancedEncryptionInteractor.getRecommendedAdvancedEncryption()
+        return createAccount(mnemonic.words, advancedEncryption, addAccountType)
+    }
 
     suspend fun createAccount(
         mnemonic: String,

@@ -70,6 +70,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_create_new_wallet"
+        app:destination="@+id/create_wallet_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_return_to_wallet"
         app:destination="@id/mainFragment"
         app:enterAnim="@anim/fragment_close_enter"
@@ -250,6 +258,14 @@
     <action
         android:id="@+id/action_open_select_governance_tracks"
         app:destination="@id/selectGovernanceTracks"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_importWalletOptionsFragment"
+        app:destination="@id/import_wallet_options_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -963,5 +979,9 @@
     <include app:graph="@navigation/cloud_backup_settings_graph" />
 
     <include app:graph="@navigation/manual_backup_graph" />
+
+    <include app:graph="@navigation/import_wallet_options_nav_graph" />
+
+    <include app:graph="@navigation/create_wallet_nav_graph" />
 
 </navigation>

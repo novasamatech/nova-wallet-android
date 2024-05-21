@@ -19,7 +19,8 @@ interface ActionBottomSheetLauncher {
         title: CharSequence,
         subtitle: CharSequence,
         actionButtonPreferences: ActionBottomSheet.ButtonPreferences,
-        neutralButtonPreferences: ActionBottomSheet.ButtonPreferences? = null
+        neutralButtonPreferences: ActionBottomSheet.ButtonPreferences? = null,
+        checkBoxPreferences: ActionBottomSheet.CheckBoxPreferences? = null
     )
 }
 

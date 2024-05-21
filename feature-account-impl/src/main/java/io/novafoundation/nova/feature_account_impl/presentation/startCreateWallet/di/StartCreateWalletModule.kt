@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -26,13 +27,15 @@ class StartCreateWalletModule {
         resourceManager: ResourceManager,
         startCreateWalletInteractor: StartCreateWalletInteractor,
         actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
-        customDialogProvider: CustomDialogDisplayer.Presentation
+        customDialogProvider: CustomDialogDisplayer.Presentation,
+        payload: StartCreateWalletPayload
     ): ViewModel {
         return StartCreateWalletViewModel(
             accountRouter,
             resourceManager,
             startCreateWalletInteractor,
             actionBottomSheetLauncherFactory,
+            payload,
             customDialogProvider
         )
     }

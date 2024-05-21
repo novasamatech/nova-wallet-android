@@ -4,7 +4,9 @@ import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 
 interface CloudBackupFeatureDependencies {
 
@@ -17,4 +19,8 @@ interface CloudBackupFeatureDependencies {
     val preferences: Preferences
 
     val encryptedPreferences: EncryptedPreferences
+
+    val resourceManager: ResourceManager
+
+    val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
 }

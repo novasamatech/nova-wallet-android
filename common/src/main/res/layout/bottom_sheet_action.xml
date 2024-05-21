@@ -41,6 +41,18 @@
         android:textColor="@color/text_secondary"
         tools:text="Please be sure to remember this password. Store it in a secure location. You will need it to restore your wallets from the backup." />
 
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/actionBottomSheetCheckBox"
+        style="@style/Widget.Nova.Checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:minHeight="40dp"
+        android:paddingStart="8dp"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:textColor="@color/text_secondary"
+        tools:text="@string/common_check_box_auto_continue" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

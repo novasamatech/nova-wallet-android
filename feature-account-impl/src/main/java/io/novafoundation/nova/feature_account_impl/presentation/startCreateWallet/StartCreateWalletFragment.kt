@@ -22,10 +22,21 @@ import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWa
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletManualBackupButton
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInput
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInputLayout
+import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletSyncWithCloudEnabled
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletTitle
 import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletToolbar
 
 class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
+
+    companion object {
+        private const val KEY_PAYLOAD = "display_back"
+
+        fun bundle(payload: StartCreateWalletPayload): Bundle {
+            return Bundle().apply {
+                putParcelable(KEY_PAYLOAD, payload)
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_start_create_wallet, container, false)
@@ -43,12 +54,13 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
         startCreateWalletManualBackupButton.setOnClickListener { viewModel.manualBackupClicked() }
 
         startCreateWalletCloudBackupButton.prepareForProgress(viewLifecycleOwner)
+        startCreateWalletConfirmName.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
         FeatureUtils.getFeature<AccountFeatureComponent>(context!!, AccountFeatureApi::class.java)
             .startCreateWallet()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
@@ -57,8 +69,12 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
         observeActionBottomSheet(viewModel)
         startCreateWalletNameInput.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
 
-        viewModel.confirmNameButtonState.observe { state ->
+        viewModel.continueButtonState.observe { state ->
             startCreateWalletConfirmName.setState(state)
+        }
+
+        viewModel.isSyncWithCloudEnabled.observe {
+            startCreateWalletSyncWithCloudEnabled.isVisible = it
         }
 
         viewModel.createWalletState.observe {
@@ -67,8 +83,6 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
             startCreateWalletNameInput.isFocusableInTouchMode = it == CreateWalletState.SETUP_NAME
 
             startCreateWalletConfirmName.isVisible = it == CreateWalletState.SETUP_NAME
-            startCreateWalletCloudBackupButton.isVisible = it == CreateWalletState.CHOOSE_BACKUP_WAY
-            startCreateWalletManualBackupButton.isVisible = it == CreateWalletState.CHOOSE_BACKUP_WAY
         }
 
         viewModel.titleText.observe {
@@ -79,9 +93,17 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
             startCreateWalletExplanation.text = it
         }
 
-        viewModel.cloudBackupSyncProgressFlow.observe {
+        viewModel.progressFlow.observe {
             startCreateWalletCloudBackupButton.showProgress(it)
             startCreateWalletManualBackupButton.isEnabled = !it
+        }
+
+        viewModel.showCloudBackupButton.observe {
+            startCreateWalletCloudBackupButton.isVisible = it
+        }
+
+        viewModel.showManualBackupButton.observe {
+            startCreateWalletManualBackupButton.isVisible = it
         }
     }
 }

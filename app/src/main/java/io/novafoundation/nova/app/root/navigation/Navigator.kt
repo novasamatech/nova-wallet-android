@@ -46,6 +46,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletFragment
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload.FlowType
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
@@ -117,8 +120,11 @@ class Navigator(
         navController?.navigate(R.id.action_splash_to_pin, bundle)
     }
 
-    override fun openCreateAccount() {
-        navController?.navigate(R.id.action_welcomeFragment_to_startCreateWallet)
+    override fun openCreateFirstWallet() {
+        navController?.navigate(
+            R.id.action_welcomeFragment_to_startCreateWallet,
+            StartCreateWalletFragment.bundle(StartCreateWalletPayload(FlowType.FIRST_WALLET))
+        )
     }
 
     override fun openMain() {
@@ -235,6 +241,10 @@ class Navigator(
 
     override fun openMoonbeamFlow(payload: ContributePayload) {
         navController?.navigate(R.id.action_mainFragment_to_moonbeamCrowdloanTermsFragment, MoonbeamCrowdloanTermsFragment.getBundle(payload))
+    }
+
+    override fun openAddAccount(payload: AddAccountPayload) {
+        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
     }
 
     override fun openFilter(payload: TransactionHistoryFilterPayload) = performNavigation(
@@ -462,8 +472,8 @@ class Navigator(
         navController?.navigate(R.id.action_accountDetailsFragment_to_changeWatchAccountFragment, bundle)
     }
 
-    override fun openAddAccount(payload: AddAccountPayload) {
-        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
+    override fun openCreateWallet(payload: StartCreateWalletPayload) {
+        navController?.navigate(R.id.action_open_create_new_wallet, StartCreateWalletFragment.bundle(payload))
     }
 
     override fun openUserContributions() {
@@ -611,7 +621,10 @@ class Navigator(
     }
 
     override fun openImportOptionsScreen() {
-        navController?.navigate(R.id.action_welcomeFragment_to_importWalletOptionsFragment)
+        when (navController?.currentDestination?.id) {
+            R.id.welcomeFragment -> navController?.navigate(R.id.action_welcomeFragment_to_importWalletOptionsFragment)
+            else -> navController?.navigate(R.id.action_importWalletOptionsFragment)
+        }
     }
 
     override fun openStartImportLedger() {

@@ -31,10 +31,12 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
@@ -159,4 +161,8 @@ interface AccountFeatureDependencies {
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val rootScope: RootScope
+
+    val cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
+
+    val listSelectorMixinFactory: ListSelectorMixin.Factory
 }

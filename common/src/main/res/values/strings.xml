@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="account_export_existing">Import existing</string>
+    <string name="cloud_backup_will_be_changed_title">Wallet changes will be updated in the Cloud Backup</string>
+    <string name="cloud_backup_will_be_changed_subtitle">New wallets are automatically added to the Cloud Backup. You can disable Cloud Backup in Settings.</string>
+    <string name="common_check_box_auto_continue">Automatically continue in the future</string>
+
+    <string name="wallet_management_add_account_title">How to add wallet?</string>
+    <string name="wallet_management_create_account_btn">How to add wallet?</string>
+    <string name="wallet_management_import_account_btn">How to add wallet?</string>
 
     <!--<string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>-->
     <string name="account_export_json_password_subtitle">This password is required to encrypt your account and is used alongside this JSON file to restore your wallet.</string>

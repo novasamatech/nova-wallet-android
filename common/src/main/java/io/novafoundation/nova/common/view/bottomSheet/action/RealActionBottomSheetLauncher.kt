@@ -21,14 +21,16 @@ class RealActionBottomSheetLauncher : ActionBottomSheetLauncher {
         title: CharSequence,
         subtitle: CharSequence,
         actionButtonPreferences: ActionBottomSheet.ButtonPreferences,
-        neutralButtonPreferences: ActionBottomSheet.ButtonPreferences?
+        neutralButtonPreferences: ActionBottomSheet.ButtonPreferences?,
+        checkBoxPreferences: ActionBottomSheet.CheckBoxPreferences?
     ) {
         showActionEvent.value = ActionBottomSheet.Payload(
             imageRes = imageRes,
             title = title,
             subtitle = subtitle,
             actionButtonPreferences = actionButtonPreferences,
-            neutralButtonPreferences = neutralButtonPreferences
+            neutralButtonPreferences = neutralButtonPreferences,
+            checkBoxPreferences = checkBoxPreferences
         ).event()
     }
 }

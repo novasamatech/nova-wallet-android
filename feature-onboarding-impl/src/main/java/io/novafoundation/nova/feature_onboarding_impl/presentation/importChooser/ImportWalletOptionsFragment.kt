@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
@@ -52,6 +53,7 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel>()
     override fun subscribe(viewModel: ImportWalletOptionsViewModel) {
         setupCustomDialogDisplayer(viewModel)
         observeProgressDialog(viewModel.progressDialogMixin)
+        observeConfirmationAction(viewModel.cloudBackupChangingWarningMixin)
 
         viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {
             SelectHardwareWalletBottomSheet(requireContext(), it.onSuccess)

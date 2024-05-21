@@ -2,38 +2,47 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/onboarding_nav_graph"
-    app:startDestination="@id/welcomeFragment">
+    android:id="@+id/import_wallet_options_nav_graph"
+    app:startDestination="@id/importWalletOptionsFragment">
 
     <fragment
-        android:id="@+id/welcomeFragment"
-        android:name="io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment"
-        android:label="fragment_users"
-        tools:layout="@layout/fragment_welcome">
+        android:id="@+id/importWalletOptionsFragment"
+        android:name="io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser.ImportWalletOptionsFragment"
+        android:label="ImportWalletOptionsFragment"
+        tools:layout="@layout/fragment_import_wallet_options">
 
         <action
-            android:id="@+id/action_welcomeFragment_to_startCreateWallet"
-            app:destination="@id/create_wallet_nav_graph"
+            android:id="@+id/action_importWalletOptionsFragment_to_createWatchWalletFragment"
+            app:destination="@id/createWatchWalletFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_welcomeFragment_to_mnemonic_nav_graph"
-            app:destination="@id/mnemonic_nav_graph"
+            android:id="@+id/action_importWalletOptionsFragment_to_import_parity_signer_graph"
+            app:destination="@id/import_parity_signer_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_welcomeFragment_to_importWalletOptionsFragment"
-            app:destination="@id/import_wallet_options_nav_graph"
+            android:id="@+id/action_importWalletOptionsFragment_to_import_ledger_graph"
+            app:destination="@id/import_ledger_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_importWalletOptionsFragment_to_restoreCloudBackup"
+            app:destination="@id/restore_cloud_backup_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
     <fragment
@@ -58,6 +67,5 @@
     <include app:graph="@navigation/import_ledger_graph" />
     <include app:graph="@navigation/create_wallet_nav_graph" />
     <include app:graph="@navigation/restore_cloud_backup_nav_graph" />
-    <include app:graph="@navigation/import_wallet_options_nav_graph" />
 
 </navigation>
