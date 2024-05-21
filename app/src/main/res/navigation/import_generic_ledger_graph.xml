@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/import_generic_ledger_graph"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/startImportGenericLedgerFragment">
+
+    <fragment
+        tools:layout="@layout/fragment_generic_import_ledger_start"
+        android:id="@+id/startImportGenericLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.start.StartImportGenericLedgerFragment"
+        android:label="StartImportGenericLedgerFragment" />
+</navigation>

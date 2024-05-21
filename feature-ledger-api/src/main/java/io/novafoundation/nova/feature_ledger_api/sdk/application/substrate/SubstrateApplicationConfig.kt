@@ -35,7 +35,7 @@ class SubstrateApplicationConfig(
         fun all() = ALL
 
         private fun novasamaLedgerTestnetFakeApp(): SubstrateApplicationConfig? {
-            return SubstrateApplicationConfig(chainId = "d67c91ca75c199ff1ee9555567dfad21b9033165c39977170ec8d3f6c1fa433c", coin = 354, cla = 0x90u)
+            return SubstrateApplicationConfig(chainId = "76a8acb4955b08219ac23524f00f23eea13048148a851f3b4e8881b9bcc95429", coin = 354, cla = 0x90u)
                 .takeIf { BuildConfig.DEBUG }
         }
     }
