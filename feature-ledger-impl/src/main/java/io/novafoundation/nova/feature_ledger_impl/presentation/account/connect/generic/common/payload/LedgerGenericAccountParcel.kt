@@ -16,3 +16,7 @@ class LedgerGenericAccountParcel(
 fun LedgerSubstrateAccount.toGenericParcel(): LedgerGenericAccountParcel {
     return LedgerGenericAccountParcel(address, publicKey, encryptionType, derivationPath)
 }
+
+fun LedgerGenericAccountParcel.toDomain(): LedgerSubstrateAccount {
+    return LedgerSubstrateAccount(address, publicKey, encryptionType, derivationPath)
+}

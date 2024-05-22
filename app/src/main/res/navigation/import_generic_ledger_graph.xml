@@ -39,6 +39,19 @@
         android:id="@+id/previewImportGenericLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerFragment"
         android:label="PreviewImportGenericLedgerFragment"
-        tools:layout="@layout/fragment_chain_account_preview" />
+        tools:layout="@layout/fragment_chain_account_preview">
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_previewImportGenericLedgerFragment_to_finishImportGenericLedgerFragment"
+            app:destination="@id/finishImportGenericLedgerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/finishImportGenericLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerFragment"
+        android:label="FinishImportGenericLedgerFragment"
+        tools:layout="@layout/fragment_create_wallet_name" />
 
 </navigation>

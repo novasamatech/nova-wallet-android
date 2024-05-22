@@ -12,7 +12,8 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -66,7 +67,9 @@ interface LedgerFeatureDependencies {
 
     val selectedAccountUseCase: SelectedAccountUseCase
 
-    val ledgerAddAccountRepository: LedgerAddAccountRepository
+    val legacyLedgerAddAccountRepository: LegacyLedgerAddAccountRepository
+
+    val genericLegacyLedgerAddAccountRepository: GenericLedgerAddAccountRepository
 
     val apiCreator: NetworkApiCreator
 

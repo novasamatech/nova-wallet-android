@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.reviewAddress
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -92,7 +93,8 @@ class PreviewImportGenericLedgerViewModel(
     }
 
     private fun onAccountVerified() {
-        showMessage("Open finish connect")
+        val nextPayload = FinishImportGenericLedgerPayload(payload.account)
+        router.openFinishImportLedgerGeneric(nextPayload)
     }
 
     private fun verifyAddressCancelled() {

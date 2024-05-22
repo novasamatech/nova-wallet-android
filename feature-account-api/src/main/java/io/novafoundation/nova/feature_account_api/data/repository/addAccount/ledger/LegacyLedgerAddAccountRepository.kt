@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.repository.addAccount.Add
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-interface LedgerAddAccountRepository : AddAccountRepository<LedgerAddAccountRepository.Payload> {
+interface LegacyLedgerAddAccountRepository : AddAccountRepository<LegacyLedgerAddAccountRepository.Payload> {
 
     sealed interface Payload {
         class MetaAccount(
