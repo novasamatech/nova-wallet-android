@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_network_list.networkList
 
-
 abstract class NetworkListFragment<T : NetworkListViewModel> : BaseFragment<T>() {
 
     @Inject

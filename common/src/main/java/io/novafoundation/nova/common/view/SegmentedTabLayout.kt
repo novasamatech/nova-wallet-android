@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
-import androidx.core.content.ContextCompat
 import com.google.android.material.tabs.TabLayout
 import io.novafoundation.nova.common.R
 import kotlin.math.roundToInt
@@ -29,7 +28,6 @@ class SegmentedTabLayout @JvmOverloads constructor(
 
         applyAttrs(attrs)
     }
-
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)

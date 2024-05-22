@@ -11,9 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementViewModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListViewModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.list.ExistingNetworkListViewModel
 
 @Module(includes = [ViewModelModule::class])

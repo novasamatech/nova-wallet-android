@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.fragment_network_management.networkManagem
 import kotlinx.android.synthetic.main.fragment_network_management.networkManagementToolbar
 import kotlinx.android.synthetic.main.fragment_network_management.networkManagementViewPager
 
-
 class NetworkManagementFragment : BaseFragment<NetworkManagementViewModel>() {
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { NetworkManagementPagerAdapter(this) }
@@ -46,6 +45,5 @@ class NetworkManagementFragment : BaseFragment<NetworkManagementViewModel>() {
     }
 
     override fun subscribe(viewModel: NetworkManagementViewModel) {
-
     }
 }

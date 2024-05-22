@@ -9,9 +9,7 @@ class NetworkManagementViewModel(
     private val resourceManager: ResourceManager,
 ) : BaseViewModel() {
 
-
     fun backClicked() {
         router.back()
     }
-
 }

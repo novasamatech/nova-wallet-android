@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.list.ExistingNetworkListFragment
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.list.ExistingNetworkListViewModel
 
 class NetworkManagementPagerAdapter(private val fragment: Fragment) : FragmentStateAdapter(fragment) {
 

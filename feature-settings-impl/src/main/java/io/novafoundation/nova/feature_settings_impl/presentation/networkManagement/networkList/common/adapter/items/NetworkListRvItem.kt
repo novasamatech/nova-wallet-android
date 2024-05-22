@@ -7,7 +7,6 @@ interface NetworkListRvItem {
     val id: String
 }
 
-
 abstract class NetworkListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     abstract fun bind(item: NetworkListRvItem)
