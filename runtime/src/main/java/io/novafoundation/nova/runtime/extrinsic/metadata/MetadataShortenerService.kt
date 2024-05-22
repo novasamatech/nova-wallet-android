@@ -25,6 +25,8 @@ import kotlinx.coroutines.sync.withLock
 
 interface MetadataShortenerService {
 
+    suspend fun isCheckMetadataHashAvailable(chainId: ChainId): Boolean
+
     suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ByteArray
 
     suspend fun generateMetadataProof(chainId: ChainId): MetadataProof
@@ -38,6 +40,11 @@ internal class RealMetadataShortenerService(
 ) : MetadataShortenerService {
 
     private val cache = MetadataProofCache()
+    override suspend fun isCheckMetadataHashAvailable(chainId: ChainId): Boolean {
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        return runtime.metadata.shouldCalculateMetadataHash()
+    }
 
     override suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ByteArray {
         val chainId = payloadExtrinsic.genesisHash.toHexString(withPrefix = false)

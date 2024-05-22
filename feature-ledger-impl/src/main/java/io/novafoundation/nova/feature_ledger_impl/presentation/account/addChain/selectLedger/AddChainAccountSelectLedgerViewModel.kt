@@ -12,9 +12,8 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class AddChainAccountSelectLedgerViewModel(
     private val substrateApplication: SubstrateLedgerApplication,
@@ -25,8 +24,7 @@ class AddChainAccountSelectLedgerViewModel(
     bluetoothManager: BluetoothManager,
     locationManager: LocationManager,
     resourceManager: ResourceManager,
-    chainRegistry: ChainRegistry,
-    selectLedgerPayload: SelectLedgerPayload,
+    messageFormatter: LedgerMessageFormatter
 ) : SelectLedgerViewModel(
     discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
@@ -34,8 +32,7 @@ class AddChainAccountSelectLedgerViewModel(
     locationManager = locationManager,
     router = router,
     resourceManager = resourceManager,
-    chainRegistry = chainRegistry,
-    payload = selectLedgerPayload
+    messageFormatter = messageFormatter,
 ) {
 
     override suspend fun verifyConnection(device: LedgerDevice) {

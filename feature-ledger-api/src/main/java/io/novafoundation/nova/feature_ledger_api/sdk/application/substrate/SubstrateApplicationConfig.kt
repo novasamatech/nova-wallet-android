@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_ledger_api.sdk.application.substrate
 
+import io.novafoundation.nova.feature_ledger_api.BuildConfig
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.BuildConfig
 
 class SubstrateApplicationConfig(
     val chainId: String,

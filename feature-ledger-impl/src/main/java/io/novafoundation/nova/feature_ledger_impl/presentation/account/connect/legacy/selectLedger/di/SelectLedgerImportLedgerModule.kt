@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -14,11 +15,12 @@ import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerImportViewModel
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class SelectLedgerImportLedgerModule {
@@ -31,10 +33,17 @@ class SelectLedgerImportLedgerModule {
     ) = permissionsAskerFactory.create(fragment, router)
 
     @Provides
+    @ScreenScope
+    fun provideMessageFormatter(
+        selectLedgerPayload: SelectLedgerPayload,
+        factory: LedgerMessageFormatterFactory,
+    ): LedgerMessageFormatter = factory.createLegacy(selectLedgerPayload.chainId)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SelectLedgerImportViewModel::class)
     fun provideViewModel(
-        substrateApplication: MigrationSubstrateLedgerApplication,
+        migrationUseCase: LedgerMigrationUseCase,
         selectLedgerPayload: SelectLedgerPayload,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
@@ -42,10 +51,10 @@ class SelectLedgerImportLedgerModule {
         locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
-        chainRegistry: ChainRegistry,
+        messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return SelectLedgerImportViewModel(
-            substrateApplication = substrateApplication,
+            migrationUseCase = migrationUseCase,
             selectLedgerPayload = selectLedgerPayload,
             discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
@@ -53,7 +62,7 @@ class SelectLedgerImportLedgerModule {
             locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
-            chainRegistry = chainRegistry
+            messageFormatter = messageFormatter
         )
     }
 

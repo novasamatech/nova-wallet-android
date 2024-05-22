@@ -8,9 +8,11 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
+import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.di.AddLedgerChainAccountSelectAddressComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.di.AddChainAccountSelectLedgerComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.di.SelectLedgerGenericImportComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.start.di.StartImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.di.FillWalletImportLedgerComponent
@@ -58,6 +60,7 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
     // New generic app flow
 
     fun startImportGenericLedgerComponentFactory(): StartImportGenericLedgerComponent.Factory
+    fun selectLedgerGenericImportComponentFactory(): SelectLedgerGenericImportComponent.Factory
 
     @Component(
         dependencies = [
@@ -65,6 +68,7 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
             RuntimeApi::class,
             WalletFeatureApi::class,
             AccountFeatureApi::class,
+            LedgerCoreApi::class,
             DbApi::class,
         ]
     )

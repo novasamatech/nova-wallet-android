@@ -9,5 +9,21 @@
         tools:layout="@layout/fragment_generic_import_ledger_start"
         android:id="@+id/startImportGenericLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.start.StartImportGenericLedgerFragment"
-        android:label="StartImportGenericLedgerFragment" />
+        android:label="StartImportGenericLedgerFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment"
+            app:destination="@id/selectLedgerGenericImportFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectLedgerGenericImportFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportFragment"
+        android:label="SelectLedgerGenericImportFragment" />
+
+
 </navigation>

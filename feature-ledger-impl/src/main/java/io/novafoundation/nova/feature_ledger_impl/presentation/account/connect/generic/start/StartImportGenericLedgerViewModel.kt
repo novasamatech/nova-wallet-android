@@ -20,7 +20,7 @@ class StartImportGenericLedgerViewModel(
     }
 
     fun continueClicked() {
-        showMessage("TODO")
+        router.openSelectLedgerGeneric()
     }
 
     fun guideClicked() {

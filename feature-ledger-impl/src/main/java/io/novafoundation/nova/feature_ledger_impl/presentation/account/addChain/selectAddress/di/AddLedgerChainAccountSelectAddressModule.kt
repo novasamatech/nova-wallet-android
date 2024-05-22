@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -40,6 +42,13 @@ class AddLedgerChainAccountSelectAddressModule {
     )
 
     @Provides
+    @ScreenScope
+    fun provideMessageFormatter(
+        screenPayload: AddLedgerChainAccountSelectAddressPayload,
+        factory: LedgerMessageFormatterFactory,
+    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId)
+
+    @Provides
     @IntoMap
     @ViewModelKey(AddLedgerChainAccountSelectAddressViewModel::class)
     fun provideViewModel(
@@ -51,6 +60,7 @@ class AddLedgerChainAccountSelectAddressModule {
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
         selectLedgerAddressPayload: SelectLedgerAddressPayload,
+        messageFormatter: LedgerMessageFormatter,
     ): ViewModel {
         return AddLedgerChainAccountSelectAddressViewModel(
             router = router,
@@ -60,7 +70,8 @@ class AddLedgerChainAccountSelectAddressModule {
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
-            selectLedgerAddressPayload = selectLedgerAddressPayload
+            selectLedgerAddressPayload = selectLedgerAddressPayload,
+            messageFormatter = messageFormatter
         )
     }
 

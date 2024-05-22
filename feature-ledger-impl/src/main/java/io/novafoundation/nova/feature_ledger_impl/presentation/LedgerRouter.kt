@@ -22,4 +22,8 @@ interface LedgerRouter : ReturnableRouter {
     fun finishSignFlow()
 
     fun openAddChainAccountSelectAddress(payload: AddLedgerChainAccountSelectAddressPayload)
+
+    // Generic app flows
+
+    fun openSelectLedgerGeneric()
 }

@@ -47,4 +47,6 @@ class LedgerNavigator(
         actionId = R.id.action_addChainAccountSelectLedgerFragment_to_addChainAccountSelectAddressLedgerFragment,
         args = AddLedgerChainAccountSelectAddressFragment.getBundle(payload)
     )
+
+    override fun openSelectLedgerGeneric() = performNavigation(R.id.action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment)
 }
