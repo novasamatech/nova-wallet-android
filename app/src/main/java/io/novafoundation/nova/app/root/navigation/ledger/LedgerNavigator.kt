@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.finish.FinishImportLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.finish.FinishImportLedgerPayload
 
@@ -49,4 +51,9 @@ class LedgerNavigator(
     )
 
     override fun openSelectLedgerGeneric() = performNavigation(R.id.action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment)
+
+    override fun openPreviewLedgerAccountsGeneric(payload: PreviewImportGenericLedgerPayload) = performNavigation(
+        actionId = R.id.action_selectLedgerGenericImportFragment_to_previewImportGenericLedgerFragment,
+        args = PreviewImportGenericLedgerFragment.getBundle(payload)
+    )
 }

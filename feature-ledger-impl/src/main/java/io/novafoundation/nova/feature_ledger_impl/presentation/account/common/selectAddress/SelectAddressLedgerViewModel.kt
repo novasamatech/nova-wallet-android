@@ -22,8 +22,8 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.reviewAddress
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -98,13 +98,11 @@ abstract class SelectAddressLedgerViewModel(
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id.toInt() }
 
-            ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
-                title = resourceManager.getString(R.string.ledger_review_approve_title),
-                subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle, device.first().name),
+            ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
+                resourceManager = resourceManager,
+                address = account.account.address,
+                deviceName = device.first().name,
                 onCancel = ::verifyAddressCancelled,
-                footer = Footer.Value(
-                    value = account.account.address,
-                )
             ).event()
 
             val result = withContext(Dispatchers.Default) {

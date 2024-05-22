@@ -5,6 +5,7 @@ import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
@@ -22,6 +23,8 @@ import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageSubti
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageTitle
 
 sealed class LedgerMessageCommand {
+
+    companion object
 
     object Hide : LedgerMessageCommand()
 
@@ -173,4 +176,20 @@ class LedgerMessageBottomSheet(
 
         setOnCancelListener { command.onCancel() }
     }
+}
+
+fun LedgerMessageCommand.Companion.reviewAddress(
+    resourceManager: ResourceManager,
+    deviceName: String,
+    address: String,
+    onCancel: () -> Unit
+): LedgerMessageCommand {
+    return LedgerMessageCommand.Show.Info(
+        title = resourceManager.getString(R.string.ledger_review_approve_title),
+        subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle, deviceName),
+        onCancel = onCancel,
+        footer = LedgerMessageCommand.Footer.Value(
+            value = address,
+        )
+    )
 }

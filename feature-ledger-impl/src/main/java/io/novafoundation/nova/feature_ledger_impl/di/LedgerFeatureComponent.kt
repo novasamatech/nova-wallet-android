@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.di.AddLedgerChainAccountSelectAddressComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.di.AddChainAccountSelectLedgerComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.di.PreviewImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.di.SelectLedgerGenericImportComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.start.di.StartImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.SelectLedgerAddressInterScreenCommunicator
@@ -61,6 +62,8 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
 
     fun startImportGenericLedgerComponentFactory(): StartImportGenericLedgerComponent.Factory
     fun selectLedgerGenericImportComponentFactory(): SelectLedgerGenericImportComponent.Factory
+
+    fun previewImportGenericLedgerComponentFactory(): PreviewImportGenericLedgerComponent.Factory
 
     @Component(
         dependencies = [

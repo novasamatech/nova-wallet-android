@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/previewImportParitySignerFragment"
-        tools:layout="@layout/fragment_import_parity_signer_preview"
+        tools:layout="@layout/fragment_chain_account_preview"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerFragment"
         android:label="PreviewImportParitySignerFragment" >
 

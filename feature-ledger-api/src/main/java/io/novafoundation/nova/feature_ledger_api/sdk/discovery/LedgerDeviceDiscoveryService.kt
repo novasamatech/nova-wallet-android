@@ -30,3 +30,7 @@ suspend fun LedgerDeviceDiscoveryService.findDevice(id: String): LedgerDevice? {
 
     return devices.find { it.id == id }
 }
+
+suspend fun LedgerDeviceDiscoveryService.findDeviceOrThrow(id: String): LedgerDevice {
+   return findDevice(id) ?: throw IllegalArgumentException("Device not found")
+}

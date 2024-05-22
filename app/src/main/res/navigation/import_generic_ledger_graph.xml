@@ -1,29 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/import_generic_ledger_graph"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/import_generic_ledger_graph"
     app:startDestination="@id/startImportGenericLedgerFragment">
 
     <fragment
-        tools:layout="@layout/fragment_generic_import_ledger_start"
         android:id="@+id/startImportGenericLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.start.StartImportGenericLedgerFragment"
-        android:label="StartImportGenericLedgerFragment" >
+        android:label="StartImportGenericLedgerFragment"
+        tools:layout="@layout/fragment_generic_import_ledger_start">
 
         <action
+            android:id="@+id/action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment"
+            app:destination="@id/selectLedgerGenericImportFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment"
-            app:destination="@id/selectLedgerGenericImportFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/selectLedgerGenericImportFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportFragment"
-        android:label="SelectLedgerGenericImportFragment" />
+        android:label="SelectLedgerGenericImportFragment"
+        tools:layout="@layout/fragment_select_ledger">
 
+        <action
+            android:id="@+id/action_selectLedgerGenericImportFragment_to_previewImportGenericLedgerFragment"
+            app:destination="@id/previewImportGenericLedgerFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/previewImportGenericLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerFragment"
+        android:label="PreviewImportGenericLedgerFragment"
+        tools:layout="@layout/fragment_chain_account_preview" />
 
 </navigation>

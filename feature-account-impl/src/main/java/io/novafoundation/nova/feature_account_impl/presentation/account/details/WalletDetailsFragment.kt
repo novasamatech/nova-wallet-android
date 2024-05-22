@@ -12,14 +12,14 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.ChainAccountsAdapter
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.ui.setupAddAccountLauncher
 import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsChainAccounts
 import kotlinx.android.synthetic.main.fragment_wallet_details.accountDetailsNameField
