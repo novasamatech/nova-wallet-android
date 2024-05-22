@@ -21,7 +21,7 @@ internal class RealSelectedAccountUseCase(
     private val addressIconGenerator: AddressIconGenerator,
     private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper
-): SelectedAccountUseCase {
+) : SelectedAccountUseCase {
 
     override fun selectedMetaAccountFlow(): Flow<MetaAccount> = accountRepository.selectedMetaAccountFlow()
 

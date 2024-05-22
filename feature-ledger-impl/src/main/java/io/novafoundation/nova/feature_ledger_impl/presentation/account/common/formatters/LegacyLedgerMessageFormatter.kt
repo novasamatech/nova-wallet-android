@@ -13,7 +13,7 @@ class LegacyLedgerMessageFormatter(
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
     private val chainId: ChainId
-): LedgerMessageFormatter {
+) : LedgerMessageFormatter {
 
     private var cache: String? = null
     private val cacheMutex = Mutex()

@@ -11,12 +11,12 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 @Module
 class LedgerFeatureModule {
 
-   @Provides
-   @FeatureScope
-   fun provideLedgerMigrationTracker(
-       metadataShortenerService: MetadataShortenerService,
-       chainRegistry: ChainRegistry
-   ): LedgerMigrationTracker {
-       return RealLedgerMigrationTracker(metadataShortenerService, chainRegistry)
-   }
+    @Provides
+    @FeatureScope
+    fun provideLedgerMigrationTracker(
+        metadataShortenerService: MetadataShortenerService,
+        chainRegistry: ChainRegistry
+    ): LedgerMigrationTracker {
+        return RealLedgerMigrationTracker(metadataShortenerService, chainRegistry)
+    }
 }

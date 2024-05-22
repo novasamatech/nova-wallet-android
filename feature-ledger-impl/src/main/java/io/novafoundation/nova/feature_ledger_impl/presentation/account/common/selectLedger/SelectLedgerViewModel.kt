@@ -56,7 +56,7 @@ abstract class SelectLedgerViewModel(
         .shareInBackground()
 
     val hints = flowOf {
-        resourceManager.getString(R.string.account_ledger_select_device_description,  messageFormatter.appName())
+        resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
     }.shareInBackground()
 
     override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()

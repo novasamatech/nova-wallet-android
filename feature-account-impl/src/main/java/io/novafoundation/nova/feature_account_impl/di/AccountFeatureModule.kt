@@ -282,7 +282,7 @@ class AccountFeatureModule {
         walletUiUseCase: WalletUiUseCase,
         metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
         presentationMapper: MetaAccountTypePresentationMapper
-    ) : SelectedAccountUseCase = RealSelectedAccountUseCase(
+    ): SelectedAccountUseCase = RealSelectedAccountUseCase(
         accountRepository = accountRepository,
         walletUiUseCase = walletUiUseCase,
         addressIconGenerator = addressIconGenerator,

@@ -95,7 +95,7 @@ internal class RealMetadataShortenerService(
     private suspend fun generateMetadataProofOrDisabled(
         chain: Chain,
         runtimeVersion: RuntimeVersionFull
-    ) : MetadataProof {
+    ): MetadataProof {
         return runCatching {
             val hash = generateMetadataHash(chain, runtimeVersion)
 

@@ -11,7 +11,7 @@ class LedgerGenericAccountParcel(
     val publicKey: ByteArray,
     val encryptionType: EncryptionType,
     val derivationPath: String,
-): Parcelable
+) : Parcelable
 
 fun LedgerSubstrateAccount.toGenericParcel(): LedgerGenericAccountParcel {
     return LedgerGenericAccountParcel(address, publicKey, encryptionType, derivationPath)

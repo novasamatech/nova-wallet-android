@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.lega
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-interface LedgerMigrationUseCase  {
+interface LedgerMigrationUseCase {
 
     suspend fun determineAppForLegacyAccount(chainId: ChainId): SubstrateLedgerApplication
 }

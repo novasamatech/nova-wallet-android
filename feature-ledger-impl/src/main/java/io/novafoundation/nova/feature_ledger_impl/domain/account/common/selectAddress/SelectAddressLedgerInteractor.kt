@@ -33,9 +33,8 @@ class RealSelectAddressLedgerInteractor(
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : SelectAddressLedgerInteractor {
 
-
     override suspend fun getDevice(deviceId: String): LedgerDevice {
-        return  ledgerDeviceDiscoveryService.findDeviceOrThrow(deviceId)
+        return ledgerDeviceDiscoveryService.findDeviceOrThrow(deviceId)
     }
 
     override suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int) = runCatching {

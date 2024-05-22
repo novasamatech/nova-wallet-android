@@ -40,5 +40,3 @@ class GenericSubstrateLedgerApplication(
         return ledgerRepository.getGenericDerivationPath(metaId)
     }
 }
-
-

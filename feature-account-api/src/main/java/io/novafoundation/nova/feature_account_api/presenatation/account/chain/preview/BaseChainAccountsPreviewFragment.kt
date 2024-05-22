@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChai
 import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountToolbar
 import javax.inject.Inject
 
-abstract class BaseChainAccountsPreviewFragment<V: BaseChainAccountsPreviewViewModel> : BaseFragment<V>(), ChainAccountsAdapter.Handler {
+abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewViewModel> : BaseFragment<V>(), ChainAccountsAdapter.Handler {
 
     @Inject
     lateinit var imageLoader: ImageLoader

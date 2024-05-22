@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedger
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LegacyLedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication

@@ -8,4 +8,4 @@ import kotlinx.android.parcel.Parcelize
 class PreviewImportGenericLedgerPayload(
     val account: LedgerGenericAccountParcel,
     val deviceId: String
-): Parcelable
+) : Parcelable

@@ -320,7 +320,7 @@ class SelectSendViewModel(
             .launchIn(this)
     }
 
-    private suspend fun recalculateFee(originAsset: ChainWithAsset, destinationAsset: ChainWithAsset, address: String, amount: BigDecimal){
+    private suspend fun recalculateFee(originAsset: ChainWithAsset, destinationAsset: ChainWithAsset, address: String, amount: BigDecimal) {
         originFeeMixin.invalidateFee()
         val hasCrossChainFee = originAsset.chain.id != destinationAsset.chain.id
 
