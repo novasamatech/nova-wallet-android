@@ -17,16 +17,19 @@ import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.RealSignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp.LegacySubstrateLedgerApplication
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -36,7 +39,21 @@ class SignLedgerModule {
 
     @Provides
     @ScreenScope
-    fun provideInteractor(chainRegistry: ChainRegistry): SignLedgerInteractor = RealSignLedgerInteractor(chainRegistry)
+    fun provideInteractor(
+        chainRegistry: ChainRegistry,
+        signLedgerPayload: SignLedgerPayload,
+        migrationTracker: LedgerMigrationTracker,
+        legacyApp: LegacySubstrateLedgerApplication,
+        migrationApp: MigrationSubstrateLedgerApplication,
+        genericApp: GenericSubstrateLedgerApplication,
+    ): SignLedgerInteractor = RealSignLedgerInteractor(
+        chainRegistry = chainRegistry,
+        usedVariant = signLedgerPayload.ledgerVariant,
+        migrationTracker = migrationTracker,
+        legacyApp = legacyApp,
+        migrationApp = migrationApp,
+        genericApp = genericApp
+    )
 
     @Provides
     @ScreenScope
@@ -48,28 +65,23 @@ class SignLedgerModule {
 
     @Provides
     @ScreenScope
-    fun provideSelectLedgerPayload(
-        signPayloadState: SigningSharedState,
-    ): SelectLedgerPayload = SelectLedgerPayload(
-        chainId = signPayloadState.getOrThrow().extrinsic.chainId
-    )
-
-    @Provides
-    @ScreenScope
     fun provideMessageFormatter(
-        selectLedgerPayload: SelectLedgerPayload,
+        signPayloadState: SigningSharedState,
+        signLedgerPayload: SignLedgerPayload,
         factory: LedgerMessageFormatterFactory
     ): LedgerMessageFormatter {
-        // TODO legacy for now, replace with mediator with generic & legacy
-        return factory.createLegacy(selectLedgerPayload.chainId)
+        val chainId = signPayloadState.getOrThrow().extrinsic.chainId
+
+        return when (signLedgerPayload.ledgerVariant) {
+            LedgerVariant.LEGACY -> factory.createLegacy(chainId, showAlerts = true)
+            LedgerVariant.GENERIC -> factory.createGeneric()
+        }
     }
 
     @Provides
     @IntoMap
     @ViewModelKey(SignLedgerViewModel::class)
     fun provideViewModel(
-        substrateApplication: MigrationSubstrateLedgerApplication,
-        selectLedgerPayload: SelectLedgerPayload,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
         bluetoothManager: BluetoothManager,
@@ -78,14 +90,12 @@ class SignLedgerModule {
         resourceManager: ResourceManager,
         signPayloadState: SigningSharedState,
         extrinsicValidityUseCase: ExtrinsicValidityUseCase,
-        request: SignInterScreenCommunicator.Request,
+        payload: SignLedgerPayload,
         interactor: SignLedgerInteractor,
         responder: LedgerSignCommunicator,
         messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return SignLedgerViewModel(
-            substrateApplication = substrateApplication,
-            selectLedgerPayload = selectLedgerPayload,
             discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
@@ -95,7 +105,7 @@ class SignLedgerModule {
             messageFormatter = messageFormatter,
             signPayloadState = signPayloadState,
             extrinsicValidityUseCase = extrinsicValidityUseCase,
-            request = request,
+            request = payload.request,
             responder = responder,
             interactor = interactor
         )

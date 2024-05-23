@@ -22,7 +22,7 @@ data class ChipLabelModel(
     val title: String
 )
 
-class TintedIcon(val canApplyOwnTint: Boolean, @DrawableRes val icon: Int) {
+data class TintedIcon(val canApplyOwnTint: Boolean, @DrawableRes val icon: Int) {
 
     companion object {
 

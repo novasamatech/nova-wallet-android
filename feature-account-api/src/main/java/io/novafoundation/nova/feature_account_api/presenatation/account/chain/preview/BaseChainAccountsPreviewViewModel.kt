@@ -20,7 +20,7 @@ abstract class BaseChainAccountsPreviewViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
     private val router: ReturnableRouter,
-) : BaseViewModel(), ExternalActions by externalActions {
+) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
     open val subtitle: String? = null
 

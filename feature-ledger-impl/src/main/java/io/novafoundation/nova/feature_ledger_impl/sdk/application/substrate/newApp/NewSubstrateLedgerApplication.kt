@@ -17,7 +17,6 @@ import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerServic
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
-import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 
@@ -99,9 +98,6 @@ abstract class NewSubstrateLedgerApplication(
         val encodedTxPayloadLength = payloadBytes.size.toShort().littleEndianBytes
 
         val metadataProof = metadataShortenerService.generateExtrinsicProof(payload)
-
-        Log.e("Ledger", "Tx blob: ${payloadBytes.toHexString(withPrefix = true)}")
-        Log.e("Ledger", "Metadata proof: ${metadataProof.toHexString(withPrefix = true)}")
 
         val wholePayload = payloadBytes + metadataProof
 

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.signer
 
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSignerFactory
@@ -49,9 +50,8 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.WATCH_ONLY -> watchOnlySigner.create(metaAccount)
             LightMetaAccount.Type.PARITY_SIGNER -> polkadotVaultSignerFactory.createParitySigner(metaAccount)
             LightMetaAccount.Type.POLKADOT_VAULT -> polkadotVaultSignerFactory.createPolkadotVault(metaAccount)
-            // TODO ledger signing
-            LightMetaAccount.Type.LEDGER -> ledgerSignerFactory.create(metaAccount)
-            LightMetaAccount.Type.LEDGER_LEGACY -> ledgerSignerFactory.create(metaAccount)
+            LightMetaAccount.Type.LEDGER -> ledgerSignerFactory.create(metaAccount, LedgerVariant.GENERIC)
+            LightMetaAccount.Type.LEDGER_LEGACY -> ledgerSignerFactory.create(metaAccount, LedgerVariant.LEGACY)
             LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount, this, isRoot)
         }
     }

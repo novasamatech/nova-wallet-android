@@ -46,7 +46,7 @@ class AddLedgerChainAccountSelectAddressModule {
     fun provideMessageFormatter(
         screenPayload: AddLedgerChainAccountSelectAddressPayload,
         factory: LedgerMessageFormatterFactory,
-    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId)
+    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId, showAlerts = false)
 
     @Provides
     @IntoMap

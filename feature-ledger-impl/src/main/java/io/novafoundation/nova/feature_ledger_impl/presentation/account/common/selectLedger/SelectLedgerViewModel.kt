@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -48,7 +49,10 @@ abstract class SelectLedgerViewModel(
     private val router: ReturnableRouter,
     private val resourceManager: ResourceManager,
     private val messageFormatter: LedgerMessageFormatter,
-) : BaseViewModel(), PermissionsAsker by permissionsAsker, LedgerMessageCommands {
+) : BaseViewModel(),
+    PermissionsAsker by permissionsAsker,
+    LedgerMessageCommands,
+    Browserable.Presentation by Browserable() {
 
     private val stateMachine = StateMachine(WaitingForPermissionsState(), coroutineScope = this)
 

@@ -40,8 +40,7 @@ class PreviewImportGenericLedgerViewModel(
     externalActions = externalActions,
     chainRegistry = chainRegistry,
     router = router
-),
-    LedgerMessageCommands {
+), LedgerMessageCommands {
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 
