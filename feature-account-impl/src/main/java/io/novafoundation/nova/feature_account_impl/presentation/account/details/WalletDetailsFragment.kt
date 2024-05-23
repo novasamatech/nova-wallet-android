@@ -9,8 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.setGroupedListSpacings
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
@@ -100,16 +99,7 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel>(), ChainAccou
 
         viewModel.chainAccountProjections.observe { adapter.submitList(it) }
 
-        viewModel.typeAlert.observe {
-            if (it != null) {
-                accountDetailsTypeAlert.makeVisible()
-                accountDetailsTypeAlert.setMessage(it.message)
-                accountDetailsTypeAlert.setSubMessage(it.subMessage)
-                accountDetailsTypeAlert.setStyle(it.style)
-            } else {
-                accountDetailsTypeAlert.makeGone()
-            }
-        }
+        viewModel.typeAlert.observe(accountDetailsTypeAlert::setModelOrHide)
     }
 
     override fun chainAccountClicked(item: AccountInChainUi) {

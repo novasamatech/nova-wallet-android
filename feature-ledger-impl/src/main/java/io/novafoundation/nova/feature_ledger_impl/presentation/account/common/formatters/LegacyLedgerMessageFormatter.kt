@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertModel.ActionModel
 import io.novafoundation.nova.common.view.AlertView.StylePreset
+import io.novafoundation.nova.common.view.asStyle
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -41,7 +42,7 @@ class LegacyLedgerMessageFormatter(
 
         return when (messageKind) {
             LedgerMessageFormatter.MessageKind.APP_NOT_OPEN -> AlertModel(
-                style = StylePreset.INFO,
+                style = StylePreset.INFO.asStyle(),
                 message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
                 subMessage = resourceManager.getString(R.string.account_ledger_legacy_warning_message),
                 action = ActionModel(
@@ -51,7 +52,7 @@ class LegacyLedgerMessageFormatter(
             )
 
             LedgerMessageFormatter.MessageKind.OTHER -> AlertModel(
-                style = StylePreset.INFO,
+                style = StylePreset.INFO.asStyle(),
                 message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
                 subMessage = resourceManager.getString(R.string.account_ledger_migration_deprecation_message),
                 action = ActionModel(
