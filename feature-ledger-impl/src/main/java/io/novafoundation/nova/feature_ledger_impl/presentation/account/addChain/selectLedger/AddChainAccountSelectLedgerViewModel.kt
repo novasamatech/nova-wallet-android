@@ -6,9 +6,10 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.determineAppForLegacyAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
@@ -16,7 +17,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.fo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 
 class AddChainAccountSelectLedgerViewModel(
-    private val substrateApplication: SubstrateLedgerApplication,
+    private val migrationUseCase: LedgerMigrationUseCase,
     private val router: LedgerRouter,
     private val addAccountPayload: AddAccountPayload.ChainAccount,
     discoveryService: LedgerDeviceDiscoveryService,
@@ -38,8 +39,10 @@ class AddChainAccountSelectLedgerViewModel(
     override suspend fun verifyConnection(device: LedgerDevice) {
         ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
 
+        val app = migrationUseCase.determineAppForLegacyAccount(addAccountPayload.chainId)
+
         // ensure that address loads successfully
-        substrateApplication.getAccount(device, addAccountPayload.chainId, accountIndex = 0, confirmAddress = false)
+        app.getAccount(device, addAccountPayload.chainId, accountIndex = 0, confirmAddress = false)
 
         val payload = AddLedgerChainAccountSelectAddressPayload(addAccountPayload.chainId, addAccountPayload.metaId, device.id)
         router.openAddChainAccountSelectAddress(payload)

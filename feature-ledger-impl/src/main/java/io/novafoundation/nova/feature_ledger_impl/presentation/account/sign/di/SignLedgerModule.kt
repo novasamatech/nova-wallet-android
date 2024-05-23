@@ -20,17 +20,14 @@ import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
-import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.RealSignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerViewModel
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp.LegacySubstrateLedgerApplication
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -42,17 +39,11 @@ class SignLedgerModule {
     fun provideInteractor(
         chainRegistry: ChainRegistry,
         signLedgerPayload: SignLedgerPayload,
-        migrationTracker: LedgerMigrationTracker,
-        legacyApp: LegacySubstrateLedgerApplication,
-        migrationApp: MigrationSubstrateLedgerApplication,
-        genericApp: GenericSubstrateLedgerApplication,
+        migrationUseCase: LedgerMigrationUseCase,
     ): SignLedgerInteractor = RealSignLedgerInteractor(
         chainRegistry = chainRegistry,
         usedVariant = signLedgerPayload.ledgerVariant,
-        migrationTracker = migrationTracker,
-        legacyApp = legacyApp,
-        migrationApp = migrationApp,
-        genericApp = genericApp
+        migrationUseCase = migrationUseCase,
     )
 
     @Provides

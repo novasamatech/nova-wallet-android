@@ -90,9 +90,10 @@ class LedgerFeatureModule {
     fun provideLedgerMigrationUseCase(
         ledgerMigrationTracker: LedgerMigrationTracker,
         migrationApp: MigrationSubstrateLedgerApplication,
-        legacyApp: LegacySubstrateLedgerApplication
+        legacyApp: LegacySubstrateLedgerApplication,
+        genericApp: GenericSubstrateLedgerApplication,
     ): LedgerMigrationUseCase {
-        return RealLedgerMigrationUseCase(ledgerMigrationTracker, migrationApp, legacyApp)
+        return RealLedgerMigrationUseCase(ledgerMigrationTracker, migrationApp, legacyApp, genericApp)
     }
 
     @Provides
