@@ -32,7 +32,7 @@ fun AccountInChain.polkadotVaultTitle(resourceManager: ResourceManager, metaAcco
     val address = projection?.address
 
     return if (address != null) {
-         address
+        address
     } else {
         val polkadotVaultVariant = metaAccount.type.asPolkadotVaultVariantOrThrow()
         resourceManager.formatWithPolkadotVaultLabel(R.string.account_details_parity_signer_not_supported, polkadotVaultVariant)

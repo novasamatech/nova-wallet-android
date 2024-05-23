@@ -17,7 +17,7 @@ class WalletDetailsMixinFactory(
     private val interactor: WalletDetailsInteractor,
     private val appLinksProvider: AppLinksProvider,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
-    ) {
+) {
 
     suspend fun create(metaId: Long, host: WalletDetailsMixinHost): WalletDetailsMixin {
         val metaAccount = interactor.getMetaAccount(metaId)
