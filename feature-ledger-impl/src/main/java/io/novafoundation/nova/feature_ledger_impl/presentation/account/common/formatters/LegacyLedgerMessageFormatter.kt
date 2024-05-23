@@ -39,7 +39,7 @@ class LegacyLedgerMessageFormatter(
         val shouldShowAlert = showAlerts && shouldUseMigrationApp()
         if (!shouldShowAlert) return null
 
-        return when(messageKind) {
+        return when (messageKind) {
             LedgerMessageFormatter.MessageKind.APP_NOT_OPEN -> AlertModel(
                 style = StylePreset.INFO,
                 message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
@@ -50,7 +50,7 @@ class LegacyLedgerMessageFormatter(
                 )
             )
 
-            LedgerMessageFormatter.MessageKind.OTHER ->  AlertModel(
+            LedgerMessageFormatter.MessageKind.OTHER -> AlertModel(
                 style = StylePreset.INFO,
                 message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
                 subMessage = resourceManager.getString(R.string.account_ledger_migration_deprecation_message),

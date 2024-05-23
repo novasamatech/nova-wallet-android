@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.Event
 interface Browserable {
     val openBrowserEvent: LiveData<Event<String>>
 
-    interface Presentation: Browserable {
+    interface Presentation : Browserable {
         companion object // extensions
 
         fun showBrowser(url: String)

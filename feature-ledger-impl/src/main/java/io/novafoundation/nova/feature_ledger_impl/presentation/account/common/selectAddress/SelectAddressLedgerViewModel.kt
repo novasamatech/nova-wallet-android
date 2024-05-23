@@ -45,7 +45,8 @@ abstract class SelectAddressLedgerViewModel(
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
     private val messageFormatter: LedgerMessageFormatter
-) : BaseViewModel(), LedgerMessageCommands,
+) : BaseViewModel(),
+    LedgerMessageCommands,
     Browserable.Presentation by Browserable() {
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()

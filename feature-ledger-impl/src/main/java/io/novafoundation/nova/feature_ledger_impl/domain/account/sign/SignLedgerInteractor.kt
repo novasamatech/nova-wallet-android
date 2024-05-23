@@ -43,7 +43,11 @@ class RealSignLedgerInteractor(
     private val genericApp: GenericSubstrateLedgerApplication,
 ) : SignLedgerInteractor {
 
-    override suspend fun getSignature(device: LedgerDevice, metaId: Long, payload: SignerPayloadExtrinsic): SignatureWrapper = withContext(Dispatchers.Default) {
+    override suspend fun getSignature(
+        device: LedgerDevice,
+        metaId: Long,
+        payload: SignerPayloadExtrinsic
+    ): SignatureWrapper = withContext(Dispatchers.Default) {
         val chainId = payload.chainId
         val app = determineLedgerApp(chainId)
 
