@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="backup_settings_no_wallets_error_title">No wallets to back up</string>
+    <string name="backup_settings_no_wallets_error_message">You haven\'t added any wallets with a passphrase.</string>
+
     <string name="account_export_existing">Import existing</string>
     <string name="cloud_backup_will_be_changed_title">Wallet changes will be updated in the Cloud Backup</string>
     <string name="cloud_backup_will_be_changed_subtitle">New wallets are automatically added to the Cloud Backup. You can disable Cloud Backup in Settings.</string>
@@ -182,9 +185,9 @@
     <string name="start_create_wallet_your_wallet_is_ready">Your wallet is ready</string>
     <string name="cloud_backup">Cloud Backup</string>
     <string name="start_create_wallet_set_wallet_name_explanation">This will only be visible to you and you can edit it later.</string>
-    <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. This makes sure that your funds are safe and secure. Backups allow you to restore your wallet at any time.</string>
-    <string name="start_create_wallet_cloud_backup_btn">Back up to Cloud</string>
-    <string name="start_create_wallet_manual_backup_btn">Back up Manually</string>
+    <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. This makes sure that your funds are safe and secure. Backups allow you to restore your wallet at any time.</string>
+    <string name="start_create_wallet_cloud_backup_btn">Continue with Google</string>
+    <string name="start_create_wallet_manual_backup_btn">Continue with manual backup</string>
 
     <string name="backup_mnemonic_attention_title">Prepare to save your wallet!</string>
     <string name="common_tap_to_reveal_title">Tap to reveal</string>
@@ -1611,7 +1614,7 @@
     <string name="account_ethereum_derivation_path">Ethereum secret derivation path</string>
     <string name="account_export">Export account</string>
     <string name="account_export_action">Export</string>
-    <string name="account_export_json_password_title">Set a new password</string>
+    <string name="account_export_json_password_title">Set a password for your JSON file</string>
     <string name="account_export_json_title">Save your secret and store it in a safe place</string>
     <string name="account_export_seed_title">Write down your secret and store it in a safe place</string>
     <string name="account_import_invalid_keystore">Invalid restore json. Please, make sure that input contains valid json.</string>

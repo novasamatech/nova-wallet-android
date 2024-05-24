@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalS
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.isBackupable
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupDestructiveChangesNotApplied
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupDestructiveChangesNotAppliedWithoutRouting
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 
@@ -55,10 +56,14 @@ class CloudBackupSyncRequestBusHandler(
     private suspend fun showDestructiveChangesNotAppliedDialog() {
         automaticInteractionGate.awaitInteractionAllowed()
 
-        actionBottomSheetLauncher.launchCloudBackupDestructiveChangesNotApplied(
-            resourceManager = resourceManager,
-            onReviewClicked = ::onReviewIssueClicked
-        )
+        if (accountRepository.hasActiveMetaAccounts()) {
+            actionBottomSheetLauncher.launchCloudBackupDestructiveChangesNotApplied(
+                resourceManager = resourceManager,
+                onReviewClicked = ::onReviewIssueClicked
+            )
+        } else {
+            actionBottomSheetLauncher.launchCloudBackupDestructiveChangesNotAppliedWithoutRouting(resourceManager)
+        }
     }
 
     private fun onReviewIssueClicked() {

@@ -133,6 +133,7 @@
             <enum name="primaryPositive" value="4" />
             <enum name="primaryNegative" value="5" />
             <enum name="accentSecondaryTransparent" value="6" />
+            <enum name="cloudBackup" value="6" />
         </attr>
 
         <attr name="size" format="enum">

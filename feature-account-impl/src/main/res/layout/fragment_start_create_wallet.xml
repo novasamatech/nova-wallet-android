@@ -156,10 +156,12 @@
         android:layout_marginBottom="12dp"
         android:text="@string/start_create_wallet_cloud_backup_btn"
         android:visibility="gone"
-        app:iconSrc="@drawable/ic_cloud_android"
+        app:appearance="cloudBackup"
+        app:iconSrc="@drawable/ic_google_logo"
         app:layout_constraintBottom_toTopOf="@id/startCreateWalletManualBackupButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/startCreateWalletManualBackupButton"
@@ -170,9 +172,9 @@
         android:text="@string/start_create_wallet_manual_backup_btn"
         android:visibility="gone"
         app:appearance="secondary"
-        app:iconSrc="@drawable/ic_memo_android"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

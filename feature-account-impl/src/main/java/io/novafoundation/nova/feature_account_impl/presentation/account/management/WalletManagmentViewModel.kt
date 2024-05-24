@@ -59,13 +59,17 @@ class WalletManagmentViewModel(
         mode.value = newMode
     }
 
-    fun deleteClicked(account: AccountUi) = launch {
-        val deleteConfirmed = confirmAccountDeletion.awaitAction()
+    fun deleteClicked(account: AccountUi) {
+        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+            launch {
+                val deleteConfirmed = confirmAccountDeletion.awaitAction()
 
-        if (deleteConfirmed) {
-            val isAllMetaAccountsWasDeleted = accountInteractor.deleteAccount(account.id)
-            if (isAllMetaAccountsWasDeleted) {
-                accountRouter.openWelcomeScreen()
+                if (deleteConfirmed) {
+                    val isAllMetaAccountsWasDeleted = accountInteractor.deleteAccount(account.id)
+                    if (isAllMetaAccountsWasDeleted) {
+                        accountRouter.openWelcomeScreen()
+                    }
+                }
             }
         }
     }

@@ -50,20 +50,29 @@ class ManualBackupSecretsViewModel(
     }
 
     private suspend fun buildSecrets(): List<ManualBackupSecretsRvItem> = buildList {
-        if (payload is ManualBackupCommonPayload.ChainAccount) {
-            this += secretsAdapterItemFactory.createChainItem(payload.chainId)
-            this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_custom_key_title))
-        } else {
-            this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_default_key_title))
-        }
-
         val mnemonicItem = secretsAdapterItemFactory.createMnemonic(payload.metaId, payload.getChainIdOrNull())
+
+        createHeaders(mnemonicItem)
 
         if (mnemonicItem == null) {
             this += secretsAdapterItemFactory.createSubtitle(resourceManager.getString(R.string.manual_backup_secrets_subtitle))
             this += secretsAdapterItemFactory.createAdvancedSecrets(payload.metaId, payload.getChainIdOrNull())
         } else {
             this += mnemonicItem
+        }
+    }
+
+    private suspend fun MutableList<ManualBackupSecretsRvItem>.createHeaders(mnemonic: Any?) {
+        if (payload is ManualBackupCommonPayload.ChainAccount) {
+            this += secretsAdapterItemFactory.createChainItem(payload.chainId)
+            this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_custom_key_title))
+        } else {
+            val hasMnemonic = mnemonic != null
+            if (hasMnemonic) {
+                this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_default_key_title))
+            } else {
+                this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_default_key_title))
+            }
         }
     }
 }

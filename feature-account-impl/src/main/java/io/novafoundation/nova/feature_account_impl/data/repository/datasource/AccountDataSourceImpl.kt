@@ -155,6 +155,10 @@ class AccountDataSourceImpl(
         return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
     }
 
+    override suspend fun hasSecretsAccounts(): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(MetaAccountLocal.Type.SECRETS)
+    }
+
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
         return metaAccountDao.getMetaAccounts().map(::mapMetaAccountLocalToLightMetaAccount)
     }

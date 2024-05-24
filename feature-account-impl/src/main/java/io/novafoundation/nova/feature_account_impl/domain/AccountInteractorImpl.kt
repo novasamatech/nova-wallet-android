@@ -201,4 +201,8 @@ class AccountInteractorImpl(
             accountRepository.selectMetaAccount(metaAccounts.first().id)
         }
     }
+
+    override suspend fun hasSecretsAccounts(): Boolean {
+        return accountRepository.hasSecretsAccounts()
+    }
 }

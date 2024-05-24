@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
@@ -62,6 +63,7 @@ import kotlinx.coroutines.launch
 class BackupSettingsViewModel(
     private val resourceManager: ResourceManager,
     private val router: SettingsRouter,
+    private val accountInteractor: AccountInteractor,
     private val cloudBackupSettingsInteractor: CloudBackupSettingsInteractor,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
@@ -131,7 +133,16 @@ class BackupSettingsViewModel(
     }
 
     fun manualBackupClicked() {
-        router.openManualBackup()
+        launch {
+            if (accountInteractor.hasSecretsAccounts()) {
+                router.openManualBackup()
+            } else {
+                showError(
+                    resourceManager.getString(R.string.backup_settings_no_wallets_error_title),
+                    resourceManager.getString(R.string.backup_settings_no_wallets_error_message)
+                )
+            }
+        }
     }
 
     fun cloudBackupManageClicked() {

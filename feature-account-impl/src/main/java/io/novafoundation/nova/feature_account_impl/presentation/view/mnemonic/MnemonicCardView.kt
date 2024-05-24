@@ -59,7 +59,7 @@ class MnemonicCardView @JvmOverloads constructor(
     fun setWordsString(list: List<String>) {
         val words = list.mapIndexed { index, item ->
             MnemonicWord(
-                id = index,
+                id = index + 1,
                 content = item,
                 indexDisplay = index.toString(),
                 removed = false

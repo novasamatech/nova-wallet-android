@@ -61,4 +61,6 @@ interface AccountInteractor {
     suspend fun removeDeactivatedMetaAccounts()
 
     suspend fun switchToNotDeactivatedAccountIfNeeded()
+
+    suspend fun hasSecretsAccounts(): Boolean
 }

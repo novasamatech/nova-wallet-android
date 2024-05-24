@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestructiveCloudVersionOrThrow
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.toMetaAccountType
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.metaAccountTypeComparator
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
@@ -43,6 +44,7 @@ interface CloudBackupSettingsInteractor {
 }
 
 class RealCloudBackupSettingsInteractor(
+    private val accountRepository: AccountRepository,
     private val cloudBackupService: CloudBackupService,
     private val cloudBackupFacade: LocalAccountsCloudBackupFacade
 ) : CloudBackupSettingsInteractor {
@@ -101,6 +103,7 @@ class RealCloudBackupSettingsInteractor(
         return runCatching {
             cloudBackupFacade.applyBackupDiff(cloudBackupDiff, cloudBackup)
             cloudBackupService.session.setLastSyncedTimeAsNow()
+            selectMetaAccountIfNeeded()
         }.flatMap {
             if (cloudBackupDiff.cloudChanges.isNotEmpty()) {
                 writeLocalBackupToCloud()
@@ -114,5 +117,14 @@ class RealCloudBackupSettingsInteractor(
         return diff.added.map { CloudBackupChangedAccount(ChangingType.ADDED, it) } +
             diff.modified.map { CloudBackupChangedAccount(ChangingType.CHANGED, it) } +
             diff.removed.map { CloudBackupChangedAccount(ChangingType.REMOVED, it) }
+    }
+
+    private suspend fun selectMetaAccountIfNeeded() {
+        if (!accountRepository.isAccountSelected()) {
+            val metaAccounts = accountRepository.activeMetaAccounts()
+            if (metaAccounts.isNotEmpty()) {
+                accountRepository.selectMetaAccount(metaAccounts.first().id)
+            }
+        }
     }
 }
