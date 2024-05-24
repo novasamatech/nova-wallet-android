@@ -139,7 +139,7 @@ class RealLocalAccountsCloudBackupFacade(
             val localWallet = metaAccountsByUUid[it.walletId] ?: return@mapNotNull null
             val chainAccountIds = localWallet.chainAccounts.map(ChainAccountLocal::accountId)
 
-            secretsStoreV2.clearSecrets(localWallet.metaAccount.id, chainAccountIds)
+            secretsStoreV2.clearMetaAccountSecrets(localWallet.metaAccount.id, chainAccountIds)
 
             MetaAccountChangesEventBus.Event.AccountRemoved(
                 metaId = localWallet.metaAccount.id,
@@ -237,9 +237,9 @@ class RealLocalAccountsCloudBackupFacade(
                 secretsStoreV2.putMetaAccountSecrets(metaId, metaAccountSecrets)
             }
 
-            // Delete all chain account secrets  associated with currently processed meta account
+            // Delete all chain account secrets associated with currently processed meta account
             val previousChainAccountIds = oldMetaAccountJoinInfo.chainAccounts.map { it.accountId }
-            secretsStoreV2.clearSecrets(metaId, previousChainAccountIds)
+            secretsStoreV2.clearChainAccountsSecrets(metaId, previousChainAccountIds)
 
             // Insert all chain account secrets from backup
             val chainAccountsSecrets = cloudVersion.getAllChainAccountSecrets(publicWalletInfo)

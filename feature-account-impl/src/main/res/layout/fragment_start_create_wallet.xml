@@ -52,12 +52,14 @@
             android:gravity="center_vertical"
             android:minHeight="22dp"
             android:orientation="horizontal"
-            android:paddingHorizontal="4dp"
             android:paddingVertical="2dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="8dp"
             app:layout_cardBackgroundColor="@color/input_background"
             app:layout_cardRadius="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_drawBorder="false">
 
             <ImageView
                 android:layout_width="14dp"

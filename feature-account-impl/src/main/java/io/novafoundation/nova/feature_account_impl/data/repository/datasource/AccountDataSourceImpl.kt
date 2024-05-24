@@ -233,7 +233,7 @@ class AccountDataSourceImpl(
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)
 
         metaAccountDao.delete(metaId)
-        secretStoreV2.clearSecrets(metaId, chainAccountIds)
+        secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
     }
 
     override suspend fun insertMetaAccountFromSecrets(
