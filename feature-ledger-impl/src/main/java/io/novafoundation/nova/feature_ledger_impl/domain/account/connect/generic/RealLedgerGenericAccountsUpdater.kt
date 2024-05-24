@@ -11,7 +11,7 @@ internal class RealLedgerGenericAccountsUpdater(
     private val ledgerMigrationTracker: LedgerMigrationTracker,
     private val metaAccountRepository: AccountRepository,
     private val genericLedgerAddAccountRepository: GenericLedgerAddAccountRepository,
-): LedgerGenericAccountsUpdater {
+) : LedgerGenericAccountsUpdater {
 
     override fun updateAvailableGenericAccounts() = ledgerMigrationTracker.supportedChainIdsByGenericAppFlow().map { chainIds ->
         runCatching {

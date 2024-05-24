@@ -26,7 +26,7 @@ abstract class BaseAddAccountRepository<T>(
         return when (this) {
             is AddAccountResult.AccountAdded -> Event.AccountAdded(metaId)
             is AddAccountResult.AccountChanged -> Event.AccountChanged(metaId)
-            is AddAccountResult.NoOp ->  null
+            is AddAccountResult.NoOp -> null
         }
     }
 }

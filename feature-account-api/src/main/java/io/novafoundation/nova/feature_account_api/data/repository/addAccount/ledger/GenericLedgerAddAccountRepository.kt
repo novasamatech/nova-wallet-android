@@ -20,6 +20,6 @@ interface GenericLedgerAddAccountRepository : AddAccountRepository<GenericLedger
         class AddMissingChainAccounts(
             val metaId: Long,
             val allAvailableChainIds: Collection<ChainId>,
-        ): Payload
+        ) : Payload
     }
 }

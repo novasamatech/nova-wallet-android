@@ -81,14 +81,13 @@ class RealGenericLedgerAddAccountRepository(
         val currentChainIds = currentChainAccounts.mapToSet { it.chainId }
         val missingChainIds = payload.allAvailableChainIds - currentChainIds
 
-
         if (missingChainIds.isEmpty()) {
-            Log.d(this.LOG_TAG, "Checking account ${metaId}. Found no missing chain accounts")
+            Log.d(this.LOG_TAG, "Checking account $metaId. Found no missing chain accounts")
 
             return AddAccountResult.NoOp(metaId)
         }
 
-        Log.d(this.LOG_TAG, "Checking account ${metaId}. Found ${missingChainIds.size} missing chain accounts: ${missingChainIds.joinToString()}")
+        Log.d(this.LOG_TAG, "Checking account $metaId. Found ${missingChainIds.size} missing chain accounts: ${missingChainIds.joinToString()}")
 
         val someChainAccount = currentChainAccounts.first()
 

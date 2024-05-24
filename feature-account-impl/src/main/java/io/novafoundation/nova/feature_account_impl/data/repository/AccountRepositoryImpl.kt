@@ -269,7 +269,7 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
-       return accountDataSource.getMetaAccountIdsByType(type)
+        return accountDataSource.getMetaAccountIdsByType(type)
     }
 
     override fun nodesFlow(): Flow<List<Node>> {

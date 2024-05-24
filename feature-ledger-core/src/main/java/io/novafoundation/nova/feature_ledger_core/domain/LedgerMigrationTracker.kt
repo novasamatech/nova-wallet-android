@@ -37,7 +37,7 @@ internal class RealLedgerMigrationTracker(
 
     override fun supportedChainIdsByGenericAppFlow(): Flow<Set<ChainId>> {
         return chainRegistry.currentChains.map { chains ->
-            chains.mapNotNullToSet {  chain ->
+            chains.mapNotNullToSet { chain ->
                 chain.id.takeIf { chain.additional.isGenericLedgerAppSupported() }
             }
         }.distinctUntilChanged()
