@@ -7,6 +7,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.interfaces.BuildTypeProvider
+import io.novafoundation.nova.common.interfaces.isMarketRelease
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.feature_push_notifications.NovaFirebaseMessagingService
@@ -29,6 +31,8 @@ interface PushNotificationsService {
 
     fun isPushNotificationsEnabled(): Boolean
 
+    fun pushNotificationsAvaiabilityState(): PushNotificationsAvailabilityState
+
     suspend fun initPushNotifications(): Result<Unit>
 
     suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings?): Result<Unit>
@@ -45,7 +49,8 @@ class RealPushNotificationsService(
     private val tokenCache: PushTokenCache,
     private val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
     private val pushPermissionRepository: PushPermissionRepository,
-    private val preferences: Preferences
+    private val preferences: Preferences,
+    private val buildTypeProvider: BuildTypeProvider
 ) : PushNotificationsService {
 
     // Using to manually sync subscriptions (firestore, topics) after enabling push notifications
@@ -56,7 +61,7 @@ class RealPushNotificationsService(
     }
 
     override fun onTokenUpdated(token: String) {
-        if (!googleApiAvailabilityProvider.isAvailable()) return
+        if (!isPushNotificationsAvailable()) return
         if (!isPushNotificationsEnabled()) return
         if (skipTokenReceivingCallback) return
 
@@ -69,7 +74,7 @@ class RealPushNotificationsService(
     }
 
     override suspend fun updatePushSettings(enabled: Boolean, pushSettings: PushSettings?): Result<Unit> {
-        if (!googleApiAvailabilityProvider.isAvailable()) return googleApiFailureResult()
+        if (!isPushNotificationsAvailable()) return googleApiFailureResult()
 
         return runCatching {
             withTimeout(SAVING_TIMEOUT) {
@@ -85,12 +90,20 @@ class RealPushNotificationsService(
     }
 
     override fun isPushNotificationsAvailable(): Boolean {
-        return googleApiAvailabilityProvider.isAvailable()
+        return pushNotificationsAvaiabilityState() == PushNotificationsAvailabilityState.AVAILABLE
+    }
+
+    override fun pushNotificationsAvaiabilityState(): PushNotificationsAvailabilityState {
+        return when {
+            !googleApiAvailabilityProvider.isAvailable() -> PushNotificationsAvailabilityState.PLAY_SERVICES_REQUIRED
+            !buildTypeProvider.isDebug() && !buildTypeProvider.isMarketRelease() -> PushNotificationsAvailabilityState.GOOGLE_PLAY_INSTALLATION_REQUIRED
+            else -> PushNotificationsAvailabilityState.AVAILABLE
+        }
     }
 
     override suspend fun syncSettingsIfNeeded() {
         if (!isPushNotificationsEnabled()) return
-        if (!googleApiAvailabilityProvider.isAvailable()) return
+        if (!isPushNotificationsAvailable()) return
 
         if (isPermissionsRevoked() || isTimeToSync()) {
             val isPermissionGranted = pushPermissionRepository.isPermissionGranted()
@@ -103,13 +116,13 @@ class RealPushNotificationsService(
     }
 
     override suspend fun initPushNotifications(): Result<Unit> {
-        if (!googleApiAvailabilityProvider.isAvailable()) return googleApiFailureResult()
+        if (!isPushNotificationsAvailable()) return googleApiFailureResult()
 
         return updatePushSettings(true, settingsProvider.getDefaultPushSettings())
     }
 
     private suspend fun handlePushTokenIfNeeded(isEnable: Boolean) {
-        if (!googleApiAvailabilityProvider.isAvailable()) return
+        if (!isPushNotificationsAvailable()) return
         if (isEnable == isPushNotificationsEnabled()) return
 
         skipTokenReceivingCallback = true
@@ -134,7 +147,7 @@ class RealPushNotificationsService(
     private fun logToken() {
         if (!isPushNotificationsEnabled()) return
         if (!BuildConfig.DEBUG) return
-        if (!googleApiAvailabilityProvider.isAvailable()) return
+        if (!isPushNotificationsAvailable()) return
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(
             OnCompleteListener { task ->

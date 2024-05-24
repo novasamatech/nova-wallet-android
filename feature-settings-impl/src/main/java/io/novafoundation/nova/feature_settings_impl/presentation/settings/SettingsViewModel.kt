@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
+import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsAvailabilityState
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
@@ -103,9 +104,6 @@ class SettingsViewModel(
         .map { Event(true) }
         .asLiveData()
 
-    val pushNotificationsAvailable = flowOf { pushNotificationsInteractor.isPushNotificationsAvailable() }
-        .shareInBackground()
-
     val pushNotificationsState = pushNotificationsInteractor.pushNotificationsEnabledFlow()
         .map { resourceManager.formatBooleanToState(it) }
         .shareInBackground()
@@ -119,7 +117,23 @@ class SettingsViewModel(
     }
 
     fun pushNotificationsClicked() {
-        router.openPushNotificationSettings()
+        when (pushNotificationsInteractor.pushNotificationsAvailabilityState()) {
+            PushNotificationsAvailabilityState.AVAILABLE -> router.openPushNotificationSettings()
+
+            PushNotificationsAvailabilityState.PLAY_SERVICES_REQUIRED -> {
+                showError(
+                    resourceManager.getString(R.string.common_not_available),
+                    resourceManager.getString(R.string.settings_push_notifications_only_available_with_google_services_error)
+                )
+            }
+
+            PushNotificationsAvailabilityState.GOOGLE_PLAY_INSTALLATION_REQUIRED -> {
+                showError(
+                    resourceManager.getString(R.string.common_not_available),
+                    resourceManager.getString(R.string.settings_push_notifications_only_available_from_google_play_error)
+                )
+            }
+        }
     }
 
     fun currenciesClicked() {

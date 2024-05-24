@@ -41,11 +41,12 @@ class ProxyExtrinsicValidationRequestBusHandler(
             call = { it.call },
             chainWithAsset = { it.chainWithAsset },
             proxyNotEnoughFee = { payload, availableBalance, fee ->
+                val asset = payload.chainWithAsset.asset
                 ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee(
-                    payload.proxyMetaAccount,
-                    payload.chainWithAsset.asset,
-                    availableBalance,
-                    fee
+                    metaAccount = payload.proxyMetaAccount,
+                    asset = asset,
+                    fee = fee.amount,
+                    availableBalance = availableBalance
                 )
             }
         )

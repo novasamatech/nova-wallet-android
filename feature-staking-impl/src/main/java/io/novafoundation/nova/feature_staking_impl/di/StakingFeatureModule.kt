@@ -27,32 +27,35 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.config.api.StakingGlobalConfigApi
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
-import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingVersioningRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealVaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingVersioningRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.VaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
@@ -65,8 +68,9 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
-import io.novafoundation.nova.feature_staking_impl.data.validators.FixedKnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
+import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteKnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -83,6 +87,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.RealStakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.list.StakingProxyListInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RealRemoveStakingProxyInteractor
@@ -296,16 +302,36 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideVaraRepository(chainRegistry: ChainRegistry): VaraRepository = RealVaraRepository(chainRegistry)
+
+    @Provides
+    @FeatureScope
     fun provideRewardCalculatorFactory(
         repository: StakingRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
         stakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
         parasRepository: ParasRepository,
-    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, stakingSharedComputation, parasRepository)
+        varaRepository: VaraRepository
+    ) = RewardCalculatorFactory(
+        stakingRepository = repository,
+        totalIssuanceRepository = totalIssuanceRepository,
+        shareStakingSharedComputation = stakingSharedComputation,
+        parasRepository = parasRepository,
+        varaRepository = varaRepository
+    )
 
     @Provides
     @FeatureScope
-    fun provideKnownNovaValidators(): KnownNovaValidators = FixedKnownNovaValidators()
+    fun provideNovaValidatorsApi(apiCreator: NetworkApiCreator): NovaValidatorsApi {
+        return apiCreator.create(NovaValidatorsApi::class.java)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideKnownNovaValidators(
+        novaValidatorsApi: NovaValidatorsApi,
+        chainRegistry: ChainRegistry
+    ): KnownNovaValidators = RemoteKnownNovaValidators(novaValidatorsApi, chainRegistry)
 
     @Provides
     @FeatureScope
@@ -652,4 +678,18 @@ class StakingFeatureModule {
         extrinsicService,
         proxySyncService
     )
+
+    @Provides
+    @FeatureScope
+    fun provideStakingGlobalConfigApi(apiCreator: NetworkApiCreator): StakingGlobalConfigApi {
+        return apiCreator.create(StakingGlobalConfigApi::class.java)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingGlobalConfigRepository(
+        api: StakingGlobalConfigApi
+    ): StakingGlobalConfigRepository {
+        return RealStakingGlobalConfigRepository(api)
+    }
 }

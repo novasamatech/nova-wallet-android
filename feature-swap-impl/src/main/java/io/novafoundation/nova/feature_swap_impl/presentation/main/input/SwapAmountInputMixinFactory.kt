@@ -76,7 +76,7 @@ private class RealSwapAmountInputMixin(
 
         return SwapInputAssetModel(
             assetIcon = SwapInputAssetModel.SwapAssetIcon.Chosen(chainAsset.iconUrl),
-            title = chainAsset.symbol,
+            title = chainAsset.symbol.value,
             subtitleIcon = Icon.FromLink(chain.icon),
             subtitle = chain.name,
             showInput = true,

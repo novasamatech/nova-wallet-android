@@ -1,6 +1,8 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.model
 
 import io.novafoundation.nova.common.utils.Identifiable
+import io.novafoundation.nova.common.utils.Precision
+import io.novafoundation.nova.common.utils.TokenSymbol
 import java.math.BigInteger
 
 typealias ChainId = String
@@ -49,6 +51,7 @@ data class Chain(
         val relaychainAsNative: Boolean?,
         val stakingMaxElectingVoters: Int?,
         val feeViaRuntimeCall: Boolean?,
+        val identityChain: ChainId?
     )
 
     data class Types(
@@ -61,8 +64,8 @@ data class Chain(
         val id: ChainAssetId,
         val priceId: String?,
         val chainId: ChainId,
-        val symbol: String,
-        val precision: Int,
+        val symbol: TokenSymbol,
+        val precision: Precision,
         val buyProviders: Map<BuyProviderId, BuyProviderArguments>,
         val staking: List<StakingType>,
         val type: Type,

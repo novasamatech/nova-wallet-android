@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R

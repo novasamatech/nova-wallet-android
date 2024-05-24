@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.source
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
@@ -18,10 +17,11 @@ class CoingeckoCoinPriceDataSource(
 
     override suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate> {
         val response = coingeckoApi.getCoinRange(priceId, currency.coingeckoId, fromTimestamp, toTimestamp)
-        return response.prices.map {
+
+        return response.prices.map { (timestampRaw, rateRaw) ->
             HistoricalCoinRate(
-                it.first().toLong().milliseconds.inWholeSeconds,
-                it.second()
+                timestamp = timestampRaw.toLong().milliseconds.inWholeSeconds,
+                rate = rateRaw
             )
         }
     }

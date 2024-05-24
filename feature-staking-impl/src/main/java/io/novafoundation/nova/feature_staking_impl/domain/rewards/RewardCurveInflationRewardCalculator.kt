@@ -48,6 +48,15 @@ class InflationConfig(
                 )
             }
         )
+
+        // Source: https://github.com/availproject/avail/blob/main/runtime/src/constants.rs#L223
+        fun Avail() = InflationConfig(
+            falloff = 0.05,
+            maxInflation = 0.05,
+            minInflation = 0.01,
+            stakeTarget = 0.50,
+            parachainAdjust = null
+        )
     }
 }
 

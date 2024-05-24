@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
+import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -14,7 +15,7 @@ sealed class SwapValidationFailure {
 
     object NonPositiveAmount : SwapValidationFailure()
 
-    object InvalidSlippage : SwapValidationFailure()
+    class InvalidSlippage(val minSlippage: Percent, val maxSlippage: Percent) : SwapValidationFailure()
 
     class NewRateExceededSlippage(
         val assetIn: Chain.Asset,

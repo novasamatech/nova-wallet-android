@@ -7,6 +7,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -93,7 +94,8 @@ class PushNotificationsFeatureModule {
         pushTokenCache: PushTokenCache,
         googleApiAvailabilityProvider: GoogleApiAvailabilityProvider,
         pushPermissionRepository: PushPermissionRepository,
-        preferences: Preferences
+        preferences: Preferences,
+        buildTypeProvider: BuildTypeProvider
     ): PushNotificationsService {
         return RealPushNotificationsService(
             pushSettingsProvider,
@@ -102,7 +104,8 @@ class PushNotificationsFeatureModule {
             pushTokenCache,
             googleApiAvailabilityProvider,
             pushPermissionRepository,
-            preferences
+            preferences,
+            buildTypeProvider
         )
     }
 
@@ -120,9 +123,9 @@ class PushNotificationsFeatureModule {
     @FeatureScope
     fun provideWelcomePushNotificationsInteractor(
         preferences: Preferences,
-        googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+        pushNotificationsService: PushNotificationsService
     ): WelcomePushNotificationsInteractor {
-        return RealWelcomePushNotificationsInteractor(preferences, googleApiAvailabilityProvider)
+        return RealWelcomePushNotificationsInteractor(preferences, pushNotificationsService)
     }
 
     @Provides

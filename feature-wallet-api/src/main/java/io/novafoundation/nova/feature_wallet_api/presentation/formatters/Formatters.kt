@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters
 
 import io.novafoundation.nova.common.utils.SemiUnboundedRange
+import io.novafoundation.nova.common.utils.asTokenSymbol
+import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -31,13 +34,8 @@ fun BigDecimal.formatTokenAmount(chainAsset: Chain.Asset, roundingMode: Rounding
 }
 
 fun BigDecimal.formatTokenAmount(tokenSymbol: String, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
-    return format(roundingMode).withTokenSymbol(tokenSymbol)
+    return formatTokenAmount(tokenSymbol.asTokenSymbol(), roundingMode)
 }
-
-fun String.withTokenSymbol(tokenSymbol: String): String {
-    return "$this $tokenSymbol"
-}
-
 fun BigDecimal.formatTokenChange(chainAsset: Chain.Asset, isIncome: Boolean): String {
     val withoutSign = formatTokenAmount(chainAsset)
     val sign = if (isIncome) '+' else '-'

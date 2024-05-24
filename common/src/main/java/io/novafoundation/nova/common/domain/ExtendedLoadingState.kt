@@ -82,3 +82,11 @@ inline fun <T> ExtendedLoadingState<T>.onNotLoaded(action: () -> Unit): Extended
 
     return this
 }
+
+inline fun <T> ExtendedLoadingState<T>.onError(action: (Throwable) -> Unit): ExtendedLoadingState<T> {
+    if (this is ExtendedLoadingState.Error) {
+        action(exception)
+    }
+
+    return this
+}

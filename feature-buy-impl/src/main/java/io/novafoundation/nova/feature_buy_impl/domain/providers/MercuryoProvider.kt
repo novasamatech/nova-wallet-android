@@ -55,7 +55,7 @@ class MercuryoProvider(
                 .appendQueryParameter("widget_id", widgetId)
                 .appendQueryParameter("type", TYPE_BUY)
                 .appendNullableQueryParameter(NETWORK_KEY, network)
-                .appendQueryParameter("currency", tokenType.symbol)
+                .appendQueryParameter("currency", tokenType.symbol.value)
                 .appendQueryParameter("address", address)
                 .appendQueryParameter("return_url", ExternalProvider.REDIRECT_URL_BASE.urlEncoded())
                 .appendQueryParameter("signature", signature)

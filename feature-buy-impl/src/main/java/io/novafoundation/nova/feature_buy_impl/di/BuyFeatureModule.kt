@@ -57,9 +57,9 @@ class BuyFeatureModule {
     ): BuyTokenRegistry {
         return RealBuyTokenRegistry(
             providers = listOf(
+                mercuryoProvider,
                 transakProvider,
                 banxaProvider,
-                mercuryoProvider
             )
         )
     }

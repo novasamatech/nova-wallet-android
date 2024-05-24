@@ -3,6 +3,8 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.asPrecision
+import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
@@ -166,8 +168,8 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
 
     return ChainAssetLocal(
         id = asset.id,
-        symbol = asset.symbol,
-        precision = asset.precision,
+        symbol = asset.symbol.value,
+        precision = asset.precision.value,
         chainId = asset.chainId,
         name = asset.name,
         priceId = asset.priceId,
@@ -329,8 +331,8 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
     return Chain.Asset(
         iconUrl = local.icon,
         id = local.id,
-        symbol = local.symbol,
-        precision = local.precision,
+        symbol = local.symbol.asTokenSymbol(),
+        precision = local.precision.asPrecision(),
         name = local.name,
         chainId = local.chainId,
         priceId = local.priceId,

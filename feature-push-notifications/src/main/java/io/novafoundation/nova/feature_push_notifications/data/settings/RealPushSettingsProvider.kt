@@ -33,7 +33,7 @@ class RealPushSettingsProvider(
             sentTokensEnabled = true,
             receivedTokensEnabled = true,
             subscribedMetaAccounts = setOf(accountRepository.getSelectedMetaAccount().id),
-            stakingReward = PushSettings.ChainFeature.Concrete(emptyList()),
+            stakingReward = PushSettings.ChainFeature.All,
             governance = emptyMap()
         )
     }

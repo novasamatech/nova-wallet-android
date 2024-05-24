@@ -13,6 +13,7 @@ import io.novafoundation.nova.app.root.presentation.RootViewModel
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
@@ -56,6 +57,7 @@ class RootActivityModule {
         rootScope: RootScope,
         compoundRequestBusHandler: CompoundRequestBusHandler,
         pushNotificationsInteractor: PushNotificationsInteractor,
+        externalServiceInitializer: ExternalServiceInitializer,
         @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher
     ): ViewModel {
         return RootViewModel(
@@ -75,6 +77,7 @@ class RootActivityModule {
             rootScope,
             compoundRequestBusHandler,
             pushNotificationsInteractor,
+            externalServiceInitializer,
             actionBottomSheetLauncher
         )
     }

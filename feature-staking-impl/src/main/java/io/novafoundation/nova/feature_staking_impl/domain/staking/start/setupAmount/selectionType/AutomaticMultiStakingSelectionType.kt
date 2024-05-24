@@ -40,7 +40,8 @@ class AutomaticMultiStakingSelectionType(
     }
 
     override suspend fun updateSelectionFor(stake: Balance) {
-        val selection = selectionFor(stake)
+        val selection = selectionFor(stake) ?: return
+
         val recommendableSelection = RecommendableMultiStakingSelection(
             source = SelectionTypeSource.Automatic,
             selection = selection
@@ -49,7 +50,7 @@ class AutomaticMultiStakingSelectionType(
         selectionStore.updateSelection(recommendableSelection)
     }
 
-    private suspend fun selectionFor(stake: Balance): StartMultiStakingSelection {
+    private suspend fun selectionFor(stake: Balance): StartMultiStakingSelection? {
         val candidate = candidates.firstAllowingToStake(stake) ?: candidates.findWithMinimumStake()
 
         return candidate.recommendation.recommendedSelection(stake)

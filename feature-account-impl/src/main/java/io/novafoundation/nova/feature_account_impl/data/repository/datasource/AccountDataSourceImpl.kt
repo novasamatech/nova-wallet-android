@@ -197,7 +197,7 @@ class AccountDataSourceImpl(
     }
 
     override suspend fun changeSelectedLanguage(language: Language) = withContext(Dispatchers.IO) {
-        preferences.saveCurrentLanguage(language.iso)
+        preferences.saveCurrentLanguage(language.iso639Code)
     }
 
     override suspend fun accountExists(accountId: AccountId, chainId: ChainId): Boolean {

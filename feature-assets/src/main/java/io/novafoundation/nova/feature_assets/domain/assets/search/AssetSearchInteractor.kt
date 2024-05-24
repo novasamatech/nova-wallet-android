@@ -144,7 +144,7 @@ class AssetSearchInteractor(
         return searchTokens(
             query = query,
             chainsById = chainsById,
-            tokenSymbol = { it.token.configuration.symbol },
+            tokenSymbol = { it.token.configuration.symbol.value },
             relevantToChains = { asset, chainIds -> asset.token.configuration.chainId in chainIds }
         )
     }

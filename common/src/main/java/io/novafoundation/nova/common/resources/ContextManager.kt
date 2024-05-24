@@ -51,13 +51,13 @@ class ContextManager private constructor(
 
         val currentLanguage = if (prefs.getCurrentLanguage() == null) {
             val currentLocale = Locale.getDefault()
-            if (languagesHolder.getLanguages().map { it.iso }.contains(currentLocale.language)) {
+            if (languagesHolder.getLanguages().map { it.iso639Code }.contains(currentLocale.language)) {
                 currentLocale.language
             } else {
-                languagesHolder.getEnglishLang().iso
+                languagesHolder.getDefaultLanguage().iso639Code
             }
         } else {
-            prefs.getCurrentLanguage()!!.iso
+            prefs.getCurrentLanguage()!!.iso639Code
         }
 
         prefs.saveCurrentLanguage(currentLanguage)

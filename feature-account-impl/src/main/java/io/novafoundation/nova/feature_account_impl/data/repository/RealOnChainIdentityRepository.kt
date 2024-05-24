@@ -16,8 +16,10 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.bindings.bindIdentity
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.bindings.bindSuperOf
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -30,6 +32,7 @@ import kotlinx.coroutines.withContext
 
 class RealOnChainIdentityRepository(
     private val storageDataSource: StorageDataSource,
+    private val chainRegistry: ChainRegistry
 ) : OnChainIdentityRepository {
 
     override suspend fun getIdentitiesFromIdsHex(
@@ -45,9 +48,10 @@ class RealOnChainIdentityRepository(
         accountIds: Collection<AccountId>,
         chainId: ChainId
     ): AccountIdKeyMap<OnChainIdentity?> = withContext(Dispatchers.Default) {
+        val identityChainId = findIdentityChain(chainId)
         val distinctKeys = accountIds.mapToSet(::AccountIdKey)
 
-        storageDataSource.query(chainId) {
+        storageDataSource.query(identityChainId) {
             if (!runtime.metadata.hasModule(Modules.IDENTITY)) {
                 return@query emptyMap()
             }
@@ -80,7 +84,9 @@ class RealOnChainIdentityRepository(
         chainId: ChainId,
         accountId: AccountId
     ): OnChainIdentity? = withContext(Dispatchers.Default) {
-        storageDataSource.query(chainId) {
+        val identityChainId = findIdentityChain(chainId)
+
+        storageDataSource.query(identityChainId) {
             if (!runtime.metadata.hasModule(Modules.IDENTITY)) {
                 return@query null
             }
@@ -122,5 +128,12 @@ class RealOnChainIdentityRepository(
     private suspend fun StorageQueryContext.fetchIdentity(accountId: AccountId): OnChainIdentity? {
         return runtime.metadata.module("Identity").storage("IdentityOf")
             .query(accountId, binding = ::bindIdentity)
+    }
+
+    private suspend fun findIdentityChain(identitiesRequestedOn: ChainId): ChainId {
+        val requestedChain = chainRegistry.getChain(identitiesRequestedOn)
+        val identityChain = requestedChain.additional?.identityChain?.let { chainRegistry.getChainOrNull(it) }
+
+        return identityChain?.id ?: requestedChain.id
     }
 }

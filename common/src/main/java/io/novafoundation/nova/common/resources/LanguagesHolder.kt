@@ -7,13 +7,19 @@ import javax.inject.Singleton
 class LanguagesHolder {
 
     companion object {
-        private val RUSSIAN = Language("ru")
-        private val ENGLISH = Language("en")
 
-        private val availableLanguages = mutableListOf(RUSSIAN, ENGLISH)
+        private val ENGLISH = Language("en")
+        private val CHINESE = Language("zh")
+        private val ITALIAN = Language("it")
+        private val PORTUGUESE = Language("pt")
+        private val RUSSIAN = Language("ru")
+        private val SPANISH = Language("es")
+        private val TURKISH = Language("tr")
+
+        private val availableLanguages = mutableListOf(ENGLISH, CHINESE, ITALIAN, PORTUGUESE, RUSSIAN, SPANISH, TURKISH)
     }
 
-    fun getEnglishLang(): Language {
+    fun getDefaultLanguage(): Language {
         return ENGLISH
     }
 

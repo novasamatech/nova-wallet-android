@@ -5,6 +5,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 
 object NotSlashedFilter : RecommendationFilter {
 
+    override fun canIgnoreWhenNoApplicableCandidatesFound(): Boolean {
+        return true
+    }
+
     override fun shouldInclude(model: Validator): Boolean {
         return !model.slashed
     }

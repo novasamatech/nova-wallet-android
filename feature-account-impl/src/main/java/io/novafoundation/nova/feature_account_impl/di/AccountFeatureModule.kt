@@ -512,8 +512,9 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideIdentityRepository(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
-    ): OnChainIdentityRepository = RealOnChainIdentityRepository(remoteStorageSource)
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): OnChainIdentityRepository = RealOnChainIdentityRepository(remoteStorageSource, chainRegistry)
 
     @Provides
     @FeatureScope

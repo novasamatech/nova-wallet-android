@@ -17,7 +17,7 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RootActionBottomSheetLauncher
 
-@Module(includes = [RequestBusHandlerModule::class])
+@Module(includes = [RequestBusHandlerModule::class, ExternalServiceInitializersModule::class])
 class RootFeatureModule {
 
     @Provides

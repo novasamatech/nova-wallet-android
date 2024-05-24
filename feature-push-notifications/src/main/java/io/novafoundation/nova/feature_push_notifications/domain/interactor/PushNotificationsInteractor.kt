@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsAvailabilityState
+import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsAvailabilityState
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
@@ -21,6 +23,8 @@ interface PushNotificationsInteractor {
     suspend fun getDefaultSettings(): PushSettings
 
     fun isPushNotificationsEnabled(): Boolean
+
+    fun pushNotificationsAvailabilityState(): PushNotificationsAvailabilityState
 
     fun isPushNotificationsAvailable(): Boolean
 
@@ -63,6 +67,10 @@ class RealPushNotificationsInteractor(
 
     override fun isPushNotificationsAvailable(): Boolean {
         return pushNotificationsService.isPushNotificationsAvailable()
+    }
+
+    override fun pushNotificationsAvailabilityState(): PushNotificationsAvailabilityState {
+        return pushNotificationsService.pushNotificationsAvaiabilityState()
     }
 
     override suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>) {

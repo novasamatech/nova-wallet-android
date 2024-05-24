@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.mappers
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Node
@@ -118,7 +119,7 @@ fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): Meta
             freeInPlanks = freeInPlanks,
             reservedInPlanks = reservedInPlanks,
             offChainBalance = offChainBalance,
-            precision = precision,
+            precision = precision.asPrecision(),
             rate = rate,
         )
     }

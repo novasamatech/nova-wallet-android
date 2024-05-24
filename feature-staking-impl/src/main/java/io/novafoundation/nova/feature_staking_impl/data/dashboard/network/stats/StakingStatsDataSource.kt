@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsResponse.WithStakingId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsRewards
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.mapSubQueryIdToStakingType
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -28,7 +29,7 @@ interface StakingStatsDataSource {
 
 class RealStakingStatsDataSource(
     private val api: StakingStatsApi,
-    private val dashboardApiUrl: String,
+    private val stakingGlobalConfigRepository: StakingGlobalConfigRepository
 ) : StakingStatsDataSource {
 
     override suspend fun fetchStakingStats(
@@ -37,6 +38,7 @@ class RealStakingStatsDataSource(
     ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {
             val request = StakingStatsRequest(stakingAccounts, stakingChains)
+            val dashboardApiUrl = stakingGlobalConfigRepository.getStakingGlobalConfig().multiStakingApiUrl
             val response = api.fetchStakingStats(request, dashboardApiUrl).data
 
             val earnings = response.stakingApies.associatedById()

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.rewards
 
+import android.util.Log
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
@@ -7,6 +9,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.VaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.data.unwrapNominationPools
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -33,6 +36,7 @@ class RewardCalculatorFactory(
     private val totalIssuanceRepository: TotalIssuanceRepository,
     private val shareStakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
     private val parasRepository: ParasRepository,
+    private val varaRepository: VaraRepository,
 ) {
 
     suspend fun create(
@@ -68,20 +72,51 @@ class RewardCalculatorFactory(
     private suspend fun StakingOption.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
         return when (unwrapNominationPools().stakingType) {
             RELAYCHAIN, RELAYCHAIN_AURA -> {
+                val custom = customRelayChainCalculator(validators, totalIssuance)
+                if (custom != null) return custom
+
                 val activePublicParachains = parasRepository.activePublicParachains(assetWithChain.chain.id)
                 val inflationConfig = InflationConfig.create(chain.id, activePublicParachains)
 
                 RewardCurveInflationRewardCalculator(validators, totalIssuance, inflationConfig)
             }
+
             ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = assetWithChain.asset)
             NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+        }
+    }
+
+    private suspend fun StakingOption.customRelayChainCalculator(
+        validators: List<RewardCalculationTarget>,
+        totalIssuance: BigInteger
+    ): RewardCalculator? {
+        return when (chain.id) {
+            Chain.Geneses.VARA -> Vara(chain.id, validators, totalIssuance)
+            else -> null
         }
     }
 
     private fun InflationConfig.Companion.create(chainId: ChainId, activePublicParachains: Int?): InflationConfig {
         return when (chainId) {
             Chain.Geneses.POLKADOT -> Polkadot(activePublicParachains)
+            Chain.Geneses.AVAIL_TURING_TESTNET, Chain.Geneses.AVAIL -> Avail()
             else -> Default(activePublicParachains)
         }
+    }
+
+    private suspend fun Vara(
+        chainId: ChainId,
+        validators: List<RewardCalculationTarget>,
+        totalIssuance: BigInteger
+    ): RewardCalculator? {
+        return runCatching {
+            val inflationInfo = varaRepository.getVaraInflation(chainId)
+
+            VaraRewardCalculator(validators, totalIssuance, inflationInfo)
+        }
+            .onFailure {
+                Log.e(LOG_TAG, "Failed to create Vara reward calculator, fallbacking to default", it)
+            }
+            .getOrNull()
     }
 }

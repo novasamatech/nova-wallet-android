@@ -7,6 +7,7 @@ import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHan
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -48,6 +49,7 @@ class RootViewModel(
     private val rootScope: RootScope,
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
+    private val externalServiceInitializer: ExternalServiceInitializer,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin, ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
@@ -84,6 +86,8 @@ class RootViewModel(
         subscribeDeepLinkCallback()
 
         syncPushSettingsIfNeeded()
+
+        externalServiceInitializer.initialize()
     }
 
     private fun obserBusEvents() {
