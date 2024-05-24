@@ -104,6 +104,18 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
     }
 }
 
+fun mapMetaAccountTypeToLocal(local: LightMetaAccount.Type): MetaAccountLocal.Type {
+    return when (local) {
+        LightMetaAccount.Type.SECRETS -> MetaAccountLocal.Type.SECRETS
+        LightMetaAccount.Type.WATCH_ONLY -> MetaAccountLocal.Type.WATCH_ONLY
+        LightMetaAccount.Type.PARITY_SIGNER -> MetaAccountLocal.Type.PARITY_SIGNER
+        LightMetaAccount.Type.LEDGER_LEGACY -> MetaAccountLocal.Type.LEDGER
+        LightMetaAccount.Type.LEDGER -> MetaAccountLocal.Type.LEDGER_GENERIC
+        LightMetaAccount.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
+        LightMetaAccount.Type.PROXIED -> MetaAccountLocal.Type.PROXIED
+    }
+}
+
 fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): MetaAccountAssetBalance {
     return with(local) {
         MetaAccountAssetBalance(

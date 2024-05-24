@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetB
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToLightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToMetaAccount
+import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeToLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -154,6 +155,10 @@ class AccountDataSourceImpl(
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {
         return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
+    }
+
+    override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
+        return metaAccountDao.getMetaAccountIdsByType(mapMetaAccountTypeToLocal(type))
     }
 
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {

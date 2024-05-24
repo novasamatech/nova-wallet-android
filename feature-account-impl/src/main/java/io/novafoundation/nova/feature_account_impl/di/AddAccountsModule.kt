@@ -130,13 +130,11 @@ class AddAccountsModule {
     @FeatureScope
     fun provideGenericLedgerAddAccountRepository(
         accountDao: MetaAccountDao,
-        chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2,
         proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ): GenericLedgerAddAccountRepository = RealGenericLedgerAddAccountRepository(
         accountDao,
-        chainRegistry,
         secretStoreV2,
         proxySyncService,
         metaAccountChangesEventBus
