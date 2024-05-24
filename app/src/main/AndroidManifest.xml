@@ -129,7 +129,7 @@
         </provider>
 
         <receiver
-            android:name="io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver"
+            android:name="io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ShareCompletedReceiver"
             android:enabled="true"
             android:exported="false" />
 

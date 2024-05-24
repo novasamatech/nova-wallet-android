@@ -14,6 +14,8 @@ import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
@@ -33,6 +35,8 @@ import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableProvider
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.mixin.condition.RealConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -54,16 +58,22 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.RealProgressDialogMixin
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.common.view.bottomSheet.action.RealActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.RealDescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.input.chooser.RealListChooserMixinFactory
+import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.common.view.input.selector.RealListSelectorMixinFactory
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
 import java.security.SecureRandom
@@ -78,6 +88,14 @@ annotation class Caching
 
 @Module(includes = [ParallaxCardModule::class])
 class CommonModule {
+
+    @Provides
+    @ApplicationScope
+    fun provideGoogleApiAvailabilityProvider(
+        context: Context
+    ): GoogleApiAvailabilityProvider {
+        return RealGoogleApiAvailabilityProvider(context)
+    }
 
     @Provides
     @ApplicationScope
@@ -310,4 +328,22 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideDescriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher = RealDescriptionBottomSheetLauncher()
+
+    @Provides
+    @ApplicationScope
+    fun provideProgressDialogMixin(): ProgressDialogMixin = RealProgressDialogMixin()
+
+    @Provides
+    @ApplicationScope
+    fun provideActionBottomSheetLauncher(): ActionBottomSheetLauncherFactory = RealActionBottomSheetLauncherFactory()
+
+    @Provides
+    @ApplicationScope
+    fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory = RealListSelectorMixinFactory()
+
+    @Provides
+    @ApplicationScope
+    fun provideConditionMixinFactory(resourceManager: ResourceManager): ConditionMixinFactory {
+        return RealConditionMixinFactory(resourceManager)
+    }
 }

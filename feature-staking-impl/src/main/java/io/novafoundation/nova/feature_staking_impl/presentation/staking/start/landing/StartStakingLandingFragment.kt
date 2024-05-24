@@ -16,7 +16,7 @@ import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.dialog
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -76,7 +76,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
         observeBrowserEvents(viewModel)
         observeValidations(viewModel)
 
-        viewModel.isContinueButtonLoading.observe(startStakingLandingButton::setProgress)
+        viewModel.isContinueButtonLoading.observe(startStakingLandingButton::setProgressState)
 
         viewModel.modelFlow.observe {
             val isLoaded = it.isLoaded()

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <ImageView
+        android:id="@+id/warningCheckBoxIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        tools:src="@drawable/ic_warning_filled" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/warningCheckBoxCheckBox"
+        style="@style/Widget.Nova.Checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="12dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="top"
+        android:lineSpacingExtra="2sp"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:textColor="@color/text_secondary"
+        tools:text="This passphrase gives you total and permanent access to all connected wallets and the funds within them. DO NOT SHARE IT." />
+
+</merge>

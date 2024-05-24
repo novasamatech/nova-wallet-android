@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingVertical="8dp"
     tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
@@ -21,10 +22,12 @@
         android:id="@+id/labeledTextIcon"
         android:layout_width="18dp"
         android:layout_height="18dp"
+        android:layout_marginStart="12dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/labeledTextText"
-        app:layout_constraintStart_toStartOf="@id/labeledTextLabel"
+        app:layout_constraintStart_toEndOf="@id/labeledTextPrimaryIcon"
         app:layout_constraintTop_toTopOf="@id/labeledTextText"
+        app:layout_goneMarginStart="16dp"
         tools:src="@color/icon_accent" />
 
     <TextView
@@ -33,10 +36,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
         android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toTopOf="@+id/labeledTextText"
         app:layout_constraintEnd_toStartOf="@id/labeledTextAction"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/labeledTextPrimaryIcon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
@@ -50,7 +53,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="64dp"
-        android:layout_marginBottom="8dp"
         android:ellipsize="middle"
         android:singleLine="true"
         android:textColor="@color/text_primary"
@@ -61,7 +63,7 @@
         app:layout_constraintTop_toBottomOf="@id/labeledTextLabel"
         app:layout_constraintVertical_bias="0.0"
         app:layout_goneMarginEnd="16dp"
-        app:layout_goneMarginStart="0dp"
+        app:layout_goneMarginStart="16dp"
         tools:text="GybH55zsi5nAGybH55zsi5nAGybH55zsi5nAGybH55zsi5nA" />
 
     <ImageView

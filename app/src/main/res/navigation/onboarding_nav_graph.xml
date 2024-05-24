@@ -12,8 +12,8 @@
         tools:layout="@layout/fragment_welcome">
 
         <action
-            android:id="@+id/action_welcomeFragment_to_createAccountFragment"
-            app:destination="@id/createAccountFragment"
+            android:id="@+id/action_welcomeFragment_to_startCreateWallet"
+            app:destination="@id/create_wallet_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -28,51 +28,13 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_welcomeFragment_to_createWatchWalletFragment"
-            app:destination="@id/createWatchWalletFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_welcomeFragment_to_import_parity_signer_graph"
-            app:destination="@id/import_parity_signer_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_welcomeFragment_to_import_ledger_graph"
-            app:destination="@id/import_ledger_graph"
+            android:id="@+id/action_welcomeFragment_to_importWalletOptionsFragment"
+            app:destination="@id/import_wallet_options_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
-
-
-    <fragment
-        android:id="@+id/createAccountFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.create.CreateAccountFragment"
-        android:label="fragment_create_account"
-        tools:layout="@layout/fragment_create_wallet_name">
-
-        <action
-            android:id="@+id/action_createAccountFragment_to_mnemonic_nav_graph"
-            app:destination="@id/mnemonic_nav_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-    </fragment>
-
-    <include app:graph="@navigation/mnemonic_nav_graph" />
-    <include app:graph="@navigation/import_nav_graph" />
-    <include app:graph="@navigation/import_parity_signer_graph" />
-    <include app:graph="@navigation/import_ledger_graph" />
 
     <fragment
         android:id="@+id/createWatchWalletFragment"
@@ -90,5 +52,12 @@
             app:popUpTo="@id/welcomeFragment"
             app:popUpToInclusive="true" />
     </fragment>
+
+    <include app:graph="@navigation/mnemonic_nav_graph" />
+    <include app:graph="@navigation/import_parity_signer_graph" />
+    <include app:graph="@navigation/import_ledger_graph" />
+    <include app:graph="@navigation/create_wallet_nav_graph" />
+    <include app:graph="@navigation/restore_cloud_backup_nav_graph" />
+    <include app:graph="@navigation/import_wallet_options_nav_graph" />
 
 </navigation>

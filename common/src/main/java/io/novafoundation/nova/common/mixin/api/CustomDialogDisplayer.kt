@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.mixin.api
 import androidx.annotation.StyleRes
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -13,7 +14,7 @@ interface CustomDialogDisplayer {
 
     class Payload(
         val title: String,
-        val message: String,
+        val message: String?,
         val okAction: DialogAction?,
         val cancelAction: DialogAction? = null,
         @StyleRes val customStyle: Int? = null,
@@ -50,5 +51,19 @@ fun CustomDialogDisplayer.Presentation.displayError(
                 cancelAction = null
             ),
         )
+    }
+}
+
+fun TitleAndMessage.toCustomDialogPayload(resourceManager: ResourceManager): CustomDialogDisplayer.Payload {
+    return CustomDialogDisplayer.Payload(
+        title = first,
+        message = second,
+        okAction = DialogAction.noOp(resourceManager.getString(R.string.common_ok)),
+    )
+}
+
+fun CustomDialogDisplayer.Presentation.displayDialogOrNothing(payload: CustomDialogDisplayer.Payload?) {
+    payload?.let {
+        displayDialog(it)
     }
 }

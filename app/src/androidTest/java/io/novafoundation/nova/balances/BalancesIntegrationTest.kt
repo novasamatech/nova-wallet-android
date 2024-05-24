@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.system
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
@@ -142,6 +143,7 @@ class BalancesIntegrationTest(
     private fun testTransactionOrigin(): TransactionOrigin = TransactionOrigin.Wallet(
         MetaAccount(
             id = 0,
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
             chainAccounts = emptyMap(),
             proxy = null,
             substratePublicKey = null,

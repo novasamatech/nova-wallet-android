@@ -7,10 +7,14 @@ import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerif
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
@@ -27,7 +31,10 @@ class AccountFeatureHolder @Inject constructor(
     private val selectAddressCommunicator: SelectAddressCommunicator,
     private val selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
     private val selectWalletCommunicator: SelectWalletCommunicator,
-    private val pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator
+    private val pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
+    private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
+    private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+    private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -39,6 +46,7 @@ class AccountFeatureHolder @Inject constructor(
             .proxyFeatureApi(getFeature(ProxyFeatureApi::class.java))
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
             .web3NamesApi(getFeature(Web3NamesApi::class.java))
+            .cloudBackupFeatureApi(getFeature(CloudBackupFeatureApi::class.java))
             .build()
 
         return DaggerAccountFeatureComponent.factory()
@@ -50,6 +58,9 @@ class AccountFeatureHolder @Inject constructor(
                 selectMultipleWalletsCommunicator = selectMultipleWalletsCommunicator,
                 selectWalletCommunicator = selectWalletCommunicator,
                 pinCodeTwoFactorVerificationCommunicator = pinCodeTwoFactorVerificationCommunicator,
+                syncWalletsBackupPasswordCommunicator = syncWalletsBackupPasswordCommunicator,
+                changeBackupPasswordCommunicator = changeBackupPasswordCommunicator,
+                restoreBackupPasswordCommunicator = restoreBackupPasswordCommunicator,
                 deps = accountFeatureDependencies
             )
     }

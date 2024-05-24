@@ -3,18 +3,17 @@ package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.w
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class WatchOnlyAddAccountRepository(
     private val accountDao: MetaAccountDao,
-    proxySyncService: ProxySyncService,
     metaAccountChangesEventBus: MetaAccountChangesEventBus
-) : BaseAddAccountRepository<WatchOnlyAddAccountRepository.Payload>(proxySyncService, metaAccountChangesEventBus) {
+) : BaseAddAccountRepository<WatchOnlyAddAccountRepository.Payload>(metaAccountChangesEventBus) {
 
     sealed interface Payload {
         class MetaAccount(
@@ -49,12 +48,13 @@ class WatchOnlyAddAccountRepository(
             isSelected = false,
             position = accountDao.nextAccountPosition(),
             type = MetaAccountLocal.Type.WATCH_ONLY,
-            status = MetaAccountLocal.Status.ACTIVE
+            status = MetaAccountLocal.Status.ACTIVE,
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
         )
 
         val metaId = accountDao.insertMetaAccount(metaAccount)
 
-        return AddAccountResult.AccountAdded(metaId)
+        return AddAccountResult.AccountAdded(metaId, LightMetaAccount.Type.WATCH_ONLY)
     }
 
     private suspend fun changeWatchOnlyChainAccount(payload: Payload.ChainAccount): AddAccountResult {
@@ -68,6 +68,6 @@ class WatchOnlyAddAccountRepository(
 
         accountDao.insertChainAccount(chainAccount)
 
-        return AddAccountResult.AccountChanged(payload.metaId)
+        return AddAccountResult.AccountChanged(payload.metaId, LightMetaAccount.Type.WATCH_ONLY)
     }
 }

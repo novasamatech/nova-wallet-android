@@ -102,6 +102,12 @@ interface WithContextExtensions {
     val Float.dp: Int
         get() = dp(providedContext)
 
+    val Int.dpF: Float
+        get() = dpF(providedContext)
+
+    val Float.dpF: Float
+        get() = dpF(providedContext)
+
     fun addRipple(to: Drawable, mask: Drawable? = getRippleMask()) = providedContext.addRipple(to, mask)
 
     fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = addRipple(this, mask)

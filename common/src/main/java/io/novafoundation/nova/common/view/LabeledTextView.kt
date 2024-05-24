@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
@@ -30,6 +31,9 @@ class LabeledTextView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_labeled_text, this)
+
+        minHeight = 48.dp
+        setPadding(0, 8.dp, 0, 8.dp)
 
         with(context) {
             background = addRipple(getCornersStateDrawable())
@@ -51,10 +55,13 @@ class LabeledTextView @JvmOverloads constructor(
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.LabeledTextView)
 
             val label = typedArray.getString(R.styleable.LabeledTextView_label)
-            label?.let(::setLabel)
+            setLabelOrHide(label)
 
             val message = typedArray.getString(R.styleable.LabeledTextView_message)
             message?.let(::setMessage)
+
+            val messageColor = typedArray.getColor(R.styleable.LabeledTextView_messageColor, context.getColor(R.color.text_primary))
+            setMessageColor(messageColor)
 
             val messageStyle = typedArray.getResourceIdOrNull(R.styleable.LabeledTextView_messageStyle)
             messageStyle?.let(labeledTextText::setTextAppearance)
@@ -78,6 +85,10 @@ class LabeledTextView @JvmOverloads constructor(
         }
     }
 
+    private fun setMessageColor(messageColor: Int) {
+        labeledTextText.setTextColor(messageColor)
+    }
+
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
 
@@ -85,7 +96,11 @@ class LabeledTextView @JvmOverloads constructor(
     }
 
     fun setLabel(label: String) {
-        labeledTextLabel.text = label
+        setLabelOrHide(label)
+    }
+
+    fun setLabelOrHide(label: String?) {
+        labeledTextLabel.setTextOrHide(label)
     }
 
     fun setActionIcon(icon: Drawable?) {
@@ -96,7 +111,7 @@ class LabeledTextView @JvmOverloads constructor(
 
     fun setMessage(@StringRes messageRes: Int) = setMessage(context.getString(messageRes))
 
-    fun setMessage(text: String) {
+    fun setMessage(text: String?) {
         labeledTextText.text = text
     }
 

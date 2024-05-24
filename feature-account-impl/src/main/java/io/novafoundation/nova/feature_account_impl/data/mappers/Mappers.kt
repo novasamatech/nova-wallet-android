@@ -41,27 +41,36 @@ fun mapCryptoTypeToCryptoTypeModel(
     resourceManager: ResourceManager,
     encryptionType: CryptoType
 ): CryptoTypeModel {
-    val name = when (encryptionType) {
-        CryptoType.SR25519 -> "${resourceManager.getString(R.string.sr25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.sr25519_selection_subtitle
-        )
-        }"
+    val title = mapCryptoTypeToCryptoTypeTitle(resourceManager, encryptionType)
+    val subtitle = mapCryptoTypeToCryptoTypeSubtitle(resourceManager, encryptionType)
 
-        CryptoType.ED25519 -> "${resourceManager.getString(R.string.ed25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.ed25519_selection_subtitle
-        )
-        }"
+    return CryptoTypeModel("$title $subtitle", encryptionType)
+}
 
-        CryptoType.ECDSA -> "${resourceManager.getString(R.string.ecdsa_selection_title)} ${
-        resourceManager.getString(
-            R.string.ecdsa_selection_subtitle
-        )
-        }"
+fun mapCryptoTypeToCryptoTypeTitle(
+    resourceManager: ResourceManager,
+    encryptionType: CryptoType
+): String {
+    return when (encryptionType) {
+        CryptoType.SR25519 -> resourceManager.getString(R.string.sr25519_selection_title)
+
+        CryptoType.ED25519 -> resourceManager.getString(R.string.ed25519_selection_title)
+
+        CryptoType.ECDSA -> resourceManager.getString(R.string.ecdsa_selection_title)
     }
+}
 
-    return CryptoTypeModel(name, encryptionType)
+fun mapCryptoTypeToCryptoTypeSubtitle(
+    resourceManager: ResourceManager,
+    encryptionType: CryptoType
+): String {
+    return when (encryptionType) {
+        CryptoType.SR25519 -> resourceManager.getString(R.string.sr25519_selection_subtitle)
+
+        CryptoType.ED25519 -> resourceManager.getString(R.string.ed25519_selection_subtitle)
+
+        CryptoType.ECDSA -> resourceManager.getString(R.string.ecdsa_selection_subtitle)
+    }
 }
 
 fun mapNodeToNodeModel(node: Node): NodeModel {
@@ -92,7 +101,7 @@ fun mapNodeLocalToNode(nodeLocal: NodeLocal): Node {
     }
 }
 
-private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
+fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
     return when (local) {
         MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
         MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
@@ -133,6 +142,7 @@ fun mapMetaAccountLocalToMetaAccount(
     return with(joinedMetaAccountInfo.metaAccount) {
         MetaAccount(
             id = id,
+            globallyUniqueId = globallyUniqueId,
             chainAccounts = chainAccounts,
             proxy = proxyAccount,
             substratePublicKey = substratePublicKey,
@@ -154,6 +164,7 @@ fun mapMetaAccountLocalToLightMetaAccount(
     return with(metaAccountLocal) {
         LightMetaAccount(
             id = id,
+            globallyUniqueId = metaAccountLocal.globallyUniqueId,
             substratePublicKey = substratePublicKey,
             substrateCryptoType = substrateCryptoType,
             substrateAccountId = substrateAccountId,

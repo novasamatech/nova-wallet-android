@@ -138,6 +138,10 @@ fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
     }
 }
 
+fun ResourceManager.formatTime(data: Date): String {
+    return formatTime(data.time)
+}
+
 fun Long.formatDaysSinceEpoch(context: Context): String? {
     val currentDays = System.currentTimeMillis().daysFromMillis()
     val diff = currentDays - this

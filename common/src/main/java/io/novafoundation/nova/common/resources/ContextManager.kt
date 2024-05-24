@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.resources
 
+import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import io.novafoundation.nova.common.data.storage.PreferencesImpl
@@ -84,4 +85,8 @@ class ContextManager private constructor(
     }
 
     private fun hasCountryCode(codes: List<String>) = codes.size != 1
+}
+
+fun ContextManager.requireActivity(): Activity {
+    return requireNotNull(getActivity())
 }

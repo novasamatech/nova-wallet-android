@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.interfaces.isMarketRelease

@@ -4,7 +4,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import androidx.annotation.CallSuper
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ShareCompletedReceiver
 
 abstract class ExportFragment<V : ExportViewModel> : BaseFragment<V>() {
 

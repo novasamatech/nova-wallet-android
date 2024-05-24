@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -20,7 +21,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -55,23 +56,25 @@ class AccountDetailsModule {
     @IntoMap
     @ViewModelKey(WalletDetailsViewModel::class)
     fun provideViewModel(
+        rootScope: RootScope,
         interactor: WalletDetailsInteractor,
         router: AccountRouter,
         metaId: Long,
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
-        addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
+        addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
         walletDetailsMixinFactory: WalletDetailsMixinFactory
     ): ViewModel {
         return WalletDetailsViewModel(
+            rootScope = rootScope,
             interactor = interactor,
             accountRouter = router,
             metaId = metaId,
             externalActions = externalActions,
             chainRegistry = chainRegistry,
             importTypeChooserMixin = importTypeChooserMixin,
-            addAccountLauncherMixin = addAccountLauncherMixin,
+            addAccountLauncherPresentationFactory = addAccountLauncherPresentationFactory,
             walletDetailsMixinFactory = walletDetailsMixinFactory
         )
     }

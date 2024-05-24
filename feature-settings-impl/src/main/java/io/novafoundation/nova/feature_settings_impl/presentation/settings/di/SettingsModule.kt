@@ -2,11 +2,11 @@ package io.novafoundation.nova.feature_settings_impl.presentation.settings.di
 
 import android.content.Context
 import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
-import androidx.biometric.BiometricPrompt
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -16,10 +16,10 @@ import io.novafoundation.nova.common.io.MainThreadExecutor
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase

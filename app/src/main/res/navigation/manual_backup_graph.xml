@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/manual_backup_graph"
+    app:startDestination="@id/manualBackupSelectWallet">
+
+    <fragment
+        android:id="@+id/manualBackupSelectWallet"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets.ManualBackupSelectWalletFragment"
+        android:label="ManualBackupSelectWalletFragment">
+
+        <action
+            android:id="@+id/action_manualBackupSelectWalletFragment_to_manualBackupSelectAccountFragment"
+            app:destination="@id/manualBackupSelectAccount"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_manualBackupSelectWallet_to_pincode_check"
+            app:destination="@+id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/manualBackupSelectAccount"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment"
+        android:label="ManualBackupSelectAccountFragment">
+
+        <action
+            android:id="@+id/action_manualBackupSelectAccount_to_pincode_check"
+            app:destination="@+id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/pincodeFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
+        android:label="fragment_pincode"
+        tools:layout="@layout/fragment_pincode">
+
+        <action
+            android:id="@+id/action_manualBackupPincodeFragment_to_manualBackupWarning"
+            app:destination="@+id/manualBackupWarning"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/manualBackupWarning"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningFragment"
+        android:label="ManualBackupWarningFragment">
+
+        <action
+            android:id="@+id/action_manualBackupWarning_to_manualBackupSecrets"
+            app:destination="@+id/manualBackupSecrets"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/manualBackupSecrets"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.main.ManualBackupSecretsFragment"
+        android:label="ManualBackupSecretsFragment">
+
+        <action
+            android:id="@+id/action_manualBackupSecrets_to_manualBackupAdvancedSecrets"
+            app:destination="@+id/manualBackupAdvancedSecrets"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/manualBackupAdvancedSecrets"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.ManualBackupAdvancedSecretsFragment"
+        android:label="ManualBackupAdvancedSecretsFragment"/>
+</navigation>
