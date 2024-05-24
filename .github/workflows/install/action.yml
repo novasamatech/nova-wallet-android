@@ -10,11 +10,8 @@ runs:
         java-version: '11'
         cache: 'gradle'
 
-    - name: 🛠️ Install NDK
-      id: setup-ndk
-      uses: nttld/setup-ndk@v1.4.2
-      with:
-        ndk-version: 'r26b'
+    - name: Install NDK
+        run: echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;26.1.10909125" --sdk_root=${ANDROID_SDK_ROOT}
 
     - name: Set ndk.dir in local.properties
       run: echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" >> local.properties
