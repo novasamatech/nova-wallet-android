@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -74,7 +73,6 @@ class SelectSendViewModel(
     private val chainRegistry: ChainRegistry,
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
-    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val router: AssetsRouter,
     private val payload: SendPayload,
     private val initialRecipientAddress: String?,
@@ -317,7 +315,12 @@ class SelectSendViewModel(
             amountChooserMixin.backPressuredAmount
         ) { originAsset, destinationAsset, address, amount ->
             originFeeMixin.invalidateFee()
-            crossChainFeeMixin.invalidateFee()
+
+            if (originAsset.chain.id != destinationAsset.chain.id) {
+                crossChainFeeMixin.invalidateFee()
+            } else {
+                crossChainFeeMixin.setFee(null)
+            }
 
             val assetTransfer = buildTransfer(origin = originAsset, destination = destinationAsset, amount = amount, address = address)
             val planks = originAsset.asset.planksFromAmount(amount)

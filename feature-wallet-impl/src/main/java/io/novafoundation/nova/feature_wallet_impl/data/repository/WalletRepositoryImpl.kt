@@ -109,7 +109,7 @@ class WalletRepositoryImpl(
             val newTokens = coinPriceChanges.flatMap { (priceId, coinPriceChange) ->
                 syncingPriceIdsToSymbols[priceId]?.let { symbols ->
                     symbols.map { symbol ->
-                        TokenLocal(symbol, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
+                        TokenLocal(symbol.value, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
                     }
                 } ?: emptyList()
             }
@@ -125,7 +125,7 @@ class WalletRepositoryImpl(
 
         val coinPriceChange = getAssetPrice(priceId, currency)
 
-        val token = TokenLocal(asset.symbol, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
+        val token = TokenLocal(asset.symbol.value, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
 
         assetCache.insertToken(token)
     }

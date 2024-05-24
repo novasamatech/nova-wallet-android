@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.states
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.asPrecision
+import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
@@ -248,8 +250,8 @@ class DefaultMetamaskState(
                 nativeCurrency = with(nativeCurrency) {
                     EvmChain.NativeCurrency(
                         name = name,
-                        symbol = symbol,
-                        decimals = decimals
+                        symbol = symbol.asTokenSymbol(),
+                        decimals = decimals.asPrecision()
                     )
                 },
                 rpcUrl = rpcUrls.first(),

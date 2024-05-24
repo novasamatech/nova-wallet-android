@@ -18,8 +18,8 @@ class NominationPoolRecommendation(
         nominationPoolRecommenderFactory.create(stakingOption, scope)
     }
 
-    override suspend fun recommendedSelection(stake: Balance): StartMultiStakingSelection {
-        val recommendedPool = recommendator.await().recommendedPool()
+    override suspend fun recommendedSelection(stake: Balance): StartMultiStakingSelection? {
+        val recommendedPool = recommendator.await().recommendedPool() ?: return null
 
         return NominationPoolSelection(recommendedPool, stakingOption, stake)
     }

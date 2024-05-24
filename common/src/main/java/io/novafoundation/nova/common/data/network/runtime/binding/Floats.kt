@@ -9,6 +9,7 @@ typealias FixedI64 = BigDecimal
 
 const val PERBILL_MANTISSA_SIZE = 9
 const val PERMILL_MANTISSA_SIZE = 6
+const val PERQUINTILL_MANTISSA_SIZE = 18
 
 @HelperBinding
 fun bindPerbillNumber(value: BigInteger, mantissa: Int = PERBILL_MANTISSA_SIZE): Perbill {
@@ -33,4 +34,8 @@ fun bindPerbillTyped(dynamic: Any?, mantissa: Int = PERBILL_MANTISSA_SIZE): Perb
 
 fun bindPermill(dynamic: Any?): PerbillTyped {
     return bindPerbillTyped(dynamic, mantissa = PERMILL_MANTISSA_SIZE)
+}
+
+fun BigInteger.asPerQuintill(): PerbillTyped {
+    return PerbillTyped(toBigDecimal(scale = PERQUINTILL_MANTISSA_SIZE).toDouble())
 }

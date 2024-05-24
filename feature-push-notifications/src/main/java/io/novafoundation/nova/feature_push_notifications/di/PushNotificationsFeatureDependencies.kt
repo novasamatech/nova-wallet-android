@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
+import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
@@ -59,4 +60,6 @@ interface PushNotificationsFeatureDependencies {
     val metaAccountChangesEventBus: MetaAccountChangesEventBus
 
     val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+
+    fun buildTypeProvider(): BuildTypeProvider
 }

@@ -21,7 +21,7 @@ fun mapTokenWithCurrencyToToken(
     chainAsset: Chain.Asset,
 ): Token {
     return mapTokenLocalToToken(
-        tokenWithCurrency.token ?: TokenLocal.createEmpty(chainAsset.symbol, tokenWithCurrency.currency.id),
+        tokenWithCurrency.token ?: TokenLocal.createEmpty(chainAsset.symbol.value, tokenWithCurrency.currency.id),
         tokenWithCurrency.currency,
         chainAsset
     )

@@ -4,7 +4,11 @@ import io.novafoundation.nova.common.utils.PalletBasedFilter
 import io.novafoundation.nova.common.utils.RuntimeDependent
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 
-typealias RecommendationFilter = PalletBasedFilter<Validator>
+interface RecommendationFilter : PalletBasedFilter<Validator> {
+
+    fun canIgnoreWhenNoApplicableCandidatesFound(): Boolean
+}
+
 typealias RecommendationSorting = Comparator<Validator>
 
 interface RecommendationPostProcessor : RuntimeDependent {

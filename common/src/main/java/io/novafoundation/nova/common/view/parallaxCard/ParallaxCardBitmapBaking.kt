@@ -18,7 +18,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ParallaxCardBitmapBaking(private val context: Context, val lruCache: BackingParallaxCardLruCache) {
+class ParallaxCardBitmapBaking(context: Context, val lruCache: BackingParallaxCardLruCache) {
 
     private var callback: OnBakingPreparedCallback? = null
 

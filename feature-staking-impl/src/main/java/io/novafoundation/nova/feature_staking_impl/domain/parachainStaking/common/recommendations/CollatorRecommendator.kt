@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.indexOfOrNull
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
-import io.novafoundation.nova.feature_staking_impl.data.collators.KnownNovaCollators
+import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
@@ -29,13 +29,13 @@ private const val COLLATORS_CACHE = "COLLATORS_CACHE"
 class CollatorRecommendatorFactory(
     private val collatorProvider: CollatorProvider,
     private val computationalCache: ComputationalCache,
-    private val knownNovaCollators: KnownNovaCollators
+    private val knownNovaValidators: KnownNovaValidators
 ) {
 
     suspend fun create(stakingOption: StakingOption, scope: CoroutineScope) = computationalCache.useCache(COLLATORS_CACHE, scope) {
         val collators = collatorProvider.getCollators(stakingOption, CollatorSource.Elected)
 
-        val knownNovaCollators = knownNovaCollators.getCollatorIds(stakingOption.chain.id)
+        val knownNovaCollators = knownNovaValidators.getValidatorIds(stakingOption.chain.id)
 
         CollatorRecommendator(collators, knownNovaCollators)
     }

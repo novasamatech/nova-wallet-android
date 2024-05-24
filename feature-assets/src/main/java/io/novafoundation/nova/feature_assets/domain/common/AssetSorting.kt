@@ -62,7 +62,7 @@ fun getAssetBaseComparator(
     return compareByDescending(comparing)
         .thenByDescending { it.balanceWithOffchain.total.amount }
         .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
-        .thenBy { it.asset.token.configuration.symbol }
+        .thenBy { it.asset.token.configuration.symbol.value }
 }
 
 fun getAssetGroupBaseComparator(

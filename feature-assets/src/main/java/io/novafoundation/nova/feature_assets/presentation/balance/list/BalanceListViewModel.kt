@@ -290,7 +290,7 @@ class BalanceListViewModel(
 
             val breakdown = balanceBreakdown.breakdown.map {
                 BalanceBreakdownAmount(
-                    name = it.token.configuration.symbol + " " + mapBalanceIdToUi(resourceManager, it.id),
+                    name = it.token.configuration.symbol.value + " " + mapBalanceIdToUi(resourceManager, it.id),
                     amount = mapAmountToAmountModel(it.tokenAmount, it.token)
                 )
             }

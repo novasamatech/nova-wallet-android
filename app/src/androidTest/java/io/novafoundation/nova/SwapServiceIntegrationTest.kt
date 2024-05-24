@@ -173,11 +173,11 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
     }
 
     private fun Chain.siri(): Chain.Asset {
-        return assets.first { it.symbol == "SIRI" }
+        return assets.first { it.symbol.value == "SIRI" }
     }
 
     private fun Chain.dot(): Chain.Asset {
-        return assets.first { it.symbol == "DOT" }
+        return assets.first { it.symbol.value == "DOT" }
     }
 
     private fun Chain.wnd(): Chain.Asset {

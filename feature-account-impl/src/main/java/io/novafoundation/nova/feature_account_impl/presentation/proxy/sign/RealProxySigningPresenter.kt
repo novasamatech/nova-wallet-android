@@ -4,22 +4,21 @@ import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.colorSpan
+import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.dialog.dialog
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.math.BigInteger
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -78,7 +77,7 @@ class RealProxySigningPresenter(
         metaAccount: MetaAccount,
         chainAsset: Chain.Asset,
         availableBalance: BigInteger,
-        fee: Fee
+        fee: BigInteger
     ) = withContext(Dispatchers.Main) {
         suspendCoroutine { continuation ->
             dialog(contextManager.getActivity()!!) {
@@ -87,12 +86,10 @@ class RealProxySigningPresenter(
                     resourceManager.getString(
                         R.string.proxy_error_not_enough_to_pay_fee_message,
                         metaAccount.name,
-                        chainAsset.amountFromPlanks(fee.amount).formatTokenAmount(chainAsset),
-                        chainAsset.amountFromPlanks(availableBalance).formatTokenAmount(chainAsset),
+                        fee.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol),
+                        availableBalance.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol)
                     )
                 )
-
-                chainAsset.amountFromPlanks(availableBalance).formatTokenAmount(chainAsset)
 
                 setPositiveButton(io.novafoundation.nova.common.R.string.common_close) { _, _ -> continuation.resume(Unit) }
             }

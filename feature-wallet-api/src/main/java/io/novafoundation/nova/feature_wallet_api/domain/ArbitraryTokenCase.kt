@@ -31,7 +31,8 @@ class RealArbitraryTokenUseCase(
         val priceId = chainAsset.priceId
 
         val rate = if (priceId != null) {
-            coinPriceRepository.getCoinPriceAtTime(priceId, currency, at)
+            runCatching { coinPriceRepository.getCoinPriceAtTime(priceId, currency, at) }
+                .getOrNull()
         } else {
             null
         }

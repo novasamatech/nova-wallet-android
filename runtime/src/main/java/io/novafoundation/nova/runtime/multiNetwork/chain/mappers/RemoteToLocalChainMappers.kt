@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLoca
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
@@ -34,6 +35,7 @@ private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
 private const val RELAYCHAIN_AS_NATIVE = "relaychainAsNative"
 private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
 private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
+private const val IDENTITY_CHAIN = "identityChain"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -55,7 +57,8 @@ fun mapRemoteChainToLocal(
             defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull(),
             relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
             stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
-            feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean
+            feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean,
+            identityChain = it[IDENTITY_CHAIN] as? ChainId
         )
     }
 
