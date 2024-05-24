@@ -226,10 +226,10 @@ buildscript {
 allprojects {
     repositories {
         google()
+        mavenCentral()
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url "https://nexus.iroha.tech/repository/maven-soramitsu/" }
-        mavenCentral()
         mavenLocal()
         flatDir { dirs "$rootDir/common/libs" }
     }
