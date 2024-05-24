@@ -25,6 +25,16 @@ import kotlinx.android.synthetic.main.view_alert.view.alertSubMessage
 
 typealias SimpleAlertModel = String
 
+class AlertModel(
+    val style: AlertView.StylePreset,
+    val message: String,
+    val subMessage: String?,
+    val action: ActionModel?
+) {
+
+    class ActionModel(val text: String, val listener: () -> Unit)
+}
+
 class AlertView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -116,5 +126,19 @@ class AlertView @JvmOverloads constructor(
         StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background)
     }
 }
+
+fun AlertView.setModel(model: AlertModel) {
+    setMessage(model.message)
+    setSubMessage(model.subMessage)
+
+    if (model.action != null) {
+        setActionText(model.action.text)
+        setOnActionClickedListener(model.action.listener)
+    }
+
+    setStylePreset(model.style)
+}
+
+fun AlertView.setModelOrHide(maybeModel: AlertModel?) = letOrHide(maybeModel, ::setModel)
 
 fun AlertView.setMessageOrHide(text: String?) = letOrHide(text, ::setMessage)

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -44,7 +45,9 @@ abstract class SelectAddressLedgerViewModel(
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
     private val messageFormatter: LedgerMessageFormatter
-) : BaseViewModel(), LedgerMessageCommands {
+) : BaseViewModel(),
+    LedgerMessageCommands,
+    Browserable.Presentation by Browserable() {
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 

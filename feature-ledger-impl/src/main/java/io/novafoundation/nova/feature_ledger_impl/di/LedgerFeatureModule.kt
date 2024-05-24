@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
@@ -79,8 +80,9 @@ class LedgerFeatureModule {
         resourceManager: ResourceManager,
         migrationTracker: LedgerMigrationTracker,
         chainRegistry: ChainRegistry,
+        appLinksProvider: AppLinksProvider,
     ): LedgerMessageFormatterFactory {
-        return LedgerMessageFormatterFactory(resourceManager, migrationTracker, chainRegistry)
+        return LedgerMessageFormatterFactory(resourceManager, migrationTracker, chainRegistry, appLinksProvider)
     }
 
     @Provides

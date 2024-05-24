@@ -28,7 +28,7 @@ class SelectAddressImportLedgerModule {
     fun provideMessageFormatter(
         screenPayload: SelectLedgerAddressPayload,
         factory: LedgerMessageFormatterFactory,
-    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId)
+    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId, showAlerts = false)
 
     @Provides
     @IntoMap

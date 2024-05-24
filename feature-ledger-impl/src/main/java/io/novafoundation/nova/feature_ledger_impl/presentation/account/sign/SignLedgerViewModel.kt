@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.INVALID_DATA
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
@@ -22,7 +21,6 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedger
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.closeToExpire
@@ -44,8 +42,6 @@ enum class InvalidDataError {
 private class InvalidSignatureError : Exception()
 
 class SignLedgerViewModel(
-    private val substrateApplication: SubstrateLedgerApplication,
-    private val selectLedgerPayload: SelectLedgerPayload,
     private val router: LedgerRouter,
     private val resourceManager: ResourceManager,
     private val signPayloadState: SigningSharedState,
@@ -106,6 +102,7 @@ class SignLedgerViewModel(
             title = resourceManager.getString(R.string.ledger_review_approve_title),
             subtitle = resourceManager.getString(R.string.ledger_sign_approve_message, device.name),
             onCancel = ::bottomSheetClosed,
+            alert = messageFormatter.alertForKind(LedgerMessageFormatter.MessageKind.OTHER),
             footer = LedgerMessageCommand.Footer.Timer(
                 timerValue = validityPeriod.period,
                 closeToExpire = { validityPeriod.closeToExpire() },
@@ -118,10 +115,9 @@ class SignLedgerViewModel(
 
         signingJob?.cancel()
         signingJob = async {
-            substrateApplication.getSignature(
+            interactor.getSignature(
                 device = device,
                 metaId = signingMetaAccount.id,
-                chainId = selectLedgerPayload.chainId,
                 payload = signState.extrinsic
             )
         }
@@ -144,7 +140,7 @@ class SignLedgerViewModel(
         timerExpired()
     }
 
-    private fun handleInvalidSignature() {
+    private suspend fun handleInvalidSignature() {
         showFatalError(
             title = resourceManager.getString(R.string.common_signature_invalid),
             subtitle = resourceManager.getString(R.string.ledger_sign_signature_invalid_message),
@@ -185,7 +181,7 @@ class SignLedgerViewModel(
         )
     }
 
-    private fun showFatalError(
+    private suspend fun showFatalError(
         title: String,
         subtitle: String,
     ) {
@@ -194,6 +190,7 @@ class SignLedgerViewModel(
         ledgerMessageCommands.value = LedgerMessageCommand.Show.Error.FatalError(
             title = title,
             subtitle = subtitle,
+            alert = messageFormatter.alertForKind(LedgerMessageFormatter.MessageKind.OTHER),
             onConfirm = ::errorAcknowledged
         ).event()
     }
