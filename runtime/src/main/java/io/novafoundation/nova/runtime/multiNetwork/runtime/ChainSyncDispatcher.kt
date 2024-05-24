@@ -37,7 +37,7 @@ class AsyncChainSyncDispatcher(maxConcurrentUpdates: Int = 8) : ChainSyncDispatc
     }
 
     override fun launchSync(chainId: String, action: suspend () -> Unit) {
-        syncingChains[chainId] =  launch(syncDispatcher) {
+        syncingChains[chainId] = launch(syncDispatcher) {
             action()
         }
     }
