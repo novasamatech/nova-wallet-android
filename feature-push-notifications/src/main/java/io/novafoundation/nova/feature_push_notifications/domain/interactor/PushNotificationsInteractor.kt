@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsAvailabilityState
-import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsAvailabilityState
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
