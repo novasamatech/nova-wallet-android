@@ -130,8 +130,9 @@ class ChainRegistryModule {
     fun provideRuntimeProviderPool(
         runtimeFactory: RuntimeFactory,
         runtimeSyncService: RuntimeSyncService,
+        runtimeFilesCache: RuntimeFilesCache,
         baseTypeSynchronizer: BaseTypeSynchronizer,
-    ) = RuntimeProviderPool(runtimeFactory, runtimeSyncService, baseTypeSynchronizer)
+    ) = RuntimeProviderPool(runtimeFactory, runtimeSyncService, runtimeFilesCache, baseTypeSynchronizer)
 
     @Provides
     @ApplicationScope

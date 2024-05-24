@@ -15,11 +15,11 @@ import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -42,7 +42,7 @@ class AddChainAccountSelectLedgerModule {
     @IntoMap
     @ViewModelKey(AddChainAccountSelectLedgerViewModel::class)
     fun provideViewModel(
-        substrateApplication: SubstrateLedgerApplication,
+        substrateApplication: MigrationSubstrateLedgerApplication,
         selectLedgerPayload: SelectLedgerPayload,
         addAccountPayload: AddAccountPayload.ChainAccount,
         discoveryService: LedgerDeviceDiscoveryService,

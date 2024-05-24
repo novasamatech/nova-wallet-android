@@ -13,11 +13,11 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.selectLedger.SelectLedgerImportViewModel
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -34,7 +34,7 @@ class SelectLedgerImportLedgerModule {
     @IntoMap
     @ViewModelKey(SelectLedgerImportViewModel::class)
     fun provideViewModel(
-        substrateApplication: SubstrateLedgerApplication,
+        substrateApplication: MigrationSubstrateLedgerApplication,
         selectLedgerPayload: SelectLedgerPayload,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,

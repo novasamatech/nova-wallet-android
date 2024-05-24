@@ -6,19 +6,22 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.hardware.usb.*
+import android.hardware.usb.UsbConstants
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbDeviceConnection
+import android.hardware.usb.UsbEndpoint
+import android.hardware.usb.UsbInterface
+import android.hardware.usb.UsbManager
 import android.os.Build
 import android.util.Log
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.LedgerConnection
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.awaitConnected
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.BaseLedgerConnection
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-
 
 class UsbLedgerConnection(
     private val appContext: Context,
@@ -60,21 +63,12 @@ class UsbLedgerConnection(
             "Not connected"
         }
 
-//        val usbRequest = UsbRequest().apply {
-//            initialize(connection, endpoint)
-//        }
-//
-//        chunks.forEach { chunk ->
-//            usbRequest.queue(ByteBuffer.wrap(chunk), chunk.size)
-//            connection.requestWait()
-//        }
-
         for (chunk in chunks) {
             val result = connection.bulkTransfer(endpoint, chunk, chunk.size, 1000)
             if (result < 0) {
                 Log.w("Ledger", "Failed to send bytes over usb: $result")
             } else {
-                Log.w("Ledger", "Successfully sent ${result} bytes to Ledger")
+                Log.w("Ledger", "Successfully sent $result bytes to Ledger")
             }
         }
 
@@ -82,7 +76,7 @@ class UsbLedgerConnection(
 
         while (true) {
             val responseBuffer = ByteArray(mtu())
-            val result = usbConnection!!.bulkTransfer(endpointIn!!, responseBuffer, responseBuffer.size, 1000)
+            val result = usbConnection!!.bulkTransfer(endpointIn!!, responseBuffer, responseBuffer.size, 50)
 
             when {
                 result > 0 -> {
@@ -91,10 +85,11 @@ class UsbLedgerConnection(
                     somethingRead = true
                 }
                 somethingRead -> {
-                    Log.w("Ledger", "Read empty bytes, stopping pollsing")
+                    Log.w("Ledger", "Read empty bytes, stopping polling")
                     break
                 }
                 else -> {
+                    delay(50)
                     Log.w("Ledger", "Read empty bytes, waiting for at least one response packet")
                 }
             }
@@ -148,26 +143,6 @@ class UsbLedgerConnection(
         }
 
         isActive.value = true
-
-        // Start a coroutine to listen for incoming data
-        listenForData()
-    }
-
-    private fun listenForData() = coroutineScope.launch(Dispatchers.IO) {
-//        while (true) {
-//            val mtu = mtu()
-////            val responseBuffer = ByteBuffer.allocate(mtu)
-////            val usbRequest = UsbRequest().apply {
-////                initialize(usbConnection!!, endpointIn!!)
-////            }
-////
-////            usbRequest.queue(responseBuffer, mtu)
-////            usbConnection!!.requestWait()
-////            responseBuffer.rewind()
-////            responseBuffer.get()
-//
-//
-//        }
     }
 
     private inner class UsbPermissionReceiver : BroadcastReceiver() {

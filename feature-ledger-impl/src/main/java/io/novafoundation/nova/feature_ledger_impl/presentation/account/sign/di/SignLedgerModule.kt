@@ -19,13 +19,13 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.RealSignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -56,7 +56,7 @@ class SignLedgerModule {
     @IntoMap
     @ViewModelKey(SignLedgerViewModel::class)
     fun provideViewModel(
-        substrateApplication: SubstrateLedgerApplication,
+        substrateApplication: MigrationSubstrateLedgerApplication,
         selectLedgerPayload: SelectLedgerPayload,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,

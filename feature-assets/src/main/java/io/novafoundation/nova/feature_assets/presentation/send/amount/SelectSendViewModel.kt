@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
@@ -312,16 +313,24 @@ class SelectSendViewModel(
             originChainWithAsset,
             destinationChainWithAsset,
             addressInputMixin.inputFlow,
-            amountChooserMixin.backPressuredAmount
-        ) { originAsset, destinationAsset, address, amount ->
-            originFeeMixin.invalidateFee()
+            amountChooserMixin.backPressuredAmount,
+            ::recalculateFee
+        )
+            .inBackground()
+            .launchIn(this)
+    }
 
-            if (originAsset.chain.id != destinationAsset.chain.id) {
-                crossChainFeeMixin.invalidateFee()
-            } else {
-                crossChainFeeMixin.setFee(null)
-            }
+    private suspend fun recalculateFee(originAsset: ChainWithAsset, destinationAsset: ChainWithAsset, address: String, amount: BigDecimal){
+        originFeeMixin.invalidateFee()
+        val hasCrossChainFee = originAsset.chain.id != destinationAsset.chain.id
 
+        if (hasCrossChainFee) {
+            crossChainFeeMixin.invalidateFee()
+        } else {
+            crossChainFeeMixin.setFee(null)
+        }
+
+        try {
             val assetTransfer = buildTransfer(origin = originAsset, destination = destinationAsset, amount = amount, address = address)
             val planks = originAsset.asset.planksFromAmount(amount)
 
@@ -331,9 +340,14 @@ class SelectSendViewModel(
 
             originFeeMixin.setFee(originFee)
             crossChainFeeMixin.setFee(crossChainFee)
+        } catch (e: Exception) {
+            e.printStackTrace()
+
+            originFeeMixin.setFeeStatus(FeeStatus.Error)
+            if (hasCrossChainFee) {
+                crossChainFeeMixin.setFeeStatus(FeeStatus.Error)
+            }
         }
-            .inBackground()
-            .launchIn(this)
     }
 
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {

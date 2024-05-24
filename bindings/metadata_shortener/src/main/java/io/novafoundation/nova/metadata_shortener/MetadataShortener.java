@@ -10,7 +10,13 @@ public class MetadataShortener {
         byte[] call,
         byte[] signed_extras,
         byte[] additional_signed,
-        byte[] metadata
+        byte[] metadata,
+
+        int spec_version,
+        String spec_name,
+        int base58_prefix,
+        int decimals,
+        String token_symbol
     );
 
     public static native byte[] generate_metadata_digest(

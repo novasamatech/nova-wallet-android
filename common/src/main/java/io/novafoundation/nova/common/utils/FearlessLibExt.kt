@@ -25,18 +25,20 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.AdditionalSignedExtras
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInExtrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInSignature
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.SignedExtras
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
+import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.module
@@ -97,6 +99,9 @@ fun Short.toByteArray(byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
 val Short.bigEndianBytes
     get() = toByteArray(ByteOrder.BIG_ENDIAN)
 
+val Short.littleEndianBytes
+    get() = toByteArray(ByteOrder.LITTLE_ENDIAN)
+
 fun ByteArray.toBigEndianShort(): Short = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).short
 fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
 
@@ -125,12 +130,12 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
     return stream.toByteArray()
 }
 
-fun SignerPayloadExtrinsic.encodedSignedExtras(): ByteArray {
-    return SignedExtras.bytes(runtime, signedExtras)
+fun SignerPayloadExtrinsic.encodedIncludedInExtrinsic(): ByteArray {
+    return ExtrasIncludedInExtrinsic.bytes(runtime, signedExtras.includedInExtrinsic)
 }
 
-fun SignerPayloadExtrinsic.encodedAdditionalSigned(): ByteArray {
-    return AdditionalSignedExtras.bytes(runtime, additionalSignedExtras)
+fun SignerPayloadExtrinsic.encodedIncludedInSignature(): ByteArray {
+    return ExtrasIncludedInSignature.bytes(runtime, signedExtras.includedInSignature)
 }
 
 fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) =
@@ -150,6 +155,10 @@ operator fun <S : Schema<S>> S.invoke(block: StructBuilderWithContext<S>? = null
 
 fun <S : Schema<S>> EncodableStruct<S>.hash(): String {
     return schema.toByteArray(this).blake2b256().toHexString(withPrefix = true)
+}
+
+fun ExtrinsicMetadata.hasSignedExtension(id: String) : Boolean {
+    return signedExtensions.any { it.id == id }
 }
 
 fun String.extrinsicHash(): String {
