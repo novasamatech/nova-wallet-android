@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <io.novafoundation.nova.common.view.Toolbar
-            android:id="@+id/previewImportParitySignerToolbar"
+            android:id="@+id/previewChainAccountToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:dividerVisible="false" />
@@ -33,13 +33,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:id="@+id/previewImportParitySignerDescription"
+            android:id="@+id/previewChainAccountDescription"
             android:layout_marginEnd="16dp"
             tools:text="@string/account_parity_signer_import_preview_description"
             android:textColor="@color/text_secondary" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/previewImportParitySignerAccounts"
+            android:id="@+id/previewChainAccountAccounts"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
@@ -51,7 +51,7 @@
     </LinearLayout>
 
     <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/previewImportParitySignerContinue"
+        android:id="@+id/previewChainAccountContinue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

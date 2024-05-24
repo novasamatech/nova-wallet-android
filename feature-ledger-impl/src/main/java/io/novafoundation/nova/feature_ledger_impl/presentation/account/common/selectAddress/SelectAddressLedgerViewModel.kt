@@ -22,9 +22,10 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.reviewAddress
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,7 @@ abstract class SelectAddressLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
+    private val messageFormatter: LedgerMessageFormatter
 ) : BaseViewModel(), LedgerMessageCommands {
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
@@ -96,13 +98,11 @@ abstract class SelectAddressLedgerViewModel(
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id.toInt() }
 
-            ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
-                title = resourceManager.getString(R.string.ledger_review_approve_title),
-                subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle, device.first().name),
+            ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
+                resourceManager = resourceManager,
+                address = account.account.address,
+                deviceName = device.first().name,
                 onCancel = ::verifyAddressCancelled,
-                footer = Footer.Value(
-                    value = account.account.address,
-                )
             ).event()
 
             val result = withContext(Dispatchers.Default) {
@@ -120,7 +120,7 @@ abstract class SelectAddressLedgerViewModel(
     }
 
     private fun handleLedgerError(error: Throwable, retry: () -> Unit) {
-        handleLedgerError(error, chain, resourceManager, retry)
+        handleLedgerError(error, messageFormatter, resourceManager, retry)
     }
 
     private fun verifyAddressCancelled() {

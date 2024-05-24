@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.getOrThrow
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
@@ -22,12 +21,12 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.closeToExpire
 import io.novafoundation.nova.runtime.extrinsic.remainingTime
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -54,11 +53,11 @@ class SignLedgerViewModel(
     private val request: SignInterScreenCommunicator.Request,
     private val responder: SignInterScreenResponder,
     private val interactor: SignLedgerInteractor,
+    private val messageFormatter: LedgerMessageFormatter,
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
-    locationManager: LocationManager,
-    chainRegistry: ChainRegistry,
+    locationManager: LocationManager
 ) : SelectLedgerViewModel(
     discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
@@ -66,8 +65,7 @@ class SignLedgerViewModel(
     locationManager = locationManager,
     router = router,
     resourceManager = resourceManager,
-    chainRegistry = chainRegistry,
-    payload = selectLedgerPayload
+    messageFormatter = messageFormatter
 ) {
 
     private val validityPeriod = flowOf {
@@ -164,7 +162,7 @@ class SignLedgerViewModel(
             }
             InvalidDataError.METADATA_OUTDATED -> {
                 errorTitle = resourceManager.getString(R.string.ledger_sign_metadata_outdated_title)
-                errorMessage = resourceManager.getString(R.string.ledger_sign_metadata_outdated_subtitle, chain().name)
+                errorMessage = resourceManager.getString(R.string.ledger_sign_metadata_outdated_subtitle, messageFormatter.appName())
             }
             null -> {
                 errorTitle = resourceManager.getString(R.string.ledger_error_general_title)

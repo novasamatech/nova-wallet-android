@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts
+package io.novafoundation.nova.feature_account_api.presenatation.account.chain
 
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.headers.TextHeaderHolder
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_account_api.view.ItemChainAccount
 

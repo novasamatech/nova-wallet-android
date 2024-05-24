@@ -5,16 +5,22 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.data.repository.RealLedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.RealSelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.RealLedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.SingleSheetLedgerMessagePresentable
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp.LegacySubstrateLedgerApplication
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.LedgerBleManager
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.CompoundLedgerDiscoveryService
@@ -52,6 +58,40 @@ class LedgerFeatureModule {
         metadataShortenerService = metadataShortenerService,
         ledgerRepository = ledgerRepository
     )
+
+    @Provides
+    @FeatureScope
+    fun provideGenericLedgerApplication(
+        transport: LedgerTransport,
+        chainRegistry: ChainRegistry,
+        ledgerRepository: LedgerRepository,
+        metadataShortenerService: MetadataShortenerService
+    ) = GenericSubstrateLedgerApplication(
+        transport = transport,
+        chainRegistry = chainRegistry,
+        metadataShortenerService = metadataShortenerService,
+        ledgerRepository = ledgerRepository
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideLedgerMessageFormatterFactory(
+        resourceManager: ResourceManager,
+        migrationTracker: LedgerMigrationTracker,
+        chainRegistry: ChainRegistry,
+    ): LedgerMessageFormatterFactory {
+        return LedgerMessageFormatterFactory(resourceManager, migrationTracker, chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideLedgerMigrationUseCase(
+        ledgerMigrationTracker: LedgerMigrationTracker,
+        migrationApp: MigrationSubstrateLedgerApplication,
+        legacyApp: LegacySubstrateLedgerApplication
+    ): LedgerMigrationUseCase {
+        return RealLedgerMigrationUseCase(ledgerMigrationTracker, migrationApp, legacyApp)
+    }
 
     @Provides
     @FeatureScope
@@ -97,14 +137,12 @@ class LedgerFeatureModule {
     @Provides
     @FeatureScope
     fun provideSelectAddressInteractor(
-        ledgerApplication: LegacySubstrateLedgerApplication,
-        migrationApplication: MigrationSubstrateLedgerApplication,
+        migrationUseCase: LedgerMigrationUseCase,
         ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
         assetSourceRegistry: AssetSourceRegistry,
     ): SelectAddressLedgerInteractor {
         return RealSelectAddressLedgerInteractor(
-            legacyApp = ledgerApplication,
-            migrationApp = migrationApplication,
+            migrationUseCase = migrationUseCase,
             ledgerDeviceDiscoveryService = ledgerDeviceDiscoveryService,
             assetSourceRegistry = assetSourceRegistry
         )

@@ -45,7 +45,7 @@ class MetaAccountTypePresentationMapper(
         return when (type) {
             LightMetaAccount.Type.SECRETS -> null
             LightMetaAccount.Type.WATCH_ONLY -> R.drawable.ic_watch_only_filled.asTintedIcon(canApplyOwnTint = true)
-            LightMetaAccount.Type.PARITY_SIGNER,  LightMetaAccount.Type.POLKADOT_VAULT -> {
+            LightMetaAccount.Type.PARITY_SIGNER, LightMetaAccount.Type.POLKADOT_VAULT -> {
                 val config = polkadotVaultVariantConfigProvider.variantConfigFor(type.asPolkadotVaultVariantOrThrow())
 
                 config.common.iconRes.asTintedIcon(canApplyOwnTint = true)

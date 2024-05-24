@@ -4,21 +4,19 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Error.RecoverableError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 
 fun <V> V.handleLedgerError(
     reason: Throwable,
-    chain: Deferred<Chain>,
+    messageFormatter: LedgerMessageFormatter,
     resourceManager: ResourceManager,
     retry: () -> Unit
 ) where V : BaseViewModel, V : LedgerMessageCommands {
@@ -29,7 +27,7 @@ fun <V> V.handleLedgerError(
             is CancellationException -> {
                 // do nothing on coroutines cancellation
             }
-            is SubstrateLedgerApplicationError.Response -> handleSubstrateApplicationError(reason.response, chain(), resourceManager, retry)
+            is SubstrateLedgerApplicationError.Response -> handleSubstrateApplicationError(reason.response, messageFormatter.appName(), resourceManager, retry)
             else -> handleUnknownError(reason, resourceManager, retry)
         }
     }
@@ -49,7 +47,7 @@ private fun LedgerMessageCommands.handleUnknownError(
 
 private fun LedgerMessageCommands.handleSubstrateApplicationError(
     reason: LedgerApplicationResponse,
-    chain: Chain,
+    ledgerAppName: String,
     resourceManager: ResourceManager,
     retry: () -> Unit
 ) {
@@ -58,8 +56,8 @@ private fun LedgerMessageCommands.handleSubstrateApplicationError(
 
     when (reason) {
         LedgerApplicationResponse.APP_NOT_OPEN, LedgerApplicationResponse.WRONG_APP_OPEN -> {
-            errorTitle = resourceManager.getString(R.string.ledger_error_app_not_launched_title, chain.name)
-            errorMessage = resourceManager.getString(R.string.ledger_error_app_not_launched_message, chain.name)
+            errorTitle = resourceManager.getString(R.string.ledger_error_app_not_launched_title, ledgerAppName)
+            errorMessage = resourceManager.getString(R.string.ledger_error_app_not_launched_message, ledgerAppName)
         }
 
         LedgerApplicationResponse.TRANSACTION_REJECTED -> {

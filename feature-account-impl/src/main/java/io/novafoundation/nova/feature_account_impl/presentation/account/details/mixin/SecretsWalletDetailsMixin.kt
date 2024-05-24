@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.mapToAccountHeader
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 

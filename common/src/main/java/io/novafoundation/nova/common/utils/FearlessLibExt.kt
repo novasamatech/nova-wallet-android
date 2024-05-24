@@ -38,7 +38,6 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadE
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.module
@@ -157,7 +156,7 @@ fun <S : Schema<S>> EncodableStruct<S>.hash(): String {
     return schema.toByteArray(this).blake2b256().toHexString(withPrefix = true)
 }
 
-fun ExtrinsicMetadata.hasSignedExtension(id: String) : Boolean {
+fun ExtrinsicMetadata.hasSignedExtension(id: String): Boolean {
     return signedExtensions.any { it.id == id }
 }
 

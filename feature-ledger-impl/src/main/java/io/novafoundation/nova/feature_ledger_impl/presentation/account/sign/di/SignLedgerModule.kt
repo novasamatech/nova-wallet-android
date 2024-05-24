@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.RealSignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
@@ -53,6 +55,16 @@ class SignLedgerModule {
     )
 
     @Provides
+    @ScreenScope
+    fun provideMessageFormatter(
+        selectLedgerPayload: SelectLedgerPayload,
+        factory: LedgerMessageFormatterFactory
+    ): LedgerMessageFormatter {
+        // TODO legacy for now, replace with mediator with generic & legacy
+        return factory.createLegacy(selectLedgerPayload.chainId)
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(SignLedgerViewModel::class)
     fun provideViewModel(
@@ -64,12 +76,12 @@ class SignLedgerModule {
         locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
-        chainRegistry: ChainRegistry,
         signPayloadState: SigningSharedState,
         extrinsicValidityUseCase: ExtrinsicValidityUseCase,
         request: SignInterScreenCommunicator.Request,
         interactor: SignLedgerInteractor,
         responder: LedgerSignCommunicator,
+        messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return SignLedgerViewModel(
             substrateApplication = substrateApplication,
@@ -80,7 +92,7 @@ class SignLedgerModule {
             locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
-            chainRegistry = chainRegistry,
+            messageFormatter = messageFormatter,
             signPayloadState = signPayloadState,
             extrinsicValidityUseCase = extrinsicValidityUseCase,
             request = request,

@@ -74,9 +74,9 @@ class WelcomeViewModel(
 
     fun connectHardwareWalletClicked() = launch {
         when (val selection = selectHardwareWallet.awaitAction()) {
-            HardwareWalletModel.LedgerGeneric -> showMessage("TODO generic app flow")
+            HardwareWalletModel.LedgerGeneric -> router.openStartImportGenericLedger()
 
-            HardwareWalletModel.LedgerLegacy -> router.openStartImportLedger()
+            HardwareWalletModel.LedgerLegacy -> router.openStartImportLegacyLedger()
 
             is HardwareWalletModel.PolkadotVault -> when (selection.variant) {
                 PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()

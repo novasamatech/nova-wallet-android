@@ -75,8 +75,8 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
@@ -536,8 +536,12 @@ class Navigator(
         openStartImportPolkadotVault(PolkadotVaultVariant.POLKADOT_VAULT)
     }
 
-    override fun openStartImportLedger() {
+    override fun openStartImportLegacyLedger() {
         navController?.navigate(R.id.action_welcomeFragment_to_import_ledger_graph)
+    }
+
+    override fun openStartImportGenericLedger() {
+        navController?.navigate(R.id.action_welcomeFragment_to_import_generic_ledger_graph)
     }
 
     override fun withPinCodeCheckRequired(

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
@@ -16,7 +17,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.notHasAccountComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

@@ -8,5 +8,5 @@ sealed class HardwareWalletModel {
 
     object LedgerGeneric : HardwareWalletModel()
 
-    object LedgerLegacy: HardwareWalletModel()
+    object LedgerLegacy : HardwareWalletModel()
 }
