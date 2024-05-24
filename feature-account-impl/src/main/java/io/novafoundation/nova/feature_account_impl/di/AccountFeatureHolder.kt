@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignC
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -39,6 +40,7 @@ class AccountFeatureHolder @Inject constructor(
             .proxyFeatureApi(getFeature(ProxyFeatureApi::class.java))
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
             .web3NamesApi(getFeature(Web3NamesApi::class.java))
+            .ledgerCoreApi(getFeature(LedgerCoreApi::class.java))
             .build()
 
         return DaggerAccountFeatureComponent.factory()

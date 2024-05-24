@@ -16,12 +16,12 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.MigrationSubstrateLedgerApplication
 
 @Module(includes = [ViewModelModule::class])
 class AddChainAccountSelectLedgerModule {
@@ -50,7 +50,7 @@ class AddChainAccountSelectLedgerModule {
     @IntoMap
     @ViewModelKey(AddChainAccountSelectLedgerViewModel::class)
     fun provideViewModel(
-        substrateApplication: MigrationSubstrateLedgerApplication,
+        migrationUseCase: LedgerMigrationUseCase,
         addAccountPayload: AddAccountPayload.ChainAccount,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
@@ -61,7 +61,7 @@ class AddChainAccountSelectLedgerModule {
         messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return AddChainAccountSelectLedgerViewModel(
-            substrateApplication = substrateApplication,
+            migrationUseCase = migrationUseCase,
             discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
