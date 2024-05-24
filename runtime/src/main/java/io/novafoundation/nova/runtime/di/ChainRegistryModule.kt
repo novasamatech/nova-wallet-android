@@ -23,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.runtime.AsyncChainSyncDispatcher
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeCacheMigrator
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
@@ -115,7 +116,8 @@ class ChainRegistryModule {
         runtimeFilesCache = runtimeFilesCache,
         chainDao = chainDao,
         runtimeMetadataFetcher = runtimeMetadataFetcher,
-        cacheMigrator = runtimeCacheMigrator
+        cacheMigrator = runtimeCacheMigrator,
+        chainSyncDispatcher = AsyncChainSyncDispatcher()
     )
 
     @Provides
