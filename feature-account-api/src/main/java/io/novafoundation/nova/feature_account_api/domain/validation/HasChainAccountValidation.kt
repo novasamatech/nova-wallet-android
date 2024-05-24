@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_account_api.R
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER_LEGACY
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PROXIED
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
@@ -52,7 +52,7 @@ class HasChainAccountValidation<P, E>(
         return when {
             account.hasAccountIn(chain) -> ValidationStatus.Valid()
 
-            account.type == LEDGER && !SubstrateApplicationConfig.supports(chain.id) -> {
+            account.type == LEDGER_LEGACY && !SubstrateApplicationConfig.supports(chain.id) -> {
                 errorProducer(chain, account, AddAccountState.LedgerNotSupported).validationError()
             }
 

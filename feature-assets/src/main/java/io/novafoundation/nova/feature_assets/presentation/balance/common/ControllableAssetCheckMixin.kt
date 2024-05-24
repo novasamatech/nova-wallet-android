@@ -19,7 +19,7 @@ class ControllableAssetCheckMixin(
 
     suspend fun check(metaAccount: MetaAccount, chainAsset: Chain.Asset, action: () -> Unit) {
         when {
-            metaAccount.type == LightMetaAccount.Type.LEDGER && chainAsset.type is Chain.Asset.Type.Orml -> showLedgerAssetNotSupportedWarning(chainAsset)
+            metaAccount.type == LightMetaAccount.Type.LEDGER_LEGACY && chainAsset.type is Chain.Asset.Type.Orml -> showLedgerAssetNotSupportedWarning(chainAsset)
             metaAccount.type == LightMetaAccount.Type.WATCH_ONLY -> missingKeysPresenter.presentNoKeysFound()
             else -> action()
         }

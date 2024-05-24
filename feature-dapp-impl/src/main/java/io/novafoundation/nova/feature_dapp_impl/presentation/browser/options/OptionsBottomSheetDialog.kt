@@ -19,7 +19,8 @@ class OptionsBottomSheetDialog(
         textItem(
             if (payload.isFavorite) R.drawable.ic_unfavorite_heart_outline else R.drawable.ic_favorite_heart_outline,
             if (payload.isFavorite) R.string.dapp_options_remove_from_favorite else R.string.dapp_options_add_to_favorite,
-            false,
+            showArrow = false,
+            applyIconTint = true,
             ::toggleFavorite
         )
 

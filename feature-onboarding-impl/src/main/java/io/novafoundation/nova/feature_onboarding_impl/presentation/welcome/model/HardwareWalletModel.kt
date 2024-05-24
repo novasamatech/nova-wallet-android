@@ -6,5 +6,7 @@ sealed class HardwareWalletModel {
 
     class PolkadotVault(val variant: PolkadotVaultVariant) : HardwareWalletModel()
 
-    object LedgerNanoX : HardwareWalletModel()
+    object LedgerGeneric : HardwareWalletModel()
+
+    object LedgerLegacy: HardwareWalletModel()
 }

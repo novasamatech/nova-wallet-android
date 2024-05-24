@@ -49,7 +49,7 @@ class AccountFormatter(
         }
     }
 
-    private suspend fun availableActionsFor(accountInChain: AccountInChain, availableActions: Set<AccountAction>): Set<AccountAction> {
+    private fun availableActionsFor(accountInChain: AccountInChain, availableActions: Set<AccountAction>): Set<AccountAction> {
         return availableActions.filterToSet { action ->
             when (action) {
                 AccountAction.CHANGE -> true
