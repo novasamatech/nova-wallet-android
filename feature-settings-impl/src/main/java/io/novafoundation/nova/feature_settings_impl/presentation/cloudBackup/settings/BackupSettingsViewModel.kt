@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInf
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
-import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
@@ -29,7 +28,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.chan
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordRequester
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordRequester
-import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordResponder
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff

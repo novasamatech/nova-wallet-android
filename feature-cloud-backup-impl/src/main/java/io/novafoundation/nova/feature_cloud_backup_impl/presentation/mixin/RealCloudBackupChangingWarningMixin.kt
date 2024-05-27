@@ -99,7 +99,6 @@ class RealCloudBackupChangingWarningMixin(
         )
     }
 
-
     private fun ActionBottomSheetLauncher.launchCloudBackupRemovingWarning(
         resourceManager: ResourceManager,
         onConfirm: () -> Unit

@@ -51,9 +51,15 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>()
     }
 
     private fun buildConditions() {
-        manualBackupWarningCondition1.setText(buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight))
-        manualBackupWarningCondition2.setText(buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight))
-        manualBackupWarningCondition3.setText(buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight))
+        manualBackupWarningCondition1.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight)
+        )
+        manualBackupWarningCondition2.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight)
+        )
+        manualBackupWarningCondition3.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight)
+        )
 
         viewModel.conditionMixin.setupConditions(
             manualBackupWarningCondition1,

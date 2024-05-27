@@ -17,8 +17,6 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordConfirmInput
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordInput
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordConfirmField
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNewField
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNext

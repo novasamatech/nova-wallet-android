@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBa
 sealed class BackupSyncOutcome {
 
     object Ok : BackupSyncOutcome()
-    
+
     object EmptyPassword : BackupSyncOutcome()
 
     object UnknownPassword : BackupSyncOutcome()
