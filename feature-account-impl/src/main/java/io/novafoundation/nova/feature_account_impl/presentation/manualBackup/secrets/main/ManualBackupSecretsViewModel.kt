@@ -52,8 +52,7 @@ class ManualBackupSecretsViewModel(
     }
 
     private suspend fun buildSecrets(): List<ManualBackupSecretsRvItem> = buildList {
-        val hasChainAccounts = accountInteractor.hasCustomChainAccounts(payload.metaId)
-        createHeaders(hasChainAccounts)
+        createHeaders()
 
         val mnemonicItem = secretsAdapterItemFactory.createMnemonic(payload.metaId, payload.getChainIdOrNull())
         if (mnemonicItem == null) {
@@ -64,12 +63,13 @@ class ManualBackupSecretsViewModel(
         }
     }
 
-    private suspend fun MutableList<ManualBackupSecretsRvItem>.createHeaders(hasCustomChainAccounts: Boolean) {
+    private suspend fun MutableList<ManualBackupSecretsRvItem>.createHeaders() {
         if (payload is ManualBackupCommonPayload.ChainAccount) {
             this += secretsAdapterItemFactory.createChainItem(payload.chainId)
             this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_custom_key_title))
         } else {
-            if (hasCustomChainAccounts) {
+            val hasChainAccounts = accountInteractor.hasCustomChainAccounts(payload.metaId)
+            if (hasChainAccounts) {
                 this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_default_key_title))
             } else {
                 this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.common_passphrase))

@@ -41,7 +41,6 @@ class CloudBackupSyncRequestBusHandler(
 
     private suspend fun EventBus.SourceEvent<MetaAccountChangesEventBus.Event>.shouldTriggerBackupSync(): Boolean {
         if (source == CLOUD_BACKUP_APPLY_SOURCE) return false
-        if (!accountRepository.hasActiveMetaAccounts()) return false
 
         val potentialTriggers = event.collect(
             onAdd = { it.metaAccountType },

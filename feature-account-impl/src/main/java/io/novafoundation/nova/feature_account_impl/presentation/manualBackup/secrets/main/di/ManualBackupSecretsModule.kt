@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -26,6 +27,7 @@ class ManualBackupSecretsModule {
         resourceManager: ResourceManager,
         router: AccountRouter,
         payload: ManualBackupCommonPayload,
+        accountInteractor: AccountInteractor,
         commonExportSecretsInteractor: CommonExportSecretsInteractor,
         secretsAdapterItemFactory: ManualBackupSecretsAdapterItemFactory,
         walletUiUseCase: WalletUiUseCase
@@ -34,6 +36,7 @@ class ManualBackupSecretsModule {
             resourceManager,
             router,
             payload,
+            accountInteractor,
             commonExportSecretsInteractor,
             secretsAdapterItemFactory,
             walletUiUseCase

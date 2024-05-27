@@ -60,10 +60,8 @@ class InputField @JvmOverloads constructor(
             content.hint = contentHint
         }
 
-        if (typedArray.hasValue(R.styleable.InputField_editTextHintColor)) {
-            val hintColor = typedArray.getColor(R.styleable.InputField_editTextHintColor, -1)
-            content.setHintTextColor(hintColor)
-        }
+        val hintColor = typedArray.getColor(R.styleable.InputField_editTextHintColor, context.getColor(R.color.hint_text))
+        content.setHintTextColor(hintColor)
 
         val backgroundMode = typedArray.getEnum(R.styleable.InputField_backgroundMode, BackgroundMode.INPUT_STATE)
         when (backgroundMode) {
