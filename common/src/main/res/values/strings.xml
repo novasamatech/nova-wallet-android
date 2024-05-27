@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="enter_backup_password_hint">Backup password</string>
+
+    <!--<string name="common_no_screenshot_message_v2_2_0">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>-->
+    <string name="common_no_screenshot_message_v2_2_0">We are going to show your passphrase. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
+
     <string name="common_not_available">Not available</string>
     <string name="settings_push_notifications_only_available_with_google_services_error">Push notifications are only available for devices with Google services.</string>
     <string name="settings_push_notifications_only_available_from_google_play_error">Push notifications are available only for the Nova Wallet version downloaded from Google Play.</string>
@@ -39,16 +44,16 @@
 
     <string name="json_export_btn">Export JSON file</string>
 
-    <string name="manual_backup_warning_disabled_button">Review &amp; Accept to Continue</string>
+    <string name="backup_secrets_warning_disabled_button">Review &amp; Accept to Continue</string>
 
     <string name="manual_backup_warning_title">Do not share your passphrase!</string>
     <string name="manual_backup_warning_subtitle">Please read the following carefully before viewing your backup</string>
-    <string name="manual_backup_warning_condition_1">This passphrase gives you total and permanent access to all connected wallets and the funds within them.\n%s</string>
-    <string name="manual_backup_warning_condition_1_highlight">DO NOT SHARE IT.</string>
-    <string name="manual_backup_warning_condition_2">Do not enter your Passphrase into any form or website.\n%s</string>
-    <string name="manual_backup_warning_condition_2_highlight">FUNDS MAY BE LOST FOREVER.</string>
-    <string name="manual_backup_warning_condition_3">Support or admins will never request your Passphrase under any circumstances.\n%s</string>
-    <string name="manual_backup_warning_condition_3_highlight">BEWARE OF IMPERSONATORS.</string>
+    <string name="backup_secrets_warning_condition_1">This passphrase gives you total and permanent access to all connected wallets and the funds within them.\n%s</string>
+    <string name="backup_secrets_warning_condition_1_highlight">DO NOT SHARE IT.</string>
+    <string name="backup_secrets_warning_condition_2">Do not enter your Passphrase into any form or website.\n%s</string>
+    <string name="backup_secrets_warning_condition_2_highlight">FUNDS MAY BE LOST FOREVER.</string>
+    <string name="backup_secrets_warning_condition_3">Support or admins will never request your Passphrase under any circumstances.\n%s</string>
+    <string name="backup_secrets_warning_condition_3_highlight">BEWARE OF IMPERSONATORS.</string>
 
     <string name="manual_backup_select_account_default_key_title">Accounts with default key</string>
     <string name="manual_backup_select_account_custom_key_title">Accounts with custom key</string>
@@ -145,13 +150,13 @@
 
     <string name="cloud_backup_delete_button">Delete Backup</string>
     <string name="restore_cloud_backup_delete_backup_title">Have you lost your password?</string>
-    <string name="restore_cloud_backup_delete_backup_description">%s Your password is exclusively yours. Without your backup password it is not possible to restore your wallets from your iCloud.\n\nAlternatively, you can %s\n\nIf your password is irretrievably lost, then you can start a new backup by deleting the current backup. This will enable you to create a new password for a fresh Cloud Backup.</string>
-    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Unfortunately, it cannot be recovered.</string>
-    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">restore your wallets by using your Passphrase.</string>
+    <string name="restore_cloud_backup_delete_backup_description">%s It's exclusively yours, securely stored, inaccessible to others. Without the backup password, restoring wallets from iCloud is impossible. If lost, delete the current backup to create a new one with a fresh password. %s</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Unfortunately, your password cannot be recovered.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">Alternatively, use Passphrase for restoration.</string>
 
     <string name="common_forgot_password">Forgot Password?</string>
     <string name="restore_cloud_backup_title">Enter backup password</string>
-    <string name="restore_cloud_backup_subtitle">To restore your wallets, please enter the password you created during the backup process</string>
+    <string name="restore_cloud_backup_subtitle">Please enter the password you created during the backup process</string>
 
     <string name="common_got_it">Got it</string>
 
@@ -177,10 +182,10 @@
     <string name="cloud_backup_error_not_found_message">Unfortunately, we have not found a backup to restore wallets</string>
 
     <string name="cloud_backup_error_google_service_auth_failed_title">Google Drive authentication failed</string>
-    <string name="cloud_backup_error_google_service_auth_failed_message">Failed to connect to Google Drive due to an authentication issue. Please ensure you have entered the correct credentials and granted Nova access to Google Drive</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">Please ensure that you are logged into your Google account with the correct credentials and have granted Nova Wallet access to Google Drive</string>
 
     <string name="cloud_backup_error_google_service_other_title">Google Drive error</string>
-    <string name="cloud_backup_error_google_service_other_message">Unable to back up your secret to Google Drive. Please ensure you have Google Drive enabled with available storage space and try again</string>
+    <string name="cloud_backup_error_google_service_other_message">Unable to backup your wallets to Google Drive. Please ensure that you have enabled Nova Wallet to use your Google Drive and have enough available storage space and then try again.</string>
 
     <string name="cloud_backup_error_google_service_not_enough_space_title">Not Enough Storage</string>
     <string name="cloud_backup_error_google_service_not_enough_space_message">This device cannot be backed up because there is not enough Google Drive storage available. You can manage your storage in Google Drive.</string>
@@ -189,7 +194,7 @@
     <string name="cloud_backup_error_google_service_not_found_message">Unfortunately, Google Drive is not working without Google Play services, which are missing on your device. Try to get Google Play services</string>
 
     <string name="start_create_wallet_your_wallet_is_ready">Your wallet is ready</string>
-    <string name="cloud_backup">Cloud Backup</string>
+    <string name="backup_title">Backup</string>
     <string name="start_create_wallet_set_wallet_name_explanation">This will only be visible to you and you can edit it later.</string>
     <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. This makes sure that your funds are safe and secure. Backups allow you to restore your wallet at any time.</string>
     <string name="start_create_wallet_cloud_backup_btn">Continue with Google</string>
@@ -201,17 +206,6 @@
 
     <string name="mnemonic_card_title">Please %s anyone</string>
     <string name="mnemonic_card_title_highlight">do not share with</string>
-
-    <string name="backup_mnemonic_disabled_button">Please, agree with conditions</string>
-
-    <string name="backup_mnemonic_condition_1">Having the Passphrase means having %s and the money within them.</string>
-    <string name="backup_mnemonic_condition_1_highlight">total and permanent access to all connected wallets</string>
-
-    <string name="backup_mnemonic_condition_2">%s They are not needed for app functionality.</string>
-    <string name="backup_mnemonic_condition_2_highlight">Do not enter your Passphrase or private key into any form or app.</string>
-
-    <string name="backup_mnemonic_condition_3">Support or %s or private key under any circumstances.</string>
-    <string name="backup_mnemonic_condition_3_highlight">admins will never request your Passphrase</string>
 
     <!--<string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>-->
     <string name="account_backup_mnemonic_title">Write down your Passphrase</string>
@@ -1711,7 +1705,6 @@
     <string name="common_left">%s left</string>
     <string name="common_module">Module</string>
     <string name="common_next">Next</string>
-    <string name="common_no_screenshot_message_v2_2_0">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
     <string name="common_not_enough_funds_message">Sorry, you don\'t have enough funds to pay the network fee.</string>
     <string name="common_not_enough_funds_title">Insufficient balance</string>
     <string name="common_ok">OK</string>

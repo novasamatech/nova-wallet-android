@@ -46,8 +46,8 @@ class BackupMnemonicViewModel(
     )
 
     val buttonState = conditionMixin.buttonState(
-        enabledState = resourceManager.getString(R.string.common_confirm),
-        disabledState = resourceManager.getString(R.string.backup_mnemonic_disabled_button)
+        enabledState = resourceManager.getString(R.string.common_continue),
+        disabledState = resourceManager.getString(R.string.backup_secrets_warning_disabled_button)
     ).shareInBackground()
 
     private val advancedEncryptionSelectionStore = async {

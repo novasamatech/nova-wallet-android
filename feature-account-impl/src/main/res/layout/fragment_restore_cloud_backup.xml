@@ -47,7 +47,8 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="24dp"
-            app:editTextHint="@string/account_import_password_placeholder"/>
+            app:editTextHintColor="@color/hint_text"
+            app:editTextHint="@string/enter_backup_password_hint"/>
 
         <TextView
             android:id="@+id/restoreCloudBackupForgotPassword"

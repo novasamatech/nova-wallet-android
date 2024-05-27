@@ -132,7 +132,7 @@ fun ActionBottomSheetLauncher.launchCloudBackupChangesAction(resourceManager: Re
         neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
             resourceManager.getString(R.string.common_not_now)
         ),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
             resourceManager.getString(R.string.cloud_backup_destructive_changes_button),
             onReviewClicked
         )

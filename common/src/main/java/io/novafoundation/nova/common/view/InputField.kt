@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.graphics.Color
 import android.text.InputType
 import android.util.AttributeSet
 import android.view.View
@@ -57,6 +58,11 @@ class InputField @JvmOverloads constructor(
         if (contentHint != null) {
             hint = null
             content.hint = contentHint
+        }
+
+        if (typedArray.hasValue(R.styleable.InputField_editTextHintColor)) {
+            val hintColor = typedArray.getColor(R.styleable.InputField_editTextHintColor, -1)
+            content.setHintTextColor(hintColor)
         }
 
         val backgroundMode = typedArray.getEnum(R.styleable.InputField_backgroundMode, BackgroundMode.INPUT_STATE)

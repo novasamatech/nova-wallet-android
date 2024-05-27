@@ -54,9 +54,9 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     private fun buildConditions() {
-        backupMnemonicCondition1.setText(buildCondition(R.string.backup_mnemonic_condition_1, R.string.backup_mnemonic_condition_1_highlight))
-        backupMnemonicCondition2.setText(buildCondition(R.string.backup_mnemonic_condition_2, R.string.backup_mnemonic_condition_2_highlight))
-        backupMnemonicCondition3.setText(buildCondition(R.string.backup_mnemonic_condition_3, R.string.backup_mnemonic_condition_3_highlight))
+        backupMnemonicCondition1.setText(buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight))
+        backupMnemonicCondition2.setText(buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight))
+        backupMnemonicCondition3.setText(buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight))
 
         viewModel.conditionMixin.setupConditions(
             backupMnemonicCondition1,

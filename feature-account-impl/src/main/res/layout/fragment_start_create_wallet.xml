@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:gravity="center_vertical"
-                android:text="@string/cloud_backup"
+                android:text="@string/common_cloud_backup"
                 android:textColor="@color/chip_text" />
 
         </LinearLayout>
