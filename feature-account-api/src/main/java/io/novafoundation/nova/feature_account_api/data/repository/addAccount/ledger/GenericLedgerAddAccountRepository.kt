@@ -15,10 +15,8 @@ interface GenericLedgerAddAccountRepository : AddAccountRepository<GenericLedger
             val universalAccount: LedgerSubstrateAccount,
         ) : Payload
 
-        // TODO after merging cloud backup changes to our branch we can do better and support multiple meta account handling
-        // To avoid multiple updates over the MetaAccountChangesEventBus
         class AddMissingChainAccounts(
-            val metaId: Long,
+            val metaIds: List<Long>,
             val allAvailableChainIds: Collection<ChainId>,
         ) : Payload
     }

@@ -67,12 +67,14 @@ class ImportWalletOptionsViewModel(
         cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
             launch {
                 when (val selection = selectHardwareWallet.awaitAction()) {
-                    HardwareWalletModel.LedgerNanoX -> router.openStartImportLedger()
+                    HardwareWalletModel.LedgerLegacy -> router.openStartImportLegacyLedger()
+                    HardwareWalletModel.LedgerGeneric -> router.openStartImportGenericLedger()
 
                     is HardwareWalletModel.PolkadotVault -> when (selection.variant) {
                         PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()
                         PolkadotVaultVariant.PARITY_SIGNER -> router.openStartImportParitySigner()
                     }
+
                 }
             }
         }

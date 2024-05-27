@@ -17,8 +17,7 @@ class RealMetaAccountTypePresentationMapper(
 ) : MetaAccountTypePresentationMapper {
 
     override fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
-        return mapTypeToChipLabel(type)
-            ?.let { AccountChipGroupRvItem(it) }
+        return mapTypeToChipLabel(type)?.let(::AccountChipGroupRvItem)
     }
 
     override fun mapTypeToChipLabel(type: LightMetaAccount.Type): ChipLabelModel? {
@@ -41,7 +40,7 @@ class RealMetaAccountTypePresentationMapper(
         }
 
         return if (icon != null && label != null) {
-            AccountChipGroupRvItem(ChipLabelModel(icon, label))
+            ChipLabelModel(icon, label)
         } else {
             null
         }

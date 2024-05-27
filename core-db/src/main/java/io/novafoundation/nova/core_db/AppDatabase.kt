@@ -63,7 +63,7 @@ import io.novafoundation.nova.core_db.migrations.AddGovernanceDapps_25_26
 import io.novafoundation.nova.core_db.migrations.AddGovernanceExternalApiToChain_27_28
 import io.novafoundation.nova.core_db.migrations.AddGovernanceFlagToChains_24_25
 import io.novafoundation.nova.core_db.migrations.AddGovernanceNetworkToExternalApi_33_34
-import io.novafoundation.nova.core_db.migrations.AddLocalMigratorVersionToChainRuntimes_57_58
+import io.novafoundation.nova.core_db.migrations.AddLocalMigratorVersionToChainRuntimes_58_59
 import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
@@ -232,7 +232,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51, AddBalanceModesToAssets_51_52)
                     .addMigrations(ChangeSessionTopicToParing_52_53, AddConnectionStateToChains_53_54, AddProxyAccount_54_55)
                     .addMigrations(AddFungibleNfts_55_56, ChainPushSupport_56_57)
-                    .addMigrations(AddGloballyUniqueIdToMetaAccounts_57_58, AddLocalMigratorVersionToChainRuntimes_57_58)
+                    .addMigrations(AddGloballyUniqueIdToMetaAccounts_57_58, AddLocalMigratorVersionToChainRuntimes_58_59)
                     .build()
             }
             return instance!!

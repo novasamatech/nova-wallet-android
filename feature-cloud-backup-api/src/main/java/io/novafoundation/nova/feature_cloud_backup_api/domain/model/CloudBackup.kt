@@ -29,7 +29,7 @@ data class CloudBackup(
         override val identifier: String = walletId
 
         enum class Type {
-            SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT
+            SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, LEDGER_GENERIC, POLKADOT_VAULT
         }
 
         data class ChainAccountInfo(

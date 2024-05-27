@@ -9,10 +9,9 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealGenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.RealProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
@@ -134,12 +133,10 @@ class AddAccountsModule {
     fun provideGenericLedgerAddAccountRepository(
         accountDao: MetaAccountDao,
         secretStoreV2: SecretStoreV2,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ): GenericLedgerAddAccountRepository = RealGenericLedgerAddAccountRepository(
         accountDao,
         secretStoreV2,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 }

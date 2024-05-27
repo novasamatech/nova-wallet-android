@@ -15,14 +15,14 @@ internal class RealLedgerGenericAccountsUpdater(
 
     override fun updateAvailableGenericAccounts() = ledgerMigrationTracker.supportedChainIdsByGenericAppFlow().map { chainIds ->
         runCatching {
-            metaAccountRepository.getMetaAccountIdsByType(LightMetaAccount.Type.LEDGER).onEach { metaId ->
-                val payload = GenericLedgerAddAccountRepository.Payload.AddMissingChainAccounts(
-                    metaId = metaId,
-                    allAvailableChainIds = chainIds
-                )
+            val ledgerAccounts = metaAccountRepository.getMetaAccountIdsByType(LightMetaAccount.Type.LEDGER)
 
-                genericLedgerAddAccountRepository.addAccount(payload)
-            }
+            val payload = GenericLedgerAddAccountRepository.Payload.AddMissingChainAccounts(
+                metaIds = ledgerAccounts,
+                allAvailableChainIds = chainIds
+            )
+
+            genericLedgerAddAccountRepository.addAccount(payload)
         }
 
         Unit

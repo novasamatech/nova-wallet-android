@@ -9,13 +9,35 @@ interface AddAccountRepository<T> {
 
 sealed interface AddAccountResult {
 
-    val metaId: Long
+    sealed interface HadEffect : AddAccountResult
 
-    val type: LightMetaAccount.Type
+    interface SingleAccountChange {
 
-    class AccountAdded(override val metaId: Long, override val type: LightMetaAccount.Type) : AddAccountResult
+        val metaId: Long
+    }
 
-    class AccountChanged(override val metaId: Long, override val type: LightMetaAccount.Type) : AddAccountResult
+    class AccountAdded(override val metaId: Long, val type: LightMetaAccount.Type) : HadEffect, SingleAccountChange
 
-    class NoOp(override val metaId: Long) : AddAccountResult
+    class AccountChanged(override val metaId: Long, val type: LightMetaAccount.Type) : HadEffect, SingleAccountChange
+
+    class Batch(val updates: List<HadEffect>): HadEffect
+
+    object NoOp : AddAccountResult
+}
+
+suspend fun <T> AddAccountRepository<T>.addAccountWithSingleChange(payload: T): AddAccountResult.SingleAccountChange {
+    val result = addAccount(payload)
+    require(result is AddAccountResult.SingleAccountChange)
+
+    return result
+}
+
+fun List<AddAccountResult>.batchIfNeeded(): AddAccountResult {
+    val updatesThatHadEffect = filterIsInstance<AddAccountResult.HadEffect>()
+
+    return when(updatesThatHadEffect.size) {
+        0 -> AddAccountResult.NoOp
+        1 -> updatesThatHadEffect.single()
+        else -> AddAccountResult.Batch(updatesThatHadEffect)
+    }
 }

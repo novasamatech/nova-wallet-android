@@ -4,14 +4,11 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.mixin.api.Browserable
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

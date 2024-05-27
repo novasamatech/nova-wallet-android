@@ -6,13 +6,9 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository.Payload
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository.Payload
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
@@ -64,11 +60,11 @@ class RealLegacyLedgerAddAccountRepository(
         }
 
         payload.ledgerChainAccounts.onEach { (chainId, ledgerAccount) ->
-            val derivationPathKey = LedgerDerivationPath.derivationPathSecretKey(chainId)
+            val derivationPathKey = LedgerDerivationPath.legacyDerivationPathSecretKey(chainId)
             secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, ledgerAccount.derivationPath)
         }
 
-        return AddAccountResult.AccountAdded(metaId, type = Type.LEDGER)
+        return AddAccountResult.AccountAdded(metaId, type = Type.LEDGER_LEGACY)
     }
 
     private suspend fun addChainAccount(payload: Payload.ChainAccount): AddAccountResult {
@@ -84,7 +80,7 @@ class RealLegacyLedgerAddAccountRepository(
 
         accountDao.insertChainAccount(chainAccount)
 
-        val derivationPathKey = LedgerDerivationPath.derivationPathSecretKey(payload.chainId)
+        val derivationPathKey = LedgerDerivationPath.legacyDerivationPathSecretKey(payload.chainId)
         secretStoreV2.putAdditionalMetaAccountSecret(payload.metaId, derivationPathKey, payload.ledgerChainAccount.derivationPath)
 
         return AddAccountResult.AccountChanged(payload.metaId, type = Type.LEDGER)

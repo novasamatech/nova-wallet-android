@@ -18,8 +18,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordFragment
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateBackupPasswordPayload
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
@@ -628,11 +628,11 @@ class Navigator(
     }
 
     override fun openStartImportLegacyLedger() {
-        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_ledger_graph)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_legacy_ledger_graph)
     }
 
     override fun openStartImportGenericLedger() {
-        navController?.navigate(R.id.action_welcomeFragment_to_import_generic_ledger_graph)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_generic_ledger_graph)
     }
 
     override fun withPinCodeCheckRequired(

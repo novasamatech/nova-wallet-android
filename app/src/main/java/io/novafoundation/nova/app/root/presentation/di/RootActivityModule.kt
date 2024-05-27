@@ -80,8 +80,8 @@ class RootActivityModule {
             compoundRequestBusHandler,
             pushNotificationsInteractor,
             externalServiceInitializer,
-            ledgerGenericAccountsUpdater,
-            actionBottomSheetLauncher
+            actionBottomSheetLauncher,
+            ledgerGenericAccountsUpdater
         )
     }
 

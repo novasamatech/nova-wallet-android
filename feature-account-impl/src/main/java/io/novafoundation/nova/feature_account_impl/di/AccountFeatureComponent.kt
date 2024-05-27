@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
@@ -23,9 +24,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.list.mul
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
-import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.di.CreateWalletBackupPasswordComponent
-import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.changePassword.di.ChangeBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.di.CreateWalletBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.di.SyncWalletsBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.di.CheckCloudBackupPasswordComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restoreBackup.di.RestoreCloudBackupComponent
@@ -176,7 +176,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             DbApi::class,
             VersionsFeatureApi::class,
             Web3NamesApi::class,
-            LedgerCoreApi::class
+            LedgerCoreApi::class,
             CloudBackupFeatureApi::class
         ]
     )
