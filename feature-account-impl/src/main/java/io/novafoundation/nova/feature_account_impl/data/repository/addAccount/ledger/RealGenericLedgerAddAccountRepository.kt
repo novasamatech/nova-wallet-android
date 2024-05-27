@@ -73,9 +73,9 @@ class RealGenericLedgerAddAccountRepository(
         // We could perform update for all meta accounts in once to lower the number of requests to db
         // But this would make implementation more complex
         // and we don't expect users to have that many ledger accounts for this optimization to place a significant difference
-       return payload.metaIds.map { metaId ->
-           addMissingChainAccounts(metaId, payload.allAvailableChainIds)
-       }.batchIfNeeded()
+        return payload.metaIds.map { metaId ->
+            addMissingChainAccounts(metaId, payload.allAvailableChainIds)
+        }.batchIfNeeded()
     }
 
     private suspend fun addMissingChainAccounts(metaId: Long, allAvailableChainIds: Collection<ChainId>): AddAccountResult {

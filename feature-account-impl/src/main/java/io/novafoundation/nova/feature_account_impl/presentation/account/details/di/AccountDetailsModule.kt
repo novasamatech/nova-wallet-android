@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry

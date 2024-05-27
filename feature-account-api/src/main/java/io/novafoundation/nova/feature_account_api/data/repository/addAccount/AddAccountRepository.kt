@@ -20,7 +20,7 @@ sealed interface AddAccountResult {
 
     class AccountChanged(override val metaId: Long, val type: LightMetaAccount.Type) : HadEffect, SingleAccountChange
 
-    class Batch(val updates: List<HadEffect>): HadEffect
+    class Batch(val updates: List<HadEffect>) : HadEffect
 
     object NoOp : AddAccountResult
 }
@@ -35,7 +35,7 @@ suspend fun <T> AddAccountRepository<T>.addAccountWithSingleChange(payload: T): 
 fun List<AddAccountResult>.batchIfNeeded(): AddAccountResult {
     val updatesThatHadEffect = filterIsInstance<AddAccountResult.HadEffect>()
 
-    return when(updatesThatHadEffect.size) {
+    return when (updatesThatHadEffect.size) {
         0 -> AddAccountResult.NoOp
         1 -> updatesThatHadEffect.single()
         else -> AddAccountResult.Batch(updatesThatHadEffect)

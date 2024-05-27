@@ -27,7 +27,7 @@ abstract class BaseAddAccountRepository<T>(
     }
 
     private fun AddAccountResult.HadEffect.toEvent(): Event {
-        return when(this) {
+        return when (this) {
             is AddAccountResult.AccountAdded -> Event.AccountAdded(metaId, type)
             is AddAccountResult.AccountChanged -> Event.AccountStructureChanged(metaId, type)
             is AddAccountResult.Batch -> Event.BatchUpdate(updates.map { it.toEvent() })

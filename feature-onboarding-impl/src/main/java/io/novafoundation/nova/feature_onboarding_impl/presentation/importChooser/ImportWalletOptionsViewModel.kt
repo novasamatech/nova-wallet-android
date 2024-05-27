@@ -74,7 +74,6 @@ class ImportWalletOptionsViewModel(
                         PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()
                         PolkadotVaultVariant.PARITY_SIGNER -> router.openStartImportParitySigner()
                     }
-
                 }
             }
         }
