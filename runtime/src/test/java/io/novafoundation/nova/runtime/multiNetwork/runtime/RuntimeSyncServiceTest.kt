@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.md5
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import io.novafoundation.nova.test_shared.any
@@ -14,6 +15,7 @@ import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
 import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.shareIn
@@ -22,15 +24,22 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.Timeout
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.never
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
+
 
 private const val TEST_TYPES = "Stub"
 
@@ -62,7 +71,15 @@ class RuntimeSyncServiceTest {
     @Mock
     private lateinit var cacheMigrator: RuntimeCacheMigrator
 
+    private lateinit var syncDispatcher: SyncChainSyncDispatcher
+
     private lateinit var service: RuntimeSyncService
+
+    private lateinit var syncResultFlow: Flow<SyncResult>
+
+    @JvmField
+    @Rule
+    val globalTimeout: Timeout = Timeout.seconds(10)
 
     @Before
     fun setup() = runBlocking {
@@ -70,17 +87,23 @@ class RuntimeSyncServiceTest {
         whenever(socket.jsonMapper).thenReturn(Gson())
         whenever(typesFetcher.getTypes(any())).thenReturn(TEST_TYPES)
 
-        whenever(runtimeMetadataFetcher.fetchRawMetadata(any())).thenReturn(RawRuntimeMetadata(metadataContent = byteArrayOf(0), isOpaque = false))
+        whenever(runtimeMetadataFetcher.fetchRawMetadata(any(), any())).thenReturn(RawRuntimeMetadata(metadataContent = byteArrayOf(0), isOpaque = false))
+
         whenever(cacheMigrator.needsMetadataFetch(anyInt())).thenReturn(false)
 
-        service = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao, runtimeMetadataFetcher, cacheMigrator)
+        syncDispatcher = Mockito.spy(SyncChainSyncDispatcher())
+
+        service = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao, runtimeMetadataFetcher, cacheMigrator, syncDispatcher)
+
+        syncResultFlow = service.syncResultFlow(testChain.id)
+            .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
     }
 
     @Test
     fun `should not start syncing new chain`() {
         service.registerChain(chain = testChain, connection = testConnection)
 
-        assertFalse(service.isSyncing(testChain.id))
+        assertNoSyncLaunched()
     }
 
     @Test
@@ -89,7 +112,8 @@ class RuntimeSyncServiceTest {
 
         service.applyRuntimeVersion(testChain.id)
 
-        assertTrue(service.isSyncing(testChain.id))
+        assertSyncLaunchedOnce()
+        assertSyncCancelledTimes(1)
     }
 
     @Test
@@ -100,18 +124,18 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            service.awaitSync(testChain.id)
-
-            assertFalse("isSyncing returns false after sync is finished", service.isSyncing(testChain.id))
+            assertSyncLaunchedOnce()
 
             service.registerChain(chain = testChain, connection = testConnection)
+
+            // No new launches
+            assertSyncLaunchedOnce()
 
             assertFalse(service.isSyncing(testChain.id))
         }
     }
 
     @Test
-    @Ignore("TODO - Fix race condition in the test")
     fun `should sync modified chain`() {
         runBlocking {
             chainDaoReturnsBiggerRuntimeVersion()
@@ -123,18 +147,13 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            service.awaitSync(testChain.id)
+            assertSyncLaunchedOnce()
 
             chainDaoReturnsSameRuntimeInfo()
 
-            // since neither types nor metadata will be syncing, it may finish faster than test will be able to call awaitSync
-            // so, listen for sync changes before executing sync
-            val syncResultFlow = service.syncResultFlow(testChain.id)
-                .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
-
             service.registerChain(chain = newChain, connection = testConnection)
 
-            assertTrue(service.isSyncing(testChain.id))
+            assertSyncLaunchedTimes(2)
 
             val syncResult = syncResultFlow.first()
 
@@ -152,7 +171,7 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            val result = service.awaitSync(testChain.id)
+            val result = syncResultFlow.first()
 
             assertNotNull(result.typesHash)
         }
@@ -166,7 +185,7 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            val result = service.awaitSync(testChain.id)
+            val result = syncResultFlow.first()
 
             assertNull(result.typesHash)
         }
@@ -180,11 +199,12 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            assertTrue(service.isSyncing(testChain.id))
+            assertSyncCancelledTimes(1)
+            assertSyncLaunchedOnce()
 
             service.unregisterChain(testChain.id)
 
-            assertFalse(service.isSyncing(testChain.id))
+            assertSyncCancelledTimes(2)
         }
     }
 
@@ -197,7 +217,7 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            val result = service.awaitSync(testChain.id)
+            val result = syncResultFlow.first()
 
             assertEquals(TEST_TYPES.md5(), result.typesHash)
         }
@@ -212,7 +232,7 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            val syncResult = service.awaitSync(testChain.id)
+            val syncResult = syncResultFlow.first()
 
             assertNotNull(syncResult.metadataHash)
         }
@@ -227,7 +247,7 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            val syncResult = service.awaitSync(testChain.id)
+            val syncResult = syncResultFlow.first()
 
             assertNotNull(syncResult.metadataHash)
         }
@@ -241,11 +261,13 @@ class RuntimeSyncServiceTest {
             whenever(testChain.types).thenReturn(Chain.Types("testUrl", overridesCommon = false))
             service.registerChain(chain = testChain, connection = testConnection)
 
-            assertFalse(service.isSyncing(testChain.id)) // guarantee test correctness
+            assertNoSyncLaunched()
 
             service.cacheNotFound(testChain.id)
 
-            val syncResult = service.awaitSync(testChain.id)
+            assertSyncLaunchedOnce()
+
+            val syncResult = syncResultFlow.first()
             assertNotNull(syncResult.metadataHash)
             assertNotNull(syncResult.typesHash)
         }
@@ -260,9 +282,25 @@ class RuntimeSyncServiceTest {
             service.registerChain(chain = testChain, connection = testConnection)
             service.applyRuntimeVersion(testChain.id)
 
-            val syncResult = service.awaitSync(testChain.id)
+            val syncResult = syncResultFlow.first()
 
             assertNull(syncResult.metadataHash)
+        }
+    }
+
+    @Test
+    fun `should sync the same version of metadata when local migration required`() {
+        runBlocking {
+            chainDaoReturnsSameRuntimeInfo()
+            requiresLocalMigration()
+
+            whenever(testChain.types).thenReturn(Chain.Types("testUrl", overridesCommon = false))
+            service.registerChain(chain = testChain, connection = testConnection)
+            service.applyRuntimeVersion(testChain.id)
+
+            val syncResult = syncResultFlow.first()
+
+            assertNotNull(syncResult.metadataHash)
         }
     }
 
@@ -282,7 +320,11 @@ class RuntimeSyncServiceTest {
         whenever(chainDao.runtimeInfo(any())).thenReturn(ChainRuntimeInfoLocal("1", syncedVersion, remoteVersion, null, localMigratorVersion = 1))
     }
 
-    private suspend fun RuntimeSyncService.awaitSync(chainId: String) = syncResultFlow(chainId).first()
+    private suspend fun RuntimeSyncService.latestSyncResult(chainId: String) = syncResultFlow(chainId).first()
+
+    private suspend fun requiresLocalMigration() {
+        whenever(cacheMigrator.needsMetadataFetch(anyInt())).thenReturn(true)
+    }
 
     private fun socketAnswersRequest(request: RuntimeRequest, response: Any?) {
         whenever(socket.executeRequest(eq(request), deliveryType = any(), callback = any())).thenAnswer {
@@ -293,6 +335,45 @@ class RuntimeSyncServiceTest {
                     // pass
                 }
             }
+        }
+    }
+
+    private fun assertNoSyncLaunched() {
+        verify(syncDispatcher, never()).launchSync(anyString(), any())
+    }
+
+    private fun assertSyncLaunchedOnce() {
+        verify(syncDispatcher, times(1)).launchSync(anyString(), any())
+    }
+
+    private fun assertSyncCancelledTimes(times: Int) {
+        verify(syncDispatcher, times(times)).cancelExistingSync(anyString())
+    }
+
+    private fun assertSyncLaunchedTimes(times: Int) {
+        verify(syncDispatcher, times(times)).launchSync(anyString(), any())
+    }
+
+    class SyncChainSyncDispatcher() : ChainSyncDispatcher {
+
+        private val syncingChains = Collections.newSetFromMap(ConcurrentHashMap<ChainId, Boolean>())
+
+        override fun isSyncing(chainId: String): Boolean {
+            return syncingChains.contains(chainId)
+        }
+
+        override fun syncFinished(chainId: String) {
+            syncingChains.remove(chainId)
+        }
+
+        override fun cancelExistingSync(chainId: String) {
+            syncingChains.remove(chainId)
+        }
+
+        override fun launchSync(chainId: String, action: suspend () -> Unit) = runBlocking {
+            syncingChains.add(chainId)
+
+            action()
         }
     }
 }
