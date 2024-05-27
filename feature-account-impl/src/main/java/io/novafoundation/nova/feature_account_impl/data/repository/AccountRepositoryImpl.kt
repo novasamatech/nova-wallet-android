@@ -14,6 +14,8 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
@@ -26,8 +28,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
@@ -266,6 +266,10 @@ class AccountRepositoryImpl(
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {
         return accountDataSource.getActiveMetaAccountsQuantity()
+    }
+
+    override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
+        return accountDataSource.getMetaAccountIdsByType(type)
     }
 
     override fun nodesFlow(): Flow<List<Node>> {

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_api.data.repository.addAccount.le
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface GenericLedgerAddAccountRepository : AddAccountRepository<GenericLedgerAddAccountRepository.Payload> {
 
@@ -14,10 +15,11 @@ interface GenericLedgerAddAccountRepository : AddAccountRepository<GenericLedger
             val universalAccount: LedgerSubstrateAccount,
         ) : Payload
 
-        // TODO next PR - all new chains supported by generic ledger automatically get their chain accounts
-//        class AddMissingChainAccounts(
-//            val metaId: Long,
-//            val availableChainAccounts: Map<ChainId, LedgerSubstrateAccount>
-//        )
+        // TODO after merging cloud backup changes to our branch we can do better and support multiple meta account handling
+        // To avoid multiple updates over the MetaAccountChangesEventBus
+        class AddMissingChainAccounts(
+            val metaId: Long,
+            val allAvailableChainIds: Collection<ChainId>,
+        ) : Payload
     }
 }

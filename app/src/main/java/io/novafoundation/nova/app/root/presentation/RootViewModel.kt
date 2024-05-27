@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_ledger_api.domain.generic.LedgerGenericAccountsUpdater
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -48,7 +49,8 @@ class RootViewModel(
     private val rootScope: RootScope,
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
-    private val externalServiceInitializer: ExternalServiceInitializer
+    private val externalServiceInitializer: ExternalServiceInitializer,
+    private val ledgerGenericAccountsUpdater: LedgerGenericAccountsUpdater
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -85,7 +87,15 @@ class RootViewModel(
 
         syncPushSettingsIfNeeded()
 
+        syncAvailableLedgerAccounts()
+
         externalServiceInitializer.initialize()
+    }
+
+    private fun syncAvailableLedgerAccounts() {
+        ledgerGenericAccountsUpdater.updateAvailableGenericAccounts()
+            .inBackground()
+            .launchIn(viewModelScope)
     }
 
     private fun obserBusEvents() {

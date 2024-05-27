@@ -8,13 +8,17 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.domain.generic.LedgerGenericAccountsUpdater
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.data.repository.RealLedgerRepository
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.RealSelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic.RealLedgerGenericAccountsUpdater
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.RealLedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
@@ -149,5 +153,15 @@ class LedgerFeatureModule {
             ledgerDeviceDiscoveryService = ledgerDeviceDiscoveryService,
             assetSourceRegistry = assetSourceRegistry
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideLedgerGenericAccountsUpdater(
+        ledgerMigrationTracker: LedgerMigrationTracker,
+        metaAccountRepository: AccountRepository,
+        genericLedgerAddAccountRepository: GenericLedgerAddAccountRepository,
+    ): LedgerGenericAccountsUpdater {
+        return RealLedgerGenericAccountsUpdater(ledgerMigrationTracker, metaAccountRepository, genericLedgerAddAccountRepository)
     }
 }
