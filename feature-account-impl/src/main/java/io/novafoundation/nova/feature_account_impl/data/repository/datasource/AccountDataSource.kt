@@ -66,6 +66,8 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun accountExists(accountId: AccountId, chainId: ChainId): Boolean
     suspend fun getMetaAccount(metaId: Long): MetaAccount
 
+    suspend fun getMetaAccountType(metaId: Long): LightMetaAccount.Type?
+
     fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
@@ -103,4 +105,8 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun getActiveMetaAccountsQuantity(): Int
 
     suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
+}
+
+suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {
+    return requireNotNull(getMetaAccountType(metaId))
 }

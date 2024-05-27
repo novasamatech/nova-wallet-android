@@ -5,6 +5,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 
 object NotOverSubscribedFilter : RecommendationFilter {
 
+    override fun canIgnoreWhenNoApplicableCandidatesFound(): Boolean {
+        return true
+    }
+
     override fun shouldInclude(model: Validator): Boolean {
         val isOversubscribed = model.electedInfo?.isOversubscribed
 

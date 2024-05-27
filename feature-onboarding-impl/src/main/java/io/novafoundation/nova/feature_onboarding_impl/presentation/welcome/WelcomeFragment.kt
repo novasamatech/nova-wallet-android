@@ -1,25 +1,24 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.formatting.applyTermsAndPrivacyPolicy
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.styleText
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_welcome.back
-import kotlinx.android.synthetic.main.fragment_welcome.createAccountBtn
-import kotlinx.android.synthetic.main.fragment_welcome.importAccountBtn
-import kotlinx.android.synthetic.main.fragment_welcome.termsTv
-import kotlinx.android.synthetic.main.fragment_welcome.welcomeAddWatchWallet
-import kotlinx.android.synthetic.main.fragment_welcome.welcomeConnectHardwareWallet
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeBackButton
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeCreateWalletButton
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeRestoreWalletButton
 
 class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
@@ -47,23 +46,32 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     override fun initViews() {
-        createAccountBtn.setOnClickListener { viewModel.createAccountClicked() }
-        importAccountBtn.setOnClickListener { viewModel.importAccountClicked() }
-        welcomeAddWatchWallet.setOnClickListener { viewModel.addWatchWalletClicked() }
-        welcomeConnectHardwareWallet.setOnClickListener { viewModel.connectHardwareWalletClicked() }
+        configureTermsAndPrivacy(
+            getString(R.string.onboarding_terms_and_conditions_1_v2_2_1),
+            getString(R.string.onboarding_terms_and_conditions_2),
+            getString(R.string.onboarding_privacy_policy)
+        )
+        welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
+        welcomeTerms.highlightColor = Color.TRANSPARENT
 
-        back.setOnClickListener { viewModel.backClicked() }
-        configureTermsAndPrivacy()
+        welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
+        welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
+
+        welcomeBackButton.setOnClickListener { viewModel.backClicked() }
     }
 
-    private fun configureTermsAndPrivacy() {
-        termsTv.applyTermsAndPrivacyPolicy(
-            R.string.onboarding_terms_and_conditions_1_v2_2_1,
-            R.string.onboarding_terms_and_conditions_2,
-            R.string.onboarding_privacy_policy,
-            viewModel::termsClicked,
-            viewModel::privacyClicked
-        )
+    private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
+        val linkColor = requireContext().getColor(R.color.text_primary)
+
+        welcomeTerms.text = styleText(sourceText) {
+            clickable(terms, linkColor) {
+                viewModel.termsClicked()
+            }
+
+            clickable(privacy, linkColor) {
+                viewModel.privacyClicked()
+            }
+        }
     }
 
     override fun inject() {
@@ -79,13 +87,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
     override fun subscribe(viewModel: WelcomeViewModel) {
         observeBrowserEvents(viewModel)
-        setupImportTypeChooser(viewModel)
 
-        viewModel.shouldShowBackLiveData.observe(back::setVisible)
-
-        viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {
-            SelectHardwareWalletBottomSheet(requireContext(), it.onSuccess)
-                .show()
-        }
+        viewModel.shouldShowBackLiveData.observe(welcomeBackButton::setVisible)
     }
 }

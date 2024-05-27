@@ -26,11 +26,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetB
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.domain.model.substrateMultiChainEncryption
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.getMetaAccountTypeOrThrow
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
@@ -155,18 +158,25 @@ class AccountRepositoryImpl(
         return accountDataSource.selectMetaAccount(metaId)
     }
 
-    override suspend fun updateMetaAccountName(metaId: Long, newName: String) {
-        return accountDataSource.updateMetaAccountName(metaId, newName)
+    override suspend fun updateMetaAccountName(metaId: Long, newName: String) = withContext(Dispatchers.Default) {
+        accountDataSource.updateMetaAccountName(metaId, newName)
+
+        val metaAccountType = requireNotNull(accountDataSource.getMetaAccountType(metaId))
+        val event = Event.AccountNameChanged(metaId, metaAccountType)
+
+        metaAccountChangesEventBus.notify(event, source = null)
     }
 
     override suspend fun isAccountSelected(): Boolean {
         return accountDataSource.anyAccountSelected()
     }
 
-    override suspend fun deleteAccount(metaId: Long) {
+    override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
+        val metaAccountType = accountDataSource.getMetaAccountTypeOrThrow(metaId)
+
         accountDataSource.deleteMetaAccount(metaId)
 
-        withContext(Dispatchers.Default) { metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId)) }
+        metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId, metaAccountType), source = null)
     }
 
     override suspend fun getAccounts(): List<Account> {
@@ -248,6 +258,25 @@ class AccountRepositoryImpl(
                 multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
                 genesisHash = chain.genesisHash.orEmpty(),
                 address = address
+            )
+        }
+    }
+
+    override suspend fun generateRestoreJson(
+        metaAccount: MetaAccount,
+        password: String,
+    ): String {
+        return withContext(Dispatchers.Default) {
+            val secrets = secretStoreV2.getMetaAccountSecrets(metaAccount.id)!!
+
+            jsonSeedEncoder.generate(
+                keypair = secrets.keypair(ethereum = false),
+                seed = secrets.seed,
+                password = password,
+                name = metaAccount.name,
+                multiChainEncryption = metaAccount.substrateMultiChainEncryption()!!,
+                genesisHash = "",
+                address = metaAccount.defaultSubstrateAddress!!
             )
         }
     }

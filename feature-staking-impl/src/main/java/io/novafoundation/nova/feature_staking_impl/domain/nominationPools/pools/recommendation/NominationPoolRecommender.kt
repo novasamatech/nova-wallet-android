@@ -6,5 +6,5 @@ interface NominationPoolRecommender {
 
     val recommendations: List<NominationPool>
 
-    fun recommendedPool(): NominationPool
+    fun recommendedPool(): NominationPool?
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:subtitle="@string/mnemonic_card_reveal_subtitle"
+    app:tapToViewBackground="@drawable/ic_mnemonic_card_blur"
+    app:title="@string/common_tap_to_reveal_title"
+    tools:parentTag="io.novafoundation.nova.common.view.TapToViewContainer">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/mnemonicCardTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            tools:text="Please do not share with anyone" />
+
+        <io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.view.MnemonicContainerView
+            android:id="@+id/mnemonicCardPhrase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:minHeight="144dp"
+            android:overScrollMode="never"
+            tools:itemCount="12"
+            tools:layout_height="144dp"
+            tools:listitem="@layout/item_backup_mnemonic_word" />
+
+    </LinearLayout>
+
+</merge>

@@ -11,6 +11,10 @@ import io.novafoundation.nova.feature_account_api.data.repository.addAccount.Add
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository.Payload
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository.Payload
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -19,9 +23,8 @@ class RealLegacyLedgerAddAccountRepository(
     private val accountDao: MetaAccountDao,
     private val chainRegistry: ChainRegistry,
     private val secretStoreV2: SecretStoreV2,
-    proxySyncService: ProxySyncService,
     metaAccountChangesEventBus: MetaAccountChangesEventBus
-) : BaseAddAccountRepository<Payload>(proxySyncService, metaAccountChangesEventBus), LegacyLedgerAddAccountRepository {
+) : BaseAddAccountRepository<Payload>(metaAccountChangesEventBus), LegacyLedgerAddAccountRepository {
 
     override suspend fun addAccountInternal(payload: Payload): AddAccountResult {
         return when (payload) {
@@ -42,7 +45,8 @@ class RealLegacyLedgerAddAccountRepository(
             isSelected = false,
             position = accountDao.nextAccountPosition(),
             type = MetaAccountLocal.Type.LEDGER,
-            status = MetaAccountLocal.Status.ACTIVE
+            status = MetaAccountLocal.Status.ACTIVE,
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
         )
 
         val metaId = accountDao.insertMetaAndChainAccounts(metaAccount) { metaId ->
@@ -64,7 +68,7 @@ class RealLegacyLedgerAddAccountRepository(
             secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, ledgerAccount.derivationPath)
         }
 
-        return AddAccountResult.AccountAdded(metaId)
+        return AddAccountResult.AccountAdded(metaId, type = Type.LEDGER)
     }
 
     private suspend fun addChainAccount(payload: Payload.ChainAccount): AddAccountResult {
@@ -83,6 +87,6 @@ class RealLegacyLedgerAddAccountRepository(
         val derivationPathKey = LedgerDerivationPath.derivationPathSecretKey(payload.chainId)
         secretStoreV2.putAdditionalMetaAccountSecret(payload.metaId, derivationPathKey, payload.ledgerChainAccount.derivationPath)
 
-        return AddAccountResult.AccountChanged(payload.metaId)
+        return AddAccountResult.AccountChanged(payload.metaId, type = Type.LEDGER)
     }
 }

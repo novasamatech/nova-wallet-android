@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <View
+        style="@style/Widget.Nova.Puller"
+        android:layout_marginTop="6dp" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/actionBottomSheetImage"
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_icon_big"
+        android:padding="12dp"
+        tools:src="@color/icon_primary" />
+
+    <TextView
+        android:id="@+id/actionBottomSheetTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:textColor="@color/text_primary"
+        tools:text="Prepare to save your wallets!" />
+
+    <TextView
+        android:id="@+id/actionBottomSheetSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/text_secondary"
+        tools:text="Please be sure to remember this password. Store it in a secure location. You will need it to restore your wallets from the backup." />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/actionBottomSheetCheckBox"
+        style="@style/Widget.Nova.Checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:minHeight="40dp"
+        android:paddingStart="8dp"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:textColor="@color/text_secondary"
+        tools:text="@string/common_check_box_auto_continue" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        android:paddingBottom="24dp">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/actionBottomSheetNeutralBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_marginTop="24dp"
+            android:layout_weight="1"
+            tools:text="@string/common_ok_back" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/actionBottomSheetPositiveBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_marginTop="24dp"
+            android:layout_weight="1"
+            tools:text="@string/common_ok_back" />
+    </LinearLayout>
+
+</LinearLayout>

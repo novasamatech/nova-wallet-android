@@ -4,14 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.BackupMnemonicAdapter
 import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicDestination
 import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicSource
 import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicToolbar
@@ -31,11 +31,7 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel>() {
     }
 
     private val sourceAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ConfirmMnemonicAdapter(itemHandler = viewModel::sourceWordClicked)
-    }
-
-    private val destinationAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ConfirmMnemonicAdapter(itemHandler = viewModel::destinationWordClicked)
+        BackupMnemonicAdapter(itemHandler = viewModel::sourceWordClicked)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,7 +46,7 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel>() {
         conformMnemonicContinue.setOnClickListener { viewModel.continueClicked() }
 
         confirmMnemonicSource.adapter = sourceAdapter
-        confirmMnemonicDestination.adapter = destinationAdapter
+        confirmMnemonicDestination.setWordClickedListener(viewModel::destinationWordClicked)
     }
 
     override fun inject() {
@@ -66,31 +62,10 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel>() {
         conformMnemonicSkip.setVisible(viewModel.skipVisible)
 
         viewModel.sourceWords.observe { sourceAdapter.submitList(it) }
-        viewModel.destinationWords.observe { destinationAdapter.submitList(it) }
+        viewModel.destinationWords.observe { confirmMnemonicDestination.setWords(it) }
 
-        viewModel.nextButtonEnabled.observe {
-            conformMnemonicContinue.isEnabled = it
+        viewModel.nextButtonState.observe {
+            conformMnemonicContinue.setState(it)
         }
-
-        viewModel.matchingMnemonicErrorAnimationEvent.observeEvent {
-            playMatchingMnemonicErrorAnimation()
-        }
-    }
-
-    private fun playMatchingMnemonicErrorAnimation() {
-        val animation = AnimationUtils.loadAnimation(activity!!, R.anim.shake)
-        animation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
-
-            override fun onAnimationStart(animation: Animation?) {
-            }
-
-            override fun onAnimationEnd(animation: Animation?) {
-                viewModel.matchingErrorAnimationCompleted()
-            }
-        })
-
-        confirmMnemonicDestination.startAnimation(animation)
     }
 }

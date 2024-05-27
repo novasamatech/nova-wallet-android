@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -77,7 +77,7 @@ class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainS
         observeHints(viewModel.hintsMixin, confirmStartParachainStakingHints)
 
         viewModel.title.observe(confirmStartParachainStakingToolbar::setTitle)
-        viewModel.showNextProgress.observe(confirmStartParachainStakingConfirm::setProgress)
+        viewModel.showNextProgress.observe(confirmStartParachainStakingConfirm::setProgressState)
 
         viewModel.amountModel.observe { amountModel ->
 

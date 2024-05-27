@@ -8,11 +8,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
 
 interface AccountRouter : SecureRouter, ReturnableRouter {
 
@@ -36,7 +37,7 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openNodes()
 
-    fun openAddAccount(payload: AddAccountPayload)
+    fun openCreateWallet(payload: StartCreateWalletPayload)
 
     fun openWalletDetails(metaId: Long)
 
@@ -47,17 +48,19 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openChangeWatchAccount(payload: AddAccountPayload.ChainAccount)
 
     @PinRequired
-    fun exportMnemonicAction(exportPayload: ExportPayload): DelayedNavigation
+    fun getExportMnemonicDelayedNavigation(exportPayload: ExportPayload.ChainAccount): DelayedNavigation
 
     @PinRequired
-    fun exportSeedAction(exportPayload: ExportPayload): DelayedNavigation
+    fun getExportSeedDelayedNavigation(exportPayload: ExportPayload.ChainAccount): DelayedNavigation
 
     @PinRequired
-    fun exportJsonPasswordAction(exportPayload: ExportPayload): DelayedNavigation
+    fun getExportJsonDelayedNavigation(exportPayload: ExportPayload): DelayedNavigation
 
-    fun openExportJsonConfirm(payload: ExportJsonConfirmPayload)
+    fun exportJsonAction(exportPayload: ExportPayload)
 
     fun openImportAccountScreen(payload: ImportAccountPayload)
+
+    fun openImportOptionsScreen()
 
     fun returnToWallet()
 
@@ -76,4 +79,24 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount)
 
     fun finishApp()
+
+    fun openCreateCloudBackupPassword(walletName: String)
+
+    fun restoreCloudBackup()
+
+    fun openSyncWalletsBackupPassword()
+
+    fun openChangeBackupPasswordFlow()
+
+    fun openRestoreBackupPassword()
+
+    fun openChangeBackupPassword()
+
+    fun openManualBackupSelectAccount(metaId: Long)
+
+    fun openManualBackupConditions(payload: ManualBackupCommonPayload)
+
+    fun openManualBackupSecrets(payload: ManualBackupCommonPayload)
+
+    fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload)
 }

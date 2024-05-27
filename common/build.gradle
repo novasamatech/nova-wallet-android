@@ -135,4 +135,6 @@ dependencies {
     implementation markwonStrikethrough
     implementation markwonHtml
     implementation kotlinReflect
+
+    implementation playServicesAuthDep
 }

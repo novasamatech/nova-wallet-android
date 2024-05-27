@@ -24,6 +24,234 @@
 
     <string name="onboarding_terms_and_conditions_1_v2_2_1">By continuing, you agree to our\n%1$s and %2$s</string>
 
+    <string name="account_export_existing">Import existing</string>
+    <string name="cloud_backup_will_be_changed_title">Wallet changes will be updated in the Cloud Backup</string>
+    <string name="cloud_backup_will_be_changed_subtitle">New wallets are automatically added to the Cloud Backup. You can disable Cloud Backup in Settings.</string>
+    <string name="common_check_box_auto_continue">Automatically continue in the future</string>
+
+    <string name="wallet_management_add_account_title">How to add wallet?</string>
+    <string name="wallet_management_create_account_btn">How to add wallet?</string>
+    <string name="wallet_management_import_account_btn">How to add wallet?</string>
+
+    <!--<string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>-->
+    <string name="account_export_json_password_subtitle">This password is required to encrypt your account and is used alongside this JSON file to restore your wallet.</string>
+
+    <string name="export_json_download_btn">Download Restore JSON</string>
+
+    <!--<string name="cloud_backup_enter_password">Enter password</string>-->
+
+    <!--<string name="common_input_error_set_password">Set a password…</string>-->
+    <string name="common_enter_password">Enter password</string>
+
+    <string name="common_network_polkadot">Polkadot</string>
+    <string name="common_network_ethereum">Ethereum</string>
+
+    <string name="manual_backup_secrets_subtitle">Do not share any of this information with anyone - If you do you will permanently and irretreveably lose all of your assets</string>
+
+    <string name="manual_backup_secrets_custom_key_title">Custom Key</string>
+    <string name="manual_backup_secrets_default_key_title">Default Key</string>
+
+    <string name="json_export_btn">Export JSON file</string>
+
+    <string name="manual_backup_warning_disabled_button">Review &amp; Accept to Continue</string>
+
+    <string name="manual_backup_warning_title">Do not share your passphrase!</string>
+    <string name="manual_backup_warning_subtitle">Please read the following carefully before viewing your backup</string>
+    <string name="manual_backup_warning_condition_1">This passphrase gives you total and permanent access to all connected wallets and the funds within them.\n%s</string>
+    <string name="manual_backup_warning_condition_1_highlight">DO NOT SHARE IT.</string>
+    <string name="manual_backup_warning_condition_2">Do not enter your Passphrase into any form or website.\n%s</string>
+    <string name="manual_backup_warning_condition_2_highlight">FUNDS MAY BE LOST FOREVER.</string>
+    <string name="manual_backup_warning_condition_3">Support or admins will never request your Passphrase under any circumstances.\n%s</string>
+    <string name="manual_backup_warning_condition_3_highlight">BEWARE OF IMPERSONATORS.</string>
+
+    <string name="manual_backup_select_account_default_key_title">Accounts with default key</string>
+    <string name="manual_backup_select_account_custom_key_title">Accounts with custom key</string>
+    <string name="manual_backup_select_account_default_key_account">Default accounts</string>
+    <string name="manual_backup_select_account_default_key_account_subtitle_more_chains">%s, +%d others</string>
+    <string name="manual_backup_select_account_header">Select the key to back up</string>
+
+    <string name="manual_backup_select_wallet_header">Select a wallet to back up</string>
+    <string name="cloud_backup_destructive_changes_not_applied_title">Wallet changes failed to update in the Cloud Backup</string>
+    <string name="cloud_backup_destructive_changes_not_applied_subtitle">At the moment your backup is not synchronized. Please review the issue.</string>
+    <string name="cloud_backup_destructive_changes_not_applied_button">Review the Issue</string>
+
+    <string name="cloud_backup_destructive_changes_confirmation_title">Are you sure that you want to apply these changes?</string>
+    <string name="cloud_backup_destructive_changes_confirmation_subtitle">If you have not manually written down your Passphrase for wallets that will be removed, then those wallets and all of their assets will be permanently and irretrievably lost forever.</string>
+
+    <string name="cloud_backup_destructive_changes_action_title">Cloud Backup changes found</string>
+    <string name="cloud_backup_destructive_changes_action_subtitle">At the moment your backup is not synchronized. Please review these updates.</string>
+    <string name="cloud_backup_destructive_changes_button">Review Updates</string>
+
+    <string name="state_new">New</string>
+    <string name="state_changed">Modified</string>
+    <string name="state_removed">Removed</string>
+
+    <string name="backup_diff_title">Apply Backup Updates?</string>
+    <string name="backup_diff_subtitle">Before proceeding with changes, %s for modified and removed wallets!</string>
+    <string name="backup_diff_subtitle_highlighted">ensure you\'ve saved Passphrases</string>
+    <string name="common_sign_in">Sign In</string>
+
+    <!--<string name="push_welcome_cancel_button">Not now</string>-->
+    <string name="common_not_now">Not now</string>
+
+    <string name="deprecated_cloud_backup_password_title">Backup password was changed</string>
+    <string name="deprecated_cloud_backup_password_subtitle">Your backup password was previously updated. To continue using Cloud Backup, %s</string>
+    <string name="deprecated_cloud_backup_password_subtitle_highlight">please enter the new backup password.</string>
+
+    <string name="restore_cloud_backup_password_title">Your backup password was previously updated. To continue using Cloud Backup, please enter the new backup password.</string>
+
+    <string name="change_cloud_backup_password_title">Update backup password</string>
+    <string name="change_cloud_backup_password_subtitle">Please enter a password that will be used to recover your wallets from cloud backup. This password can\'t be recovered in the future, so be sure to remember it!</string>
+
+    <string name="confirm_cloud_backup_password_title">Enter current backup password</string>
+    <string name="confirm_cloud_backup_password_subtitle">Please enter the password you created during the backup process</string>
+
+    <string name="deleting_backup_progress">Deleting a backup...</string>
+    <string name="cloud_backup_delete_action_title">Backup will be deleted from Google Drive</string>
+    <string name="cloud_backup_delete_action_subtitle">%s and remember to always keep them offline to restore them anytime. You can do this in the Backup Settings.</string>
+    <string name="cloud_backup_delete_action_subtitle_highlighted">Please write down all your wallet’s Passphrases before proceeding</string>
+
+    <string name="manage_cloud_backup">Manage backup</string>
+
+    <string name="backup_settings_delete_backup">Delete backup</string>
+
+    <!--<string name="account_export_password_change">Change password</string>-->
+    <string name="common_change_password">Change password</string>
+
+    <string name="cloud_backup_settings_disabled_state_subtitle">Turn it on to create a wallets backup</string>
+    <string name="cloud_backup_settings_last_sync">Last sync: %s at %s</string>
+    <string name="cloud_backup_settings_not_auth_button">Sign In to Google Drive</string>
+    <string name="cloud_backup_settings_deprecated_password_button">Enter Backup Password</string>
+    <string name="cloud_backup_settings_corrupted_backup_button">Review Backup Updates</string>
+    <string name="cloud_backup_settings_other_errors_button">Review Google Drive Issue</string>
+    <string name="cloud_backup_settings_backup_errors_button">Review Backup Error</string>
+
+    <string name="cloud_backup_state_syncing_title">Backup Syncing...</string>
+    <string name="cloud_backup_state_disabled_title">Backup Disabled</string>
+    <string name="cloud_backup_state_unsynced_title">Backup Unsynced</string>
+    <string name="cloud_backup_state_synced_title">Backup Synced</string>
+    <string name="backup_settings_toolbar_title">Backup</string>
+    <string name="backup_settings_title">Google Drive</string>
+    <string name="backup_settings_subtitle">An encrypted copy of all your wallets are safely stored using your Google Drive. Even if you install Nova on a new device you will be able to easily access your wallets.</string>
+    <string name="backup_settings_manual_title">Manual</string>
+    <string name="backup_settings_manual_subtitle">You can manually write down your recovery phrase to be sure that everything is safe</string>
+    <string name="backup_settings_switcher_text">Back up to Google Drive</string>
+    <string name="backup_settings_manual_switcher_title">Back up manually</string>
+
+    <string name="corrupted_backup_error_title">Backup found but empty or broken</string>
+    <string name="corrupted_backup_error_subtitle">An issue has been identified with your backup. You have the option to delete the current backup and create a new one. %s before proceeding.</string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Ensure you have saved Passphrases for all wallets</string>
+    <!--<string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>-->
+
+    <string name="confirm_mnemonic_not_matching_error_message">Invalid passphrase, please check one more time the words order</string>
+    <string name="confirm_mnemonic_disabled_button_state">Select the words...</string>
+
+    <string name="existing_cloud_backup_found_button">Recover Wallets</string>
+    <string name="existing_cloud_backup_found_title">Existing Cloud Backup found</string>
+    <string name="existing_cloud_backup_found_subtitle">%s All of your wallets will be safely backed up in Google Drive.</string>
+    <string name="existing_cloud_backup_found_subtitle_highlight">Do you want to recover your wallets?</string>
+
+    <string name="import_wallet_cloud_backup_not_found_title">Backup Not Found</string>
+    <string name="import_wallet_cloud_backup_not_found_subtitle">Unfortunately, Backup with your wallets has not been found.</string>
+
+    <string name="cloud_backup_delete_backup_confirmation_title">Are you sure you want to delete Cloud Backup?</string>
+    <string name="cloud_backup_delete_backup_confirmation_message">Current backup with your wallets will be permanently deleted!</string>
+
+    <string name="cloud_backup_delete_button">Delete Backup</string>
+    <string name="restore_cloud_backup_delete_backup_title">Have you lost your password?</string>
+    <string name="restore_cloud_backup_delete_backup_description">%s Your password is exclusively yours. Without your backup password it is not possible to restore your wallets from your iCloud.\n\nAlternatively, you can %s\n\nIf your password is irretrievably lost, then you can start a new backup by deleting the current backup. This will enable you to create a new password for a fresh Cloud Backup.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Unfortunately, it cannot be recovered.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">restore your wallets by using your Passphrase.</string>
+
+    <string name="common_forgot_password">Forgot Password?</string>
+    <string name="restore_cloud_backup_title">Enter backup password</string>
+    <string name="restore_cloud_backup_subtitle">To restore your wallets, please enter the password you created during the backup process</string>
+
+    <string name="common_got_it">Got it</string>
+
+    <string name="create_cloud_backup_password_alert_title">Remember Backup Password</string>
+    <string name="create_cloud_backup_password_alert_subtitle">In the future, without backup password it is not possible to restore your wallets from Cloud Backup.\n%s</string>
+    <string name="create_cloud_backup_password_alert_subtitle_highlighted">This password cannot be recovered.</string>
+    <string name="create_cloud_backup_password_title">Create your backup password</string>
+    <string name="create_cloud_backup_password_subtitle">Please enter a password to access your backup anytime. The password can’t be recovered, be sure to remember it!</string>
+    <string name="create_cloud_backup_password_input_hint">Backup password</string>
+    <string name="create_cloud_backup_password_input_confirm_hint">Confirm password</string>
+    <string name="create_cloud_backup_password_requirement_min_chars">Min. 8 characters</string>
+    <string name="create_cloud_backup_password_requirement_numbers">Numbers</string>
+    <string name="create_cloud_backup_password_requirement_letters">Letters</string>
+    <string name="create_cloud_backup_password_requirement_passwords_match">Passwords match</string>
+
+    <string name="cloud_backup_error_invalid_password_title">Password is invalid</string>
+    <string name="cloud_backup_error_invalid_password_message">Please, check password correctness and try again.</string>
+
+    <string name="common_connection_error_title">Connection Failed</string>
+    <string name="common_connection_error_message">Please, check your connection or try again later</string>
+
+    <string name="cloud_backup_error_not_found_title">No Backups Found</string>
+    <string name="cloud_backup_error_not_found_message">Unfortunately, we have not found a backup to restore wallets</string>
+
+    <string name="cloud_backup_error_google_service_auth_failed_title">Google Drive authentication failed</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">Failed to connect to Google Drive due to an authentication issue. Please ensure you have entered the correct credentials and granted Nova access to Google Drive</string>
+
+    <string name="cloud_backup_error_google_service_other_title">Google Drive error</string>
+    <string name="cloud_backup_error_google_service_other_message">Unable to back up your secret to Google Drive. Please ensure you have Google Drive enabled with available storage space and try again</string>
+
+    <string name="cloud_backup_error_google_service_not_enough_space_title">Not Enough Storage</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_message">This device cannot be backed up because there is not enough Google Drive storage available. You can manage your storage in Google Drive.</string>
+
+    <string name="cloud_backup_error_google_service_not_found_title">Google Play services not found</string>
+    <string name="cloud_backup_error_google_service_not_found_message">Unfortunately, Google Drive is not working without Google Play services, which are missing on your device. Try to get Google Play services</string>
+
+    <string name="start_create_wallet_your_wallet_is_ready">Your wallet is ready</string>
+    <string name="cloud_backup">Cloud Backup</string>
+    <string name="start_create_wallet_set_wallet_name_explanation">This will only be visible to you and you can edit it later.</string>
+    <string name="start_create_wallet_backup_ready_explanation">Now lets back up your wallet. This makes sure that your funds are safe and secure. Backups allow you to restore your wallet at any time.</string>
+    <string name="start_create_wallet_cloud_backup_btn">Back up to Cloud</string>
+    <string name="start_create_wallet_manual_backup_btn">Back up Manually</string>
+
+    <string name="backup_mnemonic_attention_title">Prepare to save your wallet!</string>
+    <string name="common_tap_to_reveal_title">Tap to reveal</string>
+    <string name="mnemonic_card_reveal_subtitle">Make sure no one can see your screen\nand do not take screenshots</string>
+
+    <string name="mnemonic_card_title">Please %s anyone</string>
+    <string name="mnemonic_card_title_highlight">do not share with</string>
+
+    <string name="backup_mnemonic_disabled_button">Please, agree with conditions</string>
+
+    <string name="backup_mnemonic_condition_1">Having the Passphrase means having %s and the money within them.</string>
+    <string name="backup_mnemonic_condition_1_highlight">total and permanent access to all connected wallets</string>
+
+    <string name="backup_mnemonic_condition_2">%s They are not needed for app functionality.</string>
+    <string name="backup_mnemonic_condition_2_highlight">Do not enter your Passphrase or private key into any form or app.</string>
+
+    <string name="backup_mnemonic_condition_3">Support or %s or private key under any circumstances.</string>
+    <string name="backup_mnemonic_condition_3_highlight">admins will never request your Passphrase</string>
+
+    <!--<string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>-->
+    <string name="account_backup_mnemonic_title">Write down your Passphrase</string>
+
+    <string name="start_create_wallet_input_hint">My new wallet</string>
+    <string name="start_create_wallet_name_your_wallet">Give your wallet a name</string>
+    <string name="start_create_wallet_enter_wallet_name">Enter wallet name</string>
+
+    <string name="common_cloud_backup">Cloud backup</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recover wallets from Google Cloud</string>
+    <string name="loocking_backup_progress">Looking for your backup...</string>
+
+    <!--<string name="account_backup_mnemonic_field_title">Mnemonic Passphrase</string>-->
+
+    <string name="import_wallet_options_mnemonic_title">Passphrase</string>
+    <string name="import_wallet_options_mnemonic_subtitle">Use your 12, 15, 18, 21 or 24-word phrase</string>
+    <string name="import_wallet_options_watch_only_title">Watch-only</string>
+
+    <!--<string name="account_welcome_hardware_wallet_title">Connect hardware wallet</string>-->
+    <string name="account_welcome_hardware_wallet_title">Hardware wallet</string>
+
+    <!--<string name="account_welcome_hardware_wallet_subtitle">Use Polkadot Vault, Ledger or Parity Signer</string>-->
+    <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Parity Signer or Ledger</string>
+
+    <string name="import_wallet_options_title">Choose how you would like to import your wallet</string>
+
     <string name="common_something_went_wrong_title">Something went wrong</string>
     <string name="push_welcome_timeout_error_message">Please try again later by accessing notification settings from the Settings tab</string>
 
@@ -113,7 +341,6 @@
     <string name="push_welcome_title">Don’t miss a thing!</string>
     <string name="push_welcome_message">Get notified about Wallet operations, Governance updates, Staking activity and Security, so you’re always in the know</string>
     <string name="push_welcome_enable_button">Enable push notifications</string>
-    <string name="push_welcome_cancel_button">Not now</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">By enabling push notifications, you agree to our %s and %s</string>
 
     <string name="wallet_send_cannot_dust_before_delivery_fee_message">Due to the cross-chain restrictions you can transfer not more than %s</string>
@@ -474,7 +701,6 @@
     <string name="account_parity_signer_scan_from">Scan the QR code from the %s</string>
     <string name="account_parity_signer_scan_with">Scan the QR code with the %s</string>
     <string name="account_parity_signer_import_start_title">Add wallet from %s</string>
-    <string name="account_welcome_hardware_wallet_subtitle">Use Polkadot Vault, Ledger or Parity Signer</string>
     <string name="account_details_parity_signer_alert">This wallet is paired with %1$s. Nova will help you to form any operations you want, and you will be requested to sign them using %1$s</string>
     <string name="account_details_parity_signer_not_supported">Not supported by %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s does not support signing arbitrary messages — only transactions</string>
@@ -1114,8 +1340,6 @@
     <string name="common_permission_permissions_denied_message">Requested permissions are required to use this screen. You should enable them in Settings.</string>
     <string name="common_to_settings">Open Settings</string>
 
-    <string name="account_welcome_hardware_wallet_title">Connect hardware wallet</string>
-
     <string name="account_parity_signer_import_start_select_top">Make sure to select top one</string>
     <string name="account_parity_signer_import_start_step_3">Parity Signer will provide you <font color='#FFFFFF'>QR code to scan</font></string>
     <string name="account_parity_signer_import_start_step_2"><font color='#FFFFFF'>Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
@@ -1389,11 +1613,8 @@
     <string name="about_version_template" translatable="false">Nova Wallet v%s</string>
     <string name="about_website_v2_2_0">Website</string>
     <string name="account_add_already_exists_message">Account already exists. Please, try another one.</string>
-    <string name="account_backup_mnemonic_field_title">Mnemonic Passphrase</string>
-    <string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>
     <string name="account_backup_secret_caption">Please make sure to write down your phrase correctly and legibly.</string>
     <string name="account_confirm_mnemonic">Confirm mnemonic</string>
-    <string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>
     <string name="account_confirm_mnemonic_title">Let’s double check it</string>
     <string name="account_confirmation_details">Choose words in the right order</string>
     <string name="account_create_account">Create a new account</string>
@@ -1411,10 +1632,8 @@
     <string name="account_ethereum_derivation_path">Ethereum secret derivation path</string>
     <string name="account_export">Export account</string>
     <string name="account_export_action">Export</string>
-    <string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>
     <string name="account_export_json_password_title">Set a new password</string>
     <string name="account_export_json_title">Save your secret and store it in a safe place</string>
-    <string name="account_export_password_change">Change password</string>
     <string name="account_export_seed_title">Write down your secret and store it in a safe place</string>
     <string name="account_import_invalid_keystore">Invalid restore json. Please, make sure that input contains valid json.</string>
     <string name="account_import_invalid_seed">Seed is invalid. Please, make sure that your input contains 64 hex symbols.</string>
@@ -1499,7 +1718,6 @@
     </plurals>
     <string name="common_i_understand">I understand</string>
     <string name="common_info">Info</string>
-    <string name="common_input_error_set_password">Set a password…</string>
     <string name="common_learn_more">Learn more</string>
     <string name="common_learn_more_v2_2_0">Find out more about</string>
     <string name="common_left">%s left</string>

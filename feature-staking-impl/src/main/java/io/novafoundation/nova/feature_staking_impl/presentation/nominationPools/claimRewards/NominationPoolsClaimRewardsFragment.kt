@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -57,7 +57,7 @@ class NominationPoolsClaimRewardsFragment : BaseFragment<NominationPoolsClaimRew
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel.feeLoaderMixin, nominationPoolsClaimRewardsExtrinsicInformation.fee)
 
-        viewModel.showNextProgress.observe(nominationPoolsClaimRewardsConfirm::setProgress)
+        viewModel.showNextProgress.observe(nominationPoolsClaimRewardsConfirm::setProgressState)
 
         viewModel.pendingRewardsAmountModel.observe(nominationPoolsClaimRewardsAmount::setAmount)
 

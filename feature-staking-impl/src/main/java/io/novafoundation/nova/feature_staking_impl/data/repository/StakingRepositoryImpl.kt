@@ -66,7 +66,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
-import kotlinx.coroutines.flow.map
 
 class StakingRepositoryImpl(
     private val accountStakingDao: AccountStakingDao,
@@ -136,11 +135,17 @@ class StakingRepositoryImpl(
             binding = { instance, _ -> bindExposureOverview(instance) }
         )
 
-        val eraStakersPaged = runtime.metadata.staking().storage("ErasStakersPaged").entries(
-            eraIndex,
-            keyExtractor = { (_: BigInteger, accountId: ByteArray, page: BigInteger) -> accountId.toHexString() to page.toInt() },
-            binding = { instance, _ -> bindExposurePage(instance) }
-        )
+        val atLeastOneNominatorPresent = eraStakersOverview.any { (_, exposureOverview) -> exposureOverview.nominatorCount > BigInteger.ZERO }
+
+        val eraStakersPaged = if (atLeastOneNominatorPresent) {
+            runtime.metadata.staking().storage("ErasStakersPaged").entries(
+                eraIndex,
+                keyExtractor = { (_: BigInteger, accountId: ByteArray, page: BigInteger) -> accountId.toHexString() to page.toInt() },
+                binding = { instance, _ -> bindExposurePage(instance) }
+            )
+        } else {
+            emptyMap()
+        }
 
         mergeOverviewsAndPagedOthers(eraStakersOverview, eraStakersPaged)
     }

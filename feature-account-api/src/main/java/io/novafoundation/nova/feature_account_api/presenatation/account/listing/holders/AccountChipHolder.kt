@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_account_api.presenatation.account.listing
 import android.view.ViewGroup
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.view.ChipLabelModel
 import io.novafoundation.nova.common.view.ChipLabelView
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountChipGroupRvItem
 
 class AccountChipHolder(override val containerView: ChipLabelView) : GroupedListHolder(containerView) {
 
@@ -19,7 +19,7 @@ class AccountChipHolder(override val containerView: ChipLabelView) : GroupedList
         }
     }
 
-    fun bind(item: AccountChipGroupRvItem) {
-        containerView.setModel(item.chipLabelModel)
+    fun bind(item: ChipLabelModel) {
+        containerView.setModel(item)
     }
 }

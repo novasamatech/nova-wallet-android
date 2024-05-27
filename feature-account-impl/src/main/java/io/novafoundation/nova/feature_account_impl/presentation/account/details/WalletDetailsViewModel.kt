@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
@@ -12,40 +13,37 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Wallet
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinHost
-import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
-
-private const val UPDATE_NAME_INTERVAL_SECONDS = 1L
 
 class WalletDetailsViewModel(
+    private val rootScope: RootScope,
     private val interactor: WalletDetailsInteractor,
     private val accountRouter: AccountRouter,
     private val metaId: Long,
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
     private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
-    private val addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
+    private val addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
     private val walletDetailsMixinFactory: WalletDetailsMixinFactory
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    ImportTypeChooserMixin by importTypeChooserMixin,
-    AddAccountLauncherMixin by addAccountLauncherMixin {
+    ImportTypeChooserMixin by importTypeChooserMixin {
+
+    val addAccountLauncherMixin = addAccountLauncherPresentationFactory.create(viewModelScope)
 
     private val detailsHost = WalletDetailsMixinHost(
         browserableDelegate = externalActions
     )
 
     private val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId, detailsHost) }
+
+    private val startAccountName = async { walletDetailsMixin().metaAccount.name }
 
     val accountNameFlow: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -62,20 +60,10 @@ class WalletDetailsViewModel(
         launch {
             accountNameFlow.emit(walletDetailsMixin().metaAccount.name)
         }
-
-        syncNameChangesWithDb()
     }
 
     fun backClicked() {
         accountRouter.back()
-    }
-
-    private fun syncNameChangesWithDb() {
-        accountNameFlow
-            .filter { it.isNotEmpty() }
-            .debounce(UPDATE_NAME_INTERVAL_SECONDS.seconds)
-            .onEach { interactor.updateName(metaId, it) }
-            .launchIn(viewModelScope)
     }
 
     fun chainAccountClicked(item: AccountInChainUi) = launch {
@@ -106,13 +94,23 @@ class WalletDetailsViewModel(
         }
     }
 
+    override fun onCleared() {
+        // Launch it in root scope to avoid coroutine cancellation
+        rootScope.launch {
+            val newAccountName = accountNameFlow.value
+            if (startAccountName() != newAccountName) {
+                interactor.updateName(metaId, newAccountName)
+            }
+        }
+    }
+
     private fun exportTypeChosen(type: SecretType, chain: Chain) {
-        val exportPayload = ExportPayload(metaId, chain.id)
+        val exportPayload = ExportPayload.ChainAccount(metaId, chain.id)
 
         val navigationAction = when (type) {
-            SecretType.MNEMONIC -> accountRouter.exportMnemonicAction(exportPayload)
-            SecretType.SEED -> accountRouter.exportSeedAction(exportPayload)
-            SecretType.JSON -> accountRouter.exportJsonPasswordAction(exportPayload)
+            SecretType.MNEMONIC -> accountRouter.getExportMnemonicDelayedNavigation(exportPayload)
+            SecretType.SEED -> accountRouter.getExportSeedDelayedNavigation(exportPayload)
+            SecretType.JSON -> accountRouter.getExportJsonDelayedNavigation(exportPayload)
         }
 
         accountRouter.withPinCodeCheckRequired(navigationAction)

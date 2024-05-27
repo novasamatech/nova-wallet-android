@@ -20,7 +20,7 @@ interface ExportSeedComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: ExportPayload
+            @BindsInstance payload: ExportPayload.ChainAccount
         ): ExportSeedComponent
     }
 

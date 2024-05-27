@@ -10,6 +10,9 @@ class VaraRewardCalculator(
 ) : InflationBasedRewardCalculator(validators, totalIssuance) {
 
     override fun calculateYearlyInflation(stakedPortion: Double): Double {
-        return inflation.value
+        // When calculating era payout, Vara runtime simply divides yearly payout by number of eras in the year
+        // Which results in `inflation` to correspond to simple returns (APR)
+        // So, we adjust it to compound returns (APY)
+        return aprToApy(inflation.value)
     }
 }

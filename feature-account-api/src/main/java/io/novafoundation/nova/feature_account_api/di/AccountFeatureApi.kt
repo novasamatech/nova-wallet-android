@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.di
 
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -16,16 +17,19 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
@@ -61,6 +65,10 @@ interface AccountFeatureApi {
 
     fun proxyExtrinsicValidationRequestBus(): ProxyExtrinsicValidationRequestBus
 
+    fun cloudBackupFacade(): LocalAccountsCloudBackupFacade
+
+    fun syncWalletsBackupPasswordCommunicator(): SyncWalletsBackupPasswordCommunicator
+
     val addressInputMixinFactory: AddressInputMixinFactory
 
     val walletUiUseCase: WalletUiUseCase
@@ -72,6 +80,8 @@ interface AccountFeatureApi {
     val signSharedState: SigningSharedState
 
     val onChainIdentityRepository: OnChainIdentityRepository
+
+    val metaAccountTypePresentationMapper: MetaAccountTypePresentationMapper
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider
@@ -98,4 +108,6 @@ interface AccountFeatureApi {
     val selectAddressMixinFactory: SelectAddressMixin.Factory
 
     val metaAccountChangesEventBus: MetaAccountChangesEventBus
+
+    val applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase
 }

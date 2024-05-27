@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedContentContainer
+import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedTitle
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedToolbar
 import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedValue
 
@@ -20,7 +21,7 @@ private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
 
     companion object {
-        fun getBundle(exportPayload: ExportPayload): Bundle {
+        fun getBundle(exportPayload: ExportPayload.ChainAccount): Bundle {
             return Bundle().apply {
                 putParcelable(PAYLOAD_KEY, exportPayload)
             }
@@ -49,6 +50,8 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
     override fun subscribe(viewModel: ExportSeedViewModel) {
         super.subscribe(viewModel)
 
-        viewModel.seedFlow.observe(exportSeedValue::setText)
+        viewModel.secretFlow.observe(exportSeedValue::setText)
+
+        viewModel.secretTypeNameFlow.observe(exportSeedTitle::setText)
     }
 }

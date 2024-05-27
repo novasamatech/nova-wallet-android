@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
+import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -25,7 +27,7 @@ abstract class WalletDetailsMixin(
 
     abstract val typeAlert: Flow<AlertModel?>
 
-    val chainAccountProjections: Flow<List<Any>> = flowOf { getChainProjections() }
+    val chainAccountProjections: Flow<List<Any>> = accountProjectionsFlow()
         .map { groupedList ->
             groupedList.toListWithHeaders(
                 keyMapper = { type, _ -> mapAccountHeader(type) },
@@ -33,7 +35,7 @@ abstract class WalletDetailsMixin(
             )
         }
 
-    abstract suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain>
+    abstract fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>>
 
     abstract suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader?
 

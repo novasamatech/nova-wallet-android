@@ -12,6 +12,10 @@ object HasIdentityFilter : RecommendationFilter {
         return model.identity != null
     }
 
+    override fun canIgnoreWhenNoApplicableCandidatesFound(): Boolean {
+        return true
+    }
+
     override fun availableIn(runtime: RuntimeSnapshot): Boolean {
         return runtime.metadata.hasModule(Modules.IDENTITY)
     }

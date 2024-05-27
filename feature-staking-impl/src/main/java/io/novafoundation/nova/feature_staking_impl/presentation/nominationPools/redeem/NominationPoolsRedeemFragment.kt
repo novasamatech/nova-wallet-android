@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -54,7 +54,7 @@ class NominationPoolsRedeemFragment : BaseFragment<NominationPoolsRedeemViewMode
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel.feeLoaderMixin, nominationPoolsRedeemExtrinsicInformation.fee)
 
-        viewModel.showNextProgress.observe(nominationPoolsRedeemConfirm::setProgress)
+        viewModel.showNextProgress.observe(nominationPoolsRedeemConfirm::setProgressState)
 
         viewModel.redeemAmountModel.observe(nominationPoolsRedeemAmount::setAmount)
 

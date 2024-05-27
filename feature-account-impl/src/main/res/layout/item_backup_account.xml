@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemManualBackupAccountContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="8dp"
+    android:minHeight="64dp"
+    tools:background="@color/secondary_screen_background">
+
+    <ImageView
+        android:id="@+id/itemManualBackupAccountIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="16dp"
+        tools:src="@color/icon_primary" />
+
+    <TextView
+        android:id="@+id/itemManualBackupAccountTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@+id/itemManualBackupAccountSubtitle"
+        app:layout_constraintEnd_toStartOf="@+id/itemManualBackupAccountArrow"
+        app:layout_constraintStart_toEndOf="@+id/itemManualBackupAccountIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Polkadot" />
+
+    <TextView
+        android:id="@+id/itemManualBackupAccountSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="middle"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:lines="1"
+        android:minHeight="18dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemManualBackupAccountArrow"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/itemManualBackupAccountIcon"
+        app:layout_constraintTop_toBottomOf="@+id/itemManualBackupAccountTitle"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="$11,529.26" />
+
+    <ImageView
+        android:id="@+id/itemManualBackupAccountArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,4 +21,15 @@ class ExportJsonInteractor(
             accountRepository.generateRestoreJson(metaAccount, chain, password)
         }
     }
+
+    suspend fun generateRestoreJson(
+        metaId: Long,
+        password: String,
+    ): Result<String> {
+        val metaAccount = accountRepository.getMetaAccount(metaId)
+
+        return runCatching {
+            accountRepository.generateRestoreJson(metaAccount, password)
+        }
+    }
 }

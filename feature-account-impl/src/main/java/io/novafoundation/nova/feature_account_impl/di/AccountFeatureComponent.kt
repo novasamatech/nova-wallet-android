@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerif
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
@@ -15,19 +17,29 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.Polk
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.di.DelegatedAccountUpdatesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.di.SelectMultipleWalletsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.di.ExportJsonConfirmComponent
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.di.ExportJsonPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.di.CreateWalletBackupPasswordComponent
+import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.changePassword.di.ChangeBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.syncWallets.di.SyncWalletsBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.confirmPassword.di.CheckCloudBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restoreBackup.di.RestoreCloudBackupComponent
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restorePassword.di.RestoreCloudBackupPasswordComponent
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ShareCompletedReceiver
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.di.ExportJsonComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.di.ManualBackupSelectAccountComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.di.ManualBackupAdvancedSecretsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.main.di.ManualBackupSecretsComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets.di.ManualBackupSelectWalletComponent
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.di.ManualBackupWarningComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.di.SelectWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.di.BackupMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.di.ConfirmMnemonicComponent
@@ -41,8 +53,10 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.di.ScanSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.di.ShowSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.di.StartCreateWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
@@ -62,13 +76,23 @@ import io.novafoundation.nova.web3names.di.Web3NamesApi
 @FeatureScope
 interface AccountFeatureComponent : AccountFeatureApi {
 
-    fun createAccountComponentFactory(): CreateAccountComponent.Factory
-
     fun advancedEncryptionComponentFactory(): AdvancedEncryptionComponent.Factory
 
     fun importAccountComponentFactory(): ImportAccountComponent.Factory
 
     fun backupMnemonicComponentFactory(): BackupMnemonicComponent.Factory
+
+    fun createWalletBackupPasswordFactory(): CreateWalletBackupPasswordComponent.Factory
+
+    fun syncWalletsBackupPasswordFactory(): SyncWalletsBackupPasswordComponent.Factory
+
+    fun changeBackupPasswordComponentFactory(): ChangeBackupPasswordComponent.Factory
+
+    fun restoreCloudBackupFactory(): RestoreCloudBackupComponent.Factory
+
+    fun checkCloudBackupPasswordFactory(): CheckCloudBackupPasswordComponent.Factory
+
+    fun restoreCloudBackupPasswordFactory(): RestoreCloudBackupPasswordComponent.Factory
 
     fun pincodeComponentFactory(): PinCodeComponent.Factory
 
@@ -98,9 +122,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun exportSeedFactory(): ExportSeedComponent.Factory
 
-    fun exportJsonPasswordFactory(): ExportJsonPasswordComponent.Factory
-
-    fun exportJsonConfirmFactory(): ExportJsonConfirmComponent.Factory
+    fun exportJsonPasswordFactory(): ExportJsonComponent.Factory
 
     fun inject(receiver: ShareCompletedReceiver)
 
@@ -115,6 +137,18 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun showSignParitySignerComponentFactory(): ShowSignParitySignerComponent.Factory
     fun scanSignParitySignerComponentFactory(): ScanSignParitySignerComponent.Factory
 
+    fun startCreateWallet(): StartCreateWalletComponent.Factory
+
+    fun manualBackupSelectWallet(): ManualBackupSelectWalletComponent.Factory
+
+    fun manualBackupWarning(): ManualBackupWarningComponent.Factory
+
+    fun manualBackupSecrets(): ManualBackupSecretsComponent.Factory
+
+    fun manualBackupSelectAccount(): ManualBackupSelectAccountComponent.Factory
+
+    fun manualBackupAdvancedSecrets(): ManualBackupAdvancedSecretsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -126,6 +160,9 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
             @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,
             @BindsInstance pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
+            @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
+            @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
+            @BindsInstance restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }
@@ -140,6 +177,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             VersionsFeatureApi::class,
             Web3NamesApi::class,
             LedgerCoreApi::class
+            CloudBackupFeatureApi::class
         ]
     )
     interface AccountFeatureDependenciesComponent : AccountFeatureDependencies

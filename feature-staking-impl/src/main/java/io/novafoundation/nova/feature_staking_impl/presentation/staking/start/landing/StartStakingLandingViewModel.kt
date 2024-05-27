@@ -1,12 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing
 
 import android.graphics.Color
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
@@ -15,23 +17,23 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.fontSpan
 import io.novafoundation.nova.common.utils.formatAsSpannable
+import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.BoundedDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.DayAndHourDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.DayDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DayDurationShortcut
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ShortcutDurationFormatter
-import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
-import io.novafoundation.nova.common.utils.formatting.duration.DayDurationShortcut
 import io.novafoundation.nova.common.utils.formatting.duration.wrapInto
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
@@ -41,20 +43,20 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.awaitStakingStarted
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.ParticipationInGovernance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.Payouts
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingCompoundData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.StartStakingLandingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.handleStartStakingLandingValidationFailure
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
-import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -63,15 +65,16 @@ import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigInteger
-import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlin.time.Duration
 
 class StartStakingInfoModel(
@@ -131,7 +134,9 @@ class StartStakingLandingViewModel(
                 moreInfo = createMoreInfoText(it.chain),
                 buttonColor = themeColor
             )
-        }.shareInBackground()
+        }
+        .onEach { it.onError { Log.e("StartStakingLandingViewModel", "Failed to load staking info", it) } }
+        .shareInBackground()
 
     private val availableBalance = startStakingInteractor.flatMapLatest { interactor ->
         interactor.observeAvailableBalance()
