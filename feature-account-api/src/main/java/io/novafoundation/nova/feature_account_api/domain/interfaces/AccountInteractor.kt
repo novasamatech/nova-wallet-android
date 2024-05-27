@@ -63,4 +63,6 @@ interface AccountInteractor {
     suspend fun switchToNotDeactivatedAccountIfNeeded()
 
     suspend fun hasSecretsAccounts(): Boolean
+
+    suspend fun hasCustomChainAccounts(metaId: Long): Boolean
 }

@@ -205,4 +205,9 @@ class AccountInteractorImpl(
     override suspend fun hasSecretsAccounts(): Boolean {
         return accountRepository.hasSecretsAccounts()
     }
+
+    override suspend fun hasCustomChainAccounts(metaId: Long): Boolean {
+        val metaAccount = getMetaAccount(metaId)
+        return metaAccount.chainAccounts.isNotEmpty()
+    }
 }

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.common.view.bottomSheet.action.negative
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.common.view.bottomSheet.action.secondary
 import io.novafoundation.nova.feature_cloud_backup_api.R
@@ -14,7 +15,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private const val KEY_CLOUD_BACKUP_WARNING_SHOWN = "cloud_backup_warning_shown"
+private const val KEY_CLOUD_BACKUP_CHANGE_WARNING_SHOWN = "cloud_backup_change_warning_shown"
 
 class RealCloudBackupChangingWarningMixinFactory(
     private val preferences: Preferences,
@@ -44,7 +45,7 @@ class RealCloudBackupChangingWarningMixin(
 
     override val actionBottomSheetLauncher: ActionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
 
-    override fun launchConfirmationIfNeeded(onConfirm: () -> Unit) {
+    override fun launchChangingConfirmationIfNeeded(onConfirm: () -> Unit) {
         scope.launch {
             // In case if cloud backup sync is disabled, we don't need to show the warning and can confirm the action now
             if (!cloudBackupService.session.isSyncWithCloudEnabled()) {
@@ -52,16 +53,28 @@ class RealCloudBackupChangingWarningMixin(
                 return@launch
             }
 
-            if (preferences.getBoolean(KEY_CLOUD_BACKUP_WARNING_SHOWN, false)) {
+            if (preferences.getBoolean(KEY_CLOUD_BACKUP_CHANGE_WARNING_SHOWN, false)) {
                 onConfirm()
                 return@launch
             }
 
-            actionBottomSheetLauncher.launchCloudBackupWillBeChangedWarning(resourceManager, onConfirm)
+            actionBottomSheetLauncher.launchCloudBackupChangingWarning(resourceManager, onConfirm)
         }
     }
 
-    fun ActionBottomSheetLauncher.launchCloudBackupWillBeChangedWarning(
+    override fun launchRemovingConfirmationIfNeeded(onConfirm: () -> Unit) {
+        scope.launch {
+            // In case if cloud backup sync is disabled, we don't need to show the warning and can confirm the action now
+            if (!cloudBackupService.session.isSyncWithCloudEnabled()) {
+                onConfirm()
+                return@launch
+            }
+
+            actionBottomSheetLauncher.launchCloudBackupRemovingWarning(resourceManager, onConfirm)
+        }
+    }
+
+    private fun ActionBottomSheetLauncher.launchCloudBackupChangingWarning(
         resourceManager: ResourceManager,
         onConfirm: () -> Unit
     ) {
@@ -75,13 +88,30 @@ class RealCloudBackupChangingWarningMixin(
             actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
                 resourceManager.getString(R.string.common_continue),
                 onClick = {
-                    preferences.putBoolean(KEY_CLOUD_BACKUP_WARNING_SHOWN, isAutoContinueChecked)
+                    preferences.putBoolean(KEY_CLOUD_BACKUP_CHANGE_WARNING_SHOWN, isAutoContinueChecked)
                     onConfirm()
                 }
             ),
             checkBoxPreferences = ActionBottomSheet.CheckBoxPreferences(
                 text = resourceManager.getString(R.string.common_check_box_auto_continue),
                 onCheckChanged = { isChecked -> isAutoContinueChecked = isChecked }
+            )
+        )
+    }
+
+
+    private fun ActionBottomSheetLauncher.launchCloudBackupRemovingWarning(
+        resourceManager: ResourceManager,
+        onConfirm: () -> Unit
+    ) {
+        launchBottomSheet(
+            imageRes = R.drawable.ic_cloud_backup_delete,
+            title = resourceManager.getString(R.string.cloud_backup_removing_warning_title),
+            subtitle = resourceManager.getString(R.string.cloud_backup_removing_warning_subtitle),
+            neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
+            actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+                resourceManager.getString(R.string.common_remove),
+                onClick = onConfirm
             )
         )
     }

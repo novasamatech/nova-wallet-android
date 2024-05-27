@@ -9,6 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -16,6 +17,8 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordConfirmInput
+import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordInput
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordConfirmField
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNewField
 import kotlinx.android.synthetic.main.fragment_export_json_password.exportJsonPasswordNext
@@ -46,6 +49,9 @@ class ExportJsonFragment : ExportFragment<ExportJsonViewModel>() {
         exportJsonPasswordNext.setOnClickListener { viewModel.nextClicked() }
 
         exportJsonPasswordNext.prepareForProgress(viewLifecycleOwner)
+
+        exportJsonPasswordNewField.setEndIconOnClickListener { viewModel.toggleShowPassword() }
+        exportJsonPasswordConfirmField.setEndIconOnClickListener { viewModel.toggleShowPassword() }
     }
 
     override fun inject() {
@@ -64,6 +70,11 @@ class ExportJsonFragment : ExportFragment<ExportJsonViewModel>() {
         exportJsonPasswordConfirmField.content.bindTo(viewModel.passwordConfirmationFlow, lifecycleScope)
 
         viewModel.nextButtonState.observe(exportJsonPasswordNext::setState)
+
+        viewModel.showPasswords.observe {
+            exportJsonPasswordNewField.content.switchPasswordInputType(it)
+            exportJsonPasswordConfirmField.content.switchPasswordInputType(it)
+        }
 
         observeValidations(viewModel)
     }

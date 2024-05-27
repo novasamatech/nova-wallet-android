@@ -33,6 +33,7 @@ class InputField @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_input_field, this)
 
+        content.setHintTextColor(context.getColor(R.color.hint_text))
         content.background = context.getCornersStateDrawable()
 
         attrs?.let(::applyAttributes)
