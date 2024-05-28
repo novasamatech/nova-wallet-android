@@ -69,30 +69,6 @@ class RealEnterCloudBackupInteractor(
 
     override suspend fun restoreCloudBackupPassword(password: String): Result<Unit> {
         return cloudBackupService.fetchAndDecryptExistingBackup(password)
-            .mergeBackupAndLocalState(password)
-            .onSuccess { cloudBackupService.session.setSavedPassword(password) }
-    }
-
-    private suspend fun Result<CloudBackup>.mergeBackupAndLocalState(password: String): Result<Unit> {
-        return mapCatching { cloudBackup ->
-            // `CannotApplyNonDestructiveDiff` shouldn't actually happen here since it is a import for clean app but we should handle it anyway
-            val diff = cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.importFromCloud())
-
-            val firstSelectedMetaAccount = accountRepository.getActiveMetaAccounts().first()
-            accountRepository.selectMetaAccount(firstSelectedMetaAccount.id)
-
-            cloudBackupService.session.initEnabledBackup(password)
-
-            diff
-        }.flatMap { diff ->
-            // Once we successfully applied state locally, we can write new changes to backup to sync backup with other local state
-            if (diff.cloudChanges.isEmpty()) return Result.success(Unit)
-
-            val request = WriteBackupRequest(
-                cloudBackup = cloudBackupFacade.fullBackupInfoFromLocalSnapshot(),
-                password = password
-            )
-            cloudBackupService.writeBackupToCloud(request)
-        }
+            .map { cloudBackupService.session.setSavedPassword(password) }
     }
 }

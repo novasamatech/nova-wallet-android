@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.WriteBackupR
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.isNotEmpty
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
+import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategyFactory
 import io.novafoundation.nova.feature_cloud_backup_api.domain.setLastSyncedTimeAsNow
 import io.novafoundation.nova.feature_settings_impl.domain.model.CloudBackupChangedAccount
 import io.novafoundation.nova.feature_settings_impl.domain.model.CloudBackupChangedAccount.ChangingType
@@ -46,7 +47,7 @@ interface CloudBackupSettingsInteractor {
 class RealCloudBackupSettingsInteractor(
     private val accountRepository: AccountRepository,
     private val cloudBackupService: CloudBackupService,
-    private val cloudBackupFacade: LocalAccountsCloudBackupFacade
+    private val cloudBackupFacade: LocalAccountsCloudBackupFacade,
 ) : CloudBackupSettingsInteractor {
 
     override fun observeLastSyncedTime(): Flow<Date?> {
@@ -56,7 +57,7 @@ class RealCloudBackupSettingsInteractor(
     override suspend fun syncCloudBackup(): Result<Unit> {
         return cloudBackupService.fetchAndDecryptExistingBackupWithSavedPassword()
             .mapCatching { cloudBackup ->
-                cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, BackupDiffStrategy.syncWithCloud())
+                cloudBackupFacade.applyNonDestructiveCloudVersionOrThrow(cloudBackup, getCloudBackupDiffStrategy())
             }.flatMap {
                 if (it.cloudChanges.isNotEmpty()) {
                     writeLocalBackupToCloud()
@@ -65,6 +66,8 @@ class RealCloudBackupSettingsInteractor(
                 }
             }.finally {
                 cloudBackupService.session.setLastSyncedTimeAsNow()
+            }.onSuccess {
+                cloudBackupService.session.setBackupWasInitialized()
             }
     }
 
@@ -125,6 +128,14 @@ class RealCloudBackupSettingsInteractor(
             if (metaAccounts.isNotEmpty()) {
                 accountRepository.selectMetaAccount(metaAccounts.first().id)
             }
+        }
+    }
+
+    private fun getCloudBackupDiffStrategy(): BackupDiffStrategyFactory {
+        return if (cloudBackupService.session.cloudBackupWasInitialized()) {
+            BackupDiffStrategy.syncWithCloud()
+        } else {
+            BackupDiffStrategy.importFromCloud()
         }
     }
 }
