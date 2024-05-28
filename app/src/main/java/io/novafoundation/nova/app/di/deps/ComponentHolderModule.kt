@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_buy_impl.di.BuyFeatureHolder
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
+import io.novafoundation.nova.feature_cloud_backup_impl.di.CloudBackupFeatureHolder
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureHolder
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -38,10 +40,10 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
-import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
-import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureHolder
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_proxy_impl.di.ProxyFeatureHolder
+import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
+import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureHolder
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -231,4 +233,10 @@ interface ComponentHolderModule {
     @ClassKey(DeepLinkingFeatureApi::class)
     @IntoMap
     fun provideDeepLinkingFeatureHolder(holder: DeepLinkingFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(CloudBackupFeatureApi::class)
+    @IntoMap
+    fun provideCloudBackupFeatureHolder(holder: CloudBackupFeatureHolder): FeatureApiHolder
 }

@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -85,7 +85,7 @@ class RevokeDelegationConfirmFragment : BaseFragment<RevokeDelegationConfirmView
 
         viewModel.undelegatingPeriod.observe(revokeDelegationConfirmUndelegatingPeriod::showLoadingValue)
 
-        viewModel.showNextProgress.observe(revokeDelegationConfirmConfirm::setProgress)
+        viewModel.showNextProgress.observe(revokeDelegationConfirmConfirm::setProgressState)
 
         viewModel.showTracksEvent.observeEvent { tracks ->
             TrackDelegationListBottomSheet(requireContext(), tracks).show()

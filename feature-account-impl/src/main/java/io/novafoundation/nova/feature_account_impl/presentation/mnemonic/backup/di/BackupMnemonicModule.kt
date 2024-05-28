@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
@@ -31,15 +32,17 @@ class BackupMnemonicModule {
         resourceManager: ResourceManager,
         advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor,
+        conditionMixinFactory: ConditionMixinFactory
     ): ViewModel {
         return BackupMnemonicViewModel(
+            resourceManager,
             interactor,
             exportMnemonicInteractor,
             router,
             payload,
             advancedEncryptionInteractor,
             advancedEncryptionSelectionStoreProvider,
-            resourceManager,
+            conditionMixinFactory,
         )
     }
 

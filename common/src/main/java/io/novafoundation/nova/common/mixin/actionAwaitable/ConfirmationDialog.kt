@@ -1,8 +1,10 @@
 package io.novafoundation.nova.common.mixin.actionAwaitable
 
 import androidx.annotation.StyleRes
+import androidx.core.content.ContentProviderCompat.requireContext
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.view.dialog.dialog
 
 class ConfirmationDialogInfo(val title: Int, val message: Int?, val positiveButton: Int, val negativeButton: Int?) {
@@ -15,12 +17,12 @@ class ConfirmationDialogInfo(val title: Int, val message: Int?, val positiveButt
     }
 }
 
-fun BaseFragment<*>.setupConfirmationDialog(
+fun BaseFragmentMixin<*>.setupConfirmationDialog(
     @StyleRes style: Int,
     awaitableMixin: ConfirmationAwaitable<ConfirmationDialogInfo>
 ) {
     awaitableMixin.awaitableActionLiveData.observeEvent { action ->
-        dialog(requireContext(), style) {
+        dialog(providedContext, style) {
             setTitle(action.payload.title)
             action.payload.message?.let { setMessage(action.payload.message) }
             setPositiveButton(action.payload.positiveButton) { _, _ -> action.onSuccess(Unit) }

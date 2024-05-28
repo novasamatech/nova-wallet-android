@@ -7,6 +7,7 @@ import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
@@ -25,6 +26,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
@@ -40,13 +42,16 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
+import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.common.view.parallaxCard.BackingParallaxCardLruCache
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
@@ -138,6 +143,14 @@ interface CommonApi {
 
     fun descriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher
 
+    fun provideActionBottomSheetLauncherFactory(): ActionBottomSheetLauncherFactory
+
+    fun progressDialogMixin(): ProgressDialogMixin
+
+    fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory
+
+    fun provideConditionMixinFactory(): ConditionMixinFactory
+
     fun buildTypeProvider(): BuildTypeProvider
 
     val systemCallExecutor: SystemCallExecutor
@@ -165,4 +178,6 @@ interface CommonApi {
     val bannerVisibilityRepository: BannerVisibilityRepository
 
     val provideActivityIntentProvider: ActivityIntentProvider
+
+    val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 }

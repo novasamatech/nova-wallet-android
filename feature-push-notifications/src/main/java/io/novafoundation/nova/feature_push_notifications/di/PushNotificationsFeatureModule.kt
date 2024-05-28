@@ -4,13 +4,13 @@ import android.content.Context
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
-import io.novafoundation.nova.feature_push_notifications.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.PushPermissionRepository
 import io.novafoundation.nova.feature_push_notifications.data.PushTokenCache
@@ -39,14 +39,6 @@ annotation class PushSettingsSerialization
 
 @Module(includes = [NotificationHandlersModule::class])
 class PushNotificationsFeatureModule {
-
-    @Provides
-    @FeatureScope
-    fun provideGoogleApiAvailabilityProvider(
-        context: Context
-    ): GoogleApiAvailabilityProvider {
-        return GoogleApiAvailabilityProvider(context)
-    }
 
     @Provides
     @FeatureScope

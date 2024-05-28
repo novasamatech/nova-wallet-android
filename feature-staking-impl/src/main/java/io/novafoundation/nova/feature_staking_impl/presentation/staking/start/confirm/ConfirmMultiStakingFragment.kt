@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -67,7 +67,7 @@ class ConfirmMultiStakingFragment : BaseFragment<ConfirmMultiStakingViewModel>()
         observeValidations(viewModel)
         setupExternalActions(viewModel)
 
-        viewModel.showNextProgress.observe(startMultiStakingConfirmConfirm::setProgress)
+        viewModel.showNextProgress.observe(startMultiStakingConfirmConfirm::setProgressState)
 
         viewModel.amountModelFlow.observe(startMultiStakingConfirmAmount::setAmount)
 

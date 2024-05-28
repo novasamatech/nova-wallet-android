@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
+import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.StateListDrawable
 import android.util.StateSet
 import androidx.annotation.ColorInt
@@ -162,5 +163,12 @@ private fun Context.cornerDrawableFromColors(
         strokeColor?.let {
             setStroke(strokeSizePx, it)
         }
+    }
+}
+
+fun ovalDrawable(@ColorInt fillColor: Int): Drawable {
+    return ShapeDrawable().apply {
+        paint.color = fillColor
+        shape = android.graphics.drawable.shapes.OvalShape()
     }
 }

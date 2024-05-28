@@ -17,11 +17,11 @@ class AddAccountChooserBottomSheet(
 
         setTitle(payload.title)
 
-        textItem(R.drawable.ic_add_circle, R.string.account_create_account) {
+        textItem(R.drawable.ic_add_circle_outline, R.string.account_create_account) {
             payload.onCreate()
         }
 
-        textItem(R.drawable.ic_key, R.string.account_restore_account) {
+        textItem(R.drawable.ic_import, R.string.account_export_existing) {
             payload.onImport()
         }
     }

@@ -13,7 +13,7 @@ class ImportAccountPayload(
 sealed interface ImportType : Parcelable {
 
     @Parcelize
-    class Mnemonic(val mnemonic: String?, val preset: AdvancedEncryptionModel?) : ImportType
+    class Mnemonic(val mnemonic: String? = null, val preset: AdvancedEncryptionModel? = null) : ImportType
 
     @Parcelize
     object Seed : ImportType
@@ -24,7 +24,7 @@ sealed interface ImportType : Parcelable {
 
 fun SecretType.asImportType(): ImportType {
     return when (this) {
-        SecretType.MNEMONIC -> ImportType.Mnemonic(null, null)
+        SecretType.MNEMONIC -> ImportType.Mnemonic()
         SecretType.SEED -> ImportType.Seed
         SecretType.JSON -> ImportType.Json
     }

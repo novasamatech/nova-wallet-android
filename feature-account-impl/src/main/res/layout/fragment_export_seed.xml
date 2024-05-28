@@ -51,10 +51,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="@string/recovery_raw_seed"
             android:textColor="@color/text_secondary"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/recovery_raw_seed" />
 
         <TextView
             android:id="@+id/exportSeedHexSymbols"

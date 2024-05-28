@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
@@ -91,7 +91,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel>()
         observeBrowserEvents(viewModel)
         observeValidations(viewModel)
 
-        viewModel.showNextProgress.observe(crowdloanContributeContinue::setProgress)
+        viewModel.showNextProgress.observe(crowdloanContributeContinue::setProgressState)
 
         viewModel.assetModelFlow.observe {
             crowdloanContributeAmount.setAssetBalance(it.assetBalance)

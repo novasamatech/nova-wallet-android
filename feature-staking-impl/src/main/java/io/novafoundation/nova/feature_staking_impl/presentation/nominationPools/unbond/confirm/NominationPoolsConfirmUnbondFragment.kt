@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -64,7 +64,7 @@ class NominationPoolsConfirmUnbondFragment : BaseFragment<NominationPoolsConfirm
         setupExternalActions(viewModel)
         observeHints(viewModel.hintsMixin, nominationPoolsConfirmUnbondHints)
 
-        viewModel.showNextProgress.observe(nominationPoolsConfirmUnbondConfirm::setProgress)
+        viewModel.showNextProgress.observe(nominationPoolsConfirmUnbondConfirm::setProgressState)
 
         viewModel.amountModelFlow.observe(nominationPoolsConfirmUnbondAmount::setAmount)
 

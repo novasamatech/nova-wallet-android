@@ -6,7 +6,9 @@ interface EventBus<T : EventBus.Event> {
 
     interface Event
 
-    suspend fun notify(event: T)
+    class SourceEvent<T : Event>(val event: T, val source: String?) : Event
 
-    fun observeEvent(): Flow<T>
+    suspend fun notify(event: T, source: String?)
+
+    fun observeEvent(): Flow<SourceEvent<T>>
 }

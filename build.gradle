@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.12.1'
-        versionCode = 133
+        versionName = '7.12.2'
+        versionCode = 134
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -12,7 +12,7 @@ buildscript {
         minSdkVersion = 24
         targetSdkVersion = 33
 
-        kotlinVersion = '1.7.10'
+        kotlinVersion = '1.7.21'
 
         ktlintPinterestVersion = '0.47.0'
 
@@ -88,6 +88,10 @@ buildscript {
         walletConnectCoreVersion = "1.27.2"
         walletConnectWalletVersion = "1.20.2"
 
+        playServicesAuthVersion = "20.0.0"
+        googleApiClientVersion = "1.32.1"
+        googleDriveVersion = "v3-rev20210919-1.32.1"
+
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
             exclude group: "androidx.fragment", module: "fragment-ktx"
@@ -99,6 +103,10 @@ buildscript {
         kotlinDep = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
         insetterDep = "dev.chrisbanes.insetter:insetter-widgets:$insetterVersion"
+
+        playServicesAuthDep = "com.google.android.gms:play-services-auth:$playServicesAuthVersion"
+        googleApiClientDep = "com.google.api-client:google-api-client-android:$googleApiClientVersion"
+        googleDriveDep = "com.google.apis:google-api-services-drive:$googleDriveVersion"
 
         androidDep = "androidx.appcompat:appcompat:$supportVersion"
         cardViewDep = "androidx.cardview:cardview:$cardViewVersion"

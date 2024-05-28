@@ -18,6 +18,6 @@
             android:id="@+id/viewLedgerGraphicsIcon"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="88dp"
-            tools:src="@drawable/ic_eye_filled" />
+            tools:src="@drawable/ic_eye_filled_15dp" />
     </FrameLayout>
 </merge>

@@ -48,6 +48,7 @@
         <attr name="textIcon" format="reference|color" />
         <attr name="enabled" format="boolean" />
         <attr name="android:singleLine" />
+        <attr name="messageColor" format="color" />
 
         <attr name="messageStyle" format="reference" />
         <attr name="labelStyle" format="reference" />
@@ -66,6 +67,17 @@
     <declare-styleable name="InputField">
         <attr name="android:inputType" />
         <attr name="android:text" />
+        <attr name="editTextHint" format="string" />
+        <attr name="android:textAppearance" />
+        <attr name="editTextPaddingStart" format="dimension" />
+        <attr name="editTextPaddingEnd" format="dimension" />
+        <attr name="editTextPaddingTop" format="dimension" />
+        <attr name="editTextPaddingBottom" format="dimension" />
+        <attr name="backgroundMode" format="enum">
+            <enum name="inputState" value="0" />
+            <enum name="solid" value="1" />
+            <enum name="custom" value="2" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="AmountView">
@@ -306,6 +318,19 @@
     <declare-styleable name="SettingsSwitcherView">
         <attr name="title" />
         <attr name="icon" />
+    </declare-styleable>
+
+    <declare-styleable name="WarningCheckBox">
+        <attr name="android:icon" />
+        <attr name="iconTint" />
+        <attr name="android:text" />
+    </declare-styleable>
+
+    <declare-styleable name="TapToViewContainer">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="cornerRadius" />
+        <attr name="tapToViewBackground" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="SegmentedTabLayout">

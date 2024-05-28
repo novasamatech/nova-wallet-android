@@ -45,6 +45,8 @@ dependencies {
 
     implementation project(':feature-settings-api')
 
+    implementation project(':feature-cloud-backup-api')
+
     implementation kotlinDep
 
     implementation androidDep

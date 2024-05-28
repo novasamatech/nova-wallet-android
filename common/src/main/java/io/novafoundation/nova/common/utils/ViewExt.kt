@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -360,6 +361,13 @@ fun ImageView.setImageResource(@DrawableRes imageRes: Int?) = if (imageRes == nu
     setImageResource(imageRes)
 }
 
+fun ImageView.setImageResourceOrHide(@DrawableRes imageRes: Int?) = if (imageRes == null) {
+    makeGone()
+} else {
+    makeVisible()
+    setImageResource(imageRes)
+}
+
 fun EditText.moveCursorToTheEnd() = setSelection(length())
 
 fun ShimmerFrameLayout.setShimmerShown(shown: Boolean) {
@@ -368,6 +376,17 @@ fun ShimmerFrameLayout.setShimmerShown(shown: Boolean) {
     } else {
         hideShimmer()
     }
+}
+
+fun EditText.switchPasswordInputType(isPasswordVisible: Boolean) {
+    val selection = selectionEnd
+    inputType = if (isPasswordVisible) {
+        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+    } else {
+        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+    }
+
+    setSelection(selection)
 }
 
 fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharSequence) {

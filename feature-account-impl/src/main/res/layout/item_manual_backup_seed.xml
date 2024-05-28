@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="16dp">
+
+    <TextView
+        android:id="@+id/manualBackupSecretsSeedLabel"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/recovery_raw_seed" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/account_seed_hex_symbols"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.novafoundation.nova.common.view.TapToViewContainer
+        android:id="@+id/manualBackupSecretsSeedContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/block_background"
+        app:cornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/manualBackupSecretsSeedLabel"
+        app:tapToViewBackground="@drawable/ic_raw_seed_blur"
+        app:title="@string/common_tap_to_reveal_title">
+
+        <TextView
+            android:id="@+id/manualBackupSecretsSeedText"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:lineSpacingExtra="2sp"
+            android:textColor="@color/text_primary"
+            tools:text="0xcb48a2823ea828s9bfeb7ceda89ceceed9h0ad3d3e7aae9bqe5f11752na938j" />
+
+    </io.novafoundation.nova.common.view.TapToViewContainer>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

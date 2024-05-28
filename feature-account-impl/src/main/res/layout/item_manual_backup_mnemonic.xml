@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.novafoundation.nova.feature_account_impl.presentation.view.mnemonic.MnemonicCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/manualBackupSecretsMnemonic"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="16dp"
+    app:showRevealContainer="true" />

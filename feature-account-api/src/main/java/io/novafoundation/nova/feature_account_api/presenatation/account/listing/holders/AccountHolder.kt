@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.AlphaColorFilter
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
@@ -75,7 +76,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
     }
 
     fun bindSubtitle(accountModel: AccountUi) {
-        containerView.itemAccountSubtitle.text = accountModel.subtitle
+        containerView.itemAccountSubtitle.setTextOrHide(accountModel.subtitle)
         containerView.itemAccountSubtitle.setDrawableStart(accountModel.subtitleIconRes, paddingInDp = 4)
     }
 
