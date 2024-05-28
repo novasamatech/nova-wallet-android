@@ -49,7 +49,8 @@ class ContextManager private constructor(
     private fun updateResources(context: Context): Context {
         val prefs = PreferencesImpl(context.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE))
 
-        val currentLanguage = if (prefs.getCurrentLanguage() == null) {
+        val currentLanguage = prefs.getCurrentLanguage()
+        val currentLanguageCode = if (currentLanguage == null) {
             val currentLocale = Locale.getDefault()
             if (languagesHolder.getLanguages().map { it.iso639Code }.contains(currentLocale.language)) {
                 currentLocale.language
@@ -57,12 +58,12 @@ class ContextManager private constructor(
                 languagesHolder.getDefaultLanguage().iso639Code
             }
         } else {
-            prefs.getCurrentLanguage()!!.iso639Code
+            currentLanguage.iso639Code
         }
 
-        prefs.saveCurrentLanguage(currentLanguage)
+        prefs.saveCurrentLanguage(currentLanguageCode)
 
-        val locale = mapLanguageToLocale(currentLanguage)
+        val locale = mapLanguageToLocale(currentLanguageCode)
         Locale.setDefault(locale)
 
         val configuration = context.resources.configuration
