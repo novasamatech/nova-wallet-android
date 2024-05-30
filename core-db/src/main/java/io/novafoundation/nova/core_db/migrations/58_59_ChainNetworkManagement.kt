@@ -2,9 +2,7 @@ package io.novafoundation.nova.core_db.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import io.novafoundation.nova.common.utils.collectAll
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
-import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
 val AddGloballyUniqueIdToMetaAccounts_58_59 = object : Migration(58, 59) {
 

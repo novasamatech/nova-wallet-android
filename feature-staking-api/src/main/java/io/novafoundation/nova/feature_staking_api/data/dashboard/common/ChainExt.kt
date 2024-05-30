@@ -7,11 +7,9 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChains
 import io.novafoundation.nova.runtime.multiNetwork.findChainsById
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 suspend fun ChainRegistry.stakingChains(): List<Chain> {
-    return findChains {  it.enabled && it.supportedStakingOptions() }
+    return findChains { it.enabled && it.supportedStakingOptions() }
 }
 
 suspend fun ChainRegistry.stakingChainsById(): ChainsById {

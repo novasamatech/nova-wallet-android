@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.addedNetworks
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable

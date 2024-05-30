@@ -8,7 +8,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
 private const val INTEGRATE_NETWORKS_BANNER_TAG = "INTEGRATE_NETWORKS_BANNER_TAG"
@@ -62,7 +61,6 @@ class RealNetworkManagementInteractor(
     }
 
     private fun asNetworkState() {
-
     }
 
     private fun sortChains(chains: List<NetworkState>): List<NetworkState> {

@@ -25,6 +25,7 @@ fun View.updateMargin(space: ViewSpace) {
             space.start ?: it.marginStart,
             space.top ?: it.topMargin,
             space.end ?: it.marginEnd,
-            space.bottom ?: it.bottomMargin)
+            space.bottom ?: it.bottomMargin
+        )
     }
 }

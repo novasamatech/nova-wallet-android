@@ -9,7 +9,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainWithAssetOrNull
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState.SupportedAssetOption
 import kotlinx.coroutines.GlobalScope

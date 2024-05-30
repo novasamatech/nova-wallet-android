@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
-import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
@@ -155,8 +154,9 @@ class ChainRegistry(
     }
 
     private suspend fun registerChain(chain: Chain) {
-        if (!chain.enabled)
+        if (!chain.enabled) {
             registerDisabledChain(chain)
+        }
 
         return when (chain.connectionState) {
             ConnectionState.FULL_SYNC -> registerFullSyncChain(chain)
@@ -328,7 +328,6 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 
     return findEvmChain(addressPrefix)
 }
-
 
 fun ChainRegistry.enabledChains() = currentChains
     .filterList { it.enabled }
