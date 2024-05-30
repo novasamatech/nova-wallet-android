@@ -582,7 +582,18 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
-    <style name="SegmentedTabTextAppearance" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+    <style name="SegmentedTab">
+        <item name="backgroundCornerRadius">12dp</item>
+        <item name="tabIndicator">@drawable/segmented_tab_indicator</item>
+        <item name="tabIndicatorColor">@color/segmented_tab_active</item>
+        <item name="tabIndicatorHeight">40dp</item>
+        <item name="tabIndicatorMargin">4dp</item>
+        <item name="tabSelectedTextColor">@color/text_primary</item>
+        <item name="tabTextAppearance">@style/SegmentedTab.Tab</item>
+        <item name="tabTextColor">@color/text_secondary</item>
+    </style>
+
+    <style name="SegmentedTab.Tab" parent="TextAppearance.NovaFoundation.Regular.Footnote">
         <item name="textAllCaps">false</item>
     </style>
 </resources>

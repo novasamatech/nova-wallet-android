@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkState
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.items.NetworkListNetworkRvItem
+import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 
@@ -19,8 +20,7 @@ class RealNetworkListAdapterItemFactory(
 
     override fun getNetworkItem(network: NetworkState): NetworkListNetworkRvItem {
         val chain = network.chain
-        val chainEnabled = true // TODO: Update it after modifying chain db model
-        val subtitle = if (!chainEnabled) resourceManager.getString(R.string.common_disabled) else null
+        val subtitle = if (chain.isDisabled) resourceManager.getString(R.string.common_disabled) else null
         val label = getChainLabel(chain)
         return NetworkListNetworkRvItem(
             chainIcon = chain.icon.asIcon(),
@@ -28,7 +28,7 @@ class RealNetworkListAdapterItemFactory(
             title = chain.name,
             subtitle = subtitle,
             chainLabel = label,
-            disabled = !chainEnabled,
+            disabled = chain.isDisabled,
             status = getConnectingState(network)
         )
     }
@@ -41,16 +41,18 @@ class RealNetworkListAdapterItemFactory(
         }
     }
 
-    private fun getConnectingState(network: NetworkState): NetworkListNetworkRvItem.ConnectionState? {
-        if (network.connectionState is SocketStateMachine.State.Connected) {
-            return null
-        }
+    private fun getConnectingState(network: NetworkState): NetworkListNetworkRvItem.ConnectionStateModel? {
+        if (network.chain.isDisabled) return null
 
-        return NetworkListNetworkRvItem.ConnectionState(
-            name = resourceManager.getString(R.string.common_connecting),
-            chainStatusColor = resourceManager.getColor(R.color.text_primary),
-            chainStatusIcon = R.drawable.ic_connection_status,
-            chainStatusIconColor = resourceManager.getColor(R.color.icon_primary)
-        )
+        return when (network.connectionState) {
+            is SocketStateMachine.State.Connected -> null
+
+            else -> NetworkListNetworkRvItem.ConnectionStateModel(
+                name = resourceManager.getString(R.string.common_connecting),
+                chainStatusColor = resourceManager.getColor(R.color.text_primary),
+                chainStatusIcon = R.drawable.ic_connection_status,
+                chainStatusIconColor = resourceManager.getColor(R.color.icon_primary)
+            )
+        }
     }
 }

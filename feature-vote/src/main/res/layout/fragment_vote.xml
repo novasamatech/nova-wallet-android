@@ -3,8 +3,8 @@
     android:id="@+id/voteContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/drawable_background_image">
+    android:background="@drawable/drawable_background_image"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,19 +31,18 @@
             android:layout_marginEnd="16dp" />
     </LinearLayout>
 
-    <io.novafoundation.nova.common.view.tabs.TabsView
+    <io.novafoundation.nova.common.view.SegmentedTabLayout
         android:id="@+id/voteTabs"
+        style="@style/SegmentedTab"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/voteFragmentContainer"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/voteViewPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

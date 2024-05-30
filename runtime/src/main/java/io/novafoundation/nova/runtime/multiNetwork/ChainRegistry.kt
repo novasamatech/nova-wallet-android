@@ -86,17 +86,21 @@ class ChainRegistry(
         syncBaseTypesIfNeeded()
     }
 
-    fun getConnectionInstantlyOrNull(chainId: String): ChainConnection? {
+    fun getConnection(chainId: String): ChainConnection {
+        return connectionPool.getConnection(chainId.removeHexPrefix())
+    }
+
+    fun getConnectionOrNull(chainId: String): ChainConnection? {
         return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
     }
 
-    suspend fun getConnection(chainId: String): ChainConnection {
+    suspend fun getActiveConnection(chainId: String): ChainConnection {
         requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
         return connectionPool.getConnection(chainId.removeHexPrefix())
     }
 
-    suspend fun getConnectionOrNull(chainId: String): ChainConnection? {
+    suspend fun getActiveConnectionOrNull(chainId: String): ChainConnection? {
         requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
         return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
@@ -283,9 +287,9 @@ suspend inline fun ChainRegistry.findChainsById(predicate: (Chain) -> Boolean): 
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
-suspend fun ChainRegistry.getSocket(chainId: String): SocketService = getConnection(chainId).socketService
+suspend fun ChainRegistry.getSocket(chainId: String): SocketService = getActiveConnection(chainId).socketService
 
-suspend fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getConnectionOrNull(chainId)?.socketService
+suspend fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getActiveConnectionOrNull(chainId)?.socketService
 
 suspend fun ChainRegistry.getEthereumApiOrThrow(chainId: String, connectionType: ConnectionType): Web3Api {
     return requireNotNull(getEthereumApi(chainId, connectionType)) {
