@@ -28,6 +28,8 @@ data class Chain(
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    val isCustomNetwork: Boolean,
+    val enabled: Boolean,
     val hasSubstrateRuntime: Boolean,
     val pushSupport: Boolean,
     val hasCrowdloans: Boolean,

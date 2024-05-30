@@ -61,7 +61,10 @@ class ReferendumDeepLinkHandler(
 
         val chainId = data.getChainId() ?: throw ReferendumHandlingException.ChainIsNotFound
         val referendumId = data.getReferendumId() ?: throw ReferendumHandlingException.ReferendumIsNotSpecified
+
         val chain = chainRegistry.getChainOrNull(chainId) ?: throw ReferendumHandlingException.ChainIsNotFound
+        require(chain.enabled)
+        
         val governanceType = data.getGovernanceType(chain)
         val payload = ReferendumDetailsPayload(referendumId)
 

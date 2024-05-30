@@ -4,9 +4,11 @@ import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.diffed
+import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
@@ -153,6 +155,9 @@ class ChainRegistry(
     }
 
     private suspend fun registerChain(chain: Chain) {
+        if (!chain.enabled)
+            registerDisabledChain(chain)
+
         return when (chain.connectionState) {
             ConnectionState.FULL_SYNC -> registerFullSyncChain(chain)
             ConnectionState.LIGHT_SYNC -> registerLightSyncChain(chain)
@@ -225,6 +230,13 @@ suspend fun ChainRegistry.getChainOrNull(chainId: String): Chain? {
 
 suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): ChainWithAsset? {
     val chain = getChainOrNull(chainId) ?: return null
+    val chainAsset = chain.assetsById[assetId] ?: return null
+
+    return ChainWithAsset(chain, chainAsset)
+}
+
+suspend fun ChainRegistry.enabledChainWithAssetOrNull(chainId: String, assetId: Int): ChainWithAsset? {
+    val chain = getChainOrNull(chainId).takeIf { it?.enabled == true } ?: return null
     val chainAsset = chain.assetsById[assetId] ?: return null
 
     return ChainWithAsset(chain, chainAsset)
@@ -316,3 +328,13 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 
     return findEvmChain(addressPrefix)
 }
+
+
+fun ChainRegistry.enabledChains() = currentChains
+    .filterList { it.enabled }
+    .inBackground()
+    .shareIn(this, SharingStarted.Eagerly, replay = 1)
+
+fun ChainRegistry.enabledChainById() = enabledChains().map { chains -> chains.associateBy { it.id } }
+    .inBackground()
+    .shareIn(this, SharingStarted.Eagerly, replay = 1)

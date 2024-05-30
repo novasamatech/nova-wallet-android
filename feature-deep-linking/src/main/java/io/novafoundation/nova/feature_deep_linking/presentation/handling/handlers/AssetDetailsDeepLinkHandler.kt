@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.buildDe
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -63,15 +64,17 @@ class AssetDetailsDeepLinkHandler(
         val chainId = data.getChainId() ?: throw IllegalStateException()
         val assetId = data.getAssetId() ?: throw IllegalStateException()
 
-        address?.let { selectMetaAccount(chainId, address) }
+        val chain = chainRegistry.getChain(chainId)
+        require(chain.enabled)
+
+        address?.let { selectMetaAccount(chain, address) }
 
         val payload = AssetPayload(chainId, assetId)
         router.openAssetDetails(payload)
     }
 
-    private suspend fun selectMetaAccount(chainId: ChainId, address: String) = withContext(Dispatchers.Default) {
-        val chain = chainRegistry.getChain(chainId)
-        val metaAccount = accountRepository.findMetaAccountOrThrow(chain.accountIdOf(address), chainId)
+    private suspend fun selectMetaAccount(chain: Chain, address: String) = withContext(Dispatchers.Default) {
+        val metaAccount = accountRepository.findMetaAccountOrThrow(chain.accountIdOf(address), chain.id)
         accountRepository.selectMetaAccount(metaAccount.id)
     }
 

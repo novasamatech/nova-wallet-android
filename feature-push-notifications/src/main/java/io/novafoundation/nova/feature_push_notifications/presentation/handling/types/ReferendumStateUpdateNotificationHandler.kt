@@ -51,7 +51,10 @@ class ReferendumStateUpdateNotificationHandler(
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.GOV_STATE)
+
         val chain = content.getChain()
+        require(chain.enabled)
+
         val referendumId = content.extractBigInteger("referendumId")
         val stateFrom = content.extractPayloadFieldsWithPath<String?>("from")?.let { ReferendumStatusType.fromRemoteNotificationType(it) }
         val stateTo = content.extractPayloadFieldsWithPath<String>("to").let { ReferendumStatusType.fromRemoteNotificationType(it) }

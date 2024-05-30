@@ -5,12 +5,12 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
 abstract class SingleItemAdapter<T : ViewHolder>() : RecyclerView.Adapter<T>() {
 
-    constructor(isShownByDefault: Boolean) : this() {
-        showPlaceholder = true
-    }
-
     protected var showPlaceholder = false
         private set
+
+    constructor(isShownByDefault: Boolean) : this() {
+        showPlaceholder = isShownByDefault
+    }
 
     override fun getItemCount(): Int {
         return if (showPlaceholder) 1 else 0

@@ -56,7 +56,10 @@ class TokenReceivedNotificationHandler(
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.TOKENS_RECEIVED)
+
         val chain = content.getChain()
+        require(chain.enabled)
+
         val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
         val assetId = content.extractPayloadFieldsWithPath<String?>("assetId")
         val amount = content.extractBigInteger("amount")

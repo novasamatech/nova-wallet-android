@@ -37,7 +37,7 @@ class ChainSyncService(
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
 
-        val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], gson) }
+        val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], isCustomNetwork = false, gson) }
         val newAssets = remoteChains.flatMap { chain ->
             chain.assets.map {
                 val fullAssetId = FullAssetIdLocal(chain.chainId, it.assetId)

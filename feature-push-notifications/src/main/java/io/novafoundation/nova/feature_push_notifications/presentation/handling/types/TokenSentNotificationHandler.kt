@@ -56,7 +56,10 @@ class TokenSentNotificationHandler(
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.TOKENS_SENT)
+
         val chain = content.getChain()
+        require(chain.enabled)
+
         val sender = content.extractPayloadFieldsWithPath<String>("sender")
         val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
         val assetId = content.extractPayloadFieldsWithPath<String?>("assetId")

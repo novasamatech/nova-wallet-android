@@ -319,7 +319,9 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             governance = mapGovernanceListFromLocal(governance),
             swap = mapSwapListFromLocal(swap),
             connectionState = mapConnectionStateFromLocal(connectionState),
-            additional = additional
+            additional = additional,
+            isCustomNetwork = isCustomNetwork,
+            enabled = enabled
         )
     }
 }

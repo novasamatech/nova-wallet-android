@@ -26,11 +26,13 @@ class SelectableAssetUseCaseImpl<A : SelectableAssetAdditionalData>(
 
         val balancesByChainAssets = walletRepository.getSupportedAssets(metaAccount.id).associateBy { it.token.configuration.fullId }
 
-        sharedState.availableToSelect().mapNotNull { supportedOption ->
-            val asset = balancesByChainAssets[supportedOption.assetWithChain.asset.fullId]
+        sharedState.availableToSelect()
+            .filter { it.assetWithChain.chain.enabled }
+            .mapNotNull { supportedOption ->
+                val asset = balancesByChainAssets[supportedOption.assetWithChain.asset.fullId]
 
-            asset?.let { AssetAndOption(asset, supportedOption) }
-        }
+                asset?.let { AssetAndOption(asset, supportedOption) }
+            }
             .sortedWith(assetsComparator())
     }
 

@@ -56,7 +56,10 @@ class StakingRewardNotificationHandler(
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.STAKING_REWARD)
+
         val chain = content.getChain()
+        require(chain.enabled)
+
         val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
         val amount = content.extractBigInteger("amount")
 

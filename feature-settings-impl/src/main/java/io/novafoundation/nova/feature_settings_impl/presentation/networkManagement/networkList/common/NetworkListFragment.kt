@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.feature_settings_impl.R
@@ -16,7 +17,9 @@ abstract class NetworkListFragment<T : NetworkListViewModel> : BaseFragment<T>()
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { NetworkManagementListAdapter(imageLoader) }
+    protected val networksAdapter by lazy(LazyThreadSafetyMode.NONE) { NetworkManagementListAdapter(imageLoader) }
+
+    protected abstract val adapter: RecyclerView.Adapter<*>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +34,6 @@ abstract class NetworkListFragment<T : NetworkListViewModel> : BaseFragment<T>()
     }
 
     override fun subscribe(viewModel: T) {
-        viewModel.networkList.observe { adapter.submitList(it) }
+        viewModel.networkList.observe { networksAdapter.submitList(it) }
     }
 }

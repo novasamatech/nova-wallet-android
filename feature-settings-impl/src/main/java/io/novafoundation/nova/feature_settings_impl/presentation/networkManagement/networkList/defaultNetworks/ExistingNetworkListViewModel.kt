@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.list
+package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.defaultNetworks
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.mapList

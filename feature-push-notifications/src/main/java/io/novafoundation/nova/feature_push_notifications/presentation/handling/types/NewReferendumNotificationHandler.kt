@@ -44,7 +44,10 @@ class NewReferendumNotificationHandler(
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.GOV_NEW_REF)
+
         val chain = content.getChain()
+        require(chain.enabled)
+
         val referendumId = content.extractBigInteger("referendumId")
 
         val notification = NotificationCompat.Builder(context, channelId)
