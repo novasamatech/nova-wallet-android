@@ -43,6 +43,7 @@ class RealNetworkManagementInteractor(
 
     override fun defaultNetworksFlow(): Flow<List<NetworkState>> {
         return chainRegistry.currentChains
+            .filterList { !it.isCustomNetwork }
             .asNetworkState()
     }
 
