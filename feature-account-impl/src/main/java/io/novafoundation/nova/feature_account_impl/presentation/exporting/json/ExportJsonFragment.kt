@@ -9,6 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -46,6 +47,9 @@ class ExportJsonFragment : ExportFragment<ExportJsonViewModel>() {
         exportJsonPasswordNext.setOnClickListener { viewModel.nextClicked() }
 
         exportJsonPasswordNext.prepareForProgress(viewLifecycleOwner)
+
+        exportJsonPasswordNewField.setEndIconOnClickListener { viewModel.toggleShowPassword() }
+        exportJsonPasswordConfirmField.setEndIconOnClickListener { viewModel.toggleShowPassword() }
     }
 
     override fun inject() {
@@ -64,6 +68,11 @@ class ExportJsonFragment : ExportFragment<ExportJsonViewModel>() {
         exportJsonPasswordConfirmField.content.bindTo(viewModel.passwordConfirmationFlow, lifecycleScope)
 
         viewModel.nextButtonState.observe(exportJsonPasswordNext::setState)
+
+        viewModel.showPasswords.observe {
+            exportJsonPasswordNewField.content.switchPasswordInputType(it)
+            exportJsonPasswordConfirmField.content.switchPasswordInputType(it)
+        }
 
         observeValidations(viewModel)
     }

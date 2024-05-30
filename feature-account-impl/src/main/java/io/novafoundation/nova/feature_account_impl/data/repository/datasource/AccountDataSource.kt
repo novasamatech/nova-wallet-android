@@ -103,6 +103,8 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun getActiveMetaAccounts(): List<MetaAccount>
 
     suspend fun getActiveMetaAccountsQuantity(): Int
+
+    suspend fun hasSecretsAccounts(): Boolean
 }
 
 suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.se
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.walletUiFlowFor
 import io.novafoundation.nova.feature_account_impl.R
@@ -19,6 +20,7 @@ class ManualBackupSecretsViewModel(
     private val resourceManager: ResourceManager,
     private val router: AccountRouter,
     private val payload: ManualBackupCommonPayload,
+    private val accountInteractor: AccountInteractor,
     private val commonExportSecretsInteractor: CommonExportSecretsInteractor,
     private val secretsAdapterItemFactory: ManualBackupSecretsAdapterItemFactory,
     private val walletUiUseCase: WalletUiUseCase
@@ -50,20 +52,28 @@ class ManualBackupSecretsViewModel(
     }
 
     private suspend fun buildSecrets(): List<ManualBackupSecretsRvItem> = buildList {
-        if (payload is ManualBackupCommonPayload.ChainAccount) {
-            this += secretsAdapterItemFactory.createChainItem(payload.chainId)
-            this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_custom_key_title))
-        } else {
-            this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_default_key_title))
-        }
+        createHeaders()
 
         val mnemonicItem = secretsAdapterItemFactory.createMnemonic(payload.metaId, payload.getChainIdOrNull())
-
         if (mnemonicItem == null) {
             this += secretsAdapterItemFactory.createSubtitle(resourceManager.getString(R.string.manual_backup_secrets_subtitle))
             this += secretsAdapterItemFactory.createAdvancedSecrets(payload.metaId, payload.getChainIdOrNull())
         } else {
             this += mnemonicItem
+        }
+    }
+
+    private suspend fun MutableList<ManualBackupSecretsRvItem>.createHeaders() {
+        if (payload is ManualBackupCommonPayload.ChainAccount) {
+            this += secretsAdapterItemFactory.createChainItem(payload.chainId)
+            this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_custom_key_title))
+        } else {
+            val hasChainAccounts = accountInteractor.hasCustomChainAccounts(payload.metaId)
+            if (hasChainAccounts) {
+                this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.manual_backup_secrets_default_key_title))
+            } else {
+                this += secretsAdapterItemFactory.createTitle(resourceManager.getString(R.string.common_passphrase))
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_impl.R
@@ -33,6 +34,9 @@ class ExportJsonViewModel(
     val passwordConfirmationFlow = MutableStateFlow("")
 
     private val jsonGenerationInProgressFlow = MutableStateFlow(false)
+
+    val _showPasswords = MutableStateFlow(false)
+    val showPasswords: Flow<Boolean> = _showPasswords
 
     val nextButtonState: Flow<DescriptiveButtonState> = combine(
         passwordFlow,
@@ -71,6 +75,10 @@ class ExportJsonViewModel(
         ) {
             tryGenerateJson(password)
         }
+    }
+
+    fun toggleShowPassword() {
+        _showPasswords.toggle()
     }
 
     private fun tryGenerateJson(password: String) = launch {

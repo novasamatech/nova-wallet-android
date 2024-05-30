@@ -23,7 +23,7 @@ class ManualBackupWarningViewModel(
 
     val buttonState = conditionMixin.buttonState(
         enabledState = resourceManager.getString(R.string.common_confirm),
-        disabledState = resourceManager.getString(R.string.manual_backup_warning_disabled_button)
+        disabledState = resourceManager.getString(R.string.backup_secrets_warning_disabled_button)
     ).shareInBackground()
 
     fun continueClicked() {

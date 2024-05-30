@@ -19,6 +19,10 @@ interface CloudBackupPreferences {
     suspend fun setSavedPassword(password: String)
 
     suspend fun getSavedPassword(): String?
+
+    fun getCloudBackupWasInitialized(): Boolean
+
+    fun setCloudBackupWasInitialized(value: Boolean)
 }
 
 suspend fun CloudBackupPreferences.enableSyncWithCloud() = setSyncWithCloudEnabled(true)
@@ -29,6 +33,7 @@ internal class SharedPrefsCloudBackupPreferences(
 ) : CloudBackupPreferences {
 
     companion object {
+        private const val CLOUD_BACKUP_WAS_INITIALIZED = "CloudBackupPreferences.cloud_backup_was_initialized"
         private const val SYNC_WITH_CLOUD_ENABLED_KEY = "CloudBackupPreferences.sync_with_cloud_enabled"
         private const val LAST_SYNC_TIME_KEY = "CloudBackupPreferences.last_sync_time"
         private const val BACKUP_ENABLED_DEFAULT = false
@@ -64,5 +69,13 @@ internal class SharedPrefsCloudBackupPreferences(
 
     override suspend fun getSavedPassword(): String? {
         return encryptedPreferences.getDecryptedString(PASSWORD_KEY)
+    }
+
+    override fun getCloudBackupWasInitialized(): Boolean {
+        return preferences.getBoolean(CLOUD_BACKUP_WAS_INITIALIZED, false)
+    }
+
+    override fun setCloudBackupWasInitialized(value: Boolean) {
+        preferences.putBoolean(CLOUD_BACKUP_WAS_INITIALIZED, value)
     }
 }

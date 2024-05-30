@@ -35,11 +35,11 @@ class LabeledTextView @JvmOverloads constructor(
         minHeight = 48.dp
         setPadding(0, 8.dp, 0, 8.dp)
 
-        with(context) {
-            background = addRipple(getCornersStateDrawable())
-        }
-
         applyAttributes(attrs)
+
+        if (background == null) {
+            background = context.addRipple(context.getCornersStateDrawable())
+        }
     }
 
     private var singleLine: Boolean = true
