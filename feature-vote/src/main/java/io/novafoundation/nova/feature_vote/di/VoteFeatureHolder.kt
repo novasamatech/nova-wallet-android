@@ -10,7 +10,7 @@ import javax.inject.Inject
 @ApplicationScope
 class VoteFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
-    private val routerFactory: VoteRouter.Factory
+    private val router: VoteRouter
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -19,6 +19,6 @@ class VoteFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .build()
         return DaggerVoteFeatureComponent.factory()
-            .create(routerFactory, dependencies)
+            .create(router, dependencies)
     }
 }

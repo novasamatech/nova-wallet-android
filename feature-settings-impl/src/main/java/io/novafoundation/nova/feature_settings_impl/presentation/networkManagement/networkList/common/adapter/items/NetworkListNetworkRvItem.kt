@@ -25,12 +25,12 @@ class NetworkListNetworkRvItem(
     val subtitle: String?,
     val chainLabel: String?,
     val disabled: Boolean,
-    val status: ConnectionState?
+    val status: ConnectionStateModel?
 ) : NetworkListRvItem {
 
     override val id: String = chainId
 
-    class ConnectionState(
+    class ConnectionStateModel(
         val name: String,
         val chainStatusColor: Int,
         val chainStatusIcon: Int,
