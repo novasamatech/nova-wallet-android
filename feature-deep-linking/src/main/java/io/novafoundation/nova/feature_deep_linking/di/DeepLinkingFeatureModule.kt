@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_deep_linking.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.BuyCallbackDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.DAppDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ImportMnemonicDeepLinkHandler
 import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
@@ -15,7 +14,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.BuyCallbackDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.WalletConnectPairDeeplinkHandler
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module()
@@ -72,6 +74,12 @@ class DeepLinkingFeatureModule {
     ) = BuyCallbackDeepLinkHandler(resourceManager)
 
     @Provides
+    fun provideWalletConnectDeepLinkHandler(
+        walletConnectService: WalletConnectService,
+        automaticInteractionGate: AutomaticInteractionGate
+    ) = WalletConnectPairDeeplinkHandler(walletConnectService, automaticInteractionGate)
+
+    @Provides
     fun provideAssetDetailsDeepLinkHandler(
         deepLinkingRouter: DeepLinkingRouter,
         accountRepository: AccountRepository,
@@ -93,7 +101,8 @@ class DeepLinkingFeatureModule {
         dappDeepLinkHandler: DAppDeepLinkHandler,
         referendumDeepLinkHandler: ReferendumDeepLinkHandler,
         buyCallbackDeepLinkHandler: BuyCallbackDeepLinkHandler,
-        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
+        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler,
+        walletConnectPairDeeplinkHandler: WalletConnectPairDeeplinkHandler,
     ): RootDeepLinkHandler {
         val deepLinkHandlers = listOf(
             stakingDashboardDeepLinkHandler,
@@ -101,7 +110,8 @@ class DeepLinkingFeatureModule {
             dappDeepLinkHandler,
             referendumDeepLinkHandler,
             buyCallbackDeepLinkHandler,
-            assetDetailsDeepLinkHandler
+            assetDetailsDeepLinkHandler,
+            walletConnectPairDeeplinkHandler
         )
 
         return RootDeepLinkHandler(deepLinkHandlers)
