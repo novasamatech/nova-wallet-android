@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.n
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -58,7 +59,7 @@ class TokenReceivedNotificationHandler(
         content.requireType(NotificationTypes.TOKENS_RECEIVED)
 
         val chain = content.getChain()
-        require(chain.enabled)
+        require(chain.isEnabled)
 
         val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
         val assetId = content.extractPayloadFieldsWithPath<String?>("assetId")

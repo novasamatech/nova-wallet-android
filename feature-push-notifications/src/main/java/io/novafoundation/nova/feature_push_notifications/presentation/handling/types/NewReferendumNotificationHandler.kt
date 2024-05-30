@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.a
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.requireType
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class NewReferendumNotificationHandler(
@@ -46,7 +47,7 @@ class NewReferendumNotificationHandler(
         content.requireType(NotificationTypes.GOV_NEW_REF)
 
         val chain = content.getChain()
-        require(chain.enabled)
+        require(chain.isEnabled)
 
         val referendumId = content.extractBigInteger("referendumId")
 

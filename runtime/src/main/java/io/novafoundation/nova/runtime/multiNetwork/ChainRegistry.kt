@@ -11,6 +11,8 @@ import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
+import io.novafoundation.nova.runtime.ext.isDisabled
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.isFullSync
 import io.novafoundation.nova.runtime.ext.level
 import io.novafoundation.nova.runtime.ext.requiresBaseTypes
@@ -158,10 +160,6 @@ class ChainRegistry(
     }
 
     private suspend fun registerChain(chain: Chain) {
-        if (!chain.enabled) {
-            registerDisabledChain(chain)
-        }
-
         return when (chain.connectionState) {
             ConnectionState.FULL_SYNC -> registerFullSyncChain(chain)
             ConnectionState.LIGHT_SYNC -> registerLightSyncChain(chain)
@@ -240,7 +238,7 @@ suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): C
 }
 
 suspend fun ChainRegistry.enabledChainWithAssetOrNull(chainId: String, assetId: Int): ChainWithAsset? {
-    val chain = getChainOrNull(chainId).takeIf { it?.enabled == true } ?: return null
+    val chain = getChainOrNull(chainId).takeIf { it?.isEnabled == true } ?: return null
     val chainAsset = chain.assetsById[assetId] ?: return null
 
     return ChainWithAsset(chain, chainAsset)
@@ -334,7 +332,7 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 }
 
 fun ChainRegistry.enabledChains() = currentChains
-    .filterList { it.enabled }
+    .filterList { it.isEnabled }
     .inBackground()
     .shareIn(this, SharingStarted.Eagerly, replay = 1)
 

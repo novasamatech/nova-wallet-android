@@ -10,6 +10,7 @@ import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 private const val INTEGRATE_NETWORKS_BANNER_TAG = "INTEGRATE_NETWORKS_BANNER_TAG"
@@ -60,6 +61,10 @@ class RealNetworkManagementInteractor(
     }
 
     private fun connectionsFlow(chains: List<Chain>): Flow<List<NetworkState>> {
+        if (chains.isEmpty()) {
+            return flowOf(emptyList())
+        }
+        
         return chains.map { chain ->
             val connectionFlow = chainRegistry.getConnectionOrNull(chain.id)?.state ?: emptyFlow<SocketStateMachine.State?>()
             connectionFlow.map { state -> NetworkState(chain, state) }

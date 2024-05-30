@@ -84,7 +84,6 @@ fun mapRemoteChainToLocal(
             connectionState = determineConnectionState(chainRemote, oldChain),
             additional = gson.toJson(additional),
             nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy),
-            enabled = oldChain?.enabled ?: true,
             isCustomNetwork = isCustomNetwork
         )
     }

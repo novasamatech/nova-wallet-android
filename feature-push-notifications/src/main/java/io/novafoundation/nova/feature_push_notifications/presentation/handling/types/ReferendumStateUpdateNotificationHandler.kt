@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.e
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.fromRemoteNotificationType
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.requireType
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -53,7 +54,7 @@ class ReferendumStateUpdateNotificationHandler(
         content.requireType(NotificationTypes.GOV_STATE)
 
         val chain = content.getChain()
-        require(chain.enabled)
+        require(chain.isEnabled)
 
         val referendumId = content.extractBigInteger("referendumId")
         val stateFrom = content.extractPayloadFieldsWithPath<String?>("from")?.let { ReferendumStatusType.fromRemoteNotificationType(it) }

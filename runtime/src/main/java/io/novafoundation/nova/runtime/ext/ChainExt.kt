@@ -61,8 +61,11 @@ val Chain.isSubstrateBased
 val Chain.commissionAsset
     get() = utilityAsset
 
+val Chain.isEnabled
+    get() = connectionState != Chain.ConnectionState.DISABLED
+
 val Chain.isDisabled
-    get() = connectionState == Chain.ConnectionState.DISABLED
+    get() = !isEnabled
 
 fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
     if (staking.isEmpty()) return emptyList()

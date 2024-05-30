@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.alphabeticalOrder
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.relaychainsFirstAscendingOrder
 import io.novafoundation.nova.runtime.ext.testnetsLastAscendingOrder
 import io.novafoundation.nova.runtime.state.SelectableAssetAdditionalData
@@ -27,7 +28,7 @@ class SelectableAssetUseCaseImpl<A : SelectableAssetAdditionalData>(
         val balancesByChainAssets = walletRepository.getSupportedAssets(metaAccount.id).associateBy { it.token.configuration.fullId }
 
         sharedState.availableToSelect()
-            .filter { it.assetWithChain.chain.enabled }
+            .filter { it.assetWithChain.chain.isEnabled }
             .mapNotNull { supportedOption ->
                 val asset = balancesByChainAssets[supportedOption.assetWithChain.asset.fullId]
 
