@@ -6,6 +6,8 @@ interface SettingsRouter : ReturnableRouter {
 
     fun openWallets()
 
+    fun openNetworks()
+
     fun openPushNotificationSettings()
 
     fun openCurrencies()

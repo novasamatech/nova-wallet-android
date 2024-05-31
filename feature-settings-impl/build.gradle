@@ -54,6 +54,7 @@ dependencies {
     implementation cardViewDep
     implementation constraintDep
 
+    implementation shimmerDep
     implementation biometricDep
 
     implementation substrateSdkDep

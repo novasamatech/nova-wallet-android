@@ -23,7 +23,7 @@ interface VoteFeatureComponent : VoteFeatureApi {
     interface Factory {
 
         fun create(
-            @BindsInstance routerFactory: VoteRouter.Factory,
+            @BindsInstance voteRouter: VoteRouter,
             deps: VoteFeatureDependencies
         ): VoteFeatureComponent
     }

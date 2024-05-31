@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/itemNetworkImage"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginVertical="12dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_nova" />
+
+    <TextView
+        android:id="@+id/itemNetworkTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/itemNetworkSubtitle"
+        app:layout_constraintStart_toEndOf="@+id/itemNetworkImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Polkadot" />
+
+    <TextView
+        android:id="@+id/itemNetworkSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemNetworkImage"
+        app:layout_constraintTop_toBottomOf="@+id/itemNetworkTitle"
+        tools:text="Disabled"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/itemNetworkLabel"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_chip_6"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="1.5dp"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemNetworkTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="testnet"
+        tools:visibility="visible" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemNetworkStatusShimmer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        app:shimmer_base_color="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemNetworkChevron"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/itemNetworkStatus"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            tools:text="connecting..." />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+    <ImageView
+        android:id="@+id/itemNetworkChevron"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

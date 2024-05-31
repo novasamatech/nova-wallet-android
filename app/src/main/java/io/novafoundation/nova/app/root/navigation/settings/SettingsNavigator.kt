@@ -21,6 +21,10 @@ class SettingsNavigator(
         delegate.openWallets()
     }
 
+    override fun openNetworks() {
+        performNavigation(R.id.action_open_networkManagement)
+    }
+
     override fun openPushNotificationSettings() {
         performNavigation(R.id.action_open_pushNotificationsSettings)
     }

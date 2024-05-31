@@ -13,10 +13,13 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.di.NetworkManagementComponent
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.list.di.ExistingNetworkListComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di.CloudBackupSettingsComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
+import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
     dependencies = [
@@ -30,6 +33,10 @@ import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeature
 interface SettingsFeatureComponent : SettingsFeatureApi {
 
     fun settingsComponentFactory(): SettingsComponent.Factory
+
+    fun networkManagementFactory(): NetworkManagementComponent.Factory
+
+    fun existingNetworkListFactory(): ExistingNetworkListComponent.Factory
 
     fun backupSettings(): CloudBackupSettingsComponent.Factory
 
@@ -48,6 +55,7 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
     @Component(
         dependencies = [
             CommonApi::class,
+            RuntimeApi::class,
             CurrencyFeatureApi::class,
             AccountFeatureApi::class,
             WalletConnectFeatureApi::class,
