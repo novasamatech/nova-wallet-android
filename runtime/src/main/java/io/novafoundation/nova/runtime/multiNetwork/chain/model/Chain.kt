@@ -23,7 +23,7 @@ data class Chain(
     val nodes: Nodes,
     val explorers: List<Explorer>,
     val externalApis: List<ExternalApi>,
-    val icon: String,
+    val icon: String?,
     val addressPrefix: Int,
     val types: Types?,
     val isEthereumBased: Boolean,
