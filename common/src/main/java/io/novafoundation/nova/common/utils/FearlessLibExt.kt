@@ -251,6 +251,10 @@ fun RuntimeMetadata.omnipool() = module(Modules.OMNIPOOL)
 
 fun RuntimeMetadata.stableSwapOrNull() = moduleOrNull(Modules.STABLE_SWAP)
 
+fun RuntimeMetadata.xykOrNull() = moduleOrNull(Modules.XYK)
+
+fun RuntimeMetadata.xyk() = module(Modules.XYK)
+
 fun RuntimeMetadata.stableSwap() = module(Modules.STABLE_SWAP)
 
 fun RuntimeMetadata.dynamicFeesOrNull() = moduleOrNull(Modules.DYNAMIC_FEES)
@@ -438,6 +442,8 @@ object Modules {
     const val ROUTER = "Router"
 
     const val STABLE_SWAP = "Stableswap"
+
+    const val XYK = "XYK"
 
     const val ASSET_REGISTRY = "AssetRegistry"
 }

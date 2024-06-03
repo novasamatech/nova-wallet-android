@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
@@ -563,11 +564,9 @@ private class HydraDxExchange(
         return buildString {
             append(segment.sourceId)
 
-            val stableswapPoolId = segment.sourceParams["PoolId"]
-            if (stableswapPoolId != null) {
-                val onChainId = stableswapPoolId.toBigInteger()
+            if (segment.sourceId == StableSwapSourceFactory.ID) {
+                val onChainId = segment.sourceParams.getValue("PoolId").toBigInteger()
                 val chainAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, onChainId)
-
                 append("[${chainAsset.symbol}]")
             }
         }
