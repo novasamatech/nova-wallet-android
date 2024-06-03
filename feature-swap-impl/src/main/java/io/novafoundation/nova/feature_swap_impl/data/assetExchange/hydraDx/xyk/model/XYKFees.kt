@@ -9,7 +9,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 
 class XYKFees(val nominator: Int, val denominator: Int)
 
-fun bindXYKFees(decoded: Any?) : XYKFees {
+fun bindXYKFees(decoded: Any?): XYKFees {
     val (first, second) = decoded.castToList()
 
     return XYKFees(bindInt(first), bindInt(second))

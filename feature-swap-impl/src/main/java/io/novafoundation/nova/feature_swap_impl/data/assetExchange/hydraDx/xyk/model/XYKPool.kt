@@ -20,7 +20,7 @@ class XYKPools(
         assetIdOut: HydraDxAssetId,
         amount: Balance,
         direction: SwapDirection
-    ) : Balance? {
+    ): Balance? {
         val relevantPool = pools.first { it.address.contentEquals(poolAddress) }
 
         return relevantPool.quote(assetIdIn, assetIdOut, amount, direction, fees)
@@ -104,5 +104,3 @@ private fun XYKFees.feeFrom(amount: BigInteger): Balance? {
     return HYKSwapMathBridge.calculate_pool_trade_fee(amount.toString(), nominator.toString(), denominator.toString())
         .fromBridgeResultToBalance()
 }
-
-
