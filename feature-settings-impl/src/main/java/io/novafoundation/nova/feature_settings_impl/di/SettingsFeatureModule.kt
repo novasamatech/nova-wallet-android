@@ -9,7 +9,9 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementInteractor
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.RealNetworkListAdapterItemFactory
@@ -37,6 +39,14 @@ class SettingsFeatureModule {
         bannerVisRepository: BannerVisibilityRepository
     ): NetworkManagementInteractor {
         return RealNetworkManagementInteractor(chainRegistry, bannerVisRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNetworkManagementChainInteractor(
+        chainRegistry: ChainRegistry
+    ): NetworkManagementChainInteractor {
+        return RealNetworkManagementChainInteractor(chainRegistry)
     }
 
     @Provides

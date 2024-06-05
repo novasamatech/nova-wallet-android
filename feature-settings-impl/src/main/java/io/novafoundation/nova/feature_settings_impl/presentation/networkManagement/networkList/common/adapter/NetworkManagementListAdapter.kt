@@ -13,12 +13,18 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 private const val NETWORK_VIEW_TYPE = 0
 
 class NetworkManagementListAdapter(
-    private val imageLoader: ImageLoader
+    private val imageLoader: ImageLoader,
+    private val itemHandler: ItemHandler
 ) : ListAdapter<NetworkListRvItem, NetworkListViewHolder>(NetworkManagementListDiffCallback()) {
+
+    interface ItemHandler {
+
+        fun onNetworkClicked(chainId: String)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NetworkListViewHolder {
         return when (viewType) {
-            NETWORK_VIEW_TYPE -> NetworkListNetworkViewHolder(parent, imageLoader)
+            NETWORK_VIEW_TYPE -> NetworkListNetworkViewHolder(parent, imageLoader, itemHandler)
             else -> throw IllegalStateException("Unknown view type: $viewType")
         }
     }

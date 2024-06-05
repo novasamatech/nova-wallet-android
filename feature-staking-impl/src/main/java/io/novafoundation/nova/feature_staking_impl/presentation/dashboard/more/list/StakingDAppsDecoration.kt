@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.StubHolder
-import io.novafoundation.nova.common.list.decoration.BackgroundDecoration
+import io.novafoundation.nova.common.list.decoration.BackgroundItemDecoration
 
-class StakingDAppsDecoration(context: Context) : BackgroundDecoration(
+class StakingDAppsDecoration(context: Context) : BackgroundItemDecoration(
     context = context,
     outerHorizontalMarginDp = 16,
     innerVerticalPaddingDp = 4

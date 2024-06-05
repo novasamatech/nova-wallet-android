@@ -122,7 +122,30 @@ class ChainRegistry(
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
 
     suspend fun enableFullSync(chainId: ChainId) {
-        chainDao.setConnectionState(chainId, ConnectionStateLocal.FULL_SYNC)
+        changeChainConectionState(chainId, ConnectionState.FULL_SYNC)
+    }
+
+    suspend fun changeChainConectionState(chainId: ChainId, state: ConnectionState) {
+        val connectionState = mapConnectionStateToLocal(state)
+        chainDao.setConnectionState(chainId, connectionState)
+    }
+
+    suspend fun setAutoBalanceEnabled(chainId: ChainId, enabled: Boolean) {
+        chainDao.setAutoBalanceEnabled(chainId, enabled)
+    }
+
+    suspend fun setDefaultNode(chainId: ChainId, nodeUrl: String?) {
+        if (nodeUrl == null) {
+            chainDao.setChainDefaultNodeUrl(chainId, null)
+            return
+        }
+
+        val chain = getChain(chainId)
+
+        val chainSupportsNode = chain.nodes.nodes.any { it.unformattedUrl == nodeUrl }
+        require(chainSupportsNode) { "Node with url $nodeUrl is not found for chain $chainId" }
+
+        chainDao.setChainDefaultNodeUrl(chainId, nodeUrl)
     }
 
     private suspend fun requireConnectionStateAtLeast(chainId: ChainId, state: ConnectionState) {

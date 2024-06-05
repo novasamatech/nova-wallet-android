@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.utils.setCompoundDrawableTint
+import io.novafoundation.nova.common.utils.setCompoundDrawableTintRes
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_settings_switcher.view.settingsSwitcher
 
@@ -29,7 +29,7 @@ class SettingsSwitcherView @JvmOverloads constructor(
     }
 
     fun setIconTintColor(@ColorRes tintRes: Int?) {
-        settingsSwitcher.setCompoundDrawableTint(tintRes)
+        settingsSwitcher.setCompoundDrawableTintRes(tintRes)
     }
 
     fun setIcon(icon: Drawable?) {

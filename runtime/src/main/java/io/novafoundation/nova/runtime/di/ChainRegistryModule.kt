@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -22,8 +23,10 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
+import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
@@ -126,16 +129,32 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideNodeConnectionFactory(
+        socketProvider: Provider<SocketService>,
+        bulkRetriever: BulkRetriever,
+        connectionSecrets: ConnectionSecrets,
+        runtimeProviderPool: RuntimeProviderPool
+    ) = NodeConnectionFactory(
+        socketProvider,
+        connectionSecrets,
+        bulkRetriever,
+        runtimeProviderPool
+    )
+
+    @Provides
+    @ApplicationScope
     fun provideChainConnectionFactory(
         socketProvider: Provider<SocketService>,
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         nodeAutobalancer: NodeAutobalancer,
         connectionSecrets: ConnectionSecrets,
+        nodeConnectionFactory: NodeConnectionFactory
     ) = ChainConnectionFactory(
         externalRequirementsFlow,
         nodeAutobalancer,
         socketProvider,
-        connectionSecrets
+        connectionSecrets,
+        nodeConnectionFactory
     )
 
     @Provides

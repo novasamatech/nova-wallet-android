@@ -6,10 +6,14 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setCompoundDrawableTintRes
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkManagementListAdapter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkImage
 import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkLabel
@@ -18,7 +22,7 @@ import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkStat
 import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkStatusShimmer
 import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkSubtitle
 
-class NetworkListNetworkRvItem(
+data class NetworkListNetworkRvItem(
     val chainIcon: Icon,
     val chainId: ChainId,
     val title: String,
@@ -29,22 +33,22 @@ class NetworkListNetworkRvItem(
 ) : NetworkListRvItem {
 
     override val id: String = chainId
-
-    class ConnectionStateModel(
-        val name: String,
-        val chainStatusColor: Int,
-        val chainStatusIcon: Int,
-        val chainStatusIconColor: Int,
-    )
 }
 
 class NetworkListNetworkViewHolder(
     parent: ViewGroup,
-    private val imageLoader: ImageLoader
+    private val imageLoader: ImageLoader,
+    private val itemHandler: NetworkManagementListAdapter.ItemHandler
 ) : NetworkListViewHolder(parent.inflateChild(R.layout.item_network_settings)) {
+
+    init {
+        itemView.background = itemView.context.getMaskedRipple(cornerSizeInDp = 0)
+    }
 
     override fun bind(item: NetworkListRvItem) = with(itemView) {
         require(item is NetworkListNetworkRvItem)
+
+        itemView.setOnClickListener { itemHandler.onNetworkClicked(item.chainId) }
 
         itemNetworkImage.setIcon(item.chainIcon, imageLoader)
         itemNetworkTitle.text = item.title
@@ -56,7 +60,7 @@ class NetworkListNetworkViewHolder(
             itemNetworkStatus.setTextOrHide(item.status.name)
             itemNetworkStatus.setTextColor(item.status.chainStatusColor)
             itemNetworkStatus.setDrawableStart(item.status.chainStatusIcon, paddingInDp = 6)
-            itemNetworkStatus.setTextColor(item.status.chainStatusIconColor)
+            itemNetworkStatus.setCompoundDrawableTintRes(item.status.chainStatusIconColor)
         }
 
         if (item.disabled) {

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.defaultNetworks
 
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
@@ -12,9 +11,8 @@ import kotlinx.coroutines.flow.Flow
 class ExistingNetworkListViewModel(
     private val networkManagementInteractor: NetworkManagementInteractor,
     private val networkListAdapterItemFactory: NetworkListAdapterItemFactory,
-    router: SettingsRouter,
-    resourceManager: ResourceManager,
-) : NetworkListViewModel() {
+    router: SettingsRouter
+) : NetworkListViewModel(router) {
 
     private val networks = networkManagementInteractor.defaultNetworksFlow()
         .shareInBackground()

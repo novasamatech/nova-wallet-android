@@ -19,9 +19,8 @@ class AddedNetworkListViewModel(
     private val networkManagementInteractor: NetworkManagementInteractor,
     private val networkListAdapterItemFactory: NetworkListAdapterItemFactory,
     private val appLinksProvider: AppLinksProvider,
-    private val router: SettingsRouter,
-    resourceManager: ResourceManager,
-) : NetworkListViewModel(), Browserable {
+    router: SettingsRouter
+) : NetworkListViewModel(router), Browserable {
 
     private val networks = networkManagementInteractor.addedNetworksFlow()
         .shareInBackground()

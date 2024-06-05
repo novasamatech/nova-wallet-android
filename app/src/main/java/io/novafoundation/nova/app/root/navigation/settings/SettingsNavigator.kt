@@ -7,6 +7,8 @@ import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 
@@ -23,6 +25,13 @@ class SettingsNavigator(
 
     override fun openNetworks() {
         performNavigation(R.id.action_open_networkManagement)
+    }
+
+    override fun openNetworkDetails(payload: ChainNetworkManagementPayload) {
+        performNavigation(
+            R.id.action_open_networkManagementDetails,
+            args = ChainNetworkManagementFragment.getBundle(payload)
+        )
     }
 
     override fun openPushNotificationSettings() {

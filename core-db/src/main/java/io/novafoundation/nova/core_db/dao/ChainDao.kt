@@ -125,6 +125,12 @@ abstract class ChainDao {
     @Query("UPDATE chains SET connectionState = :connectionState WHERE id = :chainId")
     abstract suspend fun setConnectionState(chainId: String, connectionState: ChainLocal.ConnectionStateLocal)
 
+    @Query("UPDATE chains SET autoBalanceEnabled = :autobalance WHERE id = :chainId")
+    abstract suspend fun setAutoBalanceEnabled(chainId: String, autobalance: Boolean)
+
+    @Query("UPDATE chains SET defaultNodeUrl = :defaultNodeUrl WHERE id = :chainId")
+    abstract suspend fun setChainDefaultNodeUrl(chainId: String, defaultNodeUrl: String?)
+
     @Transaction
     open suspend fun updateRemoteRuntimeVersionIfChainExists(chainId: String, runtimeVersion: Int, transactionVersion: Int) {
         if (!chainExists(chainId)) return

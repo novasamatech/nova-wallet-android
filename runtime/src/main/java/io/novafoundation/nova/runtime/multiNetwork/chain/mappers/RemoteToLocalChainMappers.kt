@@ -84,7 +84,9 @@ fun mapRemoteChainToLocal(
             connectionState = determineConnectionState(chainRemote, oldChain),
             additional = gson.toJson(additional),
             nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy),
-            isCustomNetwork = isCustomNetwork
+            isCustomNetwork = isCustomNetwork,
+            autoBalanceEnabled = oldChain?.autoBalanceEnabled ?: true,
+            defaultNodeUrl = oldChain?.defaultNodeUrl
         )
     }
 
@@ -160,7 +162,8 @@ fun mapRemoteNodesToLocal(chainRemote: ChainRemote): List<ChainNodeLocal> {
             url = chainNodeRemote.url,
             name = chainNodeRemote.name,
             chainId = chainRemote.chainId,
-            orderId = index
+            orderId = index,
+            isCustom = false
         )
     }
 }

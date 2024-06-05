@@ -36,11 +36,15 @@ data class ChainLocal(
     val nodeSelectionStrategy: NodeSelectionStrategyLocal,
     @ColumnInfo(defaultValue = DEFAULT_NETWORK_BY_DEFAULT_STR)
     val isCustomNetwork: Boolean,
+    @ColumnInfo(defaultValue = DEFAULT_AUTO_BALANCE_DEFAULT_STR)
+    val autoBalanceEnabled: Boolean,
+    val defaultNodeUrl: String?
 ) : Identifiable {
 
     companion object {
 
         const val DEFAULT_NETWORK_BY_DEFAULT_STR = "0"
+        const val DEFAULT_AUTO_BALANCE_DEFAULT_STR = "1"
     }
 
     enum class NodeSelectionStrategyLocal {

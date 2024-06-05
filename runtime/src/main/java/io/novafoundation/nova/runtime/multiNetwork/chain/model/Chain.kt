@@ -37,7 +37,9 @@ data class Chain(
     val swap: List<Swap>,
     val connectionState: ConnectionState,
     val parentId: String?,
-    val additional: Additional?
+    val additional: Additional?,
+    val autoBalanceEnabled: Boolean,
+    val defaultNodeUrl: String?
 ) : Identifiable {
 
     companion object // extensions
@@ -132,6 +134,7 @@ data class Chain(
         val unformattedUrl: String,
         val name: String,
         val orderId: Int,
+        val isCustom: Boolean
     ) : Identifiable {
 
         enum class ConnectionType {

@@ -263,9 +263,11 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             unformattedUrl = it.url,
             name = it.name,
             chainId = it.chainId,
-            orderId = it.orderId
+            orderId = it.orderId,
+            isCustom = it.isCustom,
         )
     }
+
     val nodesConfig = Chain.Nodes(
         nodeSelectionStrategy = mapNodeSelectionFromLocal(chainLocal.chain.nodeSelectionStrategy),
         nodes = nodes
@@ -320,7 +322,9 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             swap = mapSwapListFromLocal(swap),
             connectionState = mapConnectionStateFromLocal(connectionState),
             additional = additional,
-            isCustomNetwork = isCustomNetwork
+            isCustomNetwork = isCustomNetwork,
+            autoBalanceEnabled = autoBalanceEnabled,
+            defaultNodeUrl = defaultNodeUrl,
         )
     }
 }

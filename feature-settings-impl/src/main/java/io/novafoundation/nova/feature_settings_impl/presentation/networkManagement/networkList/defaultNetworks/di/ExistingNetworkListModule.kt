@@ -23,14 +23,12 @@ class ExistingNetworkListModule {
     fun provideViewModel(
         networkManagementInteractor: NetworkManagementInteractor,
         networkListAdapterItemFactory: NetworkListAdapterItemFactory,
-        router: SettingsRouter,
-        resourceManager: ResourceManager
+        router: SettingsRouter
     ): ViewModel {
         return ExistingNetworkListViewModel(
             networkManagementInteractor,
             networkListAdapterItemFactory,
-            router,
-            resourceManager
+            router
         )
     }
 

@@ -2,8 +2,11 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeConnection
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeConnectionFactory
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.interceptor.WebSocketResponseInterceptor
 import io.novasama.substrate_sdk_android.wsrpc.interceptor.WebSocketResponseInterceptor.ResponseDelivery
@@ -32,6 +35,7 @@ class ChainConnectionFactory(
     private val nodeAutobalancer: NodeAutobalancer,
     private val socketServiceProvider: Provider<SocketService>,
     private val connectionSecrets: ConnectionSecrets,
+    private val nodeConnectionFactory: NodeConnectionFactory
 ) {
 
     suspend fun create(chain: Chain): ChainConnection {
@@ -40,6 +44,7 @@ class ChainConnectionFactory(
             externalRequirementFlow = externalRequirementFlow,
             nodeAutobalancer = nodeAutobalancer,
             connectionSecrets = connectionSecrets,
+            nodeConnectionFactory = nodeConnectionFactory,
             chain = chain
         )
 
@@ -65,9 +70,10 @@ private val RATE_LIMIT_ERROR_CODES = listOf(
 class ChainConnection internal constructor(
     val socketService: SocketService,
     private val externalRequirementFlow: Flow<ExternalRequirement>,
-    nodeAutobalancer: NodeAutobalancer,
+    private val nodeAutobalancer: NodeAutobalancer,
     private val chain: Chain,
     private val connectionSecrets: ConnectionSecrets,
+    private val nodeConnectionFactory: NodeConnectionFactory
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default),
     WebSocketResponseInterceptor {
 
@@ -87,11 +93,7 @@ class ChainConnection internal constructor(
 
     private val availableNodes = MutableStateFlow(chain.nodes)
 
-    private val currentUrl = nodeAutobalancer.connectionUrlFlow(
-        chainId = chain.id,
-        changeConnectionEventFlow = nodeChangeSignal,
-        availableNodesFlow = availableNodes,
-    )
+    val currentUrl = getNodeUrlFlow()
         .shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
     suspend fun setup() {
@@ -109,6 +111,29 @@ class ChainConnection internal constructor(
             .launchIn(this)
     }
 
+    private fun getNodeUrlFlow(): Flow<NodeWithSaturatedUrl?> {
+        return if (chain.autoBalanceEnabled) {
+            getAutobalancedNodeUrlFlow()
+        } else {
+            val node = chain.nodes.nodes.firstOrNull { it.unformattedUrl == chain.defaultNodeUrl }
+                ?.saturateNodeUrl(connectionSecrets)
+
+            if (node == null) {
+                getAutobalancedNodeUrlFlow()
+            } else {
+                flowOf { node }
+            }
+        }
+    }
+
+    private fun getAutobalancedNodeUrlFlow(): Flow<NodeWithSaturatedUrl?> {
+        return nodeAutobalancer.connectionUrlFlow(
+            chainId = chain.id,
+            changeConnectionEventFlow = nodeChangeSignal,
+            availableNodesFlow = availableNodes,
+        )
+    }
+
     private suspend fun observeCurrentNode() {
         val firstNodeUrl = currentUrl.first()?.saturatedUrl ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
@@ -119,6 +144,13 @@ class ChainConnection internal constructor(
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
             .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
             .launchIn(this)
+    }
+
+    fun getNodeConnection(node: Chain.Node): NodeConnection {
+        val nodeUrls = chain.nodes.nodes.map { it.unformattedUrl }
+        require(nodeUrls.contains(node.unformattedUrl))
+
+        return nodeConnectionFactory.create(chain, node)
     }
 
     fun considerUpdateNodes(nodes: Chain.Nodes) {
@@ -161,9 +193,5 @@ class ChainConnection internal constructor(
         } else {
             ResponseDelivery.DELIVER_TO_SENDER
         }
-    }
-
-    fun getCurrentState(): State {
-        return state.value
     }
 }
