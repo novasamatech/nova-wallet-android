@@ -52,6 +52,17 @@
         android:id="@+id/finishImportGenericLedgerFragment"
         android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerFragment"
         android:label="FinishImportGenericLedgerFragment"
-        tools:layout="@layout/fragment_create_wallet_name" />
+        tools:layout="@layout/fragment_create_wallet_name" >
+
+        <action
+            android:id="@+id/action_finishImportGenericLedgerFragment_to_pincodeFragment"
+            app:destination="@id/pincodeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

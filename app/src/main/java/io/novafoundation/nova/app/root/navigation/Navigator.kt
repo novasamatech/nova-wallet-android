@@ -149,6 +149,7 @@ class Navigator(
             R.id.createWatchWalletFragment -> navController?.navigate(R.id.action_watchWalletFragment_to_pincodeFragment, bundle)
             R.id.finishImportParitySignerFragment -> navController?.navigate(R.id.action_finishImportParitySignerFragment_to_pincodeFragment, bundle)
             R.id.finishImportLedgerFragment -> navController?.navigate(R.id.action_finishImportLedgerFragment_to_pincodeFragment, bundle)
+            R.id.finishImportGenericLedgerFragment -> navController?.navigate(R.id.action_finishImportGenericLedgerFragment_to_pincodeFragment, bundle)
         }
     }
 
