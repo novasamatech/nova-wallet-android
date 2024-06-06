@@ -163,6 +163,7 @@ class Navigator(
             R.id.finishImportLedgerFragment -> navController?.navigate(R.id.action_finishImportLedgerFragment_to_pincodeFragment, bundle)
             R.id.createCloudBackupPasswordFragment -> navController?.navigate(R.id.action_createCloudBackupPasswordFragment_to_pincodeFragment, bundle)
             R.id.restoreCloudBackupFragment -> navController?.navigate(R.id.action_restoreCloudBackupFragment_to_pincodeFragment, bundle)
+            R.id.finishImportGenericLedgerFragment -> navController?.navigate(R.id.action_finishImportGenericLedgerFragment_to_pincodeFragment, bundle)
         }
     }
 

@@ -42,6 +42,6 @@ class GenericSubstrateLedgerApplication(
 
     companion object {
 
-        const val CLA: UByte = 0x9fu
+        const val CLA: UByte = 0xf9u
     }
 }
