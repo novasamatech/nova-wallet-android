@@ -23,7 +23,7 @@ class GenericSubstrateLedgerApplication(
 
     private val universalConfig = legacyApplicationConfigs.getConfig(Chain.Geneses.POLKADOT)
 
-    override val cla: UByte = universalConfig.cla
+    override val cla: UByte = CLA
 
     suspend fun getUniversalAccount(
         device: LedgerDevice,
@@ -38,5 +38,10 @@ class GenericSubstrateLedgerApplication(
 
     override suspend fun getDerivationPath(metaId: Long, chainId: ChainId): String {
         return ledgerRepository.getGenericDerivationPath(metaId)
+    }
+
+    companion object {
+
+        const val CLA: UByte = 0x9fu
     }
 }
