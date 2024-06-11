@@ -28,11 +28,9 @@ class FinishImportGenericLedgerModule {
     fun provideInteractor(
         genericLedgerAddAccountRepository: GenericLedgerAddAccountRepository,
         accountRepository: AccountRepository,
-        ledgerMigrationTracker: LedgerMigrationTracker
     ): FinishImportGenericLedgerInteractor = RealFinishImportGenericLedgerInteractor(
         genericLedgerAddAccountRepository = genericLedgerAddAccountRepository,
         accountRepository = accountRepository,
-        ledgerMigrationTracker = ledgerMigrationTracker
     )
 
     @Provides

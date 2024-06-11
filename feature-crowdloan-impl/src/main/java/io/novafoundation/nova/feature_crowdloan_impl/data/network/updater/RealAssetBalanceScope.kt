@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBalanceScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBalanceScope.ScopeValue
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository

@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerServic
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.findChainIds
 import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -20,6 +21,8 @@ interface LedgerMigrationTracker {
     suspend fun anyChainSupportsMigrationApp(): Boolean
 
     fun supportedChainIdsByGenericAppFlow(): Flow<Set<ChainId>>
+
+    suspend fun supportedChainIdsByGenericApp(): Set<ChainId>
 }
 
 internal class RealLedgerMigrationTracker(
@@ -39,6 +42,12 @@ internal class RealLedgerMigrationTracker(
 
     override suspend fun supportedChainsByGenericApp(): List<Chain> {
         return chainRegistry.findChains {
+            it.additional.isGenericLedgerAppSupported()
+        }
+    }
+
+    override suspend fun supportedChainIdsByGenericApp(): Set<ChainId> {
+        return chainRegistry.findChainIds {
             it.additional.isGenericLedgerAppSupported()
         }
     }

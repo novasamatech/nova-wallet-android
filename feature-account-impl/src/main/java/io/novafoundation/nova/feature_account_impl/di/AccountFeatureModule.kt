@@ -58,6 +58,7 @@ import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.feature_account_impl.RealBiometricServiceFactory
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
@@ -212,6 +213,14 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideAccountMappers(
+        ledgerMigrationTracker: LedgerMigrationTracker
+    ): AccountMappers {
+        return AccountMappers(ledgerMigrationTracker)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideAccountDataSource(
         preferences: Preferences,
         encryptedPreferences: EncryptedPreferences,
@@ -221,13 +230,14 @@ class AccountFeatureModule {
         metaAccountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2,
+        accountMappers: AccountMappers,
     ): AccountDataSource {
         return AccountDataSourceImpl(
             preferences,
             encryptedPreferences,
             nodeDao,
             metaAccountDao,
-            chainRegistry,
+            accountMappers,
             secretStoreV2,
             secretStoreV1,
             accountDataMigration

@@ -24,9 +24,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
@@ -121,10 +119,6 @@ class AccountRepositoryImpl(
 
     override suspend fun accountNameFor(accountId: AccountId, chainId: String): String? {
         return accountDataSource.accountNameFor(accountId, chainId)
-    }
-
-    override suspend fun activeMetaAccounts(): List<MetaAccount> {
-        return accountDataSource.activeMetaAccounts()
     }
 
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {

@@ -107,10 +107,6 @@ interface MetaAccountDao {
     @Query("SELECT * FROM chain_accounts WHERE metaId = :metaId")
     suspend fun getChainAccounts(metaId: Long): List<ChainAccountLocal>
 
-    @Query("SELECT * FROM meta_accounts WHERE status = :status")
-    @Transaction
-    suspend fun getMetaAccountsInfoByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
-
     @Query("SELECT COUNT(*) FROM meta_accounts WHERE status = :status")
     @Transaction
     suspend fun getMetaAccountsQuantityByStatus(status: MetaAccountLocal.Status): Int
@@ -122,10 +118,8 @@ interface MetaAccountDao {
     suspend fun getMetaAccountIdsByType(type: MetaAccountLocal.Type): List<Long>
 
     @Query("SELECT * FROM meta_accounts WHERE status = :status")
+    @Transaction
     suspend fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
-
-    @Query("SELECT * FROM meta_accounts")
-    suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
 
     @Query("SELECT * FROM meta_accounts")
     fun getJoinedMetaAccountsInfoFlow(): Flow<List<RelationJoinedMetaAccountInfo>>

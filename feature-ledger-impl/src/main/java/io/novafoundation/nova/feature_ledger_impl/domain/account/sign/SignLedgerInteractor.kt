@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_ledger_impl.domain.account.sign
 import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
-import io.novafoundation.nova.feature_account_api.domain.model.publicKeyIn
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
