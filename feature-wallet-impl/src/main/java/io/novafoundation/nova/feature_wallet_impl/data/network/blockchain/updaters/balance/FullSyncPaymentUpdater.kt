@@ -9,7 +9,7 @@ import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
 import io.novafoundation.nova.core_db.model.operation.OperationLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetWithAmountToLocal
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapOperationStatusToOperationLocalStatus
@@ -24,7 +24,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onEach
 
 internal class FullSyncPaymentUpdater(
@@ -40,12 +39,10 @@ internal class FullSyncPaymentUpdater(
         storageSubscriptionBuilder: SharedRequestsBuilder,
         scopeValue: MetaAccount,
     ): Flow<Updater.SideEffect> {
-        val metaAccount = scopeValue
-
-        val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
+        val accountId = scopeValue.requireAccountIdIn(chain)
 
         return chain.enabledAssets().mapNotNull { chainAsset ->
-            syncAsset(chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
+            syncAsset(chainAsset, scopeValue, accountId, storageSubscriptionBuilder)
         }
             .mergeIfMultiple()
             .noSideAffects()

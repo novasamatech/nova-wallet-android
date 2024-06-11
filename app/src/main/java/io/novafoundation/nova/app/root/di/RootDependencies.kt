@@ -23,7 +23,6 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
-import io.novafoundation.nova.feature_ledger_api.domain.generic.LedgerGenericAccountsUpdater
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -103,6 +102,4 @@ interface RootDependencies {
     val rootDeepLinkHandler: RootDeepLinkHandler
 
     val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
-
-    val ledgerGenericAccountsUpdater: LedgerGenericAccountsUpdater
 }

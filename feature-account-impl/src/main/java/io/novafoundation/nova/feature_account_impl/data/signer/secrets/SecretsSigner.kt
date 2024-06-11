@@ -7,9 +7,11 @@ import io.novafoundation.nova.common.data.secrets.v2.getMetaAccountKeypair
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionFor
+import io.novafoundation.nova.feature_account_api.domain.model.ethereumAccountId
+import io.novafoundation.nova.feature_account_api.domain.model.substrateFrom
 import io.novafoundation.nova.feature_account_impl.data.signer.LeafSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -86,5 +88,26 @@ class SecretsSigner(
         getChainAccountKeypair(metaAccount.id, accountId)
     } else {
         getMetaAccountKeypair(metaAccount.id, isEthereumBased)
+    }
+
+    /**
+    @return [MultiChainEncryption] for given [accountId] inside this meta account or null in case it was not possible to determine result
+     */
+    private fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray, chainsById: ChainsById): MultiChainEncryption? {
+        return when {
+            substrateAccountId.contentEquals(accountId) -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
+            ethereumAccountId().contentEquals(accountId) -> MultiChainEncryption.Ethereum
+            else -> {
+                val chainAccount = chainAccounts.values.firstOrNull { it.accountId.contentEquals(accountId) } ?: return null
+                val cryptoType = chainAccount.cryptoType ?: return null
+                val chain = chainsById[chainAccount.chainId] ?: return null
+
+                if (chain.isEthereumBased) {
+                    MultiChainEncryption.Ethereum
+                } else {
+                    MultiChainEncryption.substrateFrom(cryptoType)
+                }
+            }
+        }
     }
 }
