@@ -20,7 +20,7 @@ class MetaAccountTypePresentationMapper(
     suspend fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
         var ledgerGenericAvailable: Boolean? = null
 
-        //Cache result of `ledgerMigrationTracker.anyChainSupportsMigrationApp()` in the method scope
+        // Cache result of `ledgerMigrationTracker.anyChainSupportsMigrationApp()` in the method scope
         val genericLedgerAvailabilityChecker: GenericLedgerAvailabilityChecker = {
             if (ledgerGenericAvailable == null) {
                 ledgerGenericAvailable = ledgerMigrationTracker.anyChainSupportsMigrationApp()

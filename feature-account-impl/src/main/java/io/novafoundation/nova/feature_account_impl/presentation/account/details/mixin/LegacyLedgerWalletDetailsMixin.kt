@@ -57,7 +57,6 @@ class LegacyLedgerWalletDetailsMixin(
                 message = resourceManager.getString(R.string.ledger_wallet_details_description)
             )
         }
-
     }
 
     override suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain> {

@@ -61,7 +61,6 @@ class SelectHardwareWalletBottomSheet(
             )
         }
 
-
         polkadotVaultItem(PolkadotVaultVariant.PARITY_SIGNER)
     }
 

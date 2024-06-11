@@ -51,7 +51,7 @@ class LedgerSigner(
     }
 
     override suspend fun supportsCheckMetadataHash(chain: Chain): Boolean {
-        return when(ledgerVariant) {
+        return when (ledgerVariant) {
             LedgerVariant.LEGACY -> chain.additional.isMigrationLedgerAppSupported()
 
             LedgerVariant.GENERIC -> true
