@@ -46,6 +46,7 @@ class BalancesUpdateSystem(
 
     private suspend fun balancesSync(chain: Chain, metaAccount: MetaAccount): Flow<Updater.SideEffect> {
         return when {
+            !metaAccount.hasAccountIn(chain) -> emptyFlow()
             chain.connectionState.isDisabled -> emptyFlow()
             chain.canPerformFullSync() -> fullBalancesSync(chain, metaAccount)
             else -> lightBalancesSync(chain, metaAccount)

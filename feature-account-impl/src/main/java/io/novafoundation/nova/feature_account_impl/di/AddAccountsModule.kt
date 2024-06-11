@@ -7,17 +7,19 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
-import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealGenericLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.RealProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
+import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 
@@ -110,15 +112,29 @@ class AddAccountsModule {
 
     @Provides
     @FeatureScope
-    fun provideLedgerAddAccountRepository(
+    fun provideLegacyLedgerAddAccountRepository(
         accountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2,
         proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
-    ): LedgerAddAccountRepository = RealLedgerAddAccountRepository(
+    ): LegacyLedgerAddAccountRepository = RealLegacyLedgerAddAccountRepository(
         accountDao,
         chainRegistry,
+        secretStoreV2,
+        proxySyncService,
+        metaAccountChangesEventBus
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideGenericLedgerAddAccountRepository(
+        accountDao: MetaAccountDao,
+        secretStoreV2: SecretStoreV2,
+        proxySyncService: ProxySyncService,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus
+    ): GenericLedgerAddAccountRepository = RealGenericLedgerAddAccountRepository(
+        accountDao,
         secretStoreV2,
         proxySyncService,
         metaAccountChangesEventBus

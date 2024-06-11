@@ -42,10 +42,12 @@ fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
     )
 }
 
-fun Map<String, Any?>.modifyNonce(runtimeSnapshot: RuntimeSnapshot, newNonce: BigInteger): Map<String, Any?> {
-    return buildMap {
-        putAll(this@modifyNonce)
+fun SignerPayloadExtrinsic.SignedExtras.modifyNonce(runtimeSnapshot: RuntimeSnapshot, newNonce: BigInteger): SignerPayloadExtrinsic.SignedExtras {
+    val newIncludedInExtrinsic = buildMap {
+        putAll(includedInExtrinsic)
 
         put(DefaultSignedExtensions.CHECK_NONCE, runtimeSnapshot.encodeNonce(newNonce))
     }
+
+    return copy(includedInExtrinsic = newIncludedInExtrinsic)
 }

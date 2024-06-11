@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
@@ -35,7 +36,10 @@ class SelectedWalletView @JvmOverloads constructor(
                 cornerSizeInDp = 80,
             )
 
-            viewSelectedWalletTypeIcon.setImageResource(model.typeIcon)
+            viewSelectedWalletTypeIcon.setImageResource(model.typeIcon.icon)
+            val tint = R.color.icon_primary.takeIf { model.typeIcon.canApplyOwnTint }
+            viewSelectedWalletTypeIcon.setImageTintRes(tint)
+
             viewSelectedWalletTypeIcon.makeVisible()
         } else {
             background = null

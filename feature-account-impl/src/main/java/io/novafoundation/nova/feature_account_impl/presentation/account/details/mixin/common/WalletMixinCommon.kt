@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
@@ -10,7 +11,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.polkadot
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -18,8 +18,8 @@ fun polkadotVaultAccountTypeAlert(
     pokadotVaultVariant: PolkadotVaultVariant,
     variantConfig: PolkadotVaultVariantConfig,
     resourceManager: ResourceManager
-): AccountTypeAlert {
-    return AccountTypeAlert(
+): AlertModel {
+    return AlertModel(
         style = AlertView.Style(
             backgroundColorRes = R.color.block_background,
             iconRes = variantConfig.common.iconRes
@@ -29,8 +29,14 @@ fun polkadotVaultAccountTypeAlert(
 }
 
 fun AccountInChain.polkadotVaultTitle(resourceManager: ResourceManager, metaAccount: MetaAccount): String {
-    val polkadotVaultVariant = metaAccount.type.asPolkadotVaultVariantOrThrow()
-    return resourceManager.formatWithPolkadotVaultLabel(R.string.account_details_parity_signer_not_supported, polkadotVaultVariant)
+    val address = projection?.address
+
+    return if (address != null) {
+        address
+    } else {
+        val polkadotVaultVariant = metaAccount.type.asPolkadotVaultVariantOrThrow()
+        resourceManager.formatWithPolkadotVaultLabel(R.string.account_details_parity_signer_not_supported, polkadotVaultVariant)
+    }
 }
 
 fun AccountInChain.From.mapToAccountHeader(resourceManager: ResourceManager): TextHeader {
@@ -43,11 +49,11 @@ fun AccountInChain.From.mapToAccountHeader(resourceManager: ResourceManager): Te
 }
 
 fun notHasAccountComparator(): Comparator<AccountInChain> {
-    return compareBy<AccountInChain> { !it.hasChainAccount }
+    return compareBy { !it.hasChainAccount }
 }
 
 fun hasAccountComparator(): Comparator<AccountInChain> {
-    return compareBy<AccountInChain> { it.hasChainAccount }
+    return compareBy { it.hasChainAccount }
 }
 
 fun Comparator<AccountInChain>.withChainComparator(): Comparator<AccountInChain> {

@@ -33,6 +33,7 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -147,4 +148,6 @@ interface AccountFeatureDependencies {
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val rootScope: RootScope
+
+    val ledgerMigrationTracker: LedgerMigrationTracker
 }

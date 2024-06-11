@@ -2,25 +2,15 @@ package io.novafoundation.nova.runtime.multiNetwork.runtime
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.md5
-import io.novafoundation.nova.common.utils.newLimitedThreadPoolExecutor
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
-import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
-import io.novasama.substrate_sdk_android.wsrpc.executeAsync
-import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
-import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
 data class SyncInfo(
@@ -40,13 +30,12 @@ class RuntimeSyncService(
     private val typesFetcher: TypesFetcher,
     private val runtimeFilesCache: RuntimeFilesCache,
     private val chainDao: ChainDao,
-    maxConcurrentUpdates: Int = 8,
-) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
+    private val runtimeMetadataFetcher: RuntimeMetadataFetcher,
+    private val cacheMigrator: RuntimeCacheMigrator,
+    private val chainSyncDispatcher: ChainSyncDispatcher,
+) {
 
-    private val syncDispatcher = newLimitedThreadPoolExecutor(maxConcurrentUpdates).asCoroutineDispatcher()
     private val knownChains = ConcurrentHashMap<String, SyncInfo>()
-
-    private val syncingChains = ConcurrentHashMap<String, Job>()
 
     private val _syncStatusFlow = MutableSharedFlow<SyncResult>()
 
@@ -76,32 +65,32 @@ class RuntimeSyncService(
     fun unregisterChain(chainId: String) {
         knownChains.remove(chainId)
 
-        cancelExistingSync(chainId)
+        chainSyncDispatcher.cancelExistingSync(chainId)
     }
 
     // Android may clear cache files sometimes so it necessary to have force sync mechanism
     fun cacheNotFound(chainId: String) {
-        if (!syncingChains.contains(chainId)) {
+        if (!chainSyncDispatcher.isSyncing(chainId)) {
             launchSync(chainId, forceFullSync = true)
         }
     }
 
     fun isSyncing(chainId: String): Boolean {
-        return syncingChains.containsKey(chainId)
+        return chainSyncDispatcher.isSyncing(chainId)
     }
 
     private fun launchSync(
         chainId: String,
         forceFullSync: Boolean = false,
     ) {
-        cancelExistingSync(chainId)
+        chainSyncDispatcher.cancelExistingSync(chainId)
 
-        syncingChains[chainId] = launch(syncDispatcher) {
+        chainSyncDispatcher.launchSync(chainId) {
             val syncResult = runCatching {
                 sync(chainId, forceFullSync)
             }.getOrNull()
 
-            syncFinished(chainId)
+            chainSyncDispatcher.syncFinished(chainId)
 
             syncResult?.let { _syncStatusFlow.emit(it) }
         }
@@ -123,13 +112,13 @@ class RuntimeSyncService(
         val shouldSyncMetadata = runtimeInfo.shouldSyncMetadata() || forceFullSync
 
         val metadataHash = if (shouldSyncMetadata) {
-            val runtimeMetadata = syncInfo.connection.socketService.executeAsync(GetMetadataRequest, mapper = pojo<String>().nonNull())
+            val runtimeMetadata = runtimeMetadataFetcher.fetchRawMetadata(chainId, syncInfo.connection.socketService)
 
             runtimeFilesCache.saveChainMetadata(chainId, runtimeMetadata)
 
-            chainDao.updateSyncedRuntimeVersion(chainId, runtimeInfo.remoteVersion)
+            chainDao.updateSyncedRuntimeVersion(chainId, runtimeInfo.remoteVersion, cacheMigrator.latestVersion())
 
-            runtimeMetadata.md5()
+            runtimeMetadata.metadataContent.md5()
         } else {
             null
         }
@@ -151,13 +140,5 @@ class RuntimeSyncService(
         )
     }
 
-    private fun cancelExistingSync(chainId: String) {
-        syncingChains.remove(chainId)?.apply { cancel() }
-    }
-
-    private fun syncFinished(chainId: String) {
-        syncingChains.remove(chainId)
-    }
-
-    private fun ChainRuntimeInfoLocal.shouldSyncMetadata() = syncedVersion != remoteVersion
+    private fun ChainRuntimeInfoLocal.shouldSyncMetadata() = syncedVersion != remoteVersion || cacheMigrator.needsMetadataFetch(localMigratorVersion)
 }

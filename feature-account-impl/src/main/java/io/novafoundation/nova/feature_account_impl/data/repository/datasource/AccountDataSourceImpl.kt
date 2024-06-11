@@ -24,12 +24,11 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToLightMetaAccount
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToMetaAccount
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
+import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeToLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
@@ -56,7 +55,7 @@ class AccountDataSourceImpl(
     private val encryptedPreferences: EncryptedPreferences,
     private val nodeDao: NodeDao,
     private val metaAccountDao: MetaAccountDao,
-    private val chainRegistry: ChainRegistry,
+    private val accountMappers: AccountMappers,
     private val secretStoreV2: SecretStoreV2,
     secretStoreV1: SecretStoreV1,
     accountDataMigration: AccountDataMigration,
@@ -77,7 +76,7 @@ class AccountDataSourceImpl(
 
     private val selectedMetaAccountFlow = selectedMetaAccountLocal
         .filterNotNull()
-        .map(::mapMetaAccountLocalToMetaAccount)
+        .map(accountMappers::mapMetaAccountLocalToMetaAccount)
         .inBackground()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
@@ -135,7 +134,7 @@ class AccountDataSourceImpl(
 
     override suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount? {
         return metaAccountDao.getMetaAccountInfo(accountId, chainId)
-            ?.let(::mapMetaAccountLocalToMetaAccount)
+            ?.let { accountMappers.mapMetaAccountLocalToMetaAccount(it) }
     }
 
     override suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String? {
@@ -143,33 +142,32 @@ class AccountDataSourceImpl(
     }
 
     override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
-        return metaAccountDao.getMetaAccountsInfoByStatus(MetaAccountLocal.Status.ACTIVE)
-            .map(::mapMetaAccountLocalToMetaAccount)
-    }
-
-    override suspend fun activeMetaAccounts(): List<MetaAccount> {
-        return metaAccountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
-            .map(::mapMetaAccountLocalToMetaAccount)
+        val local = metaAccountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
+        return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {
         return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
     }
 
+    override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
+        return metaAccountDao.getMetaAccountIdsByType(mapMetaAccountTypeToLocal(type))
+    }
+
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
-        return metaAccountDao.getMetaAccounts().map(::mapMetaAccountLocalToLightMetaAccount)
+        return metaAccountDao.getMetaAccounts().map(accountMappers::mapMetaAccountLocalToLightMetaAccount)
     }
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
         return metaAccountDao.getJoinedMetaAccountsInfoFlow().map { accountsLocal ->
-            accountsLocal.map(::mapMetaAccountLocalToMetaAccount)
+            accountMappers.mapMetaAccountsLocalToMetaAccounts(accountsLocal)
         }
     }
 
     override fun activeMetaAccountsFlow(): Flow<List<MetaAccount>> {
         return metaAccountDao.getJoinedMetaAccountsInfoByStatusFlow(MetaAccountLocal.Status.ACTIVE)
             .map { accountsLocal ->
-                accountsLocal.map(::mapMetaAccountLocalToMetaAccount)
+                accountMappers.mapMetaAccountsLocalToMetaAccounts(accountsLocal)
             }
     }
 
@@ -208,12 +206,12 @@ class AccountDataSourceImpl(
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
 
-        return mapMetaAccountLocalToMetaAccount(joinedMetaAccountInfo)
+        return accountMappers.mapMetaAccountLocalToMetaAccount(joinedMetaAccountInfo)
     }
 
     override fun metaAccountFlow(metaId: Long): Flow<MetaAccount> {
         return metaAccountDao.metaAccountInfoFlow(metaId).mapNotNull { local ->
-            local?.let(::mapMetaAccountLocalToMetaAccount)
+            local?.let { accountMappers.mapMetaAccountLocalToMetaAccount(it) }
         }
     }
 

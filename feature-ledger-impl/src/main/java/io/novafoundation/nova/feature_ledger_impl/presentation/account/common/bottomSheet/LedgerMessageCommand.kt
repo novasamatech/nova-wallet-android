@@ -5,14 +5,18 @@ import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_ledger_impl.R
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageActions
+import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageAlert
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageCancel
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageConfirm
 import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageContainer
@@ -23,12 +27,15 @@ import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageTitle
 
 sealed class LedgerMessageCommand {
 
+    companion object
+
     object Hide : LedgerMessageCommand()
 
     sealed class Show(
         val title: String,
         val subtitle: String,
         val graphics: Graphics,
+        val alert: AlertModel?,
         val onCancel: () -> Unit,
     ) : LedgerMessageCommand() {
 
@@ -36,24 +43,27 @@ sealed class LedgerMessageCommand {
             title: String,
             subtitle: String,
             graphics: Graphics = Graphics.error(),
+            alert: AlertModel?,
             onCancel: () -> Unit,
-        ) : Show(title, subtitle, graphics, onCancel) {
+        ) : Show(title, subtitle, graphics, alert, onCancel) {
 
             class RecoverableError(
                 title: String,
                 subtitle: String,
                 graphics: Graphics = Graphics.error(),
+                alert: AlertModel?,
                 onCancel: () -> Unit,
                 val onRetry: () -> Unit
-            ) : Error(title, subtitle, graphics, onCancel)
+            ) : Error(title, subtitle, graphics, alert, onCancel)
 
             class FatalError(
                 title: String,
                 subtitle: String,
                 graphics: Graphics = Graphics.error(),
+                alert: AlertModel?,
                 val onConfirm: () -> Unit,
                 onCancel: () -> Unit = onConfirm, // when error is fatal, confirm is the same as hide by default
-            ) : Error(title, subtitle, graphics, onCancel)
+            ) : Error(title, subtitle, graphics, alert, onCancel)
         }
 
         class Info(
@@ -61,8 +71,9 @@ sealed class LedgerMessageCommand {
             subtitle: String,
             graphics: Graphics = Graphics.info(),
             onCancel: () -> Unit,
+            alert: AlertModel?,
             val footer: Footer
-        ) : Show(title, subtitle, graphics, onCancel)
+        ) : Show(title, subtitle, graphics, alert, onCancel)
     }
 
     sealed class Footer {
@@ -170,7 +181,25 @@ class LedgerMessageBottomSheet(
         ledgerMessageSubtitle.text = command.subtitle
         ledgerMessageGraphics.setIcon(command.graphics.icon, command.graphics.iconTint)
         ledgerMessageGraphics.setLedgerImage(command.graphics.background)
+        ledgerMessageAlert.setModelOrHide(command.alert)
 
         setOnCancelListener { command.onCancel() }
     }
+}
+
+fun LedgerMessageCommand.Companion.reviewAddress(
+    resourceManager: ResourceManager,
+    deviceName: String,
+    address: String,
+    onCancel: () -> Unit
+): LedgerMessageCommand {
+    return LedgerMessageCommand.Show.Info(
+        title = resourceManager.getString(R.string.ledger_review_approve_title),
+        subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle, deviceName),
+        onCancel = onCancel,
+        alert = null,
+        footer = LedgerMessageCommand.Footer.Value(
+            value = address,
+        )
+    )
 }

@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 
 class AccountFormatterFactory(
     private val iconGenerator: AddressIconGenerator,
@@ -49,7 +49,7 @@ class AccountFormatter(
         }
     }
 
-    private suspend fun availableActionsFor(accountInChain: AccountInChain, availableActions: Set<AccountAction>): Set<AccountAction> {
+    private fun availableActionsFor(accountInChain: AccountInChain, availableActions: Set<AccountAction>): Set<AccountAction> {
         return availableActions.filterToSet { action ->
             when (action) {
                 AccountAction.CHANGE -> true

@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 class RuntimeProviderPool(
     private val runtimeFactory: RuntimeFactory,
     private val runtimeSyncService: RuntimeSyncService,
+    private val runtimeFilesCache: RuntimeFilesCache,
     private val baseTypeSynchronizer: BaseTypeSynchronizer
 ) {
 
@@ -17,7 +18,7 @@ class RuntimeProviderPool(
 
     fun setupRuntimeProvider(chain: Chain): RuntimeProvider {
         val provider = pool.getOrPut(chain.id) {
-            RuntimeProvider(runtimeFactory, runtimeSyncService, baseTypeSynchronizer, chain)
+            RuntimeProvider(runtimeFactory, runtimeSyncService, baseTypeSynchronizer, runtimeFilesCache, chain)
         }
 
         provider.considerUpdatingTypesUsage(chain.typesUsage)

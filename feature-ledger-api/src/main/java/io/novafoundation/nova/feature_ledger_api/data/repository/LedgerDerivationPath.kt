@@ -9,4 +9,8 @@ object LedgerDerivationPath {
     fun derivationPathSecretKey(chainId: ChainId): String {
         return "$LEDGER_DERIVATION_PATH_KEY.$chainId"
     }
+
+    fun genericDerivationPathSecretKey(): String {
+        return "$LEDGER_DERIVATION_PATH_KEY.Generic"
+    }
 }

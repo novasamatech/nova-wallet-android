@@ -54,7 +54,15 @@ class MetaAccountLocal(
     var id: Long = 0
 
     enum class Type {
-        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT, PROXIED
+        SECRETS,
+        WATCH_ONLY,
+        PARITY_SIGNER,
+
+        // We did not rename LEDGER -> LEDGER_LEGACY as in domain to avoid writing a migration
+        LEDGER,
+        LEDGER_GENERIC,
+        POLKADOT_VAULT,
+        PROXIED
     }
 }
 

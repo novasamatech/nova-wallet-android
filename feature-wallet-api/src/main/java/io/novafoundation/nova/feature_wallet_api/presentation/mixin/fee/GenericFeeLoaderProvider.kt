@@ -108,6 +108,10 @@ private open class GenericFeeLoaderProvider<F : GenericFee>(
         }
     }
 
+    override suspend fun setFeeStatus(feeStatus: FeeStatus<F>) {
+        feeLiveData.postValue(feeStatus)
+    }
+
     override fun invalidateFee() {
         feeLiveData.postValue(FeeStatus.Loading)
     }
