@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.extrinsic
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataProof
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -13,7 +14,6 @@ import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
 import java.math.BigInteger
 
 class ExtrinsicBuilderFactory(
@@ -38,7 +38,7 @@ class ExtrinsicBuilderFactory(
      */
     suspend fun create(
         chain: Chain,
-        signer: Signer,
+        signer: NovaSigner,
         accountId: AccountId,
     ): ExtrinsicBuilder {
         return createMulti(chain, signer, accountId).first()
@@ -53,7 +53,7 @@ class ExtrinsicBuilderFactory(
 
     suspend fun createMulti(
         chain: Chain,
-        signer: Signer,
+        signer: NovaSigner,
         accountId: AccountId,
     ): Sequence<ExtrinsicBuilder> {
         val runtime = chainRegistry.getRuntime(chain.id)
@@ -65,7 +65,7 @@ class ExtrinsicBuilderFactory(
         val baseNonce = rpcCalls.getNonce(chain.id, accountAddress)
         var nonceOffset = BigInteger.ZERO
 
-        val metadataProof = metadataShortenerService.generateMetadataProof(chain.id)
+        val metadataProof = metadataShortenerService.generateMetadataProofWithSignerRestrictions(chain, signer)
 
         return generateSequence {
             val newElement = ExtrinsicBuilder(
@@ -85,6 +85,17 @@ class ExtrinsicBuilderFactory(
             nonceOffset++
 
             newElement
+        }
+    }
+
+    private suspend fun MetadataShortenerService.generateMetadataProofWithSignerRestrictions(
+        chain: Chain,
+        signer: NovaSigner,
+    ): MetadataProof {
+        return if (signer.supportsCheckMetadataHash(chain)) {
+            generateMetadataProof(chain.id)
+        } else {
+            generateDisabledMetadataProof(chain.id)
         }
     }
 }

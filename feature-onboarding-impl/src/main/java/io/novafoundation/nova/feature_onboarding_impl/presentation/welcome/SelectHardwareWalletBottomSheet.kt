@@ -13,8 +13,13 @@ import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.model
 
 class SelectHardwareWalletBottomSheet(
     context: Context,
+    private val payload: Payload,
     private val onSuccess: (HardwareWalletModel) -> Unit
 ) : FixedListBottomSheet(context) {
+
+    class Payload(
+        val genericLedgerSupported: Boolean
+    )
 
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
 
@@ -31,20 +36,30 @@ class SelectHardwareWalletBottomSheet(
 
         polkadotVaultItem(PolkadotVaultVariant.POLKADOT_VAULT)
 
-        textItem(
-            iconRes = R.drawable.ic_ledger,
-            titleRes = R.string.account_ledger_nano_x_generic,
-            showArrow = true,
-            onClick = { onSuccess(HardwareWalletModel.LedgerGeneric) }
-        )
+        if (payload.genericLedgerSupported) {
+            textItem(
+                iconRes = R.drawable.ic_ledger,
+                titleRes = R.string.account_ledger_nano_x_generic,
+                showArrow = true,
+                onClick = { onSuccess(HardwareWalletModel.LedgerGeneric) }
+            )
 
-        textItem(
-            iconRes = R.drawable.ic_ledger_legacy,
-            titleRes = R.string.account_ledger_nano_x_legacy,
-            showArrow = true,
-            applyIconTint = false,
-            onClick = { onSuccess(HardwareWalletModel.LedgerLegacy) }
-        )
+            textItem(
+                iconRes = R.drawable.ic_ledger_legacy,
+                titleRes = R.string.account_ledger_nano_x_legacy,
+                showArrow = true,
+                applyIconTint = false,
+                onClick = { onSuccess(HardwareWalletModel.LedgerLegacy) }
+            )
+        } else {
+            textItem(
+                iconRes = R.drawable.ic_ledger,
+                titleRes = R.string.account_ledger_nano_x,
+                showArrow = true,
+                applyIconTint = false,
+                onClick = { onSuccess(HardwareWalletModel.LedgerLegacy) }
+            )
+        }
 
         polkadotVaultItem(PolkadotVaultVariant.PARITY_SIGNER)
     }

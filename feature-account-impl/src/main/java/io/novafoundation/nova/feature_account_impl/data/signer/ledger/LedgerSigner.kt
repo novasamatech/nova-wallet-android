@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignC
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.SeparateFlowSigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.runtime.ext.isMigrationLedgerAppSupported
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
@@ -39,13 +41,21 @@ class LedgerSigner(
     private val signFlowRequester: LedgerSignCommunicator,
     private val ledgerVariant: LedgerVariant,
     private val resourceManager: ResourceManager,
-    private val messageSigningNotSupported: SigningNotSupportedPresentable
+    private val messageSigningNotSupported: SigningNotSupportedPresentable,
 ) : SeparateFlowSigner(signingSharedState, signFlowRequester, metaAccount) {
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         signFlowRequester.setUsedVariant(ledgerVariant)
 
         return super.signExtrinsic(payloadExtrinsic)
+    }
+
+    override suspend fun supportsCheckMetadataHash(chain: Chain): Boolean {
+        return when (ledgerVariant) {
+            LedgerVariant.LEGACY -> chain.additional.isMigrationLedgerAppSupported()
+
+            LedgerVariant.GENERIC -> true
+        }
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
@@ -27,6 +28,7 @@ class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel>() {
         startImportLedgerToolbar.applyStatusBarInsets()
 
         startImportLedgerContinue.setOnClickListener { viewModel.continueClicked() }
+
         startImportLedgerDepractionWarning.setOnClickListener { viewModel.deprecationWarningClicked() }
 
         startImportLedgerGuideLink.setOnClickListener { viewModel.guideClicked() }
@@ -41,5 +43,7 @@ class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel>() {
 
     override fun subscribe(viewModel: StartImportLedgerViewModel) {
         observeBrowserEvents(viewModel)
+
+        viewModel.shouldShowWarning.observe(startImportLedgerDepractionWarning::setVisible)
     }
 }

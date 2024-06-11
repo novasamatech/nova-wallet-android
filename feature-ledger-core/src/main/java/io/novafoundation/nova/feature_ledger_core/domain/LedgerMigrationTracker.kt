@@ -17,6 +17,8 @@ interface LedgerMigrationTracker {
 
     suspend fun supportedChainsByGenericApp(): List<Chain>
 
+    suspend fun anyChainSupportsMigrationApp(): Boolean
+
     fun supportedChainIdsByGenericAppFlow(): Flow<Set<ChainId>>
 }
 
@@ -26,13 +28,23 @@ internal class RealLedgerMigrationTracker(
 ) : LedgerMigrationTracker {
 
     override suspend fun shouldUseMigrationApp(chainId: ChainId): Boolean {
-        return metadataShortenerService.isCheckMetadataHashAvailable(chainId)
+        val supportedFromRuntime = metadataShortenerService.isCheckMetadataHashAvailable(chainId)
+
+        // We additionally check for configuration flag since Kusama will upgrade before Generic/Migration apps will be released
+        // We can lift this restriction once Generic/Migration apps are released
+        val supportedFromLedger = chainRegistry.getChain(chainId).additional.isGenericLedgerAppSupported()
+
+        return supportedFromRuntime && supportedFromLedger
     }
 
     override suspend fun supportedChainsByGenericApp(): List<Chain> {
         return chainRegistry.findChains {
             it.additional.isGenericLedgerAppSupported()
         }
+    }
+
+    override suspend fun anyChainSupportsMigrationApp(): Boolean {
+        return supportedChainsByGenericApp().isNotEmpty()
     }
 
     override fun supportedChainIdsByGenericAppFlow(): Flow<Set<ChainId>> {

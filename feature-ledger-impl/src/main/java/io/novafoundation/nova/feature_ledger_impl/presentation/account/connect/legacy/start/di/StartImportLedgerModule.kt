@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.StartImportLedgerViewModel
 
@@ -21,8 +22,9 @@ class StartImportLedgerModule {
     fun provideViewModel(
         router: LedgerRouter,
         appLinksProvider: AppLinksProvider,
+        ledgerMigrationTracker: LedgerMigrationTracker,
     ): ViewModel {
-        return StartImportLedgerViewModel(router, appLinksProvider)
+        return StartImportLedgerViewModel(router, appLinksProvider, ledgerMigrationTracker)
     }
 
     @Provides

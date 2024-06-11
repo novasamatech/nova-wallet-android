@@ -100,6 +100,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.R
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
@@ -423,7 +424,8 @@ class AccountFeatureModule {
     fun provideAccountTypePresentationMapper(
         resourceManager: ResourceManager,
         polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-    ) = MetaAccountTypePresentationMapper(resourceManager, polkadotVaultVariantConfigProvider)
+        ledgerMigrationTracker: LedgerMigrationTracker
+    ) = MetaAccountTypePresentationMapper(resourceManager, polkadotVaultVariantConfigProvider, ledgerMigrationTracker)
 
     @Provides
     @FeatureScope
