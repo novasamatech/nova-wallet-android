@@ -43,7 +43,8 @@ class WalletDetailsMixinFactory(
                 interactor = interactor,
                 host = host,
                 appLinksProvider = appLinksProvider,
-                metaAccount = metaAccount
+                metaAccount = metaAccount,
+                ledgerMigrationTracker = ledgerMigrationTracker
             )
 
             Type.LEDGER -> GenericLedgerWalletDetailsMixin(

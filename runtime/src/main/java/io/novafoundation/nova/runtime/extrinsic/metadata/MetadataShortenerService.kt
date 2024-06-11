@@ -30,6 +30,8 @@ interface MetadataShortenerService {
     suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ByteArray
 
     suspend fun generateMetadataProof(chainId: ChainId): MetadataProof
+
+    suspend fun generateDisabledMetadataProof(chainId: ChainId): MetadataProof
 }
 
 private const val MINIMUM_METADATA_VERSION_TO_CALCULATE_HASH = 15
@@ -90,6 +92,15 @@ internal class RealMetadataShortenerService(
                 )
             }
         }
+    }
+
+    override suspend fun generateDisabledMetadataProof(chainId: ChainId): MetadataProof {
+        val runtimeVersion = rpcCalls.getRuntimeVersion(chainId)
+
+        return MetadataProof(
+            checkMetadataHash = CheckMetadataHash.Disabled,
+            usedVersion = runtimeVersion,
+        )
     }
 
     private suspend fun generateMetadataProofOrDisabled(

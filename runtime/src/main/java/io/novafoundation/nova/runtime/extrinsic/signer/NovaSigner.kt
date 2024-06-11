@@ -7,6 +7,15 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadE
 
 interface NovaSigner : Signer {
 
+    /**
+     * Indicate whether it is possible to include CheckMetadataHash.Enabled into extrinsic
+     * This method will become redundant once Ledger releases both Generic and Migration apps
+     * After that, there wont be a need in additional check and runtime-based check will be enough
+     */
+    suspend fun supportsCheckMetadataHash(chain: Chain): Boolean {
+        return true
+    }
+
     suspend fun signerAccountId(chain: Chain): AccountId
 
     suspend fun modifyPayload(payloadExtrinsic: SignerPayloadExtrinsic): SignerPayloadExtrinsic

@@ -101,6 +101,8 @@ abstract class NewSubstrateLedgerApplication(
 
         val wholePayload = payloadBytes + metadataProof
 
+        Log.d("Ledger", "Whole payload size: ${wholePayload.size}, metadata proof size: ${metadataProof.size}")
+
         val firstChunk = encodedDerivationPath + encodedTxPayloadLength
         val nextChunks = wholePayload.chunked(CHUNK_SIZE)
 
