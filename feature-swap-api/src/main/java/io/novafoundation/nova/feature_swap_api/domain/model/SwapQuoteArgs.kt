@@ -17,12 +17,9 @@ data class SwapQuoteArgs(
 )
 
 class SwapExecuteArgs(
-    val assetIn: Chain.Asset,
-    val assetOut: Chain.Asset,
-    val customFeeAsset: Chain.Asset?,
-    val swapLimit: SwapLimit,
+    val quote: SwapQuote,
     val nativeAsset: Asset,
-    val path: QuotePath
+    val customFeeAsset: Chain.Asset?,
 )
 
 val SwapExecuteArgs.feeAsset: Chain.Asset

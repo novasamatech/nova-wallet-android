@@ -104,6 +104,13 @@ suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     }.awaitAll()
 }
 
+suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> List<R>): List<R> {
+    return coroutineScope {
+        map { async { operation(it) } }
+    }.awaitAll().flatten()
+}
+
+
 fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     if (prefix.size > size) return false
 

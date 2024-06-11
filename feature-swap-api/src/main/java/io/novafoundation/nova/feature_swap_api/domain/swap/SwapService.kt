@@ -22,9 +22,12 @@ interface SwapService {
 
     suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean
 
-    suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote>
+    suspend fun quote(
+        args: SwapQuoteArgs,
+        computationSharingScope: CoroutineScope
+    ): Result<SwapQuote>
 
-    suspend fun estimateFee(args: SwapExecuteArgs): SwapFee
+    suspend fun estimateFee(quote: SwapQuote): SwapFee
 
     suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission>
 

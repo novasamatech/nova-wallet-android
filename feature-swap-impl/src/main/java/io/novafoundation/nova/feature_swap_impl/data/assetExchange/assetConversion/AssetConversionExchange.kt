@@ -2,28 +2,24 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConvers
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.assetConversion
-import io.novafoundation.nova.common.utils.mutableMultiMapOf
-import io.novafoundation.nova.common.utils.put
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransaction
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransactionArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransactionFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
+import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -35,7 +31,6 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.assetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
@@ -95,49 +90,11 @@ private class AssetConversionExchange(
         return true
     }
 
-    override suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId> {
+    override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
         return remoteStorageSource.query(chain.id) {
             val allPools = metadata.assetConversionOrNull?.pools?.keys().orEmpty()
 
             constructAllAvailableDirections(allPools)
-        }
-    }
-
-    override suspend fun quote(args: AssetExchangeQuoteArgs): AssetExchangeQuote {
-        val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
-        val quotedBalance = runtimeCallsApi.quote(
-            swapDirection = args.swapDirection,
-            assetIn = args.chainAssetIn,
-            assetOut = args.chainAssetOut,
-            amount = args.amount
-        ) ?: throw SwapQuoteException.NotEnoughLiquidity
-
-        val quotePath = QuotePath(
-            segments = listOf(
-                QuotePath.Segment(
-                    from = args.chainAssetIn.fullId,
-                    to = args.chainAssetOut.fullId,
-                    sourceId = SOURCE_ID,
-                    sourceParams = emptyMap()
-                )
-            )
-        )
-
-        return AssetExchangeQuote(quote = quotedBalance, path = quotePath, direction = args.swapDirection)
-    }
-
-    override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
-        val nativeAssetFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
-            executeSwap(args, sendTo = chain.emptyAccountId())
-        }
-
-        return convertNativeFeeToPayingTokenFee(nativeAssetFee, args)
-    }
-
-    override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
-        return extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) { submissionOrigin ->
-            // Send swapped funds to the requested origin since it the account doing the swap
-            executeSwap(args, sendTo = submissionOrigin.requestedOrigin)
         }
     }
 
@@ -151,133 +108,16 @@ private class AssetConversionExchange(
             .map { ReQuoteTrigger }
     }
 
-    private suspend fun constructAllAvailableDirections(pools: List<Pair<MultiLocation, MultiLocation>>): MultiMap<FullChainAssetId, FullChainAssetId> {
-        val multiMap = mutableMultiMapOf<FullChainAssetId, FullChainAssetId>()
+    private suspend fun constructAllAvailableDirections(pools: List<Pair<MultiLocation, MultiLocation>>): List<AssetConversionEdge> {
+        return buildList {
+            pools.forEach { (firstLocation, secondLocation) ->
+                val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@forEach
+                val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@forEach
 
-        pools.forEach { (firstLocation, secondLocation) ->
-            val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@forEach
-            val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@forEach
-
-            val firstAssetId = firstAsset.fullId
-            val secondAssetId = secondAsset.fullId
-
-            multiMap.put(firstAssetId, secondAssetId)
-            multiMap.put(secondAssetId, firstAssetId)
+                add(AssetConversionEdge(firstAsset, secondAsset))
+                add(AssetConversionEdge(secondAsset, firstAsset))
+            }
         }
-
-        return multiMap
-    }
-
-    private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee, args: SwapExecuteArgs): AssetExchangeFee {
-        val customFeeAsset = args.customFeeAsset
-
-        return if (customFeeAsset != null && !customFeeAsset.isCommissionAsset()) {
-            calculateCustomTokenFee(nativeTokenFee, args.nativeAsset, customFeeAsset)
-        } else {
-            AssetExchangeFee(nativeTokenFee, MinimumBalanceBuyIn.NoBuyInNeeded)
-        }
-    }
-
-    // TODO we purposefully do not use `nativeTokenFee.amountByRequestedAccount`
-    // since we have disabled fee payment in custom tokens for accounts where the difference matters (e.g. proxy)
-    // We should adapt it if we decide to remove the restriction
-    private suspend fun calculateCustomTokenFee(
-        nativeTokenFee: Fee,
-        nativeAsset: Asset,
-        customFeeAsset: Chain.Asset
-    ): AssetExchangeFee {
-        val nativeChainAsset = nativeAsset.token.configuration
-        val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
-        val assetBalances = assetSourceRegistry.sourceFor(nativeChainAsset).balance
-
-        val minimumBalance = assetBalances.existentialDeposit(chain, nativeChainAsset)
-        // https://github.com/paritytech/polkadot-sdk/blob/39c04fdd9622792ba8478b1c1c300417943a034b/substrate/frame/transaction-payment/asset-conversion-tx-payment/src/payment.rs#L114
-        val shouldBuyMinimumBalance = nativeAsset.balanceCountedTowardsEDInPlanks < minimumBalance + nativeTokenFee.amount
-
-        val toBuyNativeFee = runtimeCallsApi.quoteFeeConversion(nativeTokenFee.amount, customFeeAsset)
-
-        val minimumBalanceBuyIn = if (shouldBuyMinimumBalance) {
-            val totalConverted = nativeTokenFee.amount + minimumBalance
-
-            val forFeesAndMinBalance = runtimeCallsApi.quoteFeeConversion(totalConverted, customFeeAsset)
-            val forMinBalance = forFeesAndMinBalance - toBuyNativeFee
-
-            MinimumBalanceBuyIn.NeedsToBuyMinimumBalance(
-                nativeAsset = nativeAsset.token.configuration,
-                nativeMinimumBalance = minimumBalance,
-                commissionAsset = customFeeAsset,
-                commissionAssetToSpendOnBuyIn = forMinBalance
-            )
-        } else {
-            MinimumBalanceBuyIn.NoBuyInNeeded
-        }
-
-        return AssetExchangeFee(
-            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin),
-            minimumBalanceBuyIn = minimumBalanceBuyIn
-        )
-    }
-
-    private suspend fun RuntimeCallsApi.quoteFeeConversion(commissionAmountOut: Balance, customFeeToken: Chain.Asset): Balance {
-        val quotedAmount = quote(
-            swapDirection = SwapDirection.SPECIFIED_OUT,
-            assetIn = customFeeToken,
-            assetOut = chain.utilityAsset,
-            amount = commissionAmountOut
-        )
-
-        return requireNotNull(quotedAmount)
-    }
-
-    private suspend fun ExtrinsicBuilder.executeSwap(swapExecuteArgs: SwapExecuteArgs, sendTo: AccountId) {
-        val path = listOf(swapExecuteArgs.assetIn, swapExecuteArgs.assetOut)
-            .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset) }
-
-        val keepAlive = false
-
-        when (val swapLimit = swapExecuteArgs.swapLimit) {
-            is SwapLimit.SpecifiedIn -> call(
-                moduleName = Modules.ASSET_CONVERSION,
-                callName = "swap_exact_tokens_for_tokens",
-                arguments = mapOf(
-                    "path" to path,
-                    "amount_in" to swapLimit.expectedAmountIn,
-                    "amount_out_min" to swapLimit.amountOutMin,
-                    "send_to" to sendTo,
-                    "keep_alive" to keepAlive
-                )
-            )
-
-            is SwapLimit.SpecifiedOut -> call(
-                moduleName = Modules.ASSET_CONVERSION,
-                callName = "swap_tokens_for_exact_tokens",
-                arguments = mapOf(
-                    "path" to path,
-                    "amount_out" to swapLimit.expectedAmountOut,
-                    "amount_in_max" to swapLimit.amountInMax,
-                    "send_to" to sendTo,
-                    "keep_alive" to keepAlive
-                )
-            )
-        }
-
-        setFeeAsset(swapExecuteArgs.customFeeAsset)
-    }
-
-    private suspend fun ExtrinsicBuilder.setFeeAsset(feeAsset: Chain.Asset?) {
-        if (feeAsset == null || feeAsset.isCommissionAsset()) return
-
-        val assetId = multiLocationConverter.encodableMultiLocationOf(feeAsset)
-
-        assetTxPayment(assetId)
-    }
-
-    private fun Chain.Asset.isCommissionAsset(): Boolean {
-        return fullId == chain.commissionAsset.fullId
-    }
-
-    private suspend fun MultiLocationConverter.encodableMultiLocationOf(chainAsset: Chain.Asset): Any? {
-        return toMultiLocationOrThrow(chainAsset).toEncodableInstance()
     }
 
     private suspend fun RuntimeCallsApi.quote(
@@ -318,5 +158,164 @@ private class AssetConversionExchange(
         val assetIdType = assetIdArgument.type!!
 
         return assetIdType.name
+    }
+
+    private inner class AssetConversionEdge(fromAsset: Chain.Asset, toAsset: Chain.Asset) : BaseSwapGraphEdge(fromAsset, toAsset) {
+
+        override suspend fun beginTransaction(args: SwapTransactionArgs): SwapTransaction {
+            return AssetConversionTransaction(args, fromAsset, toAsset)
+        }
+
+        override suspend fun appendTransaction(currentTransaction: SwapTransaction, args: SwapTransactionArgs): SwapTransaction? {
+            return null
+        }
+
+        override suspend fun quote(
+            amount: Balance,
+            direction: SwapDirection
+        ): Balance {
+            val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
+
+            return runtimeCallsApi.quote(
+                swapDirection = direction,
+                assetIn = fromAsset,
+                assetOut = toAsset,
+                amount = amount
+            ) ?: throw SwapQuoteException.NotEnoughLiquidity
+        }
+    }
+
+    class AssetConversionTransaction(
+        private val transactionArgs: SwapTransactionArgs,
+        private val fromAsset: Chain.Asset,
+        private val toAsset: Chain.Asset
+    ): SwapTransaction {
+
+        override suspend fun estimateFee(): SwapTransactionFee {
+            val nativeAssetFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+                executeSwap(sendTo = chain.emptyAccountId())
+            }
+
+            return convertNativeFeeToPayingTokenFee(nativeAssetFee)
+        }
+
+        override suspend fun submit(): Result<*> {
+            return extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) { submissionOrigin ->
+                // Send swapped funds to the requested origin since it the account doing the swap
+                executeSwap(sendTo = submissionOrigin.requestedOrigin)
+            }
+        }
+
+        private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee): SwapTransactionFee {
+            val customFeeAsset = transactionArgs.customFeeAsset
+
+            return if (customFeeAsset != null && !customFeeAsset.isCommissionAsset()) {
+                calculateCustomTokenFee(nativeTokenFee, transactionArgs.nativeAsset, customFeeAsset)
+            } else {
+                SwapTransactionFee(nativeTokenFee, MinimumBalanceBuyIn.NoBuyInNeeded)
+            }
+        }
+
+        private suspend fun ExtrinsicBuilder.executeSwap(sendTo: AccountId) {
+            val path = listOf(fromAsset, toAsset)
+                .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset) }
+
+            val keepAlive = false
+
+            when (val swapLimit = transactionArgs.swapLimit) {
+                is SwapLimit.SpecifiedIn -> call(
+                    moduleName = Modules.ASSET_CONVERSION,
+                    callName = "swap_exact_tokens_for_tokens",
+                    arguments = mapOf(
+                        "path" to path,
+                        "amount_in" to swapLimit.expectedAmountIn,
+                        "amount_out_min" to swapLimit.amountOutMin,
+                        "send_to" to sendTo,
+                        "keep_alive" to keepAlive
+                    )
+                )
+
+                is SwapLimit.SpecifiedOut -> call(
+                    moduleName = Modules.ASSET_CONVERSION,
+                    callName = "swap_tokens_for_exact_tokens",
+                    arguments = mapOf(
+                        "path" to path,
+                        "amount_out" to swapLimit.expectedAmountOut,
+                        "amount_in_max" to swapLimit.amountInMax,
+                        "send_to" to sendTo,
+                        "keep_alive" to keepAlive
+                    )
+                )
+            }
+
+            setFeeAsset(transactionArgs.customFeeAsset)
+        }
+
+        private suspend fun ExtrinsicBuilder.setFeeAsset(feeAsset: Chain.Asset?) {
+            if (feeAsset == null || feeAsset.isCommissionAsset()) return
+
+            val assetId = multiLocationConverter.encodableMultiLocationOf(feeAsset)
+
+            assetTxPayment(assetId)
+        }
+
+        // TODO we purposefully do not use `nativeTokenFee.amountByRequestedAccount`
+        // since we have disabled fee payment in custom tokens for accounts where the difference matters (e.g. proxy)
+        // We should adapt it if we decide to remove the restriction
+        private suspend fun calculateCustomTokenFee(
+            nativeTokenFee: Fee,
+            nativeAsset: Asset,
+            customFeeAsset: Chain.Asset
+        ): SwapTransactionFee {
+            val nativeChainAsset = nativeAsset.token.configuration
+            val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
+            val assetBalances = assetSourceRegistry.sourceFor(nativeChainAsset).balance
+
+            val minimumBalance = assetBalances.existentialDeposit(chain, nativeChainAsset)
+            // https://github.com/paritytech/polkadot-sdk/blob/39c04fdd9622792ba8478b1c1c300417943a034b/substrate/frame/transaction-payment/asset-conversion-tx-payment/src/payment.rs#L114
+            val shouldBuyMinimumBalance = nativeAsset.balanceCountedTowardsEDInPlanks < minimumBalance + nativeTokenFee.amount
+
+            val toBuyNativeFee = runtimeCallsApi.quoteFeeConversion(nativeTokenFee.amount, customFeeAsset)
+
+            val minimumBalanceBuyIn = if (shouldBuyMinimumBalance) {
+                val totalConverted = nativeTokenFee.amount + minimumBalance
+
+                val forFeesAndMinBalance = runtimeCallsApi.quoteFeeConversion(totalConverted, customFeeAsset)
+                val forMinBalance = forFeesAndMinBalance - toBuyNativeFee
+
+                MinimumBalanceBuyIn.NeedsToBuyMinimumBalance(
+                    nativeAsset = nativeAsset.token.configuration,
+                    nativeMinimumBalance = minimumBalance,
+                    commissionAsset = customFeeAsset,
+                    commissionAssetToSpendOnBuyIn = forMinBalance
+                )
+            } else {
+                MinimumBalanceBuyIn.NoBuyInNeeded
+            }
+
+            return SwapTransactionFee(
+                networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin),
+                minimumBalanceBuyIn = minimumBalanceBuyIn
+            )
+        }
+
+        private suspend fun RuntimeCallsApi.quoteFeeConversion(commissionAmountOut: Balance, customFeeToken: Chain.Asset): Balance {
+            val quotedAmount = quote(
+                swapDirection = SwapDirection.SPECIFIED_OUT,
+                assetIn = customFeeToken,
+                assetOut = chain.utilityAsset,
+                amount = commissionAmountOut
+            )
+
+            return requireNotNull(quotedAmount)
+        }
+
+        private fun Chain.Asset.isCommissionAsset(): Boolean {
+            return fullId == chain.commissionAsset.fullId
+        }
+
+        private suspend fun MultiLocationConverter.encodableMultiLocationOf(chainAsset: Chain.Asset): Any? {
+            return toMultiLocationOrThrow(chainAsset).toEncodableInstance()
+        }
     }
 }
