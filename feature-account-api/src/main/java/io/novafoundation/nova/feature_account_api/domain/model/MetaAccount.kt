@@ -123,7 +123,7 @@ fun MetaAccount.cryptoTypeIn(chain: Chain): CryptoType? {
 }
 
 private fun MultiChainEncryption.toCryptoType(): CryptoType {
-    return when(this) {
+    return when (this) {
         is MultiChainEncryption.Substrate -> mapEncryptionToCryptoType(encryptionType)
         MultiChainEncryption.Ethereum -> CryptoType.ECDSA
     }

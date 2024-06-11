@@ -91,7 +91,7 @@ class SecretsSigner(
     }
 
     /**
-    @return [MultiChainEncryption] for given [accountId] inside this meta account or null in case it was not possible to determine result
+     @return [MultiChainEncryption] for given [accountId] inside this meta account or null in case it was not possible to determine result
      */
     private fun MetaAccount.multiChainEncryptionFor(accountId: ByteArray, chainsById: ChainsById): MultiChainEncryption? {
         return when {

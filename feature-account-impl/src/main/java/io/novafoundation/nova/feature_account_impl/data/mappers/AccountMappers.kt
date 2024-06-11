@@ -81,7 +81,6 @@ class AccountMappers(
                     status = mapMetaAccountStateFromLocal(status)
                 )
 
-
                 LightMetaAccount.Type.LEDGER -> GenericLedgerMetaAccount(
                     id = id,
                     chainAccounts = chainAccounts,

@@ -29,7 +29,7 @@ class RealGenericLedgerAddAccountRepository(
     private suspend fun addNewWallet(payload: Payload.NewWallet): AddAccountResult {
         val metaAccount = MetaAccountLocal(
             substratePublicKey = payload.universalAccount.publicKey,
-            substrateCryptoType =  mapEncryptionToCryptoType(payload.universalAccount.encryptionType),
+            substrateCryptoType = mapEncryptionToCryptoType(payload.universalAccount.encryptionType),
             substrateAccountId = payload.universalAccount.address.toAccountId(),
             ethereumPublicKey = null,
             ethereumAddress = null,

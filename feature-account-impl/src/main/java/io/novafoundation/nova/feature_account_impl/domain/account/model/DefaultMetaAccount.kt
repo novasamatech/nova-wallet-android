@@ -39,11 +39,11 @@ open class DefaultMetaAccount(
     }
 
     override fun accountIdIn(chain: Chain): AccountId? {
-       return when {
-           hasChainAccountIn(chain.id) -> chainAccounts.getValue(chain.id).accountId
-           chain.isEthereumBased -> ethereumAddress
-           else -> substrateAccountId
-       }
+        return when {
+            hasChainAccountIn(chain.id) -> chainAccounts.getValue(chain.id).accountId
+            chain.isEthereumBased -> ethereumAddress
+            else -> substrateAccountId
+        }
     }
 
     override fun publicKeyIn(chain: Chain): ByteArray? {
