@@ -36,6 +36,10 @@ value class Percent(val value: Double) : Comparable<Percent> {
     override fun compareTo(other: Percent): Int {
         return value.compareTo(other.value)
     }
+
+    operator fun div(divisor: Int): Percent {
+        return Percent(value / divisor)
+    }
 }
 
 val Percent.fraction: BigDecimal

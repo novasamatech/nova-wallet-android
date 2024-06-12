@@ -15,27 +15,32 @@ import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
+import io.novafoundation.nova.common.utils.requireInnerNotNull
 import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_api.domain.model.QuotedSwapEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapPath
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransaction
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
@@ -118,30 +123,60 @@ internal class RealSwapService(
         }
     }
 
-    override suspend fun estimateFee(quote: SwapQuote): SwapFee {
+    override suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {
+        val atomicOperations = executeArgs.constructAtomicOperations()
 
+        val fees = atomicOperations.mapAsync { it.estimateFee() }
 
-        val swapFee: SwapFee? = quote.path.fold<SwapGraphEdge, SwapFee?>(null) { acc, edge ->
-            val segmentFee = edge.
-        }
-
-        val computationScope = CoroutineScope(coroutineContext)
-        val exchange = exchanges(computationScope).getValue(args.assetIn.chainId)
-
-        val assetExchangeFee = exchange.estimateFee(args)
-
-        return SwapFee(networkFee = assetExchangeFee.networkFee, minimumBalanceBuyIn = assetExchangeFee.minimumBalanceBuyIn)
+        return SwapFee(fees)
     }
 
-    private fun QuotedPath.toTransactionList(): List<SwapTransaction> {
-        val transactions = mutableListOf<SwapTransaction>()
-        var currentTransaction: SwapTransaction? = null
+    override suspend fun swap(args: SwapExecuteArgs): Result<SwapExecutionCorrection> {
+        val atomicOperations = args.constructAtomicOperations()
 
-        path.forEach { edge ->
-            if (currentTransaction == null) {
-                currentTransaction = edge.beginTransaction()
+        val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
+
+        return atomicOperations.fold(initialCorrection) { prevStepCorrection, operation ->
+            prevStepCorrection.flatMap { operation.submit(it) }
+        }.requireInnerNotNull()
+    }
+
+    private suspend fun SwapExecuteArgs.constructAtomicOperations(): List<AtomicSwapOperation> {
+        var currentSwapTx: AtomicSwapOperation? = null
+        val finishedSwapTxs = mutableListOf<AtomicSwapOperation>()
+
+        // TODO this will result in lower total slippage if some segments are appendable
+        val perSegmentSlippage = slippage / executionPath.size
+
+        executionPath.forEach { segmentExecuteArgs ->
+            val quotedEdge = segmentExecuteArgs.quotedSwapEdge
+
+            val operationArgs = AtomicSwapOperationArgs(
+                swapLimit = SwapLimit(direction, quotedEdge.quotedAmount, perSegmentSlippage, quotedEdge.quote),
+                customFeeAsset = segmentExecuteArgs.customFeeAsset,
+                nativeAsset = segmentExecuteArgs.nativeAsset
+            )
+
+            // Initial case - begin first operation
+            if (currentSwapTx == null) {
+                currentSwapTx = quotedEdge.edge.beginOperation(operationArgs)
+                return@forEach
+            }
+
+            // Try to append segment to current swap tx
+            val maybeAppendedCurrentTx = quotedEdge.edge.appendToOperation(currentSwapTx!!, operationArgs)
+
+            currentSwapTx = if (maybeAppendedCurrentTx == null) {
+                finishedSwapTxs.add(currentSwapTx!!)
+                quotedEdge.edge.beginOperation(operationArgs)
+            } else {
+                maybeAppendedCurrentTx
             }
         }
+
+        finishedSwapTxs.add(currentSwapTx!!)
+
+        return finishedSwapTxs
     }
 
     private suspend fun quoteInternal(
@@ -175,13 +210,6 @@ internal class RealSwapService(
         )
     }
 
-    override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
-        val computationScope = CoroutineScope(coroutineContext)
-
-        return runCatching { exchanges(computationScope).getValue(args.assetIn.chainId) }
-            .flatMap { exchange -> exchange.swap(args) }
-    }
-
     override suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
         val computationScope = CoroutineScope(coroutineContext)
         val exchanges = exchanges(computationScope)
@@ -202,10 +230,10 @@ internal class RealSwapService(
         return calculatePriceImpact(fiatIn, fiatOut)
     }
 
-    private fun SwapQuoteArgs.inAndOutAmounts(quote: QuotedPath): Pair<Balance, Balance> {
+    private fun SwapQuoteArgs.inAndOutAmounts(quote: QuotedTrade): Pair<Balance, Balance> {
         return when (swapDirection) {
-            SwapDirection.SPECIFIED_IN -> amount to quote.quote
-            SwapDirection.SPECIFIED_OUT -> quote.quote to amount
+            SwapDirection.SPECIFIED_IN -> amount to quote.lastSegmentQuote
+            SwapDirection.SPECIFIED_OUT -> quote.firstSegmentQuote to amount
         }
     }
 
@@ -284,28 +312,38 @@ internal class RealSwapService(
         path: SwapPath,
         amount: Balance,
         swapDirection: SwapDirection
-    ): QuotedPath? {
+    ): QuotedTrade? {
         val quote = when (swapDirection) {
             SwapDirection.SPECIFIED_IN -> quotePathSell(path, amount)
             SwapDirection.SPECIFIED_OUT -> quotePathBuy(path, amount)
         } ?: return null
 
-        return QuotedPath(swapDirection, quote, path)
+        return QuotedTrade(swapDirection, quote)
     }
 
-    private suspend fun quotePathBuy(path: Path<SwapGraphEdge>, amount: Balance): Balance? {
+    private suspend fun quotePathBuy(path: Path<SwapGraphEdge>, amount: Balance): Path<QuotedSwapEdge>? {
         return runCatching {
-            path.foldRight(amount) { segment, currentAmount ->
-                segment.quote(currentAmount, SwapDirection.SPECIFIED_OUT)
-            }
+            val initial = mutableListOf<QuotedSwapEdge>() to amount
+
+            path.foldRight(initial) { segment, (quotedPath, currentAmount) ->
+                val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_OUT)
+                quotedPath.add(0, QuotedSwapEdge(currentAmount, segmentQuote, segment))
+
+                quotedPath to segmentQuote
+            }.first
         }.getOrNull()
     }
 
-    private suspend fun quotePathSell(path: Path<SwapGraphEdge>, amount: Balance): Balance? {
+    private suspend fun quotePathSell(path: Path<SwapGraphEdge>, amount: Balance): Path<QuotedSwapEdge>? {
         return runCatching {
-            path.fold(amount) { currentAmount, segment ->
-                segment.quote(currentAmount, SwapDirection.SPECIFIED_IN)
-            }
+            val initial = mutableListOf<QuotedSwapEdge>() to amount
+
+            path.fold(initial) { (quotedPath, currentAmount), segment ->
+                val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_IN)
+                quotedPath.add(QuotedSwapEdge(currentAmount, segmentQuote, segment))
+
+                quotedPath to segmentQuote
+            }.first
         }.getOrNull()
     }
 
@@ -378,20 +416,23 @@ abstract class BaseQuotableEdge(
     final override val to: FullChainAssetId = toAsset.fullId
 }
 
-private class QuotedPath(
+private class QuotedTrade(
     val direction: SwapDirection,
+    val path: Path<QuotedSwapEdge>
+) : Comparable<QuotedTrade> {
 
-    val quote: Balance,
-
-    val path: SwapPath
-) : Comparable<QuotedPath> {
-
-    override fun compareTo(other: QuotedPath): Int {
+    override fun compareTo(other: QuotedTrade): Int {
         return when (direction) {
             // When we want to sell a token, the bigger the quote - the better
-            SwapDirection.SPECIFIED_IN -> (quote - other.quote).signum()
+            SwapDirection.SPECIFIED_IN -> (lastSegmentQuote - other.lastSegmentQuote).signum()
             // When we want to buy a token, the smaller the quote - the better
-            SwapDirection.SPECIFIED_OUT -> (other.quote - quote).signum()
+            SwapDirection.SPECIFIED_OUT -> (other.firstSegmentQuote - firstSegmentQuote).signum()
         }
     }
 }
+
+private val QuotedTrade.lastSegmentQuote: Balance
+    get() = path.last().quote
+
+private val QuotedTrade.firstSegmentQuote: Balance
+    get() = path.first().quote

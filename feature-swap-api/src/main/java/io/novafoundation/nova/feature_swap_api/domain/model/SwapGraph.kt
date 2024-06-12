@@ -8,14 +8,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 interface SwapGraphEdge : QuotableEdge {
 
-    suspend fun beginTransaction(args: SwapTransactionArgs): SwapTransaction
+    suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation
 
     /**
      * Append current swap edge execution to the existing transaction
      * Return null if it is not possible, indicating that the new transaction should be initiated to handle this edge via
-     * [beginTransaction]
+     * [beginOperation]
      */
-    suspend fun appendTransaction(currentTransaction: SwapTransaction, args: SwapTransactionArgs): SwapTransaction?
+    suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
 }
 
 interface QuotableEdge : Edge<FullChainAssetId> {

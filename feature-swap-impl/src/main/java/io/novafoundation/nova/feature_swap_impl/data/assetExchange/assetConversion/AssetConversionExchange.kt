@@ -8,16 +8,17 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransaction
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransactionArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransactionFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -162,11 +163,11 @@ private class AssetConversionExchange(
 
     private inner class AssetConversionEdge(fromAsset: Chain.Asset, toAsset: Chain.Asset) : BaseSwapGraphEdge(fromAsset, toAsset) {
 
-        override suspend fun beginTransaction(args: SwapTransactionArgs): SwapTransaction {
-            return AssetConversionTransaction(args, fromAsset, toAsset)
+        override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
+            return AssetConversionOperation(args, fromAsset, toAsset)
         }
 
-        override suspend fun appendTransaction(currentTransaction: SwapTransaction, args: SwapTransactionArgs): SwapTransaction? {
+        override suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
             return null
         }
 
@@ -185,13 +186,13 @@ private class AssetConversionExchange(
         }
     }
 
-    class AssetConversionTransaction(
-        private val transactionArgs: SwapTransactionArgs,
+    inner class AssetConversionOperation(
+        private val transactionArgs: AtomicSwapOperationArgs,
         private val fromAsset: Chain.Asset,
         private val toAsset: Chain.Asset
-    ): SwapTransaction {
+    ): AtomicSwapOperation {
 
-        override suspend fun estimateFee(): SwapTransactionFee {
+        override suspend fun estimateFee(): AtomicSwapOperationFee {
             val nativeAssetFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
                 executeSwap(sendTo = chain.emptyAccountId())
             }
@@ -199,20 +200,22 @@ private class AssetConversionExchange(
             return convertNativeFeeToPayingTokenFee(nativeAssetFee)
         }
 
-        override suspend fun submit(): Result<*> {
-            return extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) { submissionOrigin ->
+        override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
+            // TODO use `previousStepCorrection` to correct used call arguments
+            // TODO implement watching for extrinsic events
+            return extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { submissionOrigin ->
                 // Send swapped funds to the requested origin since it the account doing the swap
                 executeSwap(sendTo = submissionOrigin.requestedOrigin)
             }
         }
 
-        private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee): SwapTransactionFee {
+        private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee): AtomicSwapOperationFee {
             val customFeeAsset = transactionArgs.customFeeAsset
 
             return if (customFeeAsset != null && !customFeeAsset.isCommissionAsset()) {
                 calculateCustomTokenFee(nativeTokenFee, transactionArgs.nativeAsset, customFeeAsset)
             } else {
-                SwapTransactionFee(nativeTokenFee, MinimumBalanceBuyIn.NoBuyInNeeded)
+                AtomicSwapOperationFee(nativeTokenFee, MinimumBalanceBuyIn.NoBuyInNeeded)
             }
         }
 
@@ -228,7 +231,7 @@ private class AssetConversionExchange(
                     callName = "swap_exact_tokens_for_tokens",
                     arguments = mapOf(
                         "path" to path,
-                        "amount_in" to swapLimit.expectedAmountIn,
+                        "amount_in" to swapLimit.amountIn,
                         "amount_out_min" to swapLimit.amountOutMin,
                         "send_to" to sendTo,
                         "keep_alive" to keepAlive
@@ -240,7 +243,7 @@ private class AssetConversionExchange(
                     callName = "swap_tokens_for_exact_tokens",
                     arguments = mapOf(
                         "path" to path,
-                        "amount_out" to swapLimit.expectedAmountOut,
+                        "amount_out" to swapLimit.amountOut,
                         "amount_in_max" to swapLimit.amountInMax,
                         "send_to" to sendTo,
                         "keep_alive" to keepAlive
@@ -266,7 +269,7 @@ private class AssetConversionExchange(
             nativeTokenFee: Fee,
             nativeAsset: Asset,
             customFeeAsset: Chain.Asset
-        ): SwapTransactionFee {
+        ): AtomicSwapOperationFee {
             val nativeChainAsset = nativeAsset.token.configuration
             val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
             val assetBalances = assetSourceRegistry.sourceFor(nativeChainAsset).balance
@@ -293,7 +296,7 @@ private class AssetConversionExchange(
                 MinimumBalanceBuyIn.NoBuyInNeeded
             }
 
-            return SwapTransactionFee(
+            return AtomicSwapOperationFee(
                 networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin),
                 minimumBalanceBuyIn = minimumBalanceBuyIn
             )

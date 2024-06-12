@@ -27,9 +27,10 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransaction
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransactionArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapTransactionFee
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
@@ -125,7 +126,7 @@ private class HydraDxExchange(
         }
     }
 
-    override suspend fun estimateFee(args: SwapExecuteArgs): SwapTransactionFee {
+    override suspend fun estimateFee(args: SwapExecuteArgs): AtomicSwapOperationFee {
         val expectedFeeAsset = args.usedFeeAsset
 
         val currentFeeTokenId = currentPaymentAsset.first()
@@ -155,7 +156,7 @@ private class HydraDxExchange(
             submissionOrigin = swapFee.submissionOrigin
         )
 
-        return SwapTransactionFee(networkFee = feeInExpectedCurrency, MinimumBalanceBuyIn.NoBuyInNeeded)
+        return AtomicSwapOperationFee(networkFee = feeInExpectedCurrency, MinimumBalanceBuyIn.NoBuyInNeeded)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
@@ -335,37 +336,38 @@ private class HydraDxExchange(
         private val sourceQuotableEdge: HydraDxSourceEdge,
     ) : SwapGraphEdge, QuotableEdge by sourceQuotableEdge {
 
-        override suspend fun beginTransaction(args: SwapTransactionArgs): SwapTransaction {
-            return HydraDxSwapTransaction(HydraDxSwapTransactionSegment(sourceQuotableEdge, args))
+        override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
+            return HydraDxOperation(HydraDxSwapTransactionSegment(sourceQuotableEdge, args))
         }
 
-        override suspend fun appendTransaction(currentTransaction: SwapTransaction, args: SwapTransactionArgs): SwapTransaction? {
-            if (currentTransaction !is HydraDxSwapTransaction) return null
+        override suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
+            if (currentTransaction !is HydraDxOperation) return null
 
             return currentTransaction.appendSegment(HydraDxSwapTransactionSegment(sourceQuotableEdge, args))
         }
     }
 
-    inner class HydraDxSwapTransaction(
+    inner class HydraDxOperation(
         private val segments: List<HydraDxSwapTransactionSegment>,
-    ) : SwapTransaction {
+    ) : AtomicSwapOperation {
 
         constructor(segment: HydraDxSwapTransactionSegment) : this(listOf(segment))
 
-        fun appendSegment(nextSegment: HydraDxSwapTransactionSegment): HydraDxSwapTransaction {
-            return HydraDxSwapTransaction(segments + nextSegment)
+        fun appendSegment(nextSegment: HydraDxSwapTransactionSegment): HydraDxOperation {
+            return HydraDxOperation(segments + nextSegment)
         }
 
-        override suspend fun estimateFee(): SwapTransactionFee {
+        override suspend fun estimateFee(): AtomicSwapOperationFee {
             TODO("Not yet implemented")
         }
 
-        override suspend fun submit(): Result<*> {
+        override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
+            // TODO use `previousStepCorrection` to correct used call arguments
+
             TODO("Not yet implemented")
         }
 
         private suspend fun ExtrinsicBuilder.executeSwap(
-            args: SwapExecuteArgs,
             justSetFeeCurrency: HydraDxAssetId?,
             previousFeeCurrency: HydraDxAssetId
         ) {
@@ -377,28 +379,30 @@ private class HydraDxExchange(
         }
 
         private suspend fun ExtrinsicBuilder.addSwapCall() {
-            val sourceForOptimizedTrade = checkForOptimizedTrade()
+            val optimizationSucceeded = tryOptimizedSwap()
 
-            if (sourceForOptimizedTrade != null) {
-                sourceForOptimizedTrade()
-            } else {
+            if (!optimizationSucceeded) {
                 executeRouterSwap()
             }
         }
 
-        private fun checkForOptimizedTrade(): HydraDxStandaloneSwapBuilder? {
-            if (segments.size != 1) return null
+        private fun ExtrinsicBuilder.tryOptimizedSwap(): Boolean {
+            if (segments.size != 1) return false
 
             val onlySegment = segments.single()
-            return onlySegment.edge.standaloneSwapBuilder
+            val standaloneSwapBuilder = onlySegment.edge.standaloneSwapBuilder ?: return false
+
+            standaloneSwapBuilder(onlySegment.segmentArgs)
+            return true
         }
 
         private suspend fun ExtrinsicBuilder.executeRouterSwap() {
-            val firstLimit = segments
+            val firstSegment = segments.first()
+            val lastSegment = segments.last()
 
-            when (val limit = args.swapLimit) {
-                is SwapLimit.SpecifiedIn -> executeRouterSell(args, limit)
-                is SwapLimit.SpecifiedOut -> executeRouterBuy(args, limit)
+            when (val firstLimit = firstSegment.segmentArgs.swapLimit) {
+                is SwapLimit.SpecifiedIn -> executeRouterSell(firstSegment.edge, firstLimit, lastSegment.edge, lastSegment.segmentArgs.swapLimit as SwapLimit.SpecifiedIn)
+                is SwapLimit.SpecifiedOut -> executeRouterBuy(firstSegment.edge, firstLimit, lastSegment.edge, lastSegment.segmentArgs.swapLimit as SwapLimit.SpecifiedOut)
             }
         }
 
@@ -414,7 +418,7 @@ private class HydraDxExchange(
                 arguments = mapOf(
                     "asset_in" to hydraDxAssetIdConverter.toOnChainIdOrThrow(firstEdge.from),
                     "asset_out" to hydraDxAssetIdConverter.toOnChainIdOrThrow(lastEdge.to),
-                    "amount_out" to lastLimit.expectedAmountOut,
+                    "amount_out" to lastLimit.amountOut,
                     "max_amount_in" to firstLimit.amountInMax,
                     "route" to routerTradePath()
                 )
@@ -433,7 +437,7 @@ private class HydraDxExchange(
                 arguments = mapOf(
                     "asset_in" to hydraDxAssetIdConverter.toOnChainIdOrThrow(firstEdge.from),
                     "asset_out" to hydraDxAssetIdConverter.toOnChainIdOrThrow(lastEdge.to),
-                    "amount_in" to firstLimit.expectedAmountIn,
+                    "amount_in" to firstLimit.amountIn,
                     "min_amount_out" to lastLimit.amountOutMin,
                     "route" to routerTradePath()
                 )
@@ -454,7 +458,7 @@ private class HydraDxExchange(
 
 private class HydraDxSwapTransactionSegment(
     val edge: HydraDxSourceEdge,
-    val args: SwapTransactionArgs,
+    val segmentArgs: AtomicSwapOperationArgs,
 )
 
 private class HydraDxSwapEdge(

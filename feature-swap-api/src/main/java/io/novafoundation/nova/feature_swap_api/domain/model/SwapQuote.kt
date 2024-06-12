@@ -39,8 +39,9 @@ data class SwapQuote(
 }
 
 class QuotedSwapEdge(
-    val edge: SwapGraphEdge,
-    val quote: Balance
+    val quotedAmount: Balance,
+    val quote: Balance,
+    val edge: SwapGraphEdge
 )
 
 
@@ -70,9 +71,17 @@ infix fun ChainAssetWithAmount.rateAgainst(assetOut: ChainAssetWithAmount): BigD
 }
 
 class SwapFee(
-    override val networkFee: Fee,
-    val minimumBalanceBuyIn: MinimumBalanceBuyIn,
-) : GenericFee
+    val atomicOperationFees: List<AtomicSwapOperationFee>
+) : GenericFee {
+
+    // TODO handle multi-segment fee display
+    override val networkFee: Fee
+        get() = atomicOperationFees.first()
+
+    // TODO handle multi-segment minimumBalanceBuyIn
+    val minimumBalanceBuyIn: MinimumBalanceBuyIn
+        get() = atomicOperationFees.first().minimumBalanceBuyIn
+}
 
 val SwapFee.totalDeductedPlanks: Balance
     get() = networkFee.amountByRequestedAccount + minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn

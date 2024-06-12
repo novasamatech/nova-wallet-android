@@ -225,6 +225,10 @@ fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
 
+fun <T> Result<T?>.requireInnerNotNull(): Result<T> {
+    return mapCatching { requireNotNull(it) }
+}
+
 /**
  * Given a list finds a partition point in O(log2(N)) given that there is only a single partition point present.
  * That is, there is only a single place in the whole array where the value of [partition] changes from false to true

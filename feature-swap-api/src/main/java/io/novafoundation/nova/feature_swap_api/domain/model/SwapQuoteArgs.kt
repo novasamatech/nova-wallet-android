@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.fraction
+import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -17,7 +18,13 @@ data class SwapQuoteArgs(
 )
 
 class SwapExecuteArgs(
-    val quote: SwapQuote,
+    val slippage: Percent,
+    val executionPath: Path<SegmentExecuteArgs>,
+    val direction: SwapDirection,
+)
+
+class SegmentExecuteArgs(
+    val quotedSwapEdge: QuotedSwapEdge,
     val nativeAsset: Asset,
     val customFeeAsset: Chain.Asset?,
 )
@@ -25,19 +32,19 @@ class SwapExecuteArgs(
 val SwapExecuteArgs.feeAsset: Chain.Asset
     get() = customFeeAsset ?: assetIn
 
-sealed class SwapLimit(val expectedAmountIn: Balance, val expectedAmountOut: Balance) {
+sealed class SwapLimit {
 
     class SpecifiedIn(
-        expectedAmountIn: Balance,
-        expectedAmountOut: Balance,
+        val amountIn: Balance,
+        val amountOutQuote: Balance,
         val amountOutMin: Balance
-    ) : SwapLimit(expectedAmountIn, expectedAmountOut)
+    ) : SwapLimit()
 
     class SpecifiedOut(
-        expectedAmountIn: Balance,
-        expectedAmountOut: Balance,
+        val amountOut: Balance,
+        val amountInQuote: Balance,
         val amountInMax: Balance
-    ) : SwapLimit(expectedAmountIn, expectedAmountOut)
+    ) : SwapLimit()
 }
 
 fun SwapQuoteArgs.toExecuteArgs(quote: SwapQuote, customFeeAsset: Chain.Asset?, nativeAsset: Asset): SwapExecuteArgs {
@@ -52,7 +59,11 @@ fun SwapQuoteArgs.toExecuteArgs(quote: SwapQuote, customFeeAsset: Chain.Asset?, 
 }
 
 fun SwapQuoteArgs.swapLimits(quotedBalance: Balance): SwapLimit {
-    return when (swapDirection) {
+    return SwapLimit(swapDirection, amount, slippage, quotedBalance)
+}
+
+fun SwapLimit(direction: SwapDirection, amount: Balance, slippage: Percent, quotedBalance: Balance): SwapLimit {
+    return when (direction) {
         SwapDirection.SPECIFIED_IN -> SpecifiedIn(amount, slippage, quotedBalance)
         SwapDirection.SPECIFIED_OUT -> SpecifiedOut(amount, slippage, quotedBalance)
     }
@@ -64,8 +75,8 @@ private fun SpecifiedIn(amount: Balance, slippage: Percent, quotedBalance: Balan
     val amountOutMin = quotedBalance.toBigDecimal() * lessAmountCoefficient
 
     return SwapLimit.SpecifiedIn(
-        expectedAmountIn = amount,
-        expectedAmountOut = quotedBalance,
+        amountIn = amount,
+        amountOutQuote = quotedBalance,
         amountOutMin = amountOutMin.toBigInteger()
     )
 }
@@ -76,8 +87,8 @@ private fun SpecifiedOut(amount: Balance, slippage: Percent, quotedBalance: Bala
     val amountInMax = quotedBalance.toBigDecimal() * moreAmountCoefficient
 
     return SwapLimit.SpecifiedOut(
-        expectedAmountIn = quotedBalance,
-        expectedAmountOut = amount,
+        amountOut = amount,
+        amountInQuote = quotedBalance,
         amountInMax = amountInMax.toBigInteger()
     )
 }

@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_swap_api.domain.swap
 
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -27,9 +27,9 @@ interface SwapService {
         computationSharingScope: CoroutineScope
     ): Result<SwapQuote>
 
-    suspend fun estimateFee(quote: SwapQuote): SwapFee
+    suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee
 
-    suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission>
+    suspend fun swap(args: SwapExecuteArgs): Result<SwapExecutionCorrection>
 
     suspend fun slippageConfig(chainId: ChainId): SlippageConfig?
 
