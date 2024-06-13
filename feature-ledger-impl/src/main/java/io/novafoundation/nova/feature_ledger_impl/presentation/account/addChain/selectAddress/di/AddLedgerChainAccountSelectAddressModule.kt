@@ -11,13 +11,15 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.AddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.RealAddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -27,8 +29,8 @@ class AddLedgerChainAccountSelectAddressModule {
     @Provides
     @ScreenScope
     fun provideInteractor(
-        ledgerAddAccountRepository: LedgerAddAccountRepository
-    ): AddLedgerChainAccountInteractor = RealAddLedgerChainAccountInteractor(ledgerAddAccountRepository)
+        legacyLedgerAddAccountRepository: LegacyLedgerAddAccountRepository
+    ): AddLedgerChainAccountInteractor = RealAddLedgerChainAccountInteractor(legacyLedgerAddAccountRepository)
 
     @Provides
     @ScreenScope
@@ -38,6 +40,13 @@ class AddLedgerChainAccountSelectAddressModule {
         deviceId = screenPayload.deviceId,
         chainId = screenPayload.chainId
     )
+
+    @Provides
+    @ScreenScope
+    fun provideMessageFormatter(
+        screenPayload: AddLedgerChainAccountSelectAddressPayload,
+        factory: LedgerMessageFormatterFactory,
+    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId, showAlerts = false)
 
     @Provides
     @IntoMap
@@ -51,6 +60,7 @@ class AddLedgerChainAccountSelectAddressModule {
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
         selectLedgerAddressPayload: SelectLedgerAddressPayload,
+        messageFormatter: LedgerMessageFormatter,
     ): ViewModel {
         return AddLedgerChainAccountSelectAddressViewModel(
             router = router,
@@ -60,7 +70,8 @@ class AddLedgerChainAccountSelectAddressModule {
             addressIconGenerator = addressIconGenerator,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
-            selectLedgerAddressPayload = selectLedgerAddressPayload
+            selectLedgerAddressPayload = selectLedgerAddressPayload,
+            messageFormatter = messageFormatter
         )
     }
 

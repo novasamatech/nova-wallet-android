@@ -48,7 +48,7 @@ class RootViewModel(
     private val rootScope: RootScope,
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
-    private val externalServiceInitializer: ExternalServiceInitializer
+    private val externalServiceInitializer: ExternalServiceInitializer,
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false

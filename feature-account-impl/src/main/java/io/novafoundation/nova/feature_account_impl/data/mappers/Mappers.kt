@@ -2,14 +2,12 @@ package io.novafoundation.nova.feature_account_impl.data.mappers
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.asPrecision
-import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core.model.Node.NetworkType
 import io.novafoundation.nova.core_db.dao.MetaAccountWithBalanceLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
@@ -92,14 +90,15 @@ fun mapNodeLocalToNode(nodeLocal: NodeLocal): Node {
     }
 }
 
-private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
+fun mapMetaAccountTypeToLocal(local: LightMetaAccount.Type): MetaAccountLocal.Type {
     return when (local) {
-        MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
-        MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
-        MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
-        MetaAccountLocal.Type.LEDGER -> LightMetaAccount.Type.LEDGER
-        MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
-        MetaAccountLocal.Type.PROXIED -> LightMetaAccount.Type.PROXIED
+        LightMetaAccount.Type.SECRETS -> MetaAccountLocal.Type.SECRETS
+        LightMetaAccount.Type.WATCH_ONLY -> MetaAccountLocal.Type.WATCH_ONLY
+        LightMetaAccount.Type.PARITY_SIGNER -> MetaAccountLocal.Type.PARITY_SIGNER
+        LightMetaAccount.Type.LEDGER_LEGACY -> MetaAccountLocal.Type.LEDGER
+        LightMetaAccount.Type.LEDGER -> MetaAccountLocal.Type.LEDGER_GENERIC
+        LightMetaAccount.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
+        LightMetaAccount.Type.PROXIED -> MetaAccountLocal.Type.PROXIED
     }
 }
 
@@ -112,57 +111,6 @@ fun mapMetaAccountWithBalanceFromLocal(local: MetaAccountWithBalanceLocal): Meta
             offChainBalance = offChainBalance,
             precision = precision.asPrecision(),
             rate = rate,
-        )
-    }
-}
-
-fun mapMetaAccountLocalToMetaAccount(
-    joinedMetaAccountInfo: JoinedMetaAccountInfo
-): MetaAccount {
-    val chainAccounts = joinedMetaAccountInfo.chainAccounts.associateBy(
-        keySelector = ChainAccountLocal::chainId,
-        valueTransform = {
-            mapChainAccountFromLocal(it)
-        }
-    ).filterNotNull()
-
-    val proxyAccount = joinedMetaAccountInfo.proxyAccountLocal?.let {
-        mapProxyAccountFromLocal(it)
-    }
-
-    return with(joinedMetaAccountInfo.metaAccount) {
-        MetaAccount(
-            id = id,
-            chainAccounts = chainAccounts,
-            proxy = proxyAccount,
-            substratePublicKey = substratePublicKey,
-            substrateCryptoType = substrateCryptoType,
-            substrateAccountId = substrateAccountId,
-            ethereumAddress = ethereumAddress,
-            ethereumPublicKey = ethereumPublicKey,
-            isSelected = isSelected,
-            name = name,
-            type = mapMetaAccountTypeFromLocal(type),
-            status = mapMetaAccountStateFromLocal(status)
-        )
-    }
-}
-
-fun mapMetaAccountLocalToLightMetaAccount(
-    metaAccountLocal: MetaAccountLocal
-): LightMetaAccount {
-    return with(metaAccountLocal) {
-        LightMetaAccount(
-            id = id,
-            substratePublicKey = substratePublicKey,
-            substrateCryptoType = substrateCryptoType,
-            substrateAccountId = substrateAccountId,
-            ethereumAddress = ethereumAddress,
-            ethereumPublicKey = ethereumPublicKey,
-            isSelected = isSelected,
-            name = name,
-            type = mapMetaAccountTypeFromLocal(type),
-            status = mapMetaAccountStateFromLocal(status)
         )
     }
 }
@@ -208,11 +156,4 @@ fun mapAddAccountPayloadToAddAccountType(
 fun mapOptionalNameToNameChooserState(name: String?) = when (name) {
     null -> AccountNameChooserMixin.State.NoInput
     else -> AccountNameChooserMixin.State.Input(name)
-}
-
-private fun mapMetaAccountStateFromLocal(local: MetaAccountLocal.Status): LightMetaAccount.Status {
-    return when (local) {
-        MetaAccountLocal.Status.ACTIVE -> LightMetaAccount.Status.ACTIVE
-        MetaAccountLocal.Status.DEACTIVATED -> LightMetaAccount.Status.DEACTIVATED
-    }
 }

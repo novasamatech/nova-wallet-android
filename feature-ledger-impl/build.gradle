@@ -33,6 +33,7 @@ android {
 
 dependencies {
     implementation project(":feature-ledger-api")
+    implementation project(":feature-ledger-core")
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
     implementation project(":common")

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.period
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.components
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository

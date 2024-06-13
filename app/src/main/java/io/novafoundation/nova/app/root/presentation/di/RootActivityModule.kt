@@ -55,7 +55,7 @@ class RootActivityModule {
         rootScope: RootScope,
         compoundRequestBusHandler: CompoundRequestBusHandler,
         pushNotificationsInteractor: PushNotificationsInteractor,
-        externalServiceInitializer: ExternalServiceInitializer
+        externalServiceInitializer: ExternalServiceInitializer,
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -74,7 +74,7 @@ class RootActivityModule {
             rootScope,
             compoundRequestBusHandler,
             pushNotificationsInteractor,
-            externalServiceInitializer
+            externalServiceInitializer,
         )
     }
 
