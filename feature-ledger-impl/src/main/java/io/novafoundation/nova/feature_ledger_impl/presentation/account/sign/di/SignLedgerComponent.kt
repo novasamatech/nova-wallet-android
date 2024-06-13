@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerPayload
 
 @Subcomponent(
     modules = [
@@ -20,7 +20,7 @@ interface SignLedgerComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance request: SignInterScreenCommunicator.Request,
+            @BindsInstance request: SignLedgerPayload,
         ): SignLedgerComponent
     }
 

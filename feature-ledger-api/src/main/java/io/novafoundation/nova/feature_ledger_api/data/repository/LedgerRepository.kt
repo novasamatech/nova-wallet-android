@@ -8,4 +8,6 @@ interface LedgerRepository {
         metaId: Long,
         chainId: ChainId
     ): String
+
+    suspend fun getGenericDerivationPath(metaId: Long): String
 }

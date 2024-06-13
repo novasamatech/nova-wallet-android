@@ -33,7 +33,7 @@ class CloudBackupSyncRequestBusHandler(
     override fun observe() {
         metaAccountChangesEventBus.observeEvent()
             .filter { it.shouldTriggerBackupSync() }
-            .onEachLatest { event ->
+            .onEachLatest {
                 applyLocalSnapshotToCloudBackupUseCase.applyLocalSnapshotToCloudBackupIfSyncEnabled()
                     .onFailure { showDestructiveChangesNotAppliedDialog() }
             }.launchIn(scope)

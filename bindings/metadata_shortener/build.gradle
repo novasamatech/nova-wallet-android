@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+
+android {
+    namespace 'io.novafoundation.nova.metadata_shortener'
+    compileSdkVersion rootProject.compileSdkVersion
+
+    ndkVersion "26.1.10909125"
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+}
+
+dependencies {
+    implementation kotlinDep
+
+    testImplementation jUnitDep
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
+}
+
+cargo {
+    module = "rust/"
+    libname = "metadata_shortener_java"
+    targets = ["arm", "arm64", "x86", "x86_64"]
+    profile = "release"
+}
+
+tasks.matching { it.name.matches(/merge.*JniLibFolders/) }.configureEach {
+    it.inputs.dir(new File(buildDir, "rustJniLibs/android"))
+    it.dependsOn("cargoBuild")
+}

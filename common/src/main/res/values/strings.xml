@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_ledger_migration_deprecation_message">The Migration app will be unavailable in the near future. Use it to migrate your accounts to the new Ledger app to avoid losing your funds.</string>
+
+    <string name="account_ledger_migration_app">Migration</string>
+    <string name="account_ledger_migration_generic">Generic</string>
+
+    <string name="account_ledger_generic_import_start_step_1">Make sure <font color='#FFFFFF'>Generic app is installed</font> to your Ledger device using Ledger Live app</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color='#FFFFFF'>Open the Generic app</font> on your Ledger device</string>
+
+    <string name="account_ledger_legacy_warning_title">New Ledger app has been released</string>
+    <string name="account_ledger_legacy_warning_message">To sign operations and migrate your accounts to the new Generic Ledger app install and open Migration app. Legacy Old and Migration Ledger apps will not be supported in the future.</string>
+
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+
+    <string name="account_ledger_nano_x">Ledger Nano X</string>
+
+    <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
 
     <string name="common_passphrase">Passphrase</string>
 
@@ -1281,8 +1298,6 @@
     <string name="account_ledger_import_fill_title">Add accounts to your wallet</string>
     <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
 
-
-    <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_select_hardware_wallet">Select hardware wallet</string>
 
     <string name="account_ledger_import_start_title">Connect Ledger Nano X</string>

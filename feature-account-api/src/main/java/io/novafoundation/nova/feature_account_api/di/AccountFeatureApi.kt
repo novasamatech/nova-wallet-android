@@ -9,7 +9,8 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
@@ -90,7 +91,9 @@ interface AccountFeatureApi {
 
     fun proxySyncService(): ProxySyncService
 
-    fun ledgerAddAccountRepository(): LedgerAddAccountRepository
+    val legacyLedgerAddAccountRepository: LegacyLedgerAddAccountRepository
+
+    val genericLedgerAddAccountRepository: GenericLedgerAddAccountRepository
 
     val evmTransactionService: EvmTransactionService
 

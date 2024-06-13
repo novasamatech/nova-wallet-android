@@ -54,10 +54,7 @@
     </fragment>
 
     <include app:graph="@navigation/mnemonic_nav_graph" />
-    <include app:graph="@navigation/import_parity_signer_graph" />
-    <include app:graph="@navigation/import_ledger_graph" />
     <include app:graph="@navigation/create_wallet_nav_graph" />
     <include app:graph="@navigation/restore_cloud_backup_nav_graph" />
     <include app:graph="@navigation/import_wallet_options_nav_graph" />
-
 </navigation>

@@ -124,7 +124,7 @@ class RealCloudBackupSettingsInteractor(
 
     private suspend fun selectMetaAccountIfNeeded() {
         if (!accountRepository.isAccountSelected()) {
-            val metaAccounts = accountRepository.activeMetaAccounts()
+            val metaAccounts = accountRepository.getActiveMetaAccounts()
             if (metaAccounts.isNotEmpty()) {
                 accountRepository.selectMetaAccount(metaAccounts.first().id)
             }

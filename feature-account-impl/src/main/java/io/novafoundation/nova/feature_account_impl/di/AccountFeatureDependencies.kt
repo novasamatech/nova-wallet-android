@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -165,4 +166,6 @@ interface AccountFeatureDependencies {
     val cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
 
     val listSelectorMixinFactory: ListSelectorMixin.Factory
+
+    val ledgerMigrationTracker: LedgerMigrationTracker
 }

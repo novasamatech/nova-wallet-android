@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.data.dashboard.SyncingStageMap
 import io.novafoundation.nova.feature_staking_api.data.dashboard.getSyncingStage
