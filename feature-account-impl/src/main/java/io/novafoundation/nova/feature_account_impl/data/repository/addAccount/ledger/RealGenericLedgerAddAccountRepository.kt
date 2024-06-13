@@ -5,10 +5,10 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository.Payload
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId

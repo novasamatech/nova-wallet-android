@@ -21,8 +21,8 @@ import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeBackButton
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeCreateWalletButton
-import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeRestoreWalletButton
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
 
 class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
@@ -50,10 +50,16 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     override fun initViews() {
-        createAccountBtn.setOnClickListener { viewModel.createAccountClicked() }
-        importAccountBtn.setOnClickListener { viewModel.importAccountClicked() }
-        welcomeAddWatchWallet.setOnClickListener { viewModel.addWatchWalletClicked() }
-        welcomeConnectHardwareWallet.setOnClickListener { viewModel.connectHardwareWalletClicked() }
+        configureTermsAndPrivacy(
+            getString(R.string.onboarding_terms_and_conditions_1_v2_2_1),
+            getString(R.string.onboarding_terms_and_conditions_2),
+            getString(R.string.onboarding_privacy_policy)
+        )
+        welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
+        welcomeTerms.highlightColor = Color.TRANSPARENT
+
+        welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
+        welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
 
         welcomeBackButton.setOnClickListener { viewModel.backClicked() }
     }

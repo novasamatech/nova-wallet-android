@@ -170,7 +170,7 @@ data class CloudBackup(
 
         data class SubstrateSecrets(
             val seed: ByteArray?,
-            val keypair: KeyPairSecrets,
+            val keypair: KeyPairSecrets?,
             val derivationPath: String?,
         ) {
 

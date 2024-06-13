@@ -124,6 +124,10 @@ fun ByteArray.toDefaultSubstrateAddress(): String {
     return toAddress(SS58Encoder.DEFAULT_PREFIX)
 }
 
+fun MetaAccount.substrateMultiChainEncryption(): MultiChainEncryption? {
+    return substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
+}
+
 fun MetaAccount.requireAccountIdIn(chain: Chain): ByteArray {
     return requireNotNull(accountIdIn(chain))
 }

@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event.AccountStructureChanged
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.mock.LocalAccountsMocker
 import io.novafoundation.nova.feature_account_impl.mock.SecretStoreMocker
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo.KeyPairSecrets
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo.ChainAccountInfo.ChainAccountCryptoType
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.localVsCloudDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.strategy.BackupDiffStrategy
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -39,7 +41,6 @@ import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,6 +72,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
     @Mock
     lateinit var chainRegistry: ChainRegistry
 
+    @Mock
+    lateinit var ledgerMigrationTracker: LedgerMigrationTracker
+
     private val ethereumDerivationPath = "//44//60//0/0/0"
 
 
@@ -81,7 +85,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
             accountDao = metaAccountDao,
             cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker,
             metaAccountChangedEvents = metaAccountChangesEventBus,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            accountMappers = AccountMappers(ledgerMigrationTracker)
 
         )
 
@@ -330,8 +335,6 @@ class RealLocalAccountsCloudBackupFacadeTest {
         val uuid = "id"
 
         val zero32Bytes = ByteArray(32)
-        val chainId1 = chainId(0)
-        val chainId2 = chainId(1)
         val metaId = 0L
 
         val ledgerDerivationPathSecretName = expectedGenericLedgerDerivationPathKey()
@@ -343,13 +346,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
                 globallyUniqueId(uuid)
                 type(MetaAccountLocal.Type.LEDGER_GENERIC)
 
-                chainAccount(chainId1) {
-                    accountId(zero32Bytes)
-                }
-
-                chainAccount(chainId2) {
-                    accountId(zero32Bytes)
-                }
+                substrateAccountId(zero32Bytes)
+                substratePublicKey(zero32Bytes)
+                substrateCryptoType(CryptoType.ED25519)
             }
         }
 
@@ -366,20 +365,15 @@ class RealLocalAccountsCloudBackupFacadeTest {
                 wallet(uuid) {
                     type(WalletPublicInfo.Type.LEDGER_GENERIC)
 
-                    chainAccount(chainId1) {
-                        accountId(zero32Bytes)
-                    }
-
-                    chainAccount(chainId2) {
-                        accountId(zero32Bytes)
-                    }
+                    substrateAccountId(zero32Bytes)
+                    substratePublicKey(zero32Bytes)
+                    substrateCryptoType(CryptoType.ED25519)
                 }
             }
 
             privateData {
                 wallet(uuid) {
-                    // Only one chain account private info since we have only one unique accountId/publicKey for ledger
-                    chainAccount(zero32Bytes) {
+                    substrate {
                         derivationPath(ethereumDerivationPath)
                     }
                 }
@@ -520,6 +514,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verifyNoAdditionalSecretsInserted()
 
         // no deletes happened
+        verify(secretStore, never()).clearChainAccountsSecrets(anyLong(), any())
         verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
         verify(metaAccountDao, never()).delete(any<List<Long>>())
 
@@ -819,6 +814,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(metaAccountDao, never()).insertMetaAccount(any())
 
         // no deletes happened
+        verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
         verify(metaAccountDao, never()).delete(any<List<Long>>())
 
         val expectedEvent = buildChangesEvent {
@@ -890,6 +886,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(secretStore).putAdditionalMetaAccountSecret(eq(0), eq(ledgerDerivationPathSecretName), eq(ethereumDerivationPath))
 
         // no deletes happened
+        verify(secretStore, never()).clearChainAccountsSecrets(anyLong(), any())
         verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
         verify(metaAccountDao, never()).delete(any<List<Long>>())
 
@@ -927,13 +924,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
                     wallet(uuid) {
                         type(WalletPublicInfo.Type.LEDGER_GENERIC)
 
-                        chainAccount(chainId(0)) {
-                            accountId(bytes32)
-                        }
-
-                        chainAccount(chainId(1)) {
-                            accountId(bytes32)
-                        }
+                        substrateAccountId(bytes32)
+                        substratePublicKey(bytes32)
+                        substrateCryptoType(CryptoType.ED25519)
                     }
                 }
             }
@@ -941,7 +934,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
             privateData {
                 generateWallets(walletsCount = 1) { _, uuid, bytes32, _ ->
                     wallet(uuid) {
-                        chainAccount(accountId = bytes32) {
+                        substrate {
                             derivationPath(ethereumDerivationPath)
                         }
                     }
@@ -953,12 +946,10 @@ class RealLocalAccountsCloudBackupFacadeTest {
 
         facade.applyBackupDiff(diff, cloudBackup)
 
-        val bytes32 = bytes32of(0)
-
         val ledgerDerivationPathSecretName = expectedGenericLedgerDerivationPathKey()
 
         verify(metaAccountDao).insertMetaAccount(metaAccountWithUuid(walletUUid(0)))
-        verify(metaAccountDao).insertChainAccounts(multipleChainAccountsWithAccountIds(bytes32, bytes32))
+        verify(metaAccountDao, never()).insertChainAccounts(any())
 
         // there is not base secrets for ledger accounts to there should be no attempts to store base secrets
         verify(secretStore, never()).putMetaAccountSecrets(anyLong(), any())
@@ -969,7 +960,8 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(secretStore).putAdditionalMetaAccountSecret(eq(0), eq(ledgerDerivationPathSecretName), eq(ethereumDerivationPath))
 
         // no deletes happened
-        verify(secretStore, never()).clearSecrets(anyLong(), any())
+        verify(secretStore, never()).clearChainAccountsSecrets(anyLong(), any())
+        verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
         verify(metaAccountDao, never()).delete(any<List<Long>>())
 
         // no modifications happened
@@ -1091,6 +1083,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(secretStore, never()).putMetaAccountSecrets(anyLong(), any())
 
         verify(secretStore).clearChainAccountsSecrets(eq(0), byteArrayListEq(oldChainAccountIds))
+        verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
 
         // No new chain account secrets were inserted since its ledger account
         verify(secretStore, never()).putChainAccountSecrets(anyLong(), any(), any())
@@ -1101,6 +1094,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(metaAccountDao, never()).insertMetaAccount(any())
 
         // no deletes happened
+        verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
         verify(metaAccountDao, never()).delete(any<List<Long>>())
 
         val expectedEvent = buildChangesEvent {

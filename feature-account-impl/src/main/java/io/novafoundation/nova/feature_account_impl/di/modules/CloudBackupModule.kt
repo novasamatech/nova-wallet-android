@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.RealCloudBackupAccountsModificationsTracker
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.RealLocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -31,14 +32,16 @@ class CloudBackupModule {
         accountDao: MetaAccountDao,
         cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
         metaAccountChangedEvents: MetaAccountChangesEventBus,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        accountMappers: AccountMappers,
     ): LocalAccountsCloudBackupFacade {
         return RealLocalAccountsCloudBackupFacade(
             secretsStoreV2 = secretsStoreV2,
             accountDao = accountDao,
             cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker,
             metaAccountChangedEvents = metaAccountChangedEvents,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            accountMappers = accountMappers
         )
     }
 }

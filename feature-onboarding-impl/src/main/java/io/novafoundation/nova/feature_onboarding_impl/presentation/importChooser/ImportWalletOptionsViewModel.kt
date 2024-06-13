@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.importChoose
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
-import io.novafoundation.nova.common.mixin.actionAwaitable.fixedSelectionOf
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,9 +14,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCheckBackupAvailableFailureToUi
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_onboarding_api.domain.OnboardingInteractor
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.R
+import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.SelectHardwareWalletBottomSheet
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.model.HardwareWalletModel
 import kotlinx.coroutines.launch
 
@@ -30,11 +30,12 @@ class ImportWalletOptionsViewModel(
     val progressDialogMixin: ProgressDialogMixin,
     customDialogProvider: CustomDialogDisplayer.Presentation,
     cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
+    private val ledgerMigrationTracker: LedgerMigrationTracker,
 ) : BaseViewModel(), CustomDialogDisplayer.Presentation by customDialogProvider {
 
     val cloudBackupChangingWarningMixin = cloudBackupChangingWarningMixinFactory.create(this)
 
-    val selectHardwareWallet = actionAwaitableMixinFactory.fixedSelectionOf<HardwareWalletModel>()
+    val selectHardwareWallet = actionAwaitableMixinFactory.create<SelectHardwareWalletBottomSheet.Payload, HardwareWalletModel>()
 
     val showImportViaCloudButton = flowOf { onboardingInteractor.isCloudBackupAvailableForImport() }
         .shareInBackground()
@@ -66,8 +67,12 @@ class ImportWalletOptionsViewModel(
     fun importHardwareClicked() {
         cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             launch {
-                when (val selection = selectHardwareWallet.awaitAction()) {
+                val genericLedgerSupported = ledgerMigrationTracker.anyChainSupportsMigrationApp()
+                val payload = SelectHardwareWalletBottomSheet.Payload(genericLedgerSupported)
+
+                when (val selection = selectHardwareWallet.awaitAction(payload)) {
                     HardwareWalletModel.LedgerLegacy -> router.openStartImportLegacyLedger()
+
                     HardwareWalletModel.LedgerGeneric -> router.openStartImportGenericLedger()
 
                     is HardwareWalletModel.PolkadotVault -> when (selection.variant) {

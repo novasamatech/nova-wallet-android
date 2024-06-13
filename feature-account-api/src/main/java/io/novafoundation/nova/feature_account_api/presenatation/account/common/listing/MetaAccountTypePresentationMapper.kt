@@ -7,9 +7,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 
 interface MetaAccountTypePresentationMapper {
 
-    fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem?
+    suspend fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem?
 
-    fun mapTypeToChipLabel(type: LightMetaAccount.Type): ChipLabelModel?
+    suspend fun mapTypeToChipLabel(type: LightMetaAccount.Type): ChipLabelModel?
 
-    fun iconFor(type: LightMetaAccount.Type): TintedIcon?
+    suspend fun iconFor(type: LightMetaAccount.Type): TintedIcon?
 }

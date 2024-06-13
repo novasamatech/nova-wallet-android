@@ -30,7 +30,7 @@ import io.novafoundation.nova.feature_account_api.data.cloudBackup.CLOUD_BACKUP_
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeFromLocal
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPublicInfo.ChainAccountInfo.ChainAccountCryptoType
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
@@ -54,6 +54,7 @@ class RealLocalAccountsCloudBackupFacade(
     private val cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker,
     private val metaAccountChangedEvents: MetaAccountChangesEventBus,
     private val chainRegistry: ChainRegistry,
+    private val accountMappers: AccountMappers,
 ) : LocalAccountsCloudBackupFacade {
 
     override suspend fun fullBackupInfoFromLocalSnapshot(): CloudBackup {
@@ -143,7 +144,7 @@ class RealLocalAccountsCloudBackupFacade(
 
             MetaAccountChangesEventBus.Event.AccountRemoved(
                 metaId = localWallet.metaAccount.id,
-                metaAccountType = mapMetaAccountTypeFromLocal(localWallet.metaAccount.type)
+                metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(localWallet.metaAccount.type)
             )
         }
     }
@@ -161,7 +162,9 @@ class RealLocalAccountsCloudBackupFacade(
             val metaId = accountDao.insertMetaAccount(metaAccountLocal)
 
             val chainAccountsLocal = publicWalletInfo.getChainAccountsLocal(metaId)
-            accountDao.insertChainAccounts(chainAccountsLocal)
+            if (chainAccountsLocal.isNotEmpty()) {
+                accountDao.insertChainAccounts(chainAccountsLocal)
+            }
 
             val metaAccountSecrets = cloudBackup.getMetaAccountSecrets(publicWalletInfo.walletId)
             metaAccountSecrets?.let {
@@ -180,7 +183,7 @@ class RealLocalAccountsCloudBackupFacade(
 
             MetaAccountChangesEventBus.Event.AccountAdded(
                 metaId = metaId,
-                metaAccountType = mapMetaAccountTypeFromLocal(metaAccountLocal.type)
+                metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(metaAccountLocal.type)
             )
         }
     }
@@ -252,7 +255,7 @@ class RealLocalAccountsCloudBackupFacade(
                 secretsStoreV2.putAdditionalMetaAccountSecret(metaId, secretName, secretValue)
             }
 
-            val metaAccountType = mapMetaAccountTypeFromLocal(oldMetaAccountLocal.type)
+            val metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(oldMetaAccountLocal.type)
 
             result.add(
                 MetaAccountChangesEventBus.Event.AccountStructureChanged(
@@ -304,12 +307,10 @@ class RealLocalAccountsCloudBackupFacade(
         }
 
         fun getAllGenericLedgerAdditionalSecrets(): Map<String, String> {
-            val firstChainAccount = walletPublicInfo.chainAccounts.first()
-            val accountId = firstChainAccount.accountId.intoKey()
-            val derivationPath = chainAccountsSecretsByAccountId[accountId]?.derivationPath!!
+            val genericDerivationPath = privateInfo.substrate!!.derivationPath!!
             val secretName = LedgerDerivationPath.genericDerivationPathSecretKey()
 
-            return mapOf(secretName to derivationPath)
+            return mapOf(secretName to genericDerivationPath)
         }
 
         return when (walletPublicInfo.type) {
@@ -325,7 +326,7 @@ class RealLocalAccountsCloudBackupFacade(
 
     private suspend fun getAllBackupableAccounts(): List<JoinedMetaAccountInfo> {
         return accountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
-            .filter { it.metaAccount.type.isBackupable() }
+            .filter { accountMappers.mapMetaAccountTypeFromLocal(it.metaAccount.type).isBackupable() }
     }
 
     private suspend fun preparePrivateBackupData(metaAccounts: List<JoinedMetaAccountInfo>): CloudBackup.PrivateData {
@@ -349,19 +350,48 @@ class RealLocalAccountsCloudBackupFacade(
         return CloudBackup.WalletPrivateInfo(
             walletId = joinedMetaAccountInfo.metaAccount.globallyUniqueId,
             entropy = baseSecrets?.entropy,
-            substrate = baseSecrets.getSubstrateBackupSecrets(),
+            substrate = prepareSubstrateBackupSecrets(baseSecrets, joinedMetaAccountInfo),
             ethereum = baseSecrets.getEthereumBackupSecrets(),
             chainAccounts = chainAccountsFromChainSecrets + chainAccountFromAdditionalSecrets,
         )
     }
+
+    private suspend fun prepareSubstrateBackupSecrets(
+        baseSecrets: EncodableStruct<MetaAccountSecrets>?,
+        metaAccountLocal: JoinedMetaAccountInfo
+    ): CloudBackup.WalletPrivateInfo.SubstrateSecrets? {
+        return when(metaAccountLocal.metaAccount.type) {
+            MetaAccountLocal.Type.LEDGER_GENERIC -> prepareGenericLedgerSubstrateBackupSecrets(metaAccountLocal)
+
+            MetaAccountLocal.Type.LEDGER,
+            MetaAccountLocal.Type.SECRETS,
+            MetaAccountLocal.Type.WATCH_ONLY,
+            MetaAccountLocal.Type.PARITY_SIGNER,
+            MetaAccountLocal.Type.POLKADOT_VAULT,
+            MetaAccountLocal.Type.PROXIED -> baseSecrets.getSubstrateBackupSecrets()
+        }
+    }
+
+    private suspend fun prepareGenericLedgerSubstrateBackupSecrets(metaAccountLocal: JoinedMetaAccountInfo): CloudBackup.WalletPrivateInfo.SubstrateSecrets {
+        val ledgerDerivationPathKey = LedgerDerivationPath.genericDerivationPathSecretKey()
+        val ledgerDerivationPath = secretsStoreV2.getAdditionalMetaAccountSecret(metaAccountLocal.metaAccount.id, ledgerDerivationPathKey)
+
+
+        return CloudBackup.WalletPrivateInfo.SubstrateSecrets(
+            seed = null,
+            keypair = null,
+            derivationPath = ledgerDerivationPath
+        )
+    }
+
 
     private suspend fun prepareChainAccountsFromAdditionalSecrets(
         metaAccountLocal: JoinedMetaAccountInfo
     ): List<CloudBackup.WalletPrivateInfo.ChainAccountSecrets> {
         return when (metaAccountLocal.metaAccount.type) {
             MetaAccountLocal.Type.LEDGER -> prepareLegacyLedgerChainAccountSecrets(metaAccountLocal)
-            MetaAccountLocal.Type.LEDGER_GENERIC -> prepareGenericLedgerChainAccountSecrets(metaAccountLocal)
 
+            MetaAccountLocal.Type.LEDGER_GENERIC,
             MetaAccountLocal.Type.SECRETS,
             MetaAccountLocal.Type.WATCH_ONLY,
             MetaAccountLocal.Type.PARITY_SIGNER,
@@ -385,30 +415,6 @@ class RealLocalAccountsCloudBackupFacade(
                 derivationPath = ledgerDerivationPath
             )
         }
-    }
-
-    private suspend fun prepareGenericLedgerChainAccountSecrets(
-        ledgerAccountLocal: JoinedMetaAccountInfo
-    ): List<CloudBackup.WalletPrivateInfo.ChainAccountSecrets> {
-        require(ledgerAccountLocal.chainAccounts.isNotEmpty()) {
-            "Unexpected state - no generic ledger chain accounts"
-        }
-
-        val ledgerDerivationPathKey = LedgerDerivationPath.genericDerivationPathSecretKey()
-        val ledgerDerivationPath = secretsStoreV2.getAdditionalMetaAccountSecret(ledgerAccountLocal.metaAccount.id, ledgerDerivationPathKey)
-
-        val firstChainAccount = ledgerAccountLocal.chainAccounts.first()
-
-        // Generic ledger has only one chain account in private backup section since public keys for all chains are equal
-        return listOf(
-            CloudBackup.WalletPrivateInfo.ChainAccountSecrets(
-                accountId = firstChainAccount.accountId,
-                entropy = null,
-                seed = null,
-                keypair = null,
-                derivationPath = ledgerDerivationPath
-            )
-        )
     }
 
     private suspend fun prepareChainAccountPrivateInfo(metaAccount: Long, chainAccountId: AccountId): CloudBackup.WalletPrivateInfo.ChainAccountSecrets? {
@@ -450,6 +456,9 @@ class RealLocalAccountsCloudBackupFacade(
         return MetaAccountSecrets(
             entropy = entropy,
             seed = substrate?.seed,
+            // Keypair is optional in backup since Ledger backup has base substrate derivation path but doesn't have keypair
+            // MetaAccountSecrets, however, require substrateKeyPair to be non-null, so we return null here in case of null keypair
+            // Which is a expected behavior in case of Ledger secrets
             substrateKeyPair = substrate?.keypair?.toLocalKeyPair() ?: return null,
             substrateDerivationPath = substrate?.derivationPath,
             ethereumKeypair = ethereum?.keypair?.toLocalKeyPair(),

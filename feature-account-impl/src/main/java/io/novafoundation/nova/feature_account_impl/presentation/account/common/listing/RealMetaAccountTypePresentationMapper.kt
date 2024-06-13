@@ -18,7 +18,7 @@ class RealMetaAccountTypePresentationMapper(
     private val ledgerMigrationTracker: LedgerMigrationTracker,
 ): MetaAccountTypePresentationMapper {
 
-    override fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
+    override suspend fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
         return mapTypeToChipLabel(type)?.let(::AccountChipGroupRvItem)
     }
 
