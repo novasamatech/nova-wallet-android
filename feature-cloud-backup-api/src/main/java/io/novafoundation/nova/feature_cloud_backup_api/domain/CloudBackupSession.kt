@@ -33,6 +33,10 @@ interface CloudBackupSession {
     suspend fun getSavedPassword(): Result<String>
 
     suspend fun setSavedPassword(password: String)
+
+    fun cloudBackupWasInitialized(): Boolean
+
+    fun setBackupWasInitialized()
 }
 
 suspend fun CloudBackupSession.setLastSyncedTimeAsNow() {
@@ -40,6 +44,7 @@ suspend fun CloudBackupSession.setLastSyncedTimeAsNow() {
 }
 
 suspend fun CloudBackupSession.initEnabledBackup(password: String) {
+    setBackupWasInitialized()
     setSyncingBackupEnabled(true)
     setLastSyncedTimeAsNow()
     setSavedPassword(password)

@@ -64,7 +64,7 @@
                 android:layout_marginTop="16dp"
                 android:icon="@drawable/ic_manual_backup_eye"
                 app:iconTint="@color/icon_warning"
-                tools:text="@string/manual_backup_warning_condition_1" />
+                tools:text="@string/backup_secrets_warning_condition_1" />
 
             <io.novafoundation.nova.common.view.WarningCheckBox
                 android:id="@+id/manualBackupWarningCondition2"
@@ -74,7 +74,7 @@
                 android:layout_marginTop="12dp"
                 android:icon="@drawable/ic_manual_backup_funds"
                 app:iconTint="@color/icon_warning"
-                tools:text="@string/manual_backup_warning_condition_2" />
+                tools:text="@string/backup_secrets_warning_condition_2" />
 
             <io.novafoundation.nova.common.view.WarningCheckBox
                 android:id="@+id/manualBackupWarningCondition3"
@@ -84,7 +84,7 @@
                 android:layout_marginTop="12dp"
                 android:icon="@drawable/ic_manual_backup_person"
                 app:iconTint="@color/icon_warning"
-                tools:text="@string/manual_backup_warning_condition_3" />
+                tools:text="@string/backup_secrets_warning_condition_3" />
 
         </LinearLayout>
 

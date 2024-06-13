@@ -7,13 +7,13 @@ sealed class BackupSyncOutcome {
 
     object Ok : BackupSyncOutcome()
 
+    object EmptyPassword : BackupSyncOutcome()
+
     object UnknownPassword : BackupSyncOutcome()
 
     class DestructiveDiff(val cloudBackupDiff: CloudBackupDiff, val cloudBackup: CloudBackup) : BackupSyncOutcome()
 
     object StorageAuthFailed : BackupSyncOutcome()
-
-    object OtherStorageIssue : BackupSyncOutcome()
 
     object CorruptedBackup : BackupSyncOutcome()
 

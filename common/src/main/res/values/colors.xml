@@ -13,6 +13,7 @@
 
     <!-- Text Colors -->
     <color name="text_primary">#E0FFFFFF</color>
+    <color name="text_on_cloud_backup_button">#05081C</color>
     <color name="text_secondary">#7AFFFFFF</color>
     <color name="button_text">#E0FFFFFF</color>
     <color name="chip_text">#A3FFFFFF</color>
@@ -66,6 +67,7 @@
     <color name="token_container_background">#3D08090E</color>
     <color name="segmented_background">#5208090E</color>
     <color name="segmented_background_on_black">#1A999EC7</color>
+    <color name="cloud_backup_button_background">#FFFFFF</color>
 
     <color name="segmented_tab_active">#3D999EC7</color>
     <color name="switch_background">#3D999EC7</color>

@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInf
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
-import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
@@ -20,6 +19,7 @@ import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
@@ -62,6 +62,7 @@ import kotlinx.coroutines.launch
 class BackupSettingsViewModel(
     private val resourceManager: ResourceManager,
     private val router: SettingsRouter,
+    private val accountInteractor: AccountInteractor,
     private val cloudBackupSettingsInteractor: CloudBackupSettingsInteractor,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
@@ -131,7 +132,16 @@ class BackupSettingsViewModel(
     }
 
     fun manualBackupClicked() {
-        router.openManualBackup()
+        launch {
+            if (accountInteractor.hasSecretsAccounts()) {
+                router.openManualBackup()
+            } else {
+                showError(
+                    resourceManager.getString(R.string.backup_settings_no_wallets_error_title),
+                    resourceManager.getString(R.string.backup_settings_no_wallets_error_message)
+                )
+            }
+        }
     }
 
     fun cloudBackupManageClicked() {
@@ -140,9 +150,9 @@ class BackupSettingsViewModel(
         when (syncedState.value) {
             BackupSyncOutcome.StorageAuthFailed -> return
 
+            BackupSyncOutcome.EmptyPassword,
             BackupSyncOutcome.UnknownPassword,
-            BackupSyncOutcome.CorruptedBackup,
-            BackupSyncOutcome.OtherStorageIssue -> {
+            BackupSyncOutcome.CorruptedBackup -> {
                 listSelectorMixin.showSelector(
                     R.string.manage_cloud_backup,
                     listOf(manageBackupDeleteBackupItem())
@@ -162,13 +172,13 @@ class BackupSettingsViewModel(
 
     fun problemButtonClicked() {
         when (val value = syncedState.value) {
+            BackupSyncOutcome.EmptyPassword,
             BackupSyncOutcome.UnknownPassword -> openRestorePassword()
 
             BackupSyncOutcome.CorruptedBackup -> showCorruptedBackupActionDialog()
             is BackupSyncOutcome.DestructiveDiff -> openCloudBackupDiffScreen(value.cloudBackupDiff, value.cloudBackup)
             BackupSyncOutcome.StorageAuthFailed -> initSignInToCloud()
 
-            BackupSyncOutcome.OtherStorageIssue,
             BackupSyncOutcome.UnknownError -> showCloudBackupUnknownError(resourceManager)
 
             BackupSyncOutcome.Ok -> {}
@@ -209,7 +219,8 @@ class BackupSettingsViewModel(
 
     private fun Throwable.toEnableBackupSyncState(): BackupSyncOutcome {
         return when (this) {
-            is PasswordNotSaved, is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
+            is PasswordNotSaved -> BackupSyncOutcome.EmptyPassword
+            is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
             // not found backup is ok when we enable backup and when we start initial sync since we will create a new backup
             is CannotApplyNonDestructiveDiff -> BackupSyncOutcome.DestructiveDiff(cloudBackupDiff, cloudBackup)
             is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok
@@ -245,10 +256,7 @@ class BackupSettingsViewModel(
 
                 when (throwable) {
                     is CloudBackupNotFound -> {
-                        syncWalletsBackupPasswordCommunicator.awaitResponse(SyncWalletsBackupPasswordRequester.EmptyRequest)
-                        // cloudBackupSyncEnabled is set by syncWalletsBackup flow
-                        cloudBackupEnabled.value = cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()
-                        syncedState.value = BackupSyncOutcome.Ok
+                        syncWalletsBackupPasswordCommunicator.openRequest(SyncWalletsBackupPasswordRequester.EmptyRequest)
                     }
 
                     else -> {
@@ -272,8 +280,13 @@ class BackupSettingsViewModel(
     private fun Result<Unit>.handleSyncBackupResult(): Result<Unit> {
         return onSuccess { syncedState.value = BackupSyncOutcome.Ok; }
             .onFailure { throwable ->
-                syncedState.value = throwable.toEnableBackupSyncState()
-                handleBackupError(throwable)
+                val state = throwable.toEnableBackupSyncState()
+                syncedState.value = state
+                if (state == BackupSyncOutcome.EmptyPassword) {
+                    openRestorePassword()
+                } else {
+                    handleBackupError(throwable)
+                }
             }
     }
 
@@ -322,6 +335,11 @@ class BackupSettingsViewModel(
         changeBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
         restoreBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
         syncWalletsBackupPasswordCommunicator.responseFlow.syncBackupOnEach()
+
+        syncWalletsBackupPasswordCommunicator.responseFlow.onEach { response ->
+            cloudBackupEnabled.value = cloudBackupSettingsInteractor.isSyncCloudBackupEnabled()
+            syncedState.value = BackupSyncOutcome.Ok
+        }.launchIn(this)
     }
 
     private fun Flow<Any>.syncBackupOnEach() {

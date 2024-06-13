@@ -64,7 +64,7 @@ class ImportWalletOptionsViewModel(
     }
 
     fun importHardwareClicked() {
-        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+        cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             launch {
                 when (val selection = selectHardwareWallet.awaitAction()) {
                     HardwareWalletModel.LedgerLegacy -> router.openStartImportLegacyLedger()
@@ -80,7 +80,7 @@ class ImportWalletOptionsViewModel(
     }
 
     fun importWatchOnlyClicked() {
-        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+        cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             router.openCreateWatchWallet()
         }
     }
@@ -94,7 +94,7 @@ class ImportWalletOptionsViewModel(
     }
 
     private fun openImportType(importType: ImportType) {
-        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+        cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             router.openImportAccountScreen(ImportAccountPayload(importType = importType, addAccountPayload = AddAccountPayload.MetaAccount))
         }
     }

@@ -296,6 +296,10 @@ class AccountRepositoryImpl(
         return accountDataSource.getMetaAccountIdsByType(type)
     }
 
+    override suspend fun hasSecretsAccounts(): Boolean {
+        return accountDataSource.hasSecretsAccounts()
+    }
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }

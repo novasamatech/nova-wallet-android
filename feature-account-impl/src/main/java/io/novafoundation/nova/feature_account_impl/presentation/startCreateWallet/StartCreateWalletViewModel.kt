@@ -53,8 +53,9 @@ class StartCreateWalletViewModel(
 
     val isSyncWithCloudEnabled = flowOf { startCreateWalletInteractor.isSyncWithCloudEnabled() }
 
-    val continueButtonState: Flow<DescriptiveButtonState> = combine(progressFlow, nameInput) { progress, name ->
+    val continueButtonState: Flow<DescriptiveButtonState> = combine(progressFlow, nameInput, createWalletState) { progress, name, flowState ->
         when {
+            flowState != CreateWalletState.SETUP_NAME -> DescriptiveButtonState.Gone
             progress -> DescriptiveButtonState.Loading
             name.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.start_create_wallet_enter_wallet_name))
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))

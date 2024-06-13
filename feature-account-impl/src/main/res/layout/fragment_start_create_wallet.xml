@@ -52,12 +52,14 @@
             android:gravity="center_vertical"
             android:minHeight="22dp"
             android:orientation="horizontal"
-            android:paddingHorizontal="4dp"
             android:paddingVertical="2dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="8dp"
             app:layout_cardBackgroundColor="@color/input_background"
             app:layout_cardRadius="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_drawBorder="false">
 
             <ImageView
                 android:layout_width="14dp"
@@ -71,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:gravity="center_vertical"
-                android:text="@string/cloud_backup"
+                android:text="@string/common_cloud_backup"
                 android:textColor="@color/chip_text" />
 
         </LinearLayout>
@@ -156,10 +158,12 @@
         android:layout_marginBottom="12dp"
         android:text="@string/start_create_wallet_cloud_backup_btn"
         android:visibility="gone"
-        app:iconSrc="@drawable/ic_cloud_android"
+        app:appearance="cloudBackup"
+        app:iconSrc="@drawable/ic_google_logo"
         app:layout_constraintBottom_toTopOf="@id/startCreateWalletManualBackupButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/startCreateWalletManualBackupButton"
@@ -170,9 +174,9 @@
         android:text="@string/start_create_wallet_manual_backup_btn"
         android:visibility="gone"
         app:appearance="secondary"
-        app:iconSrc="@drawable/ic_memo_android"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

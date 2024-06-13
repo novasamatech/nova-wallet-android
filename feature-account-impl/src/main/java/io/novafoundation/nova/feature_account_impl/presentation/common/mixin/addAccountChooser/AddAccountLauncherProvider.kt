@@ -87,7 +87,7 @@ class AddAccountLauncherProvider(
     }
 
     private fun launchAddWatchOnly(chain: Chain, metaAccount: MetaAccount) {
-        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+        cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
 
             router.openChangeWatchAccount(chainAccountPayload)
@@ -114,7 +114,7 @@ class AddAccountLauncherProvider(
     private fun addAccountSelected(payload: AddAccountPayload.ChainAccount) {
         scope.launch {
             if (cloudBackupService.session.isSyncWithCloudEnabled()) {
-                cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+                cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
                     addAccountWithRecommendedSettings(payload)
                 }
             } else {
@@ -134,7 +134,7 @@ class AddAccountLauncherProvider(
     private fun importAccountSelected(chainAccountPayload: AddAccountPayload.ChainAccount) {
         val payload = ImportTypeChooserMixin.Payload(
             onChosen = {
-                cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+                cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
                     importTypeSelected(chainAccountPayload, it)
                 }
             }

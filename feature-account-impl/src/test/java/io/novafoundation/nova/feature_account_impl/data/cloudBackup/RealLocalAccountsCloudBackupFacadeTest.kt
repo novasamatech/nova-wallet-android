@@ -39,6 +39,7 @@ import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -519,7 +520,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verifyNoAdditionalSecretsInserted()
 
         // no deletes happened
-        verify(secretStore, never()).clearSecrets(anyLong(), any())
+        verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
         verify(metaAccountDao, never()).delete(any<List<Long>>())
 
         // no modifications happened
@@ -636,7 +637,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         val chainAccountIds = listOf(bytes32)
 
         verify(metaAccountDao).delete(singleMetaIdListOf(0))
-        verify(secretStore).clearSecrets(eq(0), byteArrayListEq(chainAccountIds))
+        verify(secretStore).clearMetaAccountSecrets(eq(0), byteArrayListEq(chainAccountIds))
 
         // no additions happened
         verify(secretStore, never()).putMetaAccountSecrets(anyLong(), any())
@@ -806,7 +807,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         // Entropy was updated
         verify(secretStore).putMetaAccountSecrets(eq(0), metaAccountSecretsWithEntropy(changedBytes32))
 
-        verify(secretStore).clearSecrets(eq(0), byteArrayListEq(chainAccountIds))
+        verify(secretStore).clearChainAccountsSecrets(eq(0), byteArrayListEq(chainAccountIds))
 
         // No new chain account secrets were inserted
         verify(secretStore, never()).putChainAccountSecrets(anyLong(), any(), any())
@@ -889,7 +890,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(secretStore).putAdditionalMetaAccountSecret(eq(0), eq(ledgerDerivationPathSecretName), eq(ethereumDerivationPath))
 
         // no deletes happened
-        verify(secretStore, never()).clearSecrets(anyLong(), any())
+        verify(secretStore, never()).clearMetaAccountSecrets(anyLong(), any())
         verify(metaAccountDao, never()).delete(any<List<Long>>())
 
         // no modifications happened
@@ -1089,7 +1090,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         // Base secrets were not updated since they are not present
         verify(secretStore, never()).putMetaAccountSecrets(anyLong(), any())
 
-        verify(secretStore).clearSecrets(eq(0), byteArrayListEq(oldChainAccountIds))
+        verify(secretStore).clearChainAccountsSecrets(eq(0), byteArrayListEq(oldChainAccountIds))
 
         // No new chain account secrets were inserted since its ledger account
         verify(secretStore, never()).putChainAccountSecrets(anyLong(), any(), any())

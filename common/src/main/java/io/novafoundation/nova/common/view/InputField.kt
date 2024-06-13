@@ -32,6 +32,7 @@ class InputField @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_input_field, this)
 
+        content.setHintTextColor(context.getColor(R.color.hint_text))
         content.background = context.getCornersStateDrawable()
 
         attrs?.let(::applyAttributes)
@@ -58,6 +59,9 @@ class InputField @JvmOverloads constructor(
             hint = null
             content.hint = contentHint
         }
+
+        val hintColor = typedArray.getColor(R.styleable.InputField_editTextHintColor, context.getColor(R.color.hint_text))
+        content.setHintTextColor(hintColor)
 
         val backgroundMode = typedArray.getEnum(R.styleable.InputField_backgroundMode, BackgroundMode.INPUT_STATE)
         when (backgroundMode) {

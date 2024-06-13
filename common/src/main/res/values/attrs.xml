@@ -68,6 +68,7 @@
         <attr name="android:inputType" />
         <attr name="android:text" />
         <attr name="editTextHint" format="string" />
+        <attr name="editTextHintColor" format="color" />
         <attr name="android:textAppearance" />
         <attr name="editTextPaddingStart" format="dimension" />
         <attr name="editTextPaddingEnd" format="dimension" />
@@ -133,6 +134,7 @@
             <enum name="primaryPositive" value="4" />
             <enum name="primaryNegative" value="5" />
             <enum name="accentSecondaryTransparent" value="6" />
+            <enum name="cloudBackup" value="7" />
         </attr>
 
         <attr name="size" format="enum">
@@ -286,6 +288,7 @@
         <attr name="layout_cardBackgroundColor" format="color" />
         <attr name="layout_cardBorderColor" format="color" />
         <attr name="layout_cardRadius" format="dimension" />
+        <attr name="layout_drawBorder" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="TitledSearchToolbar">

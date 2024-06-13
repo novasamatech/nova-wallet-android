@@ -131,4 +131,6 @@ interface AccountRepository {
     suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
 
     suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
+
+    suspend fun hasSecretsAccounts(): Boolean
 }

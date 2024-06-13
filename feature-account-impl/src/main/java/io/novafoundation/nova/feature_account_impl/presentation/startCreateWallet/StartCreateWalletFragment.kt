@@ -81,8 +81,6 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
             startCreateWalletNameInputLayout.isEndIconVisible = it == CreateWalletState.SETUP_NAME
             startCreateWalletNameInput.isFocusable = it == CreateWalletState.SETUP_NAME
             startCreateWalletNameInput.isFocusableInTouchMode = it == CreateWalletState.SETUP_NAME
-
-            startCreateWalletConfirmName.isVisible = it == CreateWalletState.SETUP_NAME
         }
 
         viewModel.titleText.observe {

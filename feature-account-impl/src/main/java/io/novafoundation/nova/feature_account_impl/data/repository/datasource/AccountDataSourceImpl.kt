@@ -153,6 +153,10 @@ class AccountDataSourceImpl(
         return metaAccountDao.getMetaAccountIdsByType(mapMetaAccountTypeToLocal(type))
     }
 
+    override suspend fun hasSecretsAccounts(): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(MetaAccountLocal.Type.SECRETS)
+    }
+
     override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
         return metaAccountDao.getMetaAccounts().map(accountMappers::mapMetaAccountLocalToLightMetaAccount)
     }
@@ -227,7 +231,7 @@ class AccountDataSourceImpl(
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)
 
         metaAccountDao.delete(metaId)
-        secretStoreV2.clearSecrets(metaId, chainAccountIds)
+        secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
     }
 
     override suspend fun insertMetaAccountFromSecrets(
