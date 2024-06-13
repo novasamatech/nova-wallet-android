@@ -16,7 +16,7 @@ class RealMetaAccountTypePresentationMapper(
     private val resourceManager: ResourceManager,
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
-): MetaAccountTypePresentationMapper {
+) : MetaAccountTypePresentationMapper {
 
     override suspend fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
         return mapTypeToChipLabel(type)?.let(::AccountChipGroupRvItem)

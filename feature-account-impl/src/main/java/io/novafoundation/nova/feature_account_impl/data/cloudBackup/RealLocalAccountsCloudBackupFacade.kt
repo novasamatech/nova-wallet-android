@@ -360,7 +360,7 @@ class RealLocalAccountsCloudBackupFacade(
         baseSecrets: EncodableStruct<MetaAccountSecrets>?,
         metaAccountLocal: JoinedMetaAccountInfo
     ): CloudBackup.WalletPrivateInfo.SubstrateSecrets? {
-        return when(metaAccountLocal.metaAccount.type) {
+        return when (metaAccountLocal.metaAccount.type) {
             MetaAccountLocal.Type.LEDGER_GENERIC -> prepareGenericLedgerSubstrateBackupSecrets(metaAccountLocal)
 
             MetaAccountLocal.Type.LEDGER,
@@ -376,14 +376,12 @@ class RealLocalAccountsCloudBackupFacade(
         val ledgerDerivationPathKey = LedgerDerivationPath.genericDerivationPathSecretKey()
         val ledgerDerivationPath = secretsStoreV2.getAdditionalMetaAccountSecret(metaAccountLocal.metaAccount.id, ledgerDerivationPathKey)
 
-
         return CloudBackup.WalletPrivateInfo.SubstrateSecrets(
             seed = null,
             keypair = null,
             derivationPath = ledgerDerivationPath
         )
     }
-
 
     private suspend fun prepareChainAccountsFromAdditionalSecrets(
         metaAccountLocal: JoinedMetaAccountInfo
