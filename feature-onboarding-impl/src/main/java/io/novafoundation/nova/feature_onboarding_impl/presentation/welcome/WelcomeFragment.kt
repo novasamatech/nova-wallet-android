@@ -46,32 +46,22 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     override fun initViews() {
-        configureTermsAndPrivacy(
-            getString(R.string.onboarding_terms_and_conditions_1_v2_2_1),
-            getString(R.string.onboarding_terms_and_conditions_2),
-            getString(R.string.onboarding_privacy_policy)
-        )
-        welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
-        welcomeTerms.highlightColor = Color.TRANSPARENT
-
-        welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
-        welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
+        createAccountBtn.setOnClickListener { viewModel.createAccountClicked() }
+        importAccountBtn.setOnClickListener { viewModel.importAccountClicked() }
+        welcomeAddWatchWallet.setOnClickListener { viewModel.addWatchWalletClicked() }
+        welcomeConnectHardwareWallet.setOnClickListener { viewModel.connectHardwareWalletClicked() }
 
         welcomeBackButton.setOnClickListener { viewModel.backClicked() }
     }
 
-    private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
-        val linkColor = requireContext().getColor(R.color.text_primary)
-
-        welcomeTerms.text = styleText(sourceText) {
-            clickable(terms, linkColor) {
-                viewModel.termsClicked()
-            }
-
-            clickable(privacy, linkColor) {
-                viewModel.privacyClicked()
-            }
-        }
+    private fun configureTermsAndPrivacy() {
+        termsTv.applyTermsAndPrivacyPolicy(
+            R.string.onboarding_terms_and_conditions_1_v2_2_1,
+            R.string.onboarding_terms_and_conditions_2,
+            R.string.onboarding_privacy_policy,
+            viewModel::termsClicked,
+            viewModel::privacyClicked
+        )
     }
 
     override fun inject() {

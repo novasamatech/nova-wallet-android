@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasAccountComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -29,6 +30,7 @@ class LegacyLedgerWalletDetailsMixin(
     private val interactor: WalletDetailsInteractor,
     private val host: WalletDetailsMixinHost,
     private val appLinksProvider: AppLinksProvider,
+    private val ledgerMigrationTracker: LedgerMigrationTracker,
     metaAccount: MetaAccount
 ) : WalletDetailsMixin(metaAccount) {
 
@@ -37,15 +39,25 @@ class LegacyLedgerWalletDetailsMixin(
     override val availableAccountActions: Flow<Set<AccountAction>> = flowOf { setOf(AccountAction.CHANGE) }
 
     override val typeAlert: Flow<AlertModel?> = flowOf {
-        AlertModel(
-            style = AlertView.Style.fromPreset(AlertView.StylePreset.WARNING),
-            message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
-            subMessage = resourceManager.getString(R.string.account_ledger_legacy_warning_message),
-            action = AlertModel.ActionModel(
-                text = resourceManager.getString(R.string.common_find_out_more),
-                listener = { host.browserableDelegate.showBrowser(appLinksProvider.ledgerMigrationArticle) }
+        if (ledgerMigrationTracker.anyChainSupportsMigrationApp()) {
+            AlertModel(
+                style = AlertView.Style.fromPreset(AlertView.StylePreset.WARNING),
+                message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
+                subMessage = resourceManager.getString(R.string.account_ledger_legacy_warning_message),
+                action = AlertModel.ActionModel(
+                    text = resourceManager.getString(R.string.common_find_out_more),
+                    listener = { host.browserableDelegate.showBrowser(appLinksProvider.ledgerMigrationArticle) }
+                )
             )
-        )
+        } else {
+            AlertModel(
+                style = AlertView.Style(
+                    backgroundColorRes = R.color.block_background,
+                    iconRes = R.drawable.ic_ledger
+                ),
+                message = resourceManager.getString(R.string.ledger_wallet_details_description)
+            )
+        }
     }
 
     override fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> = flowOfAll {

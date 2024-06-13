@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepos
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface DeepLinkingFeatureDependencies {
@@ -50,4 +51,6 @@ interface DeepLinkingFeatureDependencies {
     val mutableGovernanceState: MutableGovernanceState
 
     val encryptionDefaults: EncryptionDefaults
+
+    val walletConnectService: WalletConnectService
 }

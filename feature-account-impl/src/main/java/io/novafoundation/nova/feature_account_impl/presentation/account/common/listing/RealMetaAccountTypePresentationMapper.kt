@@ -10,18 +10,31 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.common.l
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountChipGroupRvItem
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 
 class RealMetaAccountTypePresentationMapper(
     private val resourceManager: ResourceManager,
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-) : MetaAccountTypePresentationMapper {
+    private val ledgerMigrationTracker: LedgerMigrationTracker,
+): MetaAccountTypePresentationMapper {
 
     override fun mapMetaAccountTypeToUi(type: LightMetaAccount.Type): AccountChipGroupRvItem? {
         return mapTypeToChipLabel(type)?.let(::AccountChipGroupRvItem)
     }
 
-    override fun mapTypeToChipLabel(type: LightMetaAccount.Type): ChipLabelModel? {
-        val icon = iconFor(type)
+    override suspend fun mapTypeToChipLabel(type: LightMetaAccount.Type): ChipLabelModel? {
+        var ledgerGenericAvailable: Boolean? = null
+
+        // Cache result of `ledgerMigrationTracker.anyChainSupportsMigrationApp()` in the method scope
+        val genericLedgerAvailabilityChecker: GenericLedgerAvailabilityChecker = {
+            if (ledgerGenericAvailable == null) {
+                ledgerGenericAvailable = ledgerMigrationTracker.anyChainSupportsMigrationApp()
+            }
+
+            ledgerGenericAvailable!!
+        }
+
+        val icon = iconFor(type, genericLedgerAvailabilityChecker)
 
         val label = when (type) {
             LightMetaAccount.Type.SECRETS -> null
@@ -32,7 +45,11 @@ class RealMetaAccountTypePresentationMapper(
                 resourceManager.getString(config.common.nameRes)
             }
 
-            LightMetaAccount.Type.LEDGER_LEGACY -> resourceManager.getString(R.string.accounts_ledger_legacy)
+            LightMetaAccount.Type.LEDGER_LEGACY -> if (genericLedgerAvailabilityChecker()) {
+                resourceManager.getString(R.string.accounts_ledger_legacy)
+            } else {
+                resourceManager.getString(R.string.common_ledger)
+            }
 
             LightMetaAccount.Type.LEDGER -> resourceManager.getString(R.string.common_ledger)
 
@@ -46,7 +63,14 @@ class RealMetaAccountTypePresentationMapper(
         }
     }
 
-    override fun iconFor(type: LightMetaAccount.Type): TintedIcon? {
+    override suspend fun iconFor(type: LightMetaAccount.Type): TintedIcon? {
+        return iconFor(type) { ledgerMigrationTracker.anyChainSupportsMigrationApp() }
+    }
+
+    private suspend fun iconFor(
+        type: LightMetaAccount.Type,
+        genericLedgerAvailable: GenericLedgerAvailabilityChecker
+    ): TintedIcon? {
         return when (type) {
             LightMetaAccount.Type.SECRETS -> null
             LightMetaAccount.Type.WATCH_ONLY -> R.drawable.ic_watch_only_filled.asTintedIcon(canApplyOwnTint = true)
@@ -56,9 +80,16 @@ class RealMetaAccountTypePresentationMapper(
                 config.common.iconRes.asTintedIcon(canApplyOwnTint = true)
             }
 
-            LightMetaAccount.Type.LEDGER_LEGACY -> R.drawable.ic_ledger_legacy.asTintedIcon(canApplyOwnTint = false)
+            LightMetaAccount.Type.LEDGER_LEGACY -> if (genericLedgerAvailable()) {
+                R.drawable.ic_ledger_legacy.asTintedIcon(canApplyOwnTint = false)
+            } else {
+                R.drawable.ic_ledger.asTintedIcon(canApplyOwnTint = true)
+            }
+
             LightMetaAccount.Type.LEDGER -> R.drawable.ic_ledger.asTintedIcon(canApplyOwnTint = true)
             LightMetaAccount.Type.PROXIED -> R.drawable.ic_proxy.asTintedIcon(canApplyOwnTint = true)
         }
     }
 }
+
+private typealias GenericLedgerAvailabilityChecker = suspend () -> Boolean

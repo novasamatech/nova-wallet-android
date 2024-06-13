@@ -64,7 +64,8 @@ class UsbLedgerConnection(
         }
 
         for (chunk in chunks) {
-            val result = connection.bulkTransfer(endpoint, chunk, chunk.size, 1000)
+            Log.w("Ledger", "Attempting to send chunk of size ${chunk.size} over usb")
+            val result = connection.bulkTransfer(endpoint, chunk, chunk.size, 10000)
             if (result < 0) {
                 Log.w("Ledger", "Failed to send bytes over usb: $result")
             } else {

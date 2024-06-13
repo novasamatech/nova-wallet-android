@@ -10,24 +10,27 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER_LEGACY
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PARITY_SIGNER
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.POLKADOT_VAULT
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PROXIED
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
-import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrNull
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
+import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrThrow
 import io.novafoundation.nova.feature_account_api.domain.validation.NoChainAccountFoundError.AddAccountState
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.polkadotVaultLabelFor
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.supports
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface NoChainAccountFoundError {
+
     val chain: Chain
     val account: MetaAccount
     val addAccountState: AddAccountState
 
     sealed class AddAccountState {
+
         object CanAdd : AddAccountState()
 
         object LedgerNotSupported : AddAccountState()
@@ -47,24 +50,23 @@ class HasChainAccountValidation<P, E>(
     override suspend fun validate(value: P): ValidationStatus<E> {
         val account = metaAccountExtractor(value)
         val chain = chainExtractor(value)
-        val polkadotVaultVariant = account.type.asPolkadotVaultVariantOrNull()
 
         return when {
             account.hasAccountIn(chain) -> ValidationStatus.Valid()
 
-            account.type == LEDGER_LEGACY && !SubstrateApplicationConfig.supports(chain.id) -> {
-                errorProducer(chain, account, AddAccountState.LedgerNotSupported).validationError()
-            }
+            account.supportsAddingChainAccount(chain) -> errorProducer(chain, account, AddAccountState.CanAdd).validationError()
 
-            account.type == PROXIED -> {
-                errorProducer(chain, account, AddAccountState.ProxyAccountNotSupported).validationError()
-            }
+            else -> when (account.type) {
+                LEDGER_LEGACY, LEDGER -> errorProducer(chain, account, AddAccountState.LedgerNotSupported).validationError()
+                PROXIED -> errorProducer(chain, account, AddAccountState.ProxyAccountNotSupported).validationError()
+                POLKADOT_VAULT, PARITY_SIGNER -> {
+                    val variant = account.type.asPolkadotVaultVariantOrThrow()
+                    errorProducer(chain, account, AddAccountState.PolkadotVaultNotSupported(variant)).validationError()
+                }
 
-            polkadotVaultVariant != null && chain.isEthereumBased -> {
-                errorProducer(chain, account, AddAccountState.PolkadotVaultNotSupported(polkadotVaultVariant)).validationError()
+                LightMetaAccount.Type.SECRETS, LightMetaAccount.Type.WATCH_ONLY ->
+                    error("Unexpected type with not possible to add account: ${account.type}")
             }
-
-            else -> errorProducer(chain, account, AddAccountState.CanAdd).validationError()
         }
     }
 }

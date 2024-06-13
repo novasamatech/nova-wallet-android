@@ -42,8 +42,6 @@ interface AccountRepository {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun activeMetaAccounts(): List<MetaAccount>
-
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
     suspend fun hasActiveMetaAccounts(): Boolean

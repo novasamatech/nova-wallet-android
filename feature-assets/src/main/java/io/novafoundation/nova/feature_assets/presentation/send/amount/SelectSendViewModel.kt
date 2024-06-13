@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
@@ -523,7 +522,7 @@ class SelectSendViewModel(
             SelectAddressAccountFilter.Everything()
         } else {
             val destinationAccountId = selectedAccount.first().requireAccountIdIn(desination)
-            val notOriginMetaAccounts = accountRepository.activeMetaAccounts()
+            val notOriginMetaAccounts = accountRepository.getActiveMetaAccounts()
                 .filter { it.accountIdIn(origin)?.intoKey() == destinationAccountId.intoKey() }
                 .map { it.id }
 

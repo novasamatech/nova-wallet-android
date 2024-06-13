@@ -14,7 +14,7 @@
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
 
-<!--    <string name="account_ledger_nano_x">Ledger Nano X</string>-->
+    <string name="account_ledger_nano_x">Ledger Nano X</string>
 
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
 
