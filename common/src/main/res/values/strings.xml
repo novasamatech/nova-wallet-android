@@ -172,7 +172,7 @@
 
     <string name="cloud_backup_delete_button">Delete Backup</string>
     <string name="restore_cloud_backup_delete_backup_title">Have you lost your password?</string>
-    <string name="restore_cloud_backup_delete_backup_description">%s It\'s exclusively yours, securely stored, inaccessible to others. Without the backup password, restoring wallets from iCloud is impossible. If lost, delete the current backup to create a new one with a fresh password. %s</string>
+    <string name="restore_cloud_backup_delete_backup_description">%s It\'s exclusively yours, securely stored, inaccessible to others. Without the backup password, restoring wallets from Google Drive is impossible. If lost, delete the current backup to create a new one with a fresh password. %s</string>
     <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Unfortunately, your password cannot be recovered.</string>
     <string name="restore_cloud_backup_delete_backup_description_highlighted_2">Alternatively, use Passphrase for restoration.</string>
 
