@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_onboarding_api.domain.OnboardingInteractor
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser.ImportWalletOptionsViewModel
@@ -30,7 +31,8 @@ class ImportWalletOptionsModule {
         progressDialogMixin: ProgressDialogMixin,
         onboardingInteractor: OnboardingInteractor,
         customDialogProvider: CustomDialogDisplayer.Presentation,
-        cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
+        cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
+        ledgerMigrationTracker: LedgerMigrationTracker
     ): ViewModel {
         return ImportWalletOptionsViewModel(
             resourceManager,
@@ -39,7 +41,8 @@ class ImportWalletOptionsModule {
             onboardingInteractor,
             progressDialogMixin,
             customDialogProvider,
-            cloudBackupChangingWarningMixinFactory
+            cloudBackupChangingWarningMixinFactory,
+            ledgerMigrationTracker
         )
     }
 

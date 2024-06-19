@@ -16,11 +16,24 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
+import kotlinx.android.synthetic.main.view_alert.view.alertActionArrow
+import kotlinx.android.synthetic.main.view_alert.view.alertActionContent
+import kotlinx.android.synthetic.main.view_alert.view.alertActionGroup
 import kotlinx.android.synthetic.main.view_alert.view.alertIcon
 import kotlinx.android.synthetic.main.view_alert.view.alertMessage
 import kotlinx.android.synthetic.main.view_alert.view.alertSubMessage
 
 typealias SimpleAlertModel = String
+
+class AlertModel(
+    val style: AlertView.Style,
+    val message: String,
+    val subMessage: CharSequence? = null,
+    val action: ActionModel? = null
+) {
+
+    class ActionModel(val text: String, val listener: () -> Unit)
+}
 
 class AlertView @JvmOverloads constructor(
     context: Context,
@@ -32,7 +45,17 @@ class AlertView @JvmOverloads constructor(
         WARNING, ERROR, INFO
     }
 
-    class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int, @ColorRes val iconTintRes: Int? = null)
+    class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int, @ColorRes val iconTintRes: Int? = null) {
+
+        companion object {
+
+            fun fromPreset(preset: StylePreset) = when (preset) {
+                StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background)
+                StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background)
+                StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background)
+            }
+        }
+    }
 
     init {
         View.inflate(context, R.layout.view_alert, this)
@@ -48,7 +71,7 @@ class AlertView @JvmOverloads constructor(
     }
 
     fun setStylePreset(preset: StylePreset) {
-        setStyle(styleFromPreset(preset))
+        setStyle(Style.fromPreset(preset))
     }
 
     fun setMessage(text: String) {
@@ -61,6 +84,17 @@ class AlertView @JvmOverloads constructor(
 
     fun setSubMessage(text: CharSequence?) {
         alertSubMessage.setTextOrHide(text)
+    }
+
+    fun setActionText(actionText: String?) {
+        alertActionGroup.letOrHide(actionText) { text ->
+            alertActionContent.text = text
+        }
+    }
+
+    fun setOnActionClickedListener(listener: () -> Unit) {
+        alertActionContent.setOnClickListener { listener() }
+        alertActionArrow.setOnClickListener { listener() }
     }
 
     fun setModel(maybeModel: SimpleAlertModel?) = letOrHide(maybeModel) { model ->
@@ -78,7 +112,7 @@ class AlertView @JvmOverloads constructor(
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {
         val stylePreset = it.getEnum(R.styleable.AlertView_alertMode, StylePreset.WARNING)
-        val styleFromPreset = styleFromPreset(stylePreset)
+        val styleFromPreset = Style.fromPreset(stylePreset)
 
         val backgroundColorRes = it.getResourceId(R.styleable.AlertView_styleBackgroundColor, styleFromPreset.backgroundColorRes)
         val iconRes = it.getResourceId(R.styleable.AlertView_styleIcon, styleFromPreset.iconRes)
@@ -88,13 +122,31 @@ class AlertView @JvmOverloads constructor(
 
         val text = it.getString(R.styleable.AlertView_android_text)
         text?.let(::setMessage)
-    }
 
-    private fun styleFromPreset(preset: StylePreset) = when (preset) {
-        StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background)
-        StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background)
-        StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background)
+        val description = it.getString(R.styleable.AlertView_AlertView_description)
+        setSubMessage(description)
+
+        val action = it.getString(R.styleable.AlertView_AlertView_action)
+        setActionText(action)
     }
 }
 
+fun AlertView.setModel(model: AlertModel) {
+    setMessage(model.message)
+    setSubMessage(model.subMessage)
+
+    if (model.action != null) {
+        setActionText(model.action.text)
+        setOnActionClickedListener(model.action.listener)
+    }
+
+    setStyle(model.style)
+}
+
+fun AlertView.setModelOrHide(maybeModel: AlertModel?) = letOrHide(maybeModel, ::setModel)
+
 fun AlertView.setMessageOrHide(text: String?) = letOrHide(text, ::setMessage)
+
+fun AlertView.StylePreset.asStyle(): AlertView.Style {
+    return AlertView.Style.fromPreset(this)
+}

@@ -41,6 +41,9 @@ class RuntimeProviderTest {
     lateinit var runtimeSyncService: RuntimeSyncService
 
     @Mock
+    lateinit var runtimeCache: RuntimeFilesCache
+
+    @Mock
     lateinit var runtimeFactory: RuntimeFactory
 
     @Mock
@@ -310,6 +313,6 @@ class RuntimeProviderTest {
 
         whenever(chain.types).thenReturn(types)
 
-        runtimeProvider = RuntimeProvider(runtimeFactory, runtimeSyncService, baseTypesSynchronizer, chain)
+        runtimeProvider = RuntimeProvider(runtimeFactory, runtimeSyncService, baseTypesSynchronizer, runtimeCache, chain)
     }
 }

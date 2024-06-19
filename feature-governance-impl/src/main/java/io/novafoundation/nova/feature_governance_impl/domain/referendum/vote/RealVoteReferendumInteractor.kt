@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AyeVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum

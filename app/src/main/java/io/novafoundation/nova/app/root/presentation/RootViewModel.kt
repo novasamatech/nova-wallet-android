@@ -50,8 +50,10 @@ class RootViewModel(
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher
-) : BaseViewModel(), NetworkStateUi by networkStateMixin, ActionBottomSheetLauncher by actionBottomSheetLauncher {
+    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+) : BaseViewModel(),
+    NetworkStateUi by networkStateMixin,
+    ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     private var willBeClearedForLanguageChange = false
 

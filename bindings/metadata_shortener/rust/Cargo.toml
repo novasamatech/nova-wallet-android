@@ -1,0 +1,23 @@
+[package]
+authors = ['Novasama Technologies']
+edition = '2021'
+license = 'Apache 2.0'
+name = "metadata-shortener-java"
+repository = 'https://github.com/nova-wallet/nova-wallet-android'
+version = "0.1.0"
+
+[dependencies]
+array-bytes = "6.2.2"
+merkleized-metadata = { git = "https://github.com/Zondax/merkleized-metadata", default-features = false, rev = "cd1363a2c4702abf34fcc461055f0059b3c32bec" }
+jni = { version = "0.17.0", default-features = false }
+frame-metadata = { version = "16.0.0", features = [ "current" ] }
+codec = { package = "parity-scale-codec", version = "3.6.9", features = [ "derive" ] }
+
+[profile.release]
+strip = true
+lto = true
+opt-level = "s"
+
+[lib]
+name = "metadata_shortener_java"
+crate_type = ["cdylib"]

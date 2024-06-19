@@ -198,6 +198,9 @@
         <attr name="styleIconTint" format="color" />
 
         <attr name="android:text" />
+
+        <attr name="AlertView_description" format="string" />
+        <attr name="AlertView_action" format="string" />
     </declare-styleable>
 
     <declare-styleable name="IconButton">

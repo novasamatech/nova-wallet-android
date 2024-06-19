@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.domain.watchOnly.create
 
 import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.addAccountWithSingleChange
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchOnlyRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.WatchWalletSuggestion
@@ -28,7 +29,7 @@ class RealCreateWatchWalletInteractor(
         val substrateAccountId = substrateAddress.toAccountId()
         val evmAccountId = evmAddress.takeIf { it.isNotEmpty() }?.ethereumAddressToAccountId()
 
-        val addAccountResult = watchOnlyAddAccountRepository.addAccount(
+        val addAccountResult = watchOnlyAddAccountRepository.addAccountWithSingleChange(
             WatchOnlyAddAccountRepository.Payload.MetaAccount(
                 name,
                 substrateAccountId,

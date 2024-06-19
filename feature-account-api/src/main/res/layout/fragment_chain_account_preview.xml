@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/secondary_screen_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <io.novafoundation.nova.common.view.Toolbar
+            android:id="@+id/previewChainAccountToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:dividerVisible="false" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/account_parity_signer_import_preview_title"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:id="@+id/previewChainAccountDescription"
+            android:layout_marginEnd="16dp"
+            tools:text="@string/account_parity_signer_import_preview_description"
+            android:textColor="@color/text_secondary" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/previewChainAccountAccounts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="93dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_chain_account" />
+    </LinearLayout>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/previewChainAccountContinue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="25dp"
+        android:text="@string/common_continue" />
+</FrameLayout>

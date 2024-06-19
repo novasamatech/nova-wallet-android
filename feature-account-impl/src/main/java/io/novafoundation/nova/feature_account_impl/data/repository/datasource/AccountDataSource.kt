@@ -45,8 +45,6 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun activeMetaAccounts(): List<MetaAccount>
-
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
@@ -105,6 +103,8 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun getActiveMetaAccountsQuantity(): Int
 
     suspend fun hasSecretsAccounts(): Boolean
+
+    suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
 }
 
 suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {

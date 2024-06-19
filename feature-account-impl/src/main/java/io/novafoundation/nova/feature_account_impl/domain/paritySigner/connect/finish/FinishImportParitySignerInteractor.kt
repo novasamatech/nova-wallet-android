@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish
 
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.addAccountWithSingleChange
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
@@ -27,7 +28,7 @@ class RealFinishImportParitySignerInteractor(
         variant: PolkadotVaultVariant
     ): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
-            val addAccountResult = paritySignerAddAccountRepository.addAccount(
+            val addAccountResult = paritySignerAddAccountRepository.addAccountWithSingleChange(
                 ParitySignerAddAccountRepository.Payload(
                     name,
                     substrateAccountId,

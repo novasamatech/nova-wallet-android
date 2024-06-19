@@ -29,7 +29,7 @@ data class CloudBackup(
         override val identifier: String = walletId
 
         enum class Type {
-            SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT
+            SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, LEDGER_GENERIC, POLKADOT_VAULT
         }
 
         data class ChainAccountInfo(
@@ -170,7 +170,7 @@ data class CloudBackup(
 
         data class SubstrateSecrets(
             val seed: ByteArray?,
-            val keypair: KeyPairSecrets,
+            val keypair: KeyPairSecrets?,
             val derivationPath: String?,
         ) {
 

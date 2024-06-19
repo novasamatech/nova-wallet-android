@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.12.3'
-        versionCode = 135
+        versionName = '7.13.0'
+        versionCode = 136
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.0.2'
+        substrateSdkVersion = '2.1.0'
 
         gifVersion = '1.2.19'
 
@@ -217,9 +217,9 @@ buildscript {
 
     repositories {
         google()
+        mavenCentral()
         jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
-        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
@@ -234,10 +234,10 @@ buildscript {
 allprojects {
     repositories {
         google()
+        mavenCentral()
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url "https://nexus.iroha.tech/repository/maven-soramitsu/" }
-        mavenCentral()
         mavenLocal()
         flatDir { dirs "$rootDir/common/libs" }
     }

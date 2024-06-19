@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListOverview
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.selectedMetaAccount

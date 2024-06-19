@@ -43,7 +43,7 @@ dependencies {
     implementation project(":common")
     implementation project(":runtime")
 
-    implementation project(":hydra-dx-math")
+    implementation project(":bindings:hydra-dx-math")
 
     implementation materialDep
 

@@ -35,6 +35,7 @@ private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
 private const val RELAYCHAIN_AS_NATIVE = "relaychainAsNative"
 private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
 private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
+private const val SUPPORT_GENERIC_LEDGER_APP = "supportsGenericLedgerApp"
 private const val IDENTITY_CHAIN = "identityChain"
 
 fun mapRemoteChainToLocal(
@@ -58,6 +59,7 @@ fun mapRemoteChainToLocal(
             relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
             stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
             feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean,
+            supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
             identityChain = it[IDENTITY_CHAIN] as? ChainId
         )
     }

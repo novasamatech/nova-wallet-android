@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedAndProxyMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.metaAccountTypeComparator
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -138,7 +137,8 @@ class MetaAccountGroupingInteractorImpl(
                     LightMetaAccount.Type.POLKADOT_VAULT,
                     LightMetaAccount.Type.PARITY_SIGNER,
                     LightMetaAccount.Type.PROXIED,
-                    LightMetaAccount.Type.LEDGER -> true
+                    LightMetaAccount.Type.LEDGER,
+                    LightMetaAccount.Type.LEDGER_LEGACY -> true
 
                     LightMetaAccount.Type.WATCH_ONLY -> false
                 }

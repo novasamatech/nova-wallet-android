@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.domain.manualBackup
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

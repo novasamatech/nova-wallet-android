@@ -10,14 +10,14 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.addAccountWithSingleChange
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_proxy_api.data.common.NestedProxiesGraphConstructor
 import io.novafoundation.nova.feature_proxy_api.data.common.getAllAccountIds
@@ -149,7 +149,7 @@ class RealProxySyncService(
         for (node in nestedNodes) {
             val maybeExistedProxiedMetaId = node.getExistedProxiedMetaId(chainId, oldProxies, proxyMetaId)
 
-            var nextMetaId = if (maybeExistedProxiedMetaId == null) {
+            val nextMetaId = if (maybeExistedProxiedMetaId == null) {
                 val addAccountResult = addProxiedAccount(chainId, node, proxyMetaId, identities)
                 result.addedMetaIds.add(addAccountResult.metaId)
                 addAccountResult.metaId
@@ -179,7 +179,7 @@ class RealProxySyncService(
         node: NestedProxiesGraphConstructor.Node,
         metaId: Long,
         identities: Map<AccountIdKey, Identity?>
-    ) = proxiedAddAccountRepository.addAccount(
+    ) = proxiedAddAccountRepository.addAccountWithSingleChange(
         ProxiedAddAccountRepository.Payload(
             chainId = chainId,
             proxiedAccountId = node.accountId.value,

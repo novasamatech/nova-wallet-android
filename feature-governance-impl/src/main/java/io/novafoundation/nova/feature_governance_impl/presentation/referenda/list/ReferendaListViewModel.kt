@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.DelegatedState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.GovernanceLocksOverview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor

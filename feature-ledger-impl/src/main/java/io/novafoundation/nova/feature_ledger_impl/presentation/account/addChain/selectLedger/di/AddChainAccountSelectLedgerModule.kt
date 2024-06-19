@@ -15,12 +15,13 @@ import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class AddChainAccountSelectLedgerModule {
@@ -39,11 +40,17 @@ class AddChainAccountSelectLedgerModule {
     ) = permissionsAskerFactory.create(fragment, router)
 
     @Provides
+    @ScreenScope
+    fun provideMessageFormatter(
+        screenPayload: AddAccountPayload.ChainAccount,
+        factory: LedgerMessageFormatterFactory,
+    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId, showAlerts = false)
+
+    @Provides
     @IntoMap
     @ViewModelKey(AddChainAccountSelectLedgerViewModel::class)
     fun provideViewModel(
-        substrateApplication: SubstrateLedgerApplication,
-        selectLedgerPayload: SelectLedgerPayload,
+        migrationUseCase: LedgerMigrationUseCase,
         addAccountPayload: AddAccountPayload.ChainAccount,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
@@ -51,19 +58,18 @@ class AddChainAccountSelectLedgerModule {
         locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
-        chainRegistry: ChainRegistry,
+        messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return AddChainAccountSelectLedgerViewModel(
-            substrateApplication = substrateApplication,
-            selectLedgerPayload = selectLedgerPayload,
+            migrationUseCase = migrationUseCase,
             discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
             locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
-            chainRegistry = chainRegistry,
-            addAccountPayload = addAccountPayload
+            addAccountPayload = addAccountPayload,
+            messageFormatter = messageFormatter
         )
     }
 

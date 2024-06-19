@@ -12,17 +12,25 @@ abstract class BaseAddAccountRepository<T>(
     final override suspend fun addAccount(payload: T): AddAccountResult {
         val addAccountResult = addAccountInternal(payload)
 
-        metaAccountChangesEventBus.notify(addAccountResult.toEvent(), source = null)
+        addAccountResult.toEvent()?.let { metaAccountChangesEventBus.notify(it, source = null) }
 
         return addAccountResult
     }
 
     protected abstract suspend fun addAccountInternal(payload: T): AddAccountResult
 
-    private fun AddAccountResult.toEvent(): Event {
+    private fun AddAccountResult.toEvent(): Event? {
+        return when (this) {
+            is AddAccountResult.HadEffect -> toEvent()
+            is AddAccountResult.NoOp -> null
+        }
+    }
+
+    private fun AddAccountResult.HadEffect.toEvent(): Event {
         return when (this) {
             is AddAccountResult.AccountAdded -> Event.AccountAdded(metaId, type)
             is AddAccountResult.AccountChanged -> Event.AccountStructureChanged(metaId, type)
+            is AddAccountResult.Batch -> Event.BatchUpdate(updates.map { it.toEvent() })
         }
     }
 }
