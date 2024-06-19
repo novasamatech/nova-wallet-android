@@ -232,7 +232,7 @@
     <!--<string name="account_backup_mnemonic_title">Write down the phrase and store it in a safe place</string>-->
     <string name="account_backup_mnemonic_title">Write down your Passphrase</string>
 
-    <string name="start_create_wallet_input_hint">My new wallet name</string>
+    <string name="start_create_wallet_input_hint">My new wallet</string>
     <string name="start_create_wallet_name_your_wallet">Give your wallet a name</string>
     <string name="start_create_wallet_enter_wallet_name">Enter wallet name</string>
 
