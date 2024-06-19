@@ -61,6 +61,10 @@ class StableSwapSourceFactory(
     private val chainStateRepository: ChainStateRepository
 ) : HydraDxSwapSource.Factory {
 
+    companion object {
+        const val ID = "StableSwap"
+    }
+
     override fun create(chain: Chain): HydraDxSwapSource {
         return StableSwapSource(
             remoteStorageSource = remoteStorageSource,
@@ -80,7 +84,7 @@ private class StableSwapSource(
     private val chainStateRepository: ChainStateRepository,
 ) : HydraDxSwapSource {
 
-    override val identifier: String = "StableSwap"
+    override val identifier: String = StableSwapSourceFactory.ID
 
     private val initialPoolsInfo: MutableSharedFlow<Collection<PoolInitialInfo>> = singleReplaySharedFlow()
 

@@ -4,10 +4,10 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.hydra_dx_math.HydraDxMathConversions.fromBridgeResultToBalance
 import io.novafoundation.nova.hydra_dx_math.stableswap.StableSwapMathBridge
 import java.math.BigInteger
 
@@ -185,7 +185,3 @@ private class ReservesInput(
     val id: Int,
     val decimals: Int
 )
-
-private fun String.fromBridgeResultToBalance(): Balance? {
-    return if (this == "-1") null else toBigInteger().atLeastZero()
-}

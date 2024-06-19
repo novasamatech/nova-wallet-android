@@ -524,3 +524,113 @@ fn calculate_liquidity_out_one_asset(
         error()
     }
 }
+
+// ---------------- XYK ----------------------
+
+#[no_mangle]
+pub fn Java_io_novafoundation_nova_hydra_1dx_1math_xyk_HYKSwapMathBridge_calculate_1out_1given_1in<'a>(
+    jni_env: JNIEnv<'a>,
+    _: JClass,
+    balance_in: JString,
+    balance_out: JString,
+    amount_in: JString
+) -> JString<'a> {
+    let balance_in: String = get_str(&jni_env,balance_in);
+    let balance_out: String = get_str(&jni_env,balance_out);
+    let amount_in: String = get_str(&jni_env,amount_in);
+
+    let out = xyk_calculate_out_given_in(balance_in, balance_out, amount_in);
+
+    return jni_env.new_string(out).unwrap()
+}
+
+
+fn xyk_calculate_out_given_in(
+    balance_in: String,
+    balance_out: String,
+    amount_in: String
+) -> String {
+    let balance_in = parse_into!(u128, balance_in);
+    let balance_out = parse_into!(u128, balance_out);
+    let amount_in = parse_into!(u128, amount_in);
+
+    let result = hydra_dx_math::xyk::calculate_out_given_in(balance_in, balance_out, amount_in);
+
+    if let Ok(r) = result {
+        r.to_string()
+    } else {
+        error()
+    }
+}
+
+#[no_mangle]
+pub fn Java_io_novafoundation_nova_hydra_1dx_1math_xyk_HYKSwapMathBridge_calculate_1in_1given_1out<'a>(
+    jni_env: JNIEnv<'a>,
+    _: JClass,
+    balance_in: JString,
+    balance_out: JString,
+    amount_in: JString
+) -> JString<'a> {
+    let balance_in: String = get_str(&jni_env,balance_in);
+    let balance_out: String = get_str(&jni_env,balance_out);
+    let amount_in: String = get_str(&jni_env,amount_in);
+
+    let out = xyk_calculate_in_given_out(balance_in, balance_out, amount_in);
+
+    return jni_env.new_string(out).unwrap()
+}
+
+
+fn xyk_calculate_in_given_out(
+    balance_in: String,
+    balance_out: String,
+    amount_out: String
+) -> String {
+    let balance_in = parse_into!(u128, balance_in);
+    let balance_out = parse_into!(u128, balance_out);
+    let amount_out = parse_into!(u128, amount_out);
+
+    let result = hydra_dx_math::xyk::calculate_in_given_out(balance_out, balance_in, amount_out);
+
+    if let Ok(r) = result {
+        r.to_string()
+    } else {
+        error()
+    }
+}
+
+#[no_mangle]
+pub fn Java_io_novafoundation_nova_hydra_1dx_1math_xyk_HYKSwapMathBridge_calculate_1pool_1trade_1fee<'a>(
+    jni_env: JNIEnv<'a>,
+    _: JClass,
+    amount: JString,
+    fee_nominator: JString,
+    fee_denominator: JString
+) -> JString<'a> {
+    let amount: String = get_str(&jni_env,amount);
+    let fee_nominator: String = get_str(&jni_env,fee_nominator);
+    let fee_denominator: String = get_str(&jni_env,fee_denominator);
+
+    let out = calculate_pool_trade_fee(amount, fee_nominator, fee_denominator);
+
+    return jni_env.new_string(out).unwrap()
+}
+
+
+fn calculate_pool_trade_fee(
+    amount: String,
+    fee_nominator: String,
+    fee_denominator: String
+) -> String {
+    let amount = parse_into!(u128, amount);
+    let fee_nominator = parse_into!(u32, fee_nominator);
+    let fee_denominator = parse_into!(u32, fee_denominator);
+
+    let result = hydra_dx_math::fee::calculate_pool_trade_fee(amount, (fee_nominator, fee_denominator));
+
+    if let Some(r) = result {
+        r.to_string()
+    } else {
+        error()
+    }
+}
