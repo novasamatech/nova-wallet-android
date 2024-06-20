@@ -1,0 +1,42 @@
+name: Publish report to gh-pages
+description: That workflow will publish report to the github-pages
+inputs:
+  keep-reports-history:
+    description: "History storage depth, integer"
+    required: true
+  token:
+    description: "Github PAT"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Allure history
+      uses: actions/checkout@v4
+      if: always()
+      continue-on-error: true
+      with:
+        repository: novasamatech/balances_test_result
+        ref: gh-pages
+        path: gh-pages
+
+    - name: Allure Report action
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      with:
+        allure_results: allure-results
+        allure_history: allure-history
+        keep_reports: ${{ inputs.keep-reports-history }}
+        subfolder: balances_test_result
+        github_repo: balances_test_result
+        github_repo_owner: novasamatech
+
+    - name: Deploy report to Github Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        deploy_key: ${{ inputs.token }}
+        publish_branch: gh-pages
+        publish_dir: allure-history
+        external_repository: novasamatech/balances_test_result
+        destination_dir: balances_test_result

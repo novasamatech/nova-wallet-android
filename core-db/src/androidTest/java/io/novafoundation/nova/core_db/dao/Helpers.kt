@@ -44,10 +44,15 @@ fun chainOf(
     prefix = 0,
     isTestNet = false,
     isEthereumBased = false,
-    externalApi = null,
     hasCrowdloans = false,
     additional = "",
-    governance = "governance"
+    governance = "governance",
+    connectionState = ChainLocal.ConnectionStateLocal.FULL_SYNC,
+    pushSupport = true,
+    supportProxy = false,
+    swap = "",
+    hasSubstrateRuntime = true,
+    nodeSelectionStrategy = ChainLocal.NodeSelectionStrategyLocal.ROUND_ROBIN
 )
 
 fun ChainLocal.nodeOf(
@@ -148,7 +153,10 @@ fun testMetaAccount(name: String = "Test") = MetaAccountLocal(
     substrateAccountId = byteArrayOf(),
     ethereumAddress = null,
     position = 0,
-    type = MetaAccountLocal.Type.WATCH_ONLY
+    type = MetaAccountLocal.Type.WATCH_ONLY,
+    globallyUniqueId = "",
+    parentMetaId = 1,
+    status = MetaAccountLocal.Status.ACTIVE
 )
 
 fun testChainAccount(
