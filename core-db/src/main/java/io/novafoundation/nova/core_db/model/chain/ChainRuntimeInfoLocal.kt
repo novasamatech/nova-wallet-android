@@ -1,5 +1,6 @@
 package io.novafoundation.nova.core_db.model.chain
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -24,5 +25,11 @@ class ChainRuntimeInfoLocal(
     val syncedVersion: Int,
     val remoteVersion: Int,
     val transactionVersion: Int?,
+    @ColumnInfo(defaultValue = DEFAULT_MIGRATOR_VERSION)
     val localMigratorVersion: Int
-)
+) {
+
+    companion object {
+        const val DEFAULT_MIGRATOR_VERSION = "1"
+    }
+}
