@@ -50,6 +50,8 @@ on:
         required: true
       DEBUG_GOOGLE_OAUTH_ID:
         required: true
+      RELEASE_GOOGLE_OAUTH_ID:
+          required: true
       # Special secrets for signing:
       CI_MARKET_KEYSTORE_PASS:
         required: false
@@ -93,6 +95,7 @@ env:
   DWELLIR_API_KEY: ${{ secrets.DWELLIR_API_KEY }}
   WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
   DEBUG_GOOGLE_OAUTH_ID:  ${{ secrets.DEBUG_GOOGLE_OAUTH_ID }}
+  RELEASE_GOOGLE_OAUTH_ID:  ${{ secrets.RELEASE_GOOGLE_OAUTH_ID }}
 
   CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
   CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
