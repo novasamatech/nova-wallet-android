@@ -17,12 +17,10 @@
     <string name="account_add_already_exists_message">账户已存在。请尝试另一个。</string>
     <string name="account_add_watch_only_description">通过其地址跟踪任何钱包</string>
     <string name="account_add_watch_wallet">添加仅观察钱包</string>
-    <string name="account_backup_mnemonic_field_title">助记词密语</string>
-    <string name="account_backup_mnemonic_title">记录该短语并将其存放在安全的地方</string>
+    <string name="account_backup_mnemonic_title">写下你的密码短语</string>
     <string name="account_backup_secret_caption">请确保您的短语正确且清晰地写下。</string>
     <string name="account_chain_address_format">%s地址</string>
     <string name="account_confirm_mnemonic">确认助记词</string>
-    <string name="account_confirm_mnemonic_subtitle">按正确的顺序选择单词。</string>
     <string name="account_confirm_mnemonic_title">让我们再次检查一下</string>
     <string name="account_confirmation_details">按正确的顺序选择单词</string>
     <string name="account_create_account">创建一个新账户</string>
@@ -30,6 +28,7 @@
     <string name="account_create_name_subtitle_v2_2_0">名称将仅在此应用中本地使用。您可以稍后编辑它</string>
     <string name="account_create_name_title_v2_2_0">创建钱包名称</string>
     <string name="account_create_title">备份助记词</string>
+    <string name="account_create_wallet">创建新钱包</string>
     <string name="account_creation_info">助记词用于恢复对账户的访问。请将其写下来，没有它我们将无法恢复您的账户！</string>
     <string name="account_custom_secret">带有更改密钥的账户</string>
     <string name="account_delete_confirm">忘记</string>
@@ -46,10 +45,10 @@
     <string name="account_ethereum_derivation_path">Ethereum密钥派生路径</string>
     <string name="account_export">导出账户</string>
     <string name="account_export_action">导出</string>
+    <string name="account_export_existing">导入现有账户</string>
     <string name="account_export_json_password_subtitle">这是加密数据并保存JSON文件所必需的。</string>
     <string name="account_export_json_password_title">设置一个新密码</string>
     <string name="account_export_json_title">保存您的密钥并将其存放在安全的地方</string>
-    <string name="account_export_password_change">更改密码</string>
     <string name="account_export_seed_title">记录您的密钥并将其存放在安全的地方</string>
     <string name="account_import_invalid_keystore">恢复json无效。请确保输入包含有效的json。</string>
     <string name="account_import_invalid_seed">Seed无效。请确保您的输入包含64个十六进制符号。</string>
@@ -67,16 +66,25 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">您的派生路径包含不支持的符号或结构不正确</string>
     <string name="account_invalid_derivation_path_title">无效的派生路径</string>
     <string name="account_json_file">JSON文件</string>
+    <string name="account_ledger_generic_import_start_step_1">确保已安装<font color="#FFFFFF">Generic 应用程序</font>到您的 Ledger 设备，使用 Ledger Live 应用程序</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
     <string name="account_ledger_import_fill_description">确保通过Ledger Live应用把网络应用安装到您的Ledger设备上。在您的Ledger设备上打开网络应用。</string>
     <string name="account_ledger_import_fill_disabled_hint">至少添加一个账户</string>
     <string name="account_ledger_import_fill_title">将账户添加到您的钱包</string>
     <string name="account_ledger_import_start_guide">Ledger官方蓝牙连接指南</string>
     <string name="account_ledger_import_start_step_1">确保<font color="#FFFFFF">网络应用已安装</font>到您的Ledger设备中，使用Ledger Live应用</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2">在您的Ledger设备上<font color="#FFFFFF">打开网络应用程序</font></string>
     <string name="account_ledger_import_start_step_3">允许Nova Wallet<font color="#FFFFFF">访问蓝牙和位置</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">选择帐户</font>添加到钱包</string>
     <string name="account_ledger_import_start_title">连接Ledger Nano X</string>
+    <string name="account_ledger_legacy_warning_message">要进行操作签名并将您的账户迁移到新的 Generic Ledger 应用程序，请安装并打开 Migration 应用程序。旧版 Legacy 和 Migration Ledger 应用程序将来不会被支持。</string>
+    <string name="account_ledger_legacy_warning_title">新版 Ledger 应用程序已发布</string>
+    <string name="account_ledger_migration_app">迁移</string>
+    <string name="account_ledger_migration_deprecation_message">Migration 应用程序在不久的将来将无法使用。使用它将您的账户迁移到新的 Ledger 应用程序，以免丢失资金。</string>
+    <string name="account_ledger_migration_generic">通用</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X（通用应用程序）</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Nano X（旧版）</string>
     <string name="account_ledger_select_device_description">请在手机设置和Ledger设备中启用蓝牙。解锁您的Ledger设备并打开%s应用。</string>
     <string name="account_ledger_select_device_title">选择您的Ledger设备</string>
     <string name="account_mnmonic_length_variants">12、15、18、21或24个单词的短语</string>
@@ -90,7 +98,7 @@
     <string name="account_parity_signer_import_scan_invalid_qr">无效的QR码，请确保您正在扫描来自%s的QR码</string>
     <string name="account_parity_signer_import_start_select_top">请确保选择最上面的一个</string>
     <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">转到“按键”选项卡。 选择种子，然后选择您想要添加到 Nova 钱包的帐户</font></string>
     <string name="account_parity_signer_import_start_step_3">Parity签名器将为您提供<font color="#FFFFFF">扫描的QR码</font></string>
     <string name="account_parity_signer_import_start_title">从%s添加钱包</string>
     <string name="account_parity_signer_not_supported_subtitle">%s不支持签名任意消息 — 只有交易</string>
@@ -106,7 +114,7 @@
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">注意，衍生路径名称应为空</string>
     <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">转到“密钥集”选项卡。</font>选择您的密钥集、网络，然后选择您想要添加到 Nova 钱包的帐户</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault 将提供给您<font color="#FFFFFF">要扫描的二维码</font></string>
     <string name="account_private_key">私钥</string>
     <string name="account_proxieds">委托给您的（代理）</string>
@@ -141,6 +149,7 @@
     <string name="accounts_add_wallet">添加钱包</string>
     <string name="accounts_change_chain_account">更改%s帐户</string>
     <string name="accounts_change_chain_secrets">更改帐户</string>
+    <string name="accounts_ledger_legacy">Ledger（旧版）</string>
     <string name="add_delegation_missing_account_message">您需要添加一个%s帐户到钱包才能委托</string>
     <string name="add_proxy_confirmation_delegate_to">委托给</string>
     <string name="add_proxy_confirmation_delegating_account">委托帐户</string>
@@ -188,10 +197,34 @@
     <string name="assets_send_flow_placeholder">你没有要发送的代币。购买或接收代币到你的账户。</string>
     <string name="assets_swap_flow_pay_title">要支付的代币</string>
     <string name="assets_swap_flow_receive_title">要接收的代币</string>
+    <string name="backup_diff_subtitle">在进行更改之前，%s 修改和删除的钱包！</string>
+    <string name="backup_diff_subtitle_highlighted">确保你已经保存了密码短语</string>
+    <string name="backup_diff_title">应用备份更新？</string>
+    <string name="backup_mnemonic_attention_title">准备保存你的钱包！</string>
+    <string name="backup_secrets_warning_condition_1">这个密码短语让你对所有已连接的钱包和其中的资金拥有完全的永久访问权。\n%s</string>
+    <string name="backup_secrets_warning_condition_1_highlight">不要分享。</string>
+    <string name="backup_secrets_warning_condition_2">不要在任何表单或网站中输入您的密码短语。\n%s</string>
+    <string name="backup_secrets_warning_condition_2_highlight">资金可能会永远丢失。</string>
+    <string name="backup_secrets_warning_condition_3">支持人员或管理员在任何情况下都不会请求您的密码短语。\n%s</string>
+    <string name="backup_secrets_warning_condition_3_highlight">提防冒名顶替者。</string>
+    <string name="backup_secrets_warning_disabled_button">查看并接受以继续</string>
+    <string name="backup_settings_delete_backup">删除备份</string>
+    <string name="backup_settings_manual_subtitle">您可以手动写下恢复短语，确保一切安全</string>
+    <string name="backup_settings_manual_switcher_title">手动备份</string>
+    <string name="backup_settings_manual_title">手动</string>
+    <string name="backup_settings_no_wallets_error_message">您没有添加任何带有密码短语的钱包。</string>
+    <string name="backup_settings_no_wallets_error_title">没有可以备份的钱包</string>
+    <string name="backup_settings_subtitle">使用您的Google云端硬盘安全地存储所有钱包的加密副本。即使您在新设备上安装Nova，您也能轻松访问您的钱包。</string>
+    <string name="backup_settings_switcher_text">备份到Google云端硬盘</string>
+    <string name="backup_settings_title">Google云端硬盘</string>
+    <string name="backup_settings_toolbar_title">备份</string>
+    <string name="backup_title">备份</string>
     <string name="biometric_auth_title">生物认证</string>
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
     <string name="buy_provider_open_confirmation_title">在浏览器中继续？</string>
+    <string name="change_cloud_backup_password_subtitle">请输入用于从云备份恢复钱包的密码。此密码将无法在未来恢复，请务必记住！</string>
+    <string name="change_cloud_backup_password_title">更新备份密码</string>
     <string name="choose_amount_asset">资产</string>
     <string name="choose_amount_available_balance">可用余额</string>
     <string name="choose_amount_error_balance">抱歉，余额检查请求失败。请稍后再试。</string>
@@ -200,6 +233,47 @@
     <string name="choose_amount_fee">转账费</string>
     <string name="choose_amount_network_error">网络无响应</string>
     <string name="choose_amount_to">至</string>
+    <string name="cloud_backup_delete_action_subtitle">%s 并且记住始终将它们离线保存，以便随时恢复它们。您可以在备份设置中执行此操作。</string>
+    <string name="cloud_backup_delete_action_subtitle_highlighted">请在继续之前记下您钱包的所有助记词</string>
+    <string name="cloud_backup_delete_action_title">备份将从Google Drive中删除</string>
+    <string name="cloud_backup_delete_backup_confirmation_message">当前的备份将被永久删除！</string>
+    <string name="cloud_backup_delete_backup_confirmation_title">您确定要删除云备份吗？</string>
+    <string name="cloud_backup_delete_button">删除备份</string>
+    <string name="cloud_backup_destructive_changes_action_subtitle">目前您的备份未同步。请查看这些更新。</string>
+    <string name="cloud_backup_destructive_changes_action_title">发现云备份更改</string>
+    <string name="cloud_backup_destructive_changes_button">查看更新</string>
+    <string name="cloud_backup_destructive_changes_confirmation_subtitle">如果您未手动写下要删除的钱包的助记词，那么这些钱包及其所有资产将永久且不可恢复地丢失。</string>
+    <string name="cloud_backup_destructive_changes_confirmation_title">您确定要应用这些更改吗？</string>
+    <string name="cloud_backup_destructive_changes_not_applied_button">查看问题</string>
+    <string name="cloud_backup_destructive_changes_not_applied_subtitle">目前您的备份未同步。请查看问题。</string>
+    <string name="cloud_backup_destructive_changes_not_applied_title">钱包更改未能更新到云备份</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">请确保您已使用正确的凭据登录到您的Google帐户，并且已授予Nova Wallet对Google Drive的访问权限</string>
+    <string name="cloud_backup_error_google_service_auth_failed_title">Google Drive 身份验证失败</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_message">您的 Google Drive 存储空间不足。</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_title">存储空间不足</string>
+    <string name="cloud_backup_error_google_service_not_found_message">很遗憾，Google Drive 无法在没有Google Play服务的情况下运行，而您的设备缺少这些服务。请尝试获取 Google Play 服务。</string>
+    <string name="cloud_backup_error_google_service_not_found_title">未找到 Google Play 服务</string>
+    <string name="cloud_backup_error_google_service_other_message">无法将您的钱包备份到 Google Drive。请确保您已启用 Nova Wallet 使用您的 Google Drive，并且有足够的可用存储空间，然后重试。</string>
+    <string name="cloud_backup_error_google_service_other_title">Google Drive 错误</string>
+    <string name="cloud_backup_error_invalid_password_message">请检查密码正确性并重试。</string>
+    <string name="cloud_backup_error_invalid_password_title">密码无效</string>
+    <string name="cloud_backup_error_not_found_message">很遗憾，我们没有找到可用于恢复钱包的备份。</string>
+    <string name="cloud_backup_error_not_found_title">未找到备份</string>
+    <string name="cloud_backup_removing_warning_subtitle">确保您在继续之前已经保存了钱包的助记词。</string>
+    <string name="cloud_backup_removing_warning_title">钱包将被从云备份中移除</string>
+    <string name="cloud_backup_settings_backup_errors_button">查看备份错误</string>
+    <string name="cloud_backup_settings_corrupted_backup_button">查看备份更新</string>
+    <string name="cloud_backup_settings_deprecated_password_button">输入备份密码</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">开启它以创建钱包备份</string>
+    <string name="cloud_backup_settings_last_sync" formatted="false">上次同步：%s 于 %s</string>
+    <string name="cloud_backup_settings_not_auth_button">登录 Google Drive</string>
+    <string name="cloud_backup_settings_other_errors_button">查看 Google Drive 问题</string>
+    <string name="cloud_backup_state_disabled_title">备份已禁用</string>
+    <string name="cloud_backup_state_synced_title">备份已同步</string>
+    <string name="cloud_backup_state_syncing_title">备份同步中...</string>
+    <string name="cloud_backup_state_unsynced_title">备份未同步</string>
+    <string name="cloud_backup_will_be_changed_subtitle">新钱包会自动添加到云备份。您可以在设置中禁用云备份。</string>
+    <string name="cloud_backup_will_be_changed_title">钱包更改将更新到云备份中</string>
     <string name="common_accept_terms">接受条款...</string>
     <string name="common_account">账户</string>
     <string name="common_account_address">账户地址</string>
@@ -229,16 +303,21 @@
     <string name="common_cannot_pay_network_fee_message" formatted="false">您最多可以使用%s，因为您需要支付\n%s的网络费用。</string>
     <string name="common_chain">链</string>
     <string name="common_change">更改</string>
+    <string name="common_change_password">更改密码</string>
+    <string name="common_check_box_auto_continue">未来自动继续</string>
     <string name="common_choose_network">选择网络</string>
     <string name="common_clear">清除</string>
     <string name="common_close">关闭</string>
     <string name="common_close_confirmation_message">您确定要关闭此屏幕吗？\n您的更改将不会被应用。</string>
+    <string name="common_cloud_backup">云备份</string>
     <string name="common_completed">已完成</string>
     <string name="common_completed_with_count">已完成（%s）</string>
     <string name="common_confirm">确认</string>
     <string name="common_confirm_title">确认</string>
     <string name="common_confirmation_title">你确定吗？</string>
     <string name="common_confirmed">已确认</string>
+    <string name="common_connection_error_message">请检查您的连接或稍后再试</string>
+    <string name="common_connection_error_title">连接失败</string>
     <string name="common_continue">继续</string>
     <string name="common_copied">已复制到剪贴板</string>
     <string name="common_copy_address">复制地址</string>
@@ -257,6 +336,7 @@
     <string name="common_enable">启用</string>
     <string name="common_enter_address">输入地址…</string>
     <string name="common_enter_amount">输入金额…</string>
+    <string name="common_enter_password">输入密码</string>
     <string name="common_error_general_title">错误</string>
     <string name="common_error_not_enough_tokens">代币不足</string>
     <string name="common_event">事件</string>
@@ -270,12 +350,14 @@
     <string name="common_filter_sort_header">排序依据：</string>
     <string name="common_filters">过滤器</string>
     <string name="common_find_out_more">了解更多</string>
+    <string name="common_forgot_password">忘记密码？</string>
     <plurals name="common_frequency_days">
         <item quantity="other">每%s天</item>
     </plurals>
     <string name="common_frequency_days_daily">每天</string>
     <string name="common_frequency_days_everyday">每天</string>
     <string name="common_get_token_format">获取%s</string>
+    <string name="common_got_it">知道了</string>
     <string name="common_governance">治理</string>
     <string name="common_hexadecimal_string">十六进制字符串</string>
     <plurals name="common_hours_format">
@@ -284,7 +366,6 @@
     <string name="common_how_it_works">它是如何工作的</string>
     <string name="common_i_understand">我明白了</string>
     <string name="common_info">信息</string>
-    <string name="common_input_error_set_password">设置密码…</string>
     <string name="common_invalid_qr">二维码无效</string>
     <string name="common_learn_more">了解更多</string>
     <string name="common_learn_more_v2_2_0">了解更多关于</string>
@@ -298,7 +379,9 @@
     <string name="common_missing_account_title">%s 账户缺失</string>
     <string name="common_module">模块</string>
     <string name="common_network">网络</string>
+    <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s 不支持</string>
+    <string name="common_network_polkadot">Polkadot</string>
     <string name="common_networks">网络</string>
     <plurals name="common_networks_plural">
         <item quantity="other">网络</item>
@@ -313,6 +396,7 @@
     <string name="common_not_available">不可用</string>
     <string name="common_not_enough_funds_message">抱歉，您没有足够的资金支付网络费用。</string>
     <string name="common_not_enough_funds_title">余额不足</string>
+    <string name="common_not_now">暂不</string>
     <string name="common_off">关闭</string>
     <string name="common_ok">确定</string>
     <string name="common_ok_back">好的，返回</string>
@@ -320,6 +404,7 @@
     <string name="common_ongoing">进行中</string>
     <string name="common_optional">可选的</string>
     <string name="common_options_title">选择一个选项</string>
+    <string name="common_passphrase">助记词</string>
     <string name="common_paste">粘贴</string>
     <string name="common_per_year">/ 年</string>
     <string name="common_per_year_format">%s / 年</string>
@@ -353,6 +438,7 @@
     <string name="common_secret_derivation_path">密钥派生路径</string>
     <string name="common_settings">设置</string>
     <string name="common_share">分享</string>
+    <string name="common_sign_in">登录</string>
     <string name="common_sign_request">签名请求</string>
     <string name="common_signature_invalid">签名无效</string>
     <string name="common_skip">跳过</string>
@@ -363,6 +449,7 @@
     <string name="common_sort_by">排序方式</string>
     <string name="common_status">状态</string>
     <string name="common_substrate_address">Substrate 地址</string>
+    <string name="common_tap_to_reveal_title">点击显示</string>
     <string name="common_terms_and_conditions_formatting">条款和条件</string>
     <string name="common_time_left">剩余时间</string>
     <string name="common_title">标题</string>
@@ -388,6 +475,10 @@
     <string name="common_warning">警告</string>
     <string name="common_yes">是</string>
     <string name="common_zero_amount_error">金额必须为正</string>
+    <string name="confirm_cloud_backup_password_subtitle">请输入您在备份过程中创建的密码</string>
+    <string name="confirm_cloud_backup_password_title">输入当前备份密码</string>
+    <string name="confirm_mnemonic_disabled_button_state">选择单词...</string>
+    <string name="confirm_mnemonic_not_matching_error_message">无效的助记词，请再次检查单词顺序</string>
     <string name="confirm_referendum_vote_referendum">公投</string>
     <string name="confirm_referendum_vote_title">投票</string>
     <string name="confirm_referendum_vote_track">追踪</string>
@@ -403,6 +494,20 @@
     <string name="connection_management_title">网络</string>
     <string name="connections_add_connection">添加连接</string>
     <string name="contacts_scan">扫描二维码</string>
+    <string name="corrupted_backup_error_subtitle">已检测到您的备份出现问题。您可以选择删除当前备份并创建新备份。在继续之前 %s。</string>
+    <string name="corrupted_backup_error_subtitle_highlighted">确保您已保存所有钱包的密码短语</string>
+    <string name="corrupted_backup_error_title">找到备份但为空或已损坏</string>
+    <string name="create_cloud_backup_password_alert_subtitle">将来，如果没有备份密码，将无法从云备份中恢复您的钱包。\n%s</string>
+    <string name="create_cloud_backup_password_alert_subtitle_highlighted">此密码无法恢复。</string>
+    <string name="create_cloud_backup_password_alert_title">记住备份密码</string>
+    <string name="create_cloud_backup_password_input_confirm_hint">确认密码</string>
+    <string name="create_cloud_backup_password_input_hint">备份密码</string>
+    <string name="create_cloud_backup_password_requirement_letters">字母</string>
+    <string name="create_cloud_backup_password_requirement_min_chars">最少8个字符</string>
+    <string name="create_cloud_backup_password_requirement_numbers">数字</string>
+    <string name="create_cloud_backup_password_requirement_passwords_match">密码匹配</string>
+    <string name="create_cloud_backup_password_subtitle">请输入密码以随时访问您的备份。密码无法恢复，请务必记住！</string>
+    <string name="create_cloud_backup_password_title">创建备份密码</string>
     <string name="crodloan_private_crowdloan_message">私有众贷暂不支持。</string>
     <string name="crodloan_private_crowdloan_title">私有众筹</string>
     <string name="crowdloan_about">关于众贷</string>
@@ -487,7 +592,6 @@
     <string name="dapp_sign_error_unsupported_chain">不支持的链，创世哈希%s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">确保操作是正确的</string>
     <string name="dapp_sign_extrinsic_failed">未能签署所请求的操作</string>
-    
     <string name="deep_linking_chain_id_is_not_found">未找到链</string>
     <string name="deep_linking_domain_is_not_matched">链接%s中的域名不被允许</string>
     <string name="deep_linking_governance_type_is_not_specified">未指定治理类型</string>
@@ -542,16 +646,26 @@
     <string name="delegation_your_delegation">您的委托</string>
     <string name="delegation_your_delegations">您的委托</string>
     <string name="delegations_filter">显示</string>
+    <string name="deleting_backup_progress">正在删除备份...</string>
+    <string name="deprecated_cloud_backup_password_subtitle">您的备份密码已更新。要继续使用云备份，%s</string>
+    <string name="deprecated_cloud_backup_password_subtitle_highlight">请输入新备份密码。</string>
+    <string name="deprecated_cloud_backup_password_title">备份密码已更改</string>
     <string name="duplicate_proxy_type_message">您已经向此账户委托了：%s</string>
     <string name="duplicate_proxy_type_title">委托已存在</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH 兼容)</string>
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519（替代方案）</string>
     <string name="ed25519_selection_title">Edwards</string>
+    <string name="enter_backup_password_hint">备份密码</string>
     <string name="error_not_enough_to_pay_fee_title">代币不足以支付费用</string>
     <string name="ethereum_contract">合约</string>
     <string name="ethereum_contract_call">合约调用</string>
     <string name="ethereum_function">功能</string>
+    <string name="existing_cloud_backup_found_button">恢复钱包</string>
+    <string name="existing_cloud_backup_found_subtitle">%s 您的所有钱包都将安全备份到Google Drive。</string>
+    <string name="existing_cloud_backup_found_subtitle_highlight">你想恢复你的钱包吗？</string>
+    <string name="existing_cloud_backup_found_title">找到现有的云备份</string>
+    <string name="export_json_download_btn">下载恢复 JSON</string>
     <string name="export_json_password_confirm">确认密码</string>
     <string name="export_json_password_match_error">密码不匹配</string>
     <string name="export_json_password_new">设置密码</string>
@@ -588,11 +702,18 @@
     <string name="import_mnemonic_invalid_title">您的助记词无效</string>
     <string name="import_seed_invalid_message">请确保您的输入包含64个十六进制符号。</string>
     <string name="import_seed_invalid_title">种子无效</string>
+    <string name="import_wallet_cloud_backup_not_found_subtitle">很遗憾，没有找到您的钱包备份。</string>
+    <string name="import_wallet_cloud_backup_not_found_title">未找到备份</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">从 Google 云恢复钱包</string>
+    <string name="import_wallet_options_mnemonic_subtitle">使用您 12、15、18、21 或 24 个字的短语</string>
+    <string name="import_wallet_options_title">选择您想如何导入您的钱包</string>
+    <string name="import_wallet_options_watch_only_title">仅观看</string>
     <string name="invalid_proxy_address_message">代理地址应该是一个有效的%s地址</string>
     <string name="invalid_proxy_address_title">代理地址无效</string>
     <string name="invoice_scan_error_no_info">无法解码QR</string>
     <string name="invoice_scan_qr_code_title">QR码</string>
     <string name="invoice_scan_upload">从相册上传</string>
+    <string name="json_export_btn">导出 JSON 文件</string>
     <string name="language_title">语言</string>
     <string name="ledger_chain_not_supported">Ledger不支持%s</string>
     <string name="ledger_error_app_cancelled_message">操作已被设备取消。请确保您已解锁您的Ledger。</string>
@@ -616,9 +737,24 @@
     <string name="ledger_verify_address_subtitle">按下您%s上的两个按钮以批准地址</string>
     <string name="ledger_wallet_details_description">这个钱包与Ledger配对。Nova将帮助您形成任何您想要的操作，并且您将被要求使用Ledger签名</string>
     <string name="ledher_import_select_address_title">选择要添加到钱包的账户</string>
+    <string name="loocking_backup_progress">正在寻找您的备份...</string>
     <string name="make_payout_transaction_sent">支付交易已发送</string>
     <string name="manage_assets_add_token">添加代币</string>
-    
+    <string name="manage_cloud_backup">管理备份</string>
+    <string name="manual_backup_secrets_custom_key_title">自定义密钥</string>
+    <string name="manual_backup_secrets_default_key_title">默认密钥</string>
+    <string name="manual_backup_secrets_subtitle">不要与任何人分享这些信息 — 如果您这样做，您将永久且不可恢复地失去所有资产</string>
+    <string name="manual_backup_select_account_custom_key_title">具有自定义密钥的帐户</string>
+    <string name="manual_backup_select_account_default_key_account">默认帐户</string>
+    <string name="manual_backup_select_account_default_key_account_subtitle_more_chains" formatted="false">%s，+%d 其他</string>
+    <string name="manual_backup_select_account_default_key_title">具有默认密钥的帐户</string>
+    <string name="manual_backup_select_account_header">选择要备份的密钥</string>
+    <string name="manual_backup_select_wallet_header">选择要备份的钱包</string>
+    <string name="manual_backup_warning_subtitle">在查看您的备份之前，请仔细阅读以下内容</string>
+    <string name="manual_backup_warning_title">不要分享您的助记词！</string>
+    <string name="mnemonic_card_reveal_subtitle">确保没有人能够看到你的屏幕\n且不要截图</string>
+    <string name="mnemonic_card_title">请%s任何人</string>
+    <string name="mnemonic_card_title_highlight"><font>不要分享给</font></string>
     <string name="mnemonic_error_try_another_one">请尝试另一个。</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">助记词短语无效，请再次检查单词顺序</string>
     <string name="multiple_wallets_selection_max_message">您不能选择超过%d个钱包</string>
@@ -736,7 +872,6 @@
     <string name="push_token_sent_no_account_name_title">💸 已发送</string>
     <string name="push_token_sent_title">💸 发送 %s</string>
     <string name="push_wallets_title">选择最多 3 个钱包以在钱包有活动时被通知</string>
-    <string name="push_welcome_cancel_button">暂不</string>
     <string name="push_welcome_enable_button">启用推送通知</string>
     <string name="push_welcome_message">接收有关钱包操作、治理更新、质押活动和安全的通知，让您始终了解最新情况</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">启用推送通知，即表示您同意我们的 %s 和 %s</string>
@@ -864,6 +999,13 @@
         <item quantity="other">您之前在%d个轨道上参与了公投。为了使这些轨道可用于委托，您需要移除现有的投票。</item>
     </plurals>
     <string name="remove_votes_suggestion_title">移除您的投票记录？</string>
+    <string name="restore_cloud_backup_delete_backup_description" formatted="false">%s 它是独属于你的，安全存储，对他人不可访问。没有备份密码，无法从Google云盘中恢复钱包。如果丢失，请删除当前备份，以创建一个新的备份并设置新密码。%s</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1"><font>很遗憾，您的密码无法恢复。</font></string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2"><font>或者，使用Passphrase进行恢复。</font></string>
+    <string name="restore_cloud_backup_delete_backup_title">你是否丢失了密码？</string>
+    <string name="restore_cloud_backup_password_title">您的备份密码之前已更新。要继续使用云备份，请输入新的备份密码。</string>
+    <string name="restore_cloud_backup_subtitle">请输入您在备份过程中创建的密码</string>
+    <string name="restore_cloud_backup_title">输入备份密码</string>
     <string name="runtime_update_failure_description">更新区块链运行时信息失败。部分功能可能无法工作。</string>
     <string name="runtime_update_failure_title">运行时更新失败</string>
     <string name="search_contacts">联系人</string>
@@ -921,7 +1063,6 @@
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">不支持的质押类型</string>
     <string name="sr25519_selection_subtitle">sr25519（推荐）</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    
     <string name="staking_account_is_used_as_controller">所选账户已作为控制器使用</string>
     <string name="staking_action_add_proxy">添加委托权限（代理）</string>
     <string name="staking_action_your_proxies">您的委托</string>
@@ -1215,6 +1356,14 @@
     <string name="staking_your_stake">您的质押</string>
     <string name="staking_your_validators">您的验证者</string>
     <string name="staking_your_validators_changing_title">您的验证者将在下个时代变更。</string>
+    <string name="start_create_wallet_backup_ready_explanation">现在让我们备份您的钱包。这可以确保您的资金安全。备份允许您在任何时候恢复您的钱包。</string>
+    <string name="start_create_wallet_cloud_backup_btn">继续使用Google</string>
+    <string name="start_create_wallet_enter_wallet_name">输入钱包名称</string>
+    <string name="start_create_wallet_input_hint">我的新钱包</string>
+    <string name="start_create_wallet_manual_backup_btn">继续手动备份</string>
+    <string name="start_create_wallet_name_your_wallet">给您的钱包取个名字</string>
+    <string name="start_create_wallet_set_wallet_name_explanation">这将只对您可见，您可以稍后编辑它。</string>
+    <string name="start_create_wallet_your_wallet_is_ready">您的钱包已准备好</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">由于%s，您的余额中有锁定的代币。为了继续，请输入少于%s或多于%s的金额。要质押其他金额，您应该解除%s的锁定。</string>
     <string name="start_staking_cant_stake_amount">您不能质押指定的金额</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">已选：%d（最多 %d）</string>
@@ -1250,6 +1399,9 @@
     <string name="start_staking_max_nominators_reached_message">已达到提名人的最大数量。请稍后再试</string>
     <string name="start_staking_max_nominators_reached_title">%s目前不可用</string>
     <string name="start_staking_selection_validators_subtitle" formatted="false">验证者：%d（最大%d）</string>
+    <string name="state_changed">已修改</string>
+    <string name="state_new">新的</string>
+    <string name="state_removed">已移除</string>
     <string name="swap_custom_fee_selector_description">用于支付网络费用的代币</string>
     <string name="swap_custom_fee_selector_footer">网络费用将添加到输入的金额之上</string>
     <string name="swap_error_pair_not_supported">不支持此对</string>
@@ -1389,6 +1541,9 @@
     <string name="wallet_filters_title">过滤器</string>
     <string name="wallet_filters_transfers">转账</string>
     <string name="wallet_manage_assets_title">资产管理</string>
+    <string name="wallet_management_add_account_title">如何添加钱包？</string>
+    <string name="wallet_management_create_account_btn">如何添加钱包？</string>
+    <string name="wallet_management_import_account_btn">如何添加钱包？</string>
     <string name="wallet_nickname_create_caption_v2_2_0">名称示例：主账户、我的验证器、Dotsama 众贷等。</string>
     <string name="wallet_receive_description">将此 QR 码分享给发送方</string>
     <string name="wallet_receive_description_v2_2_0">让发送方扫描此 QR 码</string>

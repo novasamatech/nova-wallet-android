@@ -17,12 +17,10 @@
     <string name="account_add_already_exists_message">Hesap zaten var. Lütfen başka bir tane deneyin.</string>
     <string name="account_add_watch_only_description">Herhangi bir cüzdanı adresi ile takip et</string>
     <string name="account_add_watch_wallet">Yalnızca-izleme cüzdanı ekle</string>
-    <string name="account_backup_mnemonic_field_title">Anımsatıcı Şifre İfadesi</string>
-    <string name="account_backup_mnemonic_title">İfadenizi yazın ve güvenli bir yerde saklayın</string>
+    <string name="account_backup_mnemonic_title">Parolanızı not edin</string>
     <string name="account_backup_secret_caption">Lütfen ifadenizi doğru ve okunaklı bir şekilde yazdığınızdan emin olun.</string>
     <string name="account_chain_address_format">%s adresi</string>
     <string name="account_confirm_mnemonic">Anımsatıcıyı onayla</string>
-    <string name="account_confirm_mnemonic_subtitle">Kelimeleri doğru sırayla seçin.</string>
     <string name="account_confirm_mnemonic_title">Hadi bunu bir daha kontrol edelim</string>
     <string name="account_confirmation_details">Kelimeleri doğru sıradaki gibi seçin</string>
     <string name="account_create_account">Yeni bir hesap oluştur</string>
@@ -30,6 +28,7 @@
     <string name="account_create_name_subtitle_v2_2_0">İsim sadece bu uygulamada yerel olarak kullanılacak. Daha sonra düzenleyebilirsiniz</string>
     <string name="account_create_name_title_v2_2_0">Cüzdan ismi oluştur</string>
     <string name="account_create_title">Yedek mnemonic</string>
+    <string name="account_create_wallet">Yeni bir cüzdan oluşturun</string>
     <string name="account_creation_info">Mnemonic hesaba erişimi kurtarmak için kullanılır. Yazın, bunun olmadan hesabınıza erişimi kurtaramayız!</string>
     <string name="account_custom_secret">Gizliliği değiştirilmiş hesaplar</string>
     <string name="account_delete_confirm">Unut</string>
@@ -46,10 +45,10 @@
     <string name="account_ethereum_derivation_path">Ethereum gizli türetme yolu</string>
     <string name="account_export">Hesabı dışa aktar</string>
     <string name="account_export_action">Dışa Aktar</string>
+    <string name="account_export_existing">Mevcut olanı içe aktar</string>
     <string name="account_export_json_password_subtitle">Bu, verileri şifrelemek ve JSON dosyasını kaydetmek için gereklidir.</string>
     <string name="account_export_json_password_title">Yeni bir şifre belirle</string>
     <string name="account_export_json_title">Gizlinizi kaydedin ve güvenli bir yerde saklayın</string>
-    <string name="account_export_password_change">Şifreyi değiştir</string>
     <string name="account_export_seed_title">Gizlinizi yazın ve güvenli bir yerde saklayın</string>
     <string name="account_import_invalid_keystore">Geçersiz geri yükleme json\'u. Lütfen girdinin geçerli bir json içerdiğinden emin olun.</string>
     <string name="account_import_invalid_seed">Seed geçersiz. Lütfen girdinizin 64 hex simgesi içerdiğinden emin olun.</string>
@@ -67,16 +66,25 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Türetme yolu desteklenmeyen semboller içeriyor ya da yanlış yapıda</string>
     <string name="account_invalid_derivation_path_title">Geçersiz türetme yolu</string>
     <string name="account_json_file">JSON dosyası</string>
+    <string name="account_ledger_generic_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınıza <font color="#FFFFFF">Generic uygulamanın yüklü</font> olduğundan emin olun</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
     <string name="account_ledger_import_start_guide">Ledger’ın resmi Bluetooth Bağlantı Kılavuzu</string>
     <string name="account_ledger_import_start_step_1">Network uygulamasının Ledger cihazınıza Ledger Live uygulaması kullanılarak kurulduğundan <font color="#FFFFFF">emin olun</font></string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2">Ledger cihazınızda <font color="#FFFFFF">ağ uygulamasını açın</font></string>
     <string name="account_ledger_import_start_step_3">Nova Cüzdan\'ın <font color="#FFFFFF">Bluetooth ve Konum\'a erişimini</font> izin verin</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4">Cüzdana eklenecek <font color="#FFFFFF">Hesabı seçin</font></string>
     <string name="account_ledger_import_start_title">Ledger Nano X’i bağlayın</string>
+    <string name="account_ledger_legacy_warning_message">İşlemleri imzalamak ve hesaplarınızı yeni Generic Ledger uygulamasına taşımak için Migration uygulamasını yükleyin ve açın. Eski Legacy ve Migration Ledger uygulamaları gelecekte desteklenmeyecektir.</string>
+    <string name="account_ledger_legacy_warning_title">Yeni Ledger uygulaması yayımlandı</string>
+    <string name="account_ledger_migration_app">Geçiş</string>
+    <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
+    <string name="account_ledger_migration_generic">Genel</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Genel Uygulama)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Eski)</string>
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 veya 24 kelime uzunluğunda ifade</string>
@@ -90,7 +98,7 @@
     <string name="account_parity_signer_import_scan_invalid_qr">Geçersiz QR kodu, lütfen %s\'ten QR kodu taradığınızdan emin olun</string>
     <string name="account_parity_signer_import_start_select_top">En üstte olanı seçtiğinizden emin olun</string>
     <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">“Tuşlar” sekmesine gidin. Nova Cüzdan\'a eklemek istediğiniz tohumu ve ardından hesabı</font> seçin</string>
     <string name="account_parity_signer_import_start_step_3">Parity Signer, size <font color="#FFFFFF">taramak için QR kodu</font> sağlayacak</string>
     <string name="account_parity_signer_import_start_title">%s\'tan cüzdan ekle</string>
     <string name="account_parity_signer_not_supported_subtitle">%s, rasgele mesajların imzalanmasını desteklemez - yalnızca işlemler</string>
@@ -106,7 +114,7 @@
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Dikkat edin, türev yol adı boş olmalıdır</string>
     <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">“Anahtar Setleri” sekmesine gidin.</font> Anahtar setinizi, Ağınızı ve ardından Nova Wallet\'a eklemek istediğiniz hesabı seçin.</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size <font color="#FFFFFF">taramak için QR kodu sağlayacak</font></string>
     <string name="account_private_key">Özel anahtar</string>
     <string name="account_proxieds">Size Delege Edilenler (Proksi)</string>
@@ -141,6 +149,7 @@
     <string name="accounts_add_wallet">Cüzdan ekle</string>
     <string name="accounts_change_chain_account">%s hesabını değiştir</string>
     <string name="accounts_change_chain_secrets">Hesabı değiştir</string>
+    <string name="accounts_ledger_legacy">Ledger (Eski)</string>
     <string name="add_delegation_missing_account_message">Delege etmek için cüzdana %s hesabı eklemeniz gerekiyor</string>
     <string name="add_proxy_confirmation_delegate_to">Hesap için delegasyon yap</string>
     <string name="add_proxy_confirmation_delegating_account">Delegasyon yapılacak hesap</string>
@@ -188,10 +197,34 @@
     <string name="assets_send_flow_placeholder">Göndermek için token\'ınız yok.\nHesabınıza token alın veya alın.</string>
     <string name="assets_swap_flow_pay_title">Ödeme yapılacak Token</string>
     <string name="assets_swap_flow_receive_title">Alınacak Token</string>
+    <string name="backup_diff_subtitle">Değişikliklere başlamadan önce, %s değiştirilen ve kaldırılan cüzdanlar için!</string>
+    <string name="backup_diff_subtitle_highlighted">Parolalarınızı kaydettiğinizden emin olun</string>
+    <string name="backup_diff_title">Yedek Güncellemelerini Uygula?</string>
+    <string name="backup_mnemonic_attention_title">Cüzdanınızı kaydetmeye hazırlanın!</string>
+    <string name="backup_secrets_warning_condition_1">Bu parola, size tüm bağlantılı cüzdanlara ve içlerindeki fonlara tam ve kalıcı erişim sağlar.\n%s</string>
+    <string name="backup_secrets_warning_condition_1_highlight">PAYLAŞMAYIN.</string>
+    <string name="backup_secrets_warning_condition_2">Parolanızı herhangi bir form veya web sitesine girmeyin.\n%s</string>
+    <string name="backup_secrets_warning_condition_2_highlight">FONLAR KALICI OLARAK KAYBEDİLEBİLİR.</string>
+    <string name="backup_secrets_warning_condition_3">Destek veya yöneticiler asla ve hiçbir koşulda parolanızı istemez.\n%s</string>
+    <string name="backup_secrets_warning_condition_3_highlight">KİŞİ TAKLİTLERİNE DİKKAT EDİN.</string>
+    <string name="backup_secrets_warning_disabled_button">Devam etmek için İncele ve Kabul Et</string>
+    <string name="backup_settings_delete_backup">Yedeklemeyi sil</string>
+    <string name="backup_settings_manual_subtitle">Her şeyin güvende olduğundan emin olmak için kurtarma cümlenizi el ile yazabilirsiniz</string>
+    <string name="backup_settings_manual_switcher_title">Manuel olarak yedekle</string>
+    <string name="backup_settings_manual_title">Manuel</string>
+    <string name="backup_settings_no_wallets_error_message">Parolalı herhangi bir cüzdan eklemediniz.</string>
+    <string name="backup_settings_no_wallets_error_title">Yedeklenecek cüzdan yok</string>
+    <string name="backup_settings_subtitle">Tüm cüzdanlarınızın şifrelenmiş bir kopyası Google Drive\'da güvenle saklanır. Nova\'yı yeni bir cihaza yükleseniz bile cüzdanlarınıza kolayca erişebilirsiniz.</string>
+    <string name="backup_settings_switcher_text">Google Drive\'a yedekle</string>
+    <string name="backup_settings_title">Google Drive</string>
+    <string name="backup_settings_toolbar_title">Yedekleme</string>
+    <string name="backup_title">Yedekleme</string>
     <string name="biometric_auth_title">Biyometrik Doğrulama</string>
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
     <string name="buy_provider_open_confirmation_title">Tarayıcıda devam et?</string>
+    <string name="change_cloud_backup_password_subtitle">Cüzdanlarınızı bulut yedeklemesinden kurtarmak için kullanılacak bir parola girin. Bu parolanın gelecekte kurtarılamayacağını unutmayın, bu nedenle onu hatırladığınızdan emin olun!</string>
+    <string name="change_cloud_backup_password_title">Yedekleme parolasını güncelle</string>
     <string name="choose_amount_asset">Varlık</string>
     <string name="choose_amount_available_balance">Kullanılabilir bakiye</string>
     <string name="choose_amount_error_balance">Üzgünüz, bakiye kontrol isteği başarısız oldu. Lütfen, daha sonra tekrar deneyin.</string>
@@ -200,13 +233,47 @@
     <string name="choose_amount_fee">Transfer ücreti</string>
     <string name="choose_amount_network_error">Ağ yanıt vermiyor</string>
     <string name="choose_amount_to">Kime</string>
-    
-    
-    
-    
-    
-    
-    
+    <string name="cloud_backup_delete_action_subtitle">%s ve her zaman çevrimdışı tutup istediğiniz zaman geri yükleyebilmek için hatırlayın. Bunu Yedekleme Ayarlarında yapabilirsiniz.</string>
+    <string name="cloud_backup_delete_action_subtitle_highlighted">Lütfen devam etmeden önce tüm cüzdan şifre kelimelerinizi not edin.</string>
+    <string name="cloud_backup_delete_action_title">Yedek Google Drive\'dan silinecek</string>
+    <string name="cloud_backup_delete_backup_confirmation_message">Cüzdanlarınızla birlikte mevcut yedekleme kalıcı olarak silinecek!</string>
+    <string name="cloud_backup_delete_backup_confirmation_title">Bulut Yedeğini silmek istediğinizden emin misiniz?</string>
+    <string name="cloud_backup_delete_button">Yedeği Sil</string>
+    <string name="cloud_backup_destructive_changes_action_subtitle">Şu anda yedeğiniz senkronize değil. Lütfen bu güncellemeleri inceleyin.</string>
+    <string name="cloud_backup_destructive_changes_action_title">Bulut Yedeklemede değişiklikler bulundu</string>
+    <string name="cloud_backup_destructive_changes_button">Güncellemeleri İncele</string>
+    <string name="cloud_backup_destructive_changes_confirmation_subtitle">Silinecek cüzdanlar için şifre kelimenizi manuel olarak yazmadıysanız, bu cüzdanlar ve tüm varlıkları kalıcı ve geri dönülmez bir şekilde kaybolacaktır.</string>
+    <string name="cloud_backup_destructive_changes_confirmation_title">Bu değişiklikleri uygulamak istediğinizden emin misiniz?</string>
+    <string name="cloud_backup_destructive_changes_not_applied_button">Sorunu İncele</string>
+    <string name="cloud_backup_destructive_changes_not_applied_subtitle">Şu anda yedeğiniz senkronize değil. Lütfen sorunu inceleyin.</string>
+    <string name="cloud_backup_destructive_changes_not_applied_title">Cüzdan değişiklikleri Bulut Yedeğine güncellenemedi</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">Lütfen doğru kimlik bilgileriyle Google hesabınıza giriş yaptığınızdan ve Nova Wallet\'a Google Drive\'a erişim izni verdiğinizden emin olun.</string>
+    <string name="cloud_backup_error_google_service_auth_failed_title">Google Drive kimlik doğrulaması başarısız oldu</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_message">Kullanılabilir Google Drive depolama alanınız yetersiz.</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_title">Yetersiz Depolama Alanı</string>
+    <string name="cloud_backup_error_google_service_not_found_message">Maalesef, cihazınızda eksik olan Google Play hizmetleri olmadan Google Drive çalışmıyor. Google Play hizmetlerini almayı deneyin</string>
+    <string name="cloud_backup_error_google_service_not_found_title">Google Play hizmetleri bulunamadı</string>
+    <string name="cloud_backup_error_google_service_other_message">Cüzdanlarınızı Google Drive\'a yedekleyemiyoruz. Lütfen Nova Wallet\'ın Google Drive\'ınızı kullanmasına izin verdiğinizden ve yeterli kullanılabilir depolama alanınız olduğundan emin olun, ardından tekrar deneyin.</string>
+    <string name="cloud_backup_error_google_service_other_title">Google Drive hatası</string>
+    <string name="cloud_backup_error_invalid_password_message">Lütfen, parolanın doğruluğunu kontrol edin ve tekrar deneyin.</string>
+    <string name="cloud_backup_error_invalid_password_title">Parola geçersiz</string>
+    <string name="cloud_backup_error_not_found_message">Maalesef, cüzdanları geri yüklemek için bir yedekleme bulamadık</string>
+    <string name="cloud_backup_error_not_found_title">Yedekleme Bulunamadı</string>
+    <string name="cloud_backup_removing_warning_subtitle">Devam etmeden önce cüzdan için Anahtar Cümlesini kaydettiğinizden emin olun.</string>
+    <string name="cloud_backup_removing_warning_title">Cüzdan Bulut Yedeklemesinde kaldırılacak</string>
+    <string name="cloud_backup_settings_backup_errors_button">Yedekleme Hatasını Gözden Geçir</string>
+    <string name="cloud_backup_settings_corrupted_backup_button">Yedekleme Güncellemelerini Gözden Geçir</string>
+    <string name="cloud_backup_settings_deprecated_password_button">Yedekleme Parolasını Girin</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Cüzdan yedeği oluşturmak için açın</string>
+    <string name="cloud_backup_settings_last_sync" formatted="false">Son senkronizasyon: %s saat %s</string>
+    <string name="cloud_backup_settings_not_auth_button">Google Drive\'a Giriş Yapın</string>
+    <string name="cloud_backup_settings_other_errors_button">Google Drive Sorununu Gözden Geçir</string>
+    <string name="cloud_backup_state_disabled_title">Yedekleme Devre Dışı</string>
+    <string name="cloud_backup_state_synced_title">Yedekleme Senkronize Edildi</string>
+    <string name="cloud_backup_state_syncing_title">Yedekleme Senkronize Ediliyor...</string>
+    <string name="cloud_backup_state_unsynced_title">Yedekleme Senkronize Edilmemiş</string>
+    <string name="cloud_backup_will_be_changed_subtitle">Yeni cüzdanlar otomatik olarak Bulut Yedekleme\'ye eklenir. Bulut Yedekleme\'yi Ayarlardan devre dışı bırakabilirsiniz.</string>
+    <string name="cloud_backup_will_be_changed_title">Cüzdan değişiklikleri Bulut Yedekleme\'de güncellenecek</string>
     <string name="common_accept_terms">Şartları kabul et...</string>
     <string name="common_account">Hesap</string>
     <string name="common_account_address">Hesap adresi</string>
@@ -236,16 +303,21 @@
     <string name="common_cannot_pay_network_fee_message" formatted="false">Ağ ücreti için\n%s ödemeniz gerektiğinden en fazla %s kullanabilirsiniz.</string>
     <string name="common_chain">Zincir</string>
     <string name="common_change">Değiştir</string>
+    <string name="common_change_password">Parolayı değiştir</string>
+    <string name="common_check_box_auto_continue">Gelecekte otomatik olarak devam et</string>
     <string name="common_choose_network">Ağı seçin</string>
     <string name="common_clear">Temizle</string>
     <string name="common_close">Kapat</string>
     <string name="common_close_confirmation_message">Bu ekranı kapatmak istediğinizden emin misiniz?\nDeğişiklikleriniz uygulanmayacak.</string>
+    <string name="common_cloud_backup">Bulut yedekleme</string>
     <string name="common_completed">Tamamlandı</string>
     <string name="common_completed_with_count">Tamamlandı (%s)</string>
     <string name="common_confirm">Onayla</string>
     <string name="common_confirm_title">Onay</string>
     <string name="common_confirmation_title">Emin misiniz?</string>
     <string name="common_confirmed">Onaylandı</string>
+    <string name="common_connection_error_message">Bağlantınızı kontrol edin veya daha sonra tekrar deneyin</string>
+    <string name="common_connection_error_title">Bağlantı Başarısız</string>
     <string name="common_continue">Devam et</string>
     <string name="common_copied">Panoya kopyalandı</string>
     <string name="common_copy_address">Adresi kopyala</string>
@@ -264,6 +336,7 @@
     <string name="common_enable">Etkinleştir</string>
     <string name="common_enter_address">Adres girin…</string>
     <string name="common_enter_amount">Miktar girin...</string>
+    <string name="common_enter_password">Parolayı girin</string>
     <string name="common_error_general_title">Hata</string>
     <string name="common_error_not_enough_tokens">Yeterli token yok</string>
     <string name="common_event">Etkinlik</string>
@@ -277,6 +350,7 @@
     <string name="common_filter_sort_header">Şuna göre sırala:</string>
     <string name="common_filters">Filtreler</string>
     <string name="common_find_out_more">Daha fazla bilgi edinin</string>
+    <string name="common_forgot_password">Parolayı mı unuttunuz?</string>
     <plurals name="common_frequency_days">
         <item quantity="one">her gün</item>
         <item quantity="other">her %s günde bir</item>
@@ -284,6 +358,7 @@
     <string name="common_frequency_days_daily">günlük</string>
     <string name="common_frequency_days_everyday">her gün</string>
     <string name="common_get_token_format">%s alın</string>
+    <string name="common_got_it">Anladım</string>
     <string name="common_governance">Yönetim</string>
     <string name="common_hexadecimal_string">Onaltılık dizi</string>
     <plurals name="common_hours_format">
@@ -293,7 +368,6 @@
     <string name="common_how_it_works">Nasıl çalışır</string>
     <string name="common_i_understand">Anladım</string>
     <string name="common_info">Bilgi</string>
-    <string name="common_input_error_set_password">Bir şifre belirleyin…</string>
     <string name="common_invalid_qr">QR kodu geçersiz</string>
     <string name="common_learn_more">Daha fazla bilgi edinin</string>
     <string name="common_learn_more_v2_2_0">Hakkında daha fazla bilgi edinin</string>
@@ -308,7 +382,9 @@
     <string name="common_missing_account_title">%s hesabı eksik</string>
     <string name="common_module">Modül</string>
     <string name="common_network">Ağ</string>
+    <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s desteklenmiyor</string>
+    <string name="common_network_polkadot">Polkadot</string>
     <string name="common_networks">Ağlar</string>
     <plurals name="common_networks_plural">
         <item quantity="one">Ağ</item>
@@ -324,6 +400,7 @@
     <string name="common_not_available">Mevcut değil</string>
     <string name="common_not_enough_funds_message">Üzgünüm, ağ ücretini ödeyecek yeterli bakiyeniz yok.</string>
     <string name="common_not_enough_funds_title">Yetersiz bakiye</string>
+    <string name="common_not_now">Şimdi değil</string>
     <string name="common_off">Kapalı</string>
     <string name="common_ok">Tamam</string>
     <string name="common_ok_back">Tamam, geri dön</string>
@@ -331,6 +408,7 @@
     <string name="common_ongoing">Devam ediyor</string>
     <string name="common_optional">İsteğe bağlı</string>
     <string name="common_options_title">Bir seçenek seçin</string>
+    <string name="common_passphrase">Şifre Cümlesi</string>
     <string name="common_paste">Yapıştır</string>
     <string name="common_per_year">/ yıl</string>
     <string name="common_per_year_format">%s / yıl</string>
@@ -364,6 +442,7 @@
     <string name="common_secret_derivation_path">Gizli türetme yolu</string>
     <string name="common_settings">Ayarlar</string>
     <string name="common_share">Paylaş</string>
+    <string name="common_sign_in">Giriş Yap</string>
     <string name="common_sign_request">İmza isteği</string>
     <string name="common_signature_invalid">İmza geçersiz</string>
     <string name="common_skip">Atla</string>
@@ -374,6 +453,7 @@
     <string name="common_sort_by">Sırala</string>
     <string name="common_status">Durum</string>
     <string name="common_substrate_address">Substrate adresi</string>
+    <string name="common_tap_to_reveal_title">Açmak için dokunun</string>
     <string name="common_terms_and_conditions_formatting">Şartlar ve Koşullar</string>
     <string name="common_time_left">Kalan zaman</string>
     <string name="common_title">Başlık</string>
@@ -400,6 +480,10 @@
     <string name="common_warning">Uyarı</string>
     <string name="common_yes">Evet</string>
     <string name="common_zero_amount_error">Miktar pozitif olmalıdır</string>
+    <string name="confirm_cloud_backup_password_subtitle">Yedekleme işlemi sırasında oluşturduğunuz parolayı girin</string>
+    <string name="confirm_cloud_backup_password_title">Geçerli yedekleme parolasını girin</string>
+    <string name="confirm_mnemonic_disabled_button_state">Kelimeleri seçin...</string>
+    <string name="confirm_mnemonic_not_matching_error_message">Geçersiz şifre cümlesi. Lütfen kelime sırasını tekrar kontrol edin</string>
     <string name="confirm_referendum_vote_referendum">Referandum</string>
     <string name="confirm_referendum_vote_title">Oylama</string>
     <string name="confirm_referendum_vote_track">Takip</string>
@@ -415,6 +499,20 @@
     <string name="connection_management_title">Ağlar</string>
     <string name="connections_add_connection">Bağlantı ekle</string>
     <string name="contacts_scan">QR kodu tarayın</string>
+    <string name="corrupted_backup_error_subtitle">Yedeklemenizde bir sorun tespit edildi. Mevcut yedeklemeyi silip yeni bir tane oluşturma seçeneğiniz var. Devam etmeden önce %s.</string>
+    <string name="corrupted_backup_error_subtitle_highlighted"><font>Tüm cüzdanlar için Şifre Cümlelerini kaydettiğinizden emin olun</font></string>
+    <string name="corrupted_backup_error_title">Yedekleme bulundu ancak boş veya bozuk</string>
+    <string name="create_cloud_backup_password_alert_subtitle">Gelecekte, yedekleme parolası olmadan Cloud Backup\'tan cüzdanlarınızı geri yüklemek mümkün değildir.\n%s</string>
+    <string name="create_cloud_backup_password_alert_subtitle_highlighted">Bu parola kurtarılamaz.</string>
+    <string name="create_cloud_backup_password_alert_title">Yedekleme Parolasını Hatırla</string>
+    <string name="create_cloud_backup_password_input_confirm_hint">Parolayı doğrulayın</string>
+    <string name="create_cloud_backup_password_input_hint">Yedekleme parolası</string>
+    <string name="create_cloud_backup_password_requirement_letters">Harfler</string>
+    <string name="create_cloud_backup_password_requirement_min_chars">Min. 8 karakter</string>
+    <string name="create_cloud_backup_password_requirement_numbers">Rakamlar</string>
+    <string name="create_cloud_backup_password_requirement_passwords_match">Parolalar eşleşiyor</string>
+    <string name="create_cloud_backup_password_subtitle">Yedeklemenize istediğiniz zaman erişim sağlamak için lütfen bir parola girin. Parola kurtarılamaz, onu hatırladığınızdan emin olun!</string>
+    <string name="create_cloud_backup_password_title">Yedekleme Parolanızı Oluşturun</string>
     <string name="crodloan_private_crowdloan_message">Özel kitle fonlamaları henüz desteklenmiyor.</string>
     <string name="crodloan_private_crowdloan_title">Özel kitle fonlaması</string>
     <string name="crowdloan_about">Kitle fonlamaları hakkında</string>
@@ -499,7 +597,6 @@
     <string name="dapp_sign_error_unsupported_chain">Desteklenmeyen zincir, genesis hash %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">İşlemin doğru olduğundan emin olun</string>
     <string name="dapp_sign_extrinsic_failed">İstenen işlemi imzalama başarısız oldu</string>
-    
     <string name="deep_linking_chain_id_is_not_found">Zincir bulunamadı</string>
     <string name="deep_linking_domain_is_not_matched">Bağlantıdaki %s alan adı izin verilenler listesinde değil</string>
     <string name="deep_linking_governance_type_is_not_specified">Yönetim türü belirtilmemiş</string>
@@ -554,16 +651,26 @@
     <string name="delegation_your_delegation">Delegasyonunuz</string>
     <string name="delegation_your_delegations">Delegasyonlarınız</string>
     <string name="delegations_filter">Göster</string>
+    <string name="deleting_backup_progress">Yedekleme siliniyor...</string>
+    <string name="deprecated_cloud_backup_password_subtitle">Yedekleme parolanız daha önce güncellendi. Cloud Backup\'ı kullanmaya devam etmek için, %s</string>
+    <string name="deprecated_cloud_backup_password_subtitle_highlight">yeni yedekleme parolasını girin.</string>
+    <string name="deprecated_cloud_backup_password_title">Yedekleme parolası değiştirildi</string>
     <string name="duplicate_proxy_type_message">Bu hesaba zaten delege ediyorsunuz: %s</string>
     <string name="duplicate_proxy_type_title">Delegasyon zaten var</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH uyumlu)</string>
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (alternatif)</string>
     <string name="ed25519_selection_title">Edwards</string>
+    <string name="enter_backup_password_hint">Yedekleme parolası</string>
     <string name="error_not_enough_to_pay_fee_title">Ücreti ödemek için yeterli token yok</string>
     <string name="ethereum_contract">Kontrat</string>
     <string name="ethereum_contract_call">Kontrat Çağrısı</string>
     <string name="ethereum_function">Fonksiyon</string>
+    <string name="existing_cloud_backup_found_button">Cüzdanları Geri Yükle</string>
+    <string name="existing_cloud_backup_found_subtitle">%s Tüm cüzdanlarınız Google Drive\'da güvenli bir şekilde yedeklenecektir.</string>
+    <string name="existing_cloud_backup_found_subtitle_highlight">Cüzdanlarınızı geri yüklemek ister misiniz?</string>
+    <string name="existing_cloud_backup_found_title">Mevcut Cloud Backup bulundu</string>
+    <string name="export_json_download_btn">JSON Yedeklemesini İndir</string>
     <string name="export_json_password_confirm">Şifreyi doğrula</string>
     <string name="export_json_password_match_error">Şifreler eşleşmiyor</string>
     <string name="export_json_password_new">Şifre belirleyin</string>
@@ -601,11 +708,18 @@
     <string name="import_mnemonic_invalid_title">Mnemoniğiniz geçersiz</string>
     <string name="import_seed_invalid_message">Lütfen girişinizin 64 hex sembolü içerdiğinden emin olun.</string>
     <string name="import_seed_invalid_title">Seed geçersiz</string>
+    <string name="import_wallet_cloud_backup_not_found_subtitle">Maalesef, cüzdanlarınızın bulunduğu yedekleme bulunamadı.</string>
+    <string name="import_wallet_cloud_backup_not_found_title">Yedekleme Bulunamadı</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Google Cloud\'dan cüzdanları geri yükle</string>
+    <string name="import_wallet_options_mnemonic_subtitle">12, 15, 18, 21 veya 24 kelimelik ifadenizi kullanın</string>
+    <string name="import_wallet_options_title">Cüzdanınızı nasıl içe aktarmak istediğinizi seçin</string>
+    <string name="import_wallet_options_watch_only_title">Sadece izleme</string>
     <string name="invalid_proxy_address_message">Proxy adresi geçerli bir %s adresi olmalıdır</string>
     <string name="invalid_proxy_address_title">Geçersiz proxy adresi</string>
     <string name="invoice_scan_error_no_info">QR kod çözümlenemedi</string>
     <string name="invoice_scan_qr_code_title">QR kodu</string>
     <string name="invoice_scan_upload">Galeriden yükle</string>
+    <string name="json_export_btn">JSON dosyasını dışa aktar</string>
     <string name="language_title">Dil</string>
     <string name="ledger_chain_not_supported">Ledger %s desteklemiyor</string>
     <string name="ledger_error_app_cancelled_message">Operasyon cihaz tarafından iptal edildi. Ledger\'ınızın kilidini açtığınızdan emin olun.</string>
@@ -629,9 +743,24 @@
     <string name="ledger_verify_address_subtitle">Adresi onaylamak için %s üzerindeki her iki düğmeye basın</string>
     <string name="ledger_wallet_details_description">Bu cüzdan Ledger ile eşleştirildi. Nova istediğiniz herhangi bir işlemi oluşturmanıza yardımcı olacak ve bunları Ledger kullanarak imzalamanız istenecektir.</string>
     <string name="ledher_import_select_address_title">Cüzdana eklemek için hesap seçin</string>
+    <string name="loocking_backup_progress">Yedeklemenizi arıyor...</string>
     <string name="make_payout_transaction_sent">Ödeme işlemi gönderildi</string>
     <string name="manage_assets_add_token">Token ekle</string>
-    
+    <string name="manage_cloud_backup">Yedeklemeyi yönet</string>
+    <string name="manual_backup_secrets_custom_key_title">Özel Anahtar</string>
+    <string name="manual_backup_secrets_default_key_title">Varsayılan Anahtar</string>
+    <string name="manual_backup_secrets_subtitle">Bu bilgileri kimseyle paylaşmayın - Paylaşmanız durumunda tüm varlıklarınızı kalıcı ve geri döndürülemez şekilde kaybedersiniz</string>
+    <string name="manual_backup_select_account_custom_key_title">Özel anahtarlı hesaplar</string>
+    <string name="manual_backup_select_account_default_key_account">Varsayılan hesaplar</string>
+    <string name="manual_backup_select_account_default_key_account_subtitle_more_chains" formatted="false">%s, +%d diğer</string>
+    <string name="manual_backup_select_account_default_key_title">Varsayılan anahtarla hesaplar</string>
+    <string name="manual_backup_select_account_header">Yedeklemek için anahtarı seçin</string>
+    <string name="manual_backup_select_wallet_header">Yedeklemek için bir cüzdan seçin</string>
+    <string name="manual_backup_warning_subtitle">Lütfen yedeğinizi görüntülemeden önce aşağıdakileri dikkatlice okuyun</string>
+    <string name="manual_backup_warning_title">Parolanızı kimseyle paylaşmayın!</string>
+    <string name="mnemonic_card_reveal_subtitle">Kimsenin ekranınızı göremediğinden emin olun\nve ekran görüntüsü almayın</string>
+    <string name="mnemonic_card_title">Lütfen %s kimseyle paylaşmayın</string>
+    <string name="mnemonic_card_title_highlight">paylaşmayın</string>
     <string name="mnemonic_error_try_another_one">Lütfen, başka bir tane deneyin.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">Geçersiz mnemonik şifre, lütfen kelime sırasını bir kez daha kontrol edin</string>
     <string name="multiple_wallets_selection_max_message">%d cüzdandan fazla seçemezsiniz</string>
@@ -750,7 +879,6 @@
     <string name="push_token_sent_no_account_name_title">💸 Gönderildi</string>
     <string name="push_token_sent_title">💸 %s Gönderildi</string>
     <string name="push_wallets_title">Cüzdanınızın aktivitesi olduğunda bildirim almak için en fazla 3 cüzdan seçin</string>
-    <string name="push_welcome_cancel_button">Şimdi Değil</string>
     <string name="push_welcome_enable_button">Bildirimleri Etkinleştir</string>
     <string name="push_welcome_message">Cüzdan işlemleri, Yönetim güncellemeleri, Staking aktivitesi ve Güvenlik hakkında bilgilendirilerek her zaman haberdar olun</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Bildirimleri etkinleştirmekle, %s ve %s kabul etmiş olursunuz</string>
@@ -879,6 +1007,13 @@
         <item quantity="other">%d parçada daha önce referandum oylaması yaptınız. Bu parçaları delegasyon için kullanılabilir hale getirmek için mevcut oylarınızı kaldırmanız gerekiyor.</item>
     </plurals>
     <string name="remove_votes_suggestion_title">Oy geçmişinizi kaldırılsın mı?</string>
+    <string name="restore_cloud_backup_delete_backup_description" formatted="false">%s Bu sadece size aittir, güvenli bir şekilde saklanır ve başkalarına erişilemez. Yedekleme parolası olmadan Google Drive\'dan cüzdanları geri yüklemek imkansızdır. Kaybedilirse, yeni bir parola ile yeni bir yedek oluşturmak için mevcut yedeği silin. %s</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Ne yazık ki, parolanız kurtarılamaz.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">Alternatif olarak, geri yükleme için Parolayı kullanın.</string>
+    <string name="restore_cloud_backup_delete_backup_title">Şifrenizi mi unuttunuz?</string>
+    <string name="restore_cloud_backup_password_title">Yedekleme şifreniz daha önce güncellendi. Bulut Yedeklemeyi kullanmaya devam etmek için lütfen yeni yedekleme şifresini girin.</string>
+    <string name="restore_cloud_backup_subtitle">Lütfen yedekleme işlemi sırasında oluşturduğunuz şifreyi girin</string>
+    <string name="restore_cloud_backup_title">Yedekleme şifresini girin</string>
     <string name="runtime_update_failure_description">Blockchain çalışma zamanı hakkında bilgiler güncellenemedi. Bazı işlevler çalışmayabilir.</string>
     <string name="runtime_update_failure_title">Çalışma zamanı güncelleme hatası</string>
     <string name="search_contacts">Kişiler</string>
@@ -936,7 +1071,6 @@
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Desteklenmeyen staking türü</string>
     <string name="sr25519_selection_subtitle">sr25519 (önerilir)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    
     <string name="staking_account_is_used_as_controller">Seçilen hesap zaten kontrolör olarak kullanılmakta</string>
     <string name="staking_action_add_proxy">Yetki devri ekle (Vekil)</string>
     <string name="staking_action_your_proxies">Delegasyonlarınız</string>
@@ -1232,6 +1366,14 @@
     <string name="staking_your_stake">Stake\'iniz</string>
     <string name="staking_your_validators">Doğrulayıcılarınız</string>
     <string name="staking_your_validators_changing_title">Doğrulayıcılarınız bir sonraki dönemde değişecek.</string>
+    <string name="start_create_wallet_backup_ready_explanation">Şimdi cüzdanınızı yedekleyelim. Bu, fonlarınızın güvende ve emniyette olmasını sağlar. Yedeklemeler, cüzdanınızı istediğiniz zaman geri yüklemenize olanak tanır.</string>
+    <string name="start_create_wallet_cloud_backup_btn">Google ile devam edin</string>
+    <string name="start_create_wallet_enter_wallet_name">Cüzdan adını girin</string>
+    <string name="start_create_wallet_input_hint">Yeni cüzdanım</string>
+    <string name="start_create_wallet_manual_backup_btn">Manuel yedeklemeyle devam edin</string>
+    <string name="start_create_wallet_name_your_wallet">Cüzdanınıza bir ad verin</string>
+    <string name="start_create_wallet_set_wallet_name_explanation">Bu yalnızca sizin tarafınızdan görülecek ve daha sonra düzenleyebilirsiniz.</string>
+    <string name="start_create_wallet_your_wallet_is_ready">Cüzdanınız hazır</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Bakiyenizde %s nedeniyle kilitlenmiş tokenlarınız var. Devam etmek için %s\'dan az ya da %s\'dan fazla bir miktar girmelisiniz. Başka bir miktar yatırmak için %s kilitlerinizi kaldırmalısınız.</string>
     <string name="start_staking_cant_stake_amount">Belirtilen miktarı yatıramazsınız</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Seçilen: %d (maksimum %d)</string>
@@ -1267,6 +1409,9 @@
     <string name="start_staking_max_nominators_reached_message">Maksimum nominator sayısına ulaşıldı. Daha sonra tekrar deneyin</string>
     <string name="start_staking_max_nominators_reached_title">%s şu anda kullanılamıyor</string>
     <string name="start_staking_selection_validators_subtitle" formatted="false">Validatorler: %d (maks %d)</string>
+    <string name="state_changed">Değiştirildi</string>
+    <string name="state_new">Yeni</string>
+    <string name="state_removed">Kaldırıldı</string>
     <string name="swap_custom_fee_selector_description">Ağ ücreti ödemek için token</string>
     <string name="swap_custom_fee_selector_footer">Ağ ücreti girilen miktarın üstüne eklenir</string>
     <string name="swap_error_pair_not_supported">Bu çift desteklenmiyor</string>
@@ -1408,6 +1553,9 @@
     <string name="wallet_filters_title">Filtreler</string>
     <string name="wallet_filters_transfers">Transferler</string>
     <string name="wallet_manage_assets_title">Varlıkları Yönet</string>
+    <string name="wallet_management_add_account_title">Cüzdan nasıl eklenir?</string>
+    <string name="wallet_management_create_account_btn">Cüzdan nasıl eklenir?</string>
+    <string name="wallet_management_import_account_btn">Cüzdan nasıl eklenir?</string>
     <string name="wallet_nickname_create_caption_v2_2_0">İsim örnekleri: Ana hesap, Benim validatörüm, Dotsama kitle fonlamaları, vb.</string>
     <string name="wallet_receive_description">Bu QR\'yi gönderici ile paylaşın</string>
     <string name="wallet_receive_description_v2_2_0">Göndericiye bu QR kodunu taratın</string>
