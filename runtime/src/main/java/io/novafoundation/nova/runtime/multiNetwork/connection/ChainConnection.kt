@@ -3,11 +3,9 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
-import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeConnection
-import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeConnectionFactory
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.interceptor.WebSocketResponseInterceptor
 import io.novasama.substrate_sdk_android.wsrpc.interceptor.WebSocketResponseInterceptor.ResponseDelivery
@@ -37,8 +35,7 @@ class ChainConnectionFactory(
     private val externalRequirementFlow: Flow<ChainConnection.ExternalRequirement>,
     private val nodeAutobalancer: NodeAutobalancer,
     private val socketServiceProvider: Provider<SocketService>,
-    private val connectionSecrets: ConnectionSecrets,
-    private val nodeConnectionFactory: NodeConnectionFactory
+    private val connectionSecrets: ConnectionSecrets
 ) {
 
     suspend fun create(chain: Chain): ChainConnection {
@@ -47,7 +44,6 @@ class ChainConnectionFactory(
             externalRequirementFlow = externalRequirementFlow,
             nodeAutobalancer = nodeAutobalancer,
             connectionSecrets = connectionSecrets,
-            nodeConnectionFactory = nodeConnectionFactory,
             initialChain = chain
         )
 
@@ -75,7 +71,6 @@ class ChainConnection internal constructor(
     private val externalRequirementFlow: Flow<ExternalRequirement>,
     private val nodeAutobalancer: NodeAutobalancer,
     private val connectionSecrets: ConnectionSecrets,
-    private val nodeConnectionFactory: NodeConnectionFactory,
     initialChain: Chain,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default),
     WebSocketResponseInterceptor {
@@ -149,13 +144,6 @@ class ChainConnection internal constructor(
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
             .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
             .launchIn(this)
-    }
-
-    fun getNodeConnection(node: Chain.Node): NodeConnection {
-        val nodeUrls = chain.value.nodes.nodes.map { it.unformattedUrl }
-        require(nodeUrls.contains(node.unformattedUrl))
-
-        return nodeConnectionFactory.create(chain.value, node)
     }
 
     fun updateChain(chain: Chain) {

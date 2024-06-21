@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
-import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.isFullSync
 import io.novafoundation.nova.runtime.ext.level

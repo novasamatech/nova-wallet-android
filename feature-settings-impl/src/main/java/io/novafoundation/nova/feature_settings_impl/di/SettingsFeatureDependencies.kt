@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushN
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 
 interface SettingsFeatureDependencies {
@@ -83,4 +84,6 @@ interface SettingsFeatureDependencies {
     val bannerVisRepository: BannerVisibilityRepository
 
     val runtimeProviderPool: RuntimeProviderPool
+
+    val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
 }

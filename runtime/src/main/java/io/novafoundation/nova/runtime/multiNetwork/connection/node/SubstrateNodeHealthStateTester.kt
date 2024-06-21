@@ -2,8 +2,8 @@ package io.novafoundation.nova.runtime.multiNetwork.connection.node
 
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.network.rpc.queryKey
-import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.awaitConnected
+import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrl
@@ -16,12 +16,13 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 
-class SubstrateNodeConnection(
+class SubstrateNodeHealthStateTester(
+    private val chain: Chain,
     private val node: Chain.Node,
     private val connectionSecrets: ConnectionSecrets,
     private val bulkRetriever: BulkRetriever,
     val socketService: SocketService
-) : NodeConnection, WebSocketResponseInterceptor {
+) : NodeHealthStateTester, WebSocketResponseInterceptor {
 
     init {
         val saturatedUrlNode = node.saturateNodeUrl(connectionSecrets)
@@ -48,7 +49,7 @@ class SubstrateNodeConnection(
     }
 
     private fun systemAccountStorageKey(): ByteArray {
-        return "System".toByteArray().xxHash128() + "Account".toByteArray().xxHash128() + emptySubstrateAccountId()
+        return "System".toByteArray().xxHash128() + "Account".toByteArray().xxHash128() + chain.emptyAccountId()
     }
 
     override fun onRpcResponseReceived(rpcResponse: RpcResponse): WebSocketResponseInterceptor.ResponseDelivery {

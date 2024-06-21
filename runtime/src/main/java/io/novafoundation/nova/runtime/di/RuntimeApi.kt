@@ -13,6 +13,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
@@ -89,4 +90,6 @@ interface RuntimeApi {
     val extrinsicWalk: ExtrinsicWalk
 
     val runtimeProviderPool: RuntimeProviderPool
+
+    val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
 }

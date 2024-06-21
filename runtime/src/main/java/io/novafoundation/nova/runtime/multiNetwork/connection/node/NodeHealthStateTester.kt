@@ -1,7 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.node
 
 
-interface NodeConnection {
+interface NodeHealthStateTester {
 
     /**
      * Should return connection delay in ms

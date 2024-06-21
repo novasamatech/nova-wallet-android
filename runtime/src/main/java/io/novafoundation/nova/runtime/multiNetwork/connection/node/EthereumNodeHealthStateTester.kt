@@ -1,18 +1,14 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.node
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.emptyEthereumAddress
-import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.awaitConnected
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrl
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
-import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.DefaultBlockParameterName
 import io.novasama.substrate_sdk_android.wsrpc.interceptor.WebSocketResponseInterceptor
 import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
@@ -20,13 +16,12 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 
-class EthereumNodeConnection(
-    private val chain: Chain,
+class EthereumNodeHealthStateTester(
     private val node: Chain.Node,
     private val connectionSecrets: ConnectionSecrets,
     private val web3ApiFactory: Web3ApiFactory,
     private val socketService: SocketService
-) : NodeConnection, WebSocketResponseInterceptor {
+) : NodeHealthStateTester, WebSocketResponseInterceptor {
 
     private val web3Api = createWeb3Api()
 
@@ -37,7 +32,6 @@ class EthereumNodeConnection(
             val saturatedUrlNode = node.saturateNodeUrl(connectionSecrets)
 
             saturatedUrlNode?.let {
-                Log.d("NodeConnection", "Socket started")
                 socketService.start(it.saturatedUrl)
             }
         }
@@ -48,17 +42,11 @@ class EthereumNodeConnection(
         return runCatching {
             socketService.awaitConnected()
 
-            Log.d("NodeConnection", "Testing node connection: ${node.unformattedUrl}")
-
             val duration = measureTime {
                 web3Api.ethGetBalance(emptyEthereumAddress(), DefaultBlockParameterName.LATEST).sendSuspend()
             }
 
-            Log.d("NodeConnection", "Node connection tested: ${node.unformattedUrl}")
-
             duration.inWholeMilliseconds
-        }.onFailure {
-            Log.e("NodeConnection", "Failed to test node health state", it)
         }
     }
 

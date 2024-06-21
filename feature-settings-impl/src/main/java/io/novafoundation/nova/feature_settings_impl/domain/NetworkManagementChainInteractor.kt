@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -50,7 +50,8 @@ interface NetworkManagementChainInteractor {
 }
 
 class RealNetworkManagementChainInteractor(
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
 ) : NetworkManagementChainInteractor {
 
     override fun chainStateFlow(chainId: String): Flow<ChainNetworkState> {
@@ -89,9 +90,8 @@ class RealNetworkManagementChainInteractor(
     }
 
     private fun nodesHealthState(chain: Chain): Flow<List<NodeHealthState>> {
-        val chainConnection = chainRegistry.getConnectionOrNull(chain.id)
         return chain.nodes.wssNodes().map {
-            nodeHealthState(chainConnection, it)
+            nodeHealthState(chain, it)
         }.combine()
     }
 
@@ -100,13 +100,13 @@ class RealNetworkManagementChainInteractor(
         return activeConnection?.currentUrl?.map { it?.node } ?: flowOf { null }
     }
 
-    private fun nodeHealthState(chainConnection: ChainConnection?, node: Chain.Node): Flow<NodeHealthState> {
+    private fun nodeHealthState(chain: Chain, node: Chain.Node): Flow<NodeHealthState> {
         return flow {
             emit(NodeHealthState(node, NodeHealthState.State.Connecting))
 
-            val nodeConnectionDelay = chainConnection?.getNodeConnection(node)
-                ?.testNodeHealthState()
-                ?.getOrNull()
+            val nodeConnectionDelay = nodeHealthStateTesterFactory.create(chain, node)
+                .testNodeHealthState()
+                .getOrNull()
 
             nodeConnectionDelay?.let {
                 emit(NodeHealthState(node, NodeHealthState.State.Connected(it)))

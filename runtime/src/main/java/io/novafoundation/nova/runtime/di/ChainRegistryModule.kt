@@ -23,10 +23,9 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
-import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeConnectionFactory
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
-import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
@@ -134,7 +133,7 @@ class ChainRegistryModule {
         bulkRetriever: BulkRetriever,
         connectionSecrets: ConnectionSecrets,
         web3ApiFactory: Web3ApiFactory
-    ) = NodeConnectionFactory(
+    ) = NodeHealthStateTesterFactory(
         socketProvider,
         connectionSecrets,
         bulkRetriever,
@@ -147,14 +146,12 @@ class ChainRegistryModule {
         socketProvider: Provider<SocketService>,
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         nodeAutobalancer: NodeAutobalancer,
-        connectionSecrets: ConnectionSecrets,
-        nodeConnectionFactory: NodeConnectionFactory
+        connectionSecrets: ConnectionSecrets
     ) = ChainConnectionFactory(
         externalRequirementsFlow,
         nodeAutobalancer,
         socketProvider,
-        connectionSecrets,
-        nodeConnectionFactory
+        connectionSecrets
     )
 
     @Provides

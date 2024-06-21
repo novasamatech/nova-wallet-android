@@ -7,26 +7,29 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import javax.inject.Provider
 
-class NodeConnectionFactory(
+class NodeHealthStateTesterFactory(
     private val socketServiceProvider: Provider<SocketService>,
     private val connectionSecrets: ConnectionSecrets,
     private val bulkRetriever: BulkRetriever,
     private val web3ApiFactory: Web3ApiFactory
 ) {
 
-    fun create(chain: Chain, node: Chain.Node): NodeConnection {
+    fun create(chain: Chain, node: Chain.Node): NodeHealthStateTester {
+        val nodeIsSupported = chain.nodes.nodes.any { it.unformattedUrl == node.unformattedUrl }
+        require(nodeIsSupported)
+
         return if (chain.hasSubstrateRuntime) {
-            SubstrateNodeConnection(
+            SubstrateNodeHealthStateTester(
+                chain = chain,
                 socketService = socketServiceProvider.get(),
                 connectionSecrets = connectionSecrets,
                 bulkRetriever = bulkRetriever,
                 node = node
             )
         } else {
-            EthereumNodeConnection(
+            EthereumNodeHealthStateTester(
                 socketService = socketServiceProvider.get(),
                 connectionSecrets = connectionSecrets,
-                chain = chain,
                 node = node,
                 web3ApiFactory = web3ApiFactory
             )
