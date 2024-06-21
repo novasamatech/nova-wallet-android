@@ -34,7 +34,7 @@ class RoundRobinStrategyTest {
     }
 
     private fun createFakeNode(id: String) = NodeWithSaturatedUrl(
-        node = Chain.Node(unformattedUrl = id, name = id, chainId = "test", orderId = 0),
+        node = Chain.Node(unformattedUrl = id, name = id, chainId = "test", orderId = 0, isCustom = false),
         saturatedUrl = id
     )
 }
