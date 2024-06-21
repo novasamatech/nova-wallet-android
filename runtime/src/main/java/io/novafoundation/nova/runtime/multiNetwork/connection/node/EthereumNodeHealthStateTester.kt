@@ -15,7 +15,6 @@ import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-
 class EthereumNodeHealthStateTester(
     private val node: Chain.Node,
     private val connectionSecrets: ConnectionSecrets,

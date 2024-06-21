@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.mapList

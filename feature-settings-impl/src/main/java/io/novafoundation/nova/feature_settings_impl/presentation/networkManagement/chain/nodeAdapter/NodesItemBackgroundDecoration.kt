@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.decoration.BackgroundItemDecoration
 import io.novafoundation.nova.common.list.decoration.DividerItemDecoration
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkConnectionRvItem
 
 class NodesItemBackgroundDecoration(context: Context) : BackgroundItemDecoration(
     context = context,

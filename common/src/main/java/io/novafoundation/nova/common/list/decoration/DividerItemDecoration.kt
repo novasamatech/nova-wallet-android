@@ -3,14 +3,12 @@ package io.novafoundation.nova.common.list.decoration
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
 import android.view.View
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
-import kotlin.math.roundToInt
 
 open class DividerItemDecoration(
     context: Context,
@@ -38,7 +36,8 @@ open class DividerItemDecoration(
                     dividerMargin.toFloat(),
                     it.bottom.toFloat(),
                     parent.width.toFloat() - dividerMargin,
-                    it.bottom.toFloat(), paint
+                    it.bottom.toFloat(),
+                    paint
                 )
             }
     }
@@ -53,7 +52,6 @@ open class DividerItemDecoration(
             .map { it.first }
             .toList()
     }
-
 
     private fun RecyclerView.shouldApplyDecoration(top: View, bottom: View): Boolean {
         val topViewHolder = getChildViewHolder(top)

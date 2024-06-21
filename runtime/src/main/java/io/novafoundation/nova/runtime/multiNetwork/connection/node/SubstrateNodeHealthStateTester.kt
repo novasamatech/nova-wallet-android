@@ -15,7 +15,6 @@ import io.novasama.substrate_sdk_android.wsrpc.response.RpcResponse
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-
 class SubstrateNodeHealthStateTester(
     private val chain: Chain,
     private val node: Chain.Node,

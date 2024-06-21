@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkManagementListAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_chain_network_management.chainNetworkManagementContent
 import kotlinx.android.synthetic.main.fragment_network_list.networkList
 
 abstract class NetworkListFragment<T : NetworkListViewModel> : BaseFragment<T>(), NetworkManagementListAdapter.ItemHandler {

@@ -9,7 +9,6 @@ import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.setCompoundDrawableTintRes
-import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_settings_switcher.view.settingsSwitcher
 

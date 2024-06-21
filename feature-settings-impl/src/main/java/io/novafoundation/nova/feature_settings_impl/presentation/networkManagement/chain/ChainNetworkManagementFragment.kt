@@ -27,8 +27,8 @@ private val NODES_GROUP_TEXT_STYLE = R.style.TextAppearance_NovaFoundation_SemiB
 private val NODES_GROUP_COLOR_RES = R.color.text_secondary
 private val NODES_GROUP_TEXT_PADDING_DP = ViewSpace(16, 24, 16, 0)
 
-
-class ChainNetworkManagementFragment : BaseFragment<ChainNetworkManagementViewModel>(),
+class ChainNetworkManagementFragment :
+    BaseFragment<ChainNetworkManagementViewModel>(),
     ChainNetworkManagementHeaderAdapter.ItemHandler,
     ChainNetworkManagementNodesAdapter.ItemHandler {
 
