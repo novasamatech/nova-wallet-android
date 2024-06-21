@@ -22,6 +22,7 @@ class ChainNetworkManagementHeaderAdapter(
     private var chainUiModel: ChainUi? = null
     private var chainEnabled = false
     private var autoBalanceEnabled = false
+    private var networkCanBeDisabled = false
 
     interface ItemHandler {
 
@@ -39,7 +40,7 @@ class ChainNetworkManagementHeaderAdapter(
     }
 
     override fun onBindViewHolder(holder: ChainNetworkManagementHeaderViewHolder, position: Int) {
-        chainUiModel?.let { holder.bind(it, chainEnabled, autoBalanceEnabled) }
+        chainUiModel?.let { holder.bind(it, chainEnabled, autoBalanceEnabled, networkCanBeDisabled) }
     }
 
     fun setChainUiModel(chainUiModel: ChainUi) {
@@ -56,6 +57,10 @@ class ChainNetworkManagementHeaderAdapter(
         this.autoBalanceEnabled = autoBalanceEnabled
         notifyItemChanged(0)
     }
+
+    fun setNetworkCanBeDisabled(networkCanBeDisabled: Boolean) {
+        this.networkCanBeDisabled = networkCanBeDisabled
+    }
 }
 
 class ChainNetworkManagementHeaderViewHolder(
@@ -71,11 +76,12 @@ class ChainNetworkManagementHeaderViewHolder(
         }
     }
 
-    fun bind(chainUi: ChainUi, chainEnabled: Boolean, autoBalanceEnabled: Boolean) {
+    fun bind(chainUi: ChainUi, chainEnabled: Boolean, autoBalanceEnabled: Boolean, networkCanBeDisabled: Boolean) {
         with(itemView) {
             chainNetworkManagementIcon.loadChainIcon(chainUi.icon, imageLoader)
             chainNetworkManagementTitle.text = chainUi.name
             chainNetworkManagementEnable.setChecked(chainEnabled)
+            chainNetworkManagementEnable.isEnabled = networkCanBeDisabled
             chainNetworkManagementAutoBalance.setChecked(autoBalanceEnabled)
         }
     }

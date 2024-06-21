@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeConnection
@@ -29,6 +30,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Provider
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 class ChainConnectionFactory(
     private val externalRequirementFlow: Flow<ChainConnection.ExternalRequirement>,
@@ -45,7 +48,7 @@ class ChainConnectionFactory(
             nodeAutobalancer = nodeAutobalancer,
             connectionSecrets = connectionSecrets,
             nodeConnectionFactory = nodeConnectionFactory,
-            chain = chain
+            initialChain = chain
         )
 
         connection.setup()
@@ -71,9 +74,9 @@ class ChainConnection internal constructor(
     val socketService: SocketService,
     private val externalRequirementFlow: Flow<ExternalRequirement>,
     private val nodeAutobalancer: NodeAutobalancer,
-    private val chain: Chain,
     private val connectionSecrets: ConnectionSecrets,
-    private val nodeConnectionFactory: NodeConnectionFactory
+    private val nodeConnectionFactory: NodeConnectionFactory,
+    initialChain: Chain,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default),
     WebSocketResponseInterceptor {
 
@@ -91,15 +94,17 @@ class ChainConnection internal constructor(
         responseRequiresNodeChangeFlow
     ).shareIn(scope = this, started = SharingStarted.Eagerly)
 
-    private val availableNodes = MutableStateFlow(chain.nodes)
+    private val chain = MutableStateFlow(initialChain)
+    private val availableNodes = chain.map { it.nodes }
+        .shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
-    val currentUrl = getNodeUrlFlow()
+    val currentUrl = chain.flatMapLatest { getNodeUrlFlow(it) }
         .shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
     suspend fun setup() {
         socketService.setInterceptor(this)
 
-        observeCurrentNode()
+        observeCurrentNode(chain.value)
 
         externalRequirementFlow.onEach {
             if (it == ExternalRequirement.ALLOWED) {
@@ -111,22 +116,22 @@ class ChainConnection internal constructor(
             .launchIn(this)
     }
 
-    private fun getNodeUrlFlow(): Flow<NodeWithSaturatedUrl?> {
+    private fun getNodeUrlFlow(chain: Chain): Flow<NodeWithSaturatedUrl?> {
         return if (chain.autoBalanceEnabled) {
-            getAutobalancedNodeUrlFlow()
+            getAutobalancedNodeUrlFlow(chain)
         } else {
             val node = chain.nodes.nodes.firstOrNull { it.unformattedUrl == chain.defaultNodeUrl }
                 ?.saturateNodeUrl(connectionSecrets)
 
             if (node == null) {
-                getAutobalancedNodeUrlFlow()
+                getAutobalancedNodeUrlFlow(chain)
             } else {
                 flowOf { node }
             }
         }
     }
 
-    private fun getAutobalancedNodeUrlFlow(): Flow<NodeWithSaturatedUrl?> {
+    private fun getAutobalancedNodeUrlFlow(chain: Chain): Flow<NodeWithSaturatedUrl?> {
         return nodeAutobalancer.connectionUrlFlow(
             chainId = chain.id,
             changeConnectionEventFlow = nodeChangeSignal,
@@ -134,7 +139,7 @@ class ChainConnection internal constructor(
         )
     }
 
-    private suspend fun observeCurrentNode() {
+    private suspend fun observeCurrentNode(chain: Chain) {
         val firstNodeUrl = currentUrl.first()?.saturatedUrl ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
 
@@ -147,14 +152,14 @@ class ChainConnection internal constructor(
     }
 
     fun getNodeConnection(node: Chain.Node): NodeConnection {
-        val nodeUrls = chain.nodes.nodes.map { it.unformattedUrl }
+        val nodeUrls = chain.value.nodes.nodes.map { it.unformattedUrl }
         require(nodeUrls.contains(node.unformattedUrl))
 
-        return nodeConnectionFactory.create(chain, node)
+        return nodeConnectionFactory.create(chain.value, node)
     }
 
-    fun considerUpdateNodes(nodes: Chain.Nodes) {
-        availableNodes.value = nodes
+    fun updateChain(chain: Chain) {
+        this.chain.value = chain
     }
 
     fun finish() {

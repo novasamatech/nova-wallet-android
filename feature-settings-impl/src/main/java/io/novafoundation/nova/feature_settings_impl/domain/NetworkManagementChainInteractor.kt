@@ -2,7 +2,10 @@ package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.ext.isEnabled
+import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -11,11 +14,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transform
 
 
 class ChainNetworkState(
     val chain: Chain,
+    val networkCanBeDisabled: Boolean,
     val nodeHealthStates: List<NodeHealthState>,
     val connectingNode: Chain.Node?
 )
@@ -55,7 +58,7 @@ class RealNetworkManagementChainInteractor(
             .map { it.getValue(chainId) }
             .flatMapLatest { chain ->
                 combine(activeNodeFlow(chainId), nodesHealthState(chain)) { activeNode, nodeHealthStates ->
-                    ChainNetworkState(chain, nodeHealthStates, activeNode)
+                    ChainNetworkState(chain, networkCanBeDisabled(chain), nodeHealthStates, activeNode)
                 }
             }
     }
@@ -81,9 +84,13 @@ class RealNetworkManagementChainInteractor(
         chainRegistry.changeChainConectionState(chainId, connectionState)
     }
 
+    private fun networkCanBeDisabled(chain: Chain): Boolean {
+        return chain.genesisHash != Chain.Geneses.POLKADOT
+    }
+
     private fun nodesHealthState(chain: Chain): Flow<List<NodeHealthState>> {
         val chainConnection = chainRegistry.getConnectionOrNull(chain.id)
-        return chain.nodes.nodes.map {
+        return chain.nodes.wssNodes().map {
             nodeHealthState(chainConnection, it)
         }.combine()
     }
@@ -102,7 +109,7 @@ class RealNetworkManagementChainInteractor(
                 ?.getOrNull()
 
             nodeConnectionDelay?.let {
-                NodeHealthState(node, NodeHealthState.State.Connected(it))
+                emit(NodeHealthState(node, NodeHealthState.State.Connected(it)))
             }
         }
     }

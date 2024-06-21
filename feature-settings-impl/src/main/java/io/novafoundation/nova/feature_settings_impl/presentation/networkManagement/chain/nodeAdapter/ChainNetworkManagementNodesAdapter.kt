@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setShimmerShown
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.feature_settings_impl.R
@@ -92,9 +93,16 @@ class ChainNetworkManagementNodeViewHolder(
 
     fun bind(item: NetworkNodeRvItem) {
         with(itemView) {
-            itemView.setOnClickListener { itemHandler.selectNode(item) }
+            if (item.isSelectable) {
+                itemView.setOnClickListener { itemHandler.selectNode(item) }
+            } else {
+                itemView.setOnClickListener(null)
+            }
+
             chainNodeRadioButton.isChecked = item.isSelected
+            chainNodeRadioButton.isEnabled = item.isSelectable
             chainNodeName.text = item.name
+            chainNodeName.setTextColorRes(item.nameColorRes)
             chainNodeSocketAddress.text = item.socketAddress
             chainNodeConnectionStatusShimmering.setShimmerShown(item.connectionState.showShimmering)
             chainNodeConnectionState.setTextOrHide(item.connectionState.name)

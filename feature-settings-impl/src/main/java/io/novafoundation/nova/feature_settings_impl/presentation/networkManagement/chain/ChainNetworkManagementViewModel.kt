@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
+import io.novafoundation.nova.feature_settings_impl.domain.ChainNetworkState
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.NodeHealthState
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkConnectionRvItem
@@ -13,7 +14,6 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodesAddCustomRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
 import io.novafoundation.nova.runtime.ext.isEnabled
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -28,6 +28,7 @@ class ChainNetworkManagementViewModel(
     private val chainNetworkStateFlow = networkManagementChainInteractor.chainStateFlow(payload.chainId)
         .shareInBackground()
 
+    val isNetworkCanBeDisabled: Flow<Boolean> = chainNetworkStateFlow.map { it.networkCanBeDisabled }
     val chainEnabled: Flow<Boolean> = chainNetworkStateFlow.map { it.chain.isEnabled }
     val autoBalanceEnabled: Flow<Boolean> = chainNetworkStateFlow.map { it.chain.autoBalanceEnabled }
     val chainModel: Flow<ChainUi> = chainNetworkStateFlow.map { mapChainToUi(it.chain) }
@@ -35,7 +36,7 @@ class ChainNetworkManagementViewModel(
     val customNodes: Flow<List<NetworkConnectionRvItem>> = chainNetworkStateFlow.map { chainNetworkState ->
         buildList {
             val nodes = chainNetworkState.nodeHealthStates.filter { it.node.isCustom }
-                .map { mapNodeToUi(it, chainNetworkState.connectingNode) }
+                .map { mapNodeToUi(it, chainNetworkState) }
 
             add(NetworkNodesAddCustomRvItem())
             addAll(nodes)
@@ -44,7 +45,7 @@ class ChainNetworkManagementViewModel(
 
     val defaultNodes: Flow<List<NetworkConnectionRvItem>> = chainNetworkStateFlow.map { chainNetworkState ->
         chainNetworkState.nodeHealthStates.filter { !it.node.isCustom }
-            .map { mapNodeToUi(it, chainNetworkState.connectingNode) }
+            .map { mapNodeToUi(it, chainNetworkState) }
     }
 
     fun backClicked() {
@@ -77,14 +78,18 @@ class ChainNetworkManagementViewModel(
         showError("Not implemented")
     }
 
-    private fun mapNodeToUi(nodeHealthState: NodeHealthState, selectedNode: Chain.Node?): NetworkNodeRvItem {
+    private fun mapNodeToUi(nodeHealthState: NodeHealthState, networkState: ChainNetworkState): NetworkNodeRvItem {
+        val selectingAvailable = !networkState.chain.autoBalanceEnabled && networkState.chain.isEnabled
+
         return NetworkNodeRvItem(
             id = nodeHealthState.node.unformattedUrl,
             name = nodeHealthState.node.name,
             socketAddress = nodeHealthState.node.unformattedUrl,
             isEditable = nodeHealthState.node.isCustom,
-            isSelected = nodeHealthState.node.unformattedUrl == selectedNode?.unformattedUrl,
-            connectionState = mapConnectionStateToUi(nodeHealthState)
+            isSelected = nodeHealthState.node.unformattedUrl == networkState.connectingNode?.unformattedUrl,
+            connectionState = mapConnectionStateToUi(nodeHealthState),
+            isSelectable = selectingAvailable,
+            nameColorRes = if (selectingAvailable) R.color.text_primary else R.color.text_secondary
         )
     }
 
@@ -106,7 +111,7 @@ class ChainNetworkManagementViewModel(
                 }
 
                 ConnectionStateModel(
-                    name = resourceManager.getString(R.string.common_connecting),
+                    name = resourceManager.getString(R.string.common_connected_ms, state.ms),
                     chainStatusColor = resourceManager.getColor(textColorRes),
                     chainStatusIcon = iconRes,
                     chainStatusIconColor = null,

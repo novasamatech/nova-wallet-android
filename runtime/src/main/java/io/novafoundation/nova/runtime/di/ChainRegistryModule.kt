@@ -133,12 +133,12 @@ class ChainRegistryModule {
         socketProvider: Provider<SocketService>,
         bulkRetriever: BulkRetriever,
         connectionSecrets: ConnectionSecrets,
-        runtimeProviderPool: RuntimeProviderPool
+        web3ApiFactory: Web3ApiFactory
     ) = NodeConnectionFactory(
         socketProvider,
         connectionSecrets,
         bulkRetriever,
-        runtimeProviderPool
+        web3ApiFactory
     )
 
     @Provides

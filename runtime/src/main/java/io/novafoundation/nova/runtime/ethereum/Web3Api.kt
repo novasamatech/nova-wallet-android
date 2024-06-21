@@ -37,6 +37,10 @@ class Web3ApiFactory(
         )
     }
 
+    fun createHttps(chainNodes: Chain.Node): Pair<Web3Api, UpdatableNodes> {
+        return createHttps(Chain.Nodes(Chain.Nodes.NodeSelectionStrategy.ROUND_ROBIN, listOf(chainNodes)))
+    }
+
     fun createHttps(chainNodes: Chain.Nodes): Pair<Web3Api, UpdatableNodes> {
         val service = BalancingHttpWeb3jService(
             initialNodes = chainNodes,

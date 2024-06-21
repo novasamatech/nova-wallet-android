@@ -9,6 +9,7 @@ import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.setCompoundDrawableTintRes
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_settings_switcher.view.settingsSwitcher
 
@@ -43,11 +44,19 @@ class SettingsSwitcherView @JvmOverloads constructor(
         settingsSwitcher.isChecked = checked
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        settingsSwitcher.isEnabled = enabled
+    }
+
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.SettingsSwitcherView) {
         val title = it.getString(R.styleable.SettingsSwitcherView_title)
         setTitle(title)
 
         val icon = it.getDrawable(R.styleable.SettingsSwitcherView_icon)
         setIcon(icon)
+
+        val textColorStateList = it.getColorStateList(R.styleable.SettingsSwitcherView_android_textColor)
+        textColorStateList?.let { settingsSwitcher.setTextColor(it) }
     }
 }

@@ -37,6 +37,7 @@
             android:id="@+id/chainNetworkManagementEnable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/button_text"
             app:title="Enable connection" />
 
         <io.novafoundation.nova.common.view.settings.SettingsSwitcherView

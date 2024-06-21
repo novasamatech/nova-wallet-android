@@ -105,6 +105,10 @@ class ChainNetworkManagementFragment : BaseFragment<ChainNetworkManagementViewMo
     }
 
     override fun subscribe(viewModel: ChainNetworkManagementViewModel) {
+        viewModel.isNetworkCanBeDisabled.observe {
+            headerAdapter.setNetworkCanBeDisabled(it)
+        }
+
         viewModel.chainEnabled.observe {
             headerAdapter.setChainEnabled(it)
         }

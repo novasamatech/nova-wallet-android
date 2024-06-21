@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_connected_ms">%d ms</string>
     <string name="add_custom_node">Add custom node</string>
 
     <string name="network_management_custom_nodes">custom nodes</string>
