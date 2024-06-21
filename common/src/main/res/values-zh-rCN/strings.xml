@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">提防冒名顶替者。</string>
     <string name="backup_secrets_warning_disabled_button">查看并接受以继续</string>
     <string name="backup_settings_delete_backup">删除备份</string>
-    <string name="backup_settings_manual_subtitle">您可以手动写下恢复短语，确保一切安全</string>
+    <string name="backup_settings_manual_subtitle">您可以手动备份您的密码短语，以确保在丢失对设备的访问时能够访问您的钱包资金。</string>
     <string name="backup_settings_manual_switcher_title">手动备份</string>
     <string name="backup_settings_manual_title">手动</string>
     <string name="backup_settings_no_wallets_error_message">您没有添加任何带有密码短语的钱包。</string>
     <string name="backup_settings_no_wallets_error_title">没有可以备份的钱包</string>
-    <string name="backup_settings_subtitle">使用您的Google云端硬盘安全地存储所有钱包的加密副本。即使您在新设备上安装Nova，您也能轻松访问您的钱包。</string>
+    <string name="backup_settings_subtitle">您可以启用Google Drive备份来存储加密的所有钱包副本，并由您设置的密码保护。</string>
     <string name="backup_settings_switcher_text">备份到Google云端硬盘</string>
     <string name="backup_settings_title">Google云端硬盘</string>
     <string name="backup_settings_toolbar_title">备份</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">查看备份错误</string>
     <string name="cloud_backup_settings_corrupted_backup_button">查看备份更新</string>
     <string name="cloud_backup_settings_deprecated_password_button">输入备份密码</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">开启它以创建钱包备份</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">启用以将钱包备份到你的Google云端硬盘</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">上次同步：%s 于 %s</string>
     <string name="cloud_backup_settings_not_auth_button">登录 Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">查看 Google Drive 问题</string>
@@ -704,7 +704,7 @@
     <string name="import_seed_invalid_title">种子无效</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">很遗憾，没有找到您的钱包备份。</string>
     <string name="import_wallet_cloud_backup_not_found_title">未找到备份</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">从 Google 云恢复钱包</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">从Google云端硬盘恢复钱包</string>
     <string name="import_wallet_options_mnemonic_subtitle">使用您 12、15、18、21 或 24 个字的短语</string>
     <string name="import_wallet_options_title">选择您想如何导入您的钱包</string>
     <string name="import_wallet_options_watch_only_title">仅观看</string>

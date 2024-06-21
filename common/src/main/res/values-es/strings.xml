@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">CUIDADO CON LOS USURPADORES.</string>
     <string name="backup_secrets_warning_disabled_button">Revisar y Aceptar para Continuar</string>
     <string name="backup_settings_delete_backup">Eliminar respaldo</string>
-    <string name="backup_settings_manual_subtitle">Puedes escribir manualmente tu frase de recuperación para asegurarte de que todo está seguro</string>
+    <string name="backup_settings_manual_subtitle">Puedes respaldar manualmente tu frase secreta para asegurar el acceso a los fondos de tu monedero si pierdes acceso a este dispositivo</string>
     <string name="backup_settings_manual_switcher_title">Respaldar manualmente</string>
     <string name="backup_settings_manual_title">Manual</string>
     <string name="backup_settings_no_wallets_error_message">No has agregado ninguna billetera con una frase de paso.</string>
     <string name="backup_settings_no_wallets_error_title">No hay billeteras para respaldar</string>
-    <string name="backup_settings_subtitle">Una copia cifrada de todas tus billeteras está guardada de forma segura usando tu Google Drive. Incluso si instalas Nova en un nuevo dispositivo, podrás acceder fácilmente a tus billeteras.</string>
+    <string name="backup_settings_subtitle">Puedes habilitar copias de seguridad en Google Drive para almacenar copias cifradas de todos tus monederos, protegidas por una contraseña que establezcas.</string>
     <string name="backup_settings_switcher_text">Respaldar en Google Drive</string>
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Respaldar</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">Revisar Error de Copia de Seguridad</string>
     <string name="cloud_backup_settings_corrupted_backup_button">Revisar Actualizaciones de Copia de Seguridad</string>
     <string name="cloud_backup_settings_deprecated_password_button">Ingresar Contraseña de Copia de Seguridad</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">Enciéndelo para crear una copia de seguridad de las billeteras</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Habilita para respaldar billeteras en tu Google Drive</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">Última sincronización: %s a las %s</string>
     <string name="cloud_backup_settings_not_auth_button">Iniciar sesión en Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">Revisar Problema de Google Drive</string>
@@ -710,7 +710,7 @@
     <string name="import_seed_invalid_title">Semilla inválida</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Desafortunadamente, no se ha encontrado una Copia de Seguridad con tus carteras.</string>
     <string name="import_wallet_cloud_backup_not_found_title">Copia de Seguridad No Encontrada</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar carteras desde Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar billeteras desde Google Drive</string>
     <string name="import_wallet_options_mnemonic_subtitle">Usa tu frase de 12, 15, 18, 21 o 24 palabras</string>
     <string name="import_wallet_options_title">Elige cómo te gustaría importar tu cartera</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>

@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">ATTENZIONE AI TRUFFATORI.</string>
     <string name="backup_secrets_warning_disabled_button">Rivedi e Accetta per Continuare</string>
     <string name="backup_settings_delete_backup">Elimina backup</string>
-    <string name="backup_settings_manual_subtitle">Puoi annotare manualmente la tua frase di recupero per essere sicuro che tutto sia al sicuro</string>
+    <string name="backup_settings_manual_subtitle">Puoi eseguire manualmente il backup della tua frase segreta per garantire l\'accesso ai fondi del tuo portafoglio in caso di perdita dell\'accesso a questo dispositivo</string>
     <string name="backup_settings_manual_switcher_title">Effettua il backup manualmente</string>
     <string name="backup_settings_manual_title">Manuale</string>
     <string name="backup_settings_no_wallets_error_message">Non hai aggiunto alcun portafoglio con una passphrase.</string>
     <string name="backup_settings_no_wallets_error_title">Nessun portafoglio da fare il backup</string>
-    <string name="backup_settings_subtitle">Una copia criptata di tutti i tuoi portafogli è conservata in sicurezza utilizzando il tuo Google Drive. Anche se installi Nova su un nuovo dispositivo, potrai accedere facilmente ai tuoi portafogli.</string>
+    <string name="backup_settings_subtitle">Puoi abilitare i backup su Google Drive per memorizzare copie criptate di tutti i tuoi portafogli, protetti da una password impostata da te.</string>
     <string name="backup_settings_switcher_text">Esegui il backup su Google Drive</string>
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Backup</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">Rivedi l\'Errore di Backup</string>
     <string name="cloud_backup_settings_corrupted_backup_button">Rivedi gli Aggiornamenti del Backup</string>
     <string name="cloud_backup_settings_deprecated_password_button">Inserisci la Password di Backup</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">Attivalo per creare un backup dei portafogli</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Abilita per eseguire il backup dei portafogli su Google Drive</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">Ultima sincronizzazione: %s alle %s</string>
     <string name="cloud_backup_settings_not_auth_button">Accedi a Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">Rivedi Problema di Google Drive</string>
@@ -710,7 +710,7 @@
     <string name="import_seed_invalid_title">Seed non valido</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Purtroppo, non è stato trovato nessun backup con i tuoi portafogli.</string>
     <string name="import_wallet_cloud_backup_not_found_title">Backup non trovato</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Ripristina i portafogli da Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recupera portafogli da Google Drive</string>
     <string name="import_wallet_options_mnemonic_subtitle">Usa la tua frase da 12, 15, 18, 21 o 24 parole</string>
     <string name="import_wallet_options_title">Scegli come desideri importare il tuo portafoglio</string>
     <string name="import_wallet_options_watch_only_title">Solo visualizzazione</string>
