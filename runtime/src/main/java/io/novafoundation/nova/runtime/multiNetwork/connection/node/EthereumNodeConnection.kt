@@ -1,13 +1,18 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.node
 
 import android.util.Log
+import io.novafoundation.nova.common.utils.emptyEthereumAddress
+import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrl
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import org.web3j.protocol.core.DefaultBlockParameter
+import org.web3j.protocol.core.DefaultBlockParameterName
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -39,7 +44,7 @@ class EthereumNodeConnection(
             Log.d("NodeConnection", "Testing node connection: ${node.unformattedUrl}")
 
             val duration = measureTime {
-                web3Api.ethBlockNumber().sendSuspend()
+                web3Api.ethGetBalance(emptyEthereumAddress(), DefaultBlockParameterName.LATEST).sendSuspend()
             }
 
             Log.d("NodeConnection", "Node connection tested: ${node.unformattedUrl}")
