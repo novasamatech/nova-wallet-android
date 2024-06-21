@@ -5,7 +5,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import io.novafoundation.nova.common.utils.collectAll
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
-val AddGloballyUniqueIdToMetaAccounts_57_58 = object : Migration(57, 58) {
+val AddGloballyUniqueIdToMetaAccounts_58_59 = object : Migration(58, 59) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE meta_accounts ADD COLUMN globallyUniqueId TEXT NOT NULL DEFAULT ''")
