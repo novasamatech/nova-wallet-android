@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.connection.node
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.network.rpc.queryKey
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
+import io.novafoundation.nova.common.utils.awaitConnected
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrl
@@ -24,10 +25,10 @@ class SubstrateNodeConnection(
 
     init {
         val saturatedUrlNode = node.saturateNodeUrl(connectionSecrets)
-
         socketService.setInterceptor(this)
+
         saturatedUrlNode?.let {
-            socketService.switchUrl(it.saturatedUrl)
+            socketService.start(it.saturatedUrl)
         }
     }
 
@@ -36,6 +37,8 @@ class SubstrateNodeConnection(
         val storageKey = systemAccountStorageKey().toHexString(withPrefix = true)
 
         return runCatching {
+            socketService.awaitConnected()
+
             val duration = measureTime {
                 bulkRetriever.queryKey(socketService, storageKey)
             }
