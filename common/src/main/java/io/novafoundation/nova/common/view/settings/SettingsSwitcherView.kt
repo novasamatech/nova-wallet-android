@@ -55,7 +55,7 @@ class SettingsSwitcherView @JvmOverloads constructor(
         val icon = it.getDrawable(R.styleable.SettingsSwitcherView_icon)
         setIcon(icon)
 
-        val textColorStateList = it.getColorStateList(R.styleable.SettingsSwitcherView_android_textColor)
+        val textColorStateList = it.getColorStateList(R.styleable.SettingsSwitcherView_switcherTextColor)
         textColorStateList?.let { settingsSwitcher.setTextColor(it) }
     }
 }

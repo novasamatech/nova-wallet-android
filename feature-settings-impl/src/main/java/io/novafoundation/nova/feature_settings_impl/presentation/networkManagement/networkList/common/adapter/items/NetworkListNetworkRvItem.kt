@@ -57,8 +57,8 @@ class NetworkListNetworkViewHolder(
 
         itemNetworkStatusShimmer.isVisible = item.status != null
         if (item.status != null) {
-            itemNetworkStatus.setTextOrHide(item.status.name)
-            itemNetworkStatus.setTextColor(item.status.chainStatusColor)
+            itemNetworkStatus.setText(item.status.name)
+            item.status.chainStatusColor?.let { itemNetworkStatus.setTextColor(it) }
             itemNetworkStatus.setDrawableStart(item.status.chainStatusIcon, paddingInDp = 6)
             itemNetworkStatus.setCompoundDrawableTint(item.status.chainStatusIconColor)
         }

@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setShimmerShown
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkConnectionRvItem
@@ -105,8 +104,8 @@ class ChainNetworkManagementNodeViewHolder(
             chainNodeName.setTextColorRes(item.nameColorRes)
             chainNodeSocketAddress.text = item.socketAddress
             chainNodeConnectionStatusShimmering.setShimmerShown(item.connectionState.showShimmering)
-            chainNodeConnectionState.setTextOrHide(item.connectionState.name)
-            chainNodeConnectionState.setTextColor(item.connectionState.chainStatusColor)
+            chainNodeConnectionState.setText(item.connectionState.name)
+            item.connectionState.chainStatusColor?.let { chainNodeConnectionState.setTextColor(it) }
             chainNodeConnectionState.setDrawableStart(item.connectionState.chainStatusIcon, paddingInDp = 6)
             chainNodeConnectionState.setCompoundDrawableTint(item.connectionState.chainStatusIconColor)
 

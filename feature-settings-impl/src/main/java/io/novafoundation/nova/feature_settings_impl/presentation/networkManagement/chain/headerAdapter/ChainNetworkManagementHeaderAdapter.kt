@@ -80,9 +80,12 @@ class ChainNetworkManagementHeaderViewHolder(
         with(itemView) {
             chainNetworkManagementIcon.loadChainIcon(chainUi.icon, imageLoader)
             chainNetworkManagementTitle.text = chainUi.name
+
             chainNetworkManagementEnable.setChecked(chainEnabled)
             chainNetworkManagementEnable.isEnabled = networkCanBeDisabled
+
             chainNetworkManagementAutoBalance.setChecked(autoBalanceEnabled)
+            chainNetworkManagementAutoBalance.isEnabled = chainEnabled
         }
     }
 }

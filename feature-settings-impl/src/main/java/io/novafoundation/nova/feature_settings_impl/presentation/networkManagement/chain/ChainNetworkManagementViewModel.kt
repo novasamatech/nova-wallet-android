@@ -118,6 +118,14 @@ class ChainNetworkManagementViewModel(
                     showShimmering = false
                 )
             }
+
+            NodeHealthState.State.Disabled -> ConnectionStateModel(
+                name = null,
+                chainStatusColor = null,
+                chainStatusIcon = R.drawable.ic_connection_status_connecting,
+                chainStatusIconColor = resourceManager.getColor(R.color.icon_inactive),
+                showShimmering = false
+            )
         }
     }
 }

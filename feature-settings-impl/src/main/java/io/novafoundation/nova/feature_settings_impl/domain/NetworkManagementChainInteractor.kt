@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -32,6 +33,8 @@ class NodeHealthState(
         object Connecting : State
 
         class Connected(val ms: Long) : State
+
+        object Disabled : State
     }
 }
 
@@ -101,6 +104,11 @@ class RealNetworkManagementChainInteractor(
 
     private fun nodeHealthState(chain: Chain, node: Chain.Node): Flow<NodeHealthState> {
         return flow {
+            if (chain.isDisabled) {
+                emit(NodeHealthState(node, NodeHealthState.State.Disabled))
+                return@flow
+            }
+
             emit(NodeHealthState(node, NodeHealthState.State.Connecting))
 
             val nodeConnectionDelay = nodeHealthStateTesterFactory.create(chain, node)
