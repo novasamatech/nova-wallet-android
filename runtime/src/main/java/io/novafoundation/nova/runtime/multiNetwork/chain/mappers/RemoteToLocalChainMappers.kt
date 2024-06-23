@@ -40,7 +40,7 @@ private const val IDENTITY_CHAIN = "identityChain"
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
     oldChain: ChainLocal?,
-    isCustomNetwork: Boolean,
+    source: ChainLocal.Source,
     gson: Gson
 ): ChainLocal {
     val types = chainRemote.types?.let {
@@ -84,7 +84,7 @@ fun mapRemoteChainToLocal(
             connectionState = determineConnectionState(chainRemote, oldChain),
             additional = gson.toJson(additional),
             nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy),
-            isCustomNetwork = isCustomNetwork
+            source = source
         )
     }
 

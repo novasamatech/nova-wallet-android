@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
+import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
@@ -320,7 +321,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             swap = mapSwapListFromLocal(swap),
             connectionState = mapConnectionStateFromLocal(connectionState),
             additional = additional,
-            isCustomNetwork = isCustomNetwork
+            source = mapSourceFromLocal(source)
         )
     }
 }
@@ -350,6 +351,13 @@ fun mapConnectionStateToLocal(domain: ConnectionState): ConnectionStateLocal {
         ConnectionState.FULL_SYNC -> ConnectionStateLocal.FULL_SYNC
         ConnectionState.LIGHT_SYNC -> ConnectionStateLocal.LIGHT_SYNC
         ConnectionState.DISABLED -> ConnectionStateLocal.DISABLED
+    }
+}
+
+private fun mapSourceFromLocal(local: ChainLocal.Source): Chain.Source {
+    return when (local) {
+        ChainLocal.Source.DEFAULT -> Chain.Source.DEFAULT
+        ChainLocal.Source.CUSTOM -> Chain.Source.CUSTOM
     }
 }
 
