@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">KİŞİ TAKLİTLERİNE DİKKAT EDİN.</string>
     <string name="backup_secrets_warning_disabled_button">Devam etmek için İncele ve Kabul Et</string>
     <string name="backup_settings_delete_backup">Yedeklemeyi sil</string>
-    <string name="backup_settings_manual_subtitle">Her şeyin güvende olduğundan emin olmak için kurtarma cümlenizi el ile yazabilirsiniz</string>
+    <string name="backup_settings_manual_subtitle">Bu cihaza erişimi kaybederseniz cüzdanınızdaki fonlara erişiminizi sağlamak için Gizli İfadenizi manuel olarak yedekleyebilirsiniz</string>
     <string name="backup_settings_manual_switcher_title">Manuel olarak yedekle</string>
     <string name="backup_settings_manual_title">Manuel</string>
     <string name="backup_settings_no_wallets_error_message">Parolalı herhangi bir cüzdan eklemediniz.</string>
     <string name="backup_settings_no_wallets_error_title">Yedeklenecek cüzdan yok</string>
-    <string name="backup_settings_subtitle">Tüm cüzdanlarınızın şifrelenmiş bir kopyası Google Drive\'da güvenle saklanır. Nova\'yı yeni bir cihaza yükleseniz bile cüzdanlarınıza kolayca erişebilirsiniz.</string>
+    <string name="backup_settings_subtitle">Şifrelenmiş cüzdan yedeklerinizi depolamak için Google Drive yedeklemelerini etkinleştirebilirsiniz, belirlediğiniz bir şifre ile güvence altına alınmıştır.</string>
     <string name="backup_settings_switcher_text">Google Drive\'a yedekle</string>
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Yedekleme</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">Yedekleme Hatasını Gözden Geçir</string>
     <string name="cloud_backup_settings_corrupted_backup_button">Yedekleme Güncellemelerini Gözden Geçir</string>
     <string name="cloud_backup_settings_deprecated_password_button">Yedekleme Parolasını Girin</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">Cüzdan yedeği oluşturmak için açın</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Cüzdanları Google Drive\'a yedeklemek için etkinleştirin</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">Son senkronizasyon: %s saat %s</string>
     <string name="cloud_backup_settings_not_auth_button">Google Drive\'a Giriş Yapın</string>
     <string name="cloud_backup_settings_other_errors_button">Google Drive Sorununu Gözden Geçir</string>
@@ -710,7 +710,7 @@
     <string name="import_seed_invalid_title">Seed geçersiz</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Maalesef, cüzdanlarınızın bulunduğu yedekleme bulunamadı.</string>
     <string name="import_wallet_cloud_backup_not_found_title">Yedekleme Bulunamadı</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Google Cloud\'dan cüzdanları geri yükle</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Google Drive\'dan cüzdanları geri yükleyin</string>
     <string name="import_wallet_options_mnemonic_subtitle">12, 15, 18, 21 veya 24 kelimelik ifadenizi kullanın</string>
     <string name="import_wallet_options_title">Cüzdanınızı nasıl içe aktarmak istediğinizi seçin</string>
     <string name="import_wallet_options_watch_only_title">Sadece izleme</string>
