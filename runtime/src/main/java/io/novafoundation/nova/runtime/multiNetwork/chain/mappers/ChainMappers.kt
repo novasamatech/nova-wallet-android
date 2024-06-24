@@ -18,6 +18,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceTy
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
+import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
@@ -265,7 +266,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             name = it.name,
             chainId = it.chainId,
             orderId = it.orderId,
-            isCustom = it.isCustom,
+            isCustom = it.source == ChainNodeLocal.Source.CUSTOM,
         )
     }
 

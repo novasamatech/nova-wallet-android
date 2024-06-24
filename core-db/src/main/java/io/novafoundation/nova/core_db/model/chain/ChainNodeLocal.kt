@@ -28,13 +28,17 @@ data class ChainNodeLocal(
     val name: String,
     @ColumnInfo(defaultValue = "0")
     val orderId: Int,
-    @ColumnInfo(defaultValue = DEFAULT_IS_CUSTOM_NODE_STR)
-    val isCustom: Boolean
+    @ColumnInfo(defaultValue = DEFAULT_NODE_SOURCE_STR)
+    val source: Source
 ) : Identifiable {
 
     companion object {
 
-        const val DEFAULT_IS_CUSTOM_NODE_STR = "1"
+        const val DEFAULT_NODE_SOURCE_STR = "DEFAULT"
+    }
+
+    enum class Source {
+        DEFAULT, CUSTOM
     }
 
     @Ignore
