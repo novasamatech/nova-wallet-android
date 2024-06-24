@@ -131,7 +131,7 @@
     <!--<string name="account_export_password_change">Change password</string>-->
     <string name="common_change_password">Change password</string>
 
-    <string name="cloud_backup_settings_disabled_state_subtitle">Turn it on to create a wallets backup</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Enable to backup wallets to your Google Drive</string>
     <string name="cloud_backup_settings_last_sync">Last sync: %s at %s</string>
     <string name="cloud_backup_settings_not_auth_button">Sign In to Google Drive</string>
     <string name="cloud_backup_settings_deprecated_password_button">Enter Backup Password</string>
@@ -145,9 +145,9 @@
     <string name="cloud_backup_state_synced_title">Backup Synced</string>
     <string name="backup_settings_toolbar_title">Backup</string>
     <string name="backup_settings_title">Google Drive</string>
-    <string name="backup_settings_subtitle">An encrypted copy of all your wallets are safely stored using your Google Drive. Even if you install Nova on a new device you will be able to easily access your wallets.</string>
+    <string name="backup_settings_subtitle">You can enable Google Drive backups to store encrypted copies of all your wallets, secured by a password you set.</string>
     <string name="backup_settings_manual_title">Manual</string>
-    <string name="backup_settings_manual_subtitle">You can manually write down your recovery phrase to be sure that everything is safe</string>
+    <string name="backup_settings_manual_subtitle">You can manually back up your passphrase to ensure access to your wallet’s funds if you lose access to this device</string>
     <string name="backup_settings_switcher_text">Back up to Google Drive</string>
     <string name="backup_settings_manual_switcher_title">Back up manually</string>
 
@@ -237,7 +237,7 @@
     <string name="start_create_wallet_enter_wallet_name">Enter wallet name</string>
 
     <string name="common_cloud_backup">Cloud backup</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Recover wallets from Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recover wallets from Google Drive</string>
     <string name="loocking_backup_progress">Looking for your backup...</string>
 
     <!--<string name="account_backup_mnemonic_field_title">Mnemonic Passphrase</string>-->

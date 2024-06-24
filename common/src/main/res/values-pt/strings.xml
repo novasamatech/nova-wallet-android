@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">CUIDADO COM IMITADORES.</string>
     <string name="backup_secrets_warning_disabled_button">Rever &amp;  Aceitar para Continuar</string>
     <string name="backup_settings_delete_backup">Excluir backup</string>
-    <string name="backup_settings_manual_subtitle">Você pode anotar manualmente sua frase de recuperação para garantir que tudo esteja seguro</string>
+    <string name="backup_settings_manual_subtitle">Você pode fazer backup manual da sua frase secreta para garantir acesso aos fundos da sua carteira se perder o acesso a este dispositivo</string>
     <string name="backup_settings_manual_switcher_title">Backup manual</string>
     <string name="backup_settings_manual_title">Manual</string>
     <string name="backup_settings_no_wallets_error_message">Você não adicionou nenhuma carteira com uma frase de recuperação.</string>
     <string name="backup_settings_no_wallets_error_title">Nenhuma carteira para fazer backup</string>
-    <string name="backup_settings_subtitle">Uma cópia criptografada de todas as suas carteiras está armazenada com segurança no seu Google Drive. Mesmo se você instalar o Nova em um novo dispositivo, você poderá acessar facilmente suas carteiras.</string>
+    <string name="backup_settings_subtitle">Você pode ativar backups no Google Drive para armazenar cópias criptografadas de todas as suas carteiras, protegidas por uma senha que você define.</string>
     <string name="backup_settings_switcher_text">Fazer backup no Google Drive</string>
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Backup</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">Revisar Erro de Backup</string>
     <string name="cloud_backup_settings_corrupted_backup_button">Revisar Atualizações de Backup</string>
     <string name="cloud_backup_settings_deprecated_password_button">Digite a Senha de Backup</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">Ative-o para criar um backup das carteiras</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Ative para fazer backup das carteiras no seu Google Drive</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">Última sincronização: %s às %s</string>
     <string name="cloud_backup_settings_not_auth_button">Entrar no Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">Revisar Problema do Google Drive</string>
@@ -710,7 +710,7 @@
     <string name="import_seed_invalid_title">Seed é inválido</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Infelizmente, o backup com suas carteiras não foi encontrado.</string>
     <string name="import_wallet_cloud_backup_not_found_title">Backup Não Encontrado</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar carteiras do Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar carteiras do Google Drive</string>
     <string name="import_wallet_options_mnemonic_subtitle">Use sua frase de 12, 15, 18, 21 ou 24 palavras</string>
     <string name="import_wallet_options_title">Escolha como você gostaria de importar sua carteira</string>
     <string name="import_wallet_options_watch_only_title">Somente visualização</string>
