@@ -354,9 +354,5 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 
 fun ChainRegistry.enabledChains() = currentChains
     .filterList { it.isEnabled }
-    .inBackground()
-    .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
 fun ChainRegistry.enabledChainById() = enabledChains().map { chains -> chains.associateBy { it.id } }
-    .inBackground()
-    .shareIn(this, SharingStarted.Eagerly, replay = 1)

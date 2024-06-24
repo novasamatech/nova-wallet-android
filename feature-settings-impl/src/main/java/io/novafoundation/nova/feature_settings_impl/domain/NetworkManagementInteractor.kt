@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
+import io.novafoundation.nova.runtime.ext.isCustomNetwork
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
@@ -45,20 +46,18 @@ class RealNetworkManagementInteractor(
     }
 
     override fun defaultNetworksFlow(): Flow<List<NetworkState>> {
-        return chainRegistry.currentChains
-            .filterList { !it.isCustomNetwork }
-            .flatMapLatest { chains ->
-                connectionsFlow(sortChains(chains))
-            }
+        return networksFlow { !it.isCustomNetwork }
     }
 
     override fun addedNetworksFlow(): Flow<List<NetworkState>> {
-        return chainRegistry.currentChains
-            .filterList { it.isCustomNetwork }
-            .flatMapLatest { chains ->
-                connectionsFlow(sortChains(chains))
-            }
+        return networksFlow { it.isCustomNetwork }
     }
+
+    private fun networksFlow(filter: (Chain) -> Boolean) = chainRegistry.currentChains
+        .filterList(filter)
+        .flatMapLatest { chains ->
+            connectionsFlow(sortChains(chains))
+        }
 
     private fun connectionsFlow(chains: List<Chain>): Flow<List<NetworkState>> {
         if (chains.isEmpty()) {

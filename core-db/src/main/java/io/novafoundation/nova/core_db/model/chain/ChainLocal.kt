@@ -35,7 +35,7 @@ data class ChainLocal(
     @ColumnInfo(defaultValue = NODE_SELECTION_STRATEGY_DEFAULT)
     val nodeSelectionStrategy: NodeSelectionStrategyLocal,
     @ColumnInfo(defaultValue = DEFAULT_NETWORK_BY_DEFAULT_STR)
-    val isCustomNetwork: Boolean,
+    val source: Source,
     @ColumnInfo(defaultValue = DEFAULT_AUTO_BALANCE_DEFAULT_STR)
     val autoBalanceEnabled: Boolean,
     val defaultNodeUrl: String?
@@ -43,7 +43,7 @@ data class ChainLocal(
 
     companion object {
 
-        const val DEFAULT_NETWORK_BY_DEFAULT_STR = "0"
+        const val DEFAULT_NETWORK_BY_DEFAULT_STR = "DEFAULT"
         const val DEFAULT_AUTO_BALANCE_DEFAULT_STR = "1"
     }
 
@@ -53,6 +53,10 @@ data class ChainLocal(
 
     enum class ConnectionStateLocal {
         FULL_SYNC, LIGHT_SYNC, DISABLED
+    }
+
+    enum class Source {
+        DEFAULT, CUSTOM
     }
 
     object Default {

@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.dao.FullAssetIdLocal
 import io.novafoundation.nova.core_db.ext.fullId
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
+import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapExternalApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
@@ -37,7 +38,7 @@ class ChainSyncService(
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
 
-        val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], isCustomNetwork = false, gson) }
+        val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], source = ChainLocal.Source.DEFAULT, gson) }
         val newAssets = remoteChains.flatMap { chain ->
             chain.assets.map {
                 val fullAssetId = FullAssetIdLocal(chain.chainId, it.assetId)
