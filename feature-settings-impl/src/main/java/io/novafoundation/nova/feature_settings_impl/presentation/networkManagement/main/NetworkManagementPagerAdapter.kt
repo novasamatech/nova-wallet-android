@@ -3,7 +3,8 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.novafoundation.nova.feature_settings_impl.R
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.list.ExistingNetworkListFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.addedNetworks.AddedNetworkListFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.defaultNetworks.ExistingNetworkListFragment
 
 class NetworkManagementPagerAdapter(private val fragment: Fragment) : FragmentStateAdapter(fragment) {
 
@@ -14,7 +15,7 @@ class NetworkManagementPagerAdapter(private val fragment: Fragment) : FragmentSt
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> ExistingNetworkListFragment()
-            1 -> ExistingNetworkListFragment()
+            1 -> AddedNetworkListFragment()
             else -> throw IllegalArgumentException("Invalid position")
         }
     }

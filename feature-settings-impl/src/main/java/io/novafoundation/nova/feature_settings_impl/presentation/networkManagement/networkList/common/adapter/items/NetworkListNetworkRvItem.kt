@@ -49,7 +49,6 @@ class NetworkListNetworkViewHolder(
         itemNetworkImage.setIcon(item.chainIcon, imageLoader)
         itemNetworkTitle.text = item.title
         itemNetworkSubtitle.text = item.subtitle
-        itemNetworkStatusShimmer.isVisible = item.chainLabel != null
         itemNetworkLabel.setTextOrHide(item.chainLabel)
 
         itemNetworkStatusShimmer.isVisible = item.status != null

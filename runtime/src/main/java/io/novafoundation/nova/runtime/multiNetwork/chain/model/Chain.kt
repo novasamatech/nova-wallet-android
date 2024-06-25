@@ -28,6 +28,7 @@ data class Chain(
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    val source: Source,
     val hasSubstrateRuntime: Boolean,
     val pushSupport: Boolean,
     val hasCrowdloans: Boolean,
@@ -209,6 +210,10 @@ data class Chain(
          * Chain is completely disabled - it does not initialize websockets not allocates any other resources
          */
         DISABLED
+    }
+
+    enum class Source {
+        DEFAULT, CUSTOM
     }
 
     override val identifier: String = id

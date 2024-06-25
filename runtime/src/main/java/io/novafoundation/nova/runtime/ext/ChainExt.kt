@@ -41,6 +41,9 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 
+val Chain.isCustomNetwork: Boolean
+    get() = source == Chain.Source.CUSTOM
+
 val Chain.typesUsage: TypesUsage
     get() = when {
         types == null -> TypesUsage.NONE
@@ -61,8 +64,11 @@ val Chain.isSubstrateBased
 val Chain.commissionAsset
     get() = utilityAsset
 
+val Chain.isEnabled
+    get() = connectionState != Chain.ConnectionState.DISABLED
+
 val Chain.isDisabled
-    get() = connectionState == Chain.ConnectionState.DISABLED
+    get() = !isEnabled
 
 fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
     if (staking.isEmpty()) return emptyList()

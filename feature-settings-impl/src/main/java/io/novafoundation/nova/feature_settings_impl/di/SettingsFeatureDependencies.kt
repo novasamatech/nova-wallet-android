@@ -4,6 +4,7 @@ import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -77,4 +78,6 @@ interface SettingsFeatureDependencies {
     val cloudBackupService: CloudBackupService
 
     val cloudBackupFacade: LocalAccountsCloudBackupFacade
+
+    val bannerVisRepository: BannerVisibilityRepository
 }

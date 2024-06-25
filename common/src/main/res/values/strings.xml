@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="added_networks_empty_placeholder">Added custom networks\nwill appear here</string>
+
+    <string name="integrate_networks_banner_title">Building for Polkadot?</string>
+    <string name="integrate_networks_banner_description">Integrate all the features of the network you are building into Nova Wallet, making it accessible to everyone.</string>
+    <string name="integrate_networks_banner_link">Integrate your network</string>
+
     <string name="common_connecting">connecting...</string>
     <string name="common_testnet">Testnet</string>
     <string name="network_management_default_page_title">Default</string>

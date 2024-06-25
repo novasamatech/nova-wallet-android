@@ -311,7 +311,7 @@ class ChainSyncServiceTest {
     private fun removesTransferApiByUrl(url: String) = removesElement<ChainExternalApiLocal> { it.url == url }
 
     private fun createLocalCopy(remote: ChainRemote): JoinedChainInfo {
-        val domain = mapRemoteChainToLocal(remote, oldChain = null, gson)
+        val domain = mapRemoteChainToLocal(remote, oldChain = null, source = ChainLocal.Source.DEFAULT, gson)
         val assets = remote.assets.map { mapRemoteAssetToLocal(remote, it, gson, true) }
         val nodes = mapRemoteNodesToLocal(remote)
         val explorers = mapRemoteExplorersToLocal(remote)

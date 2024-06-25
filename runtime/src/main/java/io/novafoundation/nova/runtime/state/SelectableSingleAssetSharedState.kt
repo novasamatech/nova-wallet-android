@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainWithAssetOrNull
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState.SupportedAssetOption
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -73,7 +73,7 @@ abstract class SelectableSingleAssetSharedState<A : SelectableAssetAdditionalDat
     }
 
     private suspend fun getChainWithAssetOrFallback(chainId: ChainId, chainAssetId: Int, additionalIdentifier: String?): SupportedAssetOption<A> {
-        val optionalChainAndAsset = chainRegistry.chainWithAssetOrNull(chainId, chainAssetId)
+        val optionalChainAndAsset = chainRegistry.enabledChainWithAssetOrNull(chainId, chainAssetId)
         val supportedOptions = optionalChainAndAsset?.let {
             supportedOptions(it.chain, it.asset)
         }.orEmpty()

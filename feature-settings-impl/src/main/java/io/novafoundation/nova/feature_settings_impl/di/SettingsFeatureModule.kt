@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealCloudBackupSettingsInteractor
 import dagger.Provides
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
@@ -32,9 +33,10 @@ class SettingsFeatureModule {
     @Provides
     @FeatureScope
     fun provideNetworkManagementInteractor(
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        bannerVisRepository: BannerVisibilityRepository
     ): NetworkManagementInteractor {
-        return RealNetworkManagementInteractor(chainRegistry)
+        return RealNetworkManagementInteractor(chainRegistry, bannerVisRepository)
     }
 
     @Provides

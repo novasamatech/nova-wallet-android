@@ -242,6 +242,7 @@
         <attr name="android:src" format="reference" />
         <attr name="bannerBackground" format="reference|color" />
         <attr name="android:scaleType" />
+        <attr name="closeIcon" format="reference" />
         <attr name="showClose" />
     </declare-styleable>
 
@@ -334,9 +335,9 @@
     </declare-styleable>
 
     <declare-styleable name="SegmentedTabLayout">
-        <attr name="tabIndicatorFullHeight" format="boolean"/>
-        <attr name="tabIndicatorMargin" format="dimension"/>
-        <attr name="backgroundCornerRadius" format="dimension"/>
+        <attr name="tabIndicatorFullHeight" format="boolean" />
+        <attr name="tabIndicatorMargin" format="dimension" />
+        <attr name="backgroundCornerRadius" format="dimension" />
     </declare-styleable>
 
 </resources>

@@ -47,6 +47,11 @@ class BannerView @JvmOverloads constructor(
             val background = typedArray.getDrawable(R.styleable.BannerView_bannerBackground)
             bannerBackground.background = background
 
+            val closeIcon = typedArray.getDrawable(R.styleable.BannerView_closeIcon)
+            if (closeIcon != null) {
+                bannerClose.setImageDrawable(closeIcon)
+            }
+
             val showClose = typedArray.getBoolean(R.styleable.BannerView_showClose, false)
             bannerClose.isVisible = showClose
 

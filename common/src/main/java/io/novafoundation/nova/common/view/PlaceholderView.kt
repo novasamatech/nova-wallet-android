@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
@@ -12,6 +13,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
@@ -67,6 +69,10 @@ class PlaceholderView @JvmOverloads constructor(
         viewPlaceholderImage.setImageResource(image)
     }
 
+    fun setImageTint(@ColorInt tint: Int?) {
+        viewPlaceholderImage.setImageTint(tint)
+    }
+
     fun setText(text: String) {
         viewPlaceholderText.text = text
     }
@@ -87,6 +93,8 @@ class PlaceholderView @JvmOverloads constructor(
         setText(model.text)
         setImage(model.imageRes)
         setButtonText(model.buttonText)
+        setImageTint(model.imageTint)
+        model.style?.let { setStyle(it) }
     }
 
     fun setButtonClickListener(listener: OnClickListener?) {
@@ -94,7 +102,13 @@ class PlaceholderView @JvmOverloads constructor(
     }
 }
 
-class PlaceholderModel(val text: String, @DrawableRes val imageRes: Int, val buttonText: String? = null)
+class PlaceholderModel(
+    val text: String,
+    @DrawableRes val imageRes: Int,
+    val buttonText: String? = null,
+    val style: PlaceholderView.Style? = null,
+    @ColorInt val imageTint: Int? = null
+)
 
 fun PlaceholderView.setModelOrHide(model: PlaceholderModel?) {
     model?.let { setModel(it) }
