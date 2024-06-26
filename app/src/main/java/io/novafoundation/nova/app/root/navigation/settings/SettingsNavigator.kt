@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeF
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementFragment
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementPayload
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodeFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodePayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 
@@ -31,6 +33,13 @@ class SettingsNavigator(
         performNavigation(
             R.id.action_open_networkManagementDetails,
             args = ChainNetworkManagementFragment.getBundle(payload)
+        )
+    }
+
+    override fun openCustomNode(payload: CustomNodePayload) {
+        performNavigation(
+            R.id.action_open_customNode,
+            args = CustomNodeFragment.getBundle(payload)
         )
     }
 

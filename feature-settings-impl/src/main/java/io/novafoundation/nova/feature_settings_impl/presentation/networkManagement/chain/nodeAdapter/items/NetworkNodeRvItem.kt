@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items
 
 import androidx.annotation.ColorRes
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.common.ConnectionStateModel
 
 data class NetworkNodeRvItem(
     val id: String,

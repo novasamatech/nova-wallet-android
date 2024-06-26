@@ -79,6 +79,9 @@ abstract class ChainDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun addExternalApis(apis: List<ChainExternalApiLocal>)
 
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    abstract suspend fun addChainNode(node: ChainNodeLocal)
+
     // ------ Update -----
 
     @Update
@@ -109,6 +112,9 @@ abstract class ChainDao {
     @Query("SELECT * FROM chains")
     @Transaction
     abstract fun joinChainInfoFlow(): Flow<List<JoinedChainInfo>>
+
+    @Query("SELECT orderId FROM chain_nodes WHERE chainId = :chainId ORDER BY orderId DESC LIMIT 1")
+    abstract suspend fun getLastChainNodeOrderId(chainId: String): Int
 
     @Query("SELECT EXISTS(SELECT * FROM chains WHERE id = :chainId)")
     abstract suspend fun chainExists(chainId: String): Boolean
@@ -141,6 +147,9 @@ abstract class ChainDao {
             insertRuntimeInfo(ChainRuntimeInfoLocal(chainId, syncedVersion = 0, remoteVersion = runtimeVersion, transactionVersion = transactionVersion))
         }
     }
+
+    @Query("UPDATE chain_nodes SET url = :newUrl, name = :name WHERE chainId = :chainId AND url = :oldUrl")
+    abstract suspend fun updateChainNode(chainId: String, oldUrl: String, newUrl: String, name: String)
 
     @Query("UPDATE chain_runtimes SET remoteVersion = :remoteVersion, transactionVersion = :transactionVersion WHERE chainId = :chainId")
     protected abstract suspend fun updateRemoteRuntimeVersionUnsafe(chainId: String, remoteVersion: Int, transactionVersion: Int)

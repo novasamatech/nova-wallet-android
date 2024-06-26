@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.multiNetwork.connection.node
+package io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState
 
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory

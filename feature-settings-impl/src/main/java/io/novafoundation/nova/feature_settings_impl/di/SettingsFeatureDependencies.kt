@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
@@ -25,9 +26,12 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
+import io.novafoundation.nova.runtime.repository.ChainNodeRepository
 
 interface SettingsFeatureDependencies {
 
@@ -86,4 +90,12 @@ interface SettingsFeatureDependencies {
     val runtimeProviderPool: RuntimeProviderPool
 
     val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
+
+    val chainNodeRepository: ChainNodeRepository
+
+    val nodeConnectionFactory: NodeConnectionFactory
+
+    val web3ApiFactory: Web3ApiFactory
+
+    val validationExecutor: ValidationExecutor
 }

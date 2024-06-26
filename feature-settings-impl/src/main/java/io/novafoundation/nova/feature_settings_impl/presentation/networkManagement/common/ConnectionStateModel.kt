@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom
+package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.common
 
 data class ConnectionStateModel(
     val name: String?,

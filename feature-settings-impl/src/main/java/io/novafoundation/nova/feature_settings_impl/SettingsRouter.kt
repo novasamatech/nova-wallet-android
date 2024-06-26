@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_settings_impl
 
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementPayload
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodePayload
 
 interface SettingsRouter : ReturnableRouter {
 
@@ -10,6 +11,8 @@ interface SettingsRouter : ReturnableRouter {
     fun openNetworks()
 
     fun openNetworkDetails(payload: ChainNetworkManagementPayload)
+
+    fun openCustomNode(payload: CustomNodePayload)
 
     fun openPushNotificationSettings()
 

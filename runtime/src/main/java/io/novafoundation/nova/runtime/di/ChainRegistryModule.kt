@@ -23,7 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
-import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool

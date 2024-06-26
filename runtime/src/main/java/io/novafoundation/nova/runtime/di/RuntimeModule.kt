@@ -24,6 +24,8 @@ import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.RealExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
@@ -32,9 +34,11 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RemoteEven
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
+import io.novafoundation.nova.runtime.repository.ChainNodeRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.repository.RealBlockLimitsRepository
+import io.novafoundation.nova.runtime.repository.RealChainNodeRepository
 import io.novafoundation.nova.runtime.repository.RealParachainInfoRepository
 import io.novafoundation.nova.runtime.repository.RealTotalIssuanceRepository
 import io.novafoundation.nova.runtime.repository.RemoteTimestampRepository
@@ -46,7 +50,9 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.LocalStorageSource
 import io.novafoundation.nova.runtime.storage.source.RemoteStorageSource
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import javax.inject.Named
+import javax.inject.Provider
 
 const val LOCAL_STORAGE_SOURCE = "LOCAL_STORAGE_SOURCE"
 const val REMOTE_STORAGE_SOURCE = "REMOTE_STORAGE_SOURCE"
@@ -214,4 +220,22 @@ class RuntimeModule {
     fun provideExtrinsicWalk(
         chainRegistry: ChainRegistry,
     ): ExtrinsicWalk = RealExtrinsicWalk(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideChainNodeRepository(
+        chainDao: ChainDao,
+    ): ChainNodeRepository = RealChainNodeRepository(chainDao)
+
+    @Provides
+    @ApplicationScope
+    fun provideNodeConnectionFactory(
+        socketServiceProvider: Provider<SocketService>,
+        connectionSecrets: ConnectionSecrets
+    ): NodeConnectionFactory {
+        return NodeConnectionFactory(
+            socketServiceProvider,
+            connectionSecrets
+        )
+    }
 }
