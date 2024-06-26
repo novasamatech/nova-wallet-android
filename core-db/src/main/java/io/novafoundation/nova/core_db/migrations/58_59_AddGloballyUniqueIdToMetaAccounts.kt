@@ -14,7 +14,7 @@ val AddGloballyUniqueIdToMetaAccounts_58_59 = object : Migration(58, 59) {
 
         ids.forEach { id ->
             val uuid = MetaAccountLocal.generateGloballyUniqueId()
-            database.execSQL("UPDATE meta_accounts as m SET globallyUniqueId = '$uuid' WHERE m.id = $id")
+            database.execSQL("UPDATE meta_accounts SET globallyUniqueId = '$uuid' WHERE id = $id")
         }
     }
 
