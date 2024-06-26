@@ -10,15 +10,19 @@ import io.novafoundation.nova.common.validation.validationError
 class NodeAlreadyAddedValidation : Validation<NetworkNodePayload, NetworkNodeFailure> {
 
     override suspend fun validate(value: NetworkNodePayload): ValidationStatus<NetworkNodeFailure> {
-        val node = value.chain.nodes
-            .nodes
-            .firstOrNull { it.unformattedUrl.normalize() == value.nodeUrl.normalize() }
+        try {
+            val node = value.chain.nodes
+                .nodes
+                .firstOrNull { it.unformattedUrl == value.nodeUrl.normalize() }
 
-        if (node != null) {
-            return validationError(NetworkNodeFailure.NodeAlreadyExists(node))
+            if (node != null) {
+                return validationError(NetworkNodeFailure.NodeAlreadyExists(node))
+            }
+
+            return valid()
+        } catch (e: Exception) {
+            return validationError(NetworkNodeFailure.NodeIsNotAlive)
         }
-
-        return valid()
     }
 
     private fun String.normalize(): String {
