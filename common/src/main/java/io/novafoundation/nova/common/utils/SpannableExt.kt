@@ -104,3 +104,7 @@ private class CustomTypefaceSpan(private val typeface: Typeface?) : MetricAffect
 private class NoOpSpan : CharacterStyle() {
     override fun updateDrawState(tp: TextPaint?) {}
 }
+
+fun CharSequence.addColor(color: Int): Spannable {
+    return this.toSpannable(colorSpan(color))
+}

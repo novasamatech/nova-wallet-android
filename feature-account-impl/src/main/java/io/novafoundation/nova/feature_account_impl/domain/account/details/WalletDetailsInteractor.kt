@@ -14,7 +14,9 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Accoun
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class WalletDetailsInteractor(
@@ -31,32 +33,33 @@ class WalletDetailsInteractor(
         accountRepository.updateMetaAccountName(metaId, newName)
     }
 
-    suspend fun getChainProjections(
-        metaAccount: MetaAccount,
+    fun chainProjectionsFlow(
+        metaId: Long,
         chains: List<Chain>,
         sorting: Comparator<AccountInChain>
-    ): GroupedList<From, AccountInChain> {
-        return withContext(Dispatchers.Default) {
-            chains.map { chain ->
-                val address = metaAccount.addressIn(chain)
-                val accountId = metaAccount.accountIdIn(chain)
+    ): Flow<GroupedList<From, AccountInChain>> {
+        return accountRepository.metaAccountFlow(metaId)
+            .map { metaAccount ->
+                chains.map { chain ->
+                    val address = metaAccount.addressIn(chain)
+                    val accountId = metaAccount.accountIdIn(chain)
 
-                val projection = if (address != null && accountId != null) {
-                    AccountInChain.Projection(address, accountId)
-                } else {
-                    null
+                    val projection = if (address != null && accountId != null) {
+                        AccountInChain.Projection(address, accountId)
+                    } else {
+                        null
+                    }
+
+                    AccountInChain(
+                        chain = chain,
+                        projection = projection,
+                        from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
+                    )
                 }
-
-                AccountInChain(
-                    chain = chain,
-                    projection = projection,
-                    from = if (metaAccount.hasChainAccountIn(chain.id)) From.CHAIN_ACCOUNT else From.META_ACCOUNT
-                )
+                    .sortedWith(sorting)
+                    .groupBy(AccountInChain::from)
+                    .toSortedMap(compareBy(From::ordering))
             }
-                .sortedWith(sorting)
-                .groupBy(AccountInChain::from)
-                .toSortedMap(compareBy(From::ordering))
-        }
     }
 
     suspend fun availableExportTypes(

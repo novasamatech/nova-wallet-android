@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_confirm_mnemonic_word"
+    android:minHeight="33dp"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="8dp"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <TextView
+        android:id="@+id/itemConfirmMnemonicIndex"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="4dp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary"
+        tools:text="3" />
+
+    <TextView
+        android:id="@+id/itemConfirmMnemonicWord"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_primary"
+        tools:text="blouse" />
+
+</LinearLayout>

@@ -5,9 +5,11 @@ import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
+import io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser.di.ImportWalletOptionsComponent
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.di.WelcomeComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 
@@ -24,6 +26,8 @@ interface OnboardingFeatureComponent : OnboardingFeatureApi {
 
     fun welcomeComponentFactory(): WelcomeComponent.Factory
 
+    fun importWalletOptionsComponentFactory(): ImportWalletOptionsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -38,7 +42,8 @@ interface OnboardingFeatureComponent : OnboardingFeatureApi {
             CommonApi::class,
             AccountFeatureApi::class,
             VersionsFeatureApi::class,
-            LedgerCoreApi::class
+            LedgerCoreApi::class,
+            CloudBackupFeatureApi::class
         ]
     )
     interface OnboardingFeatureDependenciesComponent : OnboardingFeatureDependencies

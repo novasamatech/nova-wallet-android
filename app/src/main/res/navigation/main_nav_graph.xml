@@ -70,6 +70,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_create_new_wallet"
+        app:destination="@+id/create_wallet_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_return_to_wallet"
         app:destination="@id/mainFragment"
         app:enterAnim="@anim/fragment_close_enter"
@@ -80,24 +88,28 @@
         app:popUpTo="@id/main_nav_graph" />
 
     <action
-        android:id="@+id/finish_export_flow"
-        app:enterAnim="@anim/fragment_close_enter"
-        app:exitAnim="@anim/fragment_close_exit"
-        app:popEnterAnim="@anim/fragment_open_enter"
-        app:popExitAnim="@anim/fragment_open_exit"
-        app:popUpTo="@+id/walletDetailsFragment" />
-
-    <action
         android:id="@+id/action_export_seed"
-        app:destination="@id/exportSeedFragment" />
+        app:destination="@id/exportSeedFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_export_json"
-        app:destination="@id/exportJsonPasswordFragment" />
+        app:destination="@id/exportJsonPasswordFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_open_switch_wallet"
-        app:destination="@id/switchWalletFragment" />
+        app:destination="@id/switchWalletFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_open_select_address"
@@ -228,8 +240,32 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_cloudBackupSettings"
+        app:destination="@id/cloud_backup_settings_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_manualBackupSelectWallet"
+        app:destination="@id/manual_backup_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_select_governance_tracks"
         app:destination="@id/selectGovernanceTracks"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_importWalletOptionsFragment"
+        app:destination="@id/import_wallet_options_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -703,25 +739,20 @@
 
     <fragment
         android:id="@+id/exportJsonPasswordFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonFragment"
         android:label="ExportJsonPasswordFragment"
         tools:layout="@layout/fragment_export_json_password">
 
         <action
-            android:id="@+id/action_exportJsonPasswordFragment_to_exportJsonConfirmFragment"
-            app:destination="@id/exportJsonConfirmFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
+            android:id="@+id/finish_export_flow"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@+id/exportJsonPasswordFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
-
-    <fragment
-        android:id="@+id/exportJsonConfirmFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment"
-        android:label="ExportJsonConfirmFragment"
-        tools:layout="@layout/fragment_export_json_confirm" />
 
     <fragment
         android:id="@+id/pincodeFragment"
@@ -878,10 +909,10 @@
         android:label="SelectWalletFragment" />
 
     <fragment
-        app:useAdd="true"
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
-        android:label="WalletConnectApproveSessionFragment" />
+        android:label="WalletConnectApproveSessionFragment"
+        app:useAdd="true" />
 
     <fragment
         android:id="@+id/validatorDetailsFragment"
@@ -944,5 +975,13 @@
     <include app:graph="@navigation/staking_main_graph" />
 
     <include app:graph="@navigation/push_settings_graph" />
+
+    <include app:graph="@navigation/cloud_backup_settings_graph" />
+
+    <include app:graph="@navigation/manual_backup_graph" />
+
+    <include app:graph="@navigation/import_wallet_options_nav_graph" />
+
+    <include app:graph="@navigation/create_wallet_nav_graph" />
 
 </navigation>

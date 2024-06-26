@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.showLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -59,7 +59,7 @@ class ParachainStakingRedeemFragment : BaseFragment<ParachainStakingRedeemViewMo
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel, parachainStakingRedeemExtrinsicInfo.fee)
 
-        viewModel.showNextProgress.observe(parachainStakingRedeemConfirm::setProgress)
+        viewModel.showNextProgress.observe(parachainStakingRedeemConfirm::setProgressState)
 
         viewModel.currentAccountModelFlow.observe(parachainStakingRedeemExtrinsicInfo::setAccount)
         viewModel.walletFlow.observe(parachainStakingRedeemExtrinsicInfo::setWallet)

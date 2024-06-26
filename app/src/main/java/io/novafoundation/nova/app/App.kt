@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_wallet_connect_impl.BuildConfig
 import javax.inject.Inject
 
@@ -27,6 +28,9 @@ open class App : Application(), FeatureContainer {
     private lateinit var appComponent: AppComponent
 
     private val languagesHolder: LanguagesHolder = LanguagesHolder()
+
+    // App global scope using for processes that should work while app is alive
+    private val rootScope = RootScope()
 
     override fun attachBaseContext(base: Context) {
         val contextManager = ContextManager.getInstanceOrInit(base, languagesHolder)
@@ -47,11 +51,12 @@ open class App : Application(), FeatureContainer {
             .builder()
             .application(this)
             .contextManager(contextManger)
+            .rootScope(rootScope)
             .build()
 
         appComponent.inject(this)
 
-        initializeWaleltConnect()
+        initializeWalletConnect()
     }
 
     override fun <T> getFeature(key: Class<*>): T {
@@ -66,7 +71,7 @@ open class App : Application(), FeatureContainer {
         return appComponent
     }
 
-    private fun initializeWaleltConnect() {
+    private fun initializeWalletConnect() {
         val projectId = BuildConfig.WALLET_CONNECT_PROJECT_ID
         val relayUrl = "relay.walletconnect.com"
         val serverUrl = "wss://$relayUrl?projectId=$projectId"

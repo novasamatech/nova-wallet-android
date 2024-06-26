@@ -86,6 +86,14 @@ class PrimaryButton @JvmOverloads constructor(
             override fun disabledColor(context: Context): Int = context.getColor(R.color.button_background_inactive_on_gradient)
 
             override fun textColor(context: Context): ColorStateList = context.getColorStateList(R.color.button_accent_text_colors)
+        },
+
+        CLOUD_BACKUP {
+            override fun enabledColor(context: Context): Int = context.getColor(R.color.cloud_backup_button_background)
+
+            override fun disabledColor(context: Context): Int = context.getColor(R.color.button_background_inactive)
+
+            override fun textColor(context: Context): ColorStateList = context.getColorStateList(R.color.text_on_cloud_backup_button)
         };
 
         @ColorInt
@@ -129,7 +137,7 @@ class PrimaryButton @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         val icon = icon
 
-        if (icon != null) {
+        if (icon != null && !isProgressActive()) {
             val shift: Int = (iconSize + iconPadding) / 2
 
             canvas.save()
@@ -137,7 +145,7 @@ class PrimaryButton @JvmOverloads constructor(
 
             super.onDraw(canvas)
 
-            val textWidth = paint.measureText(text as String)
+            val textWidth = paint.measureText(text.toString())
             val left = (width / 2f - textWidth / 2f - iconSize - iconPadding).toInt()
             val top: Int = height / 2 - iconSize / 2
 
@@ -147,6 +155,18 @@ class PrimaryButton @JvmOverloads constructor(
             canvas.restore()
         } else {
             super.onDraw(canvas)
+        }
+    }
+
+    fun showProgress(show: Boolean) {
+        isEnabled = !show
+
+        if (show) {
+            checkPreparedForProgress()
+
+            showProgress()
+        } else {
+            hideProgress()
         }
     }
 
@@ -179,6 +199,10 @@ class PrimaryButton @JvmOverloads constructor(
         }
 
         val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
+        setAppearance(appearance)
+    }
+
+    fun setAppearance(appearance: Appearance) {
         setAppearance(appearance, cornerSizeDp = size.cornerSizeDp)
     }
 
@@ -235,7 +259,7 @@ class PrimaryButton @JvmOverloads constructor(
     }
 }
 
-fun PrimaryButton.setProgress(show: Boolean) {
+fun PrimaryButton.setProgressState(show: Boolean) {
     setState(if (show) ButtonState.PROGRESS else ButtonState.NORMAL)
 }
 
@@ -245,13 +269,16 @@ fun PrimaryButton.setState(descriptiveButtonState: DescriptiveButtonState) {
             setState(ButtonState.DISABLED)
             text = descriptiveButtonState.reason
         }
+
         is DescriptiveButtonState.Enabled -> {
             setState(ButtonState.NORMAL)
             text = descriptiveButtonState.action
         }
+
         DescriptiveButtonState.Loading -> {
             setState(ButtonState.PROGRESS)
         }
+
         DescriptiveButtonState.Gone -> {
             setState(ButtonState.GONE)
         }

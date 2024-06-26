@@ -6,10 +6,10 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealGenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
@@ -28,17 +28,27 @@ class AddAccountsModule {
 
     @Provides
     @FeatureScope
+    fun provideLocalAddMetaAccountRepository(
+        metaAccountChangesEventBus: MetaAccountChangesEventBus,
+        metaAccountDao: MetaAccountDao,
+        secretStoreV2: SecretStoreV2
+    ) = LocalAddMetaAccountRepository(
+        metaAccountChangesEventBus,
+        metaAccountDao,
+        secretStoreV2
+    )
+
+    @Provides
+    @FeatureScope
     fun provideMnemonicAddAccountRepository(
         accountDataSource: AccountDataSource,
         accountSecretsFactory: AccountSecretsFactory,
         chainRegistry: ChainRegistry,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = MnemonicAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
         chainRegistry,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 
@@ -49,14 +59,12 @@ class AddAccountsModule {
         accountSecretsFactory: AccountSecretsFactory,
         jsonSeedDecoder: JsonSeedDecoder,
         chainRegistry: ChainRegistry,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = JsonAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
         jsonSeedDecoder,
         chainRegistry,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 
@@ -66,13 +74,11 @@ class AddAccountsModule {
         accountDataSource: AccountDataSource,
         accountSecretsFactory: AccountSecretsFactory,
         chainRegistry: ChainRegistry,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = SeedAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
         chainRegistry,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 
@@ -80,11 +86,9 @@ class AddAccountsModule {
     @FeatureScope
     fun provideWatchOnlyAddAccountRepository(
         accountDao: MetaAccountDao,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = WatchOnlyAddAccountRepository(
         accountDao,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 
@@ -92,11 +96,9 @@ class AddAccountsModule {
     @FeatureScope
     fun provideParitySignerAddAccountRepository(
         accountDao: MetaAccountDao,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = ParitySignerAddAccountRepository(
         accountDao,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 
@@ -104,10 +106,12 @@ class AddAccountsModule {
     @FeatureScope
     fun provideProxiedAddAccountRepository(
         accountDao: MetaAccountDao,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus
     ): ProxiedAddAccountRepository = RealProxiedAddAccountRepository(
         accountDao,
-        chainRegistry
+        chainRegistry,
+        metaAccountChangesEventBus
     )
 
     @Provides
@@ -116,13 +120,11 @@ class AddAccountsModule {
         accountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ): LegacyLedgerAddAccountRepository = RealLegacyLedgerAddAccountRepository(
         accountDao,
         chainRegistry,
         secretStoreV2,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 
@@ -131,12 +133,10 @@ class AddAccountsModule {
     fun provideGenericLedgerAddAccountRepository(
         accountDao: MetaAccountDao,
         secretStoreV2: SecretStoreV2,
-        proxySyncService: ProxySyncService,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ): GenericLedgerAddAccountRepository = RealGenericLedgerAddAccountRepository(
         accountDao,
         secretStoreV2,
-        proxySyncService,
         metaAccountChangesEventBus
     )
 }

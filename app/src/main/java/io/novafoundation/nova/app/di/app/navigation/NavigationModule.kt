@@ -33,6 +33,7 @@ import io.novafoundation.nova.splash.SplashRouter
         BuyNavigationModule::class,
         PushNotificationsNavigationModule::class,
         DeepLinkingNavigationModule::class,
+        CloudBackupNavigationModule::class
     ]
 )
 class NavigationModule {

@@ -93,7 +93,7 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel>(), ChainAccou
             )
         }
         setupImportTypeChooser(viewModel)
-        setupAddAccountLauncher(viewModel)
+        setupAddAccountLauncher(viewModel.addAccountLauncherMixin)
 
         accountDetailsNameField.content.bindTo(viewModel.accountNameFlow, viewLifecycleOwner.lifecycleScope)
 

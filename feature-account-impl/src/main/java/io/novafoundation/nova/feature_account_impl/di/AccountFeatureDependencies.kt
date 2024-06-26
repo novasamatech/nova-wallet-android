@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -28,9 +30,13 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
+import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
@@ -122,6 +128,14 @@ interface AccountFeatureDependencies {
 
     fun getProxyRepository(): GetProxyRepository
 
+    fun cloudBackupService(): CloudBackupService
+
+    fun provideActionBottomSheetLauncherFactory(): ActionBottomSheetLauncherFactory
+
+    fun customDialogProvider(): CustomDialogDisplayer.Presentation
+
+    fun provideConditionMixinFactory(): ConditionMixinFactory
+
     val systemCallExecutor: SystemCallExecutor
 
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
@@ -148,6 +162,10 @@ interface AccountFeatureDependencies {
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val rootScope: RootScope
+
+    val cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
+
+    val listSelectorMixinFactory: ListSelectorMixin.Factory
 
     val ledgerMigrationTracker: LedgerMigrationTracker
 }

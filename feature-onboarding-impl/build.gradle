@@ -43,6 +43,8 @@ dependencies {
     implementation project(':feature-ledger-core')
     implementation project(':feature-versions-api')
 
+    implementation project(':feature-cloud-backup-api')
+
     implementation kotlinDep
 
     implementation androidDep

@@ -6,7 +6,7 @@ object LedgerDerivationPath {
 
     private const val LEDGER_DERIVATION_PATH_KEY = "LedgerChainAccount.derivationPath"
 
-    fun derivationPathSecretKey(chainId: ChainId): String {
+    fun legacyDerivationPathSecretKey(chainId: ChainId): String {
         return "$LEDGER_DERIVATION_PATH_KEY.$chainId"
     }
 

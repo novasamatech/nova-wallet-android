@@ -6,7 +6,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novafoundation.nova.common.utils.ByteArrayHexAdapter
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import java.lang.reflect.Type
@@ -19,13 +19,6 @@ private class GenericCallAdapter : JsonSerializer<GenericCall.Instance> {
             add("function", JsonPrimitive(src.function.name))
             add("args", context.serialize(src.arguments))
         }
-    }
-}
-
-private class ByteArrayHexAdapter : JsonSerializer<ByteArray> {
-
-    override fun serialize(src: ByteArray, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
-        return JsonPrimitive(src.toHexString(withPrefix = true))
     }
 }
 

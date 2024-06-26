@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import io.novafoundation.nova.core.model.CryptoType
+import java.util.UUID
 
 @Entity(
     tableName = MetaAccountLocal.TABLE_NAME,
@@ -26,6 +27,7 @@ class MetaAccountLocal(
     val type: Type,
     @ColumnInfo(defaultValue = "ACTIVE")
     val status: Status,
+    val globallyUniqueId: String
 ) {
 
     enum class Status {
@@ -47,6 +49,10 @@ class MetaAccountLocal(
             const val IS_SELECTED = "isSelected"
             const val POSITION = "position"
             const val ID = "id"
+        }
+
+        fun generateGloballyUniqueId(): String {
+            return UUID.randomUUID().toString()
         }
     }
 

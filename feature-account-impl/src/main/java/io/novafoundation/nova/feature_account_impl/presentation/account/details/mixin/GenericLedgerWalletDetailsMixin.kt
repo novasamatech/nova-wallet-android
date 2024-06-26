@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -42,14 +43,16 @@ class GenericLedgerWalletDetailsMixin(
         )
     }
 
-    override suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain> {
-        val chains = ledgerMigrationTracker.supportedChainsByGenericApp()
+    override fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> {
+        return flowOfAll {
+            val chains = ledgerMigrationTracker.supportedChainsByGenericApp()
 
-        return interactor.getChainProjections(
-            metaAccount = metaAccount,
-            chains = chains,
-            sorting = Chain.defaultComparatorFrom(AccountInChain::chain)
-        )
+            interactor.chainProjectionsFlow(
+                metaId = metaAccount.id,
+                chains = chains,
+                sorting = Chain.defaultComparatorFrom(AccountInChain::chain)
+            )
+        }
     }
 
     override suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader? {

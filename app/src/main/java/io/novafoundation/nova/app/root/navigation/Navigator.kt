@@ -18,12 +18,18 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionFragment
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.AdvancedEncryptionModePayload
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsFragment
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateBackupPasswordPayload
+import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet.CreateWalletBackupPasswordFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmFragment
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ExportJsonConfirmPayload
-import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.password.ExportJsonPasswordFragment
+import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.ManualBackupAdvancedSecretsFragment
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.main.ManualBackupSecretsFragment
+import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning.ManualBackupWarningFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicFragment
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.BackupMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicFragment
@@ -40,6 +46,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletFragment
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
+import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload.FlowType
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
@@ -111,8 +120,11 @@ class Navigator(
         navController?.navigate(R.id.action_splash_to_pin, bundle)
     }
 
-    override fun openCreateAccount() {
-        navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment)
+    override fun openCreateFirstWallet() {
+        navController?.navigate(
+            R.id.action_welcomeFragment_to_startCreateWallet,
+            StartCreateWalletFragment.bundle(StartCreateWalletPayload(FlowType.FIRST_WALLET))
+        )
     }
 
     override fun openMain() {
@@ -149,6 +161,8 @@ class Navigator(
             R.id.createWatchWalletFragment -> navController?.navigate(R.id.action_watchWalletFragment_to_pincodeFragment, bundle)
             R.id.finishImportParitySignerFragment -> navController?.navigate(R.id.action_finishImportParitySignerFragment_to_pincodeFragment, bundle)
             R.id.finishImportLedgerFragment -> navController?.navigate(R.id.action_finishImportLedgerFragment_to_pincodeFragment, bundle)
+            R.id.createCloudBackupPasswordFragment -> navController?.navigate(R.id.action_createCloudBackupPasswordFragment_to_pincodeFragment, bundle)
+            R.id.restoreCloudBackupFragment -> navController?.navigate(R.id.action_restoreCloudBackupFragment_to_pincodeFragment, bundle)
             R.id.finishImportGenericLedgerFragment -> navController?.navigate(R.id.action_finishImportGenericLedgerFragment_to_pincodeFragment, bundle)
         }
     }
@@ -169,7 +183,7 @@ class Navigator(
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
         val currentDestination = navController?.currentDestination ?: return
         val actionId = when (currentDestination.id) {
-            // Wee need the slpash fragment case to close app if we use back navigation in import mnemonic screen
+            // Wee need the splash fragment case to close app if we use back navigation in import mnemonic screen
             R.id.splashFragment -> R.id.action_splashFragment_to_import_nav_graph
             else -> R.id.action_import_nav_graph
         }
@@ -179,7 +193,7 @@ class Navigator(
     override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {
         val destination = when (val currentDestinationId = navController?.currentDestination?.id) {
             R.id.welcomeFragment -> R.id.action_welcomeFragment_to_mnemonic_nav_graph
-            R.id.createAccountFragment -> R.id.action_createAccountFragment_to_mnemonic_nav_graph
+            R.id.startCreateWalletFragment -> R.id.action_startCreateWalletFragment_to_mnemonic_nav_graph
             R.id.walletDetailsFragment -> R.id.action_accountDetailsFragment_to_mnemonic_nav_graph
             else -> throw IllegalArgumentException("Unknown current destination to open mnemonic screen: $currentDestinationId")
         }
@@ -228,6 +242,10 @@ class Navigator(
 
     override fun openMoonbeamFlow(payload: ContributePayload) {
         navController?.navigate(R.id.action_mainFragment_to_moonbeamCrowdloanTermsFragment, MoonbeamCrowdloanTermsFragment.getBundle(payload))
+    }
+
+    override fun openAddAccount(payload: AddAccountPayload) {
+        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
     }
 
     override fun openFilter(payload: TransactionHistoryFilterPayload) = performNavigation(
@@ -411,6 +429,10 @@ class Navigator(
         performNavigation(R.id.action_open_pushNotificationsWelcome)
     }
 
+    override fun openCloudBackupSettings() {
+        performNavigation(R.id.action_open_cloudBackupSettings)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {
@@ -451,37 +473,37 @@ class Navigator(
         navController?.navigate(R.id.action_accountDetailsFragment_to_changeWatchAccountFragment, bundle)
     }
 
-    override fun openAddAccount(payload: AddAccountPayload) {
-        navController?.navigate(R.id.action_open_onboarding, WelcomeFragment.bundle(payload))
+    override fun openCreateWallet(payload: StartCreateWalletPayload) {
+        navController?.navigate(R.id.action_open_create_new_wallet, StartCreateWalletFragment.bundle(payload))
     }
 
     override fun openUserContributions() {
         navController?.navigate(R.id.action_mainFragment_to_userContributionsFragment)
     }
 
-    override fun exportMnemonicAction(exportPayload: ExportPayload): DelayedNavigation {
+    override fun getExportMnemonicDelayedNavigation(exportPayload: ExportPayload.ChainAccount): DelayedNavigation {
         val payload = BackupMnemonicPayload.Confirm(exportPayload.chainId, exportPayload.metaId)
         val extras = BackupMnemonicFragment.getBundle(payload)
 
         return NavComponentDelayedNavigation(R.id.action_open_mnemonic_nav_graph, extras)
     }
 
-    override fun exportSeedAction(exportPayload: ExportPayload): DelayedNavigation {
+    override fun getExportSeedDelayedNavigation(exportPayload: ExportPayload.ChainAccount): DelayedNavigation {
         val extras = ExportSeedFragment.getBundle(exportPayload)
 
         return NavComponentDelayedNavigation(R.id.action_export_seed, extras)
     }
 
-    override fun exportJsonPasswordAction(exportPayload: ExportPayload): DelayedNavigation {
-        val extras = ExportJsonPasswordFragment.getBundle(exportPayload)
+    override fun getExportJsonDelayedNavigation(exportPayload: ExportPayload): DelayedNavigation {
+        val extras = ExportJsonFragment.getBundle(exportPayload)
 
         return NavComponentDelayedNavigation(R.id.action_export_json, extras)
     }
 
-    override fun openExportJsonConfirm(payload: ExportJsonConfirmPayload) {
-        val extras = ExportJsonConfirmFragment.getBundle(payload)
+    override fun exportJsonAction(exportPayload: ExportPayload) {
+        val extras = ExportJsonFragment.getBundle(exportPayload)
 
-        navController?.navigate(R.id.action_exportJsonPasswordFragment_to_exportJsonConfirmFragment, extras)
+        navController?.navigate(R.id.action_export_json, extras)
     }
 
     override fun finishExportFlow() {
@@ -525,8 +547,70 @@ class Navigator(
         navigationHolder.finishApp()
     }
 
+    override fun openCreateCloudBackupPassword(walletName: String) {
+        val bundle = CreateWalletBackupPasswordFragment.getBundle(CreateBackupPasswordPayload(walletName))
+
+        navController?.navigate(R.id.action_startCreateWalletFragment_to_createCloudBackupPasswordFragment, bundle)
+    }
+
+    override fun restoreCloudBackup() {
+        when (navController?.currentDestination?.id) {
+            R.id.importWalletOptionsFragment -> navController?.navigate(R.id.action_importWalletOptionsFragment_to_restoreCloudBackup)
+            R.id.startCreateWalletFragment -> navController?.navigate(R.id.action_startCreateWalletFragment_to_resotreCloudBackupFragment)
+        }
+    }
+
+    override fun openSyncWalletsBackupPassword() {
+        performNavigation(R.id.action_cloudBackupSettings_to_syncWalletsBackupPasswordFragment)
+    }
+
+    override fun openChangeBackupPasswordFlow() {
+        performNavigation(R.id.action_cloudBackupSettings_to_checkCloudBackupPasswordFragment)
+    }
+
+    override fun openRestoreBackupPassword() {
+        performNavigation(R.id.action_cloudBackupSettings_to_restoreCloudBackupPasswordFragment)
+    }
+
+    override fun openChangeBackupPassword() {
+        performNavigation(R.id.action_checkCloudBackupPasswordFragment_to_changeBackupPasswordFragment)
+    }
+
+    override fun openManualBackupSelectAccount(metaId: Long) {
+        val bundle = ManualBackupSelectAccountFragment.bundle(ManualBackupSelectAccountPayload(metaId))
+        performNavigation(R.id.action_manualBackupSelectWalletFragment_to_manualBackupSelectAccountFragment, bundle)
+    }
+
+    override fun openManualBackupConditions(payload: ManualBackupCommonPayload) {
+        val bundle = ManualBackupWarningFragment.bundle(payload)
+
+        val pinCodePayload = PinCodeAction.Check(
+            NavComponentDelayedNavigation(R.id.action_manualBackupPincodeFragment_to_manualBackupWarning, bundle),
+            ToolbarConfiguration()
+        )
+        val pinCodeBundle = PincodeFragment.getPinCodeBundle(pinCodePayload)
+
+        performNavigation(
+            cases = arrayOf(
+                R.id.manualBackupSelectWallet to R.id.action_manualBackupSelectWallet_to_pincode_check,
+                R.id.manualBackupSelectAccount to R.id.action_manualBackupSelectAccount_to_pincode_check
+            ),
+            args = pinCodeBundle
+        )
+    }
+
+    override fun openManualBackupSecrets(payload: ManualBackupCommonPayload) {
+        val bundle = ManualBackupSecretsFragment.bundle(payload)
+        performNavigation(R.id.action_manualBackupWarning_to_manualBackupSecrets, bundle)
+    }
+
+    override fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload) {
+        val bundle = ManualBackupAdvancedSecretsFragment.bundle(payload)
+        performNavigation(R.id.action_manualBackupSecrets_to_manualBackupAdvancedSecrets, bundle)
+    }
+
     override fun openCreateWatchWallet() {
-        navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_createWatchWalletFragment)
     }
 
     override fun openStartImportParitySigner() {
@@ -537,12 +621,19 @@ class Navigator(
         openStartImportPolkadotVault(PolkadotVaultVariant.POLKADOT_VAULT)
     }
 
+    override fun openImportOptionsScreen() {
+        when (navController?.currentDestination?.id) {
+            R.id.welcomeFragment -> navController?.navigate(R.id.action_welcomeFragment_to_importWalletOptionsFragment)
+            else -> navController?.navigate(R.id.action_importWalletOptionsFragment)
+        }
+    }
+
     override fun openStartImportLegacyLedger() {
-        navController?.navigate(R.id.action_welcomeFragment_to_import_ledger_graph)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_legacy_ledger_graph)
     }
 
     override fun openStartImportGenericLedger() {
-        navController?.navigate(R.id.action_welcomeFragment_to_import_generic_ledger_graph)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_generic_ledger_graph)
     }
 
     override fun withPinCodeCheckRequired(
@@ -563,7 +654,7 @@ class Navigator(
 
     private fun openStartImportPolkadotVault(variant: PolkadotVaultVariant) {
         val args = StartImportParitySignerFragment.getBundle(ParitySignerStartPayload(variant))
-        navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph, args)
+        navController?.navigate(R.id.action_importWalletOptionsFragment_to_import_parity_signer_graph, args)
     }
 
     private fun buildCreatePinBundle(): Bundle {

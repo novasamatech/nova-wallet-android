@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
@@ -16,7 +17,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Accoun
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.notHasAccountComparator
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasAccountComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
@@ -59,15 +60,14 @@ class LegacyLedgerWalletDetailsMixin(
         }
     }
 
-    override suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain> {
+    override fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> = flowOfAll {
         val ledgerSupportedChainIds = SubstrateApplicationConfig.all().mapToSet { it.chainId }
         val chains = interactor.getAllChains()
             .filter { it.id in ledgerSupportedChainIds }
-
-        return interactor.getChainProjections(
-            metaAccount,
+        interactor.chainProjectionsFlow(
+            metaAccount.id,
             chains,
-            notHasAccountComparator().withChainComparator()
+            hasAccountComparator().withChainComparator()
         )
     }
 

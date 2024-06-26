@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 
 interface OnboardingRouter {
 
-    fun openCreateAccount()
+    fun openCreateFirstWallet()
 
     fun openMnemonicScreen(accountName: String?, payload: AddAccountPayload)
 
@@ -22,4 +22,8 @@ interface OnboardingRouter {
     fun back()
 
     fun openStartImportPolkadotVault()
+
+    fun openImportOptionsScreen()
+
+    fun restoreCloudBackup()
 }

@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class LegacyLedgerMetaAccount(
     id: Long,
+    globallyUniqueId: String,
     substratePublicKey: ByteArray?,
     substrateCryptoType: CryptoType?,
     substrateAccountId: ByteArray?,
@@ -24,6 +25,7 @@ class LegacyLedgerMetaAccount(
     chainAccounts: Map<ChainId, MetaAccount.ChainAccount>
 ) : DefaultMetaAccount(
     id = id,
+    globallyUniqueId = globallyUniqueId,
     substratePublicKey = substratePublicKey,
     substrateCryptoType = substrateCryptoType,
     substrateAccountId = substrateAccountId,

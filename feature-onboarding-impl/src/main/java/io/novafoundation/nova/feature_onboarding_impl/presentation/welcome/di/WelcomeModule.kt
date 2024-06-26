@@ -9,9 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeViewModel
@@ -27,9 +25,7 @@ class WelcomeModule {
         router: OnboardingRouter,
         appLinksProvider: AppLinksProvider,
         shouldShowBack: Boolean,
-        importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         addAccountPayload: AddAccountPayload,
-        actionAwaitableMixin: ActionAwaitableMixin.Factory,
         updateNotificationsInteractor: UpdateNotificationsInteractor,
         ledgerMigrationTracker: LedgerMigrationTracker,
     ): ViewModel {
@@ -38,9 +34,6 @@ class WelcomeModule {
             router,
             appLinksProvider,
             addAccountPayload,
-            importTypeChooserMixin,
-            actionAwaitableMixin,
-            ledgerMigrationTracker,
             updateNotificationsInteractor
         )
     }

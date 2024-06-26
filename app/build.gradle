@@ -245,6 +245,9 @@ dependencies {
     implementation project(':feature-push-notifications')
     implementation project(':feature-deep-linking')
 
+    implementation project(':feature-cloud-backup-api')
+    implementation project(':feature-cloud-backup-impl')
+
     implementation project(':bindings:metadata_shortener')
 
     implementation kotlinDep

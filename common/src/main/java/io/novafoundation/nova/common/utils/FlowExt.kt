@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.view.InsertableInputField
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.SendChannel
@@ -61,6 +62,12 @@ inline fun <T, R> Flow<Result<T>>.mapResult(crossinline mapper: suspend (T) -> R
 
 inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -> R?) = map { list ->
     list.mapNotNull { item -> mapper(item) }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun <T> Flow<T>.onEachLatest(action: suspend (T) -> Unit): Flow<T> = transformLatest { value ->
+    action(value)
+    return@transformLatest emit(value)
 }
 
 /**

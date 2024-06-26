@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -73,7 +73,7 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
         setupFeeLoading(viewModel, bondMoreFee)
         observeHints(viewModel.hintsMixin, bondMoreHints)
 
-        viewModel.showNextProgress.observe(bondMoreContinue::setProgress)
+        viewModel.showNextProgress.observe(bondMoreContinue::setProgressState)
 
         viewModel.feeLiveData.observe(bondMoreFee::setFeeStatus)
     }

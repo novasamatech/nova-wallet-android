@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.account.export.json.ExportJsonInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.mnemonic.ExportMnemonicInteractor
-import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportSeedInteractor
+import io.novafoundation.nova.feature_account_impl.domain.account.export.seed.ExportPrivateKeyInteractor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -41,7 +41,7 @@ class ExportModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2,
-    ) = ExportSeedInteractor(
+    ) = ExportPrivateKeyInteractor(
         accountRepository,
         secretStoreV2,
         chainRegistry

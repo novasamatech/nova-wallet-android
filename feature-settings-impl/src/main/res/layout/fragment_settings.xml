@@ -113,6 +113,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <io.novafoundation.nova.common.view.settings.SettingsItemView
+                android:id="@+id/settingsCloudBackup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_cloud_backup"
+                app:title="@string/backup_title" />
+
             <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
                 android:id="@+id/settingsBiometricAuth"
                 android:layout_width="match_parent"

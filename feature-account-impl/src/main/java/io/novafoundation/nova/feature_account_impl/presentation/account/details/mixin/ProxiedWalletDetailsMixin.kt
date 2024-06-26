@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.appendSpace
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.AlertModel
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
@@ -50,11 +51,11 @@ class ProxiedWalletDetailsMixin(
         )
     }
 
-    override suspend fun getChainProjections(): GroupedList<AccountInChain.From, AccountInChain> {
+    override fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> = flowOfAll {
         val proxiedChainIds = metaAccount.chainAccounts.keys
         val chains = interactor.getAllChains()
             .filter { it.id in proxiedChainIds }
-        return interactor.getChainProjections(metaAccount, chains, hasAccountComparator().withChainComparator())
+        interactor.chainProjectionsFlow(metaAccount.id, chains, hasAccountComparator().withChainComparator())
     }
 
     override suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader? {

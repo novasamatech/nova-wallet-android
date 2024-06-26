@@ -13,6 +13,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 
 open class DefaultMetaAccount(
     override val id: Long,
+    override val globallyUniqueId: String,
     override val substratePublicKey: ByteArray?,
     override val substrateCryptoType: CryptoType?,
     override val substrateAccountId: ByteArray?,

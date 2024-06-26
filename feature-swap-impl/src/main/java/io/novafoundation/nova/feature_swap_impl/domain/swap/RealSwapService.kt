@@ -110,6 +110,8 @@ internal class RealSwapService(
                     priceImpact = args.calculatePriceImpact(amountIn, amountOut),
                     path = quote.path
                 )
+            }.onFailure {
+                Log.e("RealSwapService", "Error while quoting", it)
             }
         }
     }

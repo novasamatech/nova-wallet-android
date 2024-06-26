@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.common.view.dialog.errorDialog
-import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.showValueOrHide
@@ -113,7 +113,7 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
             val actionsAllowed = !operationInProgress
 
             confirmDAppActionReject.isEnabled = actionsAllowed
-            confirmDAppActionAllow.setProgress(show = operationInProgress)
+            confirmDAppActionAllow.setProgressState(show = operationInProgress)
         }
 
         viewModel.confirmUnrecoverableError.awaitableActionLiveData.observeEvent {

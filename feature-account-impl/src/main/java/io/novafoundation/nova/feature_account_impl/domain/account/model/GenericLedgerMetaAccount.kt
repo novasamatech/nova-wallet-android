@@ -11,6 +11,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class GenericLedgerMetaAccount(
     id: Long,
+    globallyUniqueId: String,
     substratePublicKey: ByteArray?,
     substrateCryptoType: CryptoType?,
     substrateAccountId: ByteArray?,
@@ -25,6 +26,7 @@ class GenericLedgerMetaAccount(
     private val supportedGenericLedgerChains: Set<ChainId>
 ) : DefaultMetaAccount(
     id = id,
+    globallyUniqueId = globallyUniqueId,
     substratePublicKey = substratePublicKey,
     substrateCryptoType = substrateCryptoType,
     substrateAccountId = substrateAccountId,

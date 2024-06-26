@@ -11,6 +11,8 @@ class FrostedGlassLayer {
 class ViewWithLayoutParams(val view: View, layoutParams: ParallaxCardView.LayoutParams) {
     val cardRadius = layoutParams.cardRadius
 
+    val drawBorder = layoutParams.drawBorder
+
     val borderPath = Path()
 
     val cardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

@@ -21,7 +21,15 @@ class MetaAccountOrdering(
 )
 
 interface LightMetaAccount {
+
     val id: Long
+
+    /**
+     * In contrast to [id] which should only be unique **locally**, [globallyUniqueId] should be unique **globally**,
+     * meaning it should be unique across all application instances. This is useful to compare meta accounts from different application instances
+     */
+    val globallyUniqueId: String
+
     val substratePublicKey: ByteArray?
     val substrateCryptoType: CryptoType?
     val substrateAccountId: ByteArray?
@@ -49,6 +57,7 @@ interface LightMetaAccount {
 
 fun LightMetaAccount(
     id: Long,
+    globallyUniqueId: String,
     substratePublicKey: ByteArray?,
     substrateCryptoType: CryptoType?,
     substrateAccountId: ByteArray?,
@@ -57,9 +66,10 @@ fun LightMetaAccount(
     isSelected: Boolean,
     name: String,
     type: LightMetaAccount.Type,
-    status: LightMetaAccount.Status
+    status: LightMetaAccount.Status,
 ) = object : LightMetaAccount {
     override val id: Long = id
+    override val globallyUniqueId: String = globallyUniqueId
     override val substratePublicKey: ByteArray? = substratePublicKey
     override val substrateCryptoType: CryptoType? = substrateCryptoType
     override val substrateAccountId: ByteArray? = substrateAccountId
@@ -114,6 +124,10 @@ fun ByteArray.toDefaultSubstrateAddress(): String {
     return toAddress(SS58Encoder.DEFAULT_PREFIX)
 }
 
+fun MetaAccount.substrateMultiChainEncryption(): MultiChainEncryption? {
+    return substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
+}
+
 fun MetaAccount.requireAccountIdIn(chain: Chain): ByteArray {
     return requireNotNull(accountIdIn(chain))
 }
@@ -163,3 +177,6 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
         LightMetaAccount.Type.PROXIED -> false
     }
 }
+
+val LightMetaAccount.Type.isProxied: Boolean
+    get() = this == LightMetaAccount.Type.PROXIED

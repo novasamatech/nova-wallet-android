@@ -249,6 +249,10 @@ class SettingsViewModel(
         }
     }
 
+    fun cloudBackupClicked() {
+        router.openCloudBackupSettings()
+    }
+
     fun onResume() {
         biometricService.refreshBiometryState()
     }

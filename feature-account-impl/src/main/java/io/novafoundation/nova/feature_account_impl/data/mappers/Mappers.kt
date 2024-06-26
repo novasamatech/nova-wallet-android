@@ -39,27 +39,36 @@ fun mapCryptoTypeToCryptoTypeModel(
     resourceManager: ResourceManager,
     encryptionType: CryptoType
 ): CryptoTypeModel {
-    val name = when (encryptionType) {
-        CryptoType.SR25519 -> "${resourceManager.getString(R.string.sr25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.sr25519_selection_subtitle
-        )
-        }"
+    val title = mapCryptoTypeToCryptoTypeTitle(resourceManager, encryptionType)
+    val subtitle = mapCryptoTypeToCryptoTypeSubtitle(resourceManager, encryptionType)
 
-        CryptoType.ED25519 -> "${resourceManager.getString(R.string.ed25519_selection_title)} ${
-        resourceManager.getString(
-            R.string.ed25519_selection_subtitle
-        )
-        }"
+    return CryptoTypeModel("$title $subtitle", encryptionType)
+}
 
-        CryptoType.ECDSA -> "${resourceManager.getString(R.string.ecdsa_selection_title)} ${
-        resourceManager.getString(
-            R.string.ecdsa_selection_subtitle
-        )
-        }"
+fun mapCryptoTypeToCryptoTypeTitle(
+    resourceManager: ResourceManager,
+    encryptionType: CryptoType
+): String {
+    return when (encryptionType) {
+        CryptoType.SR25519 -> resourceManager.getString(R.string.sr25519_selection_title)
+
+        CryptoType.ED25519 -> resourceManager.getString(R.string.ed25519_selection_title)
+
+        CryptoType.ECDSA -> resourceManager.getString(R.string.ecdsa_selection_title)
     }
+}
 
-    return CryptoTypeModel(name, encryptionType)
+fun mapCryptoTypeToCryptoTypeSubtitle(
+    resourceManager: ResourceManager,
+    encryptionType: CryptoType
+): String {
+    return when (encryptionType) {
+        CryptoType.SR25519 -> resourceManager.getString(R.string.sr25519_selection_subtitle)
+
+        CryptoType.ED25519 -> resourceManager.getString(R.string.ed25519_selection_subtitle)
+
+        CryptoType.ECDSA -> resourceManager.getString(R.string.ecdsa_selection_subtitle)
+    }
 }
 
 fun mapNodeToNodeModel(node: Node): NodeModel {

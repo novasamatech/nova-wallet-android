@@ -2,12 +2,11 @@ package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.s
 
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
 import io.novafoundation.nova.common.utils.removeHexPrefix
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
-import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -21,13 +20,11 @@ class JsonAddAccountRepository(
     private val accountSecretsFactory: AccountSecretsFactory,
     private val jsonSeedDecoder: JsonSeedDecoder,
     private val chainRegistry: ChainRegistry,
-    proxySyncService: ProxySyncService,
     metaAccountChangesEventBus: MetaAccountChangesEventBus
 ) : SecretsAddAccountRepository<JsonAddAccountRepository.Payload>(
     accountDataSource,
     accountSecretsFactory,
     chainRegistry,
-    proxySyncService,
     metaAccountChangesEventBus
 ) {
 

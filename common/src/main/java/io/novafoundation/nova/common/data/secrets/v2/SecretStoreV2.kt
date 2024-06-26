@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.data.secrets.v2
 import io.novafoundation.nova.common.data.secrets.v1.Keypair
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.Union
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.fold
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -53,12 +54,23 @@ class SecretStoreV2(
         putAdditionalSecretKeyToKnown(metaId, secretName)
     }
 
-    suspend fun clearSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.IO) {
+    suspend fun clearMetaAccountSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.IO) {
         chainAccountIds.map { chainAccountKey(metaId, it, ACCESS_SECRETS) }
             .onEach(encryptedPreferences::removeKey)
 
         encryptedPreferences.removeKey(metaAccountKey(metaId, ACCESS_SECRETS))
         clearAdditionalSecrets(metaId)
+    }
+
+    suspend fun clearChainAccountsSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.IO) {
+        chainAccountIds.map { chainAccountKey(metaId, it, ACCESS_SECRETS) }
+            .onEach(encryptedPreferences::removeKey)
+    }
+
+    suspend fun allKnownAdditionalSecrets(metaId: Long): Map<String, String> = withContext(Dispatchers.IO) {
+        allKnownAdditionalSecretKeys(metaId).associateWith { secretKey ->
+            getAdditionalMetaAccountSecret(metaId, secretKey)
+        }.filterNotNull()
     }
 
     suspend fun allKnownAdditionalSecretKeys(metaId: Long): Set<String> = withContext(Dispatchers.IO) {

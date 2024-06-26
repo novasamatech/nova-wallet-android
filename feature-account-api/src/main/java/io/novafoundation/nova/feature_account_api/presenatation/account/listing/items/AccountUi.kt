@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable
 class AccountUi(
     val id: Long,
     val title: CharSequence,
-    val subtitle: CharSequence,
+    val subtitle: CharSequence?,
     val isSelected: Boolean,
     val isEditable: Boolean,
     val isClickable: Boolean,

@@ -32,7 +32,8 @@ class ReferralContributeView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : CustomContributeView(context, attrs, defStyle) {
 
-    @Inject lateinit var imageLoader: ImageLoader
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     init {
         View.inflate(context, R.layout.view_referral_flow, this)
@@ -66,7 +67,7 @@ class ReferralContributeView @JvmOverloads constructor(
         viewState.bonusFlow.observe(scope) { bonus ->
             referralBonus.setVisible(bonus != null)
 
-            bonus?.let { referralBonus.showValue(bonus) }
+            referralBonus.showValue(bonus)
         }
 
         with(viewState.learnBonusesTitle) {

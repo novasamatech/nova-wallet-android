@@ -17,12 +17,10 @@
     <string name="account_add_already_exists_message">La cuenta ya existe. Por favor, prueba con otra.</string>
     <string name="account_add_watch_only_description">Seguir cualquier cartera por su dirección</string>
     <string name="account_add_watch_wallet">Agregar cartera solo-lectura</string>
-    <string name="account_backup_mnemonic_field_title">Frase mnemónica</string>
-    <string name="account_backup_mnemonic_title">Apunta la frase y guárdala en un lugar seguro</string>
+    <string name="account_backup_mnemonic_title">Escribe tu Frase De Paso</string>
     <string name="account_backup_secret_caption">Por favor, asegúrate de anotar tu frase correctamente y de forma legible.</string>
     <string name="account_chain_address_format">dirección %s</string>
     <string name="account_confirm_mnemonic">Confirmar mnemónica</string>
-    <string name="account_confirm_mnemonic_subtitle">Selecciona las palabras en el orden correcto.</string>
     <string name="account_confirm_mnemonic_title">Verifiquemos de nuevo</string>
     <string name="account_confirmation_details">Elige las palabras en el orden correcto</string>
     <string name="account_create_account">Crear una cuenta nueva</string>
@@ -30,6 +28,7 @@
     <string name="account_create_name_subtitle_v2_2_0">El nombre se usará solo localmente en esta aplicación. Puedes editarlo más tarde</string>
     <string name="account_create_name_title_v2_2_0">Crear nombre de billetera</string>
     <string name="account_create_title">Respaldar mnemónico</string>
+    <string name="account_create_wallet">Crear una nueva billetera</string>
     <string name="account_creation_info">El mnemónico se usa para recuperar acceso a la cuenta. Anótalo, ¡no podremos recuperar tu cuenta sin él!</string>
     <string name="account_custom_secret">Cuentas con un secreto cambiado</string>
     <string name="account_delete_confirm">Olvidar</string>
@@ -46,10 +45,10 @@
     <string name="account_ethereum_derivation_path">Ruta de derivación secreta de Ethereum</string>
     <string name="account_export">Exportar cuenta</string>
     <string name="account_export_action">Exportar</string>
+    <string name="account_export_existing">Importar existente</string>
     <string name="account_export_json_password_subtitle">Esto es necesario para cifrar los datos y guardar el archivo JSON.</string>
     <string name="account_export_json_password_title">Establecer una nueva contraseña</string>
     <string name="account_export_json_title">Guarda tu secreto y almacénalo en un lugar seguro</string>
-    <string name="account_export_password_change">Cambiar contraseña</string>
     <string name="account_export_seed_title">Escribe tu secreto y guárdalo en un lugar seguro</string>
     <string name="account_import_invalid_keystore">JSON de restauración inválido. Por favor, asegúrate de que la entrada contenga un JSON válido.</string>
     <string name="account_import_invalid_seed">El seed es inválido. Por favor, asegúrate de que tu entrada contenga 64 símbolos hexadecimales.</string>
@@ -67,16 +66,25 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Tu ruta de derivación contiene símbolos no compatibles o tiene una estructura incorrecta</string>
     <string name="account_invalid_derivation_path_title">Ruta de derivación inválida</string>
     <string name="account_json_file">Archivo JSON</string>
+    <string name="account_ledger_generic_import_start_step_1">Asegúrate de que <font color="#FFFFFF">Generic app esté instalada</font> en tu dispositivo Ledger usando la aplicación Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
     <string name="account_ledger_import_fill_description">Asegúrate de que la aplicación de Red está instalada en tu dispositivo Ledger usando la aplicación Ledger Live. Abre la aplicación de red en tu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Agrega al menos una cuenta</string>
     <string name="account_ledger_import_fill_title">Añade cuentas a tu cartera</string>
     <string name="account_ledger_import_start_guide">Guía Oficial de Conexión Bluetooth de Ledger</string>
     <string name="account_ledger_import_start_step_1">Asegúrate de que <font color="#FFFFFF">la aplicación de Red está instalada</font> en tu dispositivo Ledger usando la aplicación Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Abra la aplicación de red</font> en su dispositivo Ledger</string>
     <string name="account_ledger_import_start_step_3">Permite a Nova Wallet el <font color="#FFFFFF">acceso a Bluetooth y Ubicación</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Seleccione cuenta</font> para agregarla a la billetera</string>
     <string name="account_ledger_import_start_title">Conecta Ledger Nano X</string>
+    <string name="account_ledger_legacy_warning_message">Para firmar operaciones y migrar tus cuentas a la nueva aplicación Generic Ledger, instala y abre la aplicación Migration. Las aplicaciones Legacy Old y Migration Ledger no serán compatibles en el futuro.</string>
+    <string name="account_ledger_legacy_warning_title">Se ha lanzado una nueva aplicación Ledger</string>
+    <string name="account_ledger_migration_app">Migration</string>
+    <string name="account_ledger_migration_deprecation_message">La aplicación Migration no estará disponible en un futuro cercano. Úsala para migrar tus cuentas a la nueva aplicación Ledger para evitar la pérdida de tus fondos.</string>
+    <string name="account_ledger_migration_generic">Generic</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Por favor, activa el Bluetooth en la configuración de tu teléfono y en el dispositivo Ledger. Desbloquea tu dispositivo Ledger y abre la aplicación %s.</string>
     <string name="account_ledger_select_device_title">Selecciona tu dispositivo Ledger</string>
     <string name="account_mnmonic_length_variants">frase de 12, 15, 18, 21 o 24 palabras</string>
@@ -90,7 +98,7 @@
     <string name="account_parity_signer_import_scan_invalid_qr">Código QR inválido, por favor asegúrate de que estás escaneando el código QR de %s</string>
     <string name="account_parity_signer_import_start_select_top">Asegúrate de seleccionar el primero de la lista</string>
     <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Vaya a la pestaña \"Claves\". Seleccione semilla, luego cuenta</font> que desea agregar a Nova Wallet</string>
     <string name="account_parity_signer_import_start_step_3">Parity Signer te proporcionará <font color="#FFFFFF">un código QR para escanear</font></string>
     <string name="account_parity_signer_import_start_title">Agrega una billetera desde %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s no soporta la firma de mensajes arbitrarios — solo transacciones</string>
@@ -106,7 +114,7 @@
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Preste atención, el nombre de la ruta de derivación debe estar vacío</string>
     <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vaya a la pestaña \"Conjuntos de claves\".</font> Seleccione su conjunto de claves, Red y luego la cuenta que desea agregar a Nova Wallet.</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault le proporcionará un <font color="#FFFFFF">código QR para escanear</font></string>
     <string name="account_private_key">Clave privada</string>
     <string name="account_proxieds">Delegado a usted (Proxieds)</string>
@@ -141,6 +149,7 @@
     <string name="accounts_add_wallet">Agregar monedero</string>
     <string name="accounts_change_chain_account">Cambiar cuenta %s</string>
     <string name="accounts_change_chain_secrets">Cambiar cuenta</string>
+    <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
     <string name="add_delegation_missing_account_message">Necesitas agregar una cuenta %s al monedero para poder delegar</string>
     <string name="add_proxy_confirmation_delegate_to">Delegar a</string>
     <string name="add_proxy_confirmation_delegating_account">Cuenta de delegación</string>
@@ -188,10 +197,34 @@
     <string name="assets_send_flow_placeholder">No tiene tokens para enviar.\nCompre o reciba tokens en su\ncuenta.</string>
     <string name="assets_swap_flow_pay_title">Token para pagar</string>
     <string name="assets_swap_flow_receive_title">Token para recibir</string>
+    <string name="backup_diff_subtitle">¡Antes de proceder con los cambios, %s para billeteras modificadas y eliminadas!</string>
+    <string name="backup_diff_subtitle_highlighted">asegúrate de haber guardado las Frases De Paso</string>
+    <string name="backup_diff_title">¿Aplicar actualizaciones de respaldo?</string>
+    <string name="backup_mnemonic_attention_title">¡Prepárate para guardar tu billetera!</string>
+    <string name="backup_secrets_warning_condition_1">Esta frase de paso te da acceso total y permanente a todas las billeteras conectadas y los fondos dentro de ellas.\n%s</string>
+    <string name="backup_secrets_warning_condition_1_highlight">NO LA COMPARTAS.</string>
+    <string name="backup_secrets_warning_condition_2">No ingreses tu Frase de Paso en ningún formulario o sitio web.\n%s</string>
+    <string name="backup_secrets_warning_condition_2_highlight">LOS FONDOS PUEDEN PERDERSE PARA SIEMPRE.</string>
+    <string name="backup_secrets_warning_condition_3">El soporte o los administradores nunca solicitarán tu Frase de Paso bajo ninguna circunstancia.\n%s</string>
+    <string name="backup_secrets_warning_condition_3_highlight">CUIDADO CON LOS USURPADORES.</string>
+    <string name="backup_secrets_warning_disabled_button">Revisar y Aceptar para Continuar</string>
+    <string name="backup_settings_delete_backup">Eliminar respaldo</string>
+    <string name="backup_settings_manual_subtitle">Puedes respaldar manualmente tu frase secreta para asegurar el acceso a los fondos de tu monedero si pierdes acceso a este dispositivo</string>
+    <string name="backup_settings_manual_switcher_title">Respaldar manualmente</string>
+    <string name="backup_settings_manual_title">Manual</string>
+    <string name="backup_settings_no_wallets_error_message">No has agregado ninguna billetera con una frase de paso.</string>
+    <string name="backup_settings_no_wallets_error_title">No hay billeteras para respaldar</string>
+    <string name="backup_settings_subtitle">Puedes habilitar copias de seguridad en Google Drive para almacenar copias cifradas de todos tus monederos, protegidas por una contraseña que establezcas.</string>
+    <string name="backup_settings_switcher_text">Respaldar en Google Drive</string>
+    <string name="backup_settings_title">Google Drive</string>
+    <string name="backup_settings_toolbar_title">Respaldar</string>
+    <string name="backup_title">Respaldar</string>
     <string name="biometric_auth_title">Autenticación biométrica</string>
     <string name="buy_completed">¡Compra iniciada! Por favor, espere hasta 60 minutos. Puede seguir el estado en el correo electrónico.</string>
     <string name="buy_provider_open_confirmation_message">Para continuar la compra será redirigido desde la aplicación Nova Wallet a %s</string>
     <string name="buy_provider_open_confirmation_title">¿Continuar en el navegador?</string>
+    <string name="change_cloud_backup_password_subtitle">Por favor, ingresa una contraseña que se usará para recuperar tus billeteras desde el respaldo en la nube. Esta contraseña no podrá ser recuperada en el futuro, ¡así que asegúrate de recordarla!</string>
+    <string name="change_cloud_backup_password_title">Actualizar contraseña de respaldo</string>
     <string name="choose_amount_asset">Token</string>
     <string name="choose_amount_available_balance">Saldo disponible</string>
     <string name="choose_amount_error_balance">Lo siento, la solicitud de verificación del saldo falló. Por favor, intente de nuevo más tarde.</string>
@@ -200,6 +233,47 @@
     <string name="choose_amount_fee">Tasa de transferencia</string>
     <string name="choose_amount_network_error">La red no responde</string>
     <string name="choose_amount_to">A</string>
+    <string name="cloud_backup_delete_action_subtitle">%s y recuerda siempre mantenerlos fuera de línea para restaurarlos en cualquier momento. Puedes hacer esto en la Configuración de Respaldo.</string>
+    <string name="cloud_backup_delete_action_subtitle_highlighted">Por favor, escribe todas las Frases de Contraseña de tu billetera antes de continuar</string>
+    <string name="cloud_backup_delete_action_title">El respaldo será eliminado de Google Drive</string>
+    <string name="cloud_backup_delete_backup_confirmation_message">¡El respaldo actual con tus billeteras será eliminado permanentemente!</string>
+    <string name="cloud_backup_delete_backup_confirmation_title">¿Estás seguro de que deseas eliminar el Respaldo en la Nube?</string>
+    <string name="cloud_backup_delete_button">Eliminar Respaldo</string>
+    <string name="cloud_backup_destructive_changes_action_subtitle">En este momento tu respaldo no está sincronizado. Por favor, revisa estas actualizaciones.</string>
+    <string name="cloud_backup_destructive_changes_action_title">Se encontraron cambios en el Respaldo en la Nube</string>
+    <string name="cloud_backup_destructive_changes_button">Revisar Actualizaciones</string>
+    <string name="cloud_backup_destructive_changes_confirmation_subtitle">Si no has escrito manualmente tu Frase de Contraseña para las billeteras que serán eliminadas, entonces esas billeteras y todos sus activos se perderán permanentemente e irremediablemente.</string>
+    <string name="cloud_backup_destructive_changes_confirmation_title">¿Estás seguro de que deseas aplicar estos cambios?</string>
+    <string name="cloud_backup_destructive_changes_not_applied_button">Revisar el Problema</string>
+    <string name="cloud_backup_destructive_changes_not_applied_subtitle">En este momento tu respaldo no está sincronizado. Por favor, revisa el problema.</string>
+    <string name="cloud_backup_destructive_changes_not_applied_title">No se pudieron aplicar los cambios de la billetera en el Respaldo en la Nube</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">Por favor, asegúrate de estar conectado a tu cuenta de Google con las credenciales correctas y haber otorgado acceso a Nova Wallet a Google Drive</string>
+    <string name="cloud_backup_error_google_service_auth_failed_title">Falló la autenticación de Google Drive</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_message">No tienes suficiente espacio de almacenamiento disponible en Google Drive.</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_title">No hay suficiente almacenamiento</string>
+    <string name="cloud_backup_error_google_service_not_found_message">Desafortunadamente, Google Drive no funciona sin los servicios de Google Play, que faltan en tu dispositivo. Intenta obtener los servicios de Google Play.</string>
+    <string name="cloud_backup_error_google_service_not_found_title">Servicios de Google Play no encontrados</string>
+    <string name="cloud_backup_error_google_service_other_message">No se puede hacer una copia de seguridad de tus billeteras en Google Drive. Asegúrate de haber habilitado Nova Wallet para usar tu Google Drive y tener suficiente espacio de almacenamiento disponible, luego intenta nuevamente.</string>
+    <string name="cloud_backup_error_google_service_other_title">Error de Google Drive</string>
+    <string name="cloud_backup_error_invalid_password_message">Por favor, verifica la corrección de la contraseña e intenta nuevamente.</string>
+    <string name="cloud_backup_error_invalid_password_title">La contraseña no es válida</string>
+    <string name="cloud_backup_error_not_found_message">Desafortunadamente, no hemos encontrado una copia de seguridad para restaurar las billeteras.</string>
+    <string name="cloud_backup_error_not_found_title">No se encontraron copias de seguridad</string>
+    <string name="cloud_backup_removing_warning_subtitle">Asegúrate de haber guardado la frase de contraseña para la billetera antes de continuar.</string>
+    <string name="cloud_backup_removing_warning_title">La billetera se eliminará en la Copia de Seguridad en la Nube</string>
+    <string name="cloud_backup_settings_backup_errors_button">Revisar Error de Copia de Seguridad</string>
+    <string name="cloud_backup_settings_corrupted_backup_button">Revisar Actualizaciones de Copia de Seguridad</string>
+    <string name="cloud_backup_settings_deprecated_password_button">Ingresar Contraseña de Copia de Seguridad</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Habilita para respaldar billeteras en tu Google Drive</string>
+    <string name="cloud_backup_settings_last_sync" formatted="false">Última sincronización: %s a las %s</string>
+    <string name="cloud_backup_settings_not_auth_button">Iniciar sesión en Google Drive</string>
+    <string name="cloud_backup_settings_other_errors_button">Revisar Problema de Google Drive</string>
+    <string name="cloud_backup_state_disabled_title">Copia de Seguridad Deshabilitada</string>
+    <string name="cloud_backup_state_synced_title">Copia de seguridad sincronizada</string>
+    <string name="cloud_backup_state_syncing_title">Sincronización de la copia de seguridad...</string>
+    <string name="cloud_backup_state_unsynced_title">Copia de seguridad no sincronizada</string>
+    <string name="cloud_backup_will_be_changed_subtitle">Nuevas billeteras se añaden automáticamente a la copia de seguridad en la nube. Puedes desactivar la copia de seguridad en la nube en Configuración.</string>
+    <string name="cloud_backup_will_be_changed_title">Los cambios de la billetera se actualizarán en la copia de seguridad en la nube</string>
     <string name="common_accept_terms">Aceptar términos...</string>
     <string name="common_account">Cuenta</string>
     <string name="common_account_address">Dirección de cuenta</string>
@@ -229,16 +303,21 @@
     <string name="common_cannot_pay_network_fee_message" formatted="false">Puedes usar hasta %s ya que necesitas pagar\n%s por la tarifa de red.</string>
     <string name="common_chain">Cadena</string>
     <string name="common_change">Cambiar</string>
+    <string name="common_change_password">Cambiar contraseña</string>
+    <string name="common_check_box_auto_continue">Continuar automáticamente en el futuro</string>
     <string name="common_choose_network">Elegir red</string>
     <string name="common_clear">Limpiar</string>
     <string name="common_close">Cerrar</string>
     <string name="common_close_confirmation_message">¿Estás seguro de que quieres cerrar esta pantalla?\nTus cambios no se aplicarán.</string>
+    <string name="common_cloud_backup">Copia de seguridad en la nube</string>
     <string name="common_completed">Completado</string>
     <string name="common_completed_with_count">Completado (%s)</string>
     <string name="common_confirm">Confirmar</string>
     <string name="common_confirm_title">Confirmación</string>
     <string name="common_confirmation_title">¿Estás seguro?</string>
     <string name="common_confirmed">Confirmado</string>
+    <string name="common_connection_error_message">Por favor, revisa tu conexión o intenta nuevamente más tarde</string>
+    <string name="common_connection_error_title">Fallo de conexión</string>
     <string name="common_continue">Continuar</string>
     <string name="common_copied">Copiado al portapapeles</string>
     <string name="common_copy_address">Copiar dirección</string>
@@ -257,6 +336,7 @@
     <string name="common_enable">Habilitar</string>
     <string name="common_enter_address">Introducir dirección…</string>
     <string name="common_enter_amount">Introducir cantidad...</string>
+    <string name="common_enter_password">Ingresar contraseña</string>
     <string name="common_error_general_title">Error</string>
     <string name="common_error_not_enough_tokens">Tokens insuficientes</string>
     <string name="common_event">Evento</string>
@@ -270,6 +350,7 @@
     <string name="common_filter_sort_header">Ordenar por:</string>
     <string name="common_filters">Filtros</string>
     <string name="common_find_out_more">Descubrir más</string>
+    <string name="common_forgot_password">¿Olvidaste tu contraseña?</string>
     <plurals name="common_frequency_days">
         <item quantity="one">todos los días</item>
         <item quantity="other">cada %s días</item>
@@ -277,6 +358,7 @@
     <string name="common_frequency_days_daily">diariamente</string>
     <string name="common_frequency_days_everyday">todos los días</string>
     <string name="common_get_token_format">Obtener %s</string>
+    <string name="common_got_it">Entendido</string>
     <string name="common_governance">Gobernanza</string>
     <string name="common_hexadecimal_string">Cadena hexadecimal</string>
     <plurals name="common_hours_format">
@@ -286,7 +368,6 @@
     <string name="common_how_it_works">Cómo funciona</string>
     <string name="common_i_understand">Entiendo</string>
     <string name="common_info">Información</string>
-    <string name="common_input_error_set_password">Establece una contraseña…</string>
     <string name="common_invalid_qr">El código QR no es válido</string>
     <string name="common_learn_more">Aprender más</string>
     <string name="common_learn_more_v2_2_0">Descubrir más sobre</string>
@@ -301,7 +382,9 @@
     <string name="common_missing_account_title">Falta la cuenta %s</string>
     <string name="common_module">Módulo</string>
     <string name="common_network">Red</string>
+    <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s no es compatible</string>
+    <string name="common_network_polkadot">Polkadot</string>
     <string name="common_networks">Redes</string>
     <plurals name="common_networks_plural">
         <item quantity="one">Red</item>
@@ -317,6 +400,7 @@
     <string name="common_not_available">No disponible</string>
     <string name="common_not_enough_funds_message">Lo sentimos, no tiene fondos suficientes para pagar la tarifa de red.</string>
     <string name="common_not_enough_funds_title">Saldo insuficiente</string>
+    <string name="common_not_now">No ahora</string>
     <string name="common_off">Apagado</string>
     <string name="common_ok">Aceptar</string>
     <string name="common_ok_back">De acuerdo, volver</string>
@@ -324,6 +408,7 @@
     <string name="common_ongoing">En curso</string>
     <string name="common_optional">Opcional</string>
     <string name="common_options_title">Seleccione una opción</string>
+    <string name="common_passphrase">Frase de recuperación</string>
     <string name="common_paste">Pegar</string>
     <string name="common_per_year">/ año</string>
     <string name="common_per_year_format">%s / año</string>
@@ -357,6 +442,7 @@
     <string name="common_secret_derivation_path">Ruta de derivación secreta</string>
     <string name="common_settings">Configuraciones</string>
     <string name="common_share">Compartir</string>
+    <string name="common_sign_in">Iniciar sesión</string>
     <string name="common_sign_request">Solicitud de Firma</string>
     <string name="common_signature_invalid">La firma es inválida</string>
     <string name="common_skip">Saltar</string>
@@ -367,6 +453,7 @@
     <string name="common_sort_by">Ordenar por</string>
     <string name="common_status">Estado</string>
     <string name="common_substrate_address">Dirección Substrate</string>
+    <string name="common_tap_to_reveal_title">Toca para revelar</string>
     <string name="common_terms_and_conditions_formatting">Términos y Condiciones</string>
     <string name="common_time_left">Tiempo restante</string>
     <string name="common_title">Título</string>
@@ -393,6 +480,10 @@
     <string name="common_warning">Advertencia</string>
     <string name="common_yes">Sí</string>
     <string name="common_zero_amount_error">La cantidad debe ser positiva</string>
+    <string name="confirm_cloud_backup_password_subtitle">Por favor, ingresa la contraseña que creaste durante el proceso de copia de seguridad</string>
+    <string name="confirm_cloud_backup_password_title">Ingresa la contraseña actual de la copia de seguridad</string>
+    <string name="confirm_mnemonic_disabled_button_state">Selecciona las palabras...</string>
+    <string name="confirm_mnemonic_not_matching_error_message">Frase de recuperación inválida, por favor verifica nuevamente el orden de las palabras</string>
     <string name="confirm_referendum_vote_referendum">Referéndum</string>
     <string name="confirm_referendum_vote_title">Votar</string>
     <string name="confirm_referendum_vote_track">Rastrear</string>
@@ -408,6 +499,20 @@
     <string name="connection_management_title">Redes</string>
     <string name="connections_add_connection">Agregar conexión</string>
     <string name="contacts_scan">Escanear código QR</string>
+    <string name="corrupted_backup_error_subtitle">Se ha identificado un problema con tu copia de seguridad. Tienes la opción de eliminar la copia de seguridad actual y crear una nueva. %s antes de proceder.</string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Asegúrate de haber guardado las frases de recuperación para todas las billeteras</string>
+    <string name="corrupted_backup_error_title">Copia de seguridad encontrada pero vacía o dañada</string>
+    <string name="create_cloud_backup_password_alert_subtitle">En el futuro, sin la contraseña de respaldo no es posible restaurar tus carteras desde la Copia de Seguridad en la Nube.\n%s</string>
+    <string name="create_cloud_backup_password_alert_subtitle_highlighted">Esta contraseña no se puede recuperar.</string>
+    <string name="create_cloud_backup_password_alert_title">Recuerda la Contraseña de Respaldo</string>
+    <string name="create_cloud_backup_password_input_confirm_hint">Confirma la contraseña</string>
+    <string name="create_cloud_backup_password_input_hint">Contraseña de respaldo</string>
+    <string name="create_cloud_backup_password_requirement_letters">Letras</string>
+    <string name="create_cloud_backup_password_requirement_min_chars">Mín. 8 caracteres</string>
+    <string name="create_cloud_backup_password_requirement_numbers">Números</string>
+    <string name="create_cloud_backup_password_requirement_passwords_match">Las contraseñas coinciden</string>
+    <string name="create_cloud_backup_password_subtitle">Por favor, introduce una contraseña para acceder a tu respaldo en cualquier momento. La contraseña no se puede recuperar, ¡asegúrate de recordarla!</string>
+    <string name="create_cloud_backup_password_title">Crea tu contraseña de respaldo</string>
     <string name="crodloan_private_crowdloan_message">Los crowdloans privados aún no están soportados.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan privado</string>
     <string name="crowdloan_about">Acerca de los crowdloans</string>
@@ -546,16 +651,26 @@
     <string name="delegation_your_delegation">Su delegación</string>
     <string name="delegation_your_delegations">Sus delegaciones</string>
     <string name="delegations_filter">Mostrar</string>
+    <string name="deleting_backup_progress">Eliminando una copia de respaldo...</string>
+    <string name="deprecated_cloud_backup_password_subtitle">Tu contraseña de respaldo fue actualizada anteriormente. Para continuar usando la Copia de Seguridad en la Nube, %s</string>
+    <string name="deprecated_cloud_backup_password_subtitle_highlight">por favor, introduce la nueva contraseña de respaldo.</string>
+    <string name="deprecated_cloud_backup_password_title">La contraseña de respaldo fue cambiada</string>
     <string name="duplicate_proxy_type_message">Ya está delegando a esta cuenta: %s</string>
     <string name="duplicate_proxy_type_title">La delegación ya existe</string>
     <string name="ecdsa_selection_subtitle">(Compatible con BTC/ETH)</string>
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (alternativa)</string>
     <string name="ed25519_selection_title">Edwards</string>
+    <string name="enter_backup_password_hint">Contraseña de respaldo</string>
     <string name="error_not_enough_to_pay_fee_title">No hay suficientes tokens para pagar la comisión</string>
     <string name="ethereum_contract">Contrato</string>
     <string name="ethereum_contract_call">Llamada de contrato</string>
     <string name="ethereum_function">Función</string>
+    <string name="existing_cloud_backup_found_button">Recuperar Carteras</string>
+    <string name="existing_cloud_backup_found_subtitle">%s Todas tus carteras estarán seguras en Google Drive.</string>
+    <string name="existing_cloud_backup_found_subtitle_highlight">¿Quieres recuperar tus carteras?</string>
+    <string name="existing_cloud_backup_found_title">Se encontró una Copia de Seguridad en la Nube existente</string>
+    <string name="export_json_download_btn">Descargar JSON de Restauración</string>
     <string name="export_json_password_confirm">Confirmar contraseña</string>
     <string name="export_json_password_match_error">Las contraseñas no coinciden</string>
     <string name="export_json_password_new">Establecer contraseña</string>
@@ -593,11 +708,18 @@
     <string name="import_mnemonic_invalid_title">Su mnemónico es inválido</string>
     <string name="import_seed_invalid_message">Por favor, asegúrese de que su entrada contiene 64 símbolos hexadecimales.</string>
     <string name="import_seed_invalid_title">Semilla inválida</string>
+    <string name="import_wallet_cloud_backup_not_found_subtitle">Desafortunadamente, no se ha encontrado una Copia de Seguridad con tus carteras.</string>
+    <string name="import_wallet_cloud_backup_not_found_title">Copia de Seguridad No Encontrada</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar billeteras desde Google Drive</string>
+    <string name="import_wallet_options_mnemonic_subtitle">Usa tu frase de 12, 15, 18, 21 o 24 palabras</string>
+    <string name="import_wallet_options_title">Elige cómo te gustaría importar tu cartera</string>
+    <string name="import_wallet_options_watch_only_title">Watch-only</string>
     <string name="invalid_proxy_address_message">La dirección proxy debe ser una dirección %s válida</string>
     <string name="invalid_proxy_address_title">Dirección proxy inválida</string>
     <string name="invoice_scan_error_no_info">No se puede decodificar el QR</string>
     <string name="invoice_scan_qr_code_title">Código QR</string>
     <string name="invoice_scan_upload">Subir desde la galería</string>
+    <string name="json_export_btn">Exportar archivo JSON</string>
     <string name="language_title">Idioma</string>
     <string name="ledger_chain_not_supported">Ledger no soporta %s</string>
     <string name="ledger_error_app_cancelled_message">La operación fue cancelada por el dispositivo. Asegúrese de haber desbloqueado su Ledger.</string>
@@ -621,8 +743,24 @@
     <string name="ledger_verify_address_subtitle">Presione ambos botones en su %s para aprobar la dirección</string>
     <string name="ledger_wallet_details_description">Esta cartera está emparejada con Ledger. Nova te ayudará a formar cualquier operación que desees, y se te solicitará firmarlas usando un dispositivo Ledger</string>
     <string name="ledher_import_select_address_title">Selecciona una cuenta para agregar a la cartera</string>
+    <string name="loocking_backup_progress">Buscando tu copia de seguridad...</string>
     <string name="make_payout_transaction_sent">Transacción de pago enviada</string>
     <string name="manage_assets_add_token">Agregar token</string>
+    <string name="manage_cloud_backup">Gestionar copia de seguridad</string>
+    <string name="manual_backup_secrets_custom_key_title">Clave personalizada</string>
+    <string name="manual_backup_secrets_default_key_title">Clave por defecto</string>
+    <string name="manual_backup_secrets_subtitle">No compartas esta información con nadie. Si lo haces, perderás todos tus activos de manera permanente e irrecuperable.</string>
+    <string name="manual_backup_select_account_custom_key_title">Cuentas con clave personalizada</string>
+    <string name="manual_backup_select_account_default_key_account">Cuentas por defecto</string>
+    <string name="manual_backup_select_account_default_key_account_subtitle_more_chains" formatted="false">%s, +%d otros</string>
+    <string name="manual_backup_select_account_default_key_title">Cuentas con clave por defecto</string>
+    <string name="manual_backup_select_account_header">Selecciona la clave para respaldar</string>
+    <string name="manual_backup_select_wallet_header">Selecciona una cartera para respaldar</string>
+    <string name="manual_backup_warning_subtitle">Por favor, lee lo siguiente atentamente antes de ver tu copia de seguridad</string>
+    <string name="manual_backup_warning_title">¡No compartas tu frase de paso!</string>
+    <string name="mnemonic_card_reveal_subtitle">Asegúrate de que nadie pueda ver tu pantalla\ny no hagas capturas de pantalla</string>
+    <string name="mnemonic_card_title">Por favor %s nadie</string>
+    <string name="mnemonic_card_title_highlight">no compartas con</string>
     <string name="mnemonic_error_try_another_one">Por favor, intenta con otra.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">Frase mnemotécnica inválida, por favor verifica una vez más el orden de las palabras</string>
     <string name="multiple_wallets_selection_max_message">No puedes seleccionar más de %d carteras</string>
@@ -741,7 +879,6 @@
     <string name="push_token_sent_no_account_name_title">💸 Enviado</string>
     <string name="push_token_sent_title">💸 Enviado %s</string>
     <string name="push_wallets_title">Seleccione hasta 3 billeteras para ser notificado cuando la billetera tenga actividad</string>
-    <string name="push_welcome_cancel_button">No ahora</string>
     <string name="push_welcome_enable_button">Habilitar notificaciones push</string>
     <string name="push_welcome_message">Reciba notificaciones sobre operaciones de Wallet, actualizaciones de Gobernanza, actividad de Staking y Seguridad, para que siempre esté informado</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Al habilitar las notificaciones push, acepta nuestros %s y %s</string>
@@ -870,6 +1007,13 @@
         <item quantity="other">Anteriormente has votado en referendos en las pistas %d. Para hacer estas pistas disponibles para delegación, necesitas eliminar tus votos existentes.</item>
     </plurals>
     <string name="remove_votes_suggestion_title">¿Eliminar el historial de tus votos?</string>
+    <string name="restore_cloud_backup_delete_backup_description" formatted="false">%s Es exclusivamente tuyo, almacenado de forma segura e inaccesible para otros. Sin la contraseña de respaldo, restaurar las carteras desde Google Drive es imposible. Si se pierde, elimina la copia de seguridad actual para crear una nueva con una contraseña nueva. %s</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">Desafortunadamente, tu contraseña no puede ser recuperada.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">Alternativamente, use la frase de recuperación para la restauración.</string>
+    <string name="restore_cloud_backup_delete_backup_title">¿Has perdido tu contraseña?</string>
+    <string name="restore_cloud_backup_password_title">Tu contraseña de respaldo se actualizó previamente. Para seguir usando la copia de seguridad en la nube, por favor ingresa la nueva contraseña de respaldo.</string>
+    <string name="restore_cloud_backup_subtitle">Por favor ingrese la contraseña que creó durante el proceso de respaldo</string>
+    <string name="restore_cloud_backup_title">Ingrese la contraseña de la copia de seguridad</string>
     <string name="runtime_update_failure_description">Error al actualizar la información sobre el tiempo de ejecución del blockchain. Algunas funcionalidades pueden no trabajar.</string>
     <string name="runtime_update_failure_title">Fallo en la actualización del tiempo de ejecución</string>
     <string name="search_contacts">Contactos</string>
@@ -1222,6 +1366,14 @@
     <string name="staking_your_stake">Tu apuesta</string>
     <string name="staking_your_validators">Tus validadores</string>
     <string name="staking_your_validators_changing_title">Tus validadores cambiarán en la próxima era.</string>
+    <string name="start_create_wallet_backup_ready_explanation">Ahora vamos a hacer una copia de seguridad de tu monedero. Esto asegura que tus fondos están seguros y protegidos. Las copias de seguridad te permiten restaurar tu monedero en cualquier momento.</string>
+    <string name="start_create_wallet_cloud_backup_btn">Continuar con Google</string>
+    <string name="start_create_wallet_enter_wallet_name">Ingrese el nombre del monedero</string>
+    <string name="start_create_wallet_input_hint">Mi nuevo monedero</string>
+    <string name="start_create_wallet_manual_backup_btn">Continuar con la copia de seguridad manual</string>
+    <string name="start_create_wallet_name_your_wallet">Da un nombre a tu monedero</string>
+    <string name="start_create_wallet_set_wallet_name_explanation">Esto solo será visible para ti y podrás editarlo más tarde.</string>
+    <string name="start_create_wallet_your_wallet_is_ready">Tu monedero está listo</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Has bloqueado tokens en tu saldo debido a %s. Para continuar debes ingresar menos de %s o más de %s. Para apostar otra cantidad debes quitar tus bloqueos de %s.</string>
     <string name="start_staking_cant_stake_amount">No puedes apostar la cantidad especificada</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Seleccionados: %d (máx %d)</string>
@@ -1257,6 +1409,9 @@
     <string name="start_staking_max_nominators_reached_message">Se ha alcanzado el número máximo de nominadores. Intente de nuevo más tarde</string>
     <string name="start_staking_max_nominators_reached_title">%s actualmente no está disponible</string>
     <string name="start_staking_selection_validators_subtitle" formatted="false">Validadores: %d (máx %d)</string>
+    <string name="state_changed">Modificado</string>
+    <string name="state_new">Nuevo</string>
+    <string name="state_removed">Eliminado</string>
     <string name="swap_custom_fee_selector_description">Token para pagar la tasa de red</string>
     <string name="swap_custom_fee_selector_footer">La tasa de red se agrega al monto ingresado</string>
     <string name="swap_error_pair_not_supported">Este par no es compatible</string>
@@ -1398,6 +1553,9 @@
     <string name="wallet_filters_title">Filtros</string>
     <string name="wallet_filters_transfers">Transferencias</string>
     <string name="wallet_manage_assets_title">Gestionar activos</string>
+    <string name="wallet_management_add_account_title">¿Cómo añadir un monedero?</string>
+    <string name="wallet_management_create_account_btn">¿Cómo añadir un monedero?</string>
+    <string name="wallet_management_import_account_btn">¿Cómo añadir un monedero?</string>
     <string name="wallet_nickname_create_caption_v2_2_0">Ejemplos de nombre: Cuenta principal, Mi validador, Crowdloans de Dotsama, etc.</string>
     <string name="wallet_receive_description">Comparte este QR con el emisor</string>
     <string name="wallet_receive_description_v2_2_0">Permite que el emisor escanee este código QR</string>

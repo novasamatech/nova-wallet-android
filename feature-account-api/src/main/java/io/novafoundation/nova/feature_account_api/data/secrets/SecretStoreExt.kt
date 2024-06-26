@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.data.secrets
 
 import io.novafoundation.nova.common.data.secrets.v2.AccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
+import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.mapChainAccountSecretsToKeypair
@@ -11,6 +12,7 @@ import io.novafoundation.nova.common.utils.fold
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.scale.EncodableStruct
 
 suspend fun SecretStoreV2.getAccountSecrets(
     metaAccount: MetaAccount,
@@ -33,4 +35,8 @@ fun AccountSecrets.derivationPath(chain: Chain): String? {
         left = { mapMetaAccountSecretsToDerivationPath(it, ethereum = chain.isEthereumBased) },
         right = { it[ChainAccountSecrets.DerivationPath] }
     )
+}
+
+fun EncodableStruct<MetaAccountSecrets>.keypair(ethereum: Boolean): Keypair {
+    return mapMetaAccountSecretsToKeypair(this, ethereum)
 }

@@ -51,8 +51,8 @@ data class Chain(
         val relaychainAsNative: Boolean?,
         val stakingMaxElectingVoters: Int?,
         val feeViaRuntimeCall: Boolean?,
-        val identityChain: ChainId?,
-        val supportLedgerGenericApp: Boolean?
+        val supportLedgerGenericApp: Boolean?,
+        val identityChain: ChainId?
     )
 
     data class Types(

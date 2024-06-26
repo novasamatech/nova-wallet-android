@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ImportOptionView">
+        <attr name="android:src" />
+        <attr name="title" />
+        <attr name="android:text" />
+    </declare-styleable>
+
+</resources>

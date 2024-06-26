@@ -7,12 +7,14 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.dialog.warningDialog
+import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_accounts.accountListToolbar
 import kotlinx.android.synthetic.main.fragment_accounts.accountsList
@@ -59,6 +61,8 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), Accoun
     }
 
     override fun subscribe(viewModel: WalletManagmentViewModel) {
+        observeConfirmationAction(viewModel.cloudBackupChangingWarningMixin)
+        setupListSelectorMixin(viewModel.listSelectorMixin)
         viewModel.walletsListingMixin.metaAccountsFlow.observe(adapter::submitList)
         viewModel.mode.observe(adapter::setMode)
 

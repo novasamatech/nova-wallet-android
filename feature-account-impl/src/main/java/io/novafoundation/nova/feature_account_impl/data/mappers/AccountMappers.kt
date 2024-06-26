@@ -52,6 +52,7 @@ class AccountMappers(
                 LightMetaAccount.Type.SECRETS,
                 LightMetaAccount.Type.WATCH_ONLY -> DefaultMetaAccount(
                     id = id,
+                    globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
                     proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
@@ -68,6 +69,7 @@ class AccountMappers(
                 LightMetaAccount.Type.PARITY_SIGNER,
                 LightMetaAccount.Type.POLKADOT_VAULT -> PolkadotVaultMetaAccount(
                     id = id,
+                    globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
                     proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
@@ -83,6 +85,7 @@ class AccountMappers(
 
                 LightMetaAccount.Type.LEDGER -> GenericLedgerMetaAccount(
                     id = id,
+                    globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
                     proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
@@ -99,6 +102,7 @@ class AccountMappers(
 
                 LightMetaAccount.Type.LEDGER_LEGACY -> LegacyLedgerMetaAccount(
                     id = id,
+                    globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
                     proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
@@ -114,6 +118,7 @@ class AccountMappers(
 
                 LightMetaAccount.Type.PROXIED -> ProxiedLedgerMetaAccount(
                     id = id,
+                    globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
                     proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
@@ -144,12 +149,13 @@ class AccountMappers(
                 isSelected = isSelected,
                 name = name,
                 type = mapMetaAccountTypeFromLocal(type),
-                status = mapMetaAccountStateFromLocal(status)
+                status = mapMetaAccountStateFromLocal(status),
+                globallyUniqueId = globallyUniqueId
             )
         }
     }
 
-    private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
+    fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMetaAccount.Type {
         return when (local) {
             MetaAccountLocal.Type.SECRETS -> LightMetaAccount.Type.SECRETS
             MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
