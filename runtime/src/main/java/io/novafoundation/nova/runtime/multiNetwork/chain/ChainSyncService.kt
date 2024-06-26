@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.ext.fullId
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapExternalApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
@@ -26,10 +27,10 @@ class ChainSyncService(
 
     suspend fun syncUp() = withContext(Dispatchers.Default) {
         val localChainsJoinedInfo = chainDao.getJoinChainInfo()
-        val oldChains = localChainsJoinedInfo.map { it.chain }
+        val oldChains = localChainsJoinedInfo.map { it.chain }.filter { it.source != ChainLocal.Source.CUSTOM }
         val oldAssets = localChainsJoinedInfo.flatMap { it.assets }
             .filter { it.source == AssetSourceLocal.DEFAULT }
-        val oldNodes = localChainsJoinedInfo.flatMap { it.nodes }
+        val oldNodes = localChainsJoinedInfo.flatMap { it.nodes }.filter { it.source != ChainNodeLocal.Source.CUSTOM }
         val oldExplorers = localChainsJoinedInfo.flatMap { it.explorers }
         val oldExternalApis = localChainsJoinedInfo.flatMap { it.externalApis }
 
