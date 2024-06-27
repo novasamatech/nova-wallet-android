@@ -34,7 +34,7 @@ class NodeAutobalancerTest : CoroutineTest() {
     lateinit var autobalancer: NodeAutobalancer
 
     private val nodes = generateNodes()
-    private val nodeSelectionStrategy = Chain.Nodes.NodeSelectionStrategy.ROUND_ROBIN
+    private val nodeSelectionStrategy = Chain.Nodes.NodeSelectionStrategy.AutoBalance.ROUND_ROBIN
 
     private val nodesFlow = MutableStateFlow(Chain.Nodes(nodeSelectionStrategy, nodes))
     private val stateFlow = singleReplaySharedFlow<Unit>()
