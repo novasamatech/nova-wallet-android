@@ -352,9 +352,9 @@
     <string name="common_find_out_more">Dowiedz się więcej</string>
     <string name="common_forgot_password">Zapomniałeś hasła?</string>
     <plurals name="common_frequency_days">
-        <item quantity="one">każdego dnia</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="one">codziennie</item>
+        <item quantity="few">co %d dzień</item>
+        <item quantity="many">co %d dzień</item>
         <item quantity="other">co %s dni</item>
     </plurals>
     <string name="common_frequency_days_daily">codziennie</string>
@@ -365,8 +365,8 @@
     <string name="common_hexadecimal_string">Ciąg szesnastkowy</string>
     <plurals name="common_hours_format">
         <item quantity="one">%d godzina</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">%d godziny</item>
+        <item quantity="many">%d godzin</item>
         <item quantity="other">%d godzin</item>
     </plurals>
     <string name="common_how_it_works">Jak to działa</string>
@@ -381,8 +381,8 @@
     <string name="common_maximum_format">%s maksymalnie</string>
     <plurals name="common_minutes_format">
         <item quantity="one">%d minuta</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">%d minuty</item>
+        <item quantity="many">%d minut</item>
         <item quantity="other">%d minut</item>
     </plurals>
     <string name="common_missing_account_title">Konto %s nie istnieje</string>
@@ -394,8 +394,8 @@
     <string name="common_networks">Sieci</string>
     <plurals name="common_networks_plural">
         <item quantity="one">Sieć</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">Sieci</item>
+        <item quantity="many">Sieci</item>
         <item quantity="other">Sieci</item>
     </plurals>
     <string name="common_next">Dalej</string>
@@ -476,8 +476,8 @@
     <string name="common_unknown">Nieznane</string>
     <plurals name="common_unknown_chains">
         <item quantity="one">%s nieobsługiwane</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">%s nieobsługiwane</item>
+        <item quantity="many">%s nieobsługiwane</item>
         <item quantity="other">%s nieobsługiwanych</item>
     </plurals>
     <string name="common_unlimited">Nieograniczone</string>
@@ -697,8 +697,8 @@
     <string name="governance_notification_channel_name">Kanał powiadomień o zarządzaniu</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Musisz wybrać przynajmniej %d ścieżkę</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">Musisz wybrać co najmniej %d ścieżki</item>
+        <item quantity="many">Musisz wybrać co najmniej %d ścieżek</item>
         <item quantity="other">Musisz wybrać przynajmniej %d ścieżki</item>
     </plurals>
     <string name="governance_unlock">Odblokować</string>
@@ -778,8 +778,8 @@
     <string name="multiple_wallets_selection_max_message">Nie możesz wybrać więcej niż %d portfeli</string>
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="one">Wybierz co najmniej %d portfel</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">Wybierz co najmniej %d portfele</item>
+        <item quantity="many">Wybierz co najmniej %d portfeli</item>
         <item quantity="other">Wybierz co najmniej %d portfeli</item>
     </plurals>
     <string name="network_fee">Opłata sieciowa</string>
@@ -1018,8 +1018,8 @@
     <string name="remove_votes_suggestion_button_text">Usuń głosy</string>
     <plurals name="remove_votes_suggestion_description">
         <item quantity="one">Głosowałeś wcześniej w referendach na %d torze. Aby ten tor był dostępny do delegowania, musisz usunąć swoje istniejące głosy.</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">Głosowałeś wcześniej w referendach na %d torach. Aby te tory były dostępne do delegowania, musisz usunąć swoje istniejące głosy.</item>
+        <item quantity="many">Głosowałeś wcześniej w referendach na %d torach. Aby te tory były dostępne do delegowania, musisz usunąć swoje istniejące głosy.</item>
         <item quantity="other">Głosowałeś wcześniej w referendach na %d torach. Aby te tory były dostępne do delegowania, musisz usunąć swoje istniejące głosy.</item>
     </plurals>
     <string name="remove_votes_suggestion_title">Usunąć historię głosowania?</string>
@@ -1153,8 +1153,8 @@
     <string name="staking_main_active_nominators_title">Aktywni nominatorzy</string>
     <plurals name="staking_main_lockup_period_value">
         <item quantity="one">%d dzień</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">%d dni</item>
+        <item quantity="many">%d dni</item>
         <item quantity="other">%d dni</item>
     </plurals>
     <string name="staking_main_minimum_stake_title">Minimalny stake</string>
@@ -1218,8 +1218,8 @@
     <string name="staking_payout_expired">Termin wypłaty minął</string>
     <plurals name="staking_payouts_days_left">
         <item quantity="one">%d dzień pozostał</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">%d dni pozostały</item>
+        <item quantity="many">%d dni pozostało</item>
         <item quantity="other">%d dni pozostało</item>
     </plurals>
     <string name="staking_pending_rewards_subtitle">Możesz wypłacić je samodzielnie, gdy są bliskie wygaśnięcia, ale zapłacisz opłatę.</string>
@@ -1548,8 +1548,8 @@
     <string name="wallet_connect_new_connection">Nowe połączenie</string>
     <plurals name="wallet_connect_session_approve_missing_accounts_alert">
         <item quantity="one">Brak konta %s. Dodaj konto do portfela w Ustawieniach</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">%s brakuje konta. Dodaj konto do portfela w Ustawieniach</item>
+        <item quantity="many">%s brakuje kont. Dodaj konta do portfela w Ustawieniach</item>
         <item quantity="other">Brak kont %s. Dodaj konta do portfela w Ustawieniach</item>
     </plurals>
     <string name="wallet_connect_session_approve_unsupported_chains_alert">Niektóre z wymaganych sieci, o które prosi \\"%s\\", nie są obsługiwane w Nova Wallet</string>
@@ -1557,10 +1557,10 @@
     <string name="wallet_connect_title">WalletConnect</string>
     <string name="wallet_connect_unknown_dapp">Nieznana dApp</string>
     <plurals name="wallet_connect_unsupported_networks_hidden">
-        <item quantity="one">Ukryta nieobsługiwana sieć %s</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other">Ukryte nieobsługiwane sieci %s</item>
+        <item quantity="one">%s nieobsługiwana sieć jest ukryta</item>
+        <item quantity="few">%d nieobsługiwane sieci ukryte</item>
+        <item quantity="many">%d ukrytych sieci nieobsługiwanych</item>
+        <item quantity="other">%d nieobsługiwanych sieci ukrytych</item>
     </plurals>
     <string name="wallet_connect_v2">WalletConnect v2</string>
     <string name="wallet_cross_chain_transfer">Transfer międzyłańcuchowy</string>
