@@ -17,7 +17,7 @@
     <string name="account_add_already_exists_message">La cuenta ya existe. Por favor, prueba con otra.</string>
     <string name="account_add_watch_only_description">Seguir cualquier cartera por su dirección</string>
     <string name="account_add_watch_wallet">Agregar cartera solo-lectura</string>
-    <string name="account_backup_mnemonic_title">Escribe tu Frase De Paso</string>
+    <string name="account_backup_mnemonic_title">Apunta la frase y guárdala en un lugar seguro</string>
     <string name="account_backup_secret_caption">Por favor, asegúrate de anotar tu frase correctamente y de forma legible.</string>
     <string name="account_chain_address_format">dirección %s</string>
     <string name="account_confirm_mnemonic">Confirmar mnemónica</string>

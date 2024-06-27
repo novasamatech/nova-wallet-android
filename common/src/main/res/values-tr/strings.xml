@@ -17,7 +17,7 @@
     <string name="account_add_already_exists_message">Hesap zaten var. Lütfen başka bir tane deneyin.</string>
     <string name="account_add_watch_only_description">Herhangi bir cüzdanı adresi ile takip et</string>
     <string name="account_add_watch_wallet">Yalnızca-izleme cüzdanı ekle</string>
-    <string name="account_backup_mnemonic_title">Parolanızı not edin</string>
+    <string name="account_backup_mnemonic_title">İfadenizi yazın ve güvenli bir yerde saklayın</string>
     <string name="account_backup_secret_caption">Lütfen ifadenizi doğru ve okunaklı bir şekilde yazdığınızdan emin olun.</string>
     <string name="account_chain_address_format">%s adresi</string>
     <string name="account_confirm_mnemonic">Anımsatıcıyı onayla</string>
@@ -435,7 +435,7 @@
     <string name="common_retry_message">Bir şeyler yanlış gitti. Lütfen tekrar deneyin</string>
     <string name="common_revoke">İptal et</string>
     <string name="common_save">Kaydet</string>
-    <string name="common_scan_qr_code"><font>QR kodunu tarayın</font></string>
+    <string name="common_scan_qr_code">QR kodunu tarayın</string>
     <string name="common_search">Arama</string>
     <string name="common_search_placeholder_default">Arama sonuçları burada gösterilecek</string>
     <string name="common_search_results_number">Arama sonuçları: %d</string>
@@ -500,7 +500,7 @@
     <string name="connections_add_connection">Bağlantı ekle</string>
     <string name="contacts_scan">QR kodu tarayın</string>
     <string name="corrupted_backup_error_subtitle">Yedeklemenizde bir sorun tespit edildi. Mevcut yedeklemeyi silip yeni bir tane oluşturma seçeneğiniz var. Devam etmeden önce %s.</string>
-    <string name="corrupted_backup_error_subtitle_highlighted"><font>Tüm cüzdanlar için Şifre Cümlelerini kaydettiğinizden emin olun</font></string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Tüm cüzdanlar için Şifre Cümlelerini kaydettiğinizden emin olun</string>
     <string name="corrupted_backup_error_title">Yedekleme bulundu ancak boş veya bozuk</string>
     <string name="create_cloud_backup_password_alert_subtitle">Gelecekte, yedekleme parolası olmadan Cloud Backup\'tan cüzdanlarınızı geri yüklemek mümkün değildir.\n%s</string>
     <string name="create_cloud_backup_password_alert_subtitle_highlighted">Bu parola kurtarılamaz.</string>
@@ -1237,7 +1237,7 @@
     <string name="staking_rebond_last">En son unstaked</string>
     <string name="staking_recommended_feature_1">En karlı</string>
     <string name="staking_recommended_feature_2">Limit aşmamış</string>
-    <string name="staking_recommended_feature_3"><font>Çevrimiçi kimliğe sahip</font></string>
+    <string name="staking_recommended_feature_3">Çevrimiçi kimliğe sahip</string>
     <string name="staking_recommended_feature_4">Ceza almamış</string>
     <string name="staking_recommended_feature_5">Kimlik başına en fazla 2 doğrulayıcı sınırlaması</string>
     <string name="staking_recommended_filter_identity_subtitle">En az bir kimlik iletişimine sahip</string>
