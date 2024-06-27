@@ -17,7 +17,7 @@
     <string name="account_add_already_exists_message">Account già esistente. Si prega di provare un altro.</string>
     <string name="account_add_watch_only_description">Traccia qualsiasi portafoglio tramite il suo indirizzo</string>
     <string name="account_add_watch_wallet">Aggiungi un portafoglio solo visione</string>
-    <string name="account_backup_mnemonic_title">Scrivi la frase e conservala in un posto sicuro</string>
+    <string name="account_backup_mnemonic_title">Scrivi la tua Passphrase</string>
     <string name="account_backup_secret_caption">Assicurati di scrivere correttamente e in modo leggibile la tua frase.</string>
     <string name="account_chain_address_format">%s indirizzo</string>
     <string name="account_confirm_mnemonic">Conferma mnemonica</string>

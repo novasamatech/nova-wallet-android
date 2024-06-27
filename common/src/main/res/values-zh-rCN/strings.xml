@@ -17,7 +17,7 @@
     <string name="account_add_already_exists_message">账户已存在。请尝试另一个。</string>
     <string name="account_add_watch_only_description">通过其地址跟踪任何钱包</string>
     <string name="account_add_watch_wallet">添加仅观察钱包</string>
-    <string name="account_backup_mnemonic_title">记录该短语并将其存放在安全的地方</string>
+    <string name="account_backup_mnemonic_title">写下你的密码短语</string>
     <string name="account_backup_secret_caption">请确保您的短语正确且清晰地写下。</string>
     <string name="account_chain_address_format">%s地址</string>
     <string name="account_confirm_mnemonic">确认助记词</string>

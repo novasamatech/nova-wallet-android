@@ -17,7 +17,7 @@
     <string name="account_add_already_exists_message">Hesap zaten var. Lütfen başka bir tane deneyin.</string>
     <string name="account_add_watch_only_description">Herhangi bir cüzdanı adresi ile takip et</string>
     <string name="account_add_watch_wallet">Yalnızca-izleme cüzdanı ekle</string>
-    <string name="account_backup_mnemonic_title">İfadenizi yazın ve güvenli bir yerde saklayın</string>
+    <string name="account_backup_mnemonic_title">Parolanızı not edin</string>
     <string name="account_backup_secret_caption">Lütfen ifadenizi doğru ve okunaklı bir şekilde yazdığınızdan emin olun.</string>
     <string name="account_chain_address_format">%s adresi</string>
     <string name="account_confirm_mnemonic">Anımsatıcıyı onayla</string>

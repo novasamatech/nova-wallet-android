@@ -17,7 +17,7 @@
     <string name="account_add_already_exists_message">A conta já existe. Por favor, tente outra.</string>
     <string name="account_add_watch_only_description">Rastreie qualquer carteira pelo seu endereço</string>
     <string name="account_add_watch_wallet">Adicionar carteira apenas para visualização</string>
-    <string name="account_backup_mnemonic_title">Anote a frase e guarde-a em um lugar seguro</string>
+    <string name="account_backup_mnemonic_title">Anote sua Frase de Passagem</string>
     <string name="account_backup_secret_caption">Por favor, certifique-se de que sua frase está escrita de forma correta e legível.</string>
     <string name="account_chain_address_format">Endereço %s</string>
     <string name="account_confirm_mnemonic">Confirmar mnemônica</string>
