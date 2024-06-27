@@ -1,7 +1,9 @@
 name: Run balances tests
 
 on:
-  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */8 * * *'
 
 jobs:
   develop-build:

@@ -85,9 +85,7 @@ class MoonbaseSendIntagrationTest {
         val chain = chainRegistry.getChain("91bc6e169807aaa54802737e1c504b2577d4fafedd5a02c10293b1cd60e39527")
 
         val accountId = chain.accountIdOf("0x0c7485f4AA235347BDE0168A59f6c73C7A42ff2C")
-        val signer = TestSigner { payload ->
-            // You can add any additional test logic here if needed
-        }
+        val signer = TestSigner {_ ->}
 
         val extrinsic = extrinsicBuilderFactory.create(chain, signer, accountId)
             .nativeTransfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), keepAlive = true)
