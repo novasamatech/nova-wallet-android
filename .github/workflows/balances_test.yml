@@ -101,5 +101,7 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
-          message: | 
-            Test message
+          message: |
+            💸 Balances tests failed.
+
+            Results: https://novasamatech.github.io/balances_test_result/${{ github.run_id}}/index.html
