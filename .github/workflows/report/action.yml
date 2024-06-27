@@ -27,7 +27,6 @@ runs:
         allure_results: allure-results
         allure_history: allure-history
         keep_reports: ${{ inputs.keep-reports-history }}
-        subfolder: balances_test_result
         github_repo: balances_test_result
         github_repo_owner: novasamatech
 
@@ -39,4 +38,3 @@ runs:
         publish_branch: gh-pages
         publish_dir: allure-history
         external_repository: novasamatech/balances_test_result
-        destination_dir: balances_test_result
