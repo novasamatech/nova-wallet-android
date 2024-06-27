@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -82,7 +83,7 @@ class CustomNodeViewModel(
             )
 
             validationExecutor.requireValid(
-                validationSystem = customNodeInteractor.getValidationSystem(),
+                validationSystem = customNodeInteractor.getValidationSystem(viewModelScope),
                 payload = payload,
                 progressConsumer = saveProgressFlow.progressConsumer(),
                 validationFailureTransformerCustom = { status, actions -> mapSaveCustomNodeFailureToUI(resourceManager, status) }
@@ -99,7 +100,7 @@ class CustomNodeViewModel(
             when (payload.mode) {
                 CustomNodePayload.Mode.Add -> customNodeInteractor.createNode(payload.chainId, nodeUrlInput.value, nodeNameInput.value)
 
-                is CustomNodePayload.Mode.Edit -> customNodeInteractor.saveNode(payload.chainId, payload.mode.url, nodeUrlInput.value, nodeNameInput.value)
+                is CustomNodePayload.Mode.Edit -> customNodeInteractor.updateNode(payload.chainId, payload.mode.url, nodeUrlInput.value, nodeNameInput.value)
             }
 
             router.back()

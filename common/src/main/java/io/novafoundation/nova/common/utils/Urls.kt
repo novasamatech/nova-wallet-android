@@ -19,9 +19,9 @@ object Urls {
     }
 
     fun normalizePath(url: String): String {
-        val path = if (url.endsWith('/')) url.substring(0, url.length - 1) else url
-
-        return URI.create(path).normalize().toString()
+        return url.removeSuffix("/").let {
+            URI.create(it).normalize().toString()
+        }
     }
 
     fun hostOf(url: String): String {

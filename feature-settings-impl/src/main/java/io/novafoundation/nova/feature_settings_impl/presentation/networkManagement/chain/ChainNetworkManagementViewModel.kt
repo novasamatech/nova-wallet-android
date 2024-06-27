@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -26,7 +27,7 @@ class ChainNetworkManagementViewModel(
     private val payload: ChainNetworkManagementPayload
 ) : BaseViewModel() {
 
-    private val chainNetworkStateFlow = networkManagementChainInteractor.chainStateFlow(payload.chainId)
+    private val chainNetworkStateFlow = networkManagementChainInteractor.chainStateFlow(payload.chainId, viewModelScope)
         .shareInBackground()
 
     val isNetworkCanBeDisabled: Flow<Boolean> = chainNetworkStateFlow.map { it.networkCanBeDisabled }

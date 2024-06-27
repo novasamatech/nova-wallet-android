@@ -13,6 +13,7 @@ import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 import java.math.BigInteger
+import kotlinx.coroutines.CoroutineScope
 
 interface NodeChainIdRepository {
 
@@ -24,8 +25,8 @@ class NodeChainIdRepositoryFactory(
     private val web3ApiFactory: Web3ApiFactory
 ) {
 
-    fun create(chain: Chain, nodeUrl: String): NodeChainIdRepository {
-        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl)
+    fun create(chain: Chain, nodeUrl: String, coroutineScope: CoroutineScope): NodeChainIdRepository {
+        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
 
         return when (chain.hasSubstrateRuntime) {
             true -> SubstrateNodeChainIdRepository(nodeConnection)

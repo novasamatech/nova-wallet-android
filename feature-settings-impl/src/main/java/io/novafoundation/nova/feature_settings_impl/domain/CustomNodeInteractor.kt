@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_settings_impl.domain.validation.validateNo
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import kotlinx.coroutines.CoroutineScope
 
 interface CustomNodeInteractor {
 
@@ -15,15 +16,15 @@ interface CustomNodeInteractor {
 
     suspend fun createNode(chainId: String, url: String, name: String)
 
-    suspend fun saveNode(chainId: String, oldUrl: String, url: String, name: String)
+    suspend fun updateNode(chainId: String, oldUrl: String, url: String, name: String)
 
-    fun getValidationSystem(): NetworkNodeValidationSystem
+    fun getValidationSystem(coroutineScope: CoroutineScope): NetworkNodeValidationSystem
 }
 
 class RealCustomNodeInteractor(
     private val chainRegistry: ChainRegistry,
     private val chainNodeRepository: ChainNodeRepository,
-    private val nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory
+    private val nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory,
 ) : CustomNodeInteractor {
 
     override suspend fun getNodeDetails(chainId: String, nodeUrl: String): Result<Chain.Node> {
@@ -38,15 +39,15 @@ class RealCustomNodeInteractor(
         chainNodeRepository.createChainNode(chainId, url, name)
     }
 
-    override suspend fun saveNode(chainId: String, oldUrl: String, url: String, name: String) {
+    override suspend fun updateNode(chainId: String, oldUrl: String, url: String, name: String) {
         chainNodeRepository.saveChainNode(chainId, oldUrl, url, name)
     }
 
-    override fun getValidationSystem(): NetworkNodeValidationSystem {
+    override fun getValidationSystem(coroutineScope: CoroutineScope): NetworkNodeValidationSystem {
         return ValidationSystem {
             validateNodeNotAdded()
 
-            validNodeUrl(nodeChainIdRepositoryFactory)
+            validNodeUrl(nodeChainIdRepositoryFactory, coroutineScope)
         }
     }
 }
