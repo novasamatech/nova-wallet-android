@@ -65,7 +65,7 @@ class PreferencesImpl(
 
     override fun getCurrentLanguage(): Language? {
         return if (sharedPreferences.contains(PREFS_SELECTED_LANGUAGE)) {
-            Language(sharedPreferences.getString(PREFS_SELECTED_LANGUAGE, "")!!)
+            Language(iso639Code = sharedPreferences.getString(PREFS_SELECTED_LANGUAGE, "")!!)
         } else {
             null
         }

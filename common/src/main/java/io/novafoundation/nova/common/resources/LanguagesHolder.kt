@@ -8,15 +8,15 @@ class LanguagesHolder {
 
     companion object {
 
-        private val ENGLISH = Language("en")
-        private val CHINESE = Language("zh")
-        private val ITALIAN = Language("it")
-        private val PORTUGUESE = Language("pt")
-        private val RUSSIAN = Language("ru")
-        private val SPANISH = Language("es")
-        private val TURKISH = Language("tr")
+        private val ENGLISH = Language("en", "ENGLISH")
+        private val CHINESE = Language("zh", "CHINESE")
+        private val ITALIAN = Language("it", "ITALIAN")
+        private val PORTUGUESE = Language("pt", "PORTUGUESE")
+        private val RUSSIAN = Language("ru", "RUSSIAN")
+        private val SPANISH = Language("es", "SPANISH")
+        private val TURKISH = Language("tr", "TURKISH")
+        private val INDONESIAN = Language("in", "INDONESIAN")
 
-        private val availableLanguages = mutableListOf(ENGLISH, CHINESE, ITALIAN, PORTUGUESE, RUSSIAN, SPANISH, TURKISH)
     }
 
     fun getDefaultLanguage(): Language {
@@ -24,6 +24,8 @@ class LanguagesHolder {
     }
 
     fun getLanguages(): List<Language> {
-        return availableLanguages
+        val defaultLanguage = listOf(getDefaultLanguage())
+        val otherLanguages = listOf(CHINESE, ITALIAN, PORTUGUESE, RUSSIAN, SPANISH, TURKISH, INDONESIAN)
+        return defaultLanguage + otherLanguages.sortedBy { it.name }
     }
 }
