@@ -129,6 +129,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
@@ -178,7 +179,8 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         StakingDashboardItemLocal::class,
         StakingRewardPeriodLocal::class,
         ExternalBalanceLocal::class,
-        ProxyAccountLocal::class
+        ProxyAccountLocal::class,
+        NodeSelectionPreferencesLocal::class
     ],
 )
 @TypeConverters(

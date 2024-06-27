@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.domain
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.autoBalanceDisabled
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.ext.isEnabled
@@ -47,8 +48,6 @@ interface NetworkManagementChainInteractor {
     suspend fun selectNode(chainId: String, nodeUrl: String)
 
     suspend fun toggleChainEnableState(chainId: String)
-
-    fun testNode(node: Chain.Node): Chain.Node
 }
 
 class RealNetworkManagementChainInteractor(
@@ -68,13 +67,7 @@ class RealNetworkManagementChainInteractor(
 
     override suspend fun toggleAutoBalance(chainId: String) {
         val chain = chainRegistry.getChain(chainId)
-        val autoBalanceDisabled = !chain.autoBalanceEnabled
-        chainRegistry.setAutoBalanceEnabled(chainId, autoBalanceDisabled)
-
-        // If we disable autobalance we need to remove default node
-        if (autoBalanceDisabled) {
-            chainRegistry.setDefaultNode(chainId, null)
-        }
+        chainRegistry.setAutoBalanceEnabled(chainId, chain.autoBalanceDisabled)
     }
 
     override suspend fun selectNode(chainId: String, nodeUrl: String) {
@@ -119,9 +112,5 @@ class RealNetworkManagementChainInteractor(
                 emit(NodeHealthState(node, NodeHealthState.State.Connected(it)))
             }
         }
-    }
-
-    override fun testNode(node: Chain.Node): Chain.Node {
-        return node
     }
 }

@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodeRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodesAddCustomRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
+import io.novafoundation.nova.runtime.ext.autoBalanceEnabled
 import io.novafoundation.nova.runtime.ext.isEnabled
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

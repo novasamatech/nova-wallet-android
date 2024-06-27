@@ -8,6 +8,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrl
 import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b128Concat
 import io.novasama.substrate_sdk_android.hash.Hasher.xxHash128
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.interceptor.WebSocketResponseInterceptor
@@ -48,7 +49,7 @@ class SubstrateNodeHealthStateTester(
     }
 
     private fun systemAccountStorageKey(): ByteArray {
-        return "System".toByteArray().xxHash128() + "Account".toByteArray().xxHash128() + chain.emptyAccountId()
+        return "System".toByteArray().xxHash128() + "Account".toByteArray().xxHash128() + chain.emptyAccountId().blake2b128Concat()
     }
 
     override fun onRpcResponseReceived(rpcResponse: RpcResponse): WebSocketResponseInterceptor.ResponseDelivery {

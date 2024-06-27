@@ -7,6 +7,9 @@ class JoinedChainInfo(
     @Embedded
     val chain: ChainLocal,
 
+    @Relation(parentColumn = "id", entityColumn = "chainId", entity = NodeSelectionPreferencesLocal::class)
+    val nodeSelectionPreferences: NodeSelectionPreferencesLocal?,
+
     @Relation(parentColumn = "id", entityColumn = "chainId", entity = ChainNodeLocal::class)
     val nodes: List<ChainNodeLocal>,
 

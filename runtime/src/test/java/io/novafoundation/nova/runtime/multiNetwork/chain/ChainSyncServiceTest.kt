@@ -122,7 +122,8 @@ class ChainSyncServiceTest {
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
                 explorersDiff = insertsExplorerByName(explorerName),
-                externalApisDiff = insertsTransferApiByUrl(transferApiUrl)
+                externalApisDiff = insertsTransferApiByUrl(transferApiUrl),
+                nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
             )
         }
     }
@@ -135,7 +136,14 @@ class ChainSyncServiceTest {
 
             chainSyncService.syncUp()
 
-            verify(dao).applyDiff(emptyDiff(), emptyDiff(), emptyDiff(), emptyDiff(), emptyDiff())
+            verify(dao).applyDiff(
+                emptyDiff(),
+                emptyDiff(),
+                emptyDiff(),
+                emptyDiff(),
+                emptyDiff(),
+                nodeSelectionPreferencesDiff
+            )
         }
     }
 
@@ -152,7 +160,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
             )
         }
     }
@@ -179,7 +188,8 @@ class ChainSyncServiceTest {
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
             )
         }
     }
@@ -206,7 +216,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
             )
         }
     }
@@ -233,7 +244,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = insertsExplorerByName(explorerName),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
             )
         }
     }
@@ -266,7 +278,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = insertsTransferApiByUrl(anotherUrl)
+                externalApisDiff = insertsTransferApiByUrl(anotherUrl),
+                nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
             )
         }
     }
@@ -285,7 +298,8 @@ class ChainSyncServiceTest {
                 assetsDiff = removesAssetWithId(assetId),
                 nodesDiff = removesNodeWithUrl(nodeUrl),
                 explorersDiff = removesExplorerByName(explorerName),
-                externalApisDiff = removesTransferApiByUrl(transferApiUrl)
+                externalApisDiff = removesTransferApiByUrl(transferApiUrl),
+                nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
             )
         }
     }

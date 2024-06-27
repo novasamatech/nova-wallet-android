@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.ext.fullId
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapExternalApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
@@ -55,13 +56,25 @@ class ChainSyncService(
         val nodesDiff = CollectionDiffer.findDiff(newNodes, oldNodes, forceUseNewItems = false)
         val explorersDiff = CollectionDiffer.findDiff(newExplorers, oldExplorers, forceUseNewItems = false)
         val externalApisDiff = CollectionDiffer.findDiff(newExternalApis, oldExternalApis, forceUseNewItems = false)
+        val nodeSelectionPreferencesDiff = CollectionDiffer.Diff.added(nodeSelectionPreferencesFor(chainsDiff.added))
 
         chainDao.applyDiff(
             chainDiff = chainsDiff,
             assetsDiff = assetDiff,
             nodesDiff = nodesDiff,
             explorersDiff = explorersDiff,
-            externalApisDiff = externalApisDiff
+            externalApisDiff = externalApisDiff,
+            nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
         )
+    }
+
+    private fun nodeSelectionPreferencesFor(chains: List<ChainLocal>): List<NodeSelectionPreferencesLocal> {
+        return chains.map {
+            NodeSelectionPreferencesLocal(
+                chainId = it.id,
+                autoBalanceEnabled = NodeSelectionPreferencesLocal.DEFAULT_AUTO_BALANCE_DEFAULT_BOOLEAN,
+                selectedNodeUrl = null
+            )
+        }
     }
 }

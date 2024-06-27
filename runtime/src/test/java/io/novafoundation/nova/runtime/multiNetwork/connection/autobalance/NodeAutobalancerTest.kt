@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.RoundRobinStrategy
 import io.novafoundation.nova.test_shared.CoroutineTest
 import io.novafoundation.nova.test_shared.any
@@ -29,7 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class NodeAutobalancerTest : CoroutineTest() {
 
     @Mock
-    lateinit var strategyProvider: AutoBalanceStrategyProvider
+    lateinit var strategyProvider: NodeSelectionStrategyProvider
 
     lateinit var autobalancer: NodeAutobalancer
 
