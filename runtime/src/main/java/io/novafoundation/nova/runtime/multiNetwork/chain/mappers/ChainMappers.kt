@@ -20,6 +20,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLoca
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -251,11 +252,17 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
     }
 }.getOrNull()
 
-private fun mapNodeSelectionFromLocal(local: NodeSelectionStrategyLocal): NodeSelectionStrategy {
-    return when (local) {
-        NodeSelectionStrategyLocal.ROUND_ROBIN -> NodeSelectionStrategy.ROUND_ROBIN
-        NodeSelectionStrategyLocal.UNIFORM -> NodeSelectionStrategy.UNIFORM
-        NodeSelectionStrategyLocal.UNKNOWN -> NodeSelectionStrategy.ROUND_ROBIN
+private fun mapNodeSelectionFromLocal(chainLocal: ChainLocal, nodeSelectionPreferencesLocal: NodeSelectionPreferencesLocal?): NodeSelectionStrategy {
+    val autoBalanceStrategy = when (chainLocal.nodeSelectionStrategy) {
+        NodeSelectionStrategyLocal.ROUND_ROBIN -> NodeSelectionStrategy.AutoBalance.ROUND_ROBIN
+        NodeSelectionStrategyLocal.UNIFORM -> NodeSelectionStrategy.AutoBalance.UNIFORM
+        NodeSelectionStrategyLocal.UNKNOWN -> NodeSelectionStrategy.AutoBalance.ROUND_ROBIN
+    }
+
+    return if (nodeSelectionPreferencesLocal?.autoBalanceEnabled == true) {
+        autoBalanceStrategy
+    } else {
+        NodeSelectionStrategy.SelectedNode(nodeSelectionPreferencesLocal?.selectedNodeUrl, autoBalanceStrategy)
     }
 }
 
@@ -271,7 +278,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     }
 
     val nodesConfig = Chain.Nodes(
-        nodeSelectionStrategy = mapNodeSelectionFromLocal(chainLocal.chain.nodeSelectionStrategy),
+        nodeSelectionStrategy = mapNodeSelectionFromLocal(chainLocal.chain, chainLocal.nodeSelectionPreferences),
         nodes = nodes
     )
 
@@ -324,9 +331,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             swap = mapSwapListFromLocal(swap),
             connectionState = mapConnectionStateFromLocal(connectionState),
             additional = additional,
-            source = mapSourceFromLocal(source),
-            autoBalanceEnabled = autoBalanceEnabled,
-            defaultNodeUrl = defaultNodeUrl,
+            source = mapSourceFromLocal(source)
         )
     }
 }

@@ -37,9 +37,7 @@ data class Chain(
     val swap: List<Swap>,
     val connectionState: ConnectionState,
     val parentId: String?,
-    val additional: Additional?,
-    val autoBalanceEnabled: Boolean,
-    val defaultNodeUrl: String?
+    val additional: Additional?
 ) : Identifiable {
 
     companion object // extensions
@@ -124,8 +122,13 @@ data class Chain(
         val nodes: List<Node>,
     ) {
 
-        enum class NodeSelectionStrategy {
-            ROUND_ROBIN, UNIFORM
+        sealed interface NodeSelectionStrategy {
+
+            enum class AutoBalance : NodeSelectionStrategy {
+                ROUND_ROBIN, UNIFORM
+            }
+
+            class SelectedNode(val nodeUrl: String?, val autoBalanceStrategy: AutoBalance) : NodeSelectionStrategy
         }
     }
 

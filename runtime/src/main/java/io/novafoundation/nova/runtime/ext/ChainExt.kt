@@ -41,6 +41,12 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 
+val Chain.autoBalanceEnabled: Boolean
+    get() = nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
+
+val Chain.autoBalanceDisabled: Boolean
+    get() = !autoBalanceEnabled
+
 val Chain.isCustomNetwork: Boolean
     get() = source == Chain.Source.CUSTOM
 

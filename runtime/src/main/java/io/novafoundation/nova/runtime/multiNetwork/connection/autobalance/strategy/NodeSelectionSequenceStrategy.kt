@@ -2,11 +2,11 @@ package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strat
 
 import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 
-interface AutoBalanceStrategy {
+interface NodeSelectionSequenceStrategy {
 
     fun generateNodeSequence(defaultNodes: List<NodeWithSaturatedUrl>): Sequence<NodeWithSaturatedUrl>
 }
 
-fun AutoBalanceStrategy.generateNodeIterator(defaultNodes: List<NodeWithSaturatedUrl>): Iterator<NodeWithSaturatedUrl> {
+fun NodeSelectionSequenceStrategy.generateNodeIterator(defaultNodes: List<NodeWithSaturatedUrl>): Iterator<NodeWithSaturatedUrl> {
     return generateNodeSequence(defaultNodes).iterator()
 }

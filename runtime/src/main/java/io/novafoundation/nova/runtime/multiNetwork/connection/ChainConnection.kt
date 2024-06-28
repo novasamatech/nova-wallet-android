@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
@@ -111,18 +110,7 @@ class ChainConnection internal constructor(
     }
 
     private fun getNodeUrlFlow(chain: Chain): Flow<NodeWithSaturatedUrl?> {
-        return if (chain.autoBalanceEnabled) {
-            getAutobalancedNodeUrlFlow(chain)
-        } else {
-            val node = chain.nodes.nodes.firstOrNull { it.unformattedUrl == chain.defaultNodeUrl }
-                ?.saturateNodeUrl(connectionSecrets)
-
-            if (node == null) {
-                getAutobalancedNodeUrlFlow(chain)
-            } else {
-                flowOf { node }
-            }
-        }
+        return getAutobalancedNodeUrlFlow(chain)
     }
 
     private fun getAutobalancedNodeUrlFlow(chain: Chain): Flow<NodeWithSaturatedUrl?> {

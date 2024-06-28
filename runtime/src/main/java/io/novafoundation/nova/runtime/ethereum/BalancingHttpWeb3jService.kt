@@ -9,8 +9,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategy
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionSequenceStrategy
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.generateNodeIterator
 import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrls
 import io.reactivex.Flowable
@@ -37,7 +37,7 @@ class BalancingHttpWeb3jService(
     initialNodes: Chain.Nodes,
     connectionSecrets: ConnectionSecrets,
     private val httpClient: OkHttpClient,
-    private val strategyProvider: AutoBalanceStrategyProvider,
+    private val strategyProvider: NodeSelectionStrategyProvider,
     private val objectMapper: ObjectMapper = ObjectMapperFactory.getObjectMapper(),
     private val executorService: ExecutorService,
 ) : Web3jService, UpdatableNodes {
@@ -246,7 +246,7 @@ class BalancingHttpWeb3jService(
 
 private class NodeSwitcher(
     initialNodes: List<Chain.Node>,
-    initialStrategy: AutoBalanceStrategy,
+    initialStrategy: NodeSelectionSequenceStrategy,
     private val connectionSecrets: ConnectionSecrets,
 ) {
 
@@ -254,7 +254,7 @@ private class NodeSwitcher(
     private var availableNodes: List<Chain.Node> = initialNodes
 
     @Volatile
-    private var balanceStrategy: AutoBalanceStrategy = initialStrategy
+    private var balanceStrategy: NodeSelectionSequenceStrategy = initialStrategy
 
     @Volatile
     private var nodeIterator: Iterator<NodeWithSaturatedUrl>? = null
@@ -267,7 +267,7 @@ private class NodeSwitcher(
     }
 
     @Synchronized
-    fun updateNodes(nodes: List<Chain.Node>, strategy: AutoBalanceStrategy) {
+    fun updateNodes(nodes: List<Chain.Node>, strategy: NodeSelectionSequenceStrategy) {
         val saturatedNodes = nodes.saturateNodeUrls(connectionSecrets)
         if (saturatedNodes.isEmpty()) return
 

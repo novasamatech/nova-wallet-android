@@ -24,9 +24,6 @@ import kotlinx.android.synthetic.main.item_chan_network_management_node.view.cha
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeRadioButton
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeSocketAddress
 
-private const val VIEW_TYPE_NODE = 0
-private const val VIEW_TYPE_ADD_CUSTOM = 1
-
 class ChainNetworkManagementNodesAdapter(
     private val itemHandler: ItemHandler
 ) : ListAdapter<NetworkConnectionRvItem, ViewHolder>(DiffCallback()) {
@@ -42,10 +39,10 @@ class ChainNetworkManagementNodesAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_NODE -> ChainNetworkManagementNodeViewHolder(parent.inflateChild(R.layout.item_chan_network_management_node), itemHandler)
+            R.layout.item_chan_network_management_node -> ChainNetworkManagementNodeViewHolder(parent.inflateChild(viewType), itemHandler)
 
-            VIEW_TYPE_ADD_CUSTOM -> ChainNetworkManagementAddNodeButtonViewHolder(
-                parent.inflateChild(R.layout.item_chan_network_management_add_node_button),
+            R.layout.item_chan_network_management_add_node_button -> ChainNetworkManagementAddNodeButtonViewHolder(
+                parent.inflateChild(viewType),
                 itemHandler
             )
 
@@ -61,8 +58,8 @@ class ChainNetworkManagementNodesAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is NetworkNodeRvItem -> VIEW_TYPE_NODE
-            is NetworkNodesAddCustomRvItem -> VIEW_TYPE_ADD_CUSTOM
+            is NetworkNodeRvItem -> R.layout.item_chan_network_management_node
+            is NetworkNodesAddCustomRvItem -> R.layout.item_chan_network_management_add_node_button
             else -> throw IllegalArgumentException("Unknown item type")
         }
     }
