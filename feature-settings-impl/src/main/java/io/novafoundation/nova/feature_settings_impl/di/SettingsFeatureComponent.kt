@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di.CloudBackupSettingsComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.di.ChainNetworkManagementComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.defaultNetworks.di.ExistingNetworkListComponent
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks.di.PreConfiguredNetworksComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.di.CustomNodeComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
@@ -46,6 +47,8 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
     fun addedNetworkListFactory(): AddedNetworkListComponent.Factory
 
     fun existingNetworkListFactory(): ExistingNetworkListComponent.Factory
+
+    fun preConfiguredNetworks(): PreConfiguredNetworksComponent.Factory
 
     fun backupSettings(): CloudBackupSettingsComponent.Factory
 

@@ -5,25 +5,25 @@ import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkState
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.common.ConnectionStateModel
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.items.NetworkListNetworkRvItem
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkListRvItem
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 
 interface NetworkListAdapterItemFactory {
 
-    fun getNetworkItem(network: NetworkState): NetworkListNetworkRvItem
+    fun getNetworkItem(network: NetworkState): NetworkListRvItem
 }
 
 class RealNetworkListAdapterItemFactory(
     private val resourceManager: ResourceManager
 ) : NetworkListAdapterItemFactory {
 
-    override fun getNetworkItem(network: NetworkState): NetworkListNetworkRvItem {
+    override fun getNetworkItem(network: NetworkState): NetworkListRvItem {
         val chain = network.chain
         val subtitle = if (chain.isDisabled) resourceManager.getString(R.string.common_disabled) else null
         val label = getChainLabel(chain)
-        return NetworkListNetworkRvItem(
+        return NetworkListRvItem(
             chainIcon = chain.icon.asIcon(),
             chainId = chain.id,
             title = chain.name,

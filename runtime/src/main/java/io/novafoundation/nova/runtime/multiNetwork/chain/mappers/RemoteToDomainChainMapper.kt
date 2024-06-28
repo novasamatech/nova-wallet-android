@@ -15,8 +15,10 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrate
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.LightChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
+import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.LightChainRemote
 
 private const val ETHEREUM_OPTION = "ethereumBased"
 private const val CROWDLOAN_OPTION = "crowdloans"
@@ -37,14 +39,17 @@ private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
 private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
 private const val IDENTITY_CHAIN = "identityChain"
 
-fun mapRemoteChainToLocal(
-    chainRemote: ChainRemote,
-    oldChain: ChainLocal?,
-    source: ChainLocal.Source,
-    gson: Gson
-): ChainLocal {
+fun mapRemoteLightChainToDomain(model: LightChainRemote): LightChain {
+    return LightChain(
+        id = model.chainId,
+        name = model.name,
+        icon = model.icon
+    )
+}
+
+fun mapRemoteChainToDomain(chainRemote: ChainRemote, source: ChainLocal.Source): Chain {
     val types = chainRemote.types?.let {
-        ChainLocal.TypesConfig(
+        Chain.Types(
             url = it.url.orEmpty(),
             overridesCommon = it.overridesCommon
         )
@@ -63,16 +68,16 @@ fun mapRemoteChainToLocal(
         )
     }
 
-    val chainLocal = with(chainRemote) {
+    val chain = with(chainRemote) {
         val optionsOrEmpty = options.orEmpty()
 
-        ChainLocal(
+        Chain(
             id = chainId,
             parentId = parentId,
             name = name,
             types = types,
-            icon = icon ?: "", // We put empty string to avoid nulls in the database
-            prefix = addressPrefix,
+            icon = icon ?: "",
+            addressPrefix = addressPrefix,
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
@@ -82,15 +87,15 @@ fun mapRemoteChainToLocal(
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             swap = mapSwapRemoteOptionsToLocal(optionsOrEmpty),
             connectionState = determineConnectionState(chainRemote, oldChain),
-            additional = gson.toJson(additional),
+            additional = additional,
             nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy),
             source = source,
-            autoBalanceEnabled = oldChain?.autoBalanceEnabled ?: true,
-            defaultNodeUrl = oldChain?.defaultNodeUrl
+            autoBalanceEnabled = true,
+            defaultNodeUrl = null
         )
     }
 
-    return chainLocal
+    return chain
 }
 
 private fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal {

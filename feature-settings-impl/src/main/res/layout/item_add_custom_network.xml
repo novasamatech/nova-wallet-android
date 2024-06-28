@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginVertical="12dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/bg_add_custom_network"
+        android:padding="4dp"
+        android:src="@drawable/ic_add"
+        app:tint="@color/icon_accent" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="@string/pre_configured_networks_add_custom_button"
+        android:textColor="@color/button_text_accent" />
+
+</LinearLayout>

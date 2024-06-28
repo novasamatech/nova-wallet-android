@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementPayload
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.items.NetworkListRvItem
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkListRvItem
 import kotlinx.coroutines.flow.Flow
 
 abstract class NetworkListViewModel(

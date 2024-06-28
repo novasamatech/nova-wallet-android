@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="pre_configured_networks_search_hint">Search by network name</string>
+    <string name="pre_configured_networks_progress_text">Loading networks list...</string>
+    <string name="pre_configured_networks_title">Add network</string>
+    <string name="pre_configured_networks_add_custom_button">Add network manually</string>
+
     <string name="node_already_exist_failure_title">This Node already exists</string>
     <string name="node_already_exist_failure_message">The URL you entered already exists as the "%s" Node.</string>
 
