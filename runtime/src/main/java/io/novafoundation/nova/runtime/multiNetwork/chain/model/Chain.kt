@@ -122,8 +122,13 @@ data class Chain(
         val nodes: List<Node>,
     ) {
 
-        enum class NodeSelectionStrategy {
-            ROUND_ROBIN, UNIFORM
+        sealed interface NodeSelectionStrategy {
+
+            enum class AutoBalance : NodeSelectionStrategy {
+                ROUND_ROBIN, UNIFORM
+            }
+
+            class SelectedNode(val nodeUrl: String?, val autoBalanceStrategy: AutoBalance) : NodeSelectionStrategy
         }
     }
 
@@ -132,6 +137,7 @@ data class Chain(
         val unformattedUrl: String,
         val name: String,
         val orderId: Int,
+        val isCustom: Boolean
     ) : Identifiable {
 
         enum class ConnectionType {

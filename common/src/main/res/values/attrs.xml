@@ -319,6 +319,7 @@
     <declare-styleable name="SettingsSwitcherView">
         <attr name="title" />
         <attr name="icon" />
+        <attr name="switcherTextColor" />
     </declare-styleable>
 
     <declare-styleable name="WarningCheckBox">

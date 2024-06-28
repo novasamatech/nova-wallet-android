@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.mapList
@@ -19,9 +18,8 @@ class AddedNetworkListViewModel(
     private val networkManagementInteractor: NetworkManagementInteractor,
     private val networkListAdapterItemFactory: NetworkListAdapterItemFactory,
     private val appLinksProvider: AppLinksProvider,
-    private val router: SettingsRouter,
-    resourceManager: ResourceManager,
-) : NetworkListViewModel(), Browserable {
+    router: SettingsRouter
+) : NetworkListViewModel(router), Browserable {
 
     private val networks = networkManagementInteractor.addedNetworksFlow()
         .shareInBackground()

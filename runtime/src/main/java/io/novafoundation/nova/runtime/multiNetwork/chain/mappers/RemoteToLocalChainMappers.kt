@@ -160,7 +160,8 @@ fun mapRemoteNodesToLocal(chainRemote: ChainRemote): List<ChainNodeLocal> {
             url = chainNodeRemote.url,
             name = chainNodeRemote.name,
             chainId = chainRemote.chainId,
-            orderId = index
+            orderId = index,
+            source = ChainNodeLocal.Source.DEFAULT
         )
     }
 }

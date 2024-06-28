@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 
-class NetworkManagementViewModel(
+class NetworkManagementListViewModel(
     private val router: SettingsRouter,
     private val resourceManager: ResourceManager,
 ) : BaseViewModel() {

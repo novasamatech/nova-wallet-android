@@ -7,10 +7,26 @@
 
     <fragment
         android:id="@+id/networkManagement"
-        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementFragment"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementListFragment"
         android:label="NetworkManagementFragment"
         tools:layout="@layout/fragment_network_management">
 
+        <action
+            android:id="@+id/action_open_networkManagementDetails"
+            app:destination="@id/networkManagementDetails"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
+    <fragment
+        android:id="@+id/networkManagementDetails"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementFragment"
+        android:label="ChainNetworkManagementFragment"
+        tools:layout="@layout/fragment_chain_network_management">
+
+
+    </fragment>
 </navigation>

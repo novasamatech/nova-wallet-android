@@ -73,7 +73,7 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao) {
             nodesDiff = CollectionDiffer.Diff(
                 added = emptyList(),
                 updated = emptyList(),
-                removed = chainInfo.nodes.takeLast(1)
+                removed = chainInfo.nodes.takeLast(1),
             ),
             explorersDiff = emptyDiff()
         )

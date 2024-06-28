@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_network_management.networkManagem
 import kotlinx.android.synthetic.main.fragment_network_management.networkManagementToolbar
 import kotlinx.android.synthetic.main.fragment_network_management.networkManagementViewPager
 
-class NetworkManagementFragment : BaseFragment<NetworkManagementViewModel>() {
+class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewModel>() {
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { NetworkManagementPagerAdapter(this) }
 
@@ -30,7 +30,7 @@ class NetworkManagementFragment : BaseFragment<NetworkManagementViewModel>() {
     override fun initViews() {
         networkManagementToolbar.applyStatusBarInsets()
         networkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
-        networkManagementViewPager.adapter = adapter
+        networkManagementViewPager.adapter = NetworkManagementPagerAdapter(this)
         networkManagementTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
     }
 
@@ -39,11 +39,11 @@ class NetworkManagementFragment : BaseFragment<NetworkManagementViewModel>() {
             requireContext(),
             SettingsFeatureApi::class.java
         )
-            .networkManagementFactory()
+            .networkManagementListFactory()
             .create(this)
             .inject(this)
     }
 
-    override fun subscribe(viewModel: NetworkManagementViewModel) {
+    override fun subscribe(viewModel: NetworkManagementListViewModel) {
     }
 }

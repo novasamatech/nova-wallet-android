@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp">
+
+    <ImageView
+        android:id="@+id/chainNetworkManagementIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="#fff" />
+
+    <TextView
+        android:id="@+id/chainNetworkManagementTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toBottomOf="@+id/chainNetworkManagementIcon"
+        app:layout_constraintStart_toEndOf="@+id/chainNetworkManagementIcon"
+        app:layout_constraintTop_toTopOf="@+id/chainNetworkManagementIcon"
+        tools:text="Polkadot" />
+
+    <io.novafoundation.nova.common.view.settings.SettingsGroupView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@+id/chainNetworkManagementIcon">
+
+        <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+            android:id="@+id/chainNetworkManagementEnable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:switcherTextColor="@color/button_text"
+            app:title="Enable connection" />
+
+        <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+            android:id="@+id/chainNetworkManagementAutoBalance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Auto-balance nodes" />
+
+    </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkState
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.items.NetworkListNetworkRvItem
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -41,17 +42,18 @@ class RealNetworkListAdapterItemFactory(
         }
     }
 
-    private fun getConnectingState(network: NetworkState): NetworkListNetworkRvItem.ConnectionStateModel? {
+    private fun getConnectingState(network: NetworkState): ConnectionStateModel? {
         if (network.chain.isDisabled) return null
 
         return when (network.connectionState) {
             is SocketStateMachine.State.Connected -> null
 
-            else -> NetworkListNetworkRvItem.ConnectionStateModel(
+            else -> ConnectionStateModel(
                 name = resourceManager.getString(R.string.common_connecting),
                 chainStatusColor = resourceManager.getColor(R.color.text_primary),
-                chainStatusIcon = R.drawable.ic_connection_status,
-                chainStatusIconColor = resourceManager.getColor(R.color.icon_primary)
+                chainStatusIcon = R.drawable.ic_connection_status_connecting,
+                chainStatusIconColor = resourceManager.getColor(R.color.icon_primary),
+                showShimmering = true
             )
         }
     }

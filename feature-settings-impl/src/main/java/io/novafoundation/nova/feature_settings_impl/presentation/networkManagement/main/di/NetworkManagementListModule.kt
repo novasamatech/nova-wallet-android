@@ -10,26 +10,26 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementViewModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementListViewModel
 
 @Module(includes = [ViewModelModule::class])
-class NetworkManagementModule {
+class NetworkManagementListModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(NetworkManagementViewModel::class)
+    @ViewModelKey(NetworkManagementListViewModel::class)
     fun provideViewModel(
         router: SettingsRouter,
         resourceManager: ResourceManager
     ): ViewModel {
-        return NetworkManagementViewModel(
+        return NetworkManagementListViewModel(
             router,
             resourceManager
         )
     }
 
     @Provides
-    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): NetworkManagementViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(NetworkManagementViewModel::class.java)
+    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): NetworkManagementListViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(NetworkManagementListViewModel::class.java)
     }
 }

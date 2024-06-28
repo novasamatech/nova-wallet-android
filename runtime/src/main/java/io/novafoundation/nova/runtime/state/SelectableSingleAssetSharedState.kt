@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.formatting.Formatable
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -55,6 +56,7 @@ abstract class SelectableSingleAssetSharedState<A : SelectableAssetAdditionalDat
 
     suspend fun availableToSelect(): List<SupportedAssetOption<A>> {
         val allChains = chainRegistry.currentChains.first()
+            .filter { it.isEnabled }
 
         return allChains.flatMap { chain ->
             chain.assets.flatMap { chainAsset ->

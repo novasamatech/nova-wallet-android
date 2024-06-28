@@ -274,8 +274,12 @@ fun ScrollView.scrollOnFocusTo(vararg focusableTargets: View) {
     focusableTargets.forEach { it.onFocusChangeListener = listener }
 }
 
-fun TextView.setCompoundDrawableTint(@ColorRes tintRes: Int?) {
-    val colorStateList = tintRes?.let { ColorStateList.valueOf(context.getColor(tintRes)) }
+fun TextView.setCompoundDrawableTintRes(@ColorRes tintRes: Int?) {
+    setCompoundDrawableTint(tintRes?.let { context.getColor(it) })
+}
+
+fun TextView.setCompoundDrawableTint(@ColorInt tint: Int?) {
+    val colorStateList = tint?.let { ColorStateList.valueOf(it) }
 
     TextViewCompat.setCompoundDrawableTintList(this, colorStateList)
 }

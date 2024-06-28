@@ -8,7 +8,6 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
@@ -23,14 +22,12 @@ class ExistingNetworkListModule {
     fun provideViewModel(
         networkManagementInteractor: NetworkManagementInteractor,
         networkListAdapterItemFactory: NetworkListAdapterItemFactory,
-        router: SettingsRouter,
-        resourceManager: ResourceManager
+        router: SettingsRouter
     ): ViewModel {
         return ExistingNetworkListViewModel(
             networkManagementInteractor,
             networkListAdapterItemFactory,
-            router,
-            resourceManager
+            router
         )
     }
 

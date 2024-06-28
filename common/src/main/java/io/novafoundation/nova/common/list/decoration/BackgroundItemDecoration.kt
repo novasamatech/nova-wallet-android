@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import kotlin.math.roundToInt
 
-open class BackgroundDecoration(
+open class BackgroundItemDecoration(
     context: Context,
     private val background: Drawable = context.getRoundedCornerDrawable(fillColorRes = R.color.block_background),
     outerHorizontalMarginDp: Int,
@@ -33,24 +33,35 @@ open class BackgroundDecoration(
     }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        val children = filterHeader(parent)
-        val topChild: View = children.mostTop() ?: return
-        val bottomChild: View = children.mostBottom() ?: return
+        val childrenSections = filterChildren(parent)
+        childrenSections.forEach {
+            val topChild: View = it.mostTop() ?: return
+            val bottomChild: View = it.mostBottom() ?: return
 
-        background.setBounds(
-            topChild.left,
-            topChild.top + topChild.translationY.roundToInt() - innerVerticalPadding,
-            topChild.right,
-            bottomChild.bottom + bottomChild.translationY.roundToInt() + innerVerticalPadding
-        )
+            background.setBounds(
+                topChild.left,
+                topChild.top + topChild.translationY.roundToInt() - innerVerticalPadding,
+                topChild.right,
+                bottomChild.bottom + bottomChild.translationY.roundToInt() + innerVerticalPadding
+            )
 
-        background.draw(canvas)
+            background.draw(canvas)
+        }
     }
 
-    private fun filterHeader(parent: RecyclerView): List<View> {
-        return parent.children
-            .filter { parent.shouldApplyDecoration(it) }
-            .toList()
+    private fun filterChildren(parent: RecyclerView): List<List<View>> {
+        val sections = mutableListOf(mutableListOf<View>())
+        parent.children.forEach { child ->
+            if (parent.shouldApplyDecoration(child)) {
+                sections.last().add(child)
+            } else {
+                if (sections.last().isNotEmpty()) {
+                    sections.add(mutableListOf())
+                }
+            }
+        }
+
+        return sections
     }
 
     private fun RecyclerView.shouldApplyDecoration(view: View): Boolean {

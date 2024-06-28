@@ -34,13 +34,13 @@ data class ChainLocal(
     val connectionState: ConnectionStateLocal,
     @ColumnInfo(defaultValue = NODE_SELECTION_STRATEGY_DEFAULT)
     val nodeSelectionStrategy: NodeSelectionStrategyLocal,
-    @ColumnInfo(defaultValue = DEFAULT_NETWORK_BY_DEFAULT_STR)
-    val source: Source,
+    @ColumnInfo(defaultValue = DEFAULT_NETWORK_SOURCE_STR)
+    val source: Source
 ) : Identifiable {
 
     companion object {
 
-        const val DEFAULT_NETWORK_BY_DEFAULT_STR = "DEFAULT"
+        const val DEFAULT_NETWORK_SOURCE_STR = "DEFAULT"
     }
 
     enum class NodeSelectionStrategyLocal {
