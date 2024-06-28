@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">Hubungkan Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Untuk menandatangani operasi dan memigrasikan akun Anda ke aplikasi Ledger Generik yang baru, instal dan buka aplikasi Migrasi. Aplikasi Ledger Lama dan Ledger Migrasi tidak akan didukung di masa depan.</string>
     <string name="account_ledger_legacy_warning_title">Aplikasi Ledger Baru Telah Dirilis</string>
-    <string name="account_ledger_migration_app">Migrasi</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Aplikasi Migrasi akan tidak tersedia dalam waktu dekat. Gunakan untuk memigrasikan akun Anda ke aplikasi Ledger baru untuk menghindari kehilangan dana Anda.</string>
-    <string name="account_ledger_migration_generic">Generik</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Aplikasi Generik)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>

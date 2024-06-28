@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">Połącz Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Aby podpisywać operacje i migrować swoje konta do nowej aplikacji Generic Ledger, zainstaluj i otwórz aplikację Migration. Aplikacje Legacy Old i Migration Ledger nie będą wspierane w przyszłości.</string>
     <string name="account_ledger_legacy_warning_title">Wydano nową aplikację Ledger</string>
-    <string name="account_ledger_migration_app">Migration</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Aplikacja Migration będzie wkrótce niedostępna. Użyj jej do migracji swoich kont do nowej aplikacji Ledger, aby nie stracić swoich środków.</string>
-    <string name="account_ledger_migration_generic">Generic</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>

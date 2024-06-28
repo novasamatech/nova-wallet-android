@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">Ledger Nano X 연결</string>
     <string name="account_ledger_legacy_warning_message">작업을 서명하고 계정을 새로운 Generic Ledger 앱으로 마이그레이션하려면 Migration 앱을 설치하고 여십시오. 레거시 구형 및 Migration Ledger 앱은 더 이상 지원되지 않을 것입니다.</string>
     <string name="account_ledger_legacy_warning_title">새로운 Ledger 앱이 출시되었습니다</string>
-    <string name="account_ledger_migration_app">Migration</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 앱은 곧 사용 불가능할 것입니다. 자금을 잃지 않기 위해 새 Ledger 앱으로 계정을 마이그레이션하세요.</string>
-    <string name="account_ledger_migration_generic">Generic</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
