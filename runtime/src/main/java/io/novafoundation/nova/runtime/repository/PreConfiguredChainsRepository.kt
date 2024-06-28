@@ -12,7 +12,6 @@ interface PreConfiguredChainsRepository {
     suspend fun getPreConfiguredChains(): Result<List<LightChain>>
 
     suspend fun getPreconfiguredChainById(id: ChainId): Result<Chain>
-
 }
 
 class RealPreConfiguredChainsRepository(

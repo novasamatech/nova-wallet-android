@@ -7,13 +7,13 @@ import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.AlphaColorFilter
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import kotlinx.android.synthetic.main.item_account.view.itemAccountArrow
 import kotlinx.android.synthetic.main.item_account.view.itemAccountCheckBox
 import kotlinx.android.synthetic.main.item_account.view.itemAccountRadioButton
@@ -59,9 +59,9 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
         bindMode(mode, accountModel, handler)
 
         itemAccountIcon.setImageDrawable(accountModel.picture)
-        itemChainIcon.letOrHide(accountModel.chainIconUrl) {
+        itemChainIcon.letOrHide(accountModel.chainIcon) {
             itemChainIcon.colorFilter = AlphaColorFilter(accountModel.chainIconOpacity)
-            itemChainIcon.loadChainIcon(it, imageLoader = imageLoader)
+            itemChainIcon.setIcon(it, imageLoader = imageLoader)
         }
 
         if (accountModel.updateIndicator) {

@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountTitleGroupRvItem
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_account_impl.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -77,7 +78,7 @@ private class DelegatedMetaAccountUpdatesListingMixin(
             isSelected = false,
             isClickable = true,
             picture = if (isEnabled) walletIcon else walletIcon.withAlphaDrawable(DISABLED_ICON_ALPHA),
-            chainIconUrl = proxiedWithProxy.chain.icon,
+            chainIcon = proxiedWithProxy.chain.iconOrFallback(),
             updateIndicator = false,
             subtitleIconRes = null,
             chainIconOpacity = if (isEnabled) ENABLED_ICON_ALPHA else DISABLED_ICON_ALPHA,

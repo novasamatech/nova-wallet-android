@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.common.utils.parseArbitraryObject
-import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
@@ -280,7 +279,6 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     )
 }
 
-
 fun mapChainLocalToChain(
     chainLocal: ChainLocal,
     nodesLocal: List<ChainNodeLocal>,
@@ -290,7 +288,6 @@ fun mapChainLocalToChain(
     externalApisLocal: List<ChainExternalApiLocal>,
     gson: Gson
 ): Chain {
-
     val nodes = nodesLocal.sortedBy { it.orderId }.map {
         Chain.Node(
             unformattedUrl = it.url,
@@ -342,7 +339,7 @@ fun mapChainLocalToChain(
             types = types,
             nodes = nodesConfig,
             explorers = explorers,
-            icon = icon,
+            icon = icon.takeIf { it.isNotBlank() },
             externalApis = externalApis,
             addressPrefix = prefix,
             isEthereumBased = isEthereumBased,

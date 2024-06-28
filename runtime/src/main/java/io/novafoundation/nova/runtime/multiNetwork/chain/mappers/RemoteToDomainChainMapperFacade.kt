@@ -6,7 +6,6 @@ import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
-
 class RemoteToDomainChainMapperFacade(
     private val gson: Gson
 ) {

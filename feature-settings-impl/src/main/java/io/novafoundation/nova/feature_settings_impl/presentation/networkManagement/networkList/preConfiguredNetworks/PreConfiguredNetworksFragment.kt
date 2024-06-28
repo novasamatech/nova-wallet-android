@@ -26,7 +26,9 @@ import kotlinx.android.synthetic.main.fragment_pre_configured_network_list.preCo
 import kotlinx.android.synthetic.main.fragment_pre_configured_network_list.preConfiguredNetworksSearch
 import kotlinx.android.synthetic.main.fragment_pre_configured_network_list.preConfiguredNetworksToolbar
 
-class PreConfiguredNetworksFragment : BaseFragment<PreConfiguredNetworksViewModel>(), NetworkManagementListAdapter.ItemHandler,
+class PreConfiguredNetworksFragment :
+    BaseFragment<PreConfiguredNetworksViewModel>(),
+    NetworkManagementListAdapter.ItemHandler,
     AddCustomNetworkAdapter.ItemHandler {
 
     @Inject

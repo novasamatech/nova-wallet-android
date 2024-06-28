@@ -10,10 +10,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
-import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.defaultNetworks.ExistingNetworkListViewModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks.PreConfiguredNetworksViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 

@@ -53,7 +53,6 @@ class NetworkManagementListDiffCallback : DiffUtil.ItemCallback<NetworkListRvIte
     }
 }
 
-
 class NetworkListViewHolder(
     parent: ViewGroup,
     private val imageLoader: ImageLoader,

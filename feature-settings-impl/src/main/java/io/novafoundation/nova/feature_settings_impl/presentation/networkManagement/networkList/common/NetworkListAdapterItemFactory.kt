@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.images.asIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.asIconOrFallback
+import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkState
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.common.ConnectionStateModel
@@ -27,7 +28,7 @@ class RealNetworkListAdapterItemFactory(
         val subtitle = if (chain.isDisabled) resourceManager.getString(R.string.common_disabled) else null
         val label = getChainLabel(chain)
         return NetworkListRvItem(
-            chainIcon = chain.icon.asIcon(),
+            chainIcon = chain.iconOrFallback(),
             chainId = chain.id,
             title = chain.name,
             subtitle = subtitle,
@@ -39,7 +40,7 @@ class RealNetworkListAdapterItemFactory(
 
     override fun getNetworkItem(network: LightChain): NetworkListRvItem {
         return NetworkListRvItem(
-            chainIcon = network.icon?.asIcon() ?: R.drawable.ic_custom_network.asIcon(),
+            chainIcon = network.icon.asIconOrFallback(),
             chainId = network.id,
             title = network.name,
             subtitle = null,
