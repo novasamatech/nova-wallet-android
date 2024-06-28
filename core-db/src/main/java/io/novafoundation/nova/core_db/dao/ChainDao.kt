@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,25 +27,29 @@ abstract class ChainDao {
         assetsDiff: CollectionDiffer.Diff<ChainAssetLocal>,
         nodesDiff: CollectionDiffer.Diff<ChainNodeLocal>,
         explorersDiff: CollectionDiffer.Diff<ChainExplorerLocal>,
-        externalApisDiff: CollectionDiffer.Diff<ChainExternalApiLocal>
+        externalApisDiff: CollectionDiffer.Diff<ChainExternalApiLocal>,
+        nodeSelectionPreferencesDiff: CollectionDiffer.Diff<NodeSelectionPreferencesLocal>
     ) {
         deleteChains(chainDiff.removed)
         deleteChainAssets(assetsDiff.removed)
         deleteChainNodes(nodesDiff.removed)
         deleteChainExplorers(explorersDiff.removed)
         deleteExternalApis(externalApisDiff.removed)
+        deleteNodePreferences(nodeSelectionPreferencesDiff.removed)
 
         addChains(chainDiff.added)
         addChainAssets(assetsDiff.added)
         addChainNodes(nodesDiff.added)
         addChainExplorers(explorersDiff.added)
         addExternalApis(externalApisDiff.added)
+        addNodePreferences(nodeSelectionPreferencesDiff.added)
 
         updateChains(chainDiff.updated)
         updateChainAssets(assetsDiff.updated)
         updateChainNodes(nodesDiff.updated)
         updateChainExplorers(explorersDiff.updated)
         updateExternalApis(externalApisDiff.updated)
+        updateNodePreferences(nodeSelectionPreferencesDiff.added)
     }
 
     // ------ Delete --------
@@ -62,6 +67,9 @@ abstract class ChainDao {
 
     @Delete
     protected abstract suspend fun deleteExternalApis(apis: List<ChainExternalApiLocal>)
+
+    @Delete
+    protected abstract suspend fun deleteNodePreferences(apis: List<NodeSelectionPreferencesLocal>)
 
     // ------ Add --------
     @Insert(onConflict = OnConflictStrategy.ABORT)
@@ -82,6 +90,9 @@ abstract class ChainDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract suspend fun addChainNode(node: ChainNodeLocal)
 
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    protected abstract suspend fun addNodePreferences(model: List<NodeSelectionPreferencesLocal>)
+
     // ------ Update -----
 
     @Update
@@ -98,6 +109,9 @@ abstract class ChainDao {
 
     @Update
     protected abstract suspend fun updateExternalApis(apis: List<ChainExternalApiLocal>)
+
+    @Update
+    protected abstract suspend fun updateNodePreferences(apis: List<NodeSelectionPreferencesLocal>)
 
     // ------- Queries ------
 
@@ -131,11 +145,8 @@ abstract class ChainDao {
     @Query("UPDATE chains SET connectionState = :connectionState WHERE id = :chainId")
     abstract suspend fun setConnectionState(chainId: String, connectionState: ChainLocal.ConnectionStateLocal)
 
-    @Query("UPDATE chains SET autoBalanceEnabled = :autobalance WHERE id = :chainId")
-    abstract suspend fun setAutoBalanceEnabled(chainId: String, autobalance: Boolean)
-
-    @Query("UPDATE chains SET defaultNodeUrl = :defaultNodeUrl WHERE id = :chainId")
-    abstract suspend fun setChainDefaultNodeUrl(chainId: String, defaultNodeUrl: String?)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun setNodePreferences(model: NodeSelectionPreferencesLocal)
 
     @Transaction
     open suspend fun updateRemoteRuntimeVersionIfChainExists(chainId: String, runtimeVersion: Int, transactionVersion: Int) {

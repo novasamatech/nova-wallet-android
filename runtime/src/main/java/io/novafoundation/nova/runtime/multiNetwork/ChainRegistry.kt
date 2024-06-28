@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.isFullSync
 import io.novafoundation.nova.runtime.ext.level
@@ -130,21 +131,16 @@ class ChainRegistry(
     }
 
     suspend fun setAutoBalanceEnabled(chainId: ChainId, enabled: Boolean) {
-        chainDao.setAutoBalanceEnabled(chainId, enabled)
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, enabled, null))
     }
 
-    suspend fun setDefaultNode(chainId: ChainId, nodeUrl: String?) {
-        if (nodeUrl == null) {
-            chainDao.setChainDefaultNodeUrl(chainId, null)
-            return
-        }
-
+    suspend fun setDefaultNode(chainId: ChainId, nodeUrl: String) {
         val chain = getChain(chainId)
 
         val chainSupportsNode = chain.nodes.nodes.any { it.unformattedUrl == nodeUrl }
         require(chainSupportsNode) { "Node with url $nodeUrl is not found for chain $chainId" }
 
-        chainDao.setChainDefaultNodeUrl(chainId, nodeUrl)
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, false, nodeUrl))
     }
 
     private suspend fun requireConnectionStateAtLeast(chainId: ChainId, state: ConnectionState) {

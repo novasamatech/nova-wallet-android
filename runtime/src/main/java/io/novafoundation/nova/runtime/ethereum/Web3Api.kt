@@ -5,7 +5,7 @@ import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,7 @@ class Web3ApiFactory(
     private val requestExecutorService: ScheduledExecutorService = Async.defaultExecutorService(),
     private val connectionSecrets: ConnectionSecrets,
     private val httpClient: OkHttpClient,
-    private val strategyProvider: AutoBalanceStrategyProvider,
+    private val strategyProvider: NodeSelectionStrategyProvider,
 ) {
 
     fun createWss(socketService: SocketService): Web3Api {
@@ -38,7 +38,7 @@ class Web3ApiFactory(
     }
 
     fun createHttps(chainNodes: Chain.Node): Pair<Web3Api, UpdatableNodes> {
-        return createHttps(Chain.Nodes(Chain.Nodes.NodeSelectionStrategy.ROUND_ROBIN, listOf(chainNodes)))
+        return createHttps(Chain.Nodes(Chain.Nodes.NodeSelectionStrategy.AutoBalance.ROUND_ROBIN, listOf(chainNodes)))
     }
 
     fun createHttps(chainNodes: Chain.Nodes): Pair<Web3Api, UpdatableNodes> {

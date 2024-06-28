@@ -31,6 +31,13 @@ object CollectionDiffer {
                 emptyList(),
                 emptyList()
             )
+
+            fun <T> added(list: List<T>) = CollectionDiffer.Diff<T>(
+                added = list,
+                emptyList(),
+                emptyList(),
+                emptyList()
+            )
         }
     }
 

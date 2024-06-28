@@ -22,7 +22,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
@@ -113,14 +113,14 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
-    fun provideAutoBalanceProvider() = AutoBalanceStrategyProvider()
+    fun provideAutoBalanceProvider() = NodeSelectionStrategyProvider()
 
     @Provides
     @ApplicationScope
     fun provideNodeAutoBalancer(
-        autoBalanceStrategyProvider: AutoBalanceStrategyProvider,
+        nodeSelectionStrategyProvider: NodeSelectionStrategyProvider,
         connectionSecrets: ConnectionSecrets
-    ) = NodeAutobalancer(autoBalanceStrategyProvider, connectionSecrets)
+    ) = NodeAutobalancer(nodeSelectionStrategyProvider, connectionSecrets)
 
     @Provides
     @ApplicationScope
@@ -169,7 +169,7 @@ class ChainRegistryModule {
     @ApplicationScope
     fun provideWeb3ApiFactory(
         connectionSecrets: ConnectionSecrets,
-        strategyProvider: AutoBalanceStrategyProvider,
+        strategyProvider: NodeSelectionStrategyProvider,
     ): Web3ApiFactory {
         val builder = HttpService.getOkHttpClientBuilder()
         builder.interceptors().clear() // getOkHttpClientBuilder() adds logging interceptor which doesn't log into LogCat
