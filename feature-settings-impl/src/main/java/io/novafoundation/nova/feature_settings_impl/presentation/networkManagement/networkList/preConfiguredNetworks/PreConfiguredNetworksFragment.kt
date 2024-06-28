@@ -36,7 +36,7 @@ class PreConfiguredNetworksFragment : BaseFragment<PreConfiguredNetworksViewMode
 
     private val networksAdapter by lazy(LazyThreadSafetyMode.NONE) { NetworkManagementListAdapter(imageLoader, this) }
 
-    private val adapter = ConcatAdapter(addCustomNetworkAdapter, networksAdapter)
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(addCustomNetworkAdapter, networksAdapter) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
