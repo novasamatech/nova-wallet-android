@@ -43,6 +43,10 @@ class SettingsNavigator(
         )
     }
 
+    override fun addNetwork() {
+        performNavigation(R.id.action_open_preConfiguredNetworks)
+    }
+
     override fun openPushNotificationSettings() {
         performNavigation(R.id.action_open_pushNotificationsSettings)
     }

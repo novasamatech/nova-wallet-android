@@ -19,12 +19,10 @@ class NetworkManagementListModule {
     @IntoMap
     @ViewModelKey(NetworkManagementListViewModel::class)
     fun provideViewModel(
-        router: SettingsRouter,
-        resourceManager: ResourceManager
+        router: SettingsRouter
     ): ViewModel {
         return NetworkManagementListViewModel(
-            router,
-            resourceManager
+            router
         )
     }
 

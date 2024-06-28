@@ -5,13 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
@@ -60,7 +63,8 @@ class PreConfiguredNetworksFragment : BaseFragment<PreConfiguredNetworksViewMode
     }
 
     override fun subscribe(viewModel: PreConfiguredNetworksViewModel) {
-        preConfiguredNetworksSearch.content.bindTo(viewModel.searchQuery)
+        observeRetries(viewModel)
+        preConfiguredNetworksSearch.content.bindTo(viewModel.searchQuery, viewModel.viewModelScope)
         viewModel.networkList.observe {
             preConfiguredNetworkProgress.isVisible = it.isLoading()
             if (it is ExtendedLoadingState.Loaded) {

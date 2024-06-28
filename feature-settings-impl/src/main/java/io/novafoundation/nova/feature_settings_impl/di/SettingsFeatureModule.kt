@@ -13,9 +13,11 @@ import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFa
 import io.novafoundation.nova.feature_settings_impl.domain.CustomNodeInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealCustomNodeInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.RealPreConfiguredNetworksInteractor
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.RealNetworkListAdapterItemFactory
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
@@ -23,6 +25,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 
 @Module
 class SettingsFeatureModule {
@@ -85,6 +88,16 @@ class SettingsFeatureModule {
             chainRegistry,
             chainNodeRepository,
             nodeChainIdRepositoryFactory
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun providePreConfiguredNetworksInteractor(
+        preConfiguredChainsRepository: PreConfiguredChainsRepository
+    ): PreConfiguredNetworksInteractor {
+        return RealPreConfiguredNetworksInteractor(
+            preConfiguredChainsRepository
         )
     }
 }

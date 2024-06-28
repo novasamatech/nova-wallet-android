@@ -5,11 +5,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 
 class NetworkManagementListViewModel(
-    private val router: SettingsRouter,
-    private val resourceManager: ResourceManager,
+    private val router: SettingsRouter
 ) : BaseViewModel() {
 
     fun backClicked() {
         router.back()
+    }
+
+    fun addNetworkClicked() {
+        router.addNetwork()
     }
 }

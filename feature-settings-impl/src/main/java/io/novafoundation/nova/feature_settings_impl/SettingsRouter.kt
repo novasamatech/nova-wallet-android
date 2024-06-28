@@ -33,4 +33,6 @@ interface SettingsRouter : ReturnableRouter {
     fun openCloudBackupSettings()
 
     fun openManualBackup()
+    
+    fun addNetwork()
 }

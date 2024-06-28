@@ -8,11 +8,14 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkListRvItem
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.LightChain
 import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 
 interface NetworkListAdapterItemFactory {
 
     fun getNetworkItem(network: NetworkState): NetworkListRvItem
+
+    fun getNetworkItem(network: LightChain): NetworkListRvItem
 }
 
 class RealNetworkListAdapterItemFactory(
@@ -31,6 +34,18 @@ class RealNetworkListAdapterItemFactory(
             chainLabel = label,
             disabled = chain.isDisabled,
             status = getConnectingState(network)
+        )
+    }
+
+    override fun getNetworkItem(network: LightChain): NetworkListRvItem {
+        return NetworkListRvItem(
+            chainIcon = network.icon?.asIcon() ?: R.drawable.ic_custom_network.asIcon(),
+            chainId = network.id,
+            title = network.name,
+            subtitle = null,
+            chainLabel = null,
+            disabled = false,
+            status = null
         )
     }
 

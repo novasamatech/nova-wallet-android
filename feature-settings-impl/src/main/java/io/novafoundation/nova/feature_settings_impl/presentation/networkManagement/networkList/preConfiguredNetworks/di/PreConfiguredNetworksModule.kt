@@ -8,11 +8,14 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.defaultNetworks.ExistingNetworkListViewModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks.PreConfiguredNetworksViewModel
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class PreConfiguredNetworksModule {
@@ -21,14 +24,18 @@ class PreConfiguredNetworksModule {
     @IntoMap
     @ViewModelKey(PreConfiguredNetworksViewModel::class)
     fun provideViewModel(
-        networkManagementInteractor: NetworkManagementInteractor,
+        preConfiguredNetworksInteractor: PreConfiguredNetworksInteractor,
         networkListAdapterItemFactory: NetworkListAdapterItemFactory,
-        router: SettingsRouter
+        router: SettingsRouter,
+        resourceManager: ResourceManager,
+        chainRegistry: ChainRegistry
     ): ViewModel {
         return PreConfiguredNetworksViewModel(
-            networkManagementInteractor,
-            networkListAdapterItemFactory,
-            router
+            preConfiguredNetworksInteractor = preConfiguredNetworksInteractor,
+            networkListAdapterItemFactory = networkListAdapterItemFactory,
+            router = router,
+            resourceManager = resourceManager,
+            chainRegistry = chainRegistry
         )
     }
 

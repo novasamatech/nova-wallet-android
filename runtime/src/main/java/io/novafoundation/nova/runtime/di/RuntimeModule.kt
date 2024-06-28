@@ -24,6 +24,8 @@ import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.RealExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainChainMapperFacade
+import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
@@ -37,9 +39,11 @@ import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.runtime.repository.RealBlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.RealChainNodeRepository
 import io.novafoundation.nova.runtime.repository.RealParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.RealPreConfiguredChainsRepository
 import io.novafoundation.nova.runtime.repository.RealTotalIssuanceRepository
 import io.novafoundation.nova.runtime.repository.RemoteTimestampRepository
 import io.novafoundation.nova.runtime.repository.TimestampRepository
@@ -236,6 +240,24 @@ class RuntimeModule {
         return NodeConnectionFactory(
             socketServiceProvider,
             connectionSecrets
+        )
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideRemoteToDomainChainMapperFacade(gson: Gson): RemoteToDomainChainMapperFacade {
+        return RemoteToDomainChainMapperFacade(gson)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun providePreConfiguredChainsRepository(
+        chainFetcher: ChainFetcher,
+        chainMapperFacade: RemoteToDomainChainMapperFacade
+    ): PreConfiguredChainsRepository {
+        return RealPreConfiguredChainsRepository(
+            chainFetcher,
+            chainMapperFacade
         )
     }
 }

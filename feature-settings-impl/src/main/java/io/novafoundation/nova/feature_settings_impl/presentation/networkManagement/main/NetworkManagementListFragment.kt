@@ -30,6 +30,7 @@ class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewMode
     override fun initViews() {
         networkManagementToolbar.applyStatusBarInsets()
         networkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
+        networkManagementToolbar.setRightActionClickListener { viewModel.addNetworkClicked() }
         networkManagementViewPager.adapter = NetworkManagementPagerAdapter(this)
         networkManagementTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
     }
