@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">连接Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">要进行操作签名并将您的账户迁移到新的 Generic Ledger 应用程序，请安装并打开 Migration 应用程序。旧版 Legacy 和 Migration Ledger 应用程序将来不会被支持。</string>
     <string name="account_ledger_legacy_warning_title">新版 Ledger 应用程序已发布</string>
-    <string name="account_ledger_migration_app">迁移</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 应用程序在不久的将来将无法使用。使用它将您的账户迁移到新的 Ledger 应用程序，以免丢失资金。</string>
-    <string name="account_ledger_migration_generic">通用</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X（通用应用程序）</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X（旧版）</string>

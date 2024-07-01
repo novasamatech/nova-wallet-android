@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">Ledger Nano X’i bağlayın</string>
     <string name="account_ledger_legacy_warning_message">İşlemleri imzalamak ve hesaplarınızı yeni Generic Ledger uygulamasına taşımak için Migration uygulamasını yükleyin ve açın. Eski Legacy ve Migration Ledger uygulamaları gelecekte desteklenmeyecektir.</string>
     <string name="account_ledger_legacy_warning_title">Yeni Ledger uygulaması yayımlandı</string>
-    <string name="account_ledger_migration_app">Geçiş</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
-    <string name="account_ledger_migration_generic">Genel</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Genel Uygulama)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Eski)</string>
