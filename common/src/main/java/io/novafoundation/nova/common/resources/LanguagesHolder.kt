@@ -21,7 +21,6 @@ class LanguagesHolder {
         private val JAPANESE = Language("ja", "JAPANESE")
         private val VIETNAMESE = Language("vi", "VIETNAMESE")
         private val KOREAN = Language("ko", "KOREAN")
-
     }
 
     fun getDefaultLanguage(): Language {
