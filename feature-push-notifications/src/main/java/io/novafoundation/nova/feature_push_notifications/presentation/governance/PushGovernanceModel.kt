@@ -8,7 +8,7 @@ data class PushGovernanceModel(
     val chainId: ChainId,
     val governance: Chain.Governance,
     val chainName: String,
-    val chainIconUrl: String,
+    val chainIconUrl: String?,
     val isEnabled: Boolean,
     val isNewReferendaEnabled: Boolean,
     val isReferendaUpdatesEnabled: Boolean,

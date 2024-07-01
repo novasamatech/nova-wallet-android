@@ -71,7 +71,7 @@ fun mapRemoteChainToLocal(
             parentId = parentId,
             name = name,
             types = types,
-            icon = icon,
+            icon = icon ?: "", // We put empty string as a fallback to avoid complicated migration
             prefix = addressPrefix,
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,

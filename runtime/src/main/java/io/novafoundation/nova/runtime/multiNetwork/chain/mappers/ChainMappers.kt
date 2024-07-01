@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
@@ -267,7 +268,27 @@ private fun mapNodeSelectionFromLocal(chainLocal: ChainLocal, nodeSelectionPrefe
 }
 
 fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
-    val nodes = chainLocal.getSortedNodes().map {
+    return mapChainLocalToChain(
+        chainLocal.chain,
+        chainLocal.nodes,
+        chainLocal.nodeSelectionPreferences,
+        chainLocal.assets,
+        chainLocal.explorers,
+        chainLocal.externalApis,
+        gson
+    )
+}
+
+fun mapChainLocalToChain(
+    chainLocal: ChainLocal,
+    nodesLocal: List<ChainNodeLocal>,
+    nodeSelectionPreferences: NodeSelectionPreferencesLocal?,
+    assetsLocal: List<ChainAssetLocal>,
+    explorersLocal: List<ChainExplorerLocal>,
+    externalApisLocal: List<ChainExternalApiLocal>,
+    gson: Gson
+): Chain {
+    val nodes = nodesLocal.sortedBy { it.orderId }.map {
         Chain.Node(
             unformattedUrl = it.url,
             name = it.name,
@@ -278,13 +299,13 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     }
 
     val nodesConfig = Chain.Nodes(
-        nodeSelectionStrategy = mapNodeSelectionFromLocal(chainLocal.chain, chainLocal.nodeSelectionPreferences),
+        nodeSelectionStrategy = mapNodeSelectionFromLocal(chainLocal, nodeSelectionPreferences),
         nodes = nodes
     )
 
-    val assets = chainLocal.assets.map { mapChainAssetLocalToAsset(it, gson) }
+    val assets = assetsLocal.map { mapChainAssetLocalToAsset(it, gson) }
 
-    val explorers = chainLocal.explorers.map {
+    val explorers = explorersLocal.map {
         Chain.Explorer(
             name = it.name,
             account = it.account,
@@ -294,22 +315,22 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         )
     }
 
-    val types = chainLocal.chain.types?.let {
+    val types = chainLocal.types?.let {
         Chain.Types(
             url = it.url.nullIfEmpty(),
             overridesCommon = it.overridesCommon
         )
     }
 
-    val externalApis = chainLocal.externalApis.mapNotNull {
+    val externalApis = externalApisLocal.mapNotNull {
         mapExternalApiLocalToExternalApi(it, gson)
     }
 
-    val additional = chainLocal.chain.additional?.let { raw ->
+    val additional = chainLocal.additional?.let { raw ->
         gson.fromJson<Chain.Additional>(raw)
     }
 
-    return with(chainLocal.chain) {
+    return with(chainLocal) {
         Chain(
             id = id,
             parentId = parentId,
@@ -318,7 +339,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             types = types,
             nodes = nodesConfig,
             explorers = explorers,
-            icon = icon,
+            icon = icon.takeIf { it.isNotBlank() },
             externalApis = externalApis,
             addressPrefix = prefix,
             isEthereumBased = isEthereumBased,

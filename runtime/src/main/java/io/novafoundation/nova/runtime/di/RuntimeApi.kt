@@ -25,6 +25,7 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.runtime.repository.TimestampRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
@@ -101,4 +102,6 @@ interface RuntimeApi {
     val nodeConnectionFactory: NodeConnectionFactory
 
     val web3ApiFactory: Web3ApiFactory
+
+    val preConfiguredChainsRepository: PreConfiguredChainsRepository
 }

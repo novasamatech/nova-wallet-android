@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.MetaAccountChains
@@ -77,7 +78,7 @@ class ManualBackupSelectAccountViewModel(
                 metaAccountChains.customChains.forEach { chain ->
                     this += ManualBackupAccountRvItem(
                         chainId = chain.id,
-                        icon = chain.icon.asIcon(),
+                        icon = chain.iconOrFallback(),
                         title = chain.name,
                         subtitle = null
                     )

@@ -32,6 +32,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.No
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 
 interface SettingsFeatureDependencies {
 
@@ -98,4 +99,6 @@ interface SettingsFeatureDependencies {
     val web3ApiFactory: Web3ApiFactory
 
     val validationExecutor: ValidationExecutor
+
+    val preConfiguredChainsRepository: PreConfiguredChainsRepository
 }

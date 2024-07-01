@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListOverview
+import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.selectedMetaAccount
 import io.novafoundation.nova.feature_wallet_connect_impl.R
@@ -235,7 +236,7 @@ class WalletConnectApproveSessionViewModel(
         val multipleChainsRequested = allChainsCount > 1
         val hasUnsupportedWarningsToShow = allUnknownChains.isNotEmpty()
 
-        val firstKnownIcon = allKnownChains.firstOrNull()?.icon
+        val firstKnownIcon = allKnownChains.firstOrNull()?.iconOrFallback()
 
         return ChainListOverview(
             icon = firstKnownIcon?.takeUnless { multipleChainsRequested },

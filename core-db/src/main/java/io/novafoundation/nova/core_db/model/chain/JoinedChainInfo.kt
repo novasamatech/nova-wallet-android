@@ -21,9 +21,4 @@ class JoinedChainInfo(
 
     @Relation(parentColumn = "id", entityColumn = "chainId", entity = ChainExternalApiLocal::class)
     val externalApis: List<ChainExternalApiLocal>
-) {
-
-    fun getSortedNodes(): List<ChainNodeLocal> {
-        return nodes.sortedBy { it.orderId }
-    }
-}
+)

@@ -23,6 +23,7 @@ fun ImageView.loadChainIcon(icon: String?, imageLoader: ImageLoader) {
     load(icon, imageLoader) {
         placeholder(R.drawable.bg_chain_placeholder)
         error(R.drawable.bg_chain_placeholder)
+        fallback(R.drawable.ic_fallback_network_icon)
     }
 }
 
@@ -31,7 +32,7 @@ fun ImageLoader.loadChainIconToTarget(icon: String?, context: Context, target: (
         .data(icon)
         .placeholder(R.drawable.bg_chain_placeholder)
         .error(R.drawable.bg_chain_placeholder)
-        .fallback(R.drawable.bg_chain_placeholder)
+        .fallback(R.drawable.ic_fallback_network_icon)
         .target { target(it) }
         .build()
 
@@ -46,4 +47,16 @@ fun ImageView.loadTokenIcon(icon: String?, imageLoader: ImageLoader) {
 
 fun Chain.Asset.icon(): Icon {
     return iconUrl?.asIcon() ?: ASSET_ICON_PLACEHOLDER.asIcon()
+}
+
+fun Chain.iconOrFallback(): Icon {
+    return icon?.asIcon() ?: chainIconFallback()
+}
+
+fun String?.asIconOrFallback(): Icon {
+    return this?.asIcon() ?: chainIconFallback()
+}
+
+fun chainIconFallback(): Icon {
+    return R.drawable.ic_fallback_network_icon.asIcon()
 }

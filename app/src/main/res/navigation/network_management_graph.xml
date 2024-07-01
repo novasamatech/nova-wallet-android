@@ -19,7 +19,20 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_open_preConfiguredNetworks"
+            app:destination="@id/preConfiguredNetworks"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/preConfiguredNetworks"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks.PreConfiguredNetworksFragment"
+        android:label="PreConfiguredNetworksFragment" />
 
     <fragment
         android:id="@+id/networkManagementDetails"
@@ -34,7 +47,6 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
-
 
     </fragment>
 

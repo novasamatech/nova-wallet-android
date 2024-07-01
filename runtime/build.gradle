@@ -15,6 +15,8 @@ android {
 
         buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v20/chains_dev.json\""
         buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v2/assets_dev.json\""
+        buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v20/preConfigured/chains_dev.json\""
+        buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v20/preConfigured/detailsDev\""
 
         buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/tests/chains_for_testBalance.json\""
 
@@ -33,6 +35,8 @@ android {
 
             buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v20/chains.json\""
             buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v2/assets.json\""
+            buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v20/preConfigured/chains.json\""
+            buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v20/preConfigured/details\""
         }
     }
 
