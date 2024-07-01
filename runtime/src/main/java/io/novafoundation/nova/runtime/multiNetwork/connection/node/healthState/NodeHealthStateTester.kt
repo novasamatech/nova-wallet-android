@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.multiNetwork.connection.node
+package io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState
 
 interface NodeHealthStateTester {
 

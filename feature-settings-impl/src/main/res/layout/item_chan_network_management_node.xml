@@ -78,11 +78,12 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:padding="8dp"
+        android:maxWidth="80dp"
+        android:text="@string/common_edit"
         android:textColor="@color/button_text_accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Edit" />
+        app:layout_constraintVertical_chainStyle="packed" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

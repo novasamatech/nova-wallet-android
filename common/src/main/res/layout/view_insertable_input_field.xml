@@ -16,7 +16,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@null"
-        android:hint="@string/common_address"
         android:includeFontPadding="false"
         android:paddingStart="12dp"
         android:paddingTop="14dp"

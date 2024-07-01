@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -12,7 +13,8 @@ import io.novafoundation.nova.feature_settings_impl.domain.NodeHealthState
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkConnectionRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodeRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodesAddCustomRvItem
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.common.ConnectionStateModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodePayload
 import io.novafoundation.nova.runtime.ext.autoBalanceEnabled
 import io.novafoundation.nova.runtime.ext.isEnabled
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +28,7 @@ class ChainNetworkManagementViewModel(
     private val payload: ChainNetworkManagementPayload
 ) : BaseViewModel() {
 
-    private val chainNetworkStateFlow = networkManagementChainInteractor.chainStateFlow(payload.chainId)
+    private val chainNetworkStateFlow = networkManagementChainInteractor.chainStateFlow(payload.chainId, viewModelScope)
         .shareInBackground()
 
     val isNetworkCanBeDisabled: Flow<Boolean> = chainNetworkStateFlow.map { it.networkCanBeDisabled }
@@ -72,11 +74,11 @@ class ChainNetworkManagementViewModel(
     }
 
     fun editNode(item: NetworkNodeRvItem) {
-        showError("Not implemented")
+        router.openCustomNode(CustomNodePayload(payload.chainId, CustomNodePayload.Mode.Edit(item.socketAddress)))
     }
 
     fun addNewNode() {
-        showError("Not implemented")
+        router.openCustomNode(CustomNodePayload(payload.chainId, CustomNodePayload.Mode.Add))
     }
 
     private fun mapNodeToUi(nodeHealthState: NodeHealthState, networkState: ChainNetworkState): NetworkNodeRvItem {

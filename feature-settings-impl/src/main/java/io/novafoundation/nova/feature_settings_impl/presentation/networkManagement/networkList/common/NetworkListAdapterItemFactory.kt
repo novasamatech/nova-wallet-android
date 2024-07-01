@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkState
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.common.ConnectionStateModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.items.NetworkListNetworkRvItem
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

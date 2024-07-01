@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="node_already_exist_failure_title">This Node already exists</string>
+    <string name="node_already_exist_failure_message">The URL you entered already exists as the "%s" Node.</string>
+
+    <string name="node_not_supported_by_network_title">Wrong network</string>
+    <string name="node_not_supported_by_network_message">The URL you entered is not corresponding to Node for %1$s.\nPlease enter URL of the valid %1$s node.</string>
+
+    <string name="node_not_alive_title">Node error</string>
+    <string name="node_not_alive_message">The Node URL you entered is either not responding or contains incorrect format. The URL format should start with "wss://".</string>
+
+    <string name="custom_node_add_title">Add custom node for</string>
+    <string name="custom_node_edit_title">Edit custom node for</string>
+    <string name="custom_node_url_title">Node URL</string>
+    <string name="custom_node_url_hint">wss://rpc.polkadot.io</string>
+    <string name="custom_node_name_title">Node name</string>
+    <string name="custom_node_name_hint">Name</string>
+    <string name="custom_node_disabled_button_state">Enter details</string>
+    <string name="custom_node_add_button_state">Add node</string>
+    <string name="custom_node_edit_button_state">Save</string>
 
     <string name="common_connected_ms">%d ms</string>
     <string name="add_custom_node">Add custom node</string>

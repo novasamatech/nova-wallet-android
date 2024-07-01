@@ -27,6 +27,20 @@
         android:label="ChainNetworkManagementFragment"
         tools:layout="@layout/fragment_chain_network_management">
 
+        <action
+            android:id="@+id/action_open_customNode"
+            app:destination="@id/customNode"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
 
     </fragment>
+
+    <fragment
+        android:id="@+id/customNode"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodeFragment"
+        android:label="CustomNodeFragment"
+        tools:layout="@layout/fragment_custom_node" />
 </navigation>

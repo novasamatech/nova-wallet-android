@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.feature_settings_impl.R
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.custom.ConnectionStateModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.common.ConnectionStateModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkManagementListAdapter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkImage

@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di.CloudBackupSettingsComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.di.ChainNetworkManagementComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.defaultNetworks.di.ExistingNetworkListComponent
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.di.CustomNodeComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
@@ -37,6 +38,8 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
     fun settingsComponentFactory(): SettingsComponent.Factory
 
     fun chainNetworkManagementFactory(): ChainNetworkManagementComponent.Factory
+
+    fun customNodeFactory(): CustomNodeComponent.Factory
 
     fun networkManagementListFactory(): NetworkManagementListComponent.Factory
 

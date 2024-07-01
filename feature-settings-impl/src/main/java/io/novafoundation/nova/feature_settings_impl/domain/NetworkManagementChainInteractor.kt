@@ -10,7 +10,8 @@ import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.connection.node.NodeHealthStateTesterFactory
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -41,7 +42,7 @@ class NodeHealthState(
 
 interface NetworkManagementChainInteractor {
 
-    fun chainStateFlow(chainId: String): Flow<ChainNetworkState>
+    fun chainStateFlow(chainId: String, coroutineScope: CoroutineScope): Flow<ChainNetworkState>
 
     suspend fun toggleAutoBalance(chainId: String)
 
@@ -55,11 +56,11 @@ class RealNetworkManagementChainInteractor(
     private val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
 ) : NetworkManagementChainInteractor {
 
-    override fun chainStateFlow(chainId: String): Flow<ChainNetworkState> {
+    override fun chainStateFlow(chainId: String, coroutineScope: CoroutineScope): Flow<ChainNetworkState> {
         return chainRegistry.chainsById
             .map { it.getValue(chainId) }
             .flatMapLatest { chain ->
-                combine(activeNodeFlow(chainId), nodesHealthState(chain)) { activeNode, nodeHealthStates ->
+                combine(activeNodeFlow(chainId), nodesHealthState(chain, coroutineScope)) { activeNode, nodeHealthStates ->
                     ChainNetworkState(chain, networkCanBeDisabled(chain), nodeHealthStates, activeNode)
                 }
             }
@@ -84,9 +85,9 @@ class RealNetworkManagementChainInteractor(
         return chain.genesisHash != Chain.Geneses.POLKADOT
     }
 
-    private fun nodesHealthState(chain: Chain): Flow<List<NodeHealthState>> {
+    private fun nodesHealthState(chain: Chain, coroutineScope: CoroutineScope): Flow<List<NodeHealthState>> {
         return chain.nodes.wssNodes().map {
-            nodeHealthState(chain, it)
+            nodeHealthState(chain, it, coroutineScope)
         }.combine()
     }
 
@@ -95,7 +96,7 @@ class RealNetworkManagementChainInteractor(
         return activeConnection?.currentUrl?.map { it?.node } ?: flowOf { null }
     }
 
-    private fun nodeHealthState(chain: Chain, node: Chain.Node): Flow<NodeHealthState> {
+    private fun nodeHealthState(chain: Chain, node: Chain.Node, coroutineScope: CoroutineScope): Flow<NodeHealthState> {
         return flow {
             if (chain.isDisabled) {
                 emit(NodeHealthState(node, NodeHealthState.State.Disabled))
@@ -104,7 +105,7 @@ class RealNetworkManagementChainInteractor(
 
             emit(NodeHealthState(node, NodeHealthState.State.Connecting))
 
-            val nodeConnectionDelay = nodeHealthStateTesterFactory.create(chain, node)
+            val nodeConnectionDelay = nodeHealthStateTesterFactory.create(chain, node, coroutineScope)
                 .testNodeHealthState()
                 .getOrNull()
 
