@@ -17,7 +17,7 @@
     <string name="account_add_already_exists_message">Аккаунт уже существует. Пожалуйста, попробуйте другой.</string>
     <string name="account_add_watch_only_description">Отследить любой кошелек по его адресу</string>
     <string name="account_add_watch_wallet">Добавить watch-only кошелёк</string>
-    <string name="account_backup_mnemonic_title">Запишите свою секретную фразу</string>
+    <string name="account_backup_mnemonic_title">Запишите вашу секретную фразу</string>
     <string name="account_backup_secret_caption">Пожалуйста, убедитесь, что ваша фраза записана корректно и разборчиво.</string>
     <string name="account_chain_address_format">%s адрес</string>
     <string name="account_confirm_mnemonic">Подтверждение</string>

@@ -27,7 +27,6 @@
 
     <string name="enter_backup_password_hint">Backup password</string>
 
-    <!--<string name="common_no_screenshot_message_v2_2_0">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>-->
     <string name="common_no_screenshot_message_v2_2_0">We are going to show your passphrase. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
 
     <string name="common_not_available">Not available</string>
@@ -48,12 +47,10 @@
     <string name="wallet_management_create_account_btn">How to add wallet?</string>
     <string name="wallet_management_import_account_btn">How to add wallet?</string>
 
-    <!--<string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>-->
     <string name="account_export_json_password_subtitle">This password is required to encrypt your account and is used alongside this JSON file to restore your wallet.</string>
 
     <string name="export_json_download_btn">Download Restore JSON</string>
 
-    <!--<string name="common_input_error_set_password">Set a password…</string>-->
     <string name="common_enter_password">Enter password</string>
 
     <string name="common_network_polkadot">Polkadot</string>
@@ -104,7 +101,6 @@
     <string name="backup_diff_subtitle_highlighted">ensure you\'ve saved Passphrases</string>
     <string name="common_sign_in">Sign In</string>
 
-    <!--<string name="push_welcome_cancel_button">Not now</string>-->
     <string name="common_not_now">Not now</string>
 
     <string name="deprecated_cloud_backup_password_title">Backup password was changed</string>
@@ -128,7 +124,6 @@
 
     <string name="backup_settings_delete_backup">Delete backup</string>
 
-    <!--<string name="account_export_password_change">Change password</string>-->
     <string name="common_change_password">Change password</string>
 
     <string name="cloud_backup_settings_disabled_state_subtitle">Enable to backup wallets to your Google Drive</string>
@@ -154,7 +149,6 @@
     <string name="corrupted_backup_error_title">Backup found but empty or broken</string>
     <string name="corrupted_backup_error_subtitle">An issue has been identified with your backup. You have the option to delete the current backup and create a new one. %s before proceeding.</string>
     <string name="corrupted_backup_error_subtitle_highlighted">Ensure you have saved Passphrases for all wallets</string>
-    <!--<string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>-->
 
     <string name="confirm_mnemonic_not_matching_error_message">Invalid passphrase, please check one more time the words order</string>
     <string name="confirm_mnemonic_disabled_button_state">Select the words...</string>
@@ -240,15 +234,11 @@
     <string name="import_wallet_options_cloud_backup_subtitle">Recover wallets from Google Drive</string>
     <string name="loocking_backup_progress">Looking for your backup...</string>
 
-    <!--<string name="account_backup_mnemonic_field_title">Mnemonic Passphrase</string>-->
-
     <string name="import_wallet_options_mnemonic_subtitle">Use your 12, 15, 18, 21 or 24-word phrase</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>
 
-    <!--<string name="account_welcome_hardware_wallet_title">Connect hardware wallet</string>-->
     <string name="account_welcome_hardware_wallet_title">Hardware wallet</string>
 
-    <!--<string name="account_welcome_hardware_wallet_subtitle">Use Polkadot Vault, Ledger or Parity Signer</string>-->
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Parity Signer or Ledger</string>
 
     <string name="import_wallet_options_title">Choose how you would like to import your wallet</string>

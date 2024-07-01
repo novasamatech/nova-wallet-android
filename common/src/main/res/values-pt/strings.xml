@@ -500,7 +500,7 @@
     <string name="connections_add_connection">Adicionar conexão</string>
     <string name="contacts_scan">Escanear código QR</string>
     <string name="corrupted_backup_error_subtitle">Foi identificado um problema com o seu backup. Você tem a opção de deletar o backup atual e criar um novo. %s antes de continuar.</string>
-    <string name="corrupted_backup_error_subtitle_highlighted"><font>Certifique-se de que salvou as Frases Secretas para todas as carteiras</font></string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Certifique-se de que salvou as Frases Secretas para todas as carteiras</string>
     <string name="corrupted_backup_error_title">Backup encontrado, mas vazio ou corrompido</string>
     <string name="create_cloud_backup_password_alert_subtitle">No futuro, sem a senha de backup, não é possível restaurar suas carteiras do Backup na Nuvem.\n%s</string>
     <string name="create_cloud_backup_password_alert_subtitle_highlighted">Esta senha não pode ser recuperada.</string>

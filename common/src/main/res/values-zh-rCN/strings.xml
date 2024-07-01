@@ -754,7 +754,7 @@
     <string name="manual_backup_warning_title">不要分享您的助记词！</string>
     <string name="mnemonic_card_reveal_subtitle">确保没有人能够看到你的屏幕\n且不要截图</string>
     <string name="mnemonic_card_title">请%s任何人</string>
-    <string name="mnemonic_card_title_highlight"><font>不要分享给</font></string>
+    <string name="mnemonic_card_title_highlight">不要分享给</string>
     <string name="mnemonic_error_try_another_one">请尝试另一个。</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">助记词短语无效，请再次检查单词顺序</string>
     <string name="multiple_wallets_selection_max_message">您不能选择超过%d个钱包</string>
@@ -1000,8 +1000,8 @@
     </plurals>
     <string name="remove_votes_suggestion_title">移除您的投票记录？</string>
     <string name="restore_cloud_backup_delete_backup_description" formatted="false">%s 它是独属于你的，安全存储，对他人不可访问。没有备份密码，无法从Google云盘中恢复钱包。如果丢失，请删除当前备份，以创建一个新的备份并设置新密码。%s</string>
-    <string name="restore_cloud_backup_delete_backup_description_highlighted_1"><font>很遗憾，您的密码无法恢复。</font></string>
-    <string name="restore_cloud_backup_delete_backup_description_highlighted_2"><font>或者，使用Passphrase进行恢复。</font></string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">很遗憾，您的密码无法恢复。</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">或者，使用Passphrase进行恢复。</string>
     <string name="restore_cloud_backup_delete_backup_title">你是否丢失了密码？</string>
     <string name="restore_cloud_backup_password_title">您的备份密码之前已更新。要继续使用云备份，请输入新的备份密码。</string>
     <string name="restore_cloud_backup_subtitle">请输入您在备份过程中创建的密码</string>
