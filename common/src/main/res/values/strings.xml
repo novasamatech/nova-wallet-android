@@ -2,8 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="account_ledger_migration_deprecation_message">The Migration app will be unavailable in the near future. Use it to migrate your accounts to the new Ledger app to avoid losing your funds.</string>
 
-    <string name="account_ledger_migration_app">Migration</string>
-    <string name="account_ledger_migration_generic">Generic</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
 
     <string name="account_ledger_generic_import_start_step_1">Make sure <font color='#FFFFFF'>Generic app is installed</font> to your Ledger device using Ledger Live app</string>
     <string name="account_ledger_generic_import_start_step_2"><font color='#FFFFFF'>Open the Generic app</font> on your Ledger device</string>
