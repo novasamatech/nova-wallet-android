@@ -114,7 +114,7 @@
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Faites attention, le nom du chemin de dérivation doit être vide</string>
     <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Ouvrez l\'application Polkadot Vault</font> sur votre smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Allez dans l\'onglet « Jeux de clés ».</font> Sélectionnez votre jeu de clés, votre réseau, puis le compte que vous souhaitez ajouter à Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Allez dans l\'onglet «Jeux de clés».</font> Sélectionnez votre jeu de clés, votre réseau, puis le compte que vous souhaitez ajouter à Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault vous fournira un <font color="#FFFFFF">QR code à scanner</font></string>
     <string name="account_private_key">Clé privée</string>
     <string name="account_proxieds">Délégué à vous (Proxieds)</string>
