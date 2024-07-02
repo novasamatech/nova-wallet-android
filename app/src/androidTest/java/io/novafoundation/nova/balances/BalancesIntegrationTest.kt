@@ -6,17 +6,17 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.emptyEthereumAccountId
-import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.system
+import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_account_impl.domain.account.model.DefaultMetaAccount
 import io.novafoundation.nova.runtime.BuildConfig.TEST_CHAINS_URL
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
@@ -42,7 +42,6 @@ import java.math.BigInteger
 import java.math.BigInteger.ZERO
 import java.net.URL
 import kotlin.time.Duration.Companion.seconds
-
 
 @RunWith(Parameterized::class)
 class BalancesIntegrationTest(
@@ -119,7 +118,7 @@ class BalancesIntegrationTest(
                         binding = { scale, runtime -> scale?.let { bindAccountInfo(scale, runtime) } }
                     )
                 }
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 throw Exception("Socket state: ${chainRegistry.getSocket(chain.id).networkStateFlow().first()}, error: ${e.message}", e)
             }
         }
@@ -141,20 +140,25 @@ class BalancesIntegrationTest(
     }
 
     private fun testTransactionOrigin(): TransactionOrigin = TransactionOrigin.Wallet(
-        MetaAccount(
+        createTestMetaAccount()
+    )
+
+    private fun createTestMetaAccount(): MetaAccount {
+        val metaAccount = DefaultMetaAccount(
             id = 0,
             globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
-            chainAccounts = emptyMap(),
-            proxy = null,
-            substratePublicKey = null,
-            substrateCryptoType = null,
-            substrateAccountId = emptySubstrateAccountId(),
-            ethereumAddress = emptyEthereumAccountId(),
-            ethereumPublicKey = null,
+            substratePublicKey = testAccount.fromHex(),
+            substrateCryptoType = CryptoType.SR25519,
+            substrateAccountId = testAccount.fromHex(),
+            ethereumAddress = testAccount.fromHex(),
+            ethereumPublicKey = testAccount.fromHex(),
             isSelected = true,
             name = "Test",
             type = LightMetaAccount.Type.WATCH_ONLY,
-            status = LightMetaAccount.Status.ACTIVE
+            status = LightMetaAccount.Status.ACTIVE,
+            chainAccounts = emptyMap(),
+            proxy = null
         )
-    )
+        return metaAccount
+    }
 }

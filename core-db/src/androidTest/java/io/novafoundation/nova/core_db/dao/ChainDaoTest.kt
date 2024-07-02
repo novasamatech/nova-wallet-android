@@ -68,14 +68,17 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao) {
             assetsDiff = CollectionDiffer.Diff(
                 added = emptyList(),
                 updated = emptyList(),
-                removed = chainInfo.assets.takeLast(1)
+                removed = chainInfo.assets.takeLast(1),
+                all = chainInfo.assets
             ),
             nodesDiff = CollectionDiffer.Diff(
                 added = emptyList(),
                 updated = emptyList(),
-                removed = chainInfo.nodes.takeLast(1)
+                removed = chainInfo.nodes.takeLast(1),
+                all = chainInfo.nodes
             ),
-            explorersDiff = emptyDiff()
+            explorersDiff = emptyDiff(),
+            externalApisDiff = emptyDiff()
         )
 
         val chainFromDb2 = dao.getJoinChainInfo().first()
@@ -108,11 +111,13 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao) {
             chainDiff = CollectionDiffer.Diff(
                 added = added.map(JoinedChainInfo::chain),
                 updated = updated.map(JoinedChainInfo::chain),
-                removed = toBeRemoved.map(JoinedChainInfo::chain)
+                removed = toBeRemoved.map(JoinedChainInfo::chain),
+                all = emptyList()
             ),
             assetsDiff = emptyDiff(),
             nodesDiff = emptyDiff(),
-            explorersDiff = emptyDiff()
+            explorersDiff = emptyDiff(),
+            externalApisDiff = emptyDiff()
         )
 
         val chainsFromDb = dao.getJoinChainInfo()
@@ -132,15 +137,15 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao) {
 
             dao.addChain(createTestChain(chainId))
 
-            dao.updateRemoteRuntimeVersionIfChainExists(chainId, 1)
+            dao.updateRemoteRuntimeVersionIfChainExists(chainId, 1, transactionVersion = 1)
 
             checkRuntimeVersions(remote = 1, synced = 0)
 
-            dao.updateSyncedRuntimeVersion(chainId, 1)
+            dao.updateSyncedRuntimeVersion(chainId, 1, localMigratorVersion = 1)
 
             checkRuntimeVersions(remote = 1, synced = 1)
 
-            dao.updateRemoteRuntimeVersionIfChainExists(chainId, 2)
+            dao.updateRemoteRuntimeVersionIfChainExists(chainId, 2, transactionVersion = 1)
 
             checkRuntimeVersions(remote = 2, synced = 1)
         }

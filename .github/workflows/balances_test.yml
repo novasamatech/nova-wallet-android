@@ -1,0 +1,109 @@
+name: Run balances tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */8 * * *'
+
+jobs:
+  develop-build:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/move_tests_to_main_repo
+    with:
+      branch: ${{github.head_ref}}
+      gradlew-command: assembleDebug
+      upload-name: develop-apk
+      run-tests: false
+    secrets: inherit
+
+  test-build:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/move_tests_to_main_repo
+    with:
+      branch: ${{github.head_ref}}
+      gradlew-command: assembleDebugAndroidTest
+      upload-name: test-apk
+      run-tests: false
+    secrets: inherit
+
+  run-tests:
+    needs: [develop-build, test-build]
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: develop-apk
+          path: app
+
+      - name: Debug path
+        run: |
+          ls -laR app
+
+      - name: Download instrumential test artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test-apk
+          path: test-app
+
+      - name: Debug path
+        run: |
+          ls -laR test-app
+
+      - name: Add permissions
+        run: chmod +x .github/scripts/run_balances_test.sh
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          disable-animations: true
+          profile: Nexus 6
+          api-level: 29
+          script: .github/scripts/run_balances_test.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anroid-results
+          path: ./allure-results.tar
+
+  report:
+    needs: [run-tests]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Unzip results
+        run: |
+          find artifacts -name allure-results.tar -exec tar -xvf {} \;
+      
+      - name: Debug path
+        run: |
+          ls -laR
+
+      - name: Generate report
+        uses: ./.github/workflows/report/
+        with:
+          token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          keep-reports-history: 30
+
+  telegram-notification:
+    needs: [report]
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Notify Telegram channel
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            💸 Balances tests failed.
+
+            Results: https://novasamatech.github.io/balances_test_result/${{ github.run_id}}/index.html
