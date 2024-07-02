@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Geçersiz türetme yolu</string>
     <string name="account_json_file">JSON dosyası</string>
     <string name="account_ledger_generic_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınıza <font color="#FFFFFF">Generic uygulamanın yüklü</font> olduğundan emin olun</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda <font color="#FFFFFF">Generic uygulamayı</font> açın</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">%s ile imzala</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Dikkat edin, türev yol adı boş olmalıdır</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Akıllı telefonunuzda Polkadot Vault</font> uygulamasını açın</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">“Anahtar Setleri” sekmesine gidin.</font> Anahtar setinizi, Ağınızı ve ardından Nova Wallet\'a eklemek istediğiniz hesabı seçin.</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size <font color="#FFFFFF">taramak için QR kodu sağlayacak</font></string>
     <string name="account_private_key">Özel anahtar</string>

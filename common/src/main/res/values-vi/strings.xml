@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Đường dẫn dẫn xuất không hợp lệ</string>
     <string name="account_json_file">Tệp JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Đảm bảo <font color="#FFFFFF">ứng dụng Generic được cài đặt</font> vào thiết bị Ledger của bạn bằng cách sử dụng ứng dụng Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Mở ứng dụng Generic</font> trên thiết bị Ledger của bạn</string>
     <string name="account_ledger_import_fill_description">Đảm bảo ứng dụng mạng được cài đặt vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live. Mở ứng dụng mạng trên thiết bị Ledger của bạn.</string>
     <string name="account_ledger_import_fill_disabled_hint">Thêm ít nhất một tài khoản</string>
     <string name="account_ledger_import_fill_title">Thêm tài khoản vào ví của bạn</string>
@@ -113,8 +113,8 @@
     <string name="account_parity_signer_sign_title">Ký với %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Hãy chú ý, tên đường dẫn dẫn xuất nên để trống</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Mở ứng dụng Polkadot Vault</font> trên điện thoại thông minh của bạn</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Chuyển đến tab \"Key Sets\".</font> Chọn bộ khóa, Mạng và sau đó chọn tài khoản bạn muốn thêm vào Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault sẽ cung cấp cho bạn <font color="#FFFFFF">mã QR để quét</font></string>
     <string name="account_private_key">Khoá riêng tư</string>
     <string name="account_proxieds">Được ủy quyền cho bạn (Proxieds)</string>

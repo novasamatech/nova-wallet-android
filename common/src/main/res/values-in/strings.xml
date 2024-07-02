@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Jalur derivasi tidak valid</string>
     <string name="account_json_file">File JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Pastikan aplikasi Generic terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Buka aplikasi Generic</font> di perangkat Ledger Anda</string>
     <string name="account_ledger_import_fill_description">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live. Buka aplikasi jaringan di perangkat Ledger Anda.</string>
     <string name="account_ledger_import_fill_disabled_hint">Tambahkan setidaknya satu akun</string>
     <string name="account_ledger_import_fill_title">Tambahkan akun ke dompet Anda</string>
@@ -113,8 +113,8 @@
     <string name="account_parity_signer_sign_title">Tanda tangani dengan %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Perhatikan, nama jalur derivasi harus kosong</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Buka aplikasi Polkadot Vault</font> di ponsel cerdas Anda</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Buka tab “Kumpulan Kunci”.</font> Pilih kumpulan Kunci Anda, Jaringan, lalu akun yang ingin Anda tambahkan ke Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault akan memberikan Anda kode QR untuk dipindai</string>
     <string name="account_private_key">Kunci privat</string>
     <string name="account_proxieds">Didelegasikan kepada Anda (Proxieds)</string>

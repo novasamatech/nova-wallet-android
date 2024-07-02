@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">無効な導出パス</string>
     <string name="account_json_file">JSONファイル</string>
     <string name="account_ledger_generic_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに<font color="#FFFFFF">Genericアプリをインストール</font>してください</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで<font color="#FFFFFF">汎用アプリを開く</font></string>
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
@@ -113,8 +113,8 @@
     <string name="account_parity_signer_sign_title">%sで署名</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">派生パス名が空であることに注意してください</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">スマートフォンでPolkadot Vault </font>アプリケーションを開きます</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">「キーセット」タブに移動します。</font>キーセット、ネットワーク、Nova Walletに追加するアカウントを選択します</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが<font color="#FFFFFF">スキャン用のQRコードを提供します</font></string>
     <string name="account_private_key">プライベートキー</string>
     <string name="account_proxieds">あなたに委任された（プロキシ）</string>
