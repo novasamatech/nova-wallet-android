@@ -16,7 +16,7 @@ class LanguagesHolder {
         private val SPANISH = Language("es", "SPANISH")
         private val TURKISH = Language("tr", "TURKISH")
         private val FRENCH = Language("fr", "FRENCH")
-        private val INDONESIAN = Language("id", "INDONESIAN")
+        private val INDONESIAN = Language("in", "INDONESIAN")
         private val POLISH = Language("pl", "POLISH")
         private val JAPANESE = Language("ja", "JAPANESE")
         private val VIETNAMESE = Language("vi", "VIETNAMESE")

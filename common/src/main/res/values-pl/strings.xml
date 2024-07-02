@@ -67,15 +67,15 @@
     <string name="account_invalid_derivation_path_title">Niepoprawna ścieżka wyprowadzenia</string>
     <string name="account_json_file">Plik JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Upewnij się, że <font color="#FFFFFF">aplikacja Generic jest zainstalowana</font> na Twoim urządzeniu Ledger przy użyciu aplikacji Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Otwórz aplikację Generic</font> na swoim urządzeniu Ledger</string>
     <string name="account_ledger_import_fill_description">Upewnij się, że aplikacja sieciowa jest zainstalowana na Twoim urządzeniu Ledger przy użyciu aplikacji Ledger Live. Otwórz aplikację sieciową na swoim urządzeniu Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Dodaj przynajmniej jedno konto</string>
     <string name="account_ledger_import_fill_title">Dodaj konta do swojego portfela</string>
     <string name="account_ledger_import_start_guide">Oficjalny przewodnik Bluetooth Ledger</string>
     <string name="account_ledger_import_start_step_1">Upewnij się, że <font color="#FFFFFF">aplikacja sieciowa jest zainstalowana</font> na Twoim urządzeniu Ledger przy użyciu aplikacji Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Otwórz aplikację</font> na swoim urządzeniu Ledger</string>
     <string name="account_ledger_import_start_step_3">Zezwól Nova Wallet na <font color="#FFFFFF">dostęp do Bluetooth i lokalizacji</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Wybierz konto</font>, które chcesz dodać do portfela</string>
     <string name="account_ledger_import_start_title">Połącz Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Aby podpisywać operacje i migrować swoje konta do nowej aplikacji Generic Ledger, zainstaluj i otwórz aplikację Migration. Aplikacje Legacy Old i Migration Ledger nie będą wspierane w przyszłości.</string>
     <string name="account_ledger_legacy_warning_title">Wydano nową aplikację Ledger</string>
@@ -113,8 +113,8 @@
     <string name="account_parity_signer_sign_title">Podpisz z %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Zwróć uwagę, że nazwa ścieżki wyznaczania powinna być pusta</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Otwórz aplikację Polkadot Vault</font> na swoim smartfonie</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Przejdź do zakładki „Zestawy kluczy”.</font> Wybierz zestaw kluczy, sieć, a następnie konto, które chcesz dodać do Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault dostarczy ci <font color="#FFFFFF">kod QR do zeskanowania</font></string>
     <string name="account_private_key">Klucz prywatny</string>
     <string name="account_proxieds">Delegowane do Ciebie (Proxieds)</string>

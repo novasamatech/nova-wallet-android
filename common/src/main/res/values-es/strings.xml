@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Ruta de derivación inválida</string>
     <string name="account_json_file">Archivo JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Asegúrate de que <font color="#FFFFFF">Generic app esté instalada</font> en tu dispositivo Ledger usando la aplicación Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Abre la aplicación Generic</font> en tu dispositivo Ledger</string>
     <string name="account_ledger_import_fill_description">Asegúrate de que la aplicación de Red está instalada en tu dispositivo Ledger usando la aplicación Ledger Live. Abre la aplicación de red en tu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Agrega al menos una cuenta</string>
     <string name="account_ledger_import_fill_title">Añade cuentas a tu cartera</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">Firmar con %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Preste atención, el nombre de la ruta de derivación debe estar vacío</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Abre la aplicación Polkadot Vault</font> en tu teléfono inteligente</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vaya a la pestaña \"Conjuntos de claves\".</font> Seleccione su conjunto de claves, Red y luego la cuenta que desea agregar a Nova Wallet.</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault le proporcionará un <font color="#FFFFFF">código QR para escanear</font></string>
     <string name="account_private_key">Clave privada</string>

@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Chemin de dérivation non valide</string>
     <string name="account_json_file">Fichier JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Assurez-vous que <font color="#FFFFFF">l\'application Generic est installée</font> sur votre appareil Ledger en utilisant l\'application Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Ouvrez l\'application Generic</font> sur votre appareil Ledger</string>
     <string name="account_ledger_import_fill_description">Assurez-vous que l\'application réseau est installée sur votre Ledger à l\'aide de l\'application Ledger Live. Puis ouvrez l\'application réseau sur votre Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Ajoutez au moins un compte</string>
     <string name="account_ledger_import_fill_title">Ajouter des comptes à votre portefeuille</string>
@@ -113,8 +113,8 @@
     <string name="account_parity_signer_sign_title">Signer avec %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Faites attention, le nom du chemin de dérivation doit être vide</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Ouvrez l\'application Polkadot Vault</font> sur votre smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Allez dans l\'onglet «Jeux de clés».</font> Sélectionnez votre jeu de clés, votre réseau, puis le compte que vous souhaitez ajouter à Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault vous fournira un <font color="#FFFFFF">QR code à scanner</font></string>
     <string name="account_private_key">Clé privée</string>
     <string name="account_proxieds">Délégué à vous (Proxieds)</string>

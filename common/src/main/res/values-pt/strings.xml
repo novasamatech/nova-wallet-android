@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Caminho de derivação inválido</string>
     <string name="account_json_file">Arquivo JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Certifique-se de que <font color="#FFFFFF">o aplicativo Genérico está instalado</font> no seu dispositivo Ledger usando o aplicativo Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Abra o aplicativo Generic</font> no seu dispositivo Ledger</string>
     <string name="account_ledger_import_fill_description">Certifique-se de que o aplicativo da Rede está instalado no seu dispositivo Ledger usando o aplicativo Ledger Live. Abra o aplicativo da rede no seu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Adicione pelo menos uma conta</string>
     <string name="account_ledger_import_fill_title">Adicionar contas à sua carteira</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">Assinar com %s</string>
     <string name="account_polkadot_vault">Cofre Polkadot</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Atenção, o nome do caminho de derivação deve estar vazio</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Abra o aplicativo Polkadot Vault</font> em seu smartphone</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vá para a guia “Conjuntos de Chaves”.</font> Selecione seu conjunto de Chaves, Rede e, em seguida, a conta que você gostaria de adicionar à Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault fornecerá a você <font color="#FFFFFF">QR code para escanear</font></string>
     <string name="account_private_key">Chave privada</string>
