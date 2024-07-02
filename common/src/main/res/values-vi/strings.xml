@@ -73,9 +73,9 @@
     <string name="account_ledger_import_fill_title">Thêm tài khoản vào ví của bạn</string>
     <string name="account_ledger_import_start_guide">Hướng dẫn kết nối Bluetooth chính thức của Ledger</string>
     <string name="account_ledger_import_start_step_1">Đảm bảo <font color="#FFFFFF">ứng dụng mạng được cài đặt</font> vào thiết bị Ledger của bạn bằng cách sử dụng ứng dụng Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Mở ứng dụng</font> trên thiết bị Ledger của bạn</string>
     <string name="account_ledger_import_start_step_3">Cho phép Nova Wallet <font color="#FFFFFF">truy cập Bluetooth và Vị trí</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Chọn tài khoản</font> để thêm vào ví</string>
     <string name="account_ledger_import_start_title">Kết nối Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Để ký kết các hoạt động và di chuyển các tài khoản của bạn sang ứng dụng Generic Ledger mới, cài đặt và mở ứng dụng Migration. Ứng dụng Ledger (Legacy) và Migration Ledger sẽ không còn được hỗ trợ trong tương lai.</string>
     <string name="account_ledger_legacy_warning_title">Ứng dụng Ledger mới đã được phát hành</string>

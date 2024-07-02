@@ -73,9 +73,9 @@
     <string name="account_ledger_import_fill_title">지갑에 계정을 추가하십시오</string>
     <string name="account_ledger_import_start_guide">Ledger의 공식 Bluetooth 연결 가이드</string>
     <string name="account_ledger_import_start_step_1">Ledger Live 앱을 사용하여 Ledger 장치에 <font color="#FFFFFF">Network 앱이 설치</font>되어 있는지 확인하십시오</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2">Ledger 기기에서 <font color="#FFFFFF">앱 열기</font></string>
     <string name="account_ledger_import_start_step_3"><font color="#FFFFFF">Bluetooth 및 위치</font>에 대한 Nova Wallet 접근을 허용하십시오</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4">지갑에 추가하려면 <font color="#FFFFFF">계정 선택</font></string>
     <string name="account_ledger_import_start_title">Ledger Nano X 연결</string>
     <string name="account_ledger_legacy_warning_message">작업을 서명하고 계정을 새로운 Generic Ledger 앱으로 마이그레이션하려면 Migration 앱을 설치하고 여십시오. 레거시 구형 및 Migration Ledger 앱은 더 이상 지원되지 않을 것입니다.</string>
     <string name="account_ledger_legacy_warning_title">새로운 Ledger 앱이 출시되었습니다</string>

@@ -73,9 +73,9 @@
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
     <string name="account_ledger_import_start_guide">Ledgerの公式Bluetooth接続ガイド</string>
     <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに<font color="#FFFFFF">ネットワークアプリをインストール</font>してください</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2">Ledger デバイスで<font color="#FFFFFF">アプリを開く</font></string>
     <string name="account_ledger_import_start_step_3">Nova Walletに<font color="#FFFFFF">Bluetoothと位置情報へのアクセスを許可</font>してください</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">ウォレットに追加するアカウント</font> を選択する。</string>
     <string name="account_ledger_import_start_title">Ledger Nano Xを接続</string>
     <string name="account_ledger_legacy_warning_message">操作にサインしてアカウントを新しいGeneric Ledgerアプリに移行するには、Migrationアプリをインストールして開いてください。Legacy OldおよびMigration Ledgerアプリは将来サポートされなくなります。</string>
     <string name="account_ledger_legacy_warning_title">新しいLedgerアプリがリリースされました</string>

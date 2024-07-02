@@ -73,9 +73,9 @@
     <string name="account_ledger_import_fill_title">Tambahkan akun ke dompet Anda</string>
     <string name="account_ledger_import_start_guide">Panduan Koneksi Bluetooth Resmi Ledger</string>
     <string name="account_ledger_import_start_step_1">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Open the network app</font> on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Buka aplikasi</font> pada perangkat Ledger Anda</string>
     <string name="account_ledger_import_start_step_3">Izinkan Nova Wallet untuk mengakses Bluetooth dan Lokasi</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Select account</font> to add to wallet</string>
+    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Pilih akun</font> untuk ditambahkan ke dompet</string>
     <string name="account_ledger_import_start_title">Hubungkan Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Untuk menandatangani operasi dan memigrasikan akun Anda ke aplikasi Ledger Generik yang baru, instal dan buka aplikasi Migrasi. Aplikasi Ledger Lama dan Ledger Migrasi tidak akan didukung di masa depan.</string>
     <string name="account_ledger_legacy_warning_title">Aplikasi Ledger Baru Telah Dirilis</string>
