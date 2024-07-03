@@ -9,11 +9,12 @@ import io.novafoundation.nova.common.utils.padEnd
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxStandaloneSwapBuilder
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSourceId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.DynamicFee
@@ -23,11 +24,9 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnip
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmnipoolAssetState
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.feeParamsConstant
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.quote
-import io.novafoundation.nova.feature_swap_impl.domain.swap.QuotableEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -86,7 +85,7 @@ private class OmniPoolSwapSource(
 
     private val omniPoolFlow: MutableSharedFlow<OmniPool> = singleReplaySharedFlow()
 
-    override suspend fun availableSwapDirections(): List<QuotableEdge> {
+    override suspend fun availableSwapDirections(): Collection<HydraDxSourceEdge> {
         val pooledOnChainAssetIds = getPooledOnChainAssetIds()
 
         val pooledChainAssetsIds = matchKnownChainAssetIds(pooledOnChainAssetIds)
@@ -101,26 +100,6 @@ private class OmniPoolSwapSource(
                     null
                 }
             }
-        }
-    }
-
-    override suspend fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs) {
-        val assetIdIn = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.assetIn)
-        val assetIdOut = hydraDxAssetIdConverter.toOnChainIdOrThrow(args.assetOut)
-
-        when (val limit = args.swapLimit) {
-            is SwapLimit.SpecifiedIn -> sell(
-                assetIdIn = assetIdIn,
-                assetIdOut = assetIdOut,
-                amountIn = limit.expectedAmountIn,
-                minBuyAmount = limit.amountOutMin
-            )
-            is SwapLimit.SpecifiedOut -> buy(
-                assetIdIn = assetIdIn,
-                assetIdOut = assetIdOut,
-                amountOut = limit.expectedAmountOut,
-                maxSellAmount = limit.amountInMax
-            )
         }
     }
 
@@ -167,10 +146,6 @@ private class OmniPoolSwapSource(
         }
             .onEach(omniPoolFlow::emit)
             .map { }
-    }
-
-    override fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*> {
-        return DictEnum.Entry("Omnipool", null)
     }
 
     private suspend fun getPooledOnChainAssetIds(): List<BigInteger> {
@@ -266,18 +241,46 @@ private class OmniPoolSwapSource(
 
     private inner class OmniPoolSwapEdge(
         private val fromAsset: RemoteIdAndLocalAsset,
-        private val toAsset: RemoteIdAndLocalAsset
-    ) : QuotableEdge {
+        private val toAsset: RemoteIdAndLocalAsset,
+    ) : HydraDxSourceEdge {
 
         override val from: FullChainAssetId = fromAsset.second.fullId
 
-        override val to: FullChainAssetId = fromAsset.second.fullId
+        override val to: FullChainAssetId = toAsset.second.fullId
+
+        override fun routerPoolArgument(): DictEnum.Entry<*> {
+            return DictEnum.Entry("Omnipool", null)
+        }
+
+        override val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder = {
+            executeSwap(it)
+        }
 
         override suspend fun quote(amount: Balance, direction: SwapDirection): Balance {
             val omniPool = omniPoolFlow.first()
 
             return omniPool.quote(fromAsset.first, toAsset.first, amount, direction)
                 ?: throw SwapQuoteException.NotEnoughLiquidity
+        }
+
+        private fun ExtrinsicBuilder.executeSwap(args: AtomicSwapOperationArgs) {
+            val assetIdIn = fromAsset.first
+            val assetIdOut = toAsset.first
+
+            when (val limit = args.swapLimit) {
+                is SwapLimit.SpecifiedIn -> sell(
+                    assetIdIn = assetIdIn,
+                    assetIdOut = assetIdOut,
+                    amountIn = limit.amountIn,
+                    minBuyAmount = limit.amountOutMin
+                )
+                is SwapLimit.SpecifiedOut -> buy(
+                    assetIdIn = assetIdIn,
+                    assetIdOut = assetIdOut,
+                    amountOut = limit.amountOut,
+                    maxSellAmount = limit.amountInMax
+                )
+            }
         }
     }
 }
@@ -288,6 +291,12 @@ fun omniPoolAccountId(): AccountId {
 
 typealias RemoteAndLocalId = Pair<HydraDxAssetId, FullChainAssetId>
 typealias RemoteIdAndLocalAsset = Pair<HydraDxAssetId, Chain.Asset>
+typealias RemoteAndLocalIdOptional = Pair<HydraDxAssetId, FullChainAssetId?>
+
+@Suppress("UNCHECKED_CAST")
+fun RemoteAndLocalIdOptional.flatten(): RemoteAndLocalId? {
+    return second?.let { this as RemoteAndLocalId }
+}
 
 val RemoteAndLocalId.remoteId
     get() = first
@@ -295,4 +304,3 @@ val RemoteAndLocalId.remoteId
 val RemoteAndLocalId.localId
     get() = second
 
-typealias RemoteAndLocalIdOptional = Pair<HydraDxAssetId, FullChainAssetId?>

@@ -44,6 +44,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -154,7 +155,6 @@ internal class RealSwapService(
             val operationArgs = AtomicSwapOperationArgs(
                 swapLimit = SwapLimit(direction, quotedEdge.quotedAmount, perSegmentSlippage, quotedEdge.quote),
                 customFeeAsset = segmentExecuteArgs.customFeeAsset,
-                nativeAsset = segmentExecuteArgs.nativeAsset
             )
 
             // Initial case - begin first operation
@@ -183,30 +183,23 @@ internal class RealSwapService(
         args: SwapQuoteArgs,
         computationSharingScope: CoroutineScope
     ): SwapQuote {
-        val from = args.tokenIn.configuration.fullId
-        val to = args.tokenOut.configuration.fullId
+        val quotedTrade = quoteTrade(
+            chainAssetIn = args.tokenIn.configuration,
+            chainAssetOut = args.tokenOut.configuration,
+            amount = args.amount,
+            swapDirection = args.swapDirection,
+            computationSharingScope = computationSharingScope
+        )
 
-        val paths = pathsFromCacheOrCompute(from, to, computationSharingScope) {
-            val graph = directionsGraph(computationSharingScope).first()
-
-            graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT)
-        }
-
-        val quotedPaths = paths.mapNotNull { path -> quotePath(path, args.amount, args.swapDirection) }
-        if (paths.isEmpty()) {
-            throw SwapQuoteException.NotEnoughLiquidity
-        }
-
-        val bestPathQuote = quotedPaths.max()
-
-        val (amountIn, amountOut) = args.inAndOutAmounts(bestPathQuote)
+        val amountIn = quotedTrade.amountIn()
+        val amountOut = quotedTrade.amountOut()
 
         return SwapQuote(
             amountIn = args.tokenIn.configuration.withAmount(amountIn),
             amountOut = args.tokenOut.configuration.withAmount(amountOut),
             direction = args.swapDirection,
             priceImpact = args.calculatePriceImpact(amountIn, amountOut),
-            path = bestPathQuote.path
+            path = quotedTrade.path
         )
     }
 
@@ -230,10 +223,24 @@ internal class RealSwapService(
         return calculatePriceImpact(fiatIn, fiatOut)
     }
 
-    private fun SwapQuoteArgs.inAndOutAmounts(quote: QuotedTrade): Pair<Balance, Balance> {
-        return when (swapDirection) {
-            SwapDirection.SPECIFIED_IN -> amount to quote.lastSegmentQuote
-            SwapDirection.SPECIFIED_OUT -> quote.firstSegmentQuote to amount
+    private fun QuotedTrade.amountIn(): Balance {
+        return when (direction) {
+            SwapDirection.SPECIFIED_IN -> firstSegmentQuotedAmount
+            SwapDirection.SPECIFIED_OUT -> firstSegmentQuote
+        }
+    }
+
+    private fun QuotedTrade.amountOut(): Balance {
+        return when (direction) {
+            SwapDirection.SPECIFIED_IN -> lastSegmentQuote
+            SwapDirection.SPECIFIED_OUT -> lastSegmentQuotedAmount
+        }
+    }
+
+    private fun QuotedTrade.finalQuote(): Balance {
+        return when (direction) {
+            SwapDirection.SPECIFIED_IN -> lastSegmentQuote
+            SwapDirection.SPECIFIED_OUT -> firstSegmentQuote
         }
     }
 
@@ -285,7 +292,7 @@ internal class RealSwapService(
             else -> null
         }
 
-        return factory?.create(chain, computationScope)
+        return factory?.create(chain, InnerParentQuoter(computationScope), computationScope)
     }
 
     // Assumes each flow will have only single element
@@ -345,6 +352,45 @@ internal class RealSwapService(
                 quotedPath to segmentQuote
             }.first
         }.getOrNull()
+    }
+
+    private suspend fun quoteTrade(
+        chainAssetIn: Chain.Asset,
+        chainAssetOut: Chain.Asset,
+        amount: Balance,
+        swapDirection: SwapDirection,
+        computationSharingScope: CoroutineScope
+    ): QuotedTrade {
+        val from = chainAssetIn.fullId
+        val to = chainAssetOut.fullId
+
+        val paths = pathsFromCacheOrCompute(from, to, computationSharingScope) {
+            val graph = directionsGraph(computationSharingScope).first()
+
+            graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT)
+        }
+
+        val quotedPaths = paths.mapNotNull { path -> quotePath(path, amount, swapDirection) }
+        if (paths.isEmpty()) {
+            throw SwapQuoteException.NotEnoughLiquidity
+        }
+
+        return quotedPaths.max()
+    }
+
+    private inner class InnerParentQuoter(
+        private val computationScope: CoroutineScope
+    ) : AssetExchange.ParentQuoter {
+
+        override suspend fun quote(quoteArgs: ParentQuoterArgs): Balance {
+            return quoteTrade(
+                chainAssetIn = quoteArgs.chainAssetIn,
+                chainAssetOut = quoteArgs.chainAssetOut,
+                amount = quoteArgs.amount,
+                swapDirection = quoteArgs.swapDirection,
+                computationSharingScope = computationScope
+            ).finalQuote()
+        }
     }
 
     // TOOD rework path logging
@@ -431,8 +477,14 @@ private class QuotedTrade(
     }
 }
 
+private val QuotedTrade.lastSegmentQuotedAmount: Balance
+    get() = path.last().quotedAmount
+
 private val QuotedTrade.lastSegmentQuote: Balance
     get() = path.last().quote
 
 private val QuotedTrade.firstSegmentQuote: Balance
     get() = path.first().quote
+
+private val QuotedTrade.firstSegmentQuotedAmount: Balance
+    get() = path.first().quotedAmount

@@ -25,7 +25,6 @@ class SwapExecuteArgs(
 
 class SegmentExecuteArgs(
     val quotedSwapEdge: QuotedSwapEdge,
-    val nativeAsset: Asset,
     val customFeeAsset: Chain.Asset?,
 )
 

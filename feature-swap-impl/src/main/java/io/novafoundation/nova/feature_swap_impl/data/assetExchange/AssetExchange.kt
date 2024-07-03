@@ -14,7 +14,16 @@ interface AssetExchange {
 
     interface Factory {
 
-        suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange?
+        suspend fun create(
+            chain: Chain,
+            parentQuoter: ParentQuoter,
+            coroutineScope: CoroutineScope
+        ): AssetExchange?
+    }
+
+    interface ParentQuoter {
+
+        suspend fun quote(quoteArgs: ParentQuoterArgs): Balance
     }
 
     /**
@@ -31,7 +40,7 @@ interface AssetExchange {
     fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 }
 
-data class AssetExchangeQuoteArgs(
+data class ParentQuoterArgs(
     val chainAssetIn: Chain.Asset,
     val chainAssetOut: Chain.Asset,
     val amount: Balance,
