@@ -164,7 +164,7 @@
     <string name="assets_add_token">Token ekle</string>
     <string name="assets_add_token_enter_info_address_label">Sözleşme adresi</string>
     <string name="assets_add_token_enter_info_decimals_label">Ondalıklar</string>
-    <string name="assets_add_token_enter_info_price_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
+    <string name="token_price_info_provider_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
     <string name="assets_add_token_enter_info_symbol_label">Sembol</string>
     <string name="assets_add_token_enter_info_title">ERC-20 token bilgilerini girin</string>
     <string name="assets_add_token_select_chain_title">ERC-20 token eklemek için ağı seçin</string>

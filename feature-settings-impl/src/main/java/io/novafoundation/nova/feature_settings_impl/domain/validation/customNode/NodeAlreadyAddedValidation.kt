@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.domain.validation
+package io.novafoundation.nova.feature_settings_impl.domain.validation.customNode
 
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.validation.Validation

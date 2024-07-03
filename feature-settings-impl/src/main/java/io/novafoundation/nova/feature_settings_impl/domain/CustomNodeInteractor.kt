@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
-import io.novafoundation.nova.feature_settings_impl.domain.validation.NetworkNodeValidationSystem
-import io.novafoundation.nova.feature_settings_impl.domain.validation.validNodeUrl
-import io.novafoundation.nova.feature_settings_impl.domain.validation.validateNodeNotAdded
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.NetworkNodeValidationSystem
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.nodeSupportedByNetworkValidation
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.validateNodeNotAdded
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
@@ -47,7 +47,7 @@ class RealCustomNodeInteractor(
         return ValidationSystem {
             validateNodeNotAdded()
 
-            validNodeUrl(nodeChainIdRepositoryFactory, coroutineScope)
+            nodeSupportedByNetworkValidation(nodeChainIdRepositoryFactory, coroutineScope)
         }
     }
 }

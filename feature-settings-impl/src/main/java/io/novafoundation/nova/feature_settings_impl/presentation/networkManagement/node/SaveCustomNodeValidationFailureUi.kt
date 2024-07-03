@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.TransformedFailure.Default
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_settings_impl.R
-import io.novafoundation.nova.feature_settings_impl.domain.validation.NetworkNodeFailure
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.NetworkNodeFailure
 
 fun mapSaveCustomNodeFailureToUI(
     resourceManager: ResourceManager,

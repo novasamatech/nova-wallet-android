@@ -22,6 +22,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
@@ -80,6 +81,14 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
     if (staking.isEmpty()) return emptyList()
 
     return staking.filter { it != UNSUPPORTED }
+}
+
+fun Chain.networkType(): NetworkType {
+    return if (hasSubstrateRuntime) {
+        NetworkType.SUBSTRATE
+    } else {
+        NetworkType.EVM
+    }
 }
 
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()

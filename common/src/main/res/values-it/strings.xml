@@ -164,7 +164,7 @@
     <string name="assets_add_token">Aggiungi token</string>
     <string name="assets_add_token_enter_info_address_label">Indirizzo del contratto</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimali</string>
-    <string name="assets_add_token_enter_info_price_label">Collegamento Coingecko per informazioni sul prezzo (opzionale)</string>
+    <string name="token_price_info_provider_label">Collegamento Coingecko per informazioni sul prezzo (opzionale)</string>
     <string name="assets_add_token_enter_info_symbol_label">Simbolo</string>
     <string name="assets_add_token_enter_info_title">Inserisci i dettagli del token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Seleziona la rete per aggiungere il token ERC-20</string>

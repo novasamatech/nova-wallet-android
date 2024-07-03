@@ -7,6 +7,7 @@ import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
@@ -25,14 +26,22 @@ class NodeChainIdRepositoryFactory(
     private val web3ApiFactory: Web3ApiFactory
 ) {
 
-    fun create(chain: Chain, nodeUrl: String, coroutineScope: CoroutineScope): NodeChainIdRepository {
-        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
+    fun create(networkType: NetworkType, nodeUrl: String, coroutineScope: CoroutineScope): NodeChainIdRepository {
+        return when (networkType) {
+            NetworkType.SUBSTRATE -> substrate(nodeUrl, coroutineScope)
 
-        return when (chain.hasSubstrateRuntime) {
-            true -> SubstrateNodeChainIdRepository(nodeConnection)
-
-            false -> EthereumNodeChainIdRepository(nodeConnection, web3ApiFactory)
+            NetworkType.EVM -> evm(nodeUrl, coroutineScope)
         }
+    }
+
+    fun substrate(nodeUrl: String, coroutineScope: CoroutineScope): SubstrateNodeChainIdRepository {
+        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
+        return SubstrateNodeChainIdRepository(nodeConnection)
+    }
+
+    fun evm(nodeUrl: String, coroutineScope: CoroutineScope): EthereumNodeChainIdRepository {
+        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
+        return EthereumNodeChainIdRepository(nodeConnection, web3ApiFactory)
     }
 }
 

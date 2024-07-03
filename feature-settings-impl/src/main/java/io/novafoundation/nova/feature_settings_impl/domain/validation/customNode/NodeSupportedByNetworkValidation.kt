@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.domain.validation
+package io.novafoundation.nova.feature_settings_impl.domain.validation.customNode
 
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -6,18 +6,19 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
+import io.novafoundation.nova.runtime.ext.networkType
 import java.lang.Exception
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.seconds
 
-class AliveNetworkNodeValidation(
+class NodeSupportedByNetworkValidation(
     private val nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory,
     private val coroutineScope: CoroutineScope
 ) : Validation<NetworkNodePayload, NetworkNodeFailure> {
 
     override suspend fun validate(value: NetworkNodePayload): ValidationStatus<NetworkNodeFailure> {
-        val nodeChainIdRepository = nodeChainIdRepositoryFactory.create(value.chain, value.nodeUrl, coroutineScope)
+        val nodeChainIdRepository = nodeChainIdRepositoryFactory.create(value.chain.networkType(), value.nodeUrl, coroutineScope)
 
         return try {
             val requestedChainId = withTimeout(10.seconds) {
@@ -33,9 +34,9 @@ class AliveNetworkNodeValidation(
     }
 }
 
-fun ValidationSystemBuilder<NetworkNodePayload, NetworkNodeFailure>.validNodeUrl(
+fun ValidationSystemBuilder<NetworkNodePayload, NetworkNodeFailure>.nodeSupportedByNetworkValidation(
     nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory,
     coroutineScope: CoroutineScope
 ) = validate(
-    AliveNetworkNodeValidation(nodeChainIdRepositoryFactory, coroutineScope)
+    NodeSupportedByNetworkValidation(nodeChainIdRepositoryFactory, coroutineScope)
 )
