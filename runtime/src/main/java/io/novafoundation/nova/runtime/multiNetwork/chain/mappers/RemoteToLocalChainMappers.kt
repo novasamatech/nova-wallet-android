@@ -10,6 +10,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.Companion.EMPTY_CHAIN_ICON
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
@@ -71,7 +72,7 @@ fun mapRemoteChainToLocal(
             parentId = parentId,
             name = name,
             types = types,
-            icon = icon ?: "", // We put empty string as a fallback to avoid complicated migration
+            icon = icon ?: EMPTY_CHAIN_ICON,
             prefix = addressPrefix,
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
@@ -114,10 +115,6 @@ private fun determineConnectionState(remoteChain: ChainRemote, oldLocalChain: Ch
 private fun ConnectionStateLocal.isNotDefault(): Boolean {
     return this != ConnectionStateLocal.LIGHT_SYNC
 }
-
-private fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
-
-private fun mapSwapListToLocal(swap: List<Chain.Swap>) = swap.joinToString(separator = ",", transform = Chain.Swap::name)
 
 private fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): String {
     val domainGovernanceTypes = remoteOptions.governanceTypesFromOptions()

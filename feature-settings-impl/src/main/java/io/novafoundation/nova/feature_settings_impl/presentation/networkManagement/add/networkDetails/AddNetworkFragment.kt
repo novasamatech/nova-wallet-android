@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import kotlinx.android.synthetic.main.fragment_add_network.addNetworkApplyButton
 import kotlinx.android.synthetic.main.fragment_add_network.addNetworkBlockExplorer
 import kotlinx.android.synthetic.main.fragment_add_network.addNetworkChainId
@@ -48,7 +49,7 @@ class AddNetworkFragment : BaseFragment<AddNetworkViewModel>() {
             SettingsFeatureApi::class.java
         )
             .addNetworkFactory()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
@@ -61,9 +62,9 @@ class AddNetworkFragment : BaseFragment<AddNetworkViewModel>() {
     override fun subscribe(viewModel: AddNetworkViewModel) {
         addNetworkNodeUrl.bindTo(viewModel.nodeUrlFlow, viewModel)
         addNetworkName.bindTo(viewModel.networkNameFlow, viewModel)
-        addNetworkCurrency.bindTo(viewModel.tokenNameFlow, viewModel)
+        addNetworkCurrency.bindTo(viewModel.tokenSymbolFlow, viewModel)
         viewModel.isChainIdVisibleFlow.observe { addNetworkChainIdContainer.isVisible = it }
-        addNetworkChainId.bindTo(viewModel.chainIdFlow, viewModel)
+        addNetworkChainId.bindTo(viewModel.evmChainIdFlow, viewModel)
         addNetworkBlockExplorer.bindTo(viewModel.blockExplorerFlow, viewModel)
         addNetworkPriceInfoProvider.bindTo(viewModel.priceProviderFlow, viewModel)
         viewModel.buttonState.observe { addNetworkApplyButton.setState(it) }

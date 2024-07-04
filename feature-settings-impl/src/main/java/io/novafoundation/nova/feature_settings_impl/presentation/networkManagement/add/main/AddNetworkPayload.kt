@@ -1,6 +1,7 @@
-package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails
+package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main
 
 import android.os.Parcelable
+import java.math.BigInteger
 import kotlinx.android.parcel.Parcelize
 
 
@@ -11,15 +12,16 @@ class AddNetworkPayload(
 ) : Parcelable {
 
     enum class Mode {
-        Substrate, EVM
+        SUBSTRATE, EVM
     }
 
     @Parcelize
     class NetworkData(
-        val rpcNodeUrl: String,
-        val networkName: String,
-        val tokenName: String,
-        val chainId: String?,
+        val iconUrl: String?,
+        val rpcNodeUrl: String?,
+        val networkName: String?,
+        val tokenName: String?,
+        val evmChainId: BigInteger?,
         val blockExplorerUrl: String?,
         val coingeckoLink: String?
     ) : Parcelable

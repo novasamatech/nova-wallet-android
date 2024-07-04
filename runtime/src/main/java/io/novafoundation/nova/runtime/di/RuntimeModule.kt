@@ -37,11 +37,13 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVer
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.runtime.repository.RealBlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.RealChainNodeRepository
+import io.novafoundation.nova.runtime.repository.RealChainRepository
 import io.novafoundation.nova.runtime.repository.RealParachainInfoRepository
 import io.novafoundation.nova.runtime.repository.RealPreConfiguredChainsRepository
 import io.novafoundation.nova.runtime.repository.RealTotalIssuanceRepository
@@ -258,6 +260,18 @@ class RuntimeModule {
         return RealPreConfiguredChainsRepository(
             chainFetcher,
             chainMapperFacade
+        )
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideChainRepository(
+        chainDao: ChainDao,
+        gson: Gson
+    ): ChainRepository {
+        return RealChainRepository(
+            chainDao,
+            gson
         )
     }
 }

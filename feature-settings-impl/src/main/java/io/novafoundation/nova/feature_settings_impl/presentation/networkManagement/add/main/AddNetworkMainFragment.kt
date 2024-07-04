@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
@@ -20,7 +21,19 @@ import kotlinx.android.synthetic.main.fragment_network_management.networkManagem
 
 class AddNetworkMainFragment : BaseFragment<AddNetworkMainViewModel>() {
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { AddNetworkMainPagerAdapter(this) }
+    companion object {
+
+        private const val KEY_PAYLOAD = "key_payload"
+
+        fun getBundle(payload: AddNetworkPayload): Bundle {
+            return Bundle().apply {
+                putParcelable(KEY_PAYLOAD, payload)
+            }
+        }
+    }
+
+    private val payloadArg: AddNetworkPayload? by lazy(LazyThreadSafetyMode.NONE) { argument(KEY_PAYLOAD) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) { AddNetworkMainPagerAdapter(this, payloadArg) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,8 +46,12 @@ class AddNetworkMainFragment : BaseFragment<AddNetworkMainViewModel>() {
     override fun initViews() {
         addNetworkMainToolbar.applyStatusBarInsets()
         addNetworkMainToolbar.setHomeButtonListener { viewModel.backClicked() }
-        addNetworkMainViewPager.adapter = AddNetworkMainPagerAdapter(this)
-        addNetworkMainTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
+        addNetworkMainViewPager.adapter = adapter
+        if (payloadArg == null) {
+            addNetworkMainTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
+        } else {
+            addNetworkMainTabLayout.makeGone()
+        }
     }
 
     override fun inject() {

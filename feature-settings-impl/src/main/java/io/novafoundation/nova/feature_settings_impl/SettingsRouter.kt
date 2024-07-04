@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_settings_impl
 
 import io.novafoundation.nova.common.navigation.ReturnableRouter
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodePayload
 
@@ -35,4 +36,10 @@ interface SettingsRouter : ReturnableRouter {
     fun openManualBackup()
 
     fun addNetwork()
+
+    fun openCreateNetworkFlow()
+
+    fun openCreateNetworkFlow(payload: AddNetworkPayload)
+
+    fun finishCreateNetworkFlow()
 }

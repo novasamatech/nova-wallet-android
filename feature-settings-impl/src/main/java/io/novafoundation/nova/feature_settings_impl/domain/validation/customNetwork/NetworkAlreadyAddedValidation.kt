@@ -5,30 +5,38 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
-import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepository
-import java.lang.Exception
-import kotlinx.coroutines.withTimeout
-import kotlin.time.Duration.Companion.seconds
+import io.novafoundation.nova.common.validation.validationWarning
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
 
 class NetworkAlreadyAddedValidation<P, F>(
-    private val nodeChainIdRepository: NodeChainIdRepository,
-    private val failure: (P) -> F
+    private val chainRegistry: ChainRegistry,
+    private val chainIdRequester: suspend (P) -> String,
+    private val defaultNetworkFailure: (P, Chain) -> F,
+    private val customNetworkWarning: (P, Chain) -> F
 ) : Validation<P, F> {
 
     override suspend fun validate(value: P): ValidationStatus<F> {
-        return try {
-            withTimeout(10.seconds) { nodeChainIdRepository.requestChainId() }
+        val chainId = chainIdRequester(value)
 
-            valid()
-        } catch (e: Exception) {
-            validationError(failure(value))
+        val chain = chainRegistry.chainsById()[chainId]
+        if (chain != null) {
+            return when (chain.source) {
+                Chain.Source.DEFAULT -> validationError(defaultNetworkFailure(value, chain))
+                Chain.Source.CUSTOM -> validationWarning(customNetworkWarning(value, chain))
+            }
         }
+
+        return valid()
     }
 }
 
-fun <P, F> ValidationSystemBuilder<P, F>.validateNetworkAlreadyAdded(
-    nodeChainIdRepository: NodeChainIdRepository,
-    failure: (P) -> F
+fun <P, F> ValidationSystemBuilder<P, F>.validateNetworkNotAdded(
+    chainRegistry: ChainRegistry,
+    chainIdRequester: suspend (P) -> String,
+    defaultNetworkFailure: (P, Chain) -> F,
+    customNetworkWarning: (P, Chain) -> F
 ) = validate(
-    NetworkNodeIsAliveValidation(nodeChainIdRepository, failure)
+    NetworkAlreadyAddedValidation(chainRegistry, chainIdRequester, defaultNetworkFailure, customNetworkWarning)
 )

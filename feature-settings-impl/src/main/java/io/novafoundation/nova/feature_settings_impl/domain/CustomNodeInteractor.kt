@@ -2,11 +2,19 @@ package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
+import io.novafoundation.nova.feature_settings_impl.domain.validation.NodeChainIdSingletonProvider
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.validateNetworkNodeIsAlive
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.validateNetworkNotAdded
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.validateNodeSupportedByNetwork
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.NetworkNodeValidationSystem
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.nodeSupportedByNetworkValidation
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.validateNetworkNodeIsAlive
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.validateNodeNotAdded
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.validateNodeSupportedByNetwork
+import io.novafoundation.nova.runtime.ext.networkType
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
 import kotlinx.coroutines.CoroutineScope
 
@@ -47,7 +55,11 @@ class RealCustomNodeInteractor(
         return ValidationSystem {
             validateNodeNotAdded()
 
-            nodeSupportedByNetworkValidation(nodeChainIdRepositoryFactory, coroutineScope)
+            val chainIdRequestSingleton = NodeChainIdSingletonProvider(nodeChainIdRepositoryFactory, coroutineScope)
+
+            validateNetworkNodeIsAlive { chainIdRequestSingleton.getChainId(it.chain.networkType(), it.nodeUrl) }
+
+            validateNodeSupportedByNetwork { chainIdRequestSingleton.getChainId() }
         }
     }
 }

@@ -32,6 +32,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.No
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 
 interface SettingsFeatureDependencies {
@@ -101,4 +102,10 @@ interface SettingsFeatureDependencies {
     val validationExecutor: ValidationExecutor
 
     val preConfiguredChainsRepository: PreConfiguredChainsRepository
+
+    val coinGeckoLinkParser: CoinGeckoLinkParser
+
+    val chainRepository: ChainRepository
+
+    val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
 }

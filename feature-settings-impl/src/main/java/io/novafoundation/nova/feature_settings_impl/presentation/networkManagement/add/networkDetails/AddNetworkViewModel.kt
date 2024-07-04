@@ -1,27 +1,45 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.nullIfBlank
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
+import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkPayload
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkValidationSystem
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class AddNetworkViewModel(
     private val resourceManager: ResourceManager,
     private val router: SettingsRouter,
-    private val payload: AddNetworkPayload
-) : BaseViewModel() {
+    private val payload: AddNetworkPayload,
+    private val interactor: AddNetworkInteractor,
+    private val validationExecutor: ValidationExecutor,
+    private val autofillNetworkMetadataMixinFactory: AutofillNetworkMetadataMixinFactory
+) : BaseViewModel(), Validatable by validationExecutor {
 
     val isChainIdVisibleFlow = flowOf { chainIdRequired() }
         .shareInBackground()
 
     val nodeUrlFlow = MutableStateFlow("")
     val networkNameFlow = MutableStateFlow("")
-    val tokenNameFlow = MutableStateFlow("")
-    val chainIdFlow = MutableStateFlow("")
+    val tokenSymbolFlow = MutableStateFlow("")
+    val evmChainIdFlow = MutableStateFlow("")
     val blockExplorerFlow = MutableStateFlow("")
     val priceProviderFlow = MutableStateFlow("")
 
@@ -30,8 +48,8 @@ class AddNetworkViewModel(
     val buttonState = combine(
         nodeUrlFlow,
         networkNameFlow,
-        tokenNameFlow,
-        chainIdFlow,
+        tokenSymbolFlow,
+        evmChainIdFlow,
         loadingState
     ) { url, networkName, tokenName, chainId, isLoading ->
         val chainIdRequiredAndEmpty = chainIdRequired() && chainId.isBlank()
@@ -50,18 +68,101 @@ class AddNetworkViewModel(
         if (prefilledData != null) {
             nodeUrlFlow.value = prefilledData.rpcNodeUrl
             networkNameFlow.value = prefilledData.networkName
-            tokenNameFlow.value = prefilledData.tokenName
-            chainIdFlow.value = prefilledData.chainId ?: ""
+            tokenSymbolFlow.value = prefilledData.tokenName
+            evmChainIdFlow.value = prefilledData.evmChainId ?: ""
             blockExplorerFlow.value = prefilledData.blockExplorerUrl ?: ""
             priceProviderFlow.value = prefilledData.coingeckoLink ?: ""
         }
+
+        runAutofill()
+    }
+
+    fun addNetworkClicked() {
+        launch {
+            val validationPayload = CustomNetworkPayload(
+                nodeUrl = nodeUrlFlow.value,
+                chainName = networkNameFlow.value,
+                tokenSymbol = tokenSymbolFlow.value,
+                evmChainId = evmChainIdFlow.value.toIntOrNull(),
+                blockExplorerUrl = blockExplorerFlow.value.nullIfBlank(),
+                coingeckoLinkUrl = priceProviderFlow.value.nullIfBlank(),
+            )
+
+            validationExecutor.requireValid(
+                validationSystem = getValidationSystem(),
+                payload = validationPayload,
+                progressConsumer = loadingState.progressConsumer(),
+                validationFailureTransformerCustom = { status, actions -> mapSaveCustomNetworkFailureToUI(resourceManager, status, actions) }
+            ) {
+                loadingState.value = false
+
+                executeSaving(validationPayload)
+            }
+        }
+    }
+
+    private fun executeSaving(savingPayload: CustomNetworkPayload) {
+        launch {
+            val nodeName = resourceManager.getString(R.string.create_network_node_name, savingPayload.chainName)
+            val blockExplorerName = resourceManager.getString(R.string.create_network_block_explorer_name, savingPayload.chainName)
+            val blockExplorerNameAndUrl = savingPayload.blockExplorerUrl?.let { blockExplorerName to it }
+
+            val result = when (payload.mode) {
+                AddNetworkPayload.Mode.EVM -> interactor.createEvmNetwork(
+                    chainId = savingPayload.evmChainId!!,
+                    iconUrl = payload.prefilledData?.iconUrl,
+                    nodeUrl = savingPayload.nodeUrl,
+                    nodeName = nodeName,
+                    chainName = savingPayload.chainName,
+                    tokenSymbol = savingPayload.tokenSymbol,
+                    blockExplorer = blockExplorerNameAndUrl,
+                    coingeckoLink = savingPayload.coingeckoLinkUrl
+                )
+
+                AddNetworkPayload.Mode.SUBSTRATE -> interactor.createSubstrateNetwork(
+                    iconUrl = payload.prefilledData?.iconUrl,
+                    nodeUrl = savingPayload.nodeUrl,
+                    nodeName = nodeName,
+                    chainName = savingPayload.chainName,
+                    tokenSymbol = savingPayload.tokenSymbol,
+                    blockExplorer = blockExplorerNameAndUrl,
+                    coingeckoLink = savingPayload.coingeckoLinkUrl,
+                    coroutineScope = viewModelScope
+                )
+            }
+
+            result.onSuccess { router.finishCreateNetworkFlow() }
+                .onFailure {
+                    showError(resourceManager.getString(R.string.common_something_went_wrong_title))
+                }
+        }
+    }
+
+    private fun getValidationSystem(): CustomNetworkValidationSystem {
+        return when (payload.mode) {
+            AddNetworkPayload.Mode.EVM -> interactor.getEvmValidationSystem(viewModelScope)
+            AddNetworkPayload.Mode.SUBSTRATE -> interactor.getSubstrateValidationSystem(viewModelScope)
+        }
+    }
+
+    private fun runAutofill() {
+        val autofillMixin = when (payload.mode) {
+            AddNetworkPayload.Mode.EVM -> autofillNetworkMetadataMixinFactory.evm(viewModelScope)
+            AddNetworkPayload.Mode.SUBSTRATE -> autofillNetworkMetadataMixinFactory.substrate(viewModelScope)
+        }
+
+        nodeUrlFlow.mapLatest { url -> autofillMixin.autofill(url) }
+            .onEach { result ->
+                result.onSuccess { data ->
+                    data.chainName?.let { networkNameFlow.value = it }
+                    data.tokenSymbol?.let { tokenSymbolFlow.value = it }
+                    data.evmChainId?.let { evmChainIdFlow.value = it.format() }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun chainIdRequired(): Boolean {
         return payload.mode == AddNetworkPayload.Mode.EVM
-    }
-
-    fun addNetworkClicked() {
-
     }
 }

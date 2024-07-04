@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork
+package io.novafoundation.nova.feature_settings_impl.domain.validation
 
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
@@ -24,5 +24,9 @@ class NodeChainIdSingletonProvider(
                 chainId!!
             }
         }
+    }
+
+    fun getChainId(): String {
+        return chainId!!
     }
 }

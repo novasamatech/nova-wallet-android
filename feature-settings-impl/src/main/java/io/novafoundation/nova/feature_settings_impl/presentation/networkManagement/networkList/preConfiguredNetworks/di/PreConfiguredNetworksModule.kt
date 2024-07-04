@@ -29,7 +29,7 @@ class PreConfiguredNetworksModule {
         chainRegistry: ChainRegistry
     ): ViewModel {
         return PreConfiguredNetworksViewModel(
-            preConfiguredNetworksInteractor = preConfiguredNetworksInteractor,
+            interactor = preConfiguredNetworksInteractor,
             networkListAdapterItemFactory = networkListAdapterItemFactory,
             router = router,
             resourceManager = resourceManager,

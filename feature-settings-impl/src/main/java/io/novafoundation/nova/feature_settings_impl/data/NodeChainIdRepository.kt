@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
+import io.novafoundation.nova.runtime.ext.evmChainIdFrom
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnection
@@ -27,20 +28,20 @@ class NodeChainIdRepositoryFactory(
 ) {
 
     fun create(networkType: NetworkType, nodeUrl: String, coroutineScope: CoroutineScope): NodeChainIdRepository {
-        return when (networkType) {
-            NetworkType.SUBSTRATE -> substrate(nodeUrl, coroutineScope)
+        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
 
-            NetworkType.EVM -> evm(nodeUrl, coroutineScope)
+        return when (networkType) {
+            NetworkType.SUBSTRATE -> substrate(nodeConnection)
+
+            NetworkType.EVM -> evm(nodeConnection)
         }
     }
 
-    fun substrate(nodeUrl: String, coroutineScope: CoroutineScope): SubstrateNodeChainIdRepository {
-        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
+    fun substrate(nodeConnection: NodeConnection): SubstrateNodeChainIdRepository {
         return SubstrateNodeChainIdRepository(nodeConnection)
     }
 
-    fun evm(nodeUrl: String, coroutineScope: CoroutineScope): EthereumNodeChainIdRepository {
-        val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
+    fun evm(nodeConnection: NodeConnection): EthereumNodeChainIdRepository {
         return EthereumNodeChainIdRepository(nodeConnection, web3ApiFactory)
     }
 }
@@ -69,7 +70,7 @@ class EthereumNodeChainIdRepository(
     override suspend fun requestChainId(): String {
         val chainId = web3Api.ethChainId().sendSuspend().chainId
 
-        return Caip2Identifier.Eip155(chainId).namespaceWitId
+        return evmChainIdFrom(chainId)
     }
 
     private fun createWeb3Api(): Web3Api {

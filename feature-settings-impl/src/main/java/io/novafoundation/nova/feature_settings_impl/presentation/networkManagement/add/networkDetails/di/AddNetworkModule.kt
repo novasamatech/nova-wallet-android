@@ -8,24 +8,48 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkMainViewModel
-import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails.AddNetworkPayload
+import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails.AddNetworkViewModel
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails.AutofillNetworkMetadataMixinFactory
+import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 
 @Module(includes = [ViewModelModule::class])
 class AddNetworkModule {
 
     @Provides
+    fun provideAutofillNetworkMetadataMixinFactory(
+        nodeConnectionFactory: NodeConnectionFactory,
+        web3ApiFactory: Web3ApiFactory
+    ): AutofillNetworkMetadataMixinFactory {
+        return AutofillNetworkMetadataMixinFactory(
+            nodeConnectionFactory,
+            web3ApiFactory
+        )
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(AddNetworkViewModel::class)
     fun provideViewModel(
+        resourceManager: ResourceManager,
         router: SettingsRouter,
-        addNetworkPayload: AddNetworkPayload
+        payload: AddNetworkPayload,
+        interactor: AddNetworkInteractor,
+        validationExecutor: ValidationExecutor,
+        autofillNetworkMetadataMixinFactory: AutofillNetworkMetadataMixinFactory,
     ): ViewModel {
         return AddNetworkViewModel(
-            router,
-            addNetworkPayload
+            resourceManager = resourceManager,
+            router = router,
+            payload = payload,
+            interactor = interactor,
+            validationExecutor = validationExecutor,
+            autofillNetworkMetadataMixinFactory = autofillNetworkMetadataMixinFactory,
         )
     }
 

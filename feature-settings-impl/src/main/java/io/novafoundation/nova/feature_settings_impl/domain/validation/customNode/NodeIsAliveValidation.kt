@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork
+package io.novafoundation.nova.feature_settings_impl.domain.validation.customNode
 
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus

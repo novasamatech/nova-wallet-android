@@ -101,6 +101,8 @@
                         android:id="@+id/addNetworkChainId"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:digits="0123456789"
                         android:hint="@string/custom_network_chain_id_placeholder" />
 
                 </LinearLayout>

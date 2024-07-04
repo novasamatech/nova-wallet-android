@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="create_network_invalid_chain_id_title">Invalid Chain ID</string>
+    <string name="create_network_invalid_chain_id_message">The entered Chain ID does not match the network in the RPC URL.</string>
+
+    <string name="common_modify">Modify</string>
+    <string name="network_already_exist_failure_title">This Node already exists</string>
+    <string name="default_network_already_exist_failure_message">The entered RPC URL is present in Nova as a %s network.</string>
+    <string name="custom_network_already_exist_failure_message">The entered RPC URL is present in Nova as a %s custom network. Are you sure you want to modify it?</string>
+
+    <string name="create_network_node_name" translatable="false">%s Default Node</string>
+    <string name="create_network_block_explorer_name" translatable="false">%s Default Block Explorer</string>
+
     <string name="common_enter_details">Enter details</string>
     <string name="common_substrate">Substrate</string>
     <string name="common_evm">EVM</string>

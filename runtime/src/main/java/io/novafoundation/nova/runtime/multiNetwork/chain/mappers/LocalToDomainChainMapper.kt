@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import android.util.Log
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
@@ -30,12 +29,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 
-fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
-
-fun mapStakingTypesToLocal(stakingTypes: List<Chain.Asset.StakingType>): String {
-    return stakingTypes.joinToString(separator = ",", transform = ::mapStakingTypeToLocal)
-}
-
 private fun mapStakingTypeFromLocal(stakingTypesLocal: String): List<Chain.Asset.StakingType> {
     if (stakingTypesLocal.isEmpty()) return emptyList()
 
@@ -49,37 +42,6 @@ fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
         AssetSourceLocal.MANUAL -> Chain.Asset.Source.MANUAL
     }
 }
-
-private fun mapAssetSourceToLocal(source: Chain.Asset.Source): AssetSourceLocal {
-    return when (source) {
-        Chain.Asset.Source.DEFAULT -> AssetSourceLocal.DEFAULT
-        Chain.Asset.Source.ERC20 -> AssetSourceLocal.ERC20
-        Chain.Asset.Source.MANUAL -> AssetSourceLocal.MANUAL
-    }
-}
-
-private const val ASSET_NATIVE = "native"
-private const val ASSET_STATEMINE = "statemine"
-private const val ASSET_ORML = "orml"
-private const val ASSET_UNSUPPORTED = "unsupported"
-
-private const val ASSET_EVM_ERC20 = "evm"
-private const val ASSET_EVM_NATIVE = "evmNative"
-
-private const val ASSET_EQUILIBRIUM = "equilibrium"
-private const val ASSET_EQUILIBRIUM_ON_CHAIN_ID = "assetId"
-
-private const val STATEMINE_EXTRAS_ID = "assetId"
-private const val STATEMINE_EXTRAS_PALLET_NAME = "palletName"
-
-private const val ORML_EXTRAS_CURRENCY_ID_SCALE = "currencyIdScale"
-private const val ORML_EXTRAS_CURRENCY_TYPE = "currencyIdType"
-private const val ORML_EXTRAS_EXISTENTIAL_DEPOSIT = "existentialDeposit"
-private const val ORML_EXTRAS_TRANSFERS_ENABLED = "transfersEnabled"
-
-private const val EVM_EXTRAS_CONTRACT_ADDRESS = "contractAddress"
-
-private const val ORML_TRANSFERS_ENABLED_DEFAULT = true
 
 private inline fun unsupportedOnError(creator: () -> Chain.Asset.Type): Chain.Asset.Type {
     return runCatching(creator)
@@ -122,69 +84,11 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
     }
 }
 
-fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when (type) {
-    is Chain.Asset.Type.Native -> ASSET_NATIVE to null
-
-    is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
-        STATEMINE_EXTRAS_ID to mapStatemineAssetIdToRaw(type.id),
-        STATEMINE_EXTRAS_PALLET_NAME to type.palletName
-    )
-
-    is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
-        ORML_EXTRAS_CURRENCY_ID_SCALE to type.currencyIdScale,
-        ORML_EXTRAS_CURRENCY_TYPE to type.currencyIdType,
-        ORML_EXTRAS_EXISTENTIAL_DEPOSIT to type.existentialDeposit.toString(),
-        ORML_EXTRAS_TRANSFERS_ENABLED to type.transfersEnabled
-    )
-
-    is Chain.Asset.Type.EvmErc20 -> ASSET_EVM_ERC20 to mapOf(
-        EVM_EXTRAS_CONTRACT_ADDRESS to type.contractAddress
-    )
-
-    is Chain.Asset.Type.EvmNative -> ASSET_EVM_NATIVE to null
-
-    is Chain.Asset.Type.Equilibrium -> ASSET_EQUILIBRIUM to mapOf(
-        ASSET_EQUILIBRIUM_ON_CHAIN_ID to type.id.toString()
-    )
-
-    Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
-}
-
 private fun mapStatemineAssetIdToRaw(statemineAssetId: StatemineAssetId): String {
     return when (statemineAssetId) {
         is StatemineAssetId.Number -> statemineAssetId.value.toString()
         is StatemineAssetId.ScaleEncoded -> statemineAssetId.scaleHex
     }
-}
-
-fun mapStatemineAssetIdFromRaw(rawValue: Any): StatemineAssetId {
-    val asString = rawValue as? String ?: error("Invalid format")
-
-    return if (asString.startsWith("0x")) {
-        StatemineAssetId.ScaleEncoded(asString)
-    } else {
-        StatemineAssetId.Number(asString.asGsonParsedNumber())
-    }
-}
-
-fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
-    val (type, typeExtras) = mapChainAssetTypeToRaw(asset.type)
-
-    return ChainAssetLocal(
-        id = asset.id,
-        symbol = asset.symbol.value,
-        precision = asset.precision.value,
-        chainId = asset.chainId,
-        name = asset.name,
-        priceId = asset.priceId,
-        staking = mapStakingTypesToLocal(asset.staking),
-        type = type,
-        source = mapAssetSourceToLocal(asset.source),
-        buyProviders = gson.toJson(asset.buyProviders),
-        typeExtras = gson.toJson(typeExtras),
-        icon = asset.iconUrl,
-        enabled = asset.enabled
-    )
 }
 
 private fun <T> ChainExternalApiLocal.ensureSourceType(
@@ -375,14 +279,6 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
         source = mapAssetSourceFromLocal(local.source),
         enabled = local.enabled
     )
-}
-
-fun mapConnectionStateToLocal(domain: ConnectionState): ConnectionStateLocal {
-    return when (domain) {
-        ConnectionState.FULL_SYNC -> ConnectionStateLocal.FULL_SYNC
-        ConnectionState.LIGHT_SYNC -> ConnectionStateLocal.LIGHT_SYNC
-        ConnectionState.DISABLED -> ConnectionStateLocal.DISABLED
-    }
 }
 
 private fun mapSourceFromLocal(local: ChainLocal.Source): Chain.Source {

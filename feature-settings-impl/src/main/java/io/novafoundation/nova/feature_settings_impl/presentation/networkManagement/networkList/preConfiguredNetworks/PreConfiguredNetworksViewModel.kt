@@ -12,9 +12,15 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
+import io.novafoundation.nova.runtime.ext.evmChainIdOrNull
+import io.novafoundation.nova.runtime.ext.networkType
+import io.novafoundation.nova.runtime.ext.normalizedUrl
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.LightChain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -22,7 +28,7 @@ import kotlinx.coroutines.launch
 typealias LoadingNetworks = ExtendedLoadingState<List<LightChain>>
 
 class PreConfiguredNetworksViewModel(
-    private val preConfiguredNetworksInteractor: PreConfiguredNetworksInteractor,
+    private val interactor: PreConfiguredNetworksInteractor,
     private val networkListAdapterItemFactory: NetworkListAdapterItemFactory,
     private val router: SettingsRouter,
     private val resourceManager: ResourceManager,
@@ -38,8 +44,8 @@ class PreConfiguredNetworksViewModel(
         chainRegistry.chainsById
     ) { preConfiguredNetworks, query, currentChains ->
         preConfiguredNetworks.map {
-            val filteredNetworks = preConfiguredNetworksInteractor.excludeChains(it, currentChains.keys)
-            preConfiguredNetworksInteractor.searchNetworks(query, filteredNetworks)
+            val filteredNetworks = interactor.excludeChains(it, currentChains.keys)
+            interactor.searchNetworks(query, filteredNetworks)
         }
     }
 
@@ -58,18 +64,51 @@ class PreConfiguredNetworksViewModel(
     }
 
     fun networkClicked(chainId: String) {
-        showMessage("Not implemented yet")
+        launch {
+            interactor.getPreConfiguredNetwork(chainId)
+                .onSuccess {
+                    openAddChainScreen(it)
+                }
+                .onFailure { showError(resourceManager.getString(R.string.common_something_went_wrong_title)) }
+        }
+        router.openCreateNetworkFlow()
+    }
+
+    private fun openAddChainScreen(chain: Chain) {
+        val (mode, chainId) = when (chain.networkType()) {
+            NetworkType.SUBSTRATE -> AddNetworkPayload.Mode.SUBSTRATE to null
+            NetworkType.EVM -> AddNetworkPayload.Mode.EVM to chain.evmChainIdOrNull()
+        }
+
+        val node = chain.nodes.nodes.firstOrNull()
+        val asset = chain.assets.firstOrNull()
+        val explorer = chain.explorers.firstOrNull()
+
+        val payload = AddNetworkPayload(
+            mode,
+            AddNetworkPayload.NetworkData(
+                iconUrl = chain.icon,
+                rpcNodeUrl = node?.unformattedUrl,
+                networkName = chain.name,
+                tokenName = asset?.symbol?.value,
+                evmChainId = chainId,
+                blockExplorerUrl = explorer?.normalizedUrl(),
+                coingeckoLink = asset?.priceId
+            )
+        )
+
+        router.openCreateNetworkFlow(payload)
     }
 
     fun addNetworkClicked() {
-        showMessage("Not implemented yet")
+        router.openCreateNetworkFlow()
     }
 
     private fun fetchPreConfiguredNetworks() {
         launch {
             allPreConfiguredNetworksFlow.value = ExtendedLoadingState.Loading
 
-            preConfiguredNetworksInteractor.getPreConfiguredNetworks()
+            interactor.getPreConfiguredNetworks()
                 .onSuccess {
                     allPreConfiguredNetworksFlow.value = ExtendedLoadingState.Loaded(it)
                 }.onFailure {

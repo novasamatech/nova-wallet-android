@@ -52,6 +52,23 @@ abstract class ChainDao {
         updateNodePreferences(nodeSelectionPreferencesDiff.added)
     }
 
+    @Transaction
+    open suspend fun addChain(
+        chain: ChainLocal,
+        assets: List<ChainAssetLocal>,
+        nodes: List<ChainNodeLocal>,
+        explorers: List<ChainExplorerLocal>,
+        externalApis: List<ChainExternalApiLocal>,
+        nodeSelectionPreferences: NodeSelectionPreferencesLocal
+    ) {
+        addChain(chain)
+        addChainAssets(assets)
+        addChainNodes(nodes)
+        addChainExplorers(explorers)
+        addExternalApis(externalApis)
+        addNodePreferences(nodeSelectionPreferences)
+    }
+
     // ------ Delete --------
     @Delete
     protected abstract suspend fun deleteChains(chains: List<ChainLocal>)
@@ -88,10 +105,16 @@ abstract class ChainDao {
     protected abstract suspend fun addExternalApis(apis: List<ChainExternalApiLocal>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
+    abstract suspend fun addChain(node: ChainLocal)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract suspend fun addChainNode(node: ChainNodeLocal)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun addNodePreferences(model: List<NodeSelectionPreferencesLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    protected abstract suspend fun addNodePreferences(model: NodeSelectionPreferencesLocal)
 
     // ------ Update -----
 

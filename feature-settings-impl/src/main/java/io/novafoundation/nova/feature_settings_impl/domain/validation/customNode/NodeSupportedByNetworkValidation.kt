@@ -6,37 +6,34 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
-import io.novafoundation.nova.runtime.ext.networkType
 import java.lang.Exception
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.seconds
 
-class NodeSupportedByNetworkValidation(
-    private val nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory,
-    private val coroutineScope: CoroutineScope
-) : Validation<NetworkNodePayload, NetworkNodeFailure> {
+class NodeSupportedByNetworkValidation<P, F>(
+    private val nodeChainIdRequester: suspend (P) -> String,
+    private val originalChainId: (P) -> String?,
+    private val failure: (P) -> F
+) : Validation<P, F> {
 
-    override suspend fun validate(value: NetworkNodePayload): ValidationStatus<NetworkNodeFailure> {
-        val nodeChainIdRepository = nodeChainIdRepositoryFactory.create(value.chain.networkType(), value.nodeUrl, coroutineScope)
+    override suspend fun validate(value: P): ValidationStatus<F> {
+        val nodeChainId = nodeChainIdRequester(value)
 
-        return try {
-            val requestedChainId = withTimeout(10.seconds) {
-                nodeChainIdRepository.requestChainId()
-            }
-
-            validOrError(requestedChainId == value.chain.id) {
-                NetworkNodeFailure.WrongNetwork(value.chain)
-            }
-        } catch (e: Exception) {
-            validationError(NetworkNodeFailure.NodeIsNotAlive)
+        return validOrError(nodeChainId == originalChainId(value)) {
+            failure(value)
         }
     }
 }
 
-fun ValidationSystemBuilder<NetworkNodePayload, NetworkNodeFailure>.nodeSupportedByNetworkValidation(
-    nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory,
-    coroutineScope: CoroutineScope
+fun <P, F> ValidationSystemBuilder<P, F>.nodeSupportedByNetworkValidation(
+    nodeChainIdRequester: suspend (P) -> String,
+    originalChainId: (P) -> String?,
+    failure: (P) -> F
 ) = validate(
-    NodeSupportedByNetworkValidation(nodeChainIdRepositoryFactory, coroutineScope)
+    NodeSupportedByNetworkValidation(
+        nodeChainIdRequester,
+        originalChainId,
+        failure
+    )
 )
