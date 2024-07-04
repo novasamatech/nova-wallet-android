@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Geçersiz türetme yolu</string>
     <string name="account_json_file">JSON dosyası</string>
     <string name="account_ledger_generic_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınıza <font color="#FFFFFF">Generic uygulamanın yüklü</font> olduğundan emin olun</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda <font color="#FFFFFF">Generic uygulamayı</font> açın</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">%s ile imzala</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Dikkat edin, türev yol adı boş olmalıdır</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Akıllı telefonunuzda Polkadot Vault</font> uygulamasını açın</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">“Anahtar Setleri” sekmesine gidin.</font> Anahtar setinizi, Ağınızı ve ardından Nova Wallet\'a eklemek istediğiniz hesabı seçin.</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size <font color="#FFFFFF">taramak için QR kodu sağlayacak</font></string>
     <string name="account_private_key">Özel anahtar</string>
@@ -435,7 +435,7 @@
     <string name="common_retry_message">Bir şeyler yanlış gitti. Lütfen tekrar deneyin</string>
     <string name="common_revoke">İptal et</string>
     <string name="common_save">Kaydet</string>
-    <string name="common_scan_qr_code"><font>QR kodunu tarayın</font></string>
+    <string name="common_scan_qr_code">QR kodunu tarayın</string>
     <string name="common_search">Arama</string>
     <string name="common_search_placeholder_default">Arama sonuçları burada gösterilecek</string>
     <string name="common_search_results_number">Arama sonuçları: %d</string>
@@ -500,7 +500,7 @@
     <string name="connections_add_connection">Bağlantı ekle</string>
     <string name="contacts_scan">QR kodu tarayın</string>
     <string name="corrupted_backup_error_subtitle">Yedeklemenizde bir sorun tespit edildi. Mevcut yedeklemeyi silip yeni bir tane oluşturma seçeneğiniz var. Devam etmeden önce %s.</string>
-    <string name="corrupted_backup_error_subtitle_highlighted"><font>Tüm cüzdanlar için Şifre Cümlelerini kaydettiğinizden emin olun</font></string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Tüm cüzdanlar için Şifre Cümlelerini kaydettiğinizden emin olun</string>
     <string name="corrupted_backup_error_title">Yedekleme bulundu ancak boş veya bozuk</string>
     <string name="create_cloud_backup_password_alert_subtitle">Gelecekte, yedekleme parolası olmadan Cloud Backup\'tan cüzdanlarınızı geri yüklemek mümkün değildir.\n%s</string>
     <string name="create_cloud_backup_password_alert_subtitle_highlighted">Bu parola kurtarılamaz.</string>
@@ -1237,7 +1237,7 @@
     <string name="staking_rebond_last">En son unstaked</string>
     <string name="staking_recommended_feature_1">En karlı</string>
     <string name="staking_recommended_feature_2">Limit aşmamış</string>
-    <string name="staking_recommended_feature_3"><font>Çevrimiçi kimliğe sahip</font></string>
+    <string name="staking_recommended_feature_3">Çevrimiçi kimliğe sahip</string>
     <string name="staking_recommended_feature_4">Ceza almamış</string>
     <string name="staking_recommended_feature_5">Kimlik başına en fazla 2 doğrulayıcı sınırlaması</string>
     <string name="staking_recommended_filter_identity_subtitle">En az bir kimlik iletişimine sahip</string>
