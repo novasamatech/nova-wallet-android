@@ -37,6 +37,7 @@ private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
 private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
 private const val SUPPORT_GENERIC_LEDGER_APP = "supportsGenericLedgerApp"
 private const val IDENTITY_CHAIN = "identityChain"
+private const val DISABLED_CHECK_METADATA_HASH = "disabledCheckMetadataHash"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -60,7 +61,8 @@ fun mapRemoteChainToLocal(
             stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
             feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean,
             supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
-            identityChain = it[IDENTITY_CHAIN] as? ChainId
+            identityChain = it[IDENTITY_CHAIN] as? ChainId,
+            disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean
         )
     }
 
