@@ -106,4 +106,4 @@ jobs:
           message: |
             💸 Balances tests failed.
 
-            Results: https://novasamatech.github.io/balances_test_result/${{ github.run_id}}/index.html
+            Results: https://novasamatech.github.io/balances_test_result/${{ github.run_number }}/index.html
