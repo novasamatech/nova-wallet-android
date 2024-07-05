@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_settings_impl.domain.validation.customNod
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkFailure
-import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 typealias NetworkNodeValidationSystem = ValidationSystem<NetworkNodePayload, NetworkNodeFailure>

@@ -5,13 +5,11 @@ import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
-import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.Companion.EMPTY_CHAIN_ICON
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
-import io.novafoundation.nova.core_db.model.chain.PUSH_DEFAULT_VALUE
 import io.novafoundation.nova.runtime.ext.autoBalanceEnabled
 import io.novafoundation.nova.runtime.ext.selectedNodeUrlOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -154,7 +152,6 @@ fun mapNodeSelectionPreferencesToLocal(chain: Chain): NodeSelectionPreferencesLo
         selectedNodeUrl = chain.selectedNodeUrlOrNull
     )
 }
-
 
 fun mapNodeSelectionStrategyToLocal(domain: Chain): ChainLocal.NodeSelectionStrategyLocal {
     val autobalanceStrategy = when (val strategy = domain.nodes.nodeSelectionStrategy) {

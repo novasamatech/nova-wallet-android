@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
-import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkFailure
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkValidationSystem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +15,6 @@ import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import kotlinx.android.synthetic.main.fragment_add_network_main.addNetworkMainTabLayout
 import kotlinx.android.synthetic.main.fragment_add_network_main.addNetworkMainToolbar
 import kotlinx.android.synthetic.main.fragment_add_network_main.addNetworkMainViewPager
-import kotlinx.android.synthetic.main.fragment_network_management.networkManagementTabLayout
-import kotlinx.android.synthetic.main.fragment_network_management.networkManagementToolbar
-import kotlinx.android.synthetic.main.fragment_network_management.networkManagementViewPager
 
 class AddNetworkMainFragment : BaseFragment<AddNetworkMainViewModel>() {
 

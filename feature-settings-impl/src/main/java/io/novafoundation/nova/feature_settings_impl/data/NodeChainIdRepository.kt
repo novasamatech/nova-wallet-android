@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_settings_impl.data
 
-import io.novafoundation.nova.caip.caip2.identifier.Caip2Identifier
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequest
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.evmChainIdFrom
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory

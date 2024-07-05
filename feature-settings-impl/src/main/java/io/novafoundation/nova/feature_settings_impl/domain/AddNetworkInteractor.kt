@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.network.runtime.calls.GetSystemPropert
 import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
-import io.novafoundation.nova.common.utils.indexOfOrNull
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
@@ -27,9 +26,7 @@ import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
-import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
-
 
 interface AddNetworkInteractor {
 
@@ -156,7 +153,6 @@ class RealAddNetworkInteractor(
         assetDecimals: Int?,
         assetType: Chain.Asset.Type
     ): Chain {
-
         val priceId = coingeckoLink?.let { coinGeckoLinkParser.parse(it).getOrNull()?.priceId }
 
         val asset = Chain.Asset(
@@ -226,7 +222,6 @@ class RealAddNetworkInteractor(
             val chainIdRequestSingleton = NodeChainIdSingletonProvider(nodeChainIdRepositoryFactory, coroutineScope)
             validateNetworkNodeIsAlive { chainIdRequestSingleton.getChainId(NetworkType.SUBSTRATE, it.nodeUrl) }
             validateNetworkNotAdded(chainRegistry) { chainIdRequestSingleton.getChainId() }
-
         }
     }
 

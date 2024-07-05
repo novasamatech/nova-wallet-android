@@ -128,7 +128,6 @@ abstract class ChainDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun addExternalApisOrUpdate(apis: List<ChainExternalApiLocal>)
 
-
     // ------ Update -----
 
     @Update

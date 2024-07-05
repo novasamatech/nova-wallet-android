@@ -36,7 +36,6 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.N
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
 import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
-import io.novasama.substrate_sdk_android.scale.dataType.list
 
 @Module
 class SettingsFeatureModule {

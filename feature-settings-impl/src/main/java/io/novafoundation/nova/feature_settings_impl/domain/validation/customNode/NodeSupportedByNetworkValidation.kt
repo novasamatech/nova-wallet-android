@@ -4,12 +4,6 @@ import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
-import io.novafoundation.nova.common.validation.validationError
-import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
-import java.lang.Exception
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.withTimeout
-import kotlin.time.Duration.Companion.seconds
 
 class NodeSupportedByNetworkValidation<P, F>(
     private val nodeChainIdRequester: suspend (P) -> String,

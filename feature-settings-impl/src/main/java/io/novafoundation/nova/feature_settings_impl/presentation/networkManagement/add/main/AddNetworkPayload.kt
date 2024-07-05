@@ -4,7 +4,6 @@ import android.os.Parcelable
 import java.math.BigInteger
 import kotlinx.android.parcel.Parcelize
 
-
 @Parcelize
 class AddNetworkPayload(
     val mode: Mode,
