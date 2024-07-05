@@ -2,25 +2,24 @@ package io.novafoundation.nova.feature_settings_impl.domain.validation.customNet
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validCoinGeckoLink
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.nodeSupportedByNetworkValidation
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.validateNetworkNodeIsAlive
 import io.novafoundation.nova.runtime.ext.evmChainIdFrom
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 typealias CustomNetworkValidationSystem = ValidationSystem<CustomNetworkPayload, CustomNetworkFailure>
 typealias CustomNetworkValidationSystemBuilder = ValidationSystemBuilder<CustomNetworkPayload, CustomNetworkFailure>
 
-class CustomNetworkPayload(
+data class CustomNetworkPayload(
     val nodeUrl: String,
     val chainName: String,
     val tokenSymbol: String,
     val evmChainId: Int?,
     val blockExplorerUrl: String?,
-    val coingeckoLinkUrl: String?
+    val coingeckoLinkUrl: String?,
+    val ignoreChainModifying: Boolean
 )
 
 sealed interface CustomNetworkFailure {
@@ -54,8 +53,9 @@ fun CustomNetworkValidationSystemBuilder.validateNetworkNotAdded(
 ) = validateNetworkNotAdded(
     chainRegistry = chainRegistry,
     chainIdRequester = { chainIdRequester(it) },
+    ignoreChainModifying = { it.ignoreChainModifying },
     defaultNetworkFailure = { payload, chain -> CustomNetworkFailure.DefaultNetworkAlreadyAdded(chain.name) },
-    customNetworkWarning = { payload, chain -> CustomNetworkFailure.CustomNetworkAlreadyAdded(chain.name) }
+    customNetworkFailure = { payload, chain -> CustomNetworkFailure.CustomNetworkAlreadyAdded(chain.name) }
 )
 
 fun CustomNetworkValidationSystemBuilder.validCoinGeckoLink(

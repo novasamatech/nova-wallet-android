@@ -42,7 +42,7 @@ abstract class ChainDao {
         addChainNodes(nodesDiff.added)
         addChainExplorers(explorersDiff.added)
         addExternalApis(externalApisDiff.added)
-        addNodePreferences(nodeSelectionPreferencesDiff.added)
+        addNodePreferencesOrUpdate(nodeSelectionPreferencesDiff.added)
 
         updateChains(chainDiff.updated)
         updateChainAssets(assetsDiff.updated)
@@ -53,7 +53,7 @@ abstract class ChainDao {
     }
 
     @Transaction
-    open suspend fun addChain(
+    open suspend fun addChainOrUpdate(
         chain: ChainLocal,
         assets: List<ChainAssetLocal>,
         nodes: List<ChainNodeLocal>,
@@ -61,12 +61,12 @@ abstract class ChainDao {
         externalApis: List<ChainExternalApiLocal>,
         nodeSelectionPreferences: NodeSelectionPreferencesLocal
     ) {
-        addChain(chain)
-        addChainAssets(assets)
-        addChainNodes(nodes)
-        addChainExplorers(explorers)
-        addExternalApis(externalApis)
-        addNodePreferences(nodeSelectionPreferences)
+        addChainOrUpdate(chain)
+        addChainAssetsOrUpdate(assets)
+        addChainNodesOrUpdate(nodes)
+        addChainExplorersOrUpdate(explorers)
+        addExternalApisOrUpdate(externalApis)
+        addNodePreferencesOrUpdate(nodeSelectionPreferences)
     }
 
     // ------ Delete --------
@@ -104,17 +104,30 @@ abstract class ChainDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun addExternalApis(apis: List<ChainExternalApiLocal>)
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    abstract suspend fun addChain(node: ChainLocal)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun addChainOrUpdate(node: ChainLocal)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract suspend fun addChainNode(node: ChainNodeLocal)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    protected abstract suspend fun addNodePreferences(model: List<NodeSelectionPreferencesLocal>)
+    protected abstract suspend fun addNodePreferencesOrUpdate(model: List<NodeSelectionPreferencesLocal>)
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    protected abstract suspend fun addNodePreferences(model: NodeSelectionPreferencesLocal)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addNodePreferencesOrUpdate(model: NodeSelectionPreferencesLocal)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addChainNodesOrUpdate(nodes: List<ChainNodeLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addChainAssetsOrUpdate(assets: List<ChainAssetLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addChainExplorersOrUpdate(explorers: List<ChainExplorerLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addExternalApisOrUpdate(apis: List<ChainExternalApiLocal>)
+
 
     // ------ Update -----
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="loading_network_info">Loading network info...</string>
+
     <string name="create_network_invalid_chain_id_title">Invalid Chain ID</string>
     <string name="create_network_invalid_chain_id_message">The entered Chain ID does not match the network in the RPC URL.</string>
 

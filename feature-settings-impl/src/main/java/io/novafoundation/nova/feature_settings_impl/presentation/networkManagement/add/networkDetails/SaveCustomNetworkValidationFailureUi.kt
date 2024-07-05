@@ -8,11 +8,12 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkFailure
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkPayload
 
 fun mapSaveCustomNetworkFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<CustomNetworkFailure>,
-    actions: ValidationFlowActions<*>,
+    actions: ValidationFlowActions<CustomNetworkPayload>,
 ): TransformedFailure {
     return when (val reason = status.reason) {
         is CustomNetworkFailure.DefaultNetworkAlreadyAdded -> Default(
@@ -25,15 +26,19 @@ fun mapSaveCustomNetworkFailureToUI(
                 CustomDialogDisplayer.Payload(
                     title = resourceManager.getString(R.string.network_already_exist_failure_title),
                     message = resourceManager.getString(R.string.custom_network_already_exist_failure_message, reason.networkName),
-                    okAction = CustomDialogDisplayer.Payload.DialogAction(
+                    cancelAction = CustomDialogDisplayer.Payload.DialogAction(
                         title = resourceManager.getString(R.string.common_close),
                         action = { }
                     ),
-                    cancelAction = CustomDialogDisplayer.Payload.DialogAction(
+                    okAction = CustomDialogDisplayer.Payload.DialogAction(
                         title = resourceManager.getString(R.string.common_modify),
-                        action = { actions.resumeFlow() }
+                        action = {
+                            actions.revalidate { payload ->
+                                payload.copy(ignoreChainModifying = true)
+                            }
+                        }
                     ),
-                    customStyle = R.style.AccentDialogNeutralButtonStyle
+                    customStyle = R.style.AccentAlertDialogTheme
                 )
             )
         }

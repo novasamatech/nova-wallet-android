@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
@@ -60,6 +61,8 @@ class AddNetworkFragment : BaseFragment<AddNetworkViewModel>() {
     }
 
     override fun subscribe(viewModel: AddNetworkViewModel) {
+        observeValidations(viewModel)
+
         addNetworkNodeUrl.bindTo(viewModel.nodeUrlFlow, viewModel)
         addNetworkName.bindTo(viewModel.networkNameFlow, viewModel)
         addNetworkCurrency.bindTo(viewModel.tokenSymbolFlow, viewModel)

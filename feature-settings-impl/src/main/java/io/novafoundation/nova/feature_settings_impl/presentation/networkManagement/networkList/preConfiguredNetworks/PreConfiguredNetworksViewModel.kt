@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.mapLoading
@@ -9,6 +10,9 @@ import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
+import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
@@ -32,8 +36,12 @@ class PreConfiguredNetworksViewModel(
     private val networkListAdapterItemFactory: NetworkListAdapterItemFactory,
     private val router: SettingsRouter,
     private val resourceManager: ResourceManager,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val progressDialogMixinFactory: ProgressDialogMixinFactory,
+    private val coinGeckoLinkParser: CoinGeckoLinkParser
 ) : BaseViewModel(), Retriable {
+
+    val progressDialogMixin = progressDialogMixinFactory.create()
 
     val searchQuery: MutableStateFlow<String> = MutableStateFlow("")
     private val allPreConfiguredNetworksFlow = MutableStateFlow<LoadingNetworks>(ExtendedLoadingState.Loading)
@@ -65,13 +73,14 @@ class PreConfiguredNetworksViewModel(
 
     fun networkClicked(chainId: String) {
         launch {
-            interactor.getPreConfiguredNetwork(chainId)
-                .onSuccess {
-                    openAddChainScreen(it)
-                }
-                .onFailure { showError(resourceManager.getString(R.string.common_something_went_wrong_title)) }
+            progressDialogMixin.startProgress(R.string.loading_network_info) {
+                interactor.getPreConfiguredNetwork(chainId)
+                    .onSuccess {
+                        openAddChainScreen(it)
+                    }
+                    .onFailure { showError(resourceManager.getString(R.string.common_something_went_wrong_title)) }
+            }
         }
-        router.openCreateNetworkFlow()
     }
 
     private fun openAddChainScreen(chain: Chain) {
@@ -93,7 +102,7 @@ class PreConfiguredNetworksViewModel(
                 tokenName = asset?.symbol?.value,
                 evmChainId = chainId,
                 blockExplorerUrl = explorer?.normalizedUrl(),
-                coingeckoLink = asset?.priceId
+                coingeckoLink = asset?.priceId?.let { coinGeckoLinkParser.format(it) }
             )
         )
 

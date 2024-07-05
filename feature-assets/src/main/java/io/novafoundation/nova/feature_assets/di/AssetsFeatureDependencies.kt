@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
@@ -241,4 +242,6 @@ interface AssetsFeatureDependencies {
     val selectAddressMixinFactory: SelectAddressMixin.Factory
 
     val chainStateRepository: ChainStateRepository
+
+    val coinGeckoLinkParser: CoinGeckoLinkParser
 }

@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_settings_impl.domain
 
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.network.runtime.calls.GetSystemPropertiesRequest
 import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.indexOfOrNull
 import io.novafoundation.nova.common.validation.ValidationSystem
-import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkValidationSystem
@@ -85,8 +85,11 @@ class RealAddNetworkInteractor(
 
         val chainProperties = getSubstrateChainProperties(nodeConnection)
 
-        val tokenIndex = chainProperties.tokenSymbol.indexOfOrNull(tokenSymbol)
-        val tokenDecimals = tokenIndex?.let { chainProperties.tokenDecimals.getOrNull(it) }
+        val tokenDecimals = if (chainProperties.tokenSymbol == tokenSymbol) {
+            chainProperties.tokenDecimals
+        } else {
+            null
+        }
 
         val chain = createChain(
             chainId = substrateNodeIdRequester.requestChainId(),
@@ -97,7 +100,7 @@ class RealAddNetworkInteractor(
             tokenSymbol = tokenSymbol,
             blockExplorer = blockExplorer,
             coingeckoLink = coingeckoLink,
-            addressPrefix = chainProperties.SS58Prefix,
+            addressPrefix = chainProperties.SS58Prefix ?: chainProperties.ss58Format ?: 1,
             isEthereumBased = chainProperties.isEthereum ?: false,
             hasSubstrateRuntime = true,
             assetDecimals = tokenDecimals,
@@ -217,25 +220,26 @@ class RealAddNetworkInteractor(
 
     override fun getSubstrateValidationSystem(coroutineScope: CoroutineScope): CustomNetworkValidationSystem {
         return ValidationSystem {
+            validCoinGeckoLink(coinGeckoLinkValidationFactory)
+
             // Use singletone here to receive chain id only one time for all vaildations
             val chainIdRequestSingleton = NodeChainIdSingletonProvider(nodeChainIdRepositoryFactory, coroutineScope)
             validateNetworkNodeIsAlive { chainIdRequestSingleton.getChainId(NetworkType.SUBSTRATE, it.nodeUrl) }
             validateNetworkNotAdded(chainRegistry) { chainIdRequestSingleton.getChainId() }
 
-            validCoinGeckoLink(coinGeckoLinkValidationFactory)
         }
     }
 
     override fun getEvmValidationSystem(coroutineScope: CoroutineScope): CustomNetworkValidationSystem {
         return ValidationSystem {
+            validCoinGeckoLink(coinGeckoLinkValidationFactory)
+
             validateNetworkNotAdded(chainRegistry) { evmChainIdFrom(it.evmChainId!!) }
 
             // Use singletone here to receive chain id only one time for all vaildations
             val chainIdRequestSingleton = NodeChainIdSingletonProvider(nodeChainIdRepositoryFactory, coroutineScope)
             validateNetworkNodeIsAlive { chainIdRequestSingleton.getChainId(NetworkType.EVM, it.nodeUrl) }
             validateNodeSupportedByNetwork { chainIdRequestSingleton.getChainId() }
-
-            validCoinGeckoLink(coinGeckoLinkValidationFactory)
         }
     }
 

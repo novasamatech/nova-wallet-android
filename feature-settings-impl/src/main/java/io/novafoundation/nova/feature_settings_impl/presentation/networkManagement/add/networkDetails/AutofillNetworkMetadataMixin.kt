@@ -25,11 +25,11 @@ class AutofillNetworkMetadataMixinFactory(
     private val web3ApiFactory: Web3ApiFactory
 ) {
     fun substrate(coroutineScope: CoroutineScope): SubstrateAutofillNetworkMetadataMixin {
-        return SubstrateAutofillNetworkMetadataMixin(nodeConnectionFactory.createNodeConnection("", coroutineScope))
+        return SubstrateAutofillNetworkMetadataMixin(nodeConnectionFactory, coroutineScope)
     }
 
     fun evm(coroutineScope: CoroutineScope): EvmAutofillNetworkMetadataMixin {
-        return EvmAutofillNetworkMetadataMixin(nodeConnectionFactory.createNodeConnection("", coroutineScope), web3ApiFactory)
+        return EvmAutofillNetworkMetadataMixin(nodeConnectionFactory, coroutineScope, web3ApiFactory)
     }
 }
 
@@ -38,17 +38,26 @@ interface AutofillNetworkMetadataMixin {
     suspend fun autofill(url: String): Result<AutofillNetworkData>
 }
 
-class SubstrateAutofillNetworkMetadataMixin(private val nodeConnection: NodeConnection) : AutofillNetworkMetadataMixin {
+class SubstrateAutofillNetworkMetadataMixin(
+    private val nodeConnectionFactory: NodeConnectionFactory,
+    private val coroutineScope: CoroutineScope
+) : AutofillNetworkMetadataMixin {
+
+    private var nodeConnection: NodeConnection? = null
 
     override suspend fun autofill(url: String): Result<AutofillNetworkData> = runCatching {
-        nodeConnection.switchUrl(url)
+        if (nodeConnection == null) {
+            nodeConnection = nodeConnectionFactory.createNodeConnection(url, coroutineScope)
+        } else {
+            nodeConnection!!.switchUrl(url)
+        }
 
-        val properties = getSubstrateChainProperties(nodeConnection)
-        val chainName = getSubstrateChainName(nodeConnection)
+        val properties = getSubstrateChainProperties(nodeConnection!!)
+        val chainName = getSubstrateChainName(nodeConnection!!)
 
         AutofillNetworkData(
             chainName = chainName,
-            tokenSymbol = properties.tokenSymbol.firstOrNull(),
+            tokenSymbol = properties.tokenSymbol,
             evmChainId = null
         )
     }
@@ -65,25 +74,31 @@ class SubstrateAutofillNetworkMetadataMixin(private val nodeConnection: NodeConn
 }
 
 class EvmAutofillNetworkMetadataMixin(
-    private val nodeConnection: NodeConnection,
+    private val nodeConnectionFactory: NodeConnectionFactory,
+    private val coroutineScope: CoroutineScope,
     private val web3ApiFactory: Web3ApiFactory
 ) : AutofillNetworkMetadataMixin {
 
-    private val web3Api = createWeb3Api()
+    private var nodeConnection: NodeConnection? = null
+    private var web3Api: Web3Api? = null
 
     override suspend fun autofill(url: String): Result<AutofillNetworkData> = runCatching {
-        nodeConnection.switchUrl(url)
+        if (nodeConnection == null) {
+            nodeConnection = nodeConnectionFactory.createNodeConnection(url, coroutineScope)
+        } else {
+            nodeConnection!!.switchUrl(url)
+        }
 
-        val chainId = web3Api.ethChainId().sendSuspend().chainId
+        if (web3Api == null) {
+            web3Api = web3ApiFactory.createWss(nodeConnection!!.getSocketService())
+        }
+
+        val chainId = web3Api!!.ethChainId().sendSuspend().chainId
 
         AutofillNetworkData(
             chainName = null,
             tokenSymbol = null,
             evmChainId = chainId
         )
-    }
-
-    private fun createWeb3Api(): Web3Api {
-        return web3ApiFactory.createWss(nodeConnection.getSocketService())
     }
 }

@@ -6,9 +6,11 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealCloudBackupSettingsInteractor
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
 import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.CustomNodeInteractor

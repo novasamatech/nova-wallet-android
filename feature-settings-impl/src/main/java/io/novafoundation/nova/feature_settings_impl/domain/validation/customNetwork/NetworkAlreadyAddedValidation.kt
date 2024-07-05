@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
-import io.novafoundation.nova.common.validation.validationWarning
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
@@ -13,6 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 class NetworkAlreadyAddedValidation<P, F>(
     private val chainRegistry: ChainRegistry,
     private val chainIdRequester: suspend (P) -> String,
+    private val ignoreChainModifying: (P) -> Boolean,
     private val defaultNetworkFailure: (P, Chain) -> F,
     private val customNetworkWarning: (P, Chain) -> F
 ) : Validation<P, F> {
@@ -21,10 +21,10 @@ class NetworkAlreadyAddedValidation<P, F>(
         val chainId = chainIdRequester(value)
 
         val chain = chainRegistry.chainsById()[chainId]
-        if (chain != null) {
+        if (chain != null && !ignoreChainModifying(value)) {
             return when (chain.source) {
                 Chain.Source.DEFAULT -> validationError(defaultNetworkFailure(value, chain))
-                Chain.Source.CUSTOM -> validationWarning(customNetworkWarning(value, chain))
+                Chain.Source.CUSTOM -> validationError(customNetworkWarning(value, chain))
             }
         }
 
@@ -35,8 +35,9 @@ class NetworkAlreadyAddedValidation<P, F>(
 fun <P, F> ValidationSystemBuilder<P, F>.validateNetworkNotAdded(
     chainRegistry: ChainRegistry,
     chainIdRequester: suspend (P) -> String,
+    ignoreChainModifying: (P) -> Boolean,
     defaultNetworkFailure: (P, Chain) -> F,
-    customNetworkWarning: (P, Chain) -> F
+    customNetworkFailure: (P, Chain) -> F
 ) = validate(
-    NetworkAlreadyAddedValidation(chainRegistry, chainIdRequester, defaultNetworkFailure, customNetworkWarning)
+    NetworkAlreadyAddedValidation(chainRegistry, chainIdRequester, ignoreChainModifying, defaultNetworkFailure, customNetworkFailure)
 )

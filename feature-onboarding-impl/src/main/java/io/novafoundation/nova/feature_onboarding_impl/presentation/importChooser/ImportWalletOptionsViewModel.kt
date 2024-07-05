@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -27,10 +28,12 @@ class ImportWalletOptionsViewModel(
     private val router: OnboardingRouter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val onboardingInteractor: OnboardingInteractor,
-    val progressDialogMixin: ProgressDialogMixin,
+    private val progressDialogMixinFactory: ProgressDialogMixinFactory,
     customDialogProvider: CustomDialogDisplayer.Presentation,
     cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
 ) : BaseViewModel(), CustomDialogDisplayer.Presentation by customDialogProvider {
+
+    val progressDialogMixin = progressDialogMixinFactory.create()
 
     val cloudBackupChangingWarningMixin = cloudBackupChangingWarningMixinFactory.create(this)
 

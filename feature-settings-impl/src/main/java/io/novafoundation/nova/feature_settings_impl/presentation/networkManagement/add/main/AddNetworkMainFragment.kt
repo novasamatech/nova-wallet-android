@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,9 +33,6 @@ class AddNetworkMainFragment : BaseFragment<AddNetworkMainViewModel>() {
         }
     }
 
-    private val payloadArg: AddNetworkPayload? by lazy(LazyThreadSafetyMode.NONE) { argument(KEY_PAYLOAD) }
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { AddNetworkMainPagerAdapter(this, payloadArg) }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,9 +44,13 @@ class AddNetworkMainFragment : BaseFragment<AddNetworkMainViewModel>() {
     override fun initViews() {
         addNetworkMainToolbar.applyStatusBarInsets()
         addNetworkMainToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        val payload: AddNetworkPayload? = argumentOrNull(KEY_PAYLOAD)
+        val adapter = AddNetworkMainPagerAdapter(this, payload)
         addNetworkMainViewPager.adapter = adapter
-        if (payloadArg == null) {
-            addNetworkMainTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
+
+        if (payload == null) {
+            addNetworkMainTabLayout.setupWithViewPager2(addNetworkMainViewPager, adapter::getPageTitle)
         } else {
             addNetworkMainTabLayout.makeGone()
         }

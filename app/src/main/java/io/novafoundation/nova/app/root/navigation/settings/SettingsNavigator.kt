@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementFragment
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementPayload
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementListFragment
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodeFragment
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodePayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
@@ -53,13 +54,13 @@ class SettingsNavigator(
     override fun openCreateNetworkFlow() {
         performNavigation(R.id.action_open_addNetworkFragment)
     }
-    
+
     override fun openCreateNetworkFlow(payload: AddNetworkPayload) {
         performNavigation(R.id.action_open_addNetworkFragment, args = AddNetworkMainFragment.getBundle(payload))
     }
 
     override fun finishCreateNetworkFlow() {
-        performNavigation(R.id.action_finishCreateNetworkFlow)
+        performNavigation(R.id.action_finishCreateNetworkFlow, args = NetworkManagementListFragment.getBundle(openAddedTab = true))
     }
 
     override fun openPushNotificationSettings() {

@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
@@ -39,7 +40,7 @@ class CloudBackupSettingsModule {
         actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         accountTypePresentationMapper: MetaAccountTypePresentationMapper,
         walletUiUseCase: WalletUiUseCase,
-        progressDialogMixin: ProgressDialogMixin,
+        progressDialogMixinFactory: ProgressDialogMixinFactory,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         listSelectorMixinFactory: ListSelectorMixin.Factory,
         customDialogProvider: CustomDialogDisplayer.Presentation
@@ -54,7 +55,7 @@ class CloudBackupSettingsModule {
             actionBottomSheetLauncherFactory,
             accountTypePresentationMapper,
             walletUiUseCase,
-            progressDialogMixin,
+            progressDialogMixinFactory,
             actionAwaitableMixinFactory,
             listSelectorMixinFactory,
             customDialogProvider

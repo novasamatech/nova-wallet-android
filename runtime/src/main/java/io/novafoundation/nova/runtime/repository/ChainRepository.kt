@@ -20,7 +20,7 @@ class RealChainRepository(
 ) : ChainRepository {
 
     override suspend fun addChain(chain: Chain) {
-        chainDao.addChain(
+        chainDao.addChainOrUpdate(
             chain = mapChainToLocal(chain, gson),
             assets = chain.assets.map { mapChainAssetToLocal(it, gson) },
             nodes = chain.nodes.nodes.map { mapChainNodeToLocal(it) },
