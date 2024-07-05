@@ -5,9 +5,63 @@ on:
 
 
 jobs:
-  test:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+  develop-build:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/adding_instrumentail_tests
     with:
       branch: ${{github.head_ref}}
       gradlew-command: assembleDevelop
+      upload-name: develop-apk
     secrets: inherit
+
+  test-build:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/adding_instrumentail_tests
+    with:
+      branch: ${{github.head_ref}}
+      gradlew-command: assembleDevelopAndroidTest
+      upload-name: test-apk
+      run-tests: false
+    secrets: inherit
+
+  
+  run-tests:
+    needs: [develop-build, test-build]
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: develop-apk
+          path: app
+
+      - name: Debug path
+        run: |
+          ls -laR app
+
+      - name: Download instrumential test artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test-apk
+          path: test-app
+
+      - name: Debug path
+        run: |
+          ls -laR test-app
+
+      - name: Add permissions
+        run: chmod +x .github/scripts/run_instrumentail_tests.sh
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          disable-animations: true
+          profile: Nexus 6
+          api-level: 29
+          script: .github/scripts/run_instrumentail_tests.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anroid-results
+          path: ./allure-results.tar
