@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="add_network_title">Enter network details</string>
     <string name="loading_network_info">Loading network info...</string>
 
     <string name="create_network_invalid_chain_id_title">Invalid Chain ID</string>

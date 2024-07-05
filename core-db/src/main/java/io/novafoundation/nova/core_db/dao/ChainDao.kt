@@ -42,7 +42,7 @@ abstract class ChainDao {
         addChainNodes(nodesDiff.added)
         addChainExplorers(explorersDiff.added)
         addExternalApis(externalApisDiff.added)
-        addNodePreferencesOrUpdate(nodeSelectionPreferencesDiff.added)
+        addNodePreferences(nodeSelectionPreferencesDiff.added)
 
         updateChains(chainDiff.updated)
         updateChainAssets(assetsDiff.updated)
@@ -111,7 +111,7 @@ abstract class ChainDao {
     abstract suspend fun addChainNode(node: ChainNodeLocal)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    protected abstract suspend fun addNodePreferencesOrUpdate(model: List<NodeSelectionPreferencesLocal>)
+    protected abstract suspend fun addNodePreferences(model: List<NodeSelectionPreferencesLocal>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun addNodePreferencesOrUpdate(model: NodeSelectionPreferencesLocal)
