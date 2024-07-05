@@ -7,7 +7,7 @@ on:
 
 jobs:
   develop-build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/move_tests_to_main_repo
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
       branch: ${{github.head_ref}}
       gradlew-command: assembleDebug
@@ -16,7 +16,7 @@ jobs:
     secrets: inherit
 
   test-build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/move_tests_to_main_repo
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
       branch: ${{github.head_ref}}
       gradlew-command: assembleDebugAndroidTest
