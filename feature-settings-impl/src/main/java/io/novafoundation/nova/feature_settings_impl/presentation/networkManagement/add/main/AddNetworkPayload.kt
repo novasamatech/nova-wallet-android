@@ -33,6 +33,4 @@ class AddNetworkPayload(
         @Parcelize
         class Edit(val chainId: String) : Mode
     }
-
 }
-

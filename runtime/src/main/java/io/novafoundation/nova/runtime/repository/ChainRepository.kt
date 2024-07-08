@@ -19,7 +19,8 @@ interface ChainRepository {
         chainId: String,
         chainName: String,
         tokenSymbol: String,
-        blockExplorer: Chain.Explorer?, priceId: String?
+        blockExplorer: Chain.Explorer?,
+        priceId: String?
     )
 
     suspend fun deleteNetwork(chainId: String)

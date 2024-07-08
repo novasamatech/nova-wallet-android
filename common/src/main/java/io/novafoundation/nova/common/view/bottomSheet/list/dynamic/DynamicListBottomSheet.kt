@@ -30,7 +30,6 @@ class ReferentialEqualityDiffCallBack<T : Any> : DiffUtil.ItemCallback<T>() {
     override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
         return true
     }
-
 }
 
 abstract class BaseDynamicListBottomSheet(context: Context) :

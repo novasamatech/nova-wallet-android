@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetw
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkValidationSystem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload.Mode
-import io.novafoundation.nova.runtime.explorer.BlockExplorerLinkFormatter
 import io.novafoundation.nova.runtime.ext.networkType
 import io.novafoundation.nova.runtime.ext.normalizedUrl
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -134,7 +133,7 @@ class AddNetworkViewModel(
                 evmChainId = evmChainIdFlow.value.toIntOrNull(),
                 blockExplorerNameAndUrl = blockExplorerUrl?.let { blockExplorerName to it },
                 coingeckoLinkUrl = priceProviderFlow.value.nullIfBlank(),
-                ignoreChainModifying = payload.mode is Mode.Edit //Skip dialog about Chain modifying if it's already editing
+                ignoreChainModifying = payload.mode is Mode.Edit // Skip dialog about Chain modifying if it's already editing
             )
 
             validationExecutor.requireValid(
@@ -174,7 +173,6 @@ class AddNetworkViewModel(
     }
 
     private suspend fun createNetowork(mode: Mode.Add, savingPayload: CustomNetworkPayload): Result<Unit> {
-
         return when (mode.networkType) {
             Mode.Add.NetworkType.EVM -> interactor.createEvmNetwork(
                 chainId = savingPayload.evmChainId!!,

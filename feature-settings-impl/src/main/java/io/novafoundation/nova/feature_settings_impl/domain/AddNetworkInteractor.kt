@@ -213,7 +213,6 @@ class RealAddNetworkInteractor(
         )
     }
 
-
     override fun getSubstrateValidationSystem(coroutineScope: CoroutineScope): CustomNetworkValidationSystem {
         return ValidationSystem {
             validCoinGeckoLink(coinGeckoLinkValidationFactory)
