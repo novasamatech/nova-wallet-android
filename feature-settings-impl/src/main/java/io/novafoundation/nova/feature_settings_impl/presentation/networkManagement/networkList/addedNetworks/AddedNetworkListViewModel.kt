@@ -18,7 +18,7 @@ class AddedNetworkListViewModel(
     private val networkManagementInteractor: NetworkManagementInteractor,
     private val networkListAdapterItemFactory: NetworkListAdapterItemFactory,
     private val appLinksProvider: AppLinksProvider,
-    router: SettingsRouter
+    private val router: SettingsRouter
 ) : NetworkListViewModel(router), Browserable {
 
     private val networks = networkManagementInteractor.addedNetworksFlow()
@@ -44,6 +44,6 @@ class AddedNetworkListViewModel(
     }
 
     fun addNetworkClicked() {
-        showError("Not implemented")
+        router.addNetwork()
     }
 }

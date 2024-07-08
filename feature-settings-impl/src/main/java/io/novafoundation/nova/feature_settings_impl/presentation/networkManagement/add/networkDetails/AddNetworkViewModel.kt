@@ -143,25 +143,25 @@ class AddNetworkViewModel(
                 progressConsumer = loadingState.progressConsumer(),
                 validationFailureTransformerCustom = { status, actions -> mapSaveCustomNetworkFailureToUI(resourceManager, status, actions) }
             ) {
-                launch {
-                    executeSaving(validationPayload)
-                    loadingState.value = false
-                }
+                executeSaving(validationPayload)
+                loadingState.value = false
             }
         }
     }
 
-    private suspend fun executeSaving(savingPayload: CustomNetworkPayload) {
-        val result = when (payload.mode) {
-            is Mode.Add -> createNetowork(payload.mode, savingPayload)
-            is Mode.Edit -> editNetwork(payload.mode, savingPayload)
-        }
-
-        result.onSuccess { finishSavingFlow() }
-            .onFailure {
-                Log.e(LOG_TAG, "Failed to save network", it)
-                showError(resourceManager.getString(R.string.common_something_went_wrong_title))
+    private fun executeSaving(savingPayload: CustomNetworkPayload) {
+        launch {
+            val result = when (payload.mode) {
+                is Mode.Add -> createNetowork(payload.mode, savingPayload)
+                is Mode.Edit -> editNetwork(payload.mode, savingPayload)
             }
+
+            result.onSuccess { finishSavingFlow() }
+                .onFailure {
+                    Log.e(LOG_TAG, "Failed to save network", it)
+                    showError(resourceManager.getString(R.string.common_something_went_wrong_title))
+                }
+        }
     }
 
     private fun finishSavingFlow() {
