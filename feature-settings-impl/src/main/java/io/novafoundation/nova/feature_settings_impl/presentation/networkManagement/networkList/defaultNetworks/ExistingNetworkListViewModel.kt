@@ -19,5 +19,5 @@ class ExistingNetworkListViewModel(
 
     override val networkList: Flow<List<NetworkListRvItem>> = networks.mapList {
         networkListAdapterItemFactory.getNetworkItem(it)
-    }
+    }.shareInBackground()
 }
