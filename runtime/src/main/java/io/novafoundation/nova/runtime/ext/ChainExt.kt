@@ -487,6 +487,6 @@ fun Chain.openGovIfSupported(): Chain.Governance? {
 }
 
 fun Chain.Explorer.normalizedUrl(): String? {
-    val url = listOfNotNull(extrinsic, account, event).first() ?: return null
-    return Urls.normalizeUrl(url)
+    val url = listOfNotNull(extrinsic, account, event).firstOrNull()
+    return url?.let { Urls.normalizeUrl(it) }
 }

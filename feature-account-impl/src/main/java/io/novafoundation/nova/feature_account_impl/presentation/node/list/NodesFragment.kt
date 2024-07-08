@@ -97,7 +97,7 @@ class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandl
         MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme)
             .setTitle(R.string.connection_delete_title)
             .setMessage(message)
-            .setPositiveButton(R.string.connection_delete_confirm) { dialog, _ ->
+            .setPositiveButton(R.string.common_delete) { dialog, _ ->
                 viewModel.confirmNodeDeletion(nodeModel)
                 dialog?.dismiss()
             }

@@ -52,6 +52,14 @@ interface AddNetworkInteractor {
         coingeckoLink: String?
     ): Result<Unit>
 
+    suspend fun updateChain(
+        chainId: String,
+        chainName: String,
+        tokenSymbol: String,
+        blockExplorerNameAndUrl: Pair<String, String>?,
+        coingeckoLinkUrl: String?
+    ): Result<Unit>
+
     fun getSubstrateValidationSystem(coroutineScope: CoroutineScope): CustomNetworkValidationSystem
 
     fun getEvmValidationSystem(coroutineScope: CoroutineScope): CustomNetworkValidationSystem
@@ -178,16 +186,7 @@ class RealAddNetworkInteractor(
             isCustom = true,
         )
 
-        val explorer = blockExplorer?.let { (name, url) ->
-            val links = blockExplorerLinkFormatter.format(url)
-            Chain.Explorer(
-                chainId = chainId,
-                name = name,
-                account = links?.account,
-                extrinsic = links?.extrinsic,
-                event = links?.event,
-            )
-        }
+        val explorer = getChainExplorer(blockExplorer, chainId)
 
         return Chain(
             id = chainId,
@@ -214,11 +213,12 @@ class RealAddNetworkInteractor(
         )
     }
 
+
     override fun getSubstrateValidationSystem(coroutineScope: CoroutineScope): CustomNetworkValidationSystem {
         return ValidationSystem {
             validCoinGeckoLink(coinGeckoLinkValidationFactory)
 
-            // Use singletone here to receive chain id only one time for all vaildations
+            // Use singleton here to receive chain id only one time for all vaildations
             val chainIdRequestSingleton = NodeChainIdSingletonProvider(nodeChainIdRepositoryFactory, coroutineScope)
             validateNetworkNodeIsAlive { chainIdRequestSingleton.getChainId(NetworkType.SUBSTRATE, it.nodeUrl) }
             validateNetworkNotAdded(chainRegistry) { chainIdRequestSingleton.getChainId() }
@@ -238,8 +238,36 @@ class RealAddNetworkInteractor(
         }
     }
 
+    override suspend fun updateChain(
+        chainId: String,
+        chainName: String,
+        tokenSymbol: String,
+        blockExplorerNameAndUrl: Pair<String, String>?,
+        coingeckoLinkUrl: String?
+    ): Result<Unit> {
+        return runCatching {
+            val blockExplorer = getChainExplorer(blockExplorer = blockExplorerNameAndUrl, chainId = chainId)
+            val priceId = coingeckoLinkUrl?.let { coinGeckoLinkParser.parse(it).getOrNull()?.priceId }
+
+            chainRepository.editChain(chainId, chainName, tokenSymbol, blockExplorer, priceId)
+        }
+    }
+
     private suspend fun getSubstrateChainProperties(nodeConnection: NodeConnection): SystemProperties {
         return nodeConnection.getSocketService()
             .executeAsync(GetSystemPropertiesRequest(), mapper = pojo<SystemProperties>().nonNull())
+    }
+
+    private fun getChainExplorer(blockExplorer: Pair<String, String>?, chainId: String): Chain.Explorer? {
+        return blockExplorer?.let { (name, url) ->
+            val links = blockExplorerLinkFormatter.format(url)
+            Chain.Explorer(
+                chainId = chainId,
+                name = name,
+                account = links?.account,
+                extrinsic = links?.extrinsic,
+                event = links?.event,
+            )
+        }
     }
 }

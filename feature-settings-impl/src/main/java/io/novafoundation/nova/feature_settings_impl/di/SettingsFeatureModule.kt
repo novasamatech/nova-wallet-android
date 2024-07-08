@@ -65,9 +65,10 @@ class SettingsFeatureModule {
     @FeatureScope
     fun provideNetworkManagementChainInteractor(
         chainRegistry: ChainRegistry,
-        nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
+        nodeHealthStateTesterFactory: NodeHealthStateTesterFactory,
+        chainRepository: ChainRepository
     ): NetworkManagementChainInteractor {
-        return RealNetworkManagementChainInteractor(chainRegistry, nodeHealthStateTesterFactory)
+        return RealNetworkManagementChainInteractor(chainRegistry, nodeHealthStateTesterFactory, chainRepository)
     }
 
     @Provides

@@ -83,18 +83,18 @@ class PreConfiguredNetworksViewModel(
     }
 
     private fun openAddChainScreen(chain: Chain) {
-        val (mode, chainId) = when (chain.networkType()) {
-            NetworkType.SUBSTRATE -> AddNetworkPayload.Mode.SUBSTRATE to null
-            NetworkType.EVM -> AddNetworkPayload.Mode.EVM to chain.evmChainIdOrNull()
+        val (networkType, chainId) = when (chain.networkType()) {
+            NetworkType.SUBSTRATE -> AddNetworkPayload.Mode.Add.NetworkType.SUBSTRATE to null
+            NetworkType.EVM -> AddNetworkPayload.Mode.Add.NetworkType.EVM to chain.evmChainIdOrNull()
         }
 
         val node = chain.nodes.nodes.firstOrNull()
         val asset = chain.assets.firstOrNull()
         val explorer = chain.explorers.firstOrNull()
 
-        val payload = AddNetworkPayload(
-            mode,
-            AddNetworkPayload.NetworkData(
+        val payload = AddNetworkPayload.Mode.Add(
+            networkType = networkType,
+            AddNetworkPayload.Mode.Add.NetworkData(
                 iconUrl = chain.icon,
                 rpcNodeUrl = node?.unformattedUrl,
                 networkName = chain.name,

@@ -69,6 +69,20 @@ abstract class ChainDao {
         addNodePreferencesOrUpdate(nodeSelectionPreferences)
     }
 
+    @Transaction
+    open suspend fun editChain(
+        chainId: String,
+        assetId: Int,
+        chainName: String,
+        symbol: String,
+        explorer: ChainExplorerLocal?,
+        priceId: String?
+    ) {
+        updateChainName(chainId, chainName)
+        updateAssetToken(chainId, assetId, symbol, priceId)
+        addChainExplorersOrUpdate(listOfNotNull(explorer))
+    }
+
     // ------ Delete --------
     @Delete
     protected abstract suspend fun deleteChains(chains: List<ChainLocal>)
@@ -205,4 +219,16 @@ abstract class ChainDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertRuntimeInfo(runtimeInfoLocal: ChainRuntimeInfoLocal)
+
+    @Query("UPDATE chains SET name = :name WHERE id = :chainId")
+    abstract suspend fun updateChainName(chainId: String, name: String)
+
+    @Query("UPDATE chain_assets SET symbol = :symbol, priceId = :priceId WHERE chainId = :chainId and id == :assetId")
+    abstract suspend fun updateAssetToken(chainId: String, assetId: Int, symbol: String, priceId: String?)
+
+    @Query("DELETE FROM chains  WHERE id = :chainId")
+    abstract suspend fun deleteChain(chainId: String)
+
+    @Query("DELETE FROM chain_nodes WHERE chainId = :chainId AND url = :url")
+    abstract suspend fun deleteNode(chainId: String, url: String)
 }

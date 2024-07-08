@@ -266,10 +266,12 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideChainRepository(
+        chainRegistry: ChainRegistry,
         chainDao: ChainDao,
         gson: Gson
     ): ChainRepository {
         return RealChainRepository(
+            chainRegistry,
             chainDao,
             gson
         )

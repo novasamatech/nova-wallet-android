@@ -5,15 +5,18 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.autoBalanceDisabled
 import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.isCustomNetwork
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
+import io.novafoundation.nova.runtime.repository.ChainRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -49,16 +52,22 @@ interface NetworkManagementChainInteractor {
     suspend fun selectNode(chainId: String, nodeUrl: String)
 
     suspend fun toggleChainEnableState(chainId: String)
+
+    suspend fun deleteNetwork(chainId: String)
+
+    suspend fun deleteNode(chainId: String, nodeUrl: String)
 }
 
 class RealNetworkManagementChainInteractor(
     private val chainRegistry: ChainRegistry,
-    private val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
+    private val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory,
+    private val chainRepository: ChainRepository
 ) : NetworkManagementChainInteractor {
 
     override fun chainStateFlow(chainId: String, coroutineScope: CoroutineScope): Flow<ChainNetworkState> {
         return chainRegistry.chainsById
-            .map { it.getValue(chainId) }
+            .map { it[chainId] }
+            .filterNotNull()
             .flatMapLatest { chain ->
                 combine(activeNodeFlow(chainId), nodesHealthState(chain, coroutineScope)) { activeNode, nodeHealthStates ->
                     ChainNetworkState(chain, networkCanBeDisabled(chain), nodeHealthStates, activeNode)
@@ -79,6 +88,20 @@ class RealNetworkManagementChainInteractor(
         val chain = chainRegistry.getChain(chainId)
         val connectionState = if (chain.isEnabled) Chain.ConnectionState.DISABLED else Chain.ConnectionState.FULL_SYNC
         chainRegistry.changeChainConectionState(chainId, connectionState)
+    }
+
+    override suspend fun deleteNetwork(chainId: String) {
+        val chain = chainRegistry.getChain(chainId)
+
+        require(chain.isCustomNetwork)
+        chainRepository.deleteNetwork(chainId)
+    }
+
+    override suspend fun deleteNode(chainId: String, nodeUrl: String) {
+        val chain = chainRegistry.getChain(chainId)
+
+        require(chain.nodes.nodes.size > 1)
+        chainRepository.deleteNode(chainId, nodeUrl)
     }
 
     private fun networkCanBeDisabled(chain: Chain): Boolean {

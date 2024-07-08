@@ -14,12 +14,13 @@ typealias CustomNetworkValidationSystemBuilder = ValidationSystemBuilder<CustomN
 
 data class CustomNetworkPayload(
     val nodeUrl: String,
+    val nodeName: String,
     val chainName: String,
     val tokenSymbol: String,
     val evmChainId: Int?,
-    val blockExplorerUrl: String?,
+    val blockExplorerNameAndUrl: Pair<String, String>?,
     val coingeckoLinkUrl: String?,
-    val ignoreChainModifying: Boolean
+    val ignoreChainModifying: Boolean,
 )
 
 sealed interface CustomNetworkFailure {
