@@ -21,6 +21,7 @@ class AddNetworkPayload(
             @Parcelize
             class NetworkData(
                 val iconUrl: String?,
+                val isTestNet: Boolean?,
                 val rpcNodeUrl: String?,
                 val networkName: String?,
                 val tokenName: String?,

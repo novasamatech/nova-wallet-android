@@ -96,6 +96,7 @@ class PreConfiguredNetworksViewModel(
             networkType = networkType,
             AddNetworkPayload.Mode.Add.NetworkData(
                 iconUrl = chain.icon,
+                isTestNet = chain.isTestNet,
                 rpcNodeUrl = node?.unformattedUrl,
                 networkName = chain.name,
                 tokenName = asset?.symbol?.value,

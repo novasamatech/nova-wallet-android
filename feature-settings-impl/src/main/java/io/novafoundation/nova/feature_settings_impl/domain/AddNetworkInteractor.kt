@@ -38,7 +38,7 @@ interface AddNetworkInteractor {
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
-        isTestNet: Boolean,
+        isTestNet: Boolean?,
         blockExplorer: Pair<String, String>?,
         coingeckoLink: String?,
         coroutineScope: CoroutineScope
@@ -51,7 +51,7 @@ interface AddNetworkInteractor {
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
-        isTestNet: Boolean,
+        isTestNet: Boolean?,
         blockExplorer: Pair<String, String>?,
         coingeckoLink: String?
     ): Result<Unit>
@@ -85,7 +85,7 @@ class RealAddNetworkInteractor(
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
-        isTestNet: Boolean,
+        isTestNet: Boolean?,
         blockExplorer: Pair<String, String>?, // name, url
         coingeckoLink: String?,
         coroutineScope: CoroutineScope
@@ -107,7 +107,7 @@ class RealAddNetworkInteractor(
             coingeckoLink = coingeckoLink,
             addressPrefix = chainProperties.ss58Format ?: chainProperties.SS58Prefix ?: 1,
             isEthereumBased = runtime.isEthereumAddress(),
-            isTestnet = isTestNet(nodeConnection),
+            isTestnet = isTestNet ?: false,
             hasSubstrateRuntime = true,
             assetDecimals = chainProperties.firstTokenDecimals(),
             assetType = Chain.Asset.Type.Native,
@@ -123,7 +123,7 @@ class RealAddNetworkInteractor(
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
-        isTestNet: Boolean,
+        isTestNet: Boolean?,
         blockExplorer: Pair<String, String>?,
         coingeckoLink: String?
     ) = runCatching {
@@ -140,7 +140,7 @@ class RealAddNetworkInteractor(
             coingeckoLink = coingeckoLink,
             addressPrefix = chainId,
             isEthereumBased = true,
-            isTestnet = false,
+            isTestnet = isTestNet ?: false,
             hasSubstrateRuntime = false,
             assetDecimals = EVM_DEFAULT_TOKEN_DECIMALS,
             assetType = Chain.Asset.Type.EvmNative,
@@ -258,11 +258,6 @@ class RealAddNetworkInteractor(
 
     private suspend fun getSubstrateChainProperties(nodeConnection: NodeConnection): SystemProperties {
         return nodeConnection.getSocketService().systemProperties()
-    }
-
-    private suspend fun isTestNet(nodeConnection: NodeConnection): Boolean {
-        val chainType = nodeConnection.getSocketService().systemChainType()
-        return chainType != "Live"
     }
 
     private fun getChainExplorer(blockExplorer: Pair<String, String>?, chainId: String): Chain.Explorer? {

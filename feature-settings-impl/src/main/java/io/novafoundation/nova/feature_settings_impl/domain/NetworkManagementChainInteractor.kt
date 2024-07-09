@@ -8,6 +8,7 @@ import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.ext.isCustomNetwork
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.ext.isEnabled
+import io.novafoundation.nova.runtime.ext.selectedNodeUrlOrNull
 import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -87,7 +88,7 @@ class RealNetworkManagementChainInteractor(
     override suspend fun toggleChainEnableState(chainId: String) {
         val chain = chainRegistry.getChain(chainId)
         val connectionState = if (chain.isEnabled) Chain.ConnectionState.DISABLED else Chain.ConnectionState.FULL_SYNC
-        chainRegistry.changeChainConectionState(chainId, connectionState)
+        chainRegistry.changeChainConnectionState(chainId, connectionState)
     }
 
     override suspend fun deleteNetwork(chainId: String) {
@@ -101,7 +102,12 @@ class RealNetworkManagementChainInteractor(
         val chain = chainRegistry.getChain(chainId)
 
         require(chain.nodes.nodes.size > 1)
+
         chainRepository.deleteNode(chainId, nodeUrl)
+
+        if (chain.selectedNodeUrlOrNull == nodeUrl) {
+            chainRegistry.setAutoBalanceEnabled(chain.id, true)
+        }
     }
 
     private fun networkCanBeDisabled(chain: Chain): Boolean {

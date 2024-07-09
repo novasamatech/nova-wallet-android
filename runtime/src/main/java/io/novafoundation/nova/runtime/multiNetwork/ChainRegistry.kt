@@ -122,10 +122,10 @@ class ChainRegistry(
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
 
     suspend fun enableFullSync(chainId: ChainId) {
-        changeChainConectionState(chainId, ConnectionState.FULL_SYNC)
+        changeChainConnectionState(chainId, ConnectionState.FULL_SYNC)
     }
 
-    suspend fun changeChainConectionState(chainId: ChainId, state: ConnectionState) {
+    suspend fun changeChainConnectionState(chainId: ChainId, state: ConnectionState) {
         val connectionState = mapConnectionStateToLocal(state)
         chainDao.setConnectionState(chainId, connectionState)
     }

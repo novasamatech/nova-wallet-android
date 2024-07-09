@@ -32,7 +32,7 @@ data class NodeSelectionPreferencesLocal(
     companion object {
 
         const val DEFAULT_AUTO_BALANCE_DEFAULT_STR = "1"
-        const val DEFAULT_AUTO_BALANCE_DEFAULT_BOOLEAN = true
+        const val DEFAULT_AUTO_BALANCE_BOOLEAN = true
     }
 
     @Ignore

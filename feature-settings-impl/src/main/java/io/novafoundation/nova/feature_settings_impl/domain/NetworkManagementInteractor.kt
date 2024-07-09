@@ -66,7 +66,7 @@ class RealNetworkManagementInteractor(
         }
 
         return chains.map { chain ->
-            val connectionFlow = chainRegistry.getConnectionOrNull(chain.id)?.state ?: emptyFlow<SocketStateMachine.State?>()
+            val connectionFlow = chainRegistry.getConnectionOrNull(chain.id)?.state ?: flowOf<SocketStateMachine.State?>(SocketStateMachine.State.Disconnected)
             connectionFlow
                 .distinctUntilChanged { old, new -> old?.isConnected() == new?.isConnected() }
                 .map { state -> NetworkState(chain, state) }

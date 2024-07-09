@@ -182,6 +182,7 @@ class AddNetworkViewModel(
                 nodeName = savingPayload.nodeName,
                 chainName = savingPayload.chainName,
                 tokenSymbol = savingPayload.tokenSymbol,
+                isTestNet = mode.prefilledData?.isTestNet,
                 blockExplorer = savingPayload.blockExplorerNameAndUrl,
                 coingeckoLink = savingPayload.coingeckoLinkUrl
             )
@@ -192,6 +193,7 @@ class AddNetworkViewModel(
                 nodeName = savingPayload.nodeName,
                 chainName = savingPayload.chainName,
                 tokenSymbol = savingPayload.tokenSymbol,
+                isTestNet = mode.prefilledData?.isTestNet,
                 blockExplorer = savingPayload.blockExplorerNameAndUrl,
                 coingeckoLink = savingPayload.coingeckoLinkUrl,
                 coroutineScope = viewModelScope
