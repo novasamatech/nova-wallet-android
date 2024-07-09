@@ -52,7 +52,8 @@ data class Chain(
         val stakingMaxElectingVoters: Int?,
         val feeViaRuntimeCall: Boolean?,
         val supportLedgerGenericApp: Boolean?,
-        val identityChain: ChainId?
+        val identityChain: ChainId?,
+        val disabledCheckMetadataHash: Boolean?
     )
 
     data class Types(
