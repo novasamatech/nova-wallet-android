@@ -143,7 +143,6 @@ class AddNetworkViewModel(
                 validationFailureTransformerCustom = { status, actions -> mapSaveCustomNetworkFailureToUI(resourceManager, status, actions) }
             ) {
                 executeSaving(validationPayload)
-                loadingState.value = false
             }
         }
     }
@@ -160,6 +159,8 @@ class AddNetworkViewModel(
                     Log.e(LOG_TAG, "Failed to save network", it)
                     showError(resourceManager.getString(R.string.common_something_went_wrong_title))
                 }
+
+            loadingState.value = false
         }
     }
 

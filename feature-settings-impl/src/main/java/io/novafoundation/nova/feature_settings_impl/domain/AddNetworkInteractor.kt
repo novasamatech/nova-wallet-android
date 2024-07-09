@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
-import io.novafoundation.nova.common.data.network.runtime.calls.GetSystemPropertiesRequest
 import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
+import io.novafoundation.nova.common.data.network.runtime.model.firstTokenDecimals
+import io.novafoundation.nova.common.data.network.runtime.model.firstTokenSymbol
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -22,10 +23,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
+import io.novafoundation.nova.runtime.network.rpc.systemChainType
+import io.novafoundation.nova.runtime.network.rpc.systemProperties
 import io.novafoundation.nova.runtime.repository.ChainRepository
-import io.novasama.substrate_sdk_android.wsrpc.executeAsync
-import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
-import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
+import io.novafoundation.nova.runtime.util.fetchRuntimeSnapshot
+import io.novafoundation.nova.runtime.util.isEthereumAddress
 import kotlinx.coroutines.CoroutineScope
 
 interface AddNetworkInteractor {
@@ -36,6 +38,7 @@ interface AddNetworkInteractor {
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
+        isTestNet: Boolean,
         blockExplorer: Pair<String, String>?,
         coingeckoLink: String?,
         coroutineScope: CoroutineScope
@@ -48,6 +51,7 @@ interface AddNetworkInteractor {
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
+        isTestNet: Boolean,
         blockExplorer: Pair<String, String>?,
         coingeckoLink: String?
     ): Result<Unit>
@@ -81,20 +85,16 @@ class RealAddNetworkInteractor(
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
+        isTestNet: Boolean,
         blockExplorer: Pair<String, String>?, // name, url
         coingeckoLink: String?,
         coroutineScope: CoroutineScope
     ) = runCatching {
         val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
         val substrateNodeIdRequester = nodeChainIdRepositoryFactory.substrate(nodeConnection)
+        val runtime = nodeConnection.getSocketService().fetchRuntimeSnapshot()
 
         val chainProperties = getSubstrateChainProperties(nodeConnection)
-
-        val tokenDecimals = if (chainProperties.tokenSymbol == tokenSymbol) {
-            chainProperties.tokenDecimals
-        } else {
-            null
-        }
 
         val chain = createChain(
             chainId = substrateNodeIdRequester.requestChainId(),
@@ -102,13 +102,14 @@ class RealAddNetworkInteractor(
             nodeUrl = nodeUrl,
             nodeName = nodeName,
             chainName = chainName,
-            tokenSymbol = tokenSymbol,
+            tokenSymbol = chainProperties.firstTokenSymbol(),
             blockExplorer = blockExplorer,
             coingeckoLink = coingeckoLink,
-            addressPrefix = chainProperties.SS58Prefix ?: chainProperties.ss58Format ?: 1,
-            isEthereumBased = chainProperties.isEthereum ?: false,
+            addressPrefix = chainProperties.ss58Format ?: chainProperties.SS58Prefix ?: 1,
+            isEthereumBased = runtime.isEthereumAddress(),
+            isTestnet = isTestNet(nodeConnection),
             hasSubstrateRuntime = true,
-            assetDecimals = tokenDecimals,
+            assetDecimals = chainProperties.firstTokenDecimals(),
             assetType = Chain.Asset.Type.Native,
         )
 
@@ -122,6 +123,7 @@ class RealAddNetworkInteractor(
         nodeName: String,
         chainName: String,
         tokenSymbol: String,
+        isTestNet: Boolean,
         blockExplorer: Pair<String, String>?,
         coingeckoLink: String?
     ) = runCatching {
@@ -138,6 +140,7 @@ class RealAddNetworkInteractor(
             coingeckoLink = coingeckoLink,
             addressPrefix = chainId,
             isEthereumBased = true,
+            isTestnet = false,
             hasSubstrateRuntime = false,
             assetDecimals = EVM_DEFAULT_TOKEN_DECIMALS,
             assetType = Chain.Asset.Type.EvmNative,
@@ -157,6 +160,7 @@ class RealAddNetworkInteractor(
         coingeckoLink: String?,
         addressPrefix: Int,
         isEthereumBased: Boolean,
+        isTestnet: Boolean,
         hasSubstrateRuntime: Boolean,
         assetDecimals: Int?,
         assetType: Chain.Asset.Type
@@ -200,7 +204,7 @@ class RealAddNetworkInteractor(
             addressPrefix = addressPrefix,
             types = null,
             isEthereumBased = isEthereumBased,
-            isTestNet = false,
+            isTestNet = isTestnet,
             source = Chain.Source.CUSTOM,
             hasSubstrateRuntime = hasSubstrateRuntime,
             pushSupport = false,
@@ -253,8 +257,12 @@ class RealAddNetworkInteractor(
     }
 
     private suspend fun getSubstrateChainProperties(nodeConnection: NodeConnection): SystemProperties {
-        return nodeConnection.getSocketService()
-            .executeAsync(GetSystemPropertiesRequest(), mapper = pojo<SystemProperties>().nonNull())
+        return nodeConnection.getSocketService().systemProperties()
+    }
+
+    private suspend fun isTestNet(nodeConnection: NodeConnection): Boolean {
+        val chainType = nodeConnection.getSocketService().systemChainType()
+        return chainType != "Live"
     }
 
     private fun getChainExplorer(blockExplorer: Pair<String, String>?, chainId: String): Chain.Explorer? {
