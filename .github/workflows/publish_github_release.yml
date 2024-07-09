@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
