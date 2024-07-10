@@ -7,13 +7,11 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.calls.FeeCalculationRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockRequest
-import io.novafoundation.nova.common.data.network.runtime.calls.GetChainRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetFinalizedHeadRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetHeaderRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetStorageSize
 import io.novafoundation.nova.common.data.network.runtime.calls.GetSystemPropertiesRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.NextAccountIndexRequest
-import io.novafoundation.nova.common.data.network.runtime.calls.SystemChainTypeRequest
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
@@ -31,7 +29,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novasama.substrate_sdk_android.extensions.fromHex
-import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
@@ -166,21 +163,8 @@ class RpcCalls(
     }
 }
 
-
 suspend fun SocketService.getBlockHash(blockNumber: BlockNumber? = null): String {
     return executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
-}
-
-suspend fun SocketService.systemChain(): String {
-    return executeAsync(GetChainRequest(), mapper = pojo<String>().nonNull())
-}
-
-suspend fun SocketService.stateGetMetadata(): String {
-    return executeAsync(GetMetadataRequest, mapper = pojo<String>().nonNull())
-}
-
-suspend fun SocketService.systemChainType(): String {
-    return executeAsync(SystemChainTypeRequest(), mapper = pojo<String>().nonNull())
 }
 
 suspend fun SocketService.systemProperties(): SystemProperties {

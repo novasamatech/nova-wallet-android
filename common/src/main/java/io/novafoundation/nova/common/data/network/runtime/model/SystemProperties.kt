@@ -7,7 +7,6 @@ import com.google.gson.annotations.JsonAdapter
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-
 class SystemProperties(
     val ss58Format: Int?,
     val SS58Prefix: Int?,

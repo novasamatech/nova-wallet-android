@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class ChainNetworkState(
     val chain: Chain,
@@ -67,8 +68,7 @@ class RealNetworkManagementChainInteractor(
 
     override fun chainStateFlow(chainId: String, coroutineScope: CoroutineScope): Flow<ChainNetworkState> {
         return chainRegistry.chainsById
-            .map { it[chainId] }
-            .filterNotNull()
+            .mapNotNull { it[chainId] }
             .flatMapLatest { chain ->
                 combine(activeNodeFlow(chainId), nodesHealthState(chain, coroutineScope)) { activeNode, nodeHealthStates ->
                     ChainNetworkState(chain, networkCanBeDisabled(chain), nodeHealthStates, activeNode)

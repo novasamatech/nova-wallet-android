@@ -100,12 +100,12 @@ class AddNetworkViewModel(
         when (mode) {
             is Mode.Add -> {
                 val prefilledData = mode.prefilledData
-                nodeUrlFlow.value = prefilledData?.rpcNodeUrl ?: ""
-                networkNameFlow.value = prefilledData?.networkName ?: ""
-                tokenSymbolFlow.value = prefilledData?.tokenName ?: ""
-                evmChainIdFlow.value = prefilledData?.evmChainId?.format() ?: ""
-                blockExplorerFlow.value = prefilledData?.blockExplorerUrl ?: ""
-                priceProviderFlow.value = prefilledData?.coingeckoLink ?: ""
+                nodeUrlFlow.value = prefilledData?.rpcNodeUrl.orEmpty()
+                networkNameFlow.value = prefilledData?.networkName.orEmpty()
+                tokenSymbolFlow.value = prefilledData?.tokenName.orEmpty()
+                evmChainIdFlow.value = prefilledData?.evmChainId?.format().orEmpty()
+                blockExplorerFlow.value = prefilledData?.blockExplorerUrl.orEmpty()
+                priceProviderFlow.value = prefilledData?.coingeckoLink.orEmpty()
             }
 
             is Mode.Edit -> {
@@ -114,8 +114,8 @@ class AddNetworkViewModel(
                 nodeUrlFlow.value = chainForEdit.nodes.nodes.first().unformattedUrl
                 networkNameFlow.value = chainForEdit.name
                 tokenSymbolFlow.value = asset.symbol.value
-                blockExplorerFlow.value = chainForEdit.explorers.firstOrNull()?.normalizedUrl() ?: ""
-                priceProviderFlow.value = asset.priceId?.let { coinGeckoLinkParser.format(it) } ?: ""
+                blockExplorerFlow.value = chainForEdit.explorers.firstOrNull()?.normalizedUrl().orEmpty()
+                priceProviderFlow.value = asset.priceId?.let { coinGeckoLinkParser.format(it) }.orEmpty()
             }
         }
     }
