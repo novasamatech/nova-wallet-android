@@ -14,7 +14,9 @@ import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.ext.autoBalanceEnabled
 import io.novafoundation.nova.runtime.ext.selectedNodeUrlOrNull
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.TransferParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ConnectionState
@@ -201,8 +203,8 @@ fun mapExternalApiTransfers(gson: Gson, chainId: String, api: ExternalApi.Transf
     }
 
     val parameters = when (api) {
-        is ExternalApi.Transfers.Evm -> transferParametersByType(gson, "evm")
-        is ExternalApi.Transfers.Substrate -> transferParametersByType(gson, "substrate")
+        is ExternalApi.Transfers.Evm -> transferParametersByType(gson, EVM_TRANSFER_PARAMETER)
+        is ExternalApi.Transfers.Substrate -> transferParametersByType(gson, SUBSTRATE_TRANSFER_PARAMETER)
     }
 
     return ChainExternalApiLocal(
