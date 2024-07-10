@@ -41,7 +41,7 @@ class RealChainRepository(
             assets = chain.assets.map { mapChainAssetToLocal(it, gson) },
             nodes = chain.nodes.nodes.map { mapChainNodeToLocal(it) },
             explorers = chain.explorers.map { mapChainExplorerToLocal(it) },
-            externalApis = chain.externalApis.map { mapChainExternalApiToLocal(it) },
+            externalApis = chain.externalApis.map { mapChainExternalApiToLocal(gson, chain.id, it) },
             nodeSelectionPreferences = mapNodeSelectionPreferencesToLocal(chain)
         )
     }

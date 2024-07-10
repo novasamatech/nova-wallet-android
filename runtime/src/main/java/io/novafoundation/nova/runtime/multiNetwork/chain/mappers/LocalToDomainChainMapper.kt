@@ -21,6 +21,10 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrate
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.TransferParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -106,19 +110,15 @@ private inline fun <reified T> ChainExternalApiLocal.parsedParameters(gson: Gson
     return parameters?.let { gson.fromJson<T>(it) }
 }
 
-private class TransferParameters(val assetType: String?)
-
 private fun mapTransferApiFromLocal(local: ChainExternalApiLocal, gson: Gson): ExternalApi.Transfers? {
     val parameters = local.parsedParameters<TransferParameters>(gson)
 
     return when (parameters?.assetType) {
-        null, "substrate" -> ExternalApi.Transfers.Substrate(local.url)
-        "evm" -> ExternalApi.Transfers.Evm(local.url)
+        null, SUBSTRATE_TRANSFER_PARAMETER -> ExternalApi.Transfers.Substrate(local.url)
+        EVM_TRANSFER_PARAMETER -> ExternalApi.Transfers.Evm(local.url)
         else -> null
     }
 }
-
-private class GovernanceReferendaParameters(val network: String?)
 
 private fun mapGovernanceReferendaApiFromLocal(local: ChainExternalApiLocal, gson: Gson): ExternalApi.GovernanceReferenda? {
     val source = when (local.sourceType) {
