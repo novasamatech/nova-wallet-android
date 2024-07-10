@@ -14,6 +14,7 @@ fun mapSaveCustomNetworkFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<CustomNetworkFailure>,
     actions: ValidationFlowActions<CustomNetworkPayload>,
+    changeTokenSymbolAction: (String) -> Unit
 ): TransformedFailure {
     return when (val reason = status.reason) {
         is CustomNetworkFailure.DefaultNetworkAlreadyAdded -> Default(
@@ -57,5 +58,25 @@ fun mapSaveCustomNetworkFailureToUI(
             resourceManager.getString(R.string.asset_add_evm_token_invalid_coin_gecko_link_title) to
                 resourceManager.getString(R.string.asset_add_evm_token_invalid_coin_gecko_link_message)
         )
+
+        is CustomNetworkFailure.WrongAsset -> {
+            TransformedFailure.Custom(
+                CustomDialogDisplayer.Payload(
+                    title = resourceManager.getString(R.string.invalid_token_symbol_title),
+                    message = resourceManager.getString(R.string.invalid_token_symbol_message, reason.usedSymbol, reason.correctSymbol),
+                    cancelAction = CustomDialogDisplayer.Payload.DialogAction(
+                        title = resourceManager.getString(R.string.common_close),
+                        action = { }
+                    ),
+                    okAction = CustomDialogDisplayer.Payload.DialogAction(
+                        title = resourceManager.getString(R.string.common_apply),
+                        action = {
+                            changeTokenSymbolAction(reason.correctSymbol)
+                        }
+                    ),
+                    customStyle = R.style.AccentAlertDialogTheme
+                )
+            )
+        }
     }
 }

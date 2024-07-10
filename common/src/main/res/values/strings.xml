@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="invalid_token_symbol_title">Invalid Currency Symbol</string>
+    <string name="invalid_token_symbol_message">The entered Currency Symbol (%1$s) does not match the network (%2$s). Do you want to use the correct currency symbol?</string>
+
     <string name="manage_node_actions_title">Manage added node</string>
     <string name="manage_node_delete_title">Delete node?</string>
     <string name="manage_node_delete_message">Node \"%s\" will be deleted</string>

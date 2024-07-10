@@ -353,4 +353,6 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 fun ChainRegistry.enabledChains() = currentChains
     .filterList { it.isEnabled }
 
-fun ChainRegistry.enabledChainById() = enabledChains().map { chains -> chains.associateBy { it.id } }
+fun ChainRegistry.enabledChainByIdFlow() = enabledChains().map { chains -> chains.associateBy { it.id } }
+
+suspend fun ChainRegistry.enabledChainById() = ChainsById(enabledChainByIdFlow().first())

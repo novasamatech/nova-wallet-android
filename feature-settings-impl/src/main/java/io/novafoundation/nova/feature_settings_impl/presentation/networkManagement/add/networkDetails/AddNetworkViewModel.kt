@@ -140,7 +140,14 @@ class AddNetworkViewModel(
                 validationSystem = getValidationSystem(),
                 payload = validationPayload,
                 progressConsumer = loadingState.progressConsumer(),
-                validationFailureTransformerCustom = { status, actions -> mapSaveCustomNetworkFailureToUI(resourceManager, status, actions) }
+                validationFailureTransformerCustom = { status, actions ->
+                    mapSaveCustomNetworkFailureToUI(
+                        resourceManager,
+                        status,
+                        actions,
+                        ::changeTokenSymbol
+                    )
+                }
             ) {
                 executeSaving(validationPayload)
             }
@@ -209,6 +216,10 @@ class AddNetworkViewModel(
             savingPayload.blockExplorerNameAndUrl,
             savingPayload.coingeckoLinkUrl
         )
+    }
+
+    private fun changeTokenSymbol(symbol: String) {
+        tokenSymbolFlow.value = symbol
     }
 
     private suspend fun getValidationSystem(): CustomNetworkValidationSystem {

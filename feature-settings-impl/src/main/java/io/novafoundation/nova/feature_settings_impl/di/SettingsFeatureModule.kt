@@ -93,12 +93,14 @@ class SettingsFeatureModule {
     fun provideCustomNodeInteractor(
         chainRegistry: ChainRegistry,
         chainNodeRepository: ChainNodeRepository,
-        nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory
+        nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory,
+        nodeConnectionFactory: NodeConnectionFactory
     ): CustomNodeInteractor {
         return RealCustomNodeInteractor(
             chainRegistry,
             chainNodeRepository,
-            nodeChainIdRepositoryFactory
+            nodeChainIdRepositoryFactory,
+            nodeConnectionFactory
         )
     }
 

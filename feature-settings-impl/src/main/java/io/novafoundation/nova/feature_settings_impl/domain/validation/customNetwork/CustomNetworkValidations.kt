@@ -34,6 +34,8 @@ sealed interface CustomNetworkFailure {
     object NodeIsNotAlive : CustomNetworkFailure
 
     object CoingeckoLinkBadFormat : CustomNetworkFailure
+
+    class WrongAsset(val usedSymbol: String, val correctSymbol: String) : CustomNetworkFailure
 }
 
 fun CustomNetworkValidationSystemBuilder.validateNetworkNodeIsAlive(
@@ -66,4 +68,12 @@ fun CustomNetworkValidationSystemBuilder.validCoinGeckoLink(
     optional = true,
     link = { it.coingeckoLinkUrl },
     error = { CustomNetworkFailure.CoingeckoLinkBadFormat }
+)
+
+fun CustomNetworkValidationSystemBuilder.validateTokenSymbol(
+    tokenSymbolRequester: suspend (CustomNetworkPayload) -> String
+) = validateAssetIsMain(
+    chainMainAssetSymbolRequester = tokenSymbolRequester,
+    symbol = { it.tokenSymbol },
+    failure = { payload, correctSymbol -> CustomNetworkFailure.WrongAsset(payload.tokenSymbol, correctSymbol) },
 )
