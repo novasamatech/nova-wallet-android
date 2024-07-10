@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainExplorerToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainExternalApiToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainNodeToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapNodeSelectionPreferencesToLocal
@@ -40,7 +41,7 @@ class RealChainRepository(
             assets = chain.assets.map { mapChainAssetToLocal(it, gson) },
             nodes = chain.nodes.nodes.map { mapChainNodeToLocal(it) },
             explorers = chain.explorers.map { mapChainExplorerToLocal(it) },
-            externalApis = emptyList(), // TODO Mapping is quite difficult to do it now (We don't have flows to add external apis in this time)
+            externalApis = chain.externalApis.map { mapChainExternalApiToLocal(it) },
             nodeSelectionPreferences = mapNodeSelectionPreferencesToLocal(chain)
         )
     }

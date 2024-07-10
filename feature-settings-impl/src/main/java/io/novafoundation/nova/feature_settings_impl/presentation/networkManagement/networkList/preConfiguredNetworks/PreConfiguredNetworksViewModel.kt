@@ -24,6 +24,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.LightChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
+import io.novafoundation.nova.runtime.util.ChainParcel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -36,8 +37,7 @@ class PreConfiguredNetworksViewModel(
     private val router: SettingsRouter,
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
-    private val progressDialogMixinFactory: ProgressDialogMixinFactory,
-    private val coinGeckoLinkParser: CoinGeckoLinkParser
+    private val progressDialogMixinFactory: ProgressDialogMixinFactory
 ) : BaseViewModel(), Retriable {
 
     val progressDialogMixin = progressDialogMixinFactory.create()
@@ -83,27 +83,14 @@ class PreConfiguredNetworksViewModel(
     }
 
     private fun openAddChainScreen(chain: Chain) {
-        val (networkType, chainId) = when (chain.networkType()) {
-            NetworkType.SUBSTRATE -> AddNetworkPayload.Mode.Add.NetworkType.SUBSTRATE to null
-            NetworkType.EVM -> AddNetworkPayload.Mode.Add.NetworkType.EVM to chain.evmChainIdOrNull()
+        val networkType = when (chain.networkType()) {
+            NetworkType.SUBSTRATE -> AddNetworkPayload.Mode.Add.NetworkType.SUBSTRATE
+            NetworkType.EVM -> AddNetworkPayload.Mode.Add.NetworkType.EVM
         }
-
-        val node = chain.nodes.nodes.firstOrNull()
-        val asset = chain.assets.firstOrNull()
-        val explorer = chain.explorers.firstOrNull()
 
         val payload = AddNetworkPayload.Mode.Add(
             networkType = networkType,
-            AddNetworkPayload.Mode.Add.NetworkData(
-                iconUrl = chain.icon,
-                isTestNet = chain.isTestNet,
-                rpcNodeUrl = node?.unformattedUrl,
-                networkName = chain.name,
-                tokenName = asset?.symbol?.value,
-                evmChainId = chainId,
-                blockExplorerUrl = explorer?.normalizedUrl(),
-                coingeckoLink = asset?.priceId?.let { coinGeckoLinkParser.format(it) }
-            )
+            ChainParcel(chain)
         )
 
         router.openCreateNetworkFlow(payload)

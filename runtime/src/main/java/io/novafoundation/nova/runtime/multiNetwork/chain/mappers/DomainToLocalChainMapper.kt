@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.Companion.EMPTY_CHAIN_ICON
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
@@ -132,6 +133,16 @@ fun mapChainNodeToLocal(node: Chain.Node): ChainNodeLocal {
         name = node.name,
         orderId = node.orderId,
         source = if (node.isCustom) ChainNodeLocal.Source.CUSTOM else ChainNodeLocal.Source.DEFAULT,
+    )
+}
+
+fun mapChainExternalApiToLocal(explorer: Chain.ExternalApi): ChainExternalApiLocal {
+    return ChainExplorerLocal(
+        chainId = explorer.chainId,
+        name = explorer.name,
+        extrinsic = explorer.extrinsic,
+        account = explorer.account,
+        event = explorer.event,
     )
 }
 

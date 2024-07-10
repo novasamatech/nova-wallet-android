@@ -38,8 +38,7 @@ class PreConfiguredNetworksModule {
             router = router,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
-            progressDialogMixinFactory = progressDialogMixinFactory,
-            coinGeckoLinkParser = coinGeckoLinkParser
+            progressDialogMixinFactory = progressDialogMixinFactory
         )
     }
 
