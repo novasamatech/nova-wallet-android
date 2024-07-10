@@ -93,7 +93,7 @@ class ChainRegistry(
         return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
     }
 
-    @Deprecated("Use getConnectionOrNull or getActiveConnectionOrNull")
+    @Deprecated("Use getActiveConnectionOrNull, since this method may throw an exception if Chain is disabled")
     suspend fun getActiveConnection(chainId: String): ChainConnection {
         requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
