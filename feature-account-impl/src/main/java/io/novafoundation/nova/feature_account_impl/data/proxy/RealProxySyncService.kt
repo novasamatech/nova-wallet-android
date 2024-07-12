@@ -59,7 +59,7 @@ class RealProxySyncService(
 ) : ProxySyncService {
 
     override fun proxySyncTrigger(): Flow<*> {
-        return chainRegistry.enabledChainsFlow()
+        return chainRegistry.currentChains
             .map { chains ->
                 chains
                     .filter(Chain::supportProxy)
