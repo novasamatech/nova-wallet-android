@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystem
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 typealias TitleAndMessage = Pair<String, String?>
@@ -41,15 +42,21 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
     }
 
     fun showMessage(text: String) {
-        _messageLiveData.value = Event(text)
+        launch {
+            _messageLiveData.value = Event(text)
+        }
     }
 
     fun showError(title: String, text: String) {
-        _errorWithTitleLiveData.value = Event(title to text)
+        launch {
+            _errorWithTitleLiveData.value = Event(title to text)
+        }
     }
 
     fun showError(text: String) {
-        _errorLiveData.postValue(Event(text))
+        launch {
+            _errorLiveData.postValue(Event(text))
+        }
     }
 
     fun showError(throwable: Throwable) {

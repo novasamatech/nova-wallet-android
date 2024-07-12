@@ -14,9 +14,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Secr
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain.From
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -79,7 +79,7 @@ class WalletDetailsInteractor(
     }
 
     suspend fun getAllChains(): List<Chain> {
-        return chainRegistry.currentChains.first()
+        return chainRegistry.enabledChains()
     }
 }
 
