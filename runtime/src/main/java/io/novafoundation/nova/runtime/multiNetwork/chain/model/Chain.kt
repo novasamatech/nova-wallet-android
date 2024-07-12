@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.model
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
+import java.io.Serializable
 import java.math.BigInteger
 
 typealias ChainId = String
@@ -38,7 +39,7 @@ data class Chain(
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
-) : Identifiable {
+) : Identifiable, Serializable {
 
     companion object // extensions
 

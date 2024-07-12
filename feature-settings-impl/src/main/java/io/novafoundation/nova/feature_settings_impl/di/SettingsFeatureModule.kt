@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_settings_impl.domain.RealCustomNodeInterac
 import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealPreConfiguredNetworksInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.utils.CustomChainFactory
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.RealNetworkListAdapterItemFactory
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
@@ -128,14 +129,30 @@ class SettingsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideCustomChainFactory(
+        nodeConnectionFactory: NodeConnectionFactory,
+        coinGeckoLinkParser: CoinGeckoLinkParser,
+        blockExplorerLinkFormatter: BlockExplorerLinkFormatter,
+        nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory
+    ): CustomChainFactory {
+        return CustomChainFactory(
+            nodeConnectionFactory,
+            nodeChainIdRepositoryFactory,
+            coinGeckoLinkParser,
+            blockExplorerLinkFormatter
+        )
+    }
+
+    @Provides
+    @FeatureScope
     fun provideAddNetworkInteractor(
         chainRepository: ChainRepository,
         chainRegistry: ChainRegistry,
         nodeChainIdRepositoryFactory: NodeChainIdRepositoryFactory,
         coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory,
         coinGeckoLinkParser: CoinGeckoLinkParser,
-        blockExplorerLinkFormatter: BlockExplorerLinkFormatter,
-        nodeConnectionFactory: NodeConnectionFactory
+        nodeConnectionFactory: NodeConnectionFactory,
+        customChainFactory: CustomChainFactory
     ): AddNetworkInteractor {
         return RealAddNetworkInteractor(
             chainRepository,
@@ -143,8 +160,8 @@ class SettingsFeatureModule {
             nodeChainIdRepositoryFactory,
             coinGeckoLinkValidationFactory,
             coinGeckoLinkParser,
-            blockExplorerLinkFormatter,
-            nodeConnectionFactory
+            nodeConnectionFactory,
+            customChainFactory
         )
     }
 }

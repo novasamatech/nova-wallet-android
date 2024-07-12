@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkFailure
-import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkPayload
+import io.novafoundation.nova.feature_settings_impl.domain.model.CustomNetworkPayload
 
 fun mapSaveCustomNetworkFailureToUI(
     resourceManager: ResourceManager,

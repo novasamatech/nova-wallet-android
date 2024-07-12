@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validCoinGeckoLink
+import io.novafoundation.nova.feature_settings_impl.domain.model.CustomNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.nodeSupportedByNetworkValidation
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.validateNetworkNodeIsAlive
 import io.novafoundation.nova.runtime.ext.evmChainIdFrom
@@ -11,17 +12,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 typealias CustomNetworkValidationSystem = ValidationSystem<CustomNetworkPayload, CustomNetworkFailure>
 typealias CustomNetworkValidationSystemBuilder = ValidationSystemBuilder<CustomNetworkPayload, CustomNetworkFailure>
-
-data class CustomNetworkPayload(
-    val nodeUrl: String,
-    val nodeName: String,
-    val chainName: String,
-    val tokenSymbol: String,
-    val evmChainId: Int?,
-    val blockExplorerNameAndUrl: Pair<String, String>?,
-    val coingeckoLinkUrl: String?,
-    val ignoreChainModifying: Boolean,
-)
 
 sealed interface CustomNetworkFailure {
 

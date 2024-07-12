@@ -16,23 +16,28 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
-import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkPayload
+import io.novafoundation.nova.feature_settings_impl.domain.model.CustomNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.CustomNetworkValidationSystem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload.Mode
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.getChain
+import io.novafoundation.nova.runtime.ext.evmChainIdOrNull
 import io.novafoundation.nova.runtime.ext.networkType
 import io.novafoundation.nova.runtime.ext.normalizedUrl
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class AddNetworkViewModel(
     private val resourceManager: ResourceManager,
@@ -97,27 +102,18 @@ class AddNetworkViewModel(
 
     private suspend fun prefillData() {
         val mode = payload.mode
-        when (mode) {
-            is Mode.Add -> {
-                val prefilledData = mode.prefilledData
-                nodeUrlFlow.value = prefilledData?.rpcNodeUrl.orEmpty()
-                networkNameFlow.value = prefilledData?.networkName.orEmpty()
-                tokenSymbolFlow.value = prefilledData?.tokenName.orEmpty()
-                evmChainIdFlow.value = prefilledData?.evmChainId?.format().orEmpty()
-                blockExplorerFlow.value = prefilledData?.blockExplorerUrl.orEmpty()
-                priceProviderFlow.value = prefilledData?.coingeckoLink.orEmpty()
-            }
-
-            is Mode.Edit -> {
-                val chainForEdit = chainRegistry.getChain(mode.chainId)
-                val asset = chainForEdit.utilityAsset
-                nodeUrlFlow.value = chainForEdit.nodes.nodes.first().unformattedUrl
-                networkNameFlow.value = chainForEdit.name
-                tokenSymbolFlow.value = asset.symbol.value
-                blockExplorerFlow.value = chainForEdit.explorers.firstOrNull()?.normalizedUrl().orEmpty()
-                priceProviderFlow.value = asset.priceId?.let { coinGeckoLinkParser.format(it) }.orEmpty()
-            }
+        val chain = when (mode) {
+            is Mode.Add -> mode.getChain()
+            is Mode.Edit -> chainRegistry.getChain(mode.chainId)
         }
+
+        val asset = chain?.utilityAsset
+        nodeUrlFlow.value = chain?.nodes?.nodes?.first()?.unformattedUrl.orEmpty()
+        networkNameFlow.value = chain?.name.orEmpty()
+        tokenSymbolFlow.value = asset?.symbol?.value.orEmpty()
+        evmChainIdFlow.value = chain?.evmChainIdOrNull()?.format().orEmpty()
+        blockExplorerFlow.value = chain?.explorers?.firstOrNull()?.normalizedUrl().orEmpty()
+        priceProviderFlow.value = asset?.priceId?.let { coinGeckoLinkParser.format(it) }.orEmpty()
     }
 
     fun addNetworkClicked() {
@@ -131,7 +127,7 @@ class AddNetworkViewModel(
                 chainName = chainName,
                 tokenSymbol = tokenSymbolFlow.value,
                 evmChainId = evmChainIdFlow.value.toIntOrNull(),
-                blockExplorerNameAndUrl = blockExplorerUrl?.let { blockExplorerName to it },
+                blockExplorer = blockExplorerUrl?.let { CustomNetworkPayload.BlockExplorer(blockExplorerName, it) },
                 coingeckoLinkUrl = priceProviderFlow.value.nullIfBlank(),
                 ignoreChainModifying = payload.mode is Mode.Edit // Skip dialog about Chain modifying if it's already editing
             )
@@ -157,7 +153,7 @@ class AddNetworkViewModel(
     private fun executeSaving(savingPayload: CustomNetworkPayload) {
         launch {
             val result = when (payload.mode) {
-                is Mode.Add -> createNetowork(payload.mode, savingPayload)
+                is Mode.Add -> createNetwork(payload.mode, savingPayload)
                 is Mode.Edit -> editNetwork(payload.mode, savingPayload)
             }
 
@@ -180,31 +176,11 @@ class AddNetworkViewModel(
         }
     }
 
-    private suspend fun createNetowork(mode: Mode.Add, savingPayload: CustomNetworkPayload): Result<Unit> {
+    private suspend fun createNetwork(mode: Mode.Add, savingPayload: CustomNetworkPayload): Result<Unit> {
         return when (mode.networkType) {
-            Mode.Add.NetworkType.EVM -> interactor.createEvmNetwork(
-                chainId = savingPayload.evmChainId!!,
-                iconUrl = mode.prefilledData?.iconUrl,
-                nodeUrl = savingPayload.nodeUrl,
-                nodeName = savingPayload.nodeName,
-                chainName = savingPayload.chainName,
-                tokenSymbol = savingPayload.tokenSymbol,
-                isTestNet = mode.prefilledData?.isTestNet,
-                blockExplorer = savingPayload.blockExplorerNameAndUrl,
-                coingeckoLink = savingPayload.coingeckoLinkUrl
-            )
+            Mode.Add.NetworkType.EVM -> interactor.createEvmNetwork(savingPayload, mode.getChain())
 
-            Mode.Add.NetworkType.SUBSTRATE -> interactor.createSubstrateNetwork(
-                iconUrl = mode.prefilledData?.iconUrl,
-                nodeUrl = savingPayload.nodeUrl,
-                nodeName = savingPayload.nodeName,
-                chainName = savingPayload.chainName,
-                tokenSymbol = savingPayload.tokenSymbol,
-                isTestNet = mode.prefilledData?.isTestNet,
-                blockExplorer = savingPayload.blockExplorerNameAndUrl,
-                coingeckoLink = savingPayload.coingeckoLinkUrl,
-                coroutineScope = viewModelScope
-            )
+            Mode.Add.NetworkType.SUBSTRATE -> interactor.createSubstrateNetwork(savingPayload, mode.getChain(), coroutineScope)
         }
     }
 
@@ -213,7 +189,7 @@ class AddNetworkViewModel(
             mode.chainId,
             savingPayload.chainName,
             savingPayload.tokenSymbol,
-            savingPayload.blockExplorerNameAndUrl,
+            savingPayload.blockExplorer,
             savingPayload.coingeckoLinkUrl
         )
     }
@@ -237,7 +213,8 @@ class AddNetworkViewModel(
             }
 
             nodeUrlFlow
-                .drop(1)
+                .ignorePrefilledValues()
+                .debounce(500.milliseconds)
                 .mapLatest { url -> autofillMixin.autofill(url) }
                 .onEach { result ->
                     result.onSuccess { data ->
@@ -248,6 +225,10 @@ class AddNetworkViewModel(
                 }
                 .launchIn(viewModelScope)
         }
+    }
+
+    private fun <T> Flow<T>.ignorePrefilledValues(): Flow<T> {
+        return this.drop(1)
     }
 
     private fun isChainIdFieldRequired(): Boolean {

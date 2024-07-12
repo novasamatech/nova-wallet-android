@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.Companion.EMPTY_CHAIN_ICON
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
@@ -12,8 +14,13 @@ import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.ext.autoBalanceEnabled
 import io.novafoundation.nova.runtime.ext.selectedNodeUrlOrNull
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.TransferParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ConnectionState
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
@@ -178,4 +185,81 @@ fun mapConnectionStateToLocal(domain: ConnectionState): ConnectionStateLocal {
         ConnectionState.LIGHT_SYNC -> ConnectionStateLocal.LIGHT_SYNC
         ConnectionState.DISABLED -> ConnectionStateLocal.DISABLED
     }
+}
+
+fun mapChainExternalApiToLocal(gson: Gson, chainId: String, api: ExternalApi): ChainExternalApiLocal {
+    return when (api) {
+        is ExternalApi.Transfers -> mapExternalApiTransfers(gson, chainId, api)
+        is ExternalApi.Crowdloans -> mapExternalApiCrowdloans(chainId, api)
+        is ExternalApi.GovernanceDelegations -> mapExternalApiGovernanceDelegations(chainId, api)
+        is ExternalApi.GovernanceReferenda -> mapExternalApiGovernanceReferenda(gson, chainId, api)
+        is ExternalApi.Staking -> mapExternalApiStaking(chainId, api)
+    }
+}
+
+fun mapExternalApiTransfers(gson: Gson, chainId: String, api: ExternalApi.Transfers): ChainExternalApiLocal {
+    fun transferParametersByType(gson: Gson, type: String): String {
+        return gson.toJson(TransferParameters(type))
+    }
+
+    val parameters = when (api) {
+        is ExternalApi.Transfers.Evm -> transferParametersByType(gson, EVM_TRANSFER_PARAMETER)
+        is ExternalApi.Transfers.Substrate -> transferParametersByType(gson, SUBSTRATE_TRANSFER_PARAMETER)
+    }
+
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = SourceType.UNKNOWN,
+        apiType = ChainExternalApiLocal.ApiType.TRANSFERS,
+        parameters = parameters,
+        url = api.url
+    )
+}
+
+fun mapExternalApiCrowdloans(chainId: String, api: ExternalApi.Crowdloans): ChainExternalApiLocal {
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = SourceType.GITHUB,
+        apiType = ChainExternalApiLocal.ApiType.CROWDLOANS,
+        parameters = null,
+        url = api.url
+    )
+}
+
+fun mapExternalApiGovernanceDelegations(chainId: String, api: ExternalApi.GovernanceDelegations): ChainExternalApiLocal {
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = SourceType.SUBQUERY,
+        apiType = ChainExternalApiLocal.ApiType.GOVERNANCE_DELEGATIONS,
+        parameters = null,
+        url = api.url
+    )
+}
+
+fun mapExternalApiGovernanceReferenda(gson: Gson, chainId: String, api: ExternalApi.GovernanceReferenda): ChainExternalApiLocal {
+    val (source, parameters) = when (api.source) {
+        ExternalApi.GovernanceReferenda.Source.SubSquare -> SourceType.SUBSQUARE to null
+
+        is ExternalApi.GovernanceReferenda.Source.Polkassembly -> {
+            SourceType.POLKASSEMBLY to gson.toJson(GovernanceReferendaParameters(api.source.network))
+        }
+    }
+
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = source,
+        apiType = ChainExternalApiLocal.ApiType.GOVERNANCE_REFERENDA,
+        parameters = parameters,
+        url = api.url
+    )
+}
+
+fun mapExternalApiStaking(chainId: String, api: ExternalApi.Staking): ChainExternalApiLocal {
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = SourceType.SUBQUERY,
+        apiType = ChainExternalApiLocal.ApiType.STAKING,
+        parameters = null,
+        url = api.url
+    )
 }
