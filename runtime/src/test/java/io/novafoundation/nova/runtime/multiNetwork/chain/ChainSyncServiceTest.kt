@@ -300,7 +300,7 @@ class ChainSyncServiceTest {
                 nodesDiff = removesNodeWithUrl(nodeUrl),
                 explorersDiff = removesExplorerByName(explorerName),
                 externalApisDiff = removesTransferApiByUrl(transferApiUrl),
-                nodeSelectionPreferencesDiff = emptyDiff()
+                nodeSelectionPreferencesDiff = removesNodeSelectionPreferences(REMOTE_CHAIN.chainId)
             )
         }
     }
@@ -325,6 +325,7 @@ class ChainSyncServiceTest {
     private fun removesNodeWithUrl(url: String) = removesElement<ChainNodeLocal> { it.url == url }
     private fun removesExplorerByName(name: String) = removesElement<ChainExplorerLocal> { it.name == name }
     private fun removesTransferApiByUrl(url: String) = removesElement<ChainExternalApiLocal> { it.url == url }
+    private fun removesNodeSelectionPreferences(chainId: String) = removesElement<NodeSelectionPreferencesLocal> { it.chainId == chainId }
 
     private fun createLocalCopy(remote: ChainRemote): JoinedChainInfo {
         val domain = mapRemoteChainToLocal(remote, oldChain = null, source = ChainLocal.Source.DEFAULT, gson)
