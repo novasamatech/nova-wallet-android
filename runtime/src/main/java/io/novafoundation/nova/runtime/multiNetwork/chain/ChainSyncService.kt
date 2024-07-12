@@ -29,11 +29,11 @@ class ChainSyncService(
     suspend fun syncUp() = withContext(Dispatchers.Default) {
         val localChainsJoinedInfo = chainDao.getJoinChainInfo()
         val oldChains = localChainsJoinedInfo.map { it.chain }.filter { it.source != ChainLocal.Source.CUSTOM }
-        val oldAssets = localChainsJoinedInfo.flatMap { it.assets }
-            .filter { it.source == AssetSourceLocal.DEFAULT }
+        val oldAssets = localChainsJoinedInfo.flatMap { it.assets }.filter { it.source == AssetSourceLocal.DEFAULT }
         val oldNodes = localChainsJoinedInfo.flatMap { it.nodes }.filter { it.source != ChainNodeLocal.Source.CUSTOM }
         val oldExplorers = localChainsJoinedInfo.flatMap { it.explorers }
         val oldExternalApis = localChainsJoinedInfo.flatMap { it.externalApis }
+        val oldNodeSelectionPreferences = localChainsJoinedInfo.mapNotNull { it.nodeSelectionPreferences }
 
         val oldChainsById = oldChains.associateBy { it.id }
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
@@ -51,13 +51,14 @@ class ChainSyncService(
         val newNodes = remoteChains.flatMap(::mapRemoteNodesToLocal)
         val newExplorers = remoteChains.flatMap(::mapRemoteExplorersToLocal)
         val newExternalApis = remoteChains.flatMap(::mapExternalApisToLocal)
+        val newNodeSelectionPreferences = nodeSelectionPreferencesFor(newChains, oldNodeSelectionPreferences)
 
         val chainsDiff = CollectionDiffer.findDiff(newChains, oldChains, forceUseNewItems = false)
         val assetDiff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
         val nodesDiff = CollectionDiffer.findDiff(newNodes, oldNodes, forceUseNewItems = false)
         val explorersDiff = CollectionDiffer.findDiff(newExplorers, oldExplorers, forceUseNewItems = false)
         val externalApisDiff = CollectionDiffer.findDiff(newExternalApis, oldExternalApis, forceUseNewItems = false)
-        val nodeSelectionPreferencesDiff = CollectionDiffer.Diff.added(nodeSelectionPreferencesFor(chainsDiff.added))
+        val nodeSelectionPreferencesDiff = CollectionDiffer.findDiff(newNodeSelectionPreferences, oldNodeSelectionPreferences, forceUseNewItems = false)
 
         chainDao.applyDiff(
             chainDiff = chainsDiff,
@@ -69,13 +70,18 @@ class ChainSyncService(
         )
     }
 
-    private fun nodeSelectionPreferencesFor(chains: List<ChainLocal>): List<NodeSelectionPreferencesLocal> {
-        return chains.map {
-            NodeSelectionPreferencesLocal(
-                chainId = it.id,
-                autoBalanceEnabled = NodeSelectionPreferencesLocal.DEFAULT_AUTO_BALANCE_DEFAULT_BOOLEAN,
-                selectedNodeUrl = null
-            )
+    private fun nodeSelectionPreferencesFor(
+        newChains: List<ChainLocal>,
+        oldNodeSelectionPreferences: List<NodeSelectionPreferencesLocal>
+    ): List<NodeSelectionPreferencesLocal> {
+        val preferencesById = oldNodeSelectionPreferences.associateBy { it.chainId }
+        return newChains.map {
+            preferencesById[it.id]
+                ?: NodeSelectionPreferencesLocal(
+                    chainId = it.id,
+                    autoBalanceEnabled = NodeSelectionPreferencesLocal.DEFAULT_AUTO_BALANCE_BOOLEAN,
+                    selectedNodeUrl = null
+                )
         }
     }
 }

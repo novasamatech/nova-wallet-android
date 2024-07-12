@@ -17,7 +17,7 @@ interface ListSelectorMixin {
         ): ListSelectorMixin
     }
 
-    class Payload(@StringRes val titleRes: Int, val items: List<Item>)
+    class Payload(@StringRes val titleRes: Int, val subtitle: String?, val items: List<Item>)
 
     class Item(
         @DrawableRes val iconRes: Int,
@@ -30,6 +30,8 @@ interface ListSelectorMixin {
     val actionLiveData: LiveData<Event<Payload>>
 
     fun showSelector(@StringRes titleRes: Int, items: List<Item>)
+
+    fun showSelector(@StringRes titleRes: Int, subtitle: String?, items: List<Item>)
 }
 
 class RealListSelectorMixinFactory : ListSelectorMixin.Factory {
@@ -48,6 +50,10 @@ class RealListSelectorMixin(
     override val actionLiveData: MutableLiveData<Event<ListSelectorMixin.Payload>> = MutableLiveData()
 
     override fun showSelector(titleRes: Int, items: List<ListSelectorMixin.Item>) {
-        actionLiveData.value = Event(ListSelectorMixin.Payload(titleRes, items))
+        showSelector(titleRes, subtitle = null, items)
+    }
+
+    override fun showSelector(titleRes: Int, subtitle: String?, items: List<ListSelectorMixin.Item>) {
+        actionLiveData.value = Event(ListSelectorMixin.Payload(titleRes, subtitle, items))
     }
 }

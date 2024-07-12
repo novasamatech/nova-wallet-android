@@ -416,7 +416,7 @@
     <string name="connection_add_already_exists_error">Узел уже был добавлен ранее. Пожалуйста, попробуйте другой узел.</string>
     <string name="connection_add_invalid_error">Не удается установить соединение с узлом. Пожалуйста, попробуйте другой узел.</string>
     <string name="connection_add_unsupported_error">К сожалению, сеть не поддерживается. Пожалуйста, попробуйте одну из следующих: %s.</string>
-    <string name="connection_delete_confirm">Удалить</string>
+    <string name="common_delete">Удалить</string>
     <string name="connection_delete_description">Подтвердите удаление %s.</string>
     <string name="connection_delete_title">Удалить сеть?</string>
     <string name="connection_error_message_v2_2_0">Пожалуйста, проверьте ваше подключение или повторите позднее</string>

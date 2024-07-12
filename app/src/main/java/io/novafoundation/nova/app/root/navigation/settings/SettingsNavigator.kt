@@ -54,12 +54,22 @@ class SettingsNavigator(
         performNavigation(R.id.action_open_addNetworkFragment)
     }
 
-    override fun openCreateNetworkFlow(payload: AddNetworkPayload) {
-        performNavigation(R.id.action_open_addNetworkFragment, args = AddNetworkMainFragment.getBundle(payload))
+    override fun openCreateNetworkFlow(payload: AddNetworkPayload.Mode.Add) {
+        performNavigation(
+            R.id.action_open_addNetworkFragment,
+            args = AddNetworkMainFragment.getBundle(AddNetworkPayload(payload))
+        )
     }
 
     override fun finishCreateNetworkFlow() {
         performNavigation(R.id.action_finishCreateNetworkFlow, args = NetworkManagementListFragment.getBundle(openAddedTab = true))
+    }
+
+    override fun openEditNetwork(payload: AddNetworkPayload.Mode.Edit) {
+        performNavigation(
+            R.id.action_open_editNetwork,
+            args = AddNetworkMainFragment.getBundle(AddNetworkPayload(payload))
+        )
     }
 
     override fun openPushNotificationSettings() {

@@ -42,7 +42,7 @@
         android:ellipsize="end"
         android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toTopOf="@+id/chainNodeConnectionStatusShimmering"
-        app:layout_constraintEnd_toStartOf="@+id/chainNodeEditButton"
+        app:layout_constraintEnd_toStartOf="@+id/chainNodeManagingGroup"
         app:layout_constraintStart_toEndOf="@+id/chainNodeRadioButton"
         app:layout_constraintTop_toBottomOf="@+id/chainNodeName"
         app:layout_constraintVertical_chainStyle="packed"
@@ -71,19 +71,42 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/chainNodeManagingGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="chainNodeEditButton,chainNodeManageButton"/>
+
     <TextView
         android:id="@+id/chainNodeEditButton"
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:padding="8dp"
         android:maxWidth="80dp"
+        android:padding="8dp"
         android:text="@string/common_edit"
         android:textColor="@color/button_text_accent"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
+
+    <ImageView
+        android:id="@+id/chainNodeManageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_more_horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:tint="@color/icon_primary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,12 +14,13 @@ typealias CustomNetworkValidationSystemBuilder = ValidationSystemBuilder<CustomN
 
 data class CustomNetworkPayload(
     val nodeUrl: String,
+    val nodeName: String,
     val chainName: String,
     val tokenSymbol: String,
     val evmChainId: Int?,
-    val blockExplorerUrl: String?,
+    val blockExplorerNameAndUrl: Pair<String, String>?,
     val coingeckoLinkUrl: String?,
-    val ignoreChainModifying: Boolean
+    val ignoreChainModifying: Boolean,
 )
 
 sealed interface CustomNetworkFailure {
@@ -33,6 +34,8 @@ sealed interface CustomNetworkFailure {
     object NodeIsNotAlive : CustomNetworkFailure
 
     object CoingeckoLinkBadFormat : CustomNetworkFailure
+
+    class WrongAsset(val usedSymbol: String, val correctSymbol: String) : CustomNetworkFailure
 }
 
 fun CustomNetworkValidationSystemBuilder.validateNetworkNodeIsAlive(
@@ -65,4 +68,12 @@ fun CustomNetworkValidationSystemBuilder.validCoinGeckoLink(
     optional = true,
     link = { it.coingeckoLinkUrl },
     error = { CustomNetworkFailure.CoingeckoLinkBadFormat }
+)
+
+fun CustomNetworkValidationSystemBuilder.validateTokenSymbol(
+    tokenSymbolRequester: suspend (CustomNetworkPayload) -> String
+) = validateAssetIsMain(
+    chainMainAssetSymbolRequester = tokenSymbolRequester,
+    symbol = { it.tokenSymbol },
+    failure = { payload, correctSymbol -> CustomNetworkFailure.WrongAsset(payload.tokenSymbol, correctSymbol) },
 )

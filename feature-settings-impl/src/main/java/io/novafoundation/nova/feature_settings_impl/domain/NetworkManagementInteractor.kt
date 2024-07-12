@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -65,12 +65,19 @@ class RealNetworkManagementInteractor(
         }
 
         return chains.map { chain ->
-            val connectionFlow = chainRegistry.getConnectionOrNull(chain.id)?.state ?: emptyFlow<SocketStateMachine.State?>()
-            connectionFlow.map { state -> NetworkState(chain, state) }
+            val connectionFlow = chainRegistry.getConnectionOrNull(chain.id)?.state ?: flowOf<SocketStateMachine.State?>(SocketStateMachine.State.Disconnected)
+            connectionFlow
+                .distinctUntilChanged { old, new -> old?.isConnected() == new?.isConnected() }
+                .map { state -> NetworkState(chain, state) }
         }.combine()
     }
 
     private fun sortChains(chains: List<Chain>): List<Chain> {
         return chains.sortedWith(Chain.defaultComparatorFrom { it })
+    }
+
+    // It's enough for us to have 2 states for this implementation: connected and not connected
+    private fun SocketStateMachine.State.isConnected(): Boolean {
+        return this is SocketStateMachine.State.Connected
     }
 }

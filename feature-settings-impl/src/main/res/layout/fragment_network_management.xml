@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:textRight="@string/common_add_network"
-        app:titleText="@string/common_network" />
+        app:titleText="@string/common_networks" />
 
     <io.novafoundation.nova.common.view.SegmentedTabLayout
         android:id="@+id/networkManagementTabLayout"

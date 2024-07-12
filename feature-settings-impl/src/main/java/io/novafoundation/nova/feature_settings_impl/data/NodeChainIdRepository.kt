@@ -24,10 +24,13 @@ class NodeChainIdRepositoryFactory(
     private val nodeConnectionFactory: NodeConnectionFactory,
     private val web3ApiFactory: Web3ApiFactory
 ) {
-
     fun create(networkType: NetworkType, nodeUrl: String, coroutineScope: CoroutineScope): NodeChainIdRepository {
         val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
 
+        return create(networkType, nodeConnection)
+    }
+
+    fun create(networkType: NetworkType, nodeConnection: NodeConnection): NodeChainIdRepository {
         return when (networkType) {
             NetworkType.SUBSTRATE -> substrate(nodeConnection)
 

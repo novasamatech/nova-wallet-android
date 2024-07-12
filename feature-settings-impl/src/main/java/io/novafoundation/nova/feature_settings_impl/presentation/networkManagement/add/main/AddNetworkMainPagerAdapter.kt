@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload.Mode.Add.NetworkType
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails.AddNetworkFragment
 
 class AddNetworkMainPagerAdapter(
@@ -21,8 +22,8 @@ class AddNetworkMainPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         return if (payloadForSinglePage == null) {
             when (position) {
-                0 -> AddNetworkFragment().addPayloadMode(AddNetworkPayload.Mode.SUBSTRATE)
-                1 -> AddNetworkFragment().addPayloadMode(AddNetworkPayload.Mode.EVM)
+                0 -> AddNetworkFragment().addPayloadEmptyMode(NetworkType.SUBSTRATE)
+                1 -> AddNetworkFragment().addPayloadEmptyMode(NetworkType.EVM)
                 else -> throw IllegalArgumentException("Invalid position")
             }
         } else {
@@ -42,8 +43,8 @@ class AddNetworkMainPagerAdapter(
         }
     }
 
-    private fun AddNetworkFragment.addPayloadMode(mode: AddNetworkPayload.Mode): AddNetworkFragment {
-        return addPayload(AddNetworkPayload(mode, prefilledData = null))
+    private fun AddNetworkFragment.addPayloadEmptyMode(networkType: NetworkType): AddNetworkFragment {
+        return addPayload(AddNetworkPayload(AddNetworkPayload.Mode.Add(networkType, null)))
     }
 
     private fun AddNetworkFragment.addPayload(mode: AddNetworkPayload): AddNetworkFragment {

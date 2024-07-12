@@ -7,8 +7,9 @@ data class NetworkNodeRvItem(
     val id: String,
     val name: String,
     @ColorRes val nameColorRes: Int,
-    val socketAddress: String,
+    val url: String,
     val isEditable: Boolean,
+    val isDeletable: Boolean,
     val isSelected: Boolean,
     val connectionState: ConnectionStateModel,
     val isSelectable: Boolean

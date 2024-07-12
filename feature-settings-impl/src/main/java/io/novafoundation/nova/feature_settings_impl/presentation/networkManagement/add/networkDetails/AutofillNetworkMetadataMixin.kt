@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails
 
-import io.novafoundation.nova.common.data.network.runtime.calls.GetChainNameRequest
+import io.novafoundation.nova.common.data.network.runtime.calls.GetChainRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetSystemPropertiesRequest
 import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
+import io.novafoundation.nova.common.data.network.runtime.model.firstTokenSymbol
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
@@ -57,7 +58,7 @@ class SubstrateAutofillNetworkMetadataMixin(
 
         AutofillNetworkData(
             chainName = chainName,
-            tokenSymbol = properties.tokenSymbol,
+            tokenSymbol = properties.firstTokenSymbol(),
             evmChainId = null
         )
     }
@@ -69,7 +70,7 @@ class SubstrateAutofillNetworkMetadataMixin(
 
     private suspend fun getSubstrateChainName(nodeConnection: NodeConnection): String {
         return nodeConnection.getSocketService()
-            .executeAsync(GetChainNameRequest(), mapper = pojo<String>().nonNull())
+            .executeAsync(GetChainRequest(), mapper = pojo<String>().nonNull())
     }
 }
 

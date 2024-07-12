@@ -39,7 +39,9 @@ interface SettingsRouter : ReturnableRouter {
 
     fun openCreateNetworkFlow()
 
-    fun openCreateNetworkFlow(payload: AddNetworkPayload)
+    fun openCreateNetworkFlow(payload: AddNetworkPayload.Mode.Add)
 
     fun finishCreateNetworkFlow()
+
+    fun openEditNetwork(payload: AddNetworkPayload.Mode.Edit)
 }

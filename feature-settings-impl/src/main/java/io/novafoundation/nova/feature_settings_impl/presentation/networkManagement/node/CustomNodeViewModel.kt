@@ -77,14 +77,17 @@ class CustomNodeViewModel(
     fun saveNodeClicked() {
         launch {
             saveProgressFlow.value = true
-            val payload = NetworkNodePayload(
+            val validationPayload = NetworkNodePayload(
                 chain = chainRegistry.getChain(payload.chainId),
                 nodeUrl = nodeUrlInput.value
             )
 
             validationExecutor.requireValid(
-                validationSystem = customNodeInteractor.getValidationSystem(viewModelScope),
-                payload = payload,
+                validationSystem = customNodeInteractor.getValidationSystem(
+                    viewModelScope,
+                    skipNodeExistValidation = payload.mode is CustomNodePayload.Mode.Edit
+                ),
+                payload = validationPayload,
                 progressConsumer = saveProgressFlow.progressConsumer(),
                 validationFailureTransformerCustom = { status, actions -> mapSaveCustomNodeFailureToUI(resourceManager, status) }
             ) {

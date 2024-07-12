@@ -406,7 +406,7 @@
     <string name="connection_add_already_exists_error">Il nodo è già stato aggiunto in precedenza. Per favore, prova un altro nodo.</string>
     <string name="connection_add_invalid_error">Impossibile stabilire una connessione con il nodo. Per favore, prova un altro.</string>
     <string name="connection_add_unsupported_error">Purtroppo, la rete non è supportata. Per favore, prova una delle seguenti: %s.</string>
-    <string name="connection_delete_confirm">Elimina</string>
+    <string name="common_delete">Elimina</string>
     <string name="connection_delete_description">Conferma eliminazione di %s.</string>
     <string name="connection_delete_title">Eliminare la rete?</string>
     <string name="connection_error_message_v2_2_0">Si prega di controllare la connessione o riprovare più tardi</string>

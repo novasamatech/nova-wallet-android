@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,13 +47,15 @@ class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewMode
         networkManagementViewPager.adapter = adapter
         networkManagementTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
 
-        setDefaultTab(adapter)
+        Handler(Looper.getMainLooper()).post {
+            setDefaultTab(adapter)
+        }
     }
 
     private fun setDefaultTab(adapter: NetworkManagementPagerAdapter) {
         val openAddedTab = argumentOrNull<Boolean>(KEY_OPEN_ADDED_TAB) ?: return
-        val defaultTabIndex = if (openAddedTab) adapter.addedTabIndex() else adapter.defaultTabIndex()
-        networkManagementViewPager.currentItem = defaultTabIndex
+        val tabIndex = if (openAddedTab) adapter.addedTabIndex() else adapter.defaultTabIndex()
+        networkManagementViewPager.currentItem = tabIndex
     }
 
     override fun inject() {

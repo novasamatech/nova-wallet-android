@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.ViewSpace
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.dialog.warningDialog
+import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
@@ -87,6 +89,7 @@ class ChainNetworkManagementFragment :
     override fun initViews() {
         chainNetworkManagementToolbar.applyStatusBarInsets()
         chainNetworkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
+        chainNetworkManagementToolbar.setRightActionClickListener { viewModel.networkActionsClicked() }
 
         chainNetworkManagementContent.adapter = adapter
         chainNetworkManagementContent.itemAnimator = null
@@ -105,6 +108,15 @@ class ChainNetworkManagementFragment :
     }
 
     override fun subscribe(viewModel: ChainNetworkManagementViewModel) {
+        setupListSelectorMixin(viewModel.listSelectorMixin)
+
+        viewModel.isNetworkEditable.observe {
+            if (it) {
+                chainNetworkManagementToolbar.setRightActionTint(R.color.icon_primary)
+                chainNetworkManagementToolbar.setRightIconRes(R.drawable.ic_more_horizontal)
+            }
+        }
+
         viewModel.isNetworkCanBeDisabled.observe {
             headerAdapter.setNetworkCanBeDisabled(it)
         }
@@ -129,6 +141,18 @@ class ChainNetworkManagementFragment :
             defaultNodesTitleAdapter.show(it.isNotEmpty())
             defaultNodes.submitList(it)
         }
+
+        viewModel.confirmAccountDeletion.awaitableActionLiveData.observeEvent {
+            warningDialog(
+                requireContext(),
+                onConfirm = { it.onSuccess(true) },
+                onCancel = { it.onSuccess(false) },
+                confirmTextRes = R.string.common_delete
+            ) {
+                setTitle(it.payload.first)
+                setMessage(it.payload.second)
+            }
+        }
     }
 
     override fun chainEnableClicked() {
@@ -144,7 +168,7 @@ class ChainNetworkManagementFragment :
     }
 
     override fun editNode(item: NetworkNodeRvItem) {
-        viewModel.editNode(item)
+        viewModel.nodeActionClicked(item)
     }
 
     override fun addNewNode() {

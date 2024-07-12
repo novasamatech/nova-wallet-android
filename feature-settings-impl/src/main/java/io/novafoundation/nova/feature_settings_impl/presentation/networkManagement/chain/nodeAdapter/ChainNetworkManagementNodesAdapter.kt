@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeConnectionState
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeConnectionStatusShimmering
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeEditButton
+import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeManageButton
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeName
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeRadioButton
 import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeSocketAddress
@@ -99,17 +100,17 @@ class ChainNetworkManagementNodeViewHolder(
             chainNodeRadioButton.isEnabled = item.isSelectable
             chainNodeName.text = item.name
             chainNodeName.setTextColorRes(item.nameColorRes)
-            chainNodeSocketAddress.text = item.socketAddress
+            chainNodeSocketAddress.text = item.url
             chainNodeConnectionStatusShimmering.setShimmerShown(item.connectionState.showShimmering)
             chainNodeConnectionState.setText(item.connectionState.name)
             item.connectionState.chainStatusColor?.let { chainNodeConnectionState.setTextColor(it) }
             chainNodeConnectionState.setDrawableStart(item.connectionState.chainStatusIcon, paddingInDp = 6)
             chainNodeConnectionState.setCompoundDrawableTint(item.connectionState.chainStatusIconColor)
 
-            chainNodeEditButton.isVisible = item.isEditable
-            chainNodeEditButton.setOnClickListener {
-                itemHandler.editNode(item)
-            }
+            chainNodeEditButton.isVisible = item.isEditable && !item.isDeletable
+            chainNodeManageButton.isVisible = item.isEditable && item.isDeletable
+            chainNodeEditButton.setOnClickListener { itemHandler.editNode(item) }
+            chainNodeManageButton.setOnClickListener { itemHandler.editNode(item) }
         }
     }
 }

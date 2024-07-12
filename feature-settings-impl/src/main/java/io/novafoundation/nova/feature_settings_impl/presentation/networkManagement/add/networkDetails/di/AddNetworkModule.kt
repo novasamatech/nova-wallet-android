@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails.AddNetworkViewModel
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.networkDetails.AutofillNetworkMetadataMixinFactory
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 
 @Module(includes = [ViewModelModule::class])
@@ -42,6 +44,8 @@ class AddNetworkModule {
         interactor: AddNetworkInteractor,
         validationExecutor: ValidationExecutor,
         autofillNetworkMetadataMixinFactory: AutofillNetworkMetadataMixinFactory,
+        coinGeckoLinkParser: CoinGeckoLinkParser,
+        chainRegistry: ChainRegistry,
     ): ViewModel {
         return AddNetworkViewModel(
             resourceManager = resourceManager,
@@ -50,6 +54,8 @@ class AddNetworkModule {
             interactor = interactor,
             validationExecutor = validationExecutor,
             autofillNetworkMetadataMixinFactory = autofillNetworkMetadataMixinFactory,
+            coinGeckoLinkParser = coinGeckoLinkParser,
+            chainRegistry = chainRegistry
         )
     }
 

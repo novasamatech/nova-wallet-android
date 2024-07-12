@@ -44,6 +44,16 @@
             tools:src="@drawable/ic_settings_outline" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/dynamicListSheetSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="13dp"
+        android:textColor="@color/text_secondary"
+        tools:text="Title" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dynamicListSheetContent"
         android:layout_width="match_parent"

@@ -399,7 +399,7 @@
     <string name="connection_add_already_exists_error">El nodo ya ha sido agregado previamente. Por favor, prueba con otro nodo.</string>
     <string name="connection_add_invalid_error">No se puede establecer conexión con el nodo. Por favor, intenta con otro.</string>
     <string name="connection_add_unsupported_error">Desafortunadamente, la red no es compatible. Por favor, intenta con una de las siguientes: %s.</string>
-    <string name="connection_delete_confirm">Eliminar</string>
+    <string name="common_delete">Eliminar</string>
     <string name="connection_delete_description">Confirma la eliminación de %s.</string>
     <string name="connection_delete_title">¿Eliminar red?</string>
     <string name="connection_error_message_v2_2_0">Por favor, verifica tu conexión o intenta de nuevo más tarde</string>

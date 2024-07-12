@@ -23,7 +23,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="14dp"
         android:singleLine="true"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/input_text_color"
         android:textColorHint="@color/hint_text" />
 
     <TextView

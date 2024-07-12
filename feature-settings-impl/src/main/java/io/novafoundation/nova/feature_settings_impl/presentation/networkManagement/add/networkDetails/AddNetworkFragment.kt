@@ -62,7 +62,7 @@ class AddNetworkFragment : BaseFragment<AddNetworkViewModel>() {
 
     override fun subscribe(viewModel: AddNetworkViewModel) {
         observeValidations(viewModel)
-
+        viewModel.isNodeEditable.observe { addNetworkNodeUrl.isEnabled = it }
         addNetworkNodeUrl.bindTo(viewModel.nodeUrlFlow, viewModel)
         addNetworkName.bindTo(viewModel.networkNameFlow, viewModel)
         addNetworkCurrency.bindTo(viewModel.tokenSymbolFlow, viewModel)

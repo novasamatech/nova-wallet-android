@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="invalid_token_symbol_title">Invalid Currency Symbol</string>
+    <string name="invalid_token_symbol_message">The entered Currency Symbol (%1$s) does not match the network (%2$s). Do you want to use the correct currency symbol?</string>
+
+    <string name="manage_node_actions_title">Manage added node</string>
+    <string name="manage_node_delete_title">Delete node?</string>
+    <string name="manage_node_delete_message">Node \"%s\" will be deleted</string>
+
+    <string name="manage_node_action_edit">Edit node</string>
+    <string name="manage_node_action_delete">Delete node</string>
+
+    <string name="manage_network_delete_title">Delete network?</string>
+    <string name="manage_network_delete_message">You will not be able to see your token balances on that network on Assets screen</string>
+
+    <string name="manage_network_action_edit">Edit network</string>
+    <string name="manage_network_action_delete">Delete network</string>
+    <string name="manage_network_actions_title">Manage added network</string>
+
+    <!--<string name="connection_delete_confirm">Delete</string>-->
+    <string name="common_delete">Delete</string>
+
     <string name="add_network_title">Enter network details</string>
     <string name="loading_network_info">Loading network info...</string>
 
@@ -51,7 +71,7 @@
     <string name="custom_node_add_title">Add custom node for</string>
     <string name="custom_node_edit_title">Edit custom node for</string>
     <string name="custom_node_url_title">Node URL</string>
-    <string name="custom_node_url_hint">wss://rpc.network.io</string>
+    <string name="custom_node_url_hint">wss://</string>
     <string name="custom_node_name_title">Node name</string>
     <string name="custom_node_name_hint">Name</string>
     <string name="custom_node_disabled_button_state">Enter details</string>
@@ -1803,7 +1823,6 @@
     <string name="connection_add_already_exists_error">The node has already been added previously. Please, try another node.</string>
     <string name="connection_add_invalid_error">Can\'t establish connection with node. Please, try another one.</string>
     <string name="connection_add_unsupported_error">Unfortunately, the network is unsupported. Please, try one of the following: %s.</string>
-    <string name="connection_delete_confirm">Delete</string>
     <string name="connection_delete_description">Confirm %s deletion.</string>
     <string name="connection_delete_title">Delete network?</string>
     <string name="connection_error_message_v2_2_0">Please, check your connection or try again later</string>

@@ -6,22 +6,32 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class AddNetworkPayload(
-    val mode: Mode,
-    val prefilledData: NetworkData?
+    val mode: Mode
 ) : Parcelable {
 
-    enum class Mode {
-        SUBSTRATE, EVM
-    }
+    sealed interface Mode : Parcelable {
 
-    @Parcelize
-    class NetworkData(
-        val iconUrl: String?,
-        val rpcNodeUrl: String?,
-        val networkName: String?,
-        val tokenName: String?,
-        val evmChainId: BigInteger?,
-        val blockExplorerUrl: String?,
-        val coingeckoLink: String?
-    ) : Parcelable
+        @Parcelize
+        class Add(val networkType: NetworkType, val prefilledData: NetworkData?) : Mode {
+
+            enum class NetworkType {
+                SUBSTRATE, EVM
+            }
+
+            @Parcelize
+            class NetworkData(
+                val iconUrl: String?,
+                val isTestNet: Boolean?,
+                val rpcNodeUrl: String?,
+                val networkName: String?,
+                val tokenName: String?,
+                val evmChainId: BigInteger?,
+                val blockExplorerUrl: String?,
+                val coingeckoLink: String?
+            ) : Parcelable
+        }
+
+        @Parcelize
+        class Edit(val chainId: String) : Mode
+    }
 }
