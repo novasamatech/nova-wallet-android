@@ -5,12 +5,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.util.ChainParcel
 import kotlinx.android.parcel.Parcelize
 
-
 @Parcelize
 class AddNetworkPayload(
     val mode: Mode,
 
-    ) : Parcelable {
+) : Parcelable {
 
     sealed interface Mode : Parcelable {
 

@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.mapLoading
@@ -17,9 +16,7 @@ import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
-import io.novafoundation.nova.runtime.ext.evmChainIdOrNull
 import io.novafoundation.nova.runtime.ext.networkType
-import io.novafoundation.nova.runtime.ext.normalizedUrl
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.LightChain

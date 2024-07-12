@@ -73,7 +73,6 @@ class CustomChainFactory(
         )
     }
 
-
     private fun createChain(
         chainId: String,
         addressPrefix: Int,
