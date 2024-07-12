@@ -37,7 +37,6 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.Signin
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.genesisHash
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import io.novafoundation.nova.runtime.ext.isDisabled
-import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.Dispatchers
