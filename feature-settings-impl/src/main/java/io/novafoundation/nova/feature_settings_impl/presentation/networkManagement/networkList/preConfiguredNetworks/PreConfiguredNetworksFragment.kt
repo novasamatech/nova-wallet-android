@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
@@ -66,6 +67,8 @@ class PreConfiguredNetworksFragment :
 
     override fun subscribe(viewModel: PreConfiguredNetworksViewModel) {
         observeRetries(viewModel)
+        observeProgressDialog(viewModel.progressDialogMixin)
+
         preConfiguredNetworksSearch.content.bindTo(viewModel.searchQuery, viewModel.viewModelScope)
         viewModel.networkList.observe {
             preConfiguredNetworkProgress.isVisible = it.isLoading()

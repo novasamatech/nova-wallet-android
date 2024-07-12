@@ -164,7 +164,7 @@
     <string name="assets_add_token">添加代币</string>
     <string name="assets_add_token_enter_info_address_label">合约地址</string>
     <string name="assets_add_token_enter_info_decimals_label">小数点</string>
-    <string name="assets_add_token_enter_info_price_label">Coingecko链接用于价格信息（可选）</string>
+    <string name="token_price_info_provider_label">Coingecko链接用于价格信息（可选）</string>
     <string name="assets_add_token_enter_info_symbol_label">符号</string>
     <string name="assets_add_token_enter_info_title">输入 ERC-20 代币详情</string>
     <string name="assets_add_token_select_chain_title">选择网络以添加 ERC-20 代币</string>

@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.NetworkListAdapterItemFactory
@@ -26,14 +28,18 @@ class PreConfiguredNetworksModule {
         networkListAdapterItemFactory: NetworkListAdapterItemFactory,
         router: SettingsRouter,
         resourceManager: ResourceManager,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        progressDialogMixinFactory: ProgressDialogMixinFactory,
+        coinGeckoLinkParser: CoinGeckoLinkParser
     ): ViewModel {
         return PreConfiguredNetworksViewModel(
-            preConfiguredNetworksInteractor = preConfiguredNetworksInteractor,
+            interactor = preConfiguredNetworksInteractor,
             networkListAdapterItemFactory = networkListAdapterItemFactory,
             router = router,
             resourceManager = resourceManager,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            progressDialogMixinFactory = progressDialogMixinFactory,
+            coinGeckoLinkParser = coinGeckoLinkParser
         )
     }
 

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.tokens.add
 
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.validation.ValidationSystem

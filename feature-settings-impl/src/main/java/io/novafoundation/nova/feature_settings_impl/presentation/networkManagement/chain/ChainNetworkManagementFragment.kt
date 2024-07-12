@@ -126,6 +126,7 @@ class ChainNetworkManagementFragment :
         }
 
         viewModel.defaultNodes.observe {
+            defaultNodesTitleAdapter.show(it.isNotEmpty())
             defaultNodes.submitList(it)
         }
     }

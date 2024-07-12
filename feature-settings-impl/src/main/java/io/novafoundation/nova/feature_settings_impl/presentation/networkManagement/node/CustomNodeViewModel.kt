@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.CustomNodeInteractor
-import io.novafoundation.nova.feature_settings_impl.domain.validation.NetworkNodePayload
+import io.novafoundation.nova.feature_settings_impl.domain.validation.customNode.NetworkNodePayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine

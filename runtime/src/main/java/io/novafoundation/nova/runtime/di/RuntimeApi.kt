@@ -23,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepo
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
@@ -104,4 +105,6 @@ interface RuntimeApi {
     val web3ApiFactory: Web3ApiFactory
 
     val preConfiguredChainsRepository: PreConfiguredChainsRepository
+
+    val chainRepository: ChainRepository
 }

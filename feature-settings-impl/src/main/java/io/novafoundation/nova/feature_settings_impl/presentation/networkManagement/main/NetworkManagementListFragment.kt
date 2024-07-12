@@ -17,7 +17,16 @@ import kotlinx.android.synthetic.main.fragment_network_management.networkManagem
 
 class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewModel>() {
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { NetworkManagementPagerAdapter(this) }
+    companion object {
+
+        private const val KEY_OPEN_ADDED_TAB = "key_payload"
+
+        fun getBundle(openAddedTab: Boolean): Bundle {
+            return Bundle().apply {
+                putBoolean(KEY_OPEN_ADDED_TAB, openAddedTab)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,8 +40,18 @@ class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewMode
         networkManagementToolbar.applyStatusBarInsets()
         networkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
         networkManagementToolbar.setRightActionClickListener { viewModel.addNetworkClicked() }
-        networkManagementViewPager.adapter = NetworkManagementPagerAdapter(this)
+
+        val adapter = NetworkManagementPagerAdapter(this)
+        networkManagementViewPager.adapter = adapter
         networkManagementTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
+
+        setDefaultTab(adapter)
+    }
+
+    private fun setDefaultTab(adapter: NetworkManagementPagerAdapter) {
+        val openAddedTab = argumentOrNull<Boolean>(KEY_OPEN_ADDED_TAB) ?: return
+        val defaultTabIndex = if (openAddedTab) adapter.addedTabIndex() else adapter.defaultTabIndex()
+        networkManagementViewPager.currentItem = defaultTabIndex
     }
 
     override fun inject() {

@@ -40,6 +40,8 @@ data class ChainLocal(
 
     companion object {
 
+        const val EMPTY_CHAIN_ICON = ""
+
         const val DEFAULT_NETWORK_SOURCE_STR = "DEFAULT"
     }
 

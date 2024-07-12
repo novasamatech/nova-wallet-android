@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_settings_impl.data
 
-import io.novafoundation.nova.caip.caip2.identifier.Caip2Identifier
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequest
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.ext.evmChainIdFrom
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
@@ -25,14 +25,22 @@ class NodeChainIdRepositoryFactory(
     private val web3ApiFactory: Web3ApiFactory
 ) {
 
-    fun create(chain: Chain, nodeUrl: String, coroutineScope: CoroutineScope): NodeChainIdRepository {
+    fun create(networkType: NetworkType, nodeUrl: String, coroutineScope: CoroutineScope): NodeChainIdRepository {
         val nodeConnection = nodeConnectionFactory.createNodeConnection(nodeUrl, coroutineScope)
 
-        return when (chain.hasSubstrateRuntime) {
-            true -> SubstrateNodeChainIdRepository(nodeConnection)
+        return when (networkType) {
+            NetworkType.SUBSTRATE -> substrate(nodeConnection)
 
-            false -> EthereumNodeChainIdRepository(nodeConnection, web3ApiFactory)
+            NetworkType.EVM -> evm(nodeConnection)
         }
+    }
+
+    fun substrate(nodeConnection: NodeConnection): SubstrateNodeChainIdRepository {
+        return SubstrateNodeChainIdRepository(nodeConnection)
+    }
+
+    fun evm(nodeConnection: NodeConnection): EthereumNodeChainIdRepository {
+        return EthereumNodeChainIdRepository(nodeConnection, web3ApiFactory)
     }
 }
 
@@ -60,7 +68,7 @@ class EthereumNodeChainIdRepository(
     override suspend fun requestChainId(): String {
         val chainId = web3Api.ethChainId().sendSuspend().chainId
 
-        return Caip2Identifier.Eip155(chainId).namespaceWitId
+        return evmChainIdFrom(chainId)
     }
 
     private fun createWeb3Api(): Web3Api {

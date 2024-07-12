@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="add_network_title">Enter network details</string>
+    <string name="loading_network_info">Loading network info...</string>
+
+    <string name="create_network_invalid_chain_id_title">Invalid Chain ID</string>
+    <string name="create_network_invalid_chain_id_message">The entered Chain ID does not match the network in the RPC URL.</string>
+
+    <string name="common_modify">Modify</string>
+    <string name="network_already_exist_failure_title">This Node already exists</string>
+    <string name="default_network_already_exist_failure_message">The entered RPC URL is present in Nova as a %s network.</string>
+    <string name="custom_network_already_exist_failure_message">The entered RPC URL is present in Nova as a %s custom network. Are you sure you want to modify it?</string>
+
+    <string name="create_network_node_name" translatable="false">%s Default Node</string>
+    <string name="create_network_block_explorer_name" translatable="false">%s Default Block Explorer</string>
+
+    <string name="common_enter_details">Enter details</string>
+    <string name="common_substrate">Substrate</string>
+    <string name="common_evm">EVM</string>
+
+    <!--<string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>-->
+    <string name="token_price_info_provider_label">Coingecko link for price info (Optional) </string>
+
+    <!--<string name="assets_add_token_enter_info_price_hint" translatable="false">www.coingecko.com/en/coins/tether</string>-->
+    <string name="token_price_info_provider_placeholder" translatable="false">www.coingecko.com/en/coins/tether</string>
+
+    <string name="custom_network_block_explorer_title">Block explorer URL (Optional) </string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_chain_id_title">Chain ID</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_currency_title">Currency Symbol</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_name_title">Network name</string>
+    <string name="custom_rpc_node_url_title">RPC URL</string>
+
     <string name="pre_configured_networks_search_hint">Search by network name</string>
     <string name="pre_configured_networks_progress_text">Loading networks list...</string>
     <string name="pre_configured_networks_title">Add network</string>
@@ -18,7 +51,7 @@
     <string name="custom_node_add_title">Add custom node for</string>
     <string name="custom_node_edit_title">Edit custom node for</string>
     <string name="custom_node_url_title">Node URL</string>
-    <string name="custom_node_url_hint">wss://rpc.polkadot.io</string>
+    <string name="custom_node_url_hint">wss://rpc.network.io</string>
     <string name="custom_node_name_title">Node name</string>
     <string name="custom_node_name_hint">Name</string>
     <string name="custom_node_disabled_button_state">Enter details</string>
@@ -1086,9 +1119,6 @@
 
     <string name="assets_add_token_enter_info_decimals_label">Decimals</string>
     <string name="assets_add_token_enter_info_decimals_hint" translatable="false">18</string>
-
-    <string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>
-    <string name="assets_add_token_enter_info_price_hint" translatable="false">www.coingecko.com/en/coins/tether</string>
 
     <string name="assets_add_token_select_chain_title">Select network to add ERC-20 token</string>
 

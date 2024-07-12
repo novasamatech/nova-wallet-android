@@ -4,6 +4,7 @@ import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
@@ -12,7 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
-import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
@@ -32,7 +33,9 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.No
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 
 interface SettingsFeatureDependencies {
 
@@ -76,7 +79,7 @@ interface SettingsFeatureDependencies {
 
     fun actionBottomSheetLauncherFactory(): ActionBottomSheetLauncherFactory
 
-    fun progressDialogMixin(): ProgressDialogMixin
+    fun progressDialogMixinFactory(): ProgressDialogMixinFactory
 
     fun customDialogProvider(): CustomDialogDisplayer.Presentation
 
@@ -101,4 +104,10 @@ interface SettingsFeatureDependencies {
     val validationExecutor: ValidationExecutor
 
     val preConfiguredChainsRepository: PreConfiguredChainsRepository
+
+    val coinGeckoLinkParser: CoinGeckoLinkParser
+
+    val chainRepository: ChainRepository
+
+    val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
 }

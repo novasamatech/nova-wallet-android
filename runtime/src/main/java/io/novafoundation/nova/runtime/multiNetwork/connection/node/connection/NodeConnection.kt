@@ -15,6 +15,8 @@ interface NodeConnection {
     suspend fun awaitConnected()
 
     fun getSocketService(): SocketService
+
+    fun switchUrl(url: String)
 }
 
 class NodeConnectionFactory(
@@ -45,6 +47,10 @@ class RealNodeConnection(
 
     override fun getSocketService(): SocketService {
         return socketService
+    }
+
+    override fun switchUrl(url: String) {
+        socketService.switchUrl(url)
     }
 
     override suspend fun awaitConnected() {

@@ -32,7 +32,33 @@
     <fragment
         android:id="@+id/preConfiguredNetworks"
         android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks.PreConfiguredNetworksFragment"
-        android:label="PreConfiguredNetworksFragment" />
+        android:label="PreConfiguredNetworksFragment">
+
+        <action
+            android:id="@+id/action_open_addNetworkFragment"
+            app:destination="@id/addNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/addNetworkFragment"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkMainFragment"
+        android:label="AddNetworkMainFragment">
+
+        <action
+            android:id="@+id/action_finishCreateNetworkFlow"
+            app:destination="@id/network_management_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/networkManagementDetails"

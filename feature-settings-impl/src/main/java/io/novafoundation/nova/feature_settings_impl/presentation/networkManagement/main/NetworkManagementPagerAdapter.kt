@@ -22,9 +22,17 @@ class NetworkManagementPagerAdapter(private val fragment: Fragment) : FragmentSt
 
     fun getPageTitle(position: Int): CharSequence {
         return when (position) {
-            0 -> fragment.getString(R.string.network_management_default_page_title)
-            1 -> fragment.getString(R.string.network_management_added_page_title)
+            defaultTabIndex() -> fragment.getString(R.string.network_management_default_page_title)
+            addedTabIndex() -> fragment.getString(R.string.network_management_added_page_title)
             else -> throw IllegalArgumentException("Invalid position")
         }
+    }
+
+    fun defaultTabIndex(): Int {
+        return 0
+    }
+
+    fun addedTabIndex(): Int {
+        return 1
     }
 }

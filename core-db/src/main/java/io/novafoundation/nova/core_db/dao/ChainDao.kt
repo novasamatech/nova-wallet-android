@@ -52,6 +52,23 @@ abstract class ChainDao {
         updateNodePreferences(nodeSelectionPreferencesDiff.added)
     }
 
+    @Transaction
+    open suspend fun addChainOrUpdate(
+        chain: ChainLocal,
+        assets: List<ChainAssetLocal>,
+        nodes: List<ChainNodeLocal>,
+        explorers: List<ChainExplorerLocal>,
+        externalApis: List<ChainExternalApiLocal>,
+        nodeSelectionPreferences: NodeSelectionPreferencesLocal
+    ) {
+        addChainOrUpdate(chain)
+        addChainAssetsOrUpdate(assets)
+        addChainNodesOrUpdate(nodes)
+        addChainExplorersOrUpdate(explorers)
+        addExternalApisOrUpdate(externalApis)
+        addNodePreferencesOrUpdate(nodeSelectionPreferences)
+    }
+
     // ------ Delete --------
     @Delete
     protected abstract suspend fun deleteChains(chains: List<ChainLocal>)
@@ -87,11 +104,29 @@ abstract class ChainDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun addExternalApis(apis: List<ChainExternalApiLocal>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun addChainOrUpdate(node: ChainLocal)
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract suspend fun addChainNode(node: ChainNodeLocal)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun addNodePreferences(model: List<NodeSelectionPreferencesLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addNodePreferencesOrUpdate(model: NodeSelectionPreferencesLocal)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addChainNodesOrUpdate(nodes: List<ChainNodeLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addChainAssetsOrUpdate(assets: List<ChainAssetLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addChainExplorersOrUpdate(explorers: List<ChainExplorerLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract suspend fun addExternalApisOrUpdate(apis: List<ChainExternalApiLocal>)
 
     // ------ Update -----
 
