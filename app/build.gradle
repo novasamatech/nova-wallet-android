@@ -247,6 +247,8 @@ dependencies {
     implementation project(':feature-cloud-backup-api')
     implementation project(':feature-cloud-backup-impl')
 
+    implementation project(':test-shared')
+
     implementation kotlinDep
 
     implementation biometricDep
