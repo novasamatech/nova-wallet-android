@@ -30,4 +30,6 @@ sealed class NominationPoolsUnbondValidationFailure {
 
     class ToStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
         NominationPoolsUnbondValidationFailure(), InsufficientBalanceToStayAboveEDError
+
+    object StakingTypesConflict: NominationPoolsUnbondValidationFailure()
 }

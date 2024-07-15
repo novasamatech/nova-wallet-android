@@ -5,9 +5,11 @@ import io.novafoundation.nova.common.utils.percentage
 import io.novafoundation.nova.common.utils.unite
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown.PercentageAmount
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceBreakdownIds
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -48,7 +50,8 @@ class BalanceBreakdown(
 
 class BalanceBreakdownInteractor(
     private val accountRepository: AccountRepository,
-    private val balanceLocksRepository: BalanceLocksRepository
+    private val balanceLocksRepository: BalanceLocksRepository,
+    private val balanceHoldsRepository: BalanceHoldsRepository,
 ) {
 
     private class TotalAmount(
@@ -65,17 +68,19 @@ class BalanceBreakdownInteractor(
             unite(
                 assetsFlow,
                 balanceLocksRepository.observeLocksForMetaAccount(metaAccount),
+                balanceHoldsRepository.observeHoldsForMetaAccount(metaAccount.id),
                 externalBalancesFlow
-            ) { assets, locks, externalBalances ->
+            ) { assets, locks, holds, externalBalances ->
                 if (assets == null) {
                     BalanceBreakdown.empty()
                 } else {
                     val assetsByChainId = assets.associateBy { it.token.configuration.fullId }
                     val locksItems = mapLocks(assetsByChainId, locks.orEmpty())
+                    val holdsItems = mapHolds(assetsByChainId, holds.orEmpty())
                     val externalBalancesItems = mapExternalBalances(assetsByChainId, externalBalances.orEmpty())
                     val reserved = getReservedBreakdown(assets)
 
-                    val breakdown = locksItems + externalBalancesItems + reserved
+                    val breakdown = locksItems + holdsItems + externalBalancesItems + reserved
 
                     val totalAmount = calculateTotalBalance(assets, externalBalancesItems)
                     val (transferablePercentage, locksPercentage) = percentage(
@@ -104,6 +109,21 @@ class BalanceBreakdownInteractor(
                     id = lock.id,
                     token = asset.token,
                     amountInPlanks = lock.amountInPlanks,
+                )
+            }
+        }
+    }
+
+    private fun mapHolds(
+        assetsByChainId: Map<FullChainAssetId, Asset>,
+        holds: List<BalanceHold>
+    ): List<BalanceBreakdown.BreakdownItem> {
+        return holds.mapNotNull { hold ->
+            assetsByChainId[hold.chainAsset.fullId]?.let { asset ->
+                BalanceBreakdown.BreakdownItem(
+                    id = hold.identifier,
+                    token = asset.token,
+                    amountInPlanks = hold.amountInPlanks,
                 )
             }
         }

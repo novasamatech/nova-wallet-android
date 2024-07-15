@@ -16,17 +16,26 @@ interface NominationPoolMembersRepository {
 
     fun observePoolMember(chainId: ChainId, accountId: AccountId): Flow<PoolMember?>
 
+    suspend fun getPoolMember(chainId: ChainId, accountId: AccountId): PoolMember?
+
     suspend fun getPendingRewards(poolMemberAccountId: AccountId, chainId: ChainId): Balance
 }
 
 class RealNominationPoolMembersRepository(
     private val localStorageSource: StorageDataSource,
+    private val remoteStorageSource: StorageDataSource,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
 ) : NominationPoolMembersRepository {
 
     override fun observePoolMember(chainId: ChainId, accountId: AccountId): Flow<PoolMember?> {
         return localStorageSource.subscribe(chainId) {
             metadata.nominationPools.poolMembers.observe(accountId)
+        }
+    }
+
+    override suspend fun getPoolMember(chainId: ChainId, accountId: AccountId): PoolMember? {
+        return remoteStorageSource.query(chainId) {
+            metadata.nominationPools.poolMembers.query(accountId)
         }
     }
 

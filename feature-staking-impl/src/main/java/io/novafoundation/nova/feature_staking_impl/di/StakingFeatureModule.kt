@@ -35,6 +35,8 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Sta
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolDelegatedStakeRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
@@ -78,6 +80,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteracto
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
@@ -691,5 +694,19 @@ class StakingFeatureModule {
         api: StakingGlobalConfigApi
     ): StakingGlobalConfigRepository {
         return RealStakingGlobalConfigRepository(api)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingConflictsValidationFactory(
+        stakingRepository: StakingRepository,
+        delegatedStakeRepository: NominationPoolDelegatedStakeRepository,
+        nominationPoolStakingRepository: NominationPoolMembersRepository
+    ): StakingTypesConflictValidationFactory {
+        return StakingTypesConflictValidationFactory(
+            stakingRepository = stakingRepository,
+            delegatedStakeRepository = delegatedStakeRepository,
+            nominationPoolStakingRepository = nominationPoolStakingRepository
+        )
     }
 }

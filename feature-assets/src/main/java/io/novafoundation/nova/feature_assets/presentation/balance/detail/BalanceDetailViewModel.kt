@@ -77,6 +77,7 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
+    // TODO show holds as well
     private val balanceLocksFlow = balanceLocksInteractor.balanceLocksFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .inBackground()
         .share()

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="setup_staking_conflict_title">Already staking</string>
+    <string name="setup_staking_conflict_message">You cannot stake with Direct Staking and Nomination Pools at the same time</string>
+
+
+    <string name="pool_staking_conflict_title">Pool operations are not available</string>
+    <string name="pool_staking_conflict_message">Pool staking can no longer be used at the same time as Direct staking. It is not possible to manage your pool staking position until you finish Direct staking.</string>
+
     <string name="account_ledger_migration_deprecation_message">The Migration app will be unavailable in the near future. Use it to migrate your accounts to the new Ledger app to avoid losing your funds.</string>
 
     <string name="account_ledger_migration_app">Migration</string>

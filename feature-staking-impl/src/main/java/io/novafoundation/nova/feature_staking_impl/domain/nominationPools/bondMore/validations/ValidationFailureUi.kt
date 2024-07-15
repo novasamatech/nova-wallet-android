@@ -8,7 +8,10 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationFailure.NotEnoughToBond
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationFailure.NotPositiveAmount
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationFailure.PoolIsDestroying
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationFailure.StakingTypesConflict
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationFailure.UnstakingAll
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.handlePoolAvailableBalanceError
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.handlePoolStakingTypesConflictValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
 import java.math.BigDecimal
 
@@ -34,9 +37,11 @@ fun nominationPoolsBondMoreValidationFailure(
                 resourceManager.getString(R.string.nomination_pools_pool_destroying_error_message)
         )
 
-        NominationPoolsBondMoreValidationFailure.UnstakingAll -> TransformedFailure.Default(
+        UnstakingAll -> TransformedFailure.Default(
             resourceManager.getString(R.string.staking_unable_to_stake_more_title) to
                 resourceManager.getString(R.string.staking_unable_to_stake_more_message)
         )
+
+        StakingTypesConflict ->TransformedFailure.Default(handlePoolStakingTypesConflictValidationFailure(resourceManager))
     }
 }

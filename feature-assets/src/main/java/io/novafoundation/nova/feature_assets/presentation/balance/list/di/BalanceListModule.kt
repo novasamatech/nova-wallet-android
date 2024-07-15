@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceLi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -55,11 +56,13 @@ class BalanceListModule {
     @ScreenScope
     fun provideBalanceBreakdownInteractor(
         accountRepository: AccountRepository,
-        balanceLocksRepository: BalanceLocksRepository
+        balanceLocksRepository: BalanceLocksRepository,
+        balanceHoldsRepository: BalanceHoldsRepository
     ): BalanceBreakdownInteractor {
         return BalanceBreakdownInteractor(
             accountRepository,
-            balanceLocksRepository
+            balanceLocksRepository,
+            balanceHoldsRepository
         )
     }
 
