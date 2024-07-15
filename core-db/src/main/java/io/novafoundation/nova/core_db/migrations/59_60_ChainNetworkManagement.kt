@@ -6,7 +6,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 
-val ChainNetworkManagement_58_59 = object : Migration(58, 59) {
+val ChainNetworkManagement_59_60 = object : Migration(59, 60) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE chains ADD COLUMN source TEXT NOT NULL DEFAULT '${ChainLocal.DEFAULT_NETWORK_SOURCE_STR}'")
