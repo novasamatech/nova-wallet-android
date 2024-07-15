@@ -17,7 +17,8 @@ class RealPreviewImportParitySignerInteractor(
 ) : PreviewImportParitySignerInteractor {
 
     override suspend fun deriveSubstrateChainAccounts(accountId: ByteArray): List<ChainAccountPreview> {
-        val substrateChains = chainRegistry.enabledChains().filter { it.isSubstrateBased }
+        val substrateChains = chainRegistry.enabledChains()
+            .filter { it.isSubstrateBased }
 
         return substrateChains
             .sortedWith(Chain.defaultComparator())
