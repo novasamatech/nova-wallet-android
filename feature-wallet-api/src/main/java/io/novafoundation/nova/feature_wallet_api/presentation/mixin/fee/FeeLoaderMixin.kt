@@ -74,6 +74,8 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
         suspend fun setFee(fee: F?)
 
+        suspend fun setFeeStatus(feeStatus: FeeStatus<F>)
+
         fun invalidateFee()
     }
 

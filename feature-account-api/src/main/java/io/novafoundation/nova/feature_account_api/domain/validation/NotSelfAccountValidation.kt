@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 

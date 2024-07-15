@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
@@ -72,9 +71,12 @@ class AddAccountLauncherProvider(
         when (metaAccount.type) {
             LightMetaAccount.Type.SECRETS -> launchAddFromSecrets(chain, metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> launchAddWatchOnly(chain, metaAccount)
-            LightMetaAccount.Type.LEDGER -> launchAddLedger(chain, metaAccount)
-            // adding chain accounts is not supported for Polkadot Vault like wallets and for Proxied wallets
-            LightMetaAccount.Type.PARITY_SIGNER, LightMetaAccount.Type.POLKADOT_VAULT, LightMetaAccount.Type.PROXIED -> {}
+            LightMetaAccount.Type.LEDGER_LEGACY -> launchAddLedger(chain, metaAccount)
+
+            LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.POLKADOT_VAULT,
+            LightMetaAccount.Type.LEDGER,
+            LightMetaAccount.Type.PROXIED -> {}
         }
     }
 
@@ -85,7 +87,7 @@ class AddAccountLauncherProvider(
     }
 
     private fun launchAddWatchOnly(chain: Chain, metaAccount: MetaAccount) {
-        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+        cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             val chainAccountPayload = AddAccountPayload.ChainAccount(chain.id, metaAccount.id)
 
             router.openChangeWatchAccount(chainAccountPayload)
@@ -112,7 +114,7 @@ class AddAccountLauncherProvider(
     private fun addAccountSelected(payload: AddAccountPayload.ChainAccount) {
         scope.launch {
             if (cloudBackupService.session.isSyncWithCloudEnabled()) {
-                cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+                cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
                     addAccountWithRecommendedSettings(payload)
                 }
             } else {
@@ -132,7 +134,7 @@ class AddAccountLauncherProvider(
     private fun importAccountSelected(chainAccountPayload: AddAccountPayload.ChainAccount) {
         val payload = ImportTypeChooserMixin.Payload(
             onChosen = {
-                cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+                cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
                     importTypeSelected(chainAccountPayload, it)
                 }
             }

@@ -64,7 +64,8 @@ class NetworkModule {
             github = BuildConfig.GITHUB_URL,
             email = BuildConfig.EMAIL,
             youtube = BuildConfig.YOUTUBE_URL,
-            storeUrl = BuildConfig.APP_UPDATE_SOURCE_LINK
+            storeUrl = BuildConfig.APP_UPDATE_SOURCE_LINK,
+            ledgerMigrationArticle = BuildConfig.LEDGER_MIGRATION_ARTICLE
         )
     }
 

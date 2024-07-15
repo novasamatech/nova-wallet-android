@@ -35,6 +35,20 @@
         tools:text="@tools:sample/lorem[20]" />
 
     <TextView
+        android:id="@+id/alertActionContent"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="5dp"
+        android:includeFontPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/button_text_accent"
+        app:layout_constraintStart_toStartOf="@+id/alertSubMessage"
+        app:layout_constraintTop_toBottomOf="@+id/alertSubMessage"
+        tools:text="@string/common_how_it_works" />
+
+    <TextView
         android:id="@+id/alertSubMessage"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
@@ -43,10 +57,28 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:includeFontPadding="false"
-        android:textColor="@color/text_secondary"
         android:visibility="gone"
+        android:textColor="@color/text_secondary"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/alertIcon"
         app:layout_constraintTop_toBottomOf="@id/alertMessage"
-        tools:text="SubMessage" />
+        tools:text="@tools:sample/lorem[20]" />
+
+    <ImageView
+        android:id="@+id/alertActionArrow"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="@+id/alertActionContent"
+        app:layout_constraintStart_toEndOf="@+id/alertActionContent"
+        app:layout_constraintTop_toTopOf="@+id/alertActionContent"
+        app:tint="@color/icon_accent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/alertActionGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="alertActionArrow,alertActionContent" />
 </merge>

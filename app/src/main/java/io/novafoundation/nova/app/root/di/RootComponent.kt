@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
@@ -45,6 +46,7 @@ interface RootComponent {
 
     @Component.Factory
     interface Factory {
+
         fun create(
             @BindsInstance navigationHolder: NavigationHolder,
             @BindsInstance rootRouter: RootRouter,
@@ -73,7 +75,8 @@ interface RootComponent {
             VersionsFeatureApi::class,
             WalletConnectFeatureApi::class,
             PushNotificationsFeatureApi::class,
-            DeepLinkingFeatureApi::class
+            DeepLinkingFeatureApi::class,
+            LedgerFeatureApi::class,
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

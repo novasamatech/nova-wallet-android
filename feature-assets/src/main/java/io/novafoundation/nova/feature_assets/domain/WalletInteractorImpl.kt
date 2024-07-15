@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository

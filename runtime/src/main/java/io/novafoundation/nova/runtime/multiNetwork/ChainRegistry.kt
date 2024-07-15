@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
@@ -300,11 +301,17 @@ fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
 suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List<Chain> = currentChains.first().filter(predicate)
 
+suspend inline fun ChainRegistry.findChainIds(predicate: (Chain) -> Boolean): Set<ChainId> = currentChains.first().mapNotNullToSet { chain ->
+    chain.id.takeIf { predicate(chain) }
+}
+
 suspend inline fun ChainRegistry.findChainsById(predicate: (Chain) -> Boolean): ChainsById {
     return chainsById().filterValues { chain -> predicate(chain) }.asChainsById()
 }
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
+
+suspend fun ChainRegistry.getRawMetadata(chainId: String) = getRuntimeProvider(chainId).getRaw()
 
 suspend fun ChainRegistry.getSocket(chainId: String): SocketService = getActiveConnection(chainId).socketService
 

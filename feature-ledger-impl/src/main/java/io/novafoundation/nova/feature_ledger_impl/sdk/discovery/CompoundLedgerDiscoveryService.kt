@@ -10,6 +10,8 @@ class CompoundLedgerDiscoveryService(
     private val delegates: List<LedgerDeviceDiscoveryService>
 ) : LedgerDeviceDiscoveryService {
 
+    constructor(vararg delegates: LedgerDeviceDiscoveryService) : this(delegates.toList())
+
     override val discoveredDevices: Flow<List<LedgerDevice>> by lazy {
         combine(
             delegates.map(LedgerDeviceDiscoveryService::discoveredDevices)

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
@@ -95,6 +96,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
 
         setupPermissionAsker(viewModel)
         setupLedgerMessages(ledgerMessagePresentable)
+        observeBrowserEvents(viewModel)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

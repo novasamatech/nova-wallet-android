@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_settings_impl.di
 
 import dagger.Module
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealCloudBackupSettingsInteractor
@@ -44,10 +45,12 @@ class SettingsFeatureModule {
     @Provides
     @FeatureScope
     fun provideCloudBackupSettingsInteractor(
+        accountRepository: AccountRepository,
         cloudBackupService: CloudBackupService,
         cloudBackupFacade: LocalAccountsCloudBackupFacade
     ): CloudBackupSettingsInteractor {
         return RealCloudBackupSettingsInteractor(
+            accountRepository,
             cloudBackupService,
             cloudBackupFacade
         )

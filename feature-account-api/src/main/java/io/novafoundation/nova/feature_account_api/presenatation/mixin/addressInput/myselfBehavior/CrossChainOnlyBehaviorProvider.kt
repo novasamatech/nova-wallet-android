@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

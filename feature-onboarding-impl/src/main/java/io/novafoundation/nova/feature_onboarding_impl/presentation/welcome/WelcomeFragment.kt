@@ -9,16 +9,20 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.utils.clickableSpan
+import io.novafoundation.nova.common.utils.colorSpan
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
+import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.styleText
+import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeBackButton
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeCreateWalletButton
-import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeRestoreWalletButton
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
 
 class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 
@@ -61,17 +65,13 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
-        val linkColor = requireContext().getColor(R.color.text_primary)
+        val clickableColor = requireContext().getColor(R.color.text_primary)
 
-        welcomeTerms.text = styleText(sourceText) {
-            clickable(terms, linkColor) {
-                viewModel.termsClicked()
-            }
-
-            clickable(privacy, linkColor) {
-                viewModel.privacyClicked()
-            }
-        }
+        welcomeTerms.text = SpannableFormatter.format(
+            sourceText,
+            terms.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::termsClicked)),
+            privacy.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::privacyClicked)),
+        )
     }
 
     override fun inject() {

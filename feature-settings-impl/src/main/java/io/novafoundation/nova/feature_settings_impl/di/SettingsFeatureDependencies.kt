@@ -18,6 +18,8 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -38,6 +40,10 @@ import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 
 interface SettingsFeatureDependencies {
+
+    val accountRepository: AccountRepository
+
+    val accountInteractor: AccountInteractor
 
     val chainRegistry: ChainRegistry
 

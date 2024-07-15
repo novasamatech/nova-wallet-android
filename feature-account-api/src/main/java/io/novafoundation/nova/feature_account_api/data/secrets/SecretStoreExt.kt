@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.data.secrets.v2.mapMetaAccountSecretsToKeyp
 import io.novafoundation.nova.common.utils.fold
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 

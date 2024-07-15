@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -36,7 +37,8 @@ interface DeepLinkingFeatureComponent : DeepLinkingFeatureApi {
             RuntimeApi::class,
             AccountFeatureApi::class,
             GovernanceFeatureApi::class,
-            DAppFeatureApi::class
+            DAppFeatureApi::class,
+            WalletConnectFeatureApi::class
         ]
     )
     interface DeepLinkingFeatureDependenciesComponent : DeepLinkingFeatureDependencies

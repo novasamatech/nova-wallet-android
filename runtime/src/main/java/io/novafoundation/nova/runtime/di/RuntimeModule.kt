@@ -19,6 +19,8 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
+import io.novafoundation.nova.runtime.extrinsic.metadata.RealMetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
@@ -71,15 +73,15 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideExtrinsicBuilderFactory(
-        chainDao: ChainDao,
         rpcCalls: RpcCalls,
         chainRegistry: ChainRegistry,
         mortalityConstructor: MortalityConstructor,
+        metadataShortenerService: MetadataShortenerService
     ) = ExtrinsicBuilderFactory(
-        chainDao,
         rpcCalls,
         chainRegistry,
-        mortalityConstructor
+        mortalityConstructor,
+        metadataShortenerService
     )
 
     @Provides
@@ -226,6 +228,15 @@ class RuntimeModule {
     fun provideExtrinsicWalk(
         chainRegistry: ChainRegistry,
     ): ExtrinsicWalk = RealExtrinsicWalk(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideMetadataShortenerService(
+        chainRegistry: ChainRegistry,
+        rpcCalls: RpcCalls,
+    ): MetadataShortenerService {
+        return RealMetadataShortenerService(chainRegistry, rpcCalls)
+    }
 
     @Provides
     @ApplicationScope

@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.domain.manualBackup
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.SECRETS
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.WATCH_ONLY
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PARITY_SIGNER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER_LEGACY
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PARITY_SIGNER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.POLKADOT_VAULT
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PROXIED
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.SECRETS
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.WATCH_ONLY
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 
 interface ManualBackupSelectWalletInteractor {
@@ -22,20 +23,21 @@ class RealManualBackupSelectWalletInteractor(
 
     override suspend fun getBackupableMetaAccounts(): List<MetaAccount> {
         return accountRepository.getActiveMetaAccounts()
-            .filter { it.isBackupable() }
+            .filter { it.canBackupManually() }
     }
 
     override suspend fun getMetaAccount(id: Long): MetaAccount {
         return accountRepository.getMetaAccount(id)
     }
 
-    private fun MetaAccount.isBackupable(): Boolean {
+    private fun MetaAccount.canBackupManually(): Boolean {
         return when (type) {
             SECRETS -> true
 
             WATCH_ONLY,
             PARITY_SIGNER,
             LEDGER,
+            LEDGER_LEGACY,
             POLKADOT_VAULT,
             PROXIED -> false
         }

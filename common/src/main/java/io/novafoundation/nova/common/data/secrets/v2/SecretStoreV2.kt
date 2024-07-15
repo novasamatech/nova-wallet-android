@@ -54,12 +54,17 @@ class SecretStoreV2(
         putAdditionalSecretKeyToKnown(metaId, secretName)
     }
 
-    suspend fun clearSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.IO) {
+    suspend fun clearMetaAccountSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.IO) {
         chainAccountIds.map { chainAccountKey(metaId, it, ACCESS_SECRETS) }
             .onEach(encryptedPreferences::removeKey)
 
         encryptedPreferences.removeKey(metaAccountKey(metaId, ACCESS_SECRETS))
         clearAdditionalSecrets(metaId)
+    }
+
+    suspend fun clearChainAccountsSecrets(metaId: Long, chainAccountIds: List<AccountId>) = withContext(Dispatchers.IO) {
+        chainAccountIds.map { chainAccountKey(metaId, it, ACCESS_SECRETS) }
+            .onEach(encryptedPreferences::removeKey)
     }
 
     suspend fun allKnownAdditionalSecrets(metaId: Long): Map<String, String> = withContext(Dispatchers.IO) {

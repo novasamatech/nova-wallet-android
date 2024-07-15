@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updat
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory

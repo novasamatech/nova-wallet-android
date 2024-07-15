@@ -75,7 +75,7 @@ class SecretStoreV2Test {
         secretStore.putMetaAccountSecrets(metaId = META_ID, metaSecrets)
         secretStore.putChainAccountSecrets(metaId = META_ID, accountId = ACCOUNT_ID, chainSecrets)
 
-        secretStore.clearSecrets(META_ID, chainAccountIds = listOf(ACCOUNT_ID))
+        secretStore.clearMetaAccountSecrets(META_ID, chainAccountIds = listOf(ACCOUNT_ID))
 
         val metaSecretsLocal = secretStore.getMetaAccountSecrets(META_ID)
         assertNull(metaSecretsLocal)
@@ -102,7 +102,7 @@ class SecretStoreV2Test {
         val changedValueFromStore = secretStore.getAdditionalMetaAccountSecret(metaId, secretName)
         assertEquals(changedValue, changedValueFromStore)
 
-        secretStore.clearSecrets(metaId, chainAccountIds = emptyList())
+        secretStore.clearMetaAccountSecrets(metaId, chainAccountIds = emptyList())
         val shouldNotExists = secretStore.getAdditionalMetaAccountSecret(metaId, secretName)
         assertNull(shouldNotExists)
     }
@@ -120,7 +120,7 @@ class SecretStoreV2Test {
         val knownSecrets = secretStore.allKnownAdditionalSecretKeys(metaId)
         assertSetEquals(secretNames.toSet(), knownSecrets)
 
-        secretStore.clearSecrets(metaId, emptyList())
+        secretStore.clearMetaAccountSecrets(metaId, emptyList())
 
         val knownSecretsAfterClear = secretStore.allKnownAdditionalSecretKeys(metaId)
         assertTrue(knownSecretsAfterClear.isEmpty())

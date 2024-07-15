@@ -41,6 +41,7 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-currency-api')
     implementation project(':feature-ledger-api')
+    implementation project(':feature-ledger-core')
     implementation project(':feature-versions-api')
     implementation project(':feature-proxy-api')
     implementation project(':feature-cloud-backup-api')

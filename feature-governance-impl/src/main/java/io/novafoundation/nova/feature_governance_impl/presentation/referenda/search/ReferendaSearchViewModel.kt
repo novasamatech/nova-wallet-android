@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_impl.R

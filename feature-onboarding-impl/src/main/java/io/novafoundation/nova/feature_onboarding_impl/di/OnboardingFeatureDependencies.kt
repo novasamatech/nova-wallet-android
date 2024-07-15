@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -28,6 +29,8 @@ interface OnboardingFeatureDependencies {
     fun customDialogProvider(): CustomDialogDisplayer.Presentation
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val ledgerMigrationTracker: LedgerMigrationTracker
 
     val cloudBackupService: CloudBackupService
 

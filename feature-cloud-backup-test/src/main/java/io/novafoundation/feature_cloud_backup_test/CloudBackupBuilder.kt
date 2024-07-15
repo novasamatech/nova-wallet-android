@@ -133,11 +133,7 @@ class WalletPrivateInfoBuilder(
 @CloudBackupBuildDsl
 class BackupSubstrateSecretsBuilder {
 
-    private var _keypair: KeyPairSecrets = KeyPairSecrets(
-        privateKey = ByteArray(32),
-        publicKey = ByteArray(32),
-        nonce = ByteArray(32)
-    )
+    private var _keypair: KeyPairSecrets? = null
     private var _seed: ByteArray? = null
     private var _derivationPath: String? = null
 
@@ -161,11 +157,7 @@ class BackupSubstrateSecretsBuilder {
 @CloudBackupBuildDsl
 class BackupEthereumSecretsBuilder {
 
-    private var _keypair: KeyPairSecrets = KeyPairSecrets(
-        privateKey = ByteArray(32),
-        publicKey = ByteArray(32),
-        nonce = ByteArray(32)
-    )
+    private var _keypair: KeyPairSecrets? = null
     private var _derivationPath: String? = null
 
     fun derivationPath(value: String?) {
@@ -177,7 +169,7 @@ class BackupEthereumSecretsBuilder {
     }
 
     fun build(): EthereumSecrets {
-        return EthereumSecrets(_keypair, _derivationPath)
+        return EthereumSecrets(requireNotNull(_keypair), _derivationPath)
     }
 }
 

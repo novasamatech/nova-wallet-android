@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_api.domain.interfaces
 
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId

@@ -59,6 +59,8 @@
         android:clipToPadding="false"
         android:orientation="horizontal"
         android:paddingHorizontal="10dp"
+        android:paddingTop="24dp"
+        android:gravity="center_vertical"
         android:paddingBottom="24dp">
 
         <io.novafoundation.nova.common.view.PrimaryButton
@@ -66,7 +68,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="6dp"
-            android:layout_marginTop="24dp"
             android:layout_weight="1"
             tools:text="@string/common_ok_back" />
 
@@ -75,7 +76,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="6dp"
-            android:layout_marginTop="24dp"
             android:layout_weight="1"
             tools:text="@string/common_ok_back" />
     </LinearLayout>

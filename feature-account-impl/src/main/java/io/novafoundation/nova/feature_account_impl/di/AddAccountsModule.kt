@@ -6,10 +6,12 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealGenericLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.RealProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
@@ -114,14 +116,26 @@ class AddAccountsModule {
 
     @Provides
     @FeatureScope
-    fun provideLedgerAddAccountRepository(
+    fun provideLegacyLedgerAddAccountRepository(
         accountDao: MetaAccountDao,
         chainRegistry: ChainRegistry,
         secretStoreV2: SecretStoreV2,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
-    ): LedgerAddAccountRepository = RealLedgerAddAccountRepository(
+    ): LegacyLedgerAddAccountRepository = RealLegacyLedgerAddAccountRepository(
         accountDao,
         chainRegistry,
+        secretStoreV2,
+        metaAccountChangesEventBus
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideGenericLedgerAddAccountRepository(
+        accountDao: MetaAccountDao,
+        secretStoreV2: SecretStoreV2,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus
+    ): GenericLedgerAddAccountRepository = RealGenericLedgerAddAccountRepository(
+        accountDao,
         secretStoreV2,
         metaAccountChangesEventBus
     )

@@ -35,6 +35,8 @@ import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureH
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
+import io.novafoundation.nova.feature_ledger_core.LedgerCoreHolder
+import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureHolder
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
@@ -101,6 +103,12 @@ interface ComponentHolderModule {
     @ClassKey(LedgerFeatureApi::class)
     @IntoMap
     fun provideLedgerFeature(accountFeatureHolder: LedgerFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(LedgerCoreApi::class)
+    @IntoMap
+    fun provideLedgerCore(accountFeatureHolder: LedgerCoreHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

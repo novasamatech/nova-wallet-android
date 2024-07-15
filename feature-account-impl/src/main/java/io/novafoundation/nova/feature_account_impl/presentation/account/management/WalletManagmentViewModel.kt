@@ -59,13 +59,17 @@ class WalletManagmentViewModel(
         mode.value = newMode
     }
 
-    fun deleteClicked(account: AccountUi) = launch {
-        val deleteConfirmed = confirmAccountDeletion.awaitAction()
+    fun deleteClicked(account: AccountUi) {
+        cloudBackupChangingWarningMixin.launchRemovingConfirmationIfNeeded {
+            launch {
+                val deleteConfirmed = confirmAccountDeletion.awaitAction()
 
-        if (deleteConfirmed) {
-            val isAllMetaAccountsWasDeleted = accountInteractor.deleteAccount(account.id)
-            if (isAllMetaAccountsWasDeleted) {
-                accountRouter.openWelcomeScreen()
+                if (deleteConfirmed) {
+                    val isAllMetaAccountsWasDeleted = accountInteractor.deleteAccount(account.id)
+                    if (isAllMetaAccountsWasDeleted) {
+                        accountRouter.openWelcomeScreen()
+                    }
+                }
             }
         }
     }
@@ -85,7 +89,7 @@ class WalletManagmentViewModel(
         return ListSelectorMixin.Item(
             R.drawable.ic_add_circle_outline,
             R.color.icon_primary,
-            R.string.account_create_account,
+            R.string.account_create_wallet,
             R.color.text_primary,
             ::onCreateNewWalletClicked
         )
@@ -106,7 +110,7 @@ class WalletManagmentViewModel(
     }
 
     private fun onCreateNewWalletClicked() {
-        cloudBackupChangingWarningMixin.launchConfirmationIfNeeded {
+        cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             accountRouter.openCreateWallet(StartCreateWalletPayload(FlowType.SECOND_WALLET))
         }
     }

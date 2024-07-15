@@ -188,8 +188,8 @@ abstract class ChainDao {
     @Query("SELECT * FROM chain_runtimes")
     abstract suspend fun allRuntimeInfos(): List<ChainRuntimeInfoLocal>
 
-    @Query("UPDATE chain_runtimes SET syncedVersion = :syncedVersion WHERE chainId = :chainId")
-    abstract suspend fun updateSyncedRuntimeVersion(chainId: String, syncedVersion: Int)
+    @Query("UPDATE chain_runtimes SET syncedVersion = :syncedVersion, localMigratorVersion = :localMigratorVersion WHERE chainId = :chainId")
+    abstract suspend fun updateSyncedRuntimeVersion(chainId: String, syncedVersion: Int, localMigratorVersion: Int)
 
     @Query("UPDATE chains SET connectionState = :connectionState WHERE id = :chainId")
     abstract suspend fun setConnectionState(chainId: String, connectionState: ChainLocal.ConnectionStateLocal)
@@ -198,13 +198,24 @@ abstract class ChainDao {
     abstract suspend fun setNodePreferences(model: NodeSelectionPreferencesLocal)
 
     @Transaction
-    open suspend fun updateRemoteRuntimeVersionIfChainExists(chainId: String, runtimeVersion: Int, transactionVersion: Int) {
+    open suspend fun updateRemoteRuntimeVersionIfChainExists(
+        chainId: String,
+        runtimeVersion: Int,
+        transactionVersion: Int,
+    ) {
         if (!chainExists(chainId)) return
 
         if (isRuntimeInfoExists(chainId)) {
             updateRemoteRuntimeVersionUnsafe(chainId, runtimeVersion, transactionVersion)
         } else {
-            insertRuntimeInfo(ChainRuntimeInfoLocal(chainId, syncedVersion = 0, remoteVersion = runtimeVersion, transactionVersion = transactionVersion))
+            val runtimeInfoLocal = ChainRuntimeInfoLocal(
+                chainId,
+                syncedVersion = 0,
+                remoteVersion = runtimeVersion,
+                transactionVersion = transactionVersion,
+                localMigratorVersion = 1
+            )
+            insertRuntimeInfo(runtimeInfoLocal)
         }
     }
 

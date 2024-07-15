@@ -26,7 +26,7 @@ class RealApplyLocalSnapshotToCloudBackupUseCase(
                 val diff = localCloudBackupSnapshot.localVsCloudDiff(cloudBackup, BackupDiffStrategy.syncWithCloud())
 
                 // If there are no changes to apply we can finish it
-                if (diff.cloudChanges.isEmpty()) return Result.success(Unit)
+                if (diff.cloudChanges.isEmpty() && diff.localChanges.isEmpty()) return Result.success(Unit)
 
                 // If we don't have destructive local changes, we can apply the diff to cloud
                 if (localAccountsCloudBackupFacade.canPerformNonDestructiveApply(diff)) {

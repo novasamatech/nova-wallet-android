@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_api.domain.updater
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.ChainUpdateScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

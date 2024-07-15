@@ -5,7 +5,6 @@ import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance

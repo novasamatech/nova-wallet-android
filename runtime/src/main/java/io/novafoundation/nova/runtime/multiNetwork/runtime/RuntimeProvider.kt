@@ -26,6 +26,7 @@ class RuntimeProvider(
     private val runtimeFactory: RuntimeFactory,
     private val runtimeSyncService: RuntimeSyncService,
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
+    private val runtimeFilesCache: RuntimeFilesCache,
     chain: Chain,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
@@ -41,6 +42,10 @@ class RuntimeProvider(
         val runtime = runtimeFlow.first()
 
         return runtime.runtime
+    }
+
+    suspend fun getRaw(): RawRuntimeMetadata {
+        return runtimeFilesCache.getChainMetadata(chainId)
     }
 
     fun observe(): Flow<RuntimeSnapshot> = runtimeFlow.map { it.runtime }
@@ -140,7 +145,7 @@ class RuntimeProvider(
                     NoRuntimeVersionException -> {
                         Log.w(this@RuntimeProvider.LOG_TAG, "Runtime version for $chainId was not found in database")
                     } // pass
-                    else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId): ${it.message}")
+                    else -> Log.e(this@RuntimeProvider.LOG_TAG, "Failed to construct runtime ($chainId)", it)
                 }
             }
 

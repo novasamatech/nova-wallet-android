@@ -56,7 +56,7 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel>()
         observeConfirmationAction(viewModel.cloudBackupChangingWarningMixin)
 
         viewModel.selectHardwareWallet.awaitableActionLiveData.observeEvent {
-            SelectHardwareWalletBottomSheet(requireContext(), it.onSuccess)
+            SelectHardwareWalletBottomSheet(requireContext(), it.payload, it.onSuccess)
                 .show()
         }
 
