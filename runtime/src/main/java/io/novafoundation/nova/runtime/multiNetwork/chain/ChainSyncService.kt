@@ -27,8 +27,8 @@ class ChainSyncService(
 ) {
 
     suspend fun syncUp() = withContext(Dispatchers.Default) {
-        val localChainsJoinedInfo = chainDao.getJoinChainInfo()
-        val oldChains = localChainsJoinedInfo.map { it.chain }.filter { it.source != ChainLocal.Source.CUSTOM }
+        val localChainsJoinedInfo = chainDao.getJoinChainInfo().filter { it.chain.source != ChainLocal.Source.CUSTOM }
+        val oldChains = localChainsJoinedInfo.map { it.chain }
         val oldAssets = localChainsJoinedInfo.flatMap { it.assets }.filter { it.source == AssetSourceLocal.DEFAULT }
         val oldNodes = localChainsJoinedInfo.flatMap { it.nodes }.filter { it.source != ChainNodeLocal.Source.CUSTOM }
         val oldExplorers = localChainsJoinedInfo.flatMap { it.explorers }
