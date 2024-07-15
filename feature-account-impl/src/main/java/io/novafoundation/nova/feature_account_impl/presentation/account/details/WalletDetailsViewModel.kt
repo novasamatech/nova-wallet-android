@@ -6,12 +6,13 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinHost
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -36,7 +37,11 @@ class WalletDetailsViewModel(
 
     val addAccountLauncherMixin = addAccountLauncherPresentationFactory.create(viewModelScope)
 
-    val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId) }
+    private val detailsHost = WalletDetailsMixinHost(
+        browserableDelegate = externalActions
+    )
+
+    private val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId, detailsHost) }
 
     private val startAccountName = async { walletDetailsMixin().metaAccount.name }
 

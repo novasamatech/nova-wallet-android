@@ -82,6 +82,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:stepNumber="4"
                 app:stepText="@string/account_ledger_import_start_step_4" />
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:layout_width="match_parent"
+                android:layout_marginTop="24dp"
+                android:layout_height="wrap_content"
+                android:text="@string/account_ledger_legacy_warning_title"
+                app:alertMode="warning"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:id="@+id/startImportLedgerDepractionWarning"
+                app:AlertView_description="@string/account_ledger_legacy_warning_message"
+                app:AlertView_action="@string/common_find_out_more" />
         </LinearLayout>
 
     </ScrollView>

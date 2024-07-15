@@ -120,9 +120,8 @@ interface MetaAccountDao {
     @Query("SELECT globallyUniqueId, id FROM meta_accounts")
     suspend fun getMetaAccountIds(): List<MetaAccountIdsLocal>
 
-    @Query("SELECT * FROM meta_accounts WHERE status = :status")
-    @Transaction
-    suspend fun getMetaAccountsInfoByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
+    @Query("SELECT * FROM chain_accounts WHERE metaId = :metaId")
+    suspend fun getChainAccounts(metaId: Long): List<ChainAccountLocal>
 
     @Query("SELECT COUNT(*) FROM meta_accounts WHERE status = :status")
     @Transaction
@@ -131,11 +130,12 @@ interface MetaAccountDao {
     @Query("SELECT id FROM meta_accounts WHERE status = :status")
     suspend fun getMetaAccountIdsByStatus(status: MetaAccountLocal.Status): List<Long>
 
-    @Query("SELECT * FROM meta_accounts WHERE status = :status")
-    suspend fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
+    @Query("SELECT id FROM meta_accounts WHERE type = :type")
+    suspend fun getMetaAccountIdsByType(type: MetaAccountLocal.Type): List<Long>
 
-    @Query("SELECT * FROM meta_accounts")
-    suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
+    @Query("SELECT * FROM meta_accounts WHERE status = :status")
+    @Transaction
+    suspend fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
 
     @Query("SELECT * FROM meta_accounts")
     fun getJoinedMetaAccountsInfoFlow(): Flow<List<RelationJoinedMetaAccountInfo>>
@@ -234,6 +234,9 @@ interface MetaAccountDao {
 
     @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE status = :status)")
     suspend fun hasMetaAccountsByStatus(status: MetaAccountLocal.Status): Boolean
+
+    @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE type = :type)")
+    suspend fun hasMetaAccountsByType(type: MetaAccountLocal.Type): Boolean
 
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)

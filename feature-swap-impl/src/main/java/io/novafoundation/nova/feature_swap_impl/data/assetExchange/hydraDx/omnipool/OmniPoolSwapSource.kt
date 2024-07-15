@@ -287,4 +287,10 @@ fun omniPoolAccountId(): AccountId {
 
 typealias RemoteAndLocalId = Pair<HydraDxAssetId, FullChainAssetId>
 
+val RemoteAndLocalId.remoteId
+    get() = first
+
+val RemoteAndLocalId.localId
+    get() = second
+
 typealias RemoteAndLocalIdOptional = Pair<HydraDxAssetId, FullChainAssetId?>

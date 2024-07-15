@@ -176,5 +176,13 @@ internal class RealCloudBackupService(
         override suspend fun setSavedPassword(password: String) {
             cloudBackupPreferences.setSavedPassword(password)
         }
+
+        override fun cloudBackupWasInitialized(): Boolean {
+            return cloudBackupPreferences.getCloudBackupWasInitialized()
+        }
+
+        override fun setBackupWasInitialized() {
+            cloudBackupPreferences.setCloudBackupWasInitialized(true)
+        }
     }
 }

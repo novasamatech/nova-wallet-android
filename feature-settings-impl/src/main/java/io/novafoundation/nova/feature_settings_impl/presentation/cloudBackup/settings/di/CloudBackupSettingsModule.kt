@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.ChangeBackupPasswordCommunicator
@@ -32,6 +33,7 @@ class CloudBackupSettingsModule {
     fun provideViewModel(
         resourceManager: ResourceManager,
         router: SettingsRouter,
+        accountInteractor: AccountInteractor,
         cloudBackupSettingsInteractor: CloudBackupSettingsInteractor,
         syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
         changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
@@ -47,6 +49,7 @@ class CloudBackupSettingsModule {
         return BackupSettingsViewModel(
             resourceManager,
             router,
+            accountInteractor,
             cloudBackupSettingsInteractor,
             syncWalletsBackupPasswordCommunicator,
             changeBackupPasswordCommunicator,

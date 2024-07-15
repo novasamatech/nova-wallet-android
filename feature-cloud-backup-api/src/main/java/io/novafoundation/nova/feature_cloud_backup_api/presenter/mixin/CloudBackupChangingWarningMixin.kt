@@ -12,5 +12,7 @@ interface CloudBackupChangingWarningMixin {
 
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
-    fun launchConfirmationIfNeeded(onConfirm: () -> Unit)
+    fun launchChangingConfirmationIfNeeded(onConfirm: () -> Unit)
+
+    fun launchRemovingConfirmationIfNeeded(onConfirm: () -> Unit)
 }

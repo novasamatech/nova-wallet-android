@@ -5,8 +5,8 @@ import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicato
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.LedgerChainAccount
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.SelectLedgerAddressInterScreenCommunicator
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.LedgerChainAccount
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.SelectLedgerAddressInterScreenCommunicator
 
 class SelectLedgerAddressCommunicatorImpl(navigationHolder: NavigationHolder) :
     NavStackInterScreenCommunicator<SelectLedgerPayload, LedgerChainAccount>(navigationHolder),

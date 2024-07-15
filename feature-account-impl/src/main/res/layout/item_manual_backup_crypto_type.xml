@@ -22,6 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="@drawable/bg_secrets_input_disabled"
+        app:enabled="false"
         app:messageColor="@color/text_secondary"
         tools:label="Schnorrkel"
         tools:message="sr25519 (Recommended)" />
@@ -42,6 +44,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="@drawable/bg_secrets_input_disabled"
+        app:enabled="false"
         app:messageColor="@color/text_secondary"
         tools:message="//44//60//0/0/0" />
 

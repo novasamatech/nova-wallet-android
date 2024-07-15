@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
+import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import javax.inject.Inject
@@ -21,6 +22,7 @@ class OnboardingFeatureHolder @Inject constructor(
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .cloudBackupFeatureApi(getFeature(CloudBackupFeatureApi::class.java))
+            .ledgerCoreApi(getFeature(LedgerCoreApi::class.java))
             .build()
         return DaggerOnboardingFeatureComponent.factory()
             .create(onboardingRouter, onboardingFeatureDependencies)

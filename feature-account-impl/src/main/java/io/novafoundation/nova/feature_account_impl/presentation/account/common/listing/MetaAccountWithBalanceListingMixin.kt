@@ -88,6 +88,7 @@ private class MetaAccountWithBalanceListingMixin(
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.WATCH_ONLY,
             LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER_LEGACY,
             LightMetaAccount.Type.LEDGER,
             LightMetaAccount.Type.POLKADOT_VAULT -> formattedTotalBalance()
 
@@ -113,6 +114,7 @@ private class MetaAccountWithBalanceListingMixin(
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.WATCH_ONLY,
             LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER_LEGACY,
             LightMetaAccount.Type.LEDGER,
             LightMetaAccount.Type.POLKADOT_VAULT -> true
 

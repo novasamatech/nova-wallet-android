@@ -86,6 +86,14 @@ class PrimaryButton @JvmOverloads constructor(
             override fun disabledColor(context: Context): Int = context.getColor(R.color.button_background_inactive_on_gradient)
 
             override fun textColor(context: Context): ColorStateList = context.getColorStateList(R.color.button_accent_text_colors)
+        },
+
+        CLOUD_BACKUP {
+            override fun enabledColor(context: Context): Int = context.getColor(R.color.cloud_backup_button_background)
+
+            override fun disabledColor(context: Context): Int = context.getColor(R.color.button_background_inactive)
+
+            override fun textColor(context: Context): ColorStateList = context.getColorStateList(R.color.text_on_cloud_backup_button)
         };
 
         @ColorInt

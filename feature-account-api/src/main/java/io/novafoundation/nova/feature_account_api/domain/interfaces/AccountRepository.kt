@@ -42,8 +42,6 @@ interface AccountRepository {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun activeMetaAccounts(): List<MetaAccount>
-
     suspend fun allLightMetaAccounts(): List<LightMetaAccount>
 
     suspend fun hasActiveMetaAccounts(): Boolean
@@ -130,5 +128,9 @@ interface AccountRepository {
 
     suspend fun getActiveMetaAccountsQuantity(): Int
 
+    suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
+
     suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
+
+    suspend fun hasSecretsAccounts(): Boolean
 }

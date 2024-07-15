@@ -34,29 +34,23 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
     val toastLiveData: LiveData<Event<String>> = _toastLiveData
 
     fun showRetryDialog(text: String) {
-        _messageLiveData.value = Event(text)
+        _messageLiveData.postValue(Event(text))
     }
 
     fun showToast(text: String) {
-        _toastLiveData.value = Event(text)
+        _toastLiveData.postValue(Event(text))
     }
 
     fun showMessage(text: String) {
-        launch {
-            _messageLiveData.value = Event(text)
-        }
+        _messageLiveData.postValue(Event(text))
     }
 
     fun showError(title: String, text: String) {
-        launch {
-            _errorWithTitleLiveData.value = Event(title to text)
-        }
+        _errorWithTitleLiveData.postValue(Event(title to text))
     }
 
     fun showError(text: String) {
-        launch {
-            _errorLiveData.postValue(Event(text))
-        }
+        _errorLiveData.postValue(Event(text))
     }
 
     fun showError(throwable: Throwable) {

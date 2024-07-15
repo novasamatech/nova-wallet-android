@@ -144,6 +144,14 @@ fun Chain.Additional?.feeViaRuntimeCall(): Boolean {
     return this?.feeViaRuntimeCall ?: false
 }
 
+fun Chain.Additional?.isGenericLedgerAppSupported(): Boolean {
+    return this?.supportLedgerGenericApp ?: false
+}
+
+fun Chain.Additional?.isMigrationLedgerAppSupported(): Boolean {
+    return isGenericLedgerAppSupported()
+}
+
 fun ChainId.chainIdHexPrefix16(): String {
     return removeHexPrefix()
         .take(32)

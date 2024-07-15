@@ -23,6 +23,10 @@ on:
         required: false
         type: string
         default: "false"
+      upload-name:
+        required: false
+        type: string
+        default: "apk"
     secrets:
       ACALA_PROD_AUTH_TOKEN:
         required: true
@@ -50,6 +54,8 @@ on:
         required: true
       DEBUG_GOOGLE_OAUTH_ID:
         required: true
+      RELEASE_GOOGLE_OAUTH_ID:
+          required: true
       # Special secrets for signing:
       CI_MARKET_KEYSTORE_PASS:
         required: false
@@ -93,6 +99,7 @@ env:
   DWELLIR_API_KEY: ${{ secrets.DWELLIR_API_KEY }}
   WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
   DEBUG_GOOGLE_OAUTH_ID:  ${{ secrets.DEBUG_GOOGLE_OAUTH_ID }}
+  RELEASE_GOOGLE_OAUTH_ID:  ${{ secrets.RELEASE_GOOGLE_OAUTH_ID }}
 
   CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
   CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
@@ -112,7 +119,7 @@ env:
   CI_PRODUCTION_GOOGLE_SERVICES_FILE: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
 
 concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{inputs.upload-name}}
   cancel-in-progress: true
 
 jobs:
@@ -144,7 +151,7 @@ jobs:
         uses: ./.github/workflows/install/
 
       - name: 🧪 Run tests
-        if: ${{ inputs.run-tests }} == "true"
+        if: ${{ inputs.run-tests }}
         run: ./gradlew runTest
 
       - name: 🔐 Getting github sign key
@@ -173,7 +180,7 @@ jobs:
 
       - name: ➡️ Upload build artifacts
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: apk
+          name: ${{ inputs.upload-name }}
           path: app/build/outputs/apk/

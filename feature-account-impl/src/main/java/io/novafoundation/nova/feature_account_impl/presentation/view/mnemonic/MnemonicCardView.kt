@@ -61,7 +61,7 @@ class MnemonicCardView @JvmOverloads constructor(
             MnemonicWord(
                 id = index,
                 content = item,
-                indexDisplay = index.toString(),
+                indexDisplay = index.plus(1).toString(),
                 removed = false
             )
         }

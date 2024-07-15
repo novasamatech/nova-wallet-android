@@ -8,7 +8,8 @@ fun CloudBackup.WalletPublicInfo.Type.toMetaAccountType(): LightMetaAccount.Type
         CloudBackup.WalletPublicInfo.Type.SECRETS -> LightMetaAccount.Type.SECRETS
         CloudBackup.WalletPublicInfo.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
         CloudBackup.WalletPublicInfo.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
-        CloudBackup.WalletPublicInfo.Type.LEDGER -> LightMetaAccount.Type.LEDGER
+        CloudBackup.WalletPublicInfo.Type.LEDGER -> LightMetaAccount.Type.LEDGER_LEGACY
         CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
+        CloudBackup.WalletPublicInfo.Type.LEDGER_GENERIC -> LightMetaAccount.Type.LEDGER
     }
 }

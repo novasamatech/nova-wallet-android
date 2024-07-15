@@ -224,10 +224,12 @@ open class ParallaxCardView @JvmOverloads constructor(
 
             // Nested card background and border
             canvas.drawPath(it.borderPath, it.cardPaint)
-            canvas.drawPath(it.borderPath, cardBorderPaint)
+            if (it.drawBorder) {
+                canvas.drawPath(it.borderPath, cardBorderPaint)
+            }
 
             // Highlight for border
-            if (helper.isPrepared) {
+            if (helper.isPrepared && it.drawBorder) {
                 canvas.drawPath(it.borderPath, helper.nestedViewBorderHighlightShader!!.paint)
             }
             canvas.restore()
@@ -329,23 +331,27 @@ open class ParallaxCardView @JvmOverloads constructor(
         val cardBackgroundColor: Int?
         val cardBorderColor: Int?
         val cardRadius: Float
+        val drawBorder: Boolean
 
         constructor(source: ViewGroup.LayoutParams) : super(source) {
             cardBackgroundColor = null
             cardBorderColor = null
             cardRadius = 0f
+            drawBorder = false
         }
 
         constructor(source: LayoutParams) : super(source) {
             cardBackgroundColor = source.cardBackgroundColor
             cardBorderColor = source.cardBorderColor
             cardRadius = source.cardRadius
+            drawBorder = source.drawBorder
         }
 
         constructor(width: Int, height: Int) : super(width, height) {
             cardBackgroundColor = null
             cardBorderColor = null
             cardRadius = 0f
+            drawBorder = true
         }
 
         constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
@@ -355,6 +361,7 @@ open class ParallaxCardView @JvmOverloads constructor(
             )
             cardBorderColor = a.getColorOrNull(R.styleable.ParallaxCardView_Layout_layout_cardBorderColor)
             cardRadius = a.getDimension(R.styleable.ParallaxCardView_Layout_layout_cardRadius, 0f)
+            drawBorder = a.getBoolean(R.styleable.ParallaxCardView_Layout_layout_drawBorder, true)
             a.recycle()
         }
     }

@@ -38,21 +38,30 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center_horizontal"
-        android:minLines="2"
+        android:paddingBottom="24dp"
         android:textColor="@color/text_secondary"
         tools:text="Press both buttons on your Nano X E426 to verify address" />
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/ledgerMessageAlert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginHorizontal="16dp" />
+
 
     <TextView
         android:id="@+id/ledgerMessageFooterMessage"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:visibility="gone"
         android:textColor="@color/text_primary"
+        android:visibility="gone"
         tools:text="Transaction is valid for 05:39" />
 
     <LinearLayout
@@ -60,6 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:visibility="visible">
 

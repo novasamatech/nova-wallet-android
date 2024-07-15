@@ -15,7 +15,9 @@ interface OnboardingRouter {
 
     fun openStartImportParitySigner()
 
-    fun openStartImportLedger()
+    fun openStartImportLegacyLedger()
+
+    fun openStartImportGenericLedger()
 
     fun back()
 

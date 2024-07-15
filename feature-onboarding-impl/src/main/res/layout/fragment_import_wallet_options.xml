@@ -55,7 +55,7 @@
                     android:src="@drawable/ic_import_option_passphrase_big"
                     android:text="@string/import_wallet_options_mnemonic_subtitle"
                     android:visibility="gone"
-                    app:title="@string/import_wallet_options_mnemonic_title" />
+                    app:title="@string/common_passphrase" />
 
                 <io.novafoundation.nova.feature_onboarding_impl.presentation.view.ImportOptionView
                     android:id="@+id/importOptionCloud"
@@ -85,7 +85,7 @@
                     android:layout_marginBottom="6dp"
                     android:src="@drawable/ic_import_option_passphrase_small"
                     android:text="@string/import_wallet_options_mnemonic_subtitle"
-                    app:title="@string/import_wallet_options_mnemonic_title" />
+                    app:title="@string/common_passphrase" />
 
                 <io.novafoundation.nova.feature_onboarding_impl.presentation.view.ImportOptionView
                     android:id="@+id/importOptionHardware"

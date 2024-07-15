@@ -37,7 +37,6 @@ abstract class BackupCreatePasswordViewModel(
     val passwordConfirmFlow = MutableStateFlow("")
 
     val _showPasswords = MutableStateFlow(false)
-
     val showPasswords: Flow<Boolean> = _showPasswords
 
     val passwordStateFlow = combine(passwordFlow, passwordConfirmFlow) { password, confirm ->

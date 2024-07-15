@@ -62,6 +62,7 @@ import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalS
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.events.RealMetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
@@ -111,6 +112,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
+import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.RealAddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
@@ -124,6 +126,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
@@ -284,6 +287,14 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideAccountMappers(
+        ledgerMigrationTracker: LedgerMigrationTracker
+    ): AccountMappers {
+        return AccountMappers(ledgerMigrationTracker)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideAccountDataSource(
         preferences: Preferences,
         encryptedPreferences: EncryptedPreferences,
@@ -294,13 +305,14 @@ class AccountFeatureModule {
         chainRegistry: ChainRegistry,
         secretsMetaAccountLocalFactory: SecretsMetaAccountLocalFactory,
         secretStoreV2: SecretStoreV2,
+        accountMappers: AccountMappers,
     ): AccountDataSource {
         return AccountDataSourceImpl(
             preferences,
             encryptedPreferences,
             nodeDao,
             metaAccountDao,
-            chainRegistry,
+            accountMappers,
             secretStoreV2,
             secretsMetaAccountLocalFactory,
             secretStoreV1,
@@ -355,14 +367,14 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         addressIconGenerator: AddressIconGenerator,
         walletUiUseCase: WalletUiUseCase,
-        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
-    ) = SelectedAccountUseCase(
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+        presentationMapper: MetaAccountTypePresentationMapper
+    ): SelectedAccountUseCase = RealSelectedAccountUseCase(
         accountRepository = accountRepository,
         walletUiUseCase = walletUiUseCase,
         addressIconGenerator = addressIconGenerator,
-        polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
-        metaAccountsUpdatesRegistry = metaAccountsUpdatesRegistry
+        metaAccountsUpdatesRegistry = metaAccountsUpdatesRegistry,
+        accountTypePresentationMapper = presentationMapper
     )
 
     @Provides
@@ -507,7 +519,8 @@ class AccountFeatureModule {
     fun provideAccountTypePresentationMapper(
         resourceManager: ResourceManager,
         polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-    ): MetaAccountTypePresentationMapper = RealMetaAccountTypePresentationMapper(resourceManager, polkadotVaultVariantConfigProvider)
+        ledgerMigrationTracker: LedgerMigrationTracker
+    ): MetaAccountTypePresentationMapper = RealMetaAccountTypePresentationMapper(resourceManager, polkadotVaultVariantConfigProvider, ledgerMigrationTracker)
 
     @Provides
     @FeatureScope

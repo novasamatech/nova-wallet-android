@@ -4,9 +4,11 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrThrow
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
@@ -16,8 +18,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.polkadotVaultAccountTypeAlert
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.polkadotVaultTitle
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.model.AccountTypeAlert
-import io.novafoundation.nova.feature_account_impl.presentation.common.chainAccounts.AccountInChainUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -27,16 +27,14 @@ class PolkadotVaultWalletDetailsMixin(
     private val accountFormatterFactory: AccountFormatterFactory,
     private val interactor: WalletDetailsInteractor,
     metaAccount: MetaAccount
-) : WalletDetailsMixin(
-    metaAccount
-) {
+) : WalletDetailsMixin(metaAccount) {
     private val accountFormatter = accountFormatterFactory.create(
         accountTitleFormatter = { it.polkadotVaultTitle(resourceManager, metaAccount) }
     )
 
     override val availableAccountActions: Flow<Set<AccountAction>> = flowOf { emptySet() }
 
-    override val typeAlert: Flow<AccountTypeAlert?> = flowOf {
+    override val typeAlert: Flow<AlertModel?> = flowOf {
         val vaultVariant = metaAccount.type.asPolkadotVaultVariantOrThrow()
         val variantConfig = polkadotVaultVariantConfigProvider.variantConfigFor(vaultVariant)
         polkadotVaultAccountTypeAlert(vaultVariant, variantConfig, resourceManager)

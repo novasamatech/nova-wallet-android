@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -26,7 +25,7 @@ class LocalIdentityProvider(
 
     override suspend fun identitiesFor(accountIds: Collection<AccountId>, chainId: ChainId): Map<AccountIdKey, Identity?> {
         val chain = chainRegistry.getChain(chainId)
-        val metaAccounts = accountRepository.activeMetaAccounts()
+        val metaAccounts = accountRepository.getActiveMetaAccounts()
             .filter { it.hasAccountIn(chain) }
             .associateBy { it.requireAccountIdIn(chain).intoKey() }
 
