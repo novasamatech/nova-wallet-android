@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.associateByMultiple
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.first
+import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 
 interface Caip2Resolver {
 
@@ -35,7 +35,7 @@ internal class RealCaip2Resolver(
     }
 
     override suspend fun chainsByCaip2(): Map<String, Chain> {
-        val allChains = chainRegistry.currentChains.first()
+        val allChains = chainRegistry.enabledChains()
 
         return allChains.associateByMultiple { chain -> allCaip2Of(chain).map { it.namespaceWitId } }
     }

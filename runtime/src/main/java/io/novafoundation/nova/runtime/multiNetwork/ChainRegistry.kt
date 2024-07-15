@@ -109,9 +109,11 @@ class ChainRegistry(
     }
 
     suspend fun getEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
-        requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
+        return runCatching {
+            requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
-        return web3ApiPool.getWeb3Api(chainId, connectionType)
+            web3ApiPool.getWeb3Api(chainId, connectionType)
+        }.getOrNull()
     }
 
     suspend fun getRuntimeProvider(chainId: String): RuntimeProvider {
@@ -350,9 +352,11 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
     return findEvmChain(addressPrefix)
 }
 
-fun ChainRegistry.enabledChains() = currentChains
+fun ChainRegistry.enabledChainsFlow() = currentChains
     .filterList { it.isEnabled }
 
-fun ChainRegistry.enabledChainByIdFlow() = enabledChains().map { chains -> chains.associateBy { it.id } }
+suspend fun ChainRegistry.enabledChains() = enabledChainsFlow().first()
+
+fun ChainRegistry.enabledChainByIdFlow() = enabledChainsFlow().map { chains -> chains.associateBy { it.id } }
 
 suspend fun ChainRegistry.enabledChainById() = ChainsById(enabledChainByIdFlow().first())

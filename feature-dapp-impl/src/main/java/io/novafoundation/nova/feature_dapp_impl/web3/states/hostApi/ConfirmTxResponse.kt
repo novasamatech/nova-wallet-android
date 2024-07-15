@@ -18,4 +18,7 @@ sealed class ConfirmTxResponse : Parcelable {
 
     @Parcelize
     class SigningFailed(override val requestId: String, val shouldPresent: Boolean) : ConfirmTxResponse()
+
+    @Parcelize
+    class ChainIsDisabled(override val requestId: String, val chainName: String) : ConfirmTxResponse()
 }

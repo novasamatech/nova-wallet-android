@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
-import io.novafoundation.nova.runtime.multiNetwork.enabledChains
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -53,7 +53,7 @@ class RealManageTokenInteractor(
         }
     }
 
-    private fun multiChainTokensFlow() = chainRegistry.enabledChains().map { chains ->
+    private fun multiChainTokensFlow() = chainRegistry.enabledChainsFlow().map { chains ->
         constructMultiChainTokens(chains)
     }
 

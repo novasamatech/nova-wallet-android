@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.findChains
+import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -58,11 +58,12 @@ class RealProxySyncService(
 ) : ProxySyncService {
 
     override fun proxySyncTrigger(): Flow<*> {
-        return chainRegistry.currentChains.map { chains ->
-            chains
-                .filter(Chain::supportProxy)
-                .map(Chain::id)
-        }.distinctUntilChanged()
+        return chainRegistry.currentChains
+            .map { chains ->
+                chains
+                    .filter(Chain::supportProxy)
+                    .map(Chain::id)
+            }.distinctUntilChanged()
     }
 
     override fun startSyncing() {
@@ -212,7 +213,8 @@ class RealProxySyncService(
     }
 
     private suspend fun getSupportedProxyChains(): List<Chain> {
-        return chainRegistry.findChains { it.supportProxy }
+        return chainRegistry.enabledChains()
+            .filter { it.supportProxy }
     }
 
     private fun Chain.getAvailableMetaAccounts(metaAccounts: List<MetaAccount>): List<MetaAccount> {

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="disabled_chain_error_title">%s is disabled</string>
+    <string name="disabled_chain_error_message">You can not sign transactions of disabled networks. Enable %s in settings and try again</string>
+
     <string name="invalid_token_symbol_title">Invalid Currency Symbol</string>
     <string name="invalid_token_symbol_message">The entered Currency Symbol (%1$s) does not match the network (%2$s). Do you want to use the correct currency symbol?</string>
 
