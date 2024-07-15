@@ -23,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -52,7 +53,7 @@ class RealAddTokensInteractor(
 ) : AddTokensInteractor {
 
     override fun availableChainsToAddTokenFlow(): Flow<List<Chain>> {
-        return chainRegistry.currentChains.map { chains ->
+        return chainRegistry.enabledChainsFlow().map { chains ->
             chains.filter { it.isEthereumBased }
                 .sortedWith(Chain.defaultComparator())
         }
