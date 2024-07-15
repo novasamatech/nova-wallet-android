@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.encodedIncludedInExtrinsic
 import io.novafoundation.nova.common.utils.encodedIncludedInSignature
 import io.novafoundation.nova.common.utils.hasSignedExtension
 import io.novafoundation.nova.metadata_shortener.MetadataShortener
+import io.novafoundation.nova.runtime.ext.shouldDisableMetadataHashCheck
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -44,8 +45,9 @@ internal class RealMetadataShortenerService(
     private val cache = MetadataProofCache()
     override suspend fun isCheckMetadataHashAvailable(chainId: ChainId): Boolean {
         val runtime = chainRegistry.getRuntime(chainId)
+        val chain = chainRegistry.getChain(chainId)
 
-        return runtime.metadata.shouldCalculateMetadataHash()
+        return shouldCalculateMetadataHash(runtime.metadata, chain)
     }
 
     override suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ByteArray {
@@ -81,7 +83,7 @@ internal class RealMetadataShortenerService(
 
         return cache.getOrCompute(chainId, expectedSpecVersion = runtimeVersion.specVersion) {
             val runtimeMetadata = chainRegistry.getRuntime(chainId).metadata
-            val shouldIncludeHash = runtimeMetadata.shouldCalculateMetadataHash()
+            val shouldIncludeHash = shouldCalculateMetadataHash(runtimeMetadata, chain)
 
             if (shouldIncludeHash) {
                 generateMetadataProofOrDisabled(chain, runtimeVersion)
@@ -166,10 +168,11 @@ internal class RealMetadataShortenerService(
         }
     }
 
-    private fun RuntimeMetadata.shouldCalculateMetadataHash(): Boolean {
-        val atLeastMinimumVersion = metadataVersion >= MINIMUM_METADATA_VERSION_TO_CALCULATE_HASH
-        val hasSignedExtension = extrinsic.hasSignedExtension(DefaultSignedExtensions.CHECK_METADATA_HASH)
+    private fun shouldCalculateMetadataHash(runtimeMetadata: RuntimeMetadata, chain: Chain): Boolean {
+        val canBeEnabled = chain.additional.shouldDisableMetadataHashCheck().not()
+        val atLeastMinimumVersion = runtimeMetadata.metadataVersion >= MINIMUM_METADATA_VERSION_TO_CALCULATE_HASH
+        val hasSignedExtension = runtimeMetadata.extrinsic.hasSignedExtension(DefaultSignedExtensions.CHECK_METADATA_HASH)
 
-        return atLeastMinimumVersion && hasSignedExtension
+        return canBeEnabled && atLeastMinimumVersion && hasSignedExtension
     }
 }
