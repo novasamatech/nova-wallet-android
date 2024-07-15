@@ -16,14 +16,14 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@null"
-        android:hint="@string/common_address"
+        android:imeOptions="actionDone"
         android:includeFontPadding="false"
         android:paddingStart="12dp"
         android:paddingTop="14dp"
         android:paddingEnd="12dp"
         android:paddingBottom="14dp"
         android:singleLine="true"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/input_text_color"
         android:textColorHint="@color/hint_text" />
 
     <TextView
@@ -63,5 +63,4 @@
             tools:visibility="visible" />
 
     </FrameLayout>
-
 </merge>

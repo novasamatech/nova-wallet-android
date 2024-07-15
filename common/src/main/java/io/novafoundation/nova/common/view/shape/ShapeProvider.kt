@@ -23,6 +23,13 @@ fun Context.getRippleMask(cornerSizeDp: Int = DEFAULT_CORNER_RADIUS): Drawable {
     return getRoundedCornerDrawableFromColors(Color.WHITE, null, cornerSizeDp)
 }
 
+fun Context.getMaskedRipple(
+    cornerSizeInDp: Int,
+    @ColorInt rippleColor: Int = getColor(R.color.cell_background_pressed)
+): Drawable {
+    return RippleDrawable(rippleColor.toColorStateList(), null, getRippleMask(cornerSizeInDp))
+}
+
 fun Context.addRipple(
     drawable: Drawable? = null,
     mask: Drawable? = getRippleMask(),

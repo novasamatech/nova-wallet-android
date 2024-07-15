@@ -60,6 +60,9 @@ interface BaseFragmentMixin<T : BaseViewModel> : BaseScreenMixin<T> {
 
     @Suppress("UNCHECKED_CAST")
     fun <A> argument(key: String): A = fragment.arguments!![key] as A
+
+    @Suppress("UNCHECKED_CAST")
+    fun <A> argumentOrNull(key: String): A? = fragment.arguments?.get(key) as? A
 }
 
 class BaseFragmentDelegate<T : BaseViewModel>(

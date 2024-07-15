@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.i
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.requireType
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -56,7 +57,10 @@ class StakingRewardNotificationHandler(
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()
         content.requireType(NotificationTypes.STAKING_REWARD)
+
         val chain = content.getChain()
+        require(chain.isEnabled)
+
         val recipient = content.extractPayloadFieldsWithPath<String>("recipient")
         val amount = content.extractBigInteger("amount")
 

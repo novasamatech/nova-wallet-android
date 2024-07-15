@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCo
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class DAppBrowserModule {
@@ -69,7 +70,8 @@ class DAppBrowserModule {
         initialUrl: String,
         extensionStoreFactory: ExtensionStoreFactory,
         dAppInteractor: DappInteractor,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        chainRegistry: ChainRegistry
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
@@ -80,7 +82,8 @@ class DAppBrowserModule {
             dAppSearchRequester = searchRequester,
             initialUrl = initialUrl,
             extensionStoreFactory = extensionStoreFactory,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            chainRegistry = chainRegistry
         )
     }
 }

@@ -58,6 +58,10 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.networkStateFlow
+import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
+import kotlinx.coroutines.flow.first
 import org.web3j.crypto.Sign
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
@@ -379,6 +383,10 @@ fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Mo
 fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEntry = storage?.get(name)
     ?: fallbacks.firstOrNull { storage?.get(it) != null }
         ?.let { storage?.get(it) } ?: throw NoSuchElementException()
+
+suspend fun SocketService.awaitConnected() {
+    networkStateFlow().first { it is SocketStateMachine.State.Connected }
+}
 
 object Modules {
 

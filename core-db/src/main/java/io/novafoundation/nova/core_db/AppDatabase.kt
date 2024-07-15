@@ -59,6 +59,7 @@ import io.novafoundation.nova.core_db.migrations.AddExtrinsicContentField_37_38
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddFungibleNfts_55_56
 import io.novafoundation.nova.core_db.migrations.AddGloballyUniqueIdToMetaAccounts_58_59
+import io.novafoundation.nova.core_db.migrations.ChainNetworkManagement_59_60
 import io.novafoundation.nova.core_db.migrations.AddGovernanceDapps_25_26
 import io.novafoundation.nova.core_db.migrations.AddGovernanceExternalApiToChain_27_28
 import io.novafoundation.nova.core_db.migrations.AddGovernanceFlagToChains_24_25
@@ -129,6 +130,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
@@ -140,7 +142,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 59,
+    version = 60,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -178,7 +180,8 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         StakingDashboardItemLocal::class,
         StakingRewardPeriodLocal::class,
         ExternalBalanceLocal::class,
-        ProxyAccountLocal::class
+        ProxyAccountLocal::class,
+        NodeSelectionPreferencesLocal::class
     ],
 )
 @TypeConverters(
@@ -233,6 +236,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(ChangeSessionTopicToParing_52_53, AddConnectionStateToChains_53_54, AddProxyAccount_54_55)
                     .addMigrations(AddFungibleNfts_55_56, ChainPushSupport_56_57)
                     .addMigrations(AddLocalMigratorVersionToChainRuntimes_57_58, AddGloballyUniqueIdToMetaAccounts_58_59)
+                    .addMigrations(ChainNetworkManagement_59_60)
                     .build()
             }
             return instance!!

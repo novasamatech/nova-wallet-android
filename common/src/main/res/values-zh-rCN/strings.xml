@@ -173,7 +173,7 @@
     <string name="assets_add_token">添加代币</string>
     <string name="assets_add_token_enter_info_address_label">合约地址</string>
     <string name="assets_add_token_enter_info_decimals_label">小数点</string>
-    <string name="assets_add_token_enter_info_price_label">Coingecko链接用于价格信息（可选）</string>
+    <string name="token_price_info_provider_label">Coingecko链接用于价格信息（可选）</string>
     <string name="assets_add_token_enter_info_symbol_label">符号</string>
     <string name="assets_add_token_enter_info_title">输入 ERC-20 代币详情</string>
     <string name="assets_add_token_select_chain_title">选择网络以添加 ERC-20 代币</string>
@@ -485,7 +485,7 @@
     <string name="connection_add_already_exists_error">节点已经之前被添加。请试用另一个节点。</string>
     <string name="connection_add_invalid_error">无法与节点建立连接。请尝试另一个。</string>
     <string name="connection_add_unsupported_error">不幸的是，网络不支持。请尝试以下之一：%s。</string>
-    <string name="connection_delete_confirm">删除</string>
+    <string name="common_delete">删除</string>
     <string name="connection_delete_description">确认删除%s。</string>
     <string name="connection_delete_title">删除网络？</string>
     <string name="connection_error_message_v2_2_0">请检查您的连接或稍后再试</string>

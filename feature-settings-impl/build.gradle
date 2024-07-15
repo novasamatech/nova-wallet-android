@@ -42,6 +42,8 @@ dependencies {
     implementation project(':feature-wallet-connect-api')
     implementation project(':feature-versions-api')
     implementation project(':feature-push-notifications')
+    implementation project(':feature-assets')
+    implementation project(':caip')
 
     implementation project(':feature-settings-api')
 
@@ -54,6 +56,7 @@ dependencies {
     implementation cardViewDep
     implementation constraintDep
 
+    implementation shimmerDep
     implementation biometricDep
 
     implementation substrateSdkDep

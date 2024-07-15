@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.RoundRobinStrategy
 import io.novafoundation.nova.test_shared.CoroutineTest
 import io.novafoundation.nova.test_shared.any
@@ -29,12 +29,12 @@ import org.mockito.junit.MockitoJUnitRunner
 class NodeAutobalancerTest : CoroutineTest() {
 
     @Mock
-    lateinit var strategyProvider: AutoBalanceStrategyProvider
+    lateinit var strategyProvider: NodeSelectionStrategyProvider
 
     lateinit var autobalancer: NodeAutobalancer
 
     private val nodes = generateNodes()
-    private val nodeSelectionStrategy = Chain.Nodes.NodeSelectionStrategy.ROUND_ROBIN
+    private val nodeSelectionStrategy = Chain.Nodes.NodeSelectionStrategy.AutoBalance.ROUND_ROBIN
 
     private val nodesFlow = MutableStateFlow(Chain.Nodes(nodeSelectionStrategy, nodes))
     private val stateFlow = singleReplaySharedFlow<Unit>()
@@ -73,7 +73,7 @@ class NodeAutobalancerTest : CoroutineTest() {
     }
 
     private fun generateNodes() = (1..10).map {
-        Chain.Node(unformattedUrl = it.toString(), name = it.toString(), chainId = "test", orderId = 0)
+        Chain.Node(unformattedUrl = it.toString(), name = it.toString(), chainId = "test", orderId = 0, isCustom = false)
     }
 
     private fun nodeFlow() = autobalancer.connectionUrlFlow(

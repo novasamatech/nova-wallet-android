@@ -15,8 +15,4 @@ class VoteViewModel(
     fun avatarClicked() {
         router.openSwitchWallet()
     }
-
-    init {
-        router.openDemocracy()
-    }
 }

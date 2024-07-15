@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
@@ -51,6 +52,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -68,6 +70,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.filter
 
 class SelectSendViewModel(
     private val chainRegistry: ChainRegistry,
@@ -496,22 +499,26 @@ class SelectSendViewModel(
     }
 
     private fun availableInDirections(): Flow<List<CrossChainDirection>> {
-        return crossChainTransfersUseCase.incomingCrossChainDirections(destinationAsset).mapList { incomingDirection ->
-            CrossChainDirection(
-                chainWithAsset = ChainWithAsset(incomingDirection.chain, incomingDirection.asset.token.configuration),
-                balances = incomingDirection.asset
-            )
-        }
+        return crossChainTransfersUseCase.incomingCrossChainDirections(destinationAsset)
+            .filterList { it.chain.isEnabled }
+            .mapList { incomingDirection ->
+                CrossChainDirection(
+                    chainWithAsset = ChainWithAsset(incomingDirection.chain, incomingDirection.asset.token.configuration),
+                    balances = incomingDirection.asset
+                )
+            }
     }
 
     private fun availableOutDirections(): Flow<List<CrossChainDirection>> {
         return originAsset.flatMapLatest {
-            crossChainTransfersUseCase.outcomingCrossChainDirections(it).mapList { incomingDirection ->
-                CrossChainDirection(
-                    chainWithAsset = ChainWithAsset(incomingDirection.chain, incomingDirection.asset),
-                    balances = null
-                )
-            }
+            crossChainTransfersUseCase.outcomingCrossChainDirections(it)
+                .filterList { it.chain.isEnabled }
+                .mapList { incomingDirection ->
+                    CrossChainDirection(
+                        chainWithAsset = ChainWithAsset(incomingDirection.chain, incomingDirection.asset),
+                        balances = null
+                    )
+                }
         }
     }
 

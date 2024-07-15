@@ -36,7 +36,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="6dp"
         android:layout_marginEnd="32dp"
-        android:background="@drawable/bg_chip"
+        android:background="@drawable/bg_chip_8"
         android:includeFontPadding="false"
         android:layout_marginVertical="11dp"
         android:paddingHorizontal="8dp"

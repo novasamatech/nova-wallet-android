@@ -173,7 +173,7 @@
     <string name="assets_add_token">Token ekle</string>
     <string name="assets_add_token_enter_info_address_label">Sözleşme adresi</string>
     <string name="assets_add_token_enter_info_decimals_label">Ondalıklar</string>
-    <string name="assets_add_token_enter_info_price_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
+    <string name="token_price_info_provider_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
     <string name="assets_add_token_enter_info_symbol_label">Sembol</string>
     <string name="assets_add_token_enter_info_title">ERC-20 token bilgilerini girin</string>
     <string name="assets_add_token_select_chain_title">ERC-20 token eklemek için ağı seçin</string>
@@ -490,7 +490,7 @@
     <string name="connection_add_already_exists_error">Düğüm daha önce eklenmiş. Lütfen başka bir düğüm deneyin.</string>
     <string name="connection_add_invalid_error">Düğüm ile bağlantı kurulamıyor. Lütfen başka birini deneyin.</string>
     <string name="connection_add_unsupported_error">Maalesef ağ desteklenmiyor. Lütfen aşağıdakilerden birini deneyin: %s.</string>
-    <string name="connection_delete_confirm">Sil</string>
+    <string name="common_delete">Sil</string>
     <string name="connection_delete_description">%s silinmesini onaylayın.</string>
     <string name="connection_delete_title">Ağı sil?</string>
     <string name="connection_error_message_v2_2_0">Lütfen bağlantınızı kontrol edin veya daha sonra tekrar deneyin</string>

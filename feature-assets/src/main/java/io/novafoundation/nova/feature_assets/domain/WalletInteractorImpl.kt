@@ -27,6 +27,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainByIdFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -58,8 +59,14 @@ class WalletInteractorImpl(
     }
 
     override fun assetsFlow(): Flow<List<Asset>> {
-        return accountRepository.selectedMetaAccountFlow()
+        val assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
+
+        val enabledChains = chainRegistry.enabledChainByIdFlow()
+
+        return combine(assetsFlow, enabledChains) { assets, chainsById ->
+            assets.filter { chainsById.containsKey(it.token.configuration.chainId) }
+        }
     }
 
     override suspend fun syncAssetsRates(currency: Currency) {
@@ -165,7 +172,7 @@ class WalletInteractorImpl(
         assets: List<Asset>,
         externalBalances: List<ExternalBalance>
     ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
-        val chains = chainRegistry.chainsById.first()
+        val chains = chainRegistry.enabledChainByIdFlow().first()
 
         return groupAndSortAssetsByNetwork(assets, externalBalances.aggregatedBalanceByAsset(), chains)
     }

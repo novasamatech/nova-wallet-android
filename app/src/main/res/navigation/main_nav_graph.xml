@@ -256,6 +256,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_networkManagement"
+        app:destination="@id/network_management_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_select_governance_tracks"
         app:destination="@id/selectGovernanceTracks"
         app:enterAnim="@anim/fragment_open_enter"
@@ -983,5 +991,7 @@
     <include app:graph="@navigation/import_wallet_options_nav_graph" />
 
     <include app:graph="@navigation/create_wallet_nav_graph" />
+
+    <include app:graph="@navigation/network_management_graph" />
 
 </navigation>

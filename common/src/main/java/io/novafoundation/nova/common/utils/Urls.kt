@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.util.Patterns
+import java.net.URI
 import java.net.URL
 
 object Urls {
@@ -15,6 +16,12 @@ object Urls {
         val parsedUrl = URL(url)
 
         return "${parsedUrl.protocol}://${parsedUrl.host}"
+    }
+
+    fun normalizePath(url: String): String {
+        return url.removeSuffix("/").let {
+            URI.create(it).normalize().toString()
+        }
     }
 
     fun hostOf(url: String): String {

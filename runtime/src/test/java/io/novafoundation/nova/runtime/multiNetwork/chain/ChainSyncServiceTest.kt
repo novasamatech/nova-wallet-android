@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapExternalApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
@@ -122,7 +123,8 @@ class ChainSyncServiceTest {
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
                 explorersDiff = insertsExplorerByName(explorerName),
-                externalApisDiff = insertsTransferApiByUrl(transferApiUrl)
+                externalApisDiff = insertsTransferApiByUrl(transferApiUrl),
+                nodeSelectionPreferencesDiff = insertsNodeSelectionPreferences(REMOTE_CHAIN.chainId)
             )
         }
     }
@@ -135,7 +137,14 @@ class ChainSyncServiceTest {
 
             chainSyncService.syncUp()
 
-            verify(dao).applyDiff(emptyDiff(), emptyDiff(), emptyDiff(), emptyDiff(), emptyDiff())
+            verify(dao).applyDiff(
+                emptyDiff(),
+                emptyDiff(),
+                emptyDiff(),
+                emptyDiff(),
+                emptyDiff(),
+                emptyDiff()
+            )
         }
     }
 
@@ -152,7 +161,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = emptyDiff()
             )
         }
     }
@@ -179,7 +189,8 @@ class ChainSyncServiceTest {
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = emptyDiff()
             )
         }
     }
@@ -206,7 +217,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = emptyDiff()
             )
         }
     }
@@ -233,7 +245,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = insertsExplorerByName(explorerName),
-                externalApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff(),
+                nodeSelectionPreferencesDiff = emptyDiff()
             )
         }
     }
@@ -266,7 +279,8 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                externalApisDiff = insertsTransferApiByUrl(anotherUrl)
+                externalApisDiff = insertsTransferApiByUrl(anotherUrl),
+                nodeSelectionPreferencesDiff = emptyDiff()
             )
         }
     }
@@ -285,7 +299,8 @@ class ChainSyncServiceTest {
                 assetsDiff = removesAssetWithId(assetId),
                 nodesDiff = removesNodeWithUrl(nodeUrl),
                 explorersDiff = removesExplorerByName(explorerName),
-                externalApisDiff = removesTransferApiByUrl(transferApiUrl)
+                externalApisDiff = removesTransferApiByUrl(transferApiUrl),
+                nodeSelectionPreferencesDiff = removesNodeSelectionPreferences(REMOTE_CHAIN.chainId)
             )
         }
     }
@@ -303,15 +318,22 @@ class ChainSyncServiceTest {
     private fun insertsNodeWithUrl(url: String) = insertsElement<ChainNodeLocal> { it.url == url }
     private fun insertsExplorerByName(name: String) = insertsElement<ChainExplorerLocal> { it.name == name }
     private fun insertsTransferApiByUrl(url: String) = insertsElement<ChainExternalApiLocal> { it.url == url }
+    private fun insertsNodeSelectionPreferences(id: String) = insertsElement<NodeSelectionPreferencesLocal> { it.chainId == id }
 
     private fun removesChainWithId(id: String) = removesElement<ChainLocal> { it.id == id }
     private fun removesAssetWithId(id: Int) = removesElement<ChainAssetLocal> { it.id == id }
     private fun removesNodeWithUrl(url: String) = removesElement<ChainNodeLocal> { it.url == url }
     private fun removesExplorerByName(name: String) = removesElement<ChainExplorerLocal> { it.name == name }
     private fun removesTransferApiByUrl(url: String) = removesElement<ChainExternalApiLocal> { it.url == url }
+    private fun removesNodeSelectionPreferences(chainId: String) = removesElement<NodeSelectionPreferencesLocal> { it.chainId == chainId }
 
     private fun createLocalCopy(remote: ChainRemote): JoinedChainInfo {
-        val domain = mapRemoteChainToLocal(remote, oldChain = null, gson)
+        val domain = mapRemoteChainToLocal(remote, oldChain = null, source = ChainLocal.Source.DEFAULT, gson)
+        val nodeSelectionPreferences = NodeSelectionPreferencesLocal(
+            chainId = remote.chainId,
+            autoBalanceEnabled = true,
+            selectedNodeUrl = null
+        )
         val assets = remote.assets.map { mapRemoteAssetToLocal(remote, it, gson, true) }
         val nodes = mapRemoteNodesToLocal(remote)
         val explorers = mapRemoteExplorersToLocal(remote)
@@ -319,6 +341,7 @@ class ChainSyncServiceTest {
 
         return JoinedChainInfo(
             chain = domain,
+            nodeSelectionPreferences = nodeSelectionPreferences,
             nodes = nodes,
             assets = assets,
             explorers = explorers,

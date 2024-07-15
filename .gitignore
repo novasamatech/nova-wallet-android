@@ -26,3 +26,4 @@ app/*.apk
 !/core-db/schemas/io.novafoundation.nova.core_db.AppDatabase/9.json
 
 google-services.json
+/bindings

@@ -250,6 +250,8 @@ dependencies {
 
     implementation project(':bindings:metadata_shortener')
 
+    implementation project(':test-shared')
+
     implementation kotlinDep
 
     implementation biometricDep

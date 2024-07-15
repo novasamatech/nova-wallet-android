@@ -78,7 +78,8 @@ class ChainDaoTest : DaoTest<ChainDao>(AppDatabase::chainDao) {
                 all = chainInfo.nodes
             ),
             explorersDiff = emptyDiff(),
-            externalApisDiff = emptyDiff()
+            externalApisDiff = emptyDiff(),
+            nodeSelectionPreferencesDiff = emptyDiff()
         )
 
         val chainFromDb2 = dao.getJoinChainInfo().first()

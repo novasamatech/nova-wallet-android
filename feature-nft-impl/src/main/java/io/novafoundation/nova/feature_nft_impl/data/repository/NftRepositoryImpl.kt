@@ -17,13 +17,15 @@ import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
 import io.novafoundation.nova.runtime.ext.level
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
+import io.novafoundation.nova.runtime.multiNetwork.enabledChains
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
@@ -43,7 +45,7 @@ class NftRepositoryImpl(
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
         return nftDao.nftsFlow(metaAccount.id)
             .map { nftsLocal ->
-                val chainsById = chainRegistry.chainsById.first()
+                val chainsById = chainRegistry.enabledChainById()
 
                 nftsLocal.mapNotNull { nftLocal ->
                     mapNftLocalToNft(chainsById, metaAccount, nftLocal)
@@ -61,7 +63,7 @@ class NftRepositoryImpl(
     }
 
     override fun initialNftSyncTrigger(): Flow<NftSyncTrigger> {
-        return chainRegistry.currentChains
+        return chainRegistry.enabledChainsFlow()
             .map { chains -> chains.filter { nftProvidersRegistry.nftSupported(it) } }
             .transformLatestDiffed { emit(NftSyncTrigger(it)) }
     }
@@ -70,7 +72,7 @@ class NftRepositoryImpl(
         metaAccount: MetaAccount,
         forceOverwrite: Boolean,
     ): Unit = withContext(Dispatchers.IO) {
-        val chains = chainRegistry.currentChains.first()
+        val chains = chainRegistry.enabledChains()
 
         val syncJobs = chains.flatMap { chain ->
             nftSyncJobs(chain, metaAccount, forceOverwrite)

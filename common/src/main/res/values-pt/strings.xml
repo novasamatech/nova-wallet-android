@@ -173,7 +173,7 @@
     <string name="assets_add_token">Adicionar token</string>
     <string name="assets_add_token_enter_info_address_label">Endereço do contrato</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimais</string>
-    <string name="assets_add_token_enter_info_price_label">Link Coingecko para informações de preço (Opcional)</string>
+    <string name="token_price_info_provider_label">Link Coingecko para informações de preço (Opcional)</string>
     <string name="assets_add_token_enter_info_symbol_label">Símbolo</string>
     <string name="assets_add_token_enter_info_title">Insira os detalhes do token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Selecione a rede para adicionar o token ERC-20</string>
@@ -490,7 +490,7 @@
     <string name="connection_add_already_exists_error">O nó já foi adicionado anteriormente. Por favor, tente outro nó.</string>
     <string name="connection_add_invalid_error">Não é possível estabelecer conexão com o nó. Por favor, tente outro.</string>
     <string name="connection_add_unsupported_error">Infelizmente, a rede não é suportada. Por favor, tente uma das seguintes: %s.</string>
-    <string name="connection_delete_confirm">Deletar</string>
+    <string name="common_delete">Deletar</string>
     <string name="connection_delete_description">Confirme a deleção de %s.</string>
     <string name="connection_delete_title">Deletar rede?</string>
     <string name="connection_error_message_v2_2_0">Por favor, verifique sua conexão ou tente novamente mais tarde</string>
