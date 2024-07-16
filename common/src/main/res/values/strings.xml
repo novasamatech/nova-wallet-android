@@ -9,8 +9,8 @@
 
     <string name="account_ledger_migration_deprecation_message">The Migration app will be unavailable in the near future. Use it to migrate your accounts to the new Ledger app to avoid losing your funds.</string>
 
-    <string name="account_ledger_migration_app">Migration</string>
-    <string name="account_ledger_migration_generic">Generic</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
 
     <string name="account_ledger_generic_import_start_step_1">Make sure <font color='#FFFFFF'>Generic app is installed</font> to your Ledger device using Ledger Live app</string>
     <string name="account_ledger_generic_import_start_step_2"><font color='#FFFFFF'>Open the Generic app</font> on your Ledger device</string>
@@ -34,9 +34,104 @@
 
     <string name="enter_backup_password_hint">Backup password</string>
 
-    <!--<string name="common_no_screenshot_message_v2_2_0">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>-->
     <string name="common_no_screenshot_message_v2_2_0">We are going to show your passphrase. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
 
+    <string name="disabled_chain_error_title">%s is disabled</string>
+    <string name="disabled_chain_error_message">You can not sign transactions of disabled networks. Enable %s in settings and try again</string>
+
+    <string name="invalid_token_symbol_title">Invalid Currency Symbol</string>
+    <string name="invalid_token_symbol_message">The entered Currency Symbol (%1$s) does not match the network (%2$s). Do you want to use the correct currency symbol?</string>
+
+    <string name="manage_node_actions_title">Manage added node</string>
+    <string name="manage_node_delete_title">Delete node?</string>
+    <string name="manage_node_delete_message">Node \"%s\" will be deleted</string>
+
+    <string name="manage_node_action_edit">Edit node</string>
+    <string name="manage_node_action_delete">Delete node</string>
+
+    <string name="manage_network_delete_title">Delete network?</string>
+    <string name="manage_network_delete_message">You will not be able to see your token balances on that network on Assets screen</string>
+
+    <string name="manage_network_action_edit">Edit network</string>
+    <string name="manage_network_action_delete">Delete network</string>
+    <string name="manage_network_actions_title">Manage added network</string>
+
+    <!--<string name="connection_delete_confirm">Delete</string>-->
+    <string name="common_delete">Delete</string>
+
+    <string name="add_network_title">Enter network details</string>
+    <string name="loading_network_info">Loading network info...</string>
+
+    <string name="create_network_invalid_chain_id_title">Invalid Chain ID</string>
+    <string name="create_network_invalid_chain_id_message">The entered Chain ID does not match the network in the RPC URL.</string>
+
+    <string name="common_modify">Modify</string>
+    <string name="network_already_exist_failure_title">This Node already exists</string>
+    <string name="default_network_already_exist_failure_message">The entered RPC URL is present in Nova as a %s network.</string>
+    <string name="custom_network_already_exist_failure_message">The entered RPC URL is present in Nova as a %s custom network. Are you sure you want to modify it?</string>
+
+    <string name="create_network_node_name" translatable="false">%s Default Node</string>
+    <string name="create_network_block_explorer_name" translatable="false">%s Default Block Explorer</string>
+
+    <string name="common_enter_details">Enter details</string>
+    <string name="common_substrate">Substrate</string>
+    <string name="common_evm">EVM</string>
+
+    <!--<string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>-->
+    <string name="token_price_info_provider_label">Coingecko link for price info (Optional) </string>
+
+    <!--<string name="assets_add_token_enter_info_price_hint" translatable="false">www.coingecko.com/en/coins/tether</string>-->
+    <string name="token_price_info_provider_placeholder" translatable="false">www.coingecko.com/en/coins/tether</string>
+
+    <string name="custom_network_block_explorer_title">Block explorer URL (Optional) </string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_chain_id_title">Chain ID</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_currency_title">Currency Symbol</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_name_title">Network name</string>
+    <string name="custom_rpc_node_url_title">RPC URL</string>
+
+    <string name="pre_configured_networks_search_hint">Search by network name</string>
+    <string name="pre_configured_networks_progress_text">Loading networks list...</string>
+    <string name="pre_configured_networks_title">Add network</string>
+    <string name="pre_configured_networks_add_custom_button">Add network manually</string>
+
+    <string name="node_already_exist_failure_title">This Node already exists</string>
+    <string name="node_already_exist_failure_message">The URL you entered already exists as the "%s" Node.</string>
+
+    <string name="node_not_supported_by_network_title">Wrong network</string>
+    <string name="node_not_supported_by_network_message">The URL you entered is not corresponding to Node for %1$s.\nPlease enter URL of the valid %1$s node.</string>
+
+    <string name="node_not_alive_title">Node error</string>
+    <string name="node_not_alive_message">The Node URL you entered is either not responding or contains incorrect format. The URL format should start with "wss://".</string>
+
+    <string name="custom_node_add_title">Add custom node for</string>
+    <string name="custom_node_edit_title">Edit custom node for</string>
+    <string name="custom_node_url_title">Node URL</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_name_title">Node name</string>
+    <string name="custom_node_name_hint">Name</string>
+    <string name="custom_node_disabled_button_state">Enter details</string>
+    <string name="custom_node_add_button_state">Add node</string>
+    <string name="custom_node_edit_button_state">Save</string>
+
+    <string name="common_connected_ms">%d ms</string>
+    <string name="add_custom_node">Add custom node</string>
+
+    <string name="network_management_custom_nodes">custom nodes</string>
+    <string name="network_management_default_nodes">default nodes</string>
+    <string name="added_networks_empty_placeholder">Added custom networks\nwill appear here</string>
+
+    <string name="integrate_networks_banner_title">Building for Polkadot?</string>
+    <string name="integrate_networks_banner_description">Integrate all the features of the network you are building into Nova Wallet, making it accessible to everyone.</string>
+    <string name="integrate_networks_banner_link">Integrate your network</string>
+
+    <string name="common_connecting">connecting...</string>
+    <string name="common_testnet">Testnet</string>
+    <string name="network_management_default_page_title">Default</string>
+    <string name="network_management_added_page_title">Added</string>
+    <string name="common_add_network">Add network</string>
     <string name="common_not_available">Not available</string>
     <string name="settings_push_notifications_only_available_with_google_services_error">Push notifications are only available for devices with Google services.</string>
     <string name="settings_push_notifications_only_available_from_google_play_error">Push notifications are available only for the Nova Wallet version downloaded from Google Play.</string>
@@ -55,12 +150,10 @@
     <string name="wallet_management_create_account_btn">How to add wallet?</string>
     <string name="wallet_management_import_account_btn">How to add wallet?</string>
 
-    <!--<string name="account_export_json_password_subtitle">This is necessary to encrypt the data and save the JSON file.</string>-->
     <string name="account_export_json_password_subtitle">This password is required to encrypt your account and is used alongside this JSON file to restore your wallet.</string>
 
     <string name="export_json_download_btn">Download Restore JSON</string>
 
-    <!--<string name="common_input_error_set_password">Set a password…</string>-->
     <string name="common_enter_password">Enter password</string>
 
     <string name="common_network_polkadot">Polkadot</string>
@@ -111,7 +204,6 @@
     <string name="backup_diff_subtitle_highlighted">ensure you\'ve saved Passphrases</string>
     <string name="common_sign_in">Sign In</string>
 
-    <!--<string name="push_welcome_cancel_button">Not now</string>-->
     <string name="common_not_now">Not now</string>
 
     <string name="deprecated_cloud_backup_password_title">Backup password was changed</string>
@@ -135,10 +227,9 @@
 
     <string name="backup_settings_delete_backup">Delete backup</string>
 
-    <!--<string name="account_export_password_change">Change password</string>-->
     <string name="common_change_password">Change password</string>
 
-    <string name="cloud_backup_settings_disabled_state_subtitle">Turn it on to create a wallets backup</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Enable to backup wallets to your Google Drive</string>
     <string name="cloud_backup_settings_last_sync">Last sync: %s at %s</string>
     <string name="cloud_backup_settings_not_auth_button">Sign In to Google Drive</string>
     <string name="cloud_backup_settings_deprecated_password_button">Enter Backup Password</string>
@@ -152,16 +243,15 @@
     <string name="cloud_backup_state_synced_title">Backup Synced</string>
     <string name="backup_settings_toolbar_title">Backup</string>
     <string name="backup_settings_title">Google Drive</string>
-    <string name="backup_settings_subtitle">An encrypted copy of all your wallets are safely stored using your Google Drive. Even if you install Nova on a new device you will be able to easily access your wallets.</string>
+    <string name="backup_settings_subtitle">You can enable Google Drive backups to store encrypted copies of all your wallets, secured by a password you set.</string>
     <string name="backup_settings_manual_title">Manual</string>
-    <string name="backup_settings_manual_subtitle">You can manually write down your recovery phrase to be sure that everything is safe</string>
+    <string name="backup_settings_manual_subtitle">You can manually back up your passphrase to ensure access to your wallet’s funds if you lose access to this device</string>
     <string name="backup_settings_switcher_text">Back up to Google Drive</string>
     <string name="backup_settings_manual_switcher_title">Back up manually</string>
 
     <string name="corrupted_backup_error_title">Backup found but empty or broken</string>
     <string name="corrupted_backup_error_subtitle">An issue has been identified with your backup. You have the option to delete the current backup and create a new one. %s before proceeding.</string>
     <string name="corrupted_backup_error_subtitle_highlighted">Ensure you have saved Passphrases for all wallets</string>
-    <!--<string name="account_confirm_mnemonic_subtitle">Select the words in the right order.</string>-->
 
     <string name="confirm_mnemonic_not_matching_error_message">Invalid passphrase, please check one more time the words order</string>
     <string name="confirm_mnemonic_disabled_button_state">Select the words...</string>
@@ -244,18 +334,14 @@
     <string name="start_create_wallet_enter_wallet_name">Enter wallet name</string>
 
     <string name="common_cloud_backup">Cloud backup</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Recover wallets from Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recover wallets from Google Drive</string>
     <string name="loocking_backup_progress">Looking for your backup...</string>
-
-    <!--<string name="account_backup_mnemonic_field_title">Mnemonic Passphrase</string>-->
 
     <string name="import_wallet_options_mnemonic_subtitle">Use your 12, 15, 18, 21 or 24-word phrase</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>
 
-    <!--<string name="account_welcome_hardware_wallet_title">Connect hardware wallet</string>-->
     <string name="account_welcome_hardware_wallet_title">Hardware wallet</string>
 
-    <!--<string name="account_welcome_hardware_wallet_subtitle">Use Polkadot Vault, Ledger or Parity Signer</string>-->
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Parity Signer or Ledger</string>
 
     <string name="import_wallet_options_title">Choose how you would like to import your wallet</string>
@@ -1072,9 +1158,6 @@
     <string name="assets_add_token_enter_info_decimals_label">Decimals</string>
     <string name="assets_add_token_enter_info_decimals_hint" translatable="false">18</string>
 
-    <string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>
-    <string name="assets_add_token_enter_info_price_hint" translatable="false">www.coingecko.com/en/coins/tether</string>
-
     <string name="assets_add_token_select_chain_title">Select network to add ERC-20 token</string>
 
     <string name="common_disabled">Disabled</string>
@@ -1755,7 +1838,6 @@
     <string name="connection_add_already_exists_error">The node has already been added previously. Please, try another node.</string>
     <string name="connection_add_invalid_error">Can\'t establish connection with node. Please, try another one.</string>
     <string name="connection_add_unsupported_error">Unfortunately, the network is unsupported. Please, try one of the following: %s.</string>
-    <string name="connection_delete_confirm">Delete</string>
     <string name="connection_delete_description">Confirm %s deletion.</string>
     <string name="connection_delete_title">Delete network?</string>
     <string name="connection_error_message_v2_2_0">Please, check your connection or try again later</string>

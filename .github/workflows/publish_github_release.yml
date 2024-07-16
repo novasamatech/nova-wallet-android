@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
@@ -22,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Download built artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: apk
           path: app

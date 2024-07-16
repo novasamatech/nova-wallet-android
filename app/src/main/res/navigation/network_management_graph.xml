@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/network_management_graph"
+    app:startDestination="@id/networkManagement">
+
+    <fragment
+        android:id="@+id/networkManagement"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementListFragment"
+        android:label="NetworkManagementFragment"
+        tools:layout="@layout/fragment_network_management">
+
+        <action
+            android:id="@+id/action_open_networkManagementDetails"
+            app:destination="@id/networkManagementDetails"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_open_preConfiguredNetworks"
+            app:destination="@id/preConfiguredNetworks"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/preConfiguredNetworks"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks.PreConfiguredNetworksFragment"
+        android:label="PreConfiguredNetworksFragment">
+
+        <action
+            android:id="@+id/action_open_addNetworkFragment"
+            app:destination="@id/addNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/addNetworkFragment"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkMainFragment"
+        android:label="AddNetworkMainFragment">
+
+        <action
+            android:id="@+id/action_finishCreateNetworkFlow"
+            app:destination="@id/network_management_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/networkManagement"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/networkManagementDetails"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementFragment"
+        android:label="ChainNetworkManagementFragment"
+        tools:layout="@layout/fragment_chain_network_management">
+
+        <action
+            android:id="@+id/action_open_customNode"
+            app:destination="@id/customNode"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_open_editNetwork"
+            app:destination="@id/addNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/customNode"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodeFragment"
+        android:label="CustomNodeFragment"
+        tools:layout="@layout/fragment_custom_node" />
+</navigation>

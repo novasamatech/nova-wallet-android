@@ -42,7 +42,7 @@ class ManualBackupSelectWalletViewModel(
             isSelected = false,
             isClickable = true,
             picture = walletUiUseCase.walletIcon(metaAccount, iconSize = SIZE_BIG),
-            chainIconUrl = null,
+            chainIcon = null,
             updateIndicator = false,
             subtitleIconRes = null,
             chainIconOpacity = 1f,

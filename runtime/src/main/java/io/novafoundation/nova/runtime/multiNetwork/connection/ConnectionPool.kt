@@ -16,7 +16,7 @@ class ConnectionPool(private val chainConnectionFactory: ChainConnectionFactory)
             chainConnectionFactory.create(chain)
         }
 
-        connection.considerUpdateNodes(chain.nodes)
+        connection.updateChain(chain)
 
         return connection
     }

@@ -13,6 +13,7 @@ import androidx.core.widget.addTextChangedListener
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getInputBackground
@@ -55,6 +56,18 @@ class InsertableInputField @JvmOverloads constructor(
         actionInputFieldClear.setOnClickListener { content.text = null }
 
         updateButtonsVisibility(content.text)
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        if (enabled) {
+            updateButtonsVisibility(content.text)
+        } else {
+            actionInputFieldAction.makeGone()
+            actionInputFieldClear.makeGone()
+        }
+
+        content.isEnabled = enabled
     }
 
     private fun updateButtonsVisibility(text: CharSequence?) {

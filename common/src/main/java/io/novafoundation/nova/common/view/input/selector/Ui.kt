@@ -8,6 +8,7 @@ fun BaseFragmentMixin<*>.setupListSelectorMixin(listChooserMixin: ListSelectorMi
             context = fragment.requireContext(),
             payload = DynamicSelectorBottomSheet.Payload(
                 titleRes = action.titleRes,
+                subtitle = action.subtitle,
                 data = action.items
             ),
             onClicked = { _, item -> item.onClick() },

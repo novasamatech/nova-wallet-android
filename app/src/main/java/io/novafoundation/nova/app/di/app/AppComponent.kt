@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.common.di.modules.NetworkModule
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 
 @ApplicationScope
 @Component(
@@ -32,6 +33,9 @@ interface AppComponent : CommonApi {
 
         @BindsInstance
         fun contextManager(contextManager: ContextManager): Builder
+
+        @BindsInstance
+        fun rootScope(rootScope: RootScope): Builder
 
         fun build(): AppComponent
     }

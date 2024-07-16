@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">无效的派生路径</string>
     <string name="account_json_file">JSON文件</string>
     <string name="account_ledger_generic_import_start_step_1">确保已安装<font color="#FFFFFF">Generic 应用程序</font>到您的 Ledger 设备，使用 Ledger Live 应用程序</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2">在 Ledger 设备上<font color="#FFFFFF">打开 Generic 应用程序</font></string>
     <string name="account_ledger_import_fill_description">确保通过Ledger Live应用把网络应用安装到您的Ledger设备上。在您的Ledger设备上打开网络应用。</string>
     <string name="account_ledger_import_fill_disabled_hint">至少添加一个账户</string>
     <string name="account_ledger_import_fill_title">将账户添加到您的钱包</string>
@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">连接Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">要进行操作签名并将您的账户迁移到新的 Generic Ledger 应用程序，请安装并打开 Migration 应用程序。旧版 Legacy 和 Migration Ledger 应用程序将来不会被支持。</string>
     <string name="account_ledger_legacy_warning_title">新版 Ledger 应用程序已发布</string>
-    <string name="account_ledger_migration_app">迁移</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 应用程序在不久的将来将无法使用。使用它将您的账户迁移到新的 Ledger 应用程序，以免丢失资金。</string>
-    <string name="account_ledger_migration_generic">通用</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X（通用应用程序）</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X（旧版）</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">使用 %s 签名</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">注意，衍生路径名称应为空</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">在您的智能手机上打开 Polkadot Vault</font> 应用程序</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">转到“密钥集”选项卡。</font>选择您的密钥集、网络，然后选择您想要添加到 Nova 钱包的帐户</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault 将提供给您<font color="#FFFFFF">要扫描的二维码</font></string>
     <string name="account_private_key">私钥</string>
@@ -173,7 +173,7 @@
     <string name="assets_add_token">添加代币</string>
     <string name="assets_add_token_enter_info_address_label">合约地址</string>
     <string name="assets_add_token_enter_info_decimals_label">小数点</string>
-    <string name="assets_add_token_enter_info_price_label">Coingecko链接用于价格信息（可选）</string>
+    <string name="token_price_info_provider_label">Coingecko链接用于价格信息（可选）</string>
     <string name="assets_add_token_enter_info_symbol_label">符号</string>
     <string name="assets_add_token_enter_info_title">输入 ERC-20 代币详情</string>
     <string name="assets_add_token_select_chain_title">选择网络以添加 ERC-20 代币</string>
@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">提防冒名顶替者。</string>
     <string name="backup_secrets_warning_disabled_button">查看并接受以继续</string>
     <string name="backup_settings_delete_backup">删除备份</string>
-    <string name="backup_settings_manual_subtitle">您可以手动写下恢复短语，确保一切安全</string>
+    <string name="backup_settings_manual_subtitle">您可以手动备份您的密码短语，以确保在丢失对设备的访问时能够访问您的钱包资金。</string>
     <string name="backup_settings_manual_switcher_title">手动备份</string>
     <string name="backup_settings_manual_title">手动</string>
     <string name="backup_settings_no_wallets_error_message">您没有添加任何带有密码短语的钱包。</string>
     <string name="backup_settings_no_wallets_error_title">没有可以备份的钱包</string>
-    <string name="backup_settings_subtitle">使用您的Google云端硬盘安全地存储所有钱包的加密副本。即使您在新设备上安装Nova，您也能轻松访问您的钱包。</string>
+    <string name="backup_settings_subtitle">您可以启用Google Drive备份来存储加密的所有钱包副本，并由您设置的密码保护。</string>
     <string name="backup_settings_switcher_text">备份到Google云端硬盘</string>
     <string name="backup_settings_title">Google云端硬盘</string>
     <string name="backup_settings_toolbar_title">备份</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">查看备份错误</string>
     <string name="cloud_backup_settings_corrupted_backup_button">查看备份更新</string>
     <string name="cloud_backup_settings_deprecated_password_button">输入备份密码</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">开启它以创建钱包备份</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">启用以将钱包备份到你的Google云端硬盘</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">上次同步：%s 于 %s</string>
     <string name="cloud_backup_settings_not_auth_button">登录 Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">查看 Google Drive 问题</string>
@@ -485,7 +485,7 @@
     <string name="connection_add_already_exists_error">节点已经之前被添加。请试用另一个节点。</string>
     <string name="connection_add_invalid_error">无法与节点建立连接。请尝试另一个。</string>
     <string name="connection_add_unsupported_error">不幸的是，网络不支持。请尝试以下之一：%s。</string>
-    <string name="connection_delete_confirm">删除</string>
+    <string name="common_delete">删除</string>
     <string name="connection_delete_description">确认删除%s。</string>
     <string name="connection_delete_title">删除网络？</string>
     <string name="connection_error_message_v2_2_0">请检查您的连接或稍后再试</string>
@@ -704,7 +704,7 @@
     <string name="import_seed_invalid_title">种子无效</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">很遗憾，没有找到您的钱包备份。</string>
     <string name="import_wallet_cloud_backup_not_found_title">未找到备份</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">从 Google 云恢复钱包</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">从Google云端硬盘恢复钱包</string>
     <string name="import_wallet_options_mnemonic_subtitle">使用您 12、15、18、21 或 24 个字的短语</string>
     <string name="import_wallet_options_title">选择您想如何导入您的钱包</string>
     <string name="import_wallet_options_watch_only_title">仅观看</string>
@@ -754,7 +754,7 @@
     <string name="manual_backup_warning_title">不要分享您的助记词！</string>
     <string name="mnemonic_card_reveal_subtitle">确保没有人能够看到你的屏幕\n且不要截图</string>
     <string name="mnemonic_card_title">请%s任何人</string>
-    <string name="mnemonic_card_title_highlight"><font>不要分享给</font></string>
+    <string name="mnemonic_card_title_highlight">不要分享给</string>
     <string name="mnemonic_error_try_another_one">请尝试另一个。</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">助记词短语无效，请再次检查单词顺序</string>
     <string name="multiple_wallets_selection_max_message">您不能选择超过%d个钱包</string>
@@ -1000,8 +1000,8 @@
     </plurals>
     <string name="remove_votes_suggestion_title">移除您的投票记录？</string>
     <string name="restore_cloud_backup_delete_backup_description" formatted="false">%s 它是独属于你的，安全存储，对他人不可访问。没有备份密码，无法从Google云盘中恢复钱包。如果丢失，请删除当前备份，以创建一个新的备份并设置新密码。%s</string>
-    <string name="restore_cloud_backup_delete_backup_description_highlighted_1"><font>很遗憾，您的密码无法恢复。</font></string>
-    <string name="restore_cloud_backup_delete_backup_description_highlighted_2"><font>或者，使用Passphrase进行恢复。</font></string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">很遗憾，您的密码无法恢复。</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">或者，使用Passphrase进行恢复。</string>
     <string name="restore_cloud_backup_delete_backup_title">你是否丢失了密码？</string>
     <string name="restore_cloud_backup_password_title">您的备份密码之前已更新。要继续使用云备份，请输入新的备份密码。</string>
     <string name="restore_cloud_backup_subtitle">请输入您在备份过程中创建的密码</string>

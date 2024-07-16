@@ -30,7 +30,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
@@ -271,8 +274,12 @@ fun ScrollView.scrollOnFocusTo(vararg focusableTargets: View) {
     focusableTargets.forEach { it.onFocusChangeListener = listener }
 }
 
-fun TextView.setCompoundDrawableTint(@ColorRes tintRes: Int?) {
-    val colorStateList = tintRes?.let { ColorStateList.valueOf(context.getColor(tintRes)) }
+fun TextView.setCompoundDrawableTintRes(@ColorRes tintRes: Int?) {
+    setCompoundDrawableTint(tintRes?.let { context.getColor(it) })
+}
+
+fun TextView.setCompoundDrawableTint(@ColorInt tint: Int?) {
+    val colorStateList = tint?.let { ColorStateList.valueOf(it) }
 
     TextViewCompat.setCompoundDrawableTintList(this, colorStateList)
 }
@@ -384,4 +391,10 @@ fun EditText.switchPasswordInputType(isPasswordVisible: Boolean) {
     }
 
     setSelection(selection)
+}
+
+fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharSequence) {
+    TabLayoutMediator(this, viewPager) { tab, position ->
+        tab.text = tabText(position)
+    }.attach()
 }

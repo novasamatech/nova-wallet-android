@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.setCompoundDrawableTint
+import io.novafoundation.nova.common.utils.setCompoundDrawableTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
@@ -78,10 +78,10 @@ abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> :
     private fun TextView.requirementState(isValid: Boolean) {
         if (isValid) {
             setTextColorRes(R.color.text_positive)
-            setCompoundDrawableTint(R.color.icon_positive)
+            setCompoundDrawableTintRes(R.color.icon_positive)
         } else {
             setTextColorRes(R.color.text_secondary)
-            setCompoundDrawableTint(R.color.icon_secondary)
+            setCompoundDrawableTintRes(R.color.icon_secondary)
         }
     }
 }

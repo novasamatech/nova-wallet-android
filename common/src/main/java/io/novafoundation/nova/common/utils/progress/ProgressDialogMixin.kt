@@ -5,6 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 
+class ProgressDialogMixinFactory {
+
+    fun create(): ProgressDialogMixin = RealProgressDialogMixin()
+}
+
 interface ProgressDialogMixin {
 
     val showProgressLiveData: LiveData<Event<ProgressState>>

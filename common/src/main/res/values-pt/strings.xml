@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Caminho de derivação inválido</string>
     <string name="account_json_file">Arquivo JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Certifique-se de que <font color="#FFFFFF">o aplicativo Genérico está instalado</font> no seu dispositivo Ledger usando o aplicativo Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Abra o aplicativo Generic</font> no seu dispositivo Ledger</string>
     <string name="account_ledger_import_fill_description">Certifique-se de que o aplicativo da Rede está instalado no seu dispositivo Ledger usando o aplicativo Ledger Live. Abra o aplicativo da rede no seu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Adicione pelo menos uma conta</string>
     <string name="account_ledger_import_fill_title">Adicionar contas à sua carteira</string>
@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">Conecte o Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Para assinar operações e migrar suas contas para o novo aplicativo Genérico Ledger, instale e abra o aplicativo Migration. Os aplicativos Legacy Old e Migration Ledger não serão suportados no futuro.</string>
     <string name="account_ledger_legacy_warning_title">Novo aplicativo Ledger foi lançado</string>
-    <string name="account_ledger_migration_app">Migration</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">O aplicativo Migration estará indisponível em breve. Use-o para migrar suas contas para o novo aplicativo Ledger e evitar perder seus fundos.</string>
-    <string name="account_ledger_migration_generic">Genérico</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Aplicativo Genérico)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">Assinar com %s</string>
     <string name="account_polkadot_vault">Cofre Polkadot</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Atenção, o nome do caminho de derivação deve estar vazio</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Abra o aplicativo Polkadot Vault</font> em seu smartphone</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vá para a guia “Conjuntos de Chaves”.</font> Selecione seu conjunto de Chaves, Rede e, em seguida, a conta que você gostaria de adicionar à Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault fornecerá a você <font color="#FFFFFF">QR code para escanear</font></string>
     <string name="account_private_key">Chave privada</string>
@@ -173,7 +173,7 @@
     <string name="assets_add_token">Adicionar token</string>
     <string name="assets_add_token_enter_info_address_label">Endereço do contrato</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimais</string>
-    <string name="assets_add_token_enter_info_price_label">Link Coingecko para informações de preço (Opcional)</string>
+    <string name="token_price_info_provider_label">Link Coingecko para informações de preço (Opcional)</string>
     <string name="assets_add_token_enter_info_symbol_label">Símbolo</string>
     <string name="assets_add_token_enter_info_title">Insira os detalhes do token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Selecione a rede para adicionar o token ERC-20</string>
@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">CUIDADO COM IMITADORES.</string>
     <string name="backup_secrets_warning_disabled_button">Rever &amp;  Aceitar para Continuar</string>
     <string name="backup_settings_delete_backup">Excluir backup</string>
-    <string name="backup_settings_manual_subtitle">Você pode anotar manualmente sua frase de recuperação para garantir que tudo esteja seguro</string>
+    <string name="backup_settings_manual_subtitle">Você pode fazer backup manual da sua frase secreta para garantir acesso aos fundos da sua carteira se perder o acesso a este dispositivo</string>
     <string name="backup_settings_manual_switcher_title">Backup manual</string>
     <string name="backup_settings_manual_title">Manual</string>
     <string name="backup_settings_no_wallets_error_message">Você não adicionou nenhuma carteira com uma frase de recuperação.</string>
     <string name="backup_settings_no_wallets_error_title">Nenhuma carteira para fazer backup</string>
-    <string name="backup_settings_subtitle">Uma cópia criptografada de todas as suas carteiras está armazenada com segurança no seu Google Drive. Mesmo se você instalar o Nova em um novo dispositivo, você poderá acessar facilmente suas carteiras.</string>
+    <string name="backup_settings_subtitle">Você pode ativar backups no Google Drive para armazenar cópias criptografadas de todas as suas carteiras, protegidas por uma senha que você define.</string>
     <string name="backup_settings_switcher_text">Fazer backup no Google Drive</string>
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Backup</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">Revisar Erro de Backup</string>
     <string name="cloud_backup_settings_corrupted_backup_button">Revisar Atualizações de Backup</string>
     <string name="cloud_backup_settings_deprecated_password_button">Digite a Senha de Backup</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">Ative-o para criar um backup das carteiras</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Ative para fazer backup das carteiras no seu Google Drive</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">Última sincronização: %s às %s</string>
     <string name="cloud_backup_settings_not_auth_button">Entrar no Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">Revisar Problema do Google Drive</string>
@@ -490,7 +490,7 @@
     <string name="connection_add_already_exists_error">O nó já foi adicionado anteriormente. Por favor, tente outro nó.</string>
     <string name="connection_add_invalid_error">Não é possível estabelecer conexão com o nó. Por favor, tente outro.</string>
     <string name="connection_add_unsupported_error">Infelizmente, a rede não é suportada. Por favor, tente uma das seguintes: %s.</string>
-    <string name="connection_delete_confirm">Deletar</string>
+    <string name="common_delete">Deletar</string>
     <string name="connection_delete_description">Confirme a deleção de %s.</string>
     <string name="connection_delete_title">Deletar rede?</string>
     <string name="connection_error_message_v2_2_0">Por favor, verifique sua conexão ou tente novamente mais tarde</string>
@@ -500,7 +500,7 @@
     <string name="connections_add_connection">Adicionar conexão</string>
     <string name="contacts_scan">Escanear código QR</string>
     <string name="corrupted_backup_error_subtitle">Foi identificado um problema com o seu backup. Você tem a opção de deletar o backup atual e criar um novo. %s antes de continuar.</string>
-    <string name="corrupted_backup_error_subtitle_highlighted"><font>Certifique-se de que salvou as Frases Secretas para todas as carteiras</font></string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Certifique-se de que salvou as Frases Secretas para todas as carteiras</string>
     <string name="corrupted_backup_error_title">Backup encontrado, mas vazio ou corrompido</string>
     <string name="create_cloud_backup_password_alert_subtitle">No futuro, sem a senha de backup, não é possível restaurar suas carteiras do Backup na Nuvem.\n%s</string>
     <string name="create_cloud_backup_password_alert_subtitle_highlighted">Esta senha não pode ser recuperada.</string>
@@ -710,7 +710,7 @@
     <string name="import_seed_invalid_title">Seed é inválido</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Infelizmente, o backup com suas carteiras não foi encontrado.</string>
     <string name="import_wallet_cloud_backup_not_found_title">Backup Não Encontrado</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar carteiras do Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar carteiras do Google Drive</string>
     <string name="import_wallet_options_mnemonic_subtitle">Use sua frase de 12, 15, 18, 21 ou 24 palavras</string>
     <string name="import_wallet_options_title">Escolha como você gostaria de importar sua carteira</string>
     <string name="import_wallet_options_watch_only_title">Somente visualização</string>

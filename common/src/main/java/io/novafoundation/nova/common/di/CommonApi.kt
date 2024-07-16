@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
@@ -42,7 +43,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -145,7 +146,7 @@ interface CommonApi {
 
     fun provideActionBottomSheetLauncherFactory(): ActionBottomSheetLauncherFactory
 
-    fun progressDialogMixin(): ProgressDialogMixin
+    fun progressDialogMixinFactory(): ProgressDialogMixinFactory
 
     fun provideListSelectorMixinFactory(): ListSelectorMixin.Factory
 
@@ -180,4 +181,6 @@ interface CommonApi {
     val provideActivityIntentProvider: ActivityIntentProvider
 
     val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+
+    val coinGeckoLinkParser: CoinGeckoLinkParser
 }

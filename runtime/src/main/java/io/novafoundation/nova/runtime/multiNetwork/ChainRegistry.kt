@@ -4,13 +4,16 @@ import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.diffed
+import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
-import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
+import io.novafoundation.nova.runtime.ext.isDisabled
+import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.isFullSync
 import io.novafoundation.nova.runtime.ext.level
 import io.novafoundation.nova.runtime.ext.requiresBaseTypes
@@ -27,6 +30,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
+import io.novafoundation.nova.runtime.multiNetwork.exception.DisabledChainException
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
@@ -86,22 +90,31 @@ class ChainRegistry(
         syncBaseTypesIfNeeded()
     }
 
-    suspend fun getConnection(chainId: String): ChainConnection {
+    fun getConnectionOrNull(chainId: String): ChainConnection? {
+        return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
+    }
+
+    @Deprecated("Use getActiveConnectionOrNull, since this method may throw an exception if Chain is disabled")
+    suspend fun getActiveConnection(chainId: String): ChainConnection {
         requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
         return connectionPool.getConnection(chainId.removeHexPrefix())
     }
 
-    suspend fun getConnectionOrNull(chainId: String): ChainConnection? {
-        requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
+    suspend fun getActiveConnectionOrNull(chainId: String): ChainConnection? {
+        return runCatching {
+            requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
-        return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
+            return connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
+        }.getOrNull()
     }
 
     suspend fun getEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
-        requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
+        return runCatching {
+            requireConnectionStateAtLeast(chainId, ConnectionState.LIGHT_SYNC)
 
-        return web3ApiPool.getWeb3Api(chainId, connectionType)
+            web3ApiPool.getWeb3Api(chainId, connectionType)
+        }.getOrNull()
     }
 
     suspend fun getRuntimeProvider(chainId: String): RuntimeProvider {
@@ -113,12 +126,31 @@ class ChainRegistry(
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
 
     suspend fun enableFullSync(chainId: ChainId) {
-        chainDao.setConnectionState(chainId, ConnectionStateLocal.FULL_SYNC)
+        changeChainConnectionState(chainId, ConnectionState.FULL_SYNC)
+    }
+
+    suspend fun changeChainConnectionState(chainId: ChainId, state: ConnectionState) {
+        val connectionState = mapConnectionStateToLocal(state)
+        chainDao.setConnectionState(chainId, connectionState)
+    }
+
+    suspend fun setAutoBalanceEnabled(chainId: ChainId, enabled: Boolean) {
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, enabled, null))
+    }
+
+    suspend fun setDefaultNode(chainId: ChainId, nodeUrl: String) {
+        val chain = getChain(chainId)
+
+        val chainSupportsNode = chain.nodes.nodes.any { it.unformattedUrl == nodeUrl }
+        require(chainSupportsNode) { "Node with url $nodeUrl is not found for chain $chainId" }
+
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, false, nodeUrl))
     }
 
     private suspend fun requireConnectionStateAtLeast(chainId: ChainId, state: ConnectionState) {
         val chain = getChain(chainId)
 
+        if (chain.isDisabled) throw DisabledChainException()
         if (chain.connectionState.level >= state.level) return
 
         Log.d("ConnectionState", "Requested state $state for ${chain.name}, current is ${chain.connectionState}. Triggering state change to $state")
@@ -227,6 +259,13 @@ suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): C
     return ChainWithAsset(chain, chainAsset)
 }
 
+suspend fun ChainRegistry.enabledChainWithAssetOrNull(chainId: String, assetId: Int): ChainWithAsset? {
+    val chain = getChainOrNull(chainId).takeIf { it?.isEnabled == true } ?: return null
+    val chainAsset = chain.assetsById[assetId] ?: return null
+
+    return ChainWithAsset(chain, chainAsset)
+}
+
 suspend fun ChainRegistry.assetOrNull(fullChainAssetId: FullChainAssetId): Chain.Asset? {
     val chain = getChainOrNull(fullChainAssetId.chainId) ?: return null
 
@@ -274,9 +313,9 @@ suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chain
 
 suspend fun ChainRegistry.getRawMetadata(chainId: String) = getRuntimeProvider(chainId).getRaw()
 
-suspend fun ChainRegistry.getSocket(chainId: String): SocketService = getConnection(chainId).socketService
+suspend fun ChainRegistry.getSocket(chainId: String): SocketService = getActiveConnection(chainId).socketService
 
-suspend fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getConnectionOrNull(chainId)?.socketService
+suspend fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getActiveConnectionOrNull(chainId)?.socketService
 
 suspend fun ChainRegistry.getEthereumApiOrThrow(chainId: String, connectionType: ConnectionType): Web3Api {
     return requireNotNull(getEthereumApi(chainId, connectionType)) {
@@ -319,3 +358,12 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 
     return findEvmChain(addressPrefix)
 }
+
+fun ChainRegistry.enabledChainsFlow() = currentChains
+    .filterList { it.isEnabled }
+
+suspend fun ChainRegistry.enabledChains() = enabledChainsFlow().first()
+
+fun ChainRegistry.enabledChainByIdFlow() = enabledChainsFlow().map { chains -> chains.associateBy { it.id } }
+
+suspend fun ChainRegistry.enabledChainById() = ChainsById(enabledChainByIdFlow().first())

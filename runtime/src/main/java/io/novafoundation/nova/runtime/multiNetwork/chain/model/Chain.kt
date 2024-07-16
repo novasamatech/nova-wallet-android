@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.model
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
+import java.io.Serializable
 import java.math.BigInteger
 
 typealias ChainId = String
@@ -23,11 +24,12 @@ data class Chain(
     val nodes: Nodes,
     val explorers: List<Explorer>,
     val externalApis: List<ExternalApi>,
-    val icon: String,
+    val icon: String?,
     val addressPrefix: Int,
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    val source: Source,
     val hasSubstrateRuntime: Boolean,
     val pushSupport: Boolean,
     val hasCrowdloans: Boolean,
@@ -37,7 +39,7 @@ data class Chain(
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
-) : Identifiable {
+) : Identifiable, Serializable {
 
     companion object // extensions
 
@@ -122,8 +124,13 @@ data class Chain(
         val nodes: List<Node>,
     ) {
 
-        enum class NodeSelectionStrategy {
-            ROUND_ROBIN, UNIFORM
+        sealed interface NodeSelectionStrategy {
+
+            enum class AutoBalance : NodeSelectionStrategy {
+                ROUND_ROBIN, UNIFORM
+            }
+
+            class SelectedNode(val nodeUrl: String?, val autoBalanceStrategy: AutoBalance) : NodeSelectionStrategy
         }
     }
 
@@ -132,6 +139,7 @@ data class Chain(
         val unformattedUrl: String,
         val name: String,
         val orderId: Int,
+        val isCustom: Boolean
     ) : Identifiable {
 
         enum class ConnectionType {
@@ -210,6 +218,10 @@ data class Chain(
          * Chain is completely disabled - it does not initialize websockets not allocates any other resources
          */
         DISABLED
+    }
+
+    enum class Source {
+        DEFAULT, CUSTOM
     }
 
     override val identifier: String = id

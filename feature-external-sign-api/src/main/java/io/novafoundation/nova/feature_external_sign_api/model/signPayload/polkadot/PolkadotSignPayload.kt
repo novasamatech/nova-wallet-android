@@ -32,3 +32,5 @@ sealed class PolkadotSignPayload : Parcelable {
 }
 
 fun PolkadotSignPayload.maybeSignExtrinsic(): PolkadotSignPayload.Json? = this as? PolkadotSignPayload.Json
+
+fun PolkadotSignPayload.genesisHash(): String? = (this as? PolkadotSignPayload.Json)?.genesisHash

@@ -8,7 +8,7 @@ data class ChainRemote(
     val nodeSelectionStrategy: String?,
     val explorers: List<ChainExplorerRemote>?,
     val externalApi: ChainExternalApisRemote?,
-    val icon: String,
+    val icon: String?,
     val addressPrefix: Int,
     val types: ChainTypesInfo?,
     val options: Set<String>?,

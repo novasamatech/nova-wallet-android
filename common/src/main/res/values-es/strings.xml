@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Ruta de derivación inválida</string>
     <string name="account_json_file">Archivo JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Asegúrate de que <font color="#FFFFFF">Generic app esté instalada</font> en tu dispositivo Ledger usando la aplicación Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Abre la aplicación Generic</font> en tu dispositivo Ledger</string>
     <string name="account_ledger_import_fill_description">Asegúrate de que la aplicación de Red está instalada en tu dispositivo Ledger usando la aplicación Ledger Live. Abre la aplicación de red en tu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Agrega al menos una cuenta</string>
     <string name="account_ledger_import_fill_title">Añade cuentas a tu cartera</string>
@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">Conecta Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Para firmar operaciones y migrar tus cuentas a la nueva aplicación Generic Ledger, instala y abre la aplicación Migration. Las aplicaciones Legacy Old y Migration Ledger no serán compatibles en el futuro.</string>
     <string name="account_ledger_legacy_warning_title">Se ha lanzado una nueva aplicación Ledger</string>
-    <string name="account_ledger_migration_app">Migration</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">La aplicación Migration no estará disponible en un futuro cercano. Úsala para migrar tus cuentas a la nueva aplicación Ledger para evitar la pérdida de tus fondos.</string>
-    <string name="account_ledger_migration_generic">Generic</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">Firmar con %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Preste atención, el nombre de la ruta de derivación debe estar vacío</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Abre la aplicación Polkadot Vault</font> en tu teléfono inteligente</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vaya a la pestaña \"Conjuntos de claves\".</font> Seleccione su conjunto de claves, Red y luego la cuenta que desea agregar a Nova Wallet.</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault le proporcionará un <font color="#FFFFFF">código QR para escanear</font></string>
     <string name="account_private_key">Clave privada</string>
@@ -173,7 +173,7 @@
     <string name="assets_add_token">Agregar token</string>
     <string name="assets_add_token_enter_info_address_label">Dirección del contrato</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimales</string>
-    <string name="assets_add_token_enter_info_price_label">Enlace de Coingecko para información de precio (Opcional)</string>
+    <string name="token_price_info_provider_label">Enlace de Coingecko para información de precio (Opcional)</string>
     <string name="assets_add_token_enter_info_symbol_label">Símbolo</string>
     <string name="assets_add_token_enter_info_title">Ingrese los detalles del token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Seleccione la red para agregar el token ERC-20</string>
@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">CUIDADO CON LOS USURPADORES.</string>
     <string name="backup_secrets_warning_disabled_button">Revisar y Aceptar para Continuar</string>
     <string name="backup_settings_delete_backup">Eliminar respaldo</string>
-    <string name="backup_settings_manual_subtitle">Puedes escribir manualmente tu frase de recuperación para asegurarte de que todo está seguro</string>
+    <string name="backup_settings_manual_subtitle">Puedes respaldar manualmente tu frase secreta para asegurar el acceso a los fondos de tu monedero si pierdes acceso a este dispositivo</string>
     <string name="backup_settings_manual_switcher_title">Respaldar manualmente</string>
     <string name="backup_settings_manual_title">Manual</string>
     <string name="backup_settings_no_wallets_error_message">No has agregado ninguna billetera con una frase de paso.</string>
     <string name="backup_settings_no_wallets_error_title">No hay billeteras para respaldar</string>
-    <string name="backup_settings_subtitle">Una copia cifrada de todas tus billeteras está guardada de forma segura usando tu Google Drive. Incluso si instalas Nova en un nuevo dispositivo, podrás acceder fácilmente a tus billeteras.</string>
+    <string name="backup_settings_subtitle">Puedes habilitar copias de seguridad en Google Drive para almacenar copias cifradas de todos tus monederos, protegidas por una contraseña que establezcas.</string>
     <string name="backup_settings_switcher_text">Respaldar en Google Drive</string>
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Respaldar</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">Revisar Error de Copia de Seguridad</string>
     <string name="cloud_backup_settings_corrupted_backup_button">Revisar Actualizaciones de Copia de Seguridad</string>
     <string name="cloud_backup_settings_deprecated_password_button">Ingresar Contraseña de Copia de Seguridad</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">Enciéndelo para crear una copia de seguridad de las billeteras</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Habilita para respaldar billeteras en tu Google Drive</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">Última sincronización: %s a las %s</string>
     <string name="cloud_backup_settings_not_auth_button">Iniciar sesión en Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">Revisar Problema de Google Drive</string>
@@ -490,7 +490,7 @@
     <string name="connection_add_already_exists_error">El nodo ya ha sido agregado previamente. Por favor, prueba con otro nodo.</string>
     <string name="connection_add_invalid_error">No se puede establecer conexión con el nodo. Por favor, intenta con otro.</string>
     <string name="connection_add_unsupported_error">Desafortunadamente, la red no es compatible. Por favor, intenta con una de las siguientes: %s.</string>
-    <string name="connection_delete_confirm">Eliminar</string>
+    <string name="common_delete">Eliminar</string>
     <string name="connection_delete_description">Confirma la eliminación de %s.</string>
     <string name="connection_delete_title">¿Eliminar red?</string>
     <string name="connection_error_message_v2_2_0">Por favor, verifica tu conexión o intenta de nuevo más tarde</string>
@@ -710,7 +710,7 @@
     <string name="import_seed_invalid_title">Semilla inválida</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Desafortunadamente, no se ha encontrado una Copia de Seguridad con tus carteras.</string>
     <string name="import_wallet_cloud_backup_not_found_title">Copia de Seguridad No Encontrada</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar carteras desde Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recuperar billeteras desde Google Drive</string>
     <string name="import_wallet_options_mnemonic_subtitle">Usa tu frase de 12, 15, 18, 21 o 24 palabras</string>
     <string name="import_wallet_options_title">Elige cómo te gustaría importar tu cartera</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>

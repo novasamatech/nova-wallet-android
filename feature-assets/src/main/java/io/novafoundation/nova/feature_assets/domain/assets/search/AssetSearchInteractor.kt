@@ -19,7 +19,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -133,7 +133,7 @@ class AssetSearchInteractor(
         val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
 
         return combine(assetsFlow, aggregatedExternalBalances, queryFlow) { assets, externalBalances, query ->
-            val chainsById = chainRegistry.chainsById()
+            val chainsById = chainRegistry.enabledChainById()
             val filtered = assets.filterBy(query, chainsById)
 
             groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById, assetGroupComparator, assetsComparator)

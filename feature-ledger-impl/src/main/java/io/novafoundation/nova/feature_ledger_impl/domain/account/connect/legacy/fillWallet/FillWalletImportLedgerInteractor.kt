@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.findChains
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 
 interface FillWalletImportLedgerInteractor {
 
@@ -19,6 +19,9 @@ class RealFillWalletImportLedgerInteractor(
         val supportedLedgerApps = SubstrateApplicationConfig.all()
         val supportedChainIds = supportedLedgerApps.mapToSet { it.chainId }
 
-        return chainRegistry.findChains { it.id in supportedChainIds }
+        return chainRegistry.enabledChainById()
+            .filterKeys { it in supportedChainIds }
+            .values
+            .toList()
     }
 }

@@ -44,6 +44,7 @@ fun groupAndSortAssetsByNetwork(
 ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
     return assets
         .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances)) }
+        .filter { chainsById.containsKey(it.asset.token.configuration.chainId) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
         .mapValues { (_, assets) -> assets.sortedWith(assetComparator) }
         .mapKeys { (chain, assets) ->

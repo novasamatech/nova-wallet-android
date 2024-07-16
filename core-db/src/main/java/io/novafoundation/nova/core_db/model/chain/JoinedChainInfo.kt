@@ -7,6 +7,9 @@ class JoinedChainInfo(
     @Embedded
     val chain: ChainLocal,
 
+    @Relation(parentColumn = "id", entityColumn = "chainId", entity = NodeSelectionPreferencesLocal::class)
+    val nodeSelectionPreferences: NodeSelectionPreferencesLocal?,
+
     @Relation(parentColumn = "id", entityColumn = "chainId", entity = ChainNodeLocal::class)
     val nodes: List<ChainNodeLocal>,
 
@@ -18,9 +21,4 @@ class JoinedChainInfo(
 
     @Relation(parentColumn = "id", entityColumn = "chainId", entity = ChainExternalApiLocal::class)
     val externalApis: List<ChainExternalApiLocal>
-) {
-
-    fun getSortedNodes(): List<ChainNodeLocal> {
-        return nodes.sortedBy { it.orderId }
-    }
-}
+)

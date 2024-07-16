@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Percorso di derivazione non valido</string>
     <string name="account_json_file">File JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Assicurati che <font color="#FFFFFF">l\'app Generic sia installata</font> sul tuo dispositivo Ledger utilizzando l\'app Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Open the Generic app</font> on your Ledger device</string>
+    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Apri l\'app Generic</font> sul tuo dispositivo Ledger</string>
     <string name="account_ledger_import_fill_description">Assicurati che l\'app di rete sia installata sul tuo dispositivo Ledger utilizzando l\'app Ledger Live. Apri l\'app di rete sul tuo dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Aggiungi almeno un account</string>
     <string name="account_ledger_import_fill_title">Aggiungi account al tuo portafoglio</string>
@@ -79,9 +79,9 @@
     <string name="account_ledger_import_start_title">Collega Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Per firmare operazioni e migrare i tuoi account alla nuova app Generic Ledger, installa e apri l\'app Migration. Le app Ledger Legacy e Migration non saranno supportate in futuro.</string>
     <string name="account_ledger_legacy_warning_title">È stata rilasciata una nuova app Ledger</string>
-    <string name="account_ledger_migration_app">Migrazione</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">L\'app Migration sarà non più disponibile nel prossimo futuro. Usala per migrare i tuoi account alla nuova app Ledger per evitare di perdere i tuoi fondi.</string>
-    <string name="account_ledger_migration_generic">Generico</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_ledger_nano_x_generic">Ledger Nano X (App Generico)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
@@ -113,7 +113,7 @@
     <string name="account_parity_signer_sign_title">Firma con %s</string>
     <string name="account_polkadot_vault">Cofre di Polkadot</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Fai attenzione, il nome del percorso di derivazione dovrebbe essere vuoto</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Open Polkadot Vault</font> application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Apri l\'applicazione Polkadot Vault</font> sul tuo smartphone</string>
     <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vai alla scheda \"Set di chiavi\".</font> Seleziona il tuo set di chiavi, Rete, quindi l\'account che desideri aggiungere a Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_3">Il Cofre di Polkadot ti fornirà il <font color="#FFFFFF">codice QR da scannerizzare</font></string>
     <string name="account_private_key">Chiave privata</string>
@@ -173,7 +173,7 @@
     <string name="assets_add_token">Aggiungi token</string>
     <string name="assets_add_token_enter_info_address_label">Indirizzo del contratto</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimali</string>
-    <string name="assets_add_token_enter_info_price_label">Collegamento Coingecko per informazioni sul prezzo (opzionale)</string>
+    <string name="token_price_info_provider_label">Collegamento Coingecko per informazioni sul prezzo (opzionale)</string>
     <string name="assets_add_token_enter_info_symbol_label">Simbolo</string>
     <string name="assets_add_token_enter_info_title">Inserisci i dettagli del token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Seleziona la rete per aggiungere il token ERC-20</string>
@@ -209,12 +209,12 @@
     <string name="backup_secrets_warning_condition_3_highlight">ATTENZIONE AI TRUFFATORI.</string>
     <string name="backup_secrets_warning_disabled_button">Rivedi e Accetta per Continuare</string>
     <string name="backup_settings_delete_backup">Elimina backup</string>
-    <string name="backup_settings_manual_subtitle">Puoi annotare manualmente la tua frase di recupero per essere sicuro che tutto sia al sicuro</string>
+    <string name="backup_settings_manual_subtitle">Puoi eseguire manualmente il backup della tua frase segreta per garantire l\'accesso ai fondi del tuo portafoglio in caso di perdita dell\'accesso a questo dispositivo</string>
     <string name="backup_settings_manual_switcher_title">Effettua il backup manualmente</string>
     <string name="backup_settings_manual_title">Manuale</string>
     <string name="backup_settings_no_wallets_error_message">Non hai aggiunto alcun portafoglio con una passphrase.</string>
     <string name="backup_settings_no_wallets_error_title">Nessun portafoglio da fare il backup</string>
-    <string name="backup_settings_subtitle">Una copia criptata di tutti i tuoi portafogli è conservata in sicurezza utilizzando il tuo Google Drive. Anche se installi Nova su un nuovo dispositivo, potrai accedere facilmente ai tuoi portafogli.</string>
+    <string name="backup_settings_subtitle">Puoi abilitare i backup su Google Drive per memorizzare copie criptate di tutti i tuoi portafogli, protetti da una password impostata da te.</string>
     <string name="backup_settings_switcher_text">Esegui il backup su Google Drive</string>
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Backup</string>
@@ -264,7 +264,7 @@
     <string name="cloud_backup_settings_backup_errors_button">Rivedi l\'Errore di Backup</string>
     <string name="cloud_backup_settings_corrupted_backup_button">Rivedi gli Aggiornamenti del Backup</string>
     <string name="cloud_backup_settings_deprecated_password_button">Inserisci la Password di Backup</string>
-    <string name="cloud_backup_settings_disabled_state_subtitle">Attivalo per creare un backup dei portafogli</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Abilita per eseguire il backup dei portafogli su Google Drive</string>
     <string name="cloud_backup_settings_last_sync" formatted="false">Ultima sincronizzazione: %s alle %s</string>
     <string name="cloud_backup_settings_not_auth_button">Accedi a Google Drive</string>
     <string name="cloud_backup_settings_other_errors_button">Rivedi Problema di Google Drive</string>
@@ -490,7 +490,7 @@
     <string name="connection_add_already_exists_error">Il nodo è già stato aggiunto in precedenza. Per favore, prova un altro nodo.</string>
     <string name="connection_add_invalid_error">Impossibile stabilire una connessione con il nodo. Per favore, prova un altro.</string>
     <string name="connection_add_unsupported_error">Purtroppo, la rete non è supportata. Per favore, prova una delle seguenti: %s.</string>
-    <string name="connection_delete_confirm">Elimina</string>
+    <string name="common_delete">Elimina</string>
     <string name="connection_delete_description">Conferma eliminazione di %s.</string>
     <string name="connection_delete_title">Eliminare la rete?</string>
     <string name="connection_error_message_v2_2_0">Si prega di controllare la connessione o riprovare più tardi</string>
@@ -710,7 +710,7 @@
     <string name="import_seed_invalid_title">Seed non valido</string>
     <string name="import_wallet_cloud_backup_not_found_subtitle">Purtroppo, non è stato trovato nessun backup con i tuoi portafogli.</string>
     <string name="import_wallet_cloud_backup_not_found_title">Backup non trovato</string>
-    <string name="import_wallet_options_cloud_backup_subtitle">Ripristina i portafogli da Google Cloud</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Recupera portafogli da Google Drive</string>
     <string name="import_wallet_options_mnemonic_subtitle">Usa la tua frase da 12, 15, 18, 21 o 24 parole</string>
     <string name="import_wallet_options_title">Scegli come desideri importare il tuo portafoglio</string>
     <string name="import_wallet_options_watch_only_title">Solo visualizzazione</string>

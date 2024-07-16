@@ -6,6 +6,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -22,7 +23,8 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.AsyncChainSyncDispatcher
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeCacheMigrator
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
@@ -138,14 +140,14 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
-    fun provideAutoBalanceProvider() = AutoBalanceStrategyProvider()
+    fun provideAutoBalanceProvider() = NodeSelectionStrategyProvider()
 
     @Provides
     @ApplicationScope
     fun provideNodeAutoBalancer(
-        autoBalanceStrategyProvider: AutoBalanceStrategyProvider,
+        nodeSelectionStrategyProvider: NodeSelectionStrategyProvider,
         connectionSecrets: ConnectionSecrets
-    ) = NodeAutobalancer(autoBalanceStrategyProvider, connectionSecrets)
+    ) = NodeAutobalancer(nodeSelectionStrategyProvider, connectionSecrets)
 
     @Provides
     @ApplicationScope
@@ -153,11 +155,25 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideNodeConnectionFactory(
+        socketProvider: Provider<SocketService>,
+        bulkRetriever: BulkRetriever,
+        connectionSecrets: ConnectionSecrets,
+        web3ApiFactory: Web3ApiFactory
+    ) = NodeHealthStateTesterFactory(
+        socketProvider,
+        connectionSecrets,
+        bulkRetriever,
+        web3ApiFactory
+    )
+
+    @Provides
+    @ApplicationScope
     fun provideChainConnectionFactory(
         socketProvider: Provider<SocketService>,
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         nodeAutobalancer: NodeAutobalancer,
-        connectionSecrets: ConnectionSecrets,
+        connectionSecrets: ConnectionSecrets
     ) = ChainConnectionFactory(
         externalRequirementsFlow,
         nodeAutobalancer,
@@ -180,7 +196,7 @@ class ChainRegistryModule {
     @ApplicationScope
     fun provideWeb3ApiFactory(
         connectionSecrets: ConnectionSecrets,
-        strategyProvider: AutoBalanceStrategyProvider,
+        strategyProvider: NodeSelectionStrategyProvider,
     ): Web3ApiFactory {
         val builder = HttpService.getOkHttpClientBuilder()
         builder.interceptors().clear() // getOkHttpClientBuilder() adds logging interceptor which doesn't log into LogCat

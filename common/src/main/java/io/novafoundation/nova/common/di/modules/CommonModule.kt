@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
@@ -54,12 +55,10 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.QrCodeGenerator
-import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
-import io.novafoundation.nova.common.utils.progress.RealProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
@@ -317,10 +316,6 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideRootScope() = RootScope()
-
-    @Provides
-    @ApplicationScope
     fun provideBannerVisibilityRepository(
         preferences: Preferences
     ): BannerVisibilityRepository = RealBannerVisibilityRepository(preferences)
@@ -331,7 +326,7 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideProgressDialogMixin(): ProgressDialogMixin = RealProgressDialogMixin()
+    fun provideProgressDialogMixinFactory(): ProgressDialogMixinFactory = ProgressDialogMixinFactory()
 
     @Provides
     @ApplicationScope
@@ -345,5 +340,11 @@ class CommonModule {
     @ApplicationScope
     fun provideConditionMixinFactory(resourceManager: ResourceManager): ConditionMixinFactory {
         return RealConditionMixinFactory(resourceManager)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideCoinGeckoLinkParser(): CoinGeckoLinkParser {
+        return CoinGeckoLinkParser()
     }
 }

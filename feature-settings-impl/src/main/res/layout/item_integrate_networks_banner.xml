@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.novafoundation.nova.common.view.BannerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/integrateNetworkBanner"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="16dp"
+    android:scaleType="center"
+    android:src="@drawable/ic_networks_banner_image"
+    app:bannerBackground="@drawable/bg_networks_banner">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp">
+
+        <ImageView
+            android:id="@+id/integrateNetworkBannerClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_close_circle_translucent_contrast"/>
+
+        <TextView
+            android:id="@+id/integrateNetworkBannerTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/integrate_networks_banner_title"
+            android:textColor="@color/text_primary"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/integrateNetworkBannerDescription"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="124dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/integrate_networks_banner_description"
+            android:textColor="@color/text_primary"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/integrateNetworkBannerTitle"
+            app:layout_constraintTop_toBottomOf="@+id/integrateNetworkBannerTitle" />
+
+        <io.novafoundation.nova.common.view.LinkView
+            android:id="@+id/integrateNetworkBannerLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/integrateNetworkBannerDescription"
+            app:linkText="@string/integrate_networks_banner_link" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</io.novafoundation.nova.common.view.BannerView>
