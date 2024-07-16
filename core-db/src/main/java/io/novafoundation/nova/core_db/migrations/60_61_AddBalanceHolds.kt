@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddBalanceHolds_59_60 = object : Migration(59, 60) {
+val AddBalanceHolds_60_61 = object : Migration(60, 61) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
