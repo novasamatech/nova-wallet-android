@@ -23,8 +23,6 @@ class VoteFragment : BaseFragment<VoteViewModel>() {
     @Inject
     lateinit var router: VoteRouter
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { VotePagerAdapter(this, router) }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,6 +33,7 @@ class VoteFragment : BaseFragment<VoteViewModel>() {
 
     override fun initViews() {
         voteContainer.applyStatusBarInsets()
+        val adapter = VotePagerAdapter(this, router)
         voteViewPager.adapter = adapter
         voteTabs.setupWithViewPager2(voteViewPager, adapter::getPageTitle)
 
