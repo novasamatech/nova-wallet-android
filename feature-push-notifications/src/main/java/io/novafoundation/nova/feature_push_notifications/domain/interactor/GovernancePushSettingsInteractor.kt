@@ -7,6 +7,7 @@ import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.ext.openGovIfSupported
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -27,9 +28,9 @@ class RealGovernancePushSettingsInteractor(
 ) : GovernancePushSettingsInteractor {
 
     override fun governanceChainsFlow(): Flow<List<ChainWithGovTracks>> {
-        return chainRegistry.currentChains
-            .map {
-                it.filter { it.pushSupport }
+        return chainRegistry.enabledChainsFlow()
+            .map { chains ->
+                chains.filter { it.pushSupport }
                     .flatMap { it.supportedGovTypes() }
                     .map { (chain, govType) -> ChainWithGovTracks(chain, govType, getTrackIds(chain, govType)) }
                     .sortedWith(Chain.defaultComparatorFrom(ChainWithGovTracks::chain))
