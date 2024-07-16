@@ -150,7 +150,9 @@
     <string name="accounts_change_chain_account">%s hesabını değiştir</string>
     <string name="accounts_change_chain_secrets">Hesabı değiştir</string>
     <string name="accounts_ledger_legacy">Ledger (Eski)</string>
+    <string name="add_custom_node">Özel düğüm ekle</string>
     <string name="add_delegation_missing_account_message">Delege etmek için cüzdana %s hesabı eklemeniz gerekiyor</string>
+    <string name="add_network_title">Ağ detaylarını girin</string>
     <string name="add_proxy_confirmation_delegate_to">Hesap için delegasyon yap</string>
     <string name="add_proxy_confirmation_delegating_account">Delegasyon yapılacak hesap</string>
     <string name="add_proxy_confirmation_delegating_wallet">Delegasyon yapılacak cüzdan</string>
@@ -158,6 +160,7 @@
     <string name="add_proxy_deposit_description_message">Proxy kaldırılana kadar depozito hesabınızda rezerve olarak kalır.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s\'da eklenen maksimum proxy (%s) limitine ulaştınız. Yeni eklemeler yapabilmek için proxy\'leri kaldırın.</string>
     <string name="add_proxy_maximum_reached_error_title">Maksimum proxy sayısına ulaşıldı</string>
+    <string name="added_networks_empty_placeholder">Eklenen özel ağlar\nburada görünecek</string>
     <string name="asset_add_evm_token_already_exist_message">Girilen sözleşme adresi Nova\'da zaten %s tokeni olarak bulunmaktadır.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Girilen sözleşme adresi Nova\'da zaten %s tokeni olarak bulunmaktadır. Değiştirmek istediğinize emin misiniz?</string>
     <string name="asset_add_evm_token_already_exist_title">Bu token zaten var</string>
@@ -173,7 +176,6 @@
     <string name="assets_add_token">Token ekle</string>
     <string name="assets_add_token_enter_info_address_label">Sözleşme adresi</string>
     <string name="assets_add_token_enter_info_decimals_label">Ondalıklar</string>
-    <string name="token_price_info_provider_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
     <string name="assets_add_token_enter_info_symbol_label">Sembol</string>
     <string name="assets_add_token_enter_info_title">ERC-20 token bilgilerini girin</string>
     <string name="assets_add_token_select_chain_title">ERC-20 token eklemek için ağı seçin</string>
@@ -280,6 +282,7 @@
     <string name="common_active">Aktif</string>
     <string name="common_add">Ekle</string>
     <string name="common_add_delegation">Delegasyon ekle</string>
+    <string name="common_add_network">Ağ ekle</string>
     <string name="common_address">Adres</string>
     <string name="common_advanced">Gelişmiş</string>
     <string name="common_all">Tümü</string>
@@ -316,6 +319,8 @@
     <string name="common_confirm_title">Onay</string>
     <string name="common_confirmation_title">Emin misiniz?</string>
     <string name="common_confirmed">Onaylandı</string>
+    <string name="common_connected_ms">%d milisaniye</string>
+    <string name="common_connecting">bağlanıyor...</string>
     <string name="common_connection_error_message">Bağlantınızı kontrol edin veya daha sonra tekrar deneyin</string>
     <string name="common_connection_error_title">Bağlantı Başarısız</string>
     <string name="common_continue">Devam et</string>
@@ -325,6 +330,7 @@
     <string name="common_crypto_type">Şifreleme tipi</string>
     <string name="common_date">Tarih</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s ve %s</string>
+    <string name="common_delete">Sil</string>
     <string name="common_details">Detaylar</string>
     <string name="common_disabled">Devre dışı</string>
     <string name="common_disconnect">Bağlantıyı kes</string>
@@ -336,10 +342,12 @@
     <string name="common_enable">Etkinleştir</string>
     <string name="common_enter_address">Adres girin…</string>
     <string name="common_enter_amount">Miktar girin...</string>
+    <string name="common_enter_details">Detayları girin</string>
     <string name="common_enter_password">Parolayı girin</string>
     <string name="common_error_general_title">Hata</string>
     <string name="common_error_not_enough_tokens">Yeterli token yok</string>
     <string name="common_event">Etkinlik</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">EVM adresi</string>
     <string name="common_existential_warning_message_v2_2_0">Bu işlem sonrası hesabınız, toplam bakiyeyi minimal bakiyenin altına düşürdüğü için blockchain\'den kaldırılacak</string>
     <string name="common_existential_warning_title">Hesap kaldırılacak</string>
@@ -380,6 +388,7 @@
         <item quantity="other">%d dakika</item>
     </plurals>
     <string name="common_missing_account_title">%s hesabı eksik</string>
+    <string name="common_modify">Düzenle</string>
     <string name="common_module">Modül</string>
     <string name="common_network">Ağ</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -452,9 +461,11 @@
     <string name="common_something_went_wrong_title">Bir şeyler yanlış gitti</string>
     <string name="common_sort_by">Sırala</string>
     <string name="common_status">Durum</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Substrate adresi</string>
     <string name="common_tap_to_reveal_title">Açmak için dokunun</string>
     <string name="common_terms_and_conditions_formatting">Şartlar ve Koşullar</string>
+    <string name="common_testnet">Testnet</string>
     <string name="common_time_left">Kalan zaman</string>
     <string name="common_title">Başlık</string>
     <string name="common_to_settings">Ayarları Aç</string>
@@ -490,7 +501,6 @@
     <string name="connection_add_already_exists_error">Düğüm daha önce eklenmiş. Lütfen başka bir düğüm deneyin.</string>
     <string name="connection_add_invalid_error">Düğüm ile bağlantı kurulamıyor. Lütfen başka birini deneyin.</string>
     <string name="connection_add_unsupported_error">Maalesef ağ desteklenmiyor. Lütfen aşağıdakilerden birini deneyin: %s.</string>
-    <string name="common_delete">Sil</string>
     <string name="connection_delete_description">%s silinmesini onaylayın.</string>
     <string name="connection_delete_title">Ağı sil?</string>
     <string name="connection_error_message_v2_2_0">Lütfen bağlantınızı kontrol edin veya daha sonra tekrar deneyin</string>
@@ -513,6 +523,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">Parolalar eşleşiyor</string>
     <string name="create_cloud_backup_password_subtitle">Yedeklemenize istediğiniz zaman erişim sağlamak için lütfen bir parola girin. Parola kurtarılamaz, onu hatırladığınızdan emin olun!</string>
     <string name="create_cloud_backup_password_title">Yedekleme Parolanızı Oluşturun</string>
+    <string name="create_network_invalid_chain_id_message">Girilen Zincir ID\'si RPC URL\'sindeki ağ ile eşleşmiyor.</string>
+    <string name="create_network_invalid_chain_id_title">Geçersiz Zincir ID\'si</string>
     <string name="crodloan_private_crowdloan_message">Özel kitle fonlamaları henüz desteklenmiyor.</string>
     <string name="crodloan_private_crowdloan_title">Özel kitle fonlaması</string>
     <string name="crowdloan_about">Kitle fonlamaları hakkında</string>
@@ -569,6 +581,24 @@
     <string name="crowdloan_unlock_hint">Kiralanma dönemi sonrasında %s tokenlarınız iade edilecektir.</string>
     <string name="crowdloan_your_contributions">Katkılarınız</string>
     <string name="crownloans_raised_format" formatted="false">Toplandı: %s / %s</string>
+    <string name="custom_network_already_exist_failure_message">Girilen RPC URL\'si Nova\'da %s özel ağı olarak mevcut. Bunu değiştirmek istediğinizden emin misiniz?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">Blok gezgin URL\'si (İsteğe bağlı)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">Zincir ID\'si</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">Para Birimi Sembolü</string>
+    <string name="custom_network_name_title">Ağ adı</string>
+    <string name="custom_node_add_button_state">Düğüm ekle</string>
+    <string name="custom_node_add_title">İçin özel düğüm ekle</string>
+    <string name="custom_node_disabled_button_state">Detayları girin</string>
+    <string name="custom_node_edit_button_state">Kaydet</string>
+    <string name="custom_node_edit_title">İçin özel düğüm düzenle</string>
+    <string name="custom_node_name_hint">Ad</string>
+    <string name="custom_node_name_title">Düğüm adı</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">Düğüm URL\'si</string>
+    <string name="custom_rpc_node_url_title">RPC URL\'si</string>
     <string name="dapp_authorized_description">Kullandığınızda adresinizi görmelerine izin verdiğiniz DApps</string>
     <string name="dapp_authorized_remove_description">\"%s\" DApp Yetkilendirmelerden kaldırılacak</string>
     <string name="dapp_authorized_remove_title">Yetkilendirilmişlerden Kaldırılsın mı?</string>
@@ -605,6 +635,7 @@
     <string name="deep_linking_invalid_derivation_path">Geçersiz türetim yolu</string>
     <string name="deep_linking_invalid_mnemonic">Geçersiz mnemonik</string>
     <string name="deep_linking_url_is_invalid">Geçersiz url</string>
+    <string name="default_network_already_exist_failure_message">Girilen RPC URL\'si Nova\'da %s ağı olarak mevcut.</string>
     <string name="default_notification_channel_name">Varsayılan Bildirim Kanalı</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Adrese veya isme göre ara</string>
@@ -655,6 +686,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">Yedekleme parolanız daha önce güncellendi. Cloud Backup\'ı kullanmaya devam etmek için, %s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">yeni yedekleme parolasını girin.</string>
     <string name="deprecated_cloud_backup_password_title">Yedekleme parolası değiştirildi</string>
+    <string name="disabled_chain_error_message">Devre dışı bırakılan ağların işlemlerini imzalayamazsınız. Ayarlardan %s etkinleştirip tekrar deneyin</string>
+    <string name="disabled_chain_error_title">%s devre dışı</string>
     <string name="duplicate_proxy_type_message">Bu hesaba zaten delege ediyorsunuz: %s</string>
     <string name="duplicate_proxy_type_title">Delegasyon zaten var</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH uyumlu)</string>
@@ -714,8 +747,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">12, 15, 18, 21 veya 24 kelimelik ifadenizi kullanın</string>
     <string name="import_wallet_options_title">Cüzdanınızı nasıl içe aktarmak istediğinizi seçin</string>
     <string name="import_wallet_options_watch_only_title">Sadece izleme</string>
+    <string name="integrate_networks_banner_description">Nova Wallet\'ta geliştirdiğiniz ağın tüm özelliklerini entegre edin ve herkesin erişebilmesini sağlayın.</string>
+    <string name="integrate_networks_banner_link">Ağınızı entegre edin</string>
+    <string name="integrate_networks_banner_title">Polkadot için mi geliştiriyorsunuz?</string>
     <string name="invalid_proxy_address_message">Proxy adresi geçerli bir %s adresi olmalıdır</string>
     <string name="invalid_proxy_address_title">Geçersiz proxy adresi</string>
+    <string name="invalid_token_symbol_message">Girilen Para Birimi Sembolü (%1$s) ağ (%2$s) ile eşleşmiyor. Doğru para birimi sembolünü kullanmak istiyor musunuz?</string>
+    <string name="invalid_token_symbol_title">Geçersiz Para Birimi Sembolü</string>
     <string name="invoice_scan_error_no_info">QR kod çözümlenemedi</string>
     <string name="invoice_scan_qr_code_title">QR kodu</string>
     <string name="invoice_scan_upload">Galeriden yükle</string>
@@ -743,10 +781,21 @@
     <string name="ledger_verify_address_subtitle">Adresi onaylamak için %s üzerindeki her iki düğmeye basın</string>
     <string name="ledger_wallet_details_description">Bu cüzdan Ledger ile eşleştirildi. Nova istediğiniz herhangi bir işlemi oluşturmanıza yardımcı olacak ve bunları Ledger kullanarak imzalamanız istenecektir.</string>
     <string name="ledher_import_select_address_title">Cüzdana eklemek için hesap seçin</string>
+    <string name="loading_network_info">Ağ bilgisi yükleniyor...</string>
     <string name="loocking_backup_progress">Yedeklemenizi arıyor...</string>
     <string name="make_payout_transaction_sent">Ödeme işlemi gönderildi</string>
     <string name="manage_assets_add_token">Token ekle</string>
     <string name="manage_cloud_backup">Yedeklemeyi yönet</string>
+    <string name="manage_network_action_delete">Ağı sil</string>
+    <string name="manage_network_action_edit">Ağı düzenle</string>
+    <string name="manage_network_actions_title">Eklenen ağı yönet</string>
+    <string name="manage_network_delete_message">Bu ağdaki token bakiyelerinizi Varlıklar ekranında göremeyeceksiniz</string>
+    <string name="manage_network_delete_title">Ağı silmek mi?</string>
+    <string name="manage_node_action_delete">Düğümü sil</string>
+    <string name="manage_node_action_edit">Düğümü düzenle</string>
+    <string name="manage_node_actions_title">Eklenen düğümü yönet</string>
+    <string name="manage_node_delete_message">Düğüm \"%s\" silinecek</string>
+    <string name="manage_node_delete_title">Düğümü silmek mi?</string>
     <string name="manual_backup_secrets_custom_key_title">Özel Anahtar</string>
     <string name="manual_backup_secrets_default_key_title">Varsayılan Anahtar</string>
     <string name="manual_backup_secrets_subtitle">Bu bilgileri kimseyle paylaşmayın - Paylaşmanız durumunda tüm varlıklarınızı kalıcı ve geri döndürülemez şekilde kaybedersiniz</string>
@@ -768,9 +817,14 @@
         <item quantity="one">En az %d cüzdan seçin</item>
         <item quantity="other">En az %d cüzdan seçin</item>
     </plurals>
+    <string name="network_already_exist_failure_title">Bu Düğüm zaten mevcut</string>
     <string name="network_fee">Ağ ücreti</string>
     <string name="network_info_address">Düğüm adresi</string>
     <string name="network_info_title">Düğüm Bilgisi</string>
+    <string name="network_management_added_page_title">Eklendi</string>
+    <string name="network_management_custom_nodes">özel düğümler</string>
+    <string name="network_management_default_nodes">varsayılan düğümler</string>
+    <string name="network_management_default_page_title">Varsayılan</string>
     <string name="network_status_connecting">Bağlanıyor…</string>
     <string name="nft_collection">Koleksiyon</string>
     <string name="nft_created_by">Oluşturan</string>
@@ -781,6 +835,12 @@
     <string name="nft_owned_by">Sahibi</string>
     <string name="nft_price_not_listed">Listelenmemiş</string>
     <string name="nft_your_nfts">Senin NFT\'lerin</string>
+    <string name="node_already_exist_failure_message">Girdiğiniz URL zaten \"%s\" Düğümü olarak mevcut.</string>
+    <string name="node_already_exist_failure_title">Bu Düğüm zaten mevcut</string>
+    <string name="node_not_alive_message">Girdiğiniz Düğüm URL\'si ya yanıt vermiyor ya da yanlış biçimde. URL biçimi \"wss://\" ile başlamalıdır.</string>
+    <string name="node_not_alive_title">Düğüm hatası</string>
+    <string name="node_not_supported_by_network_message">Girdiğiniz URL, %1$s için Düğümle eşleşmiyor.\nLütfen geçerli %1$s düğümünün URL\'sini girin.</string>
+    <string name="node_not_supported_by_network_title">Hatalı ağ</string>
     <string name="nomination_pool_claim_rewards">Ödülleri Talep Et</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Tokenleriniz stake\'e geri eklenecek</string>
     <string name="nomination_pools_direct">Doğrudan</string>
@@ -825,6 +885,10 @@
     <string name="pool_full_failure_title">Havuz dolu</string>
     <string name="pool_inactive_failure_message">Açık olmayan bir havuza katılamazsınız. Lütfen havuz sahibi ile iletişime geçin.</string>
     <string name="pool_inactive_failure_title">Havuz açık değil</string>
+    <string name="pre_configured_networks_add_custom_button">Ağı elle ekle</string>
+    <string name="pre_configured_networks_progress_text">Ağlar listesi yükleniyor...</string>
+    <string name="pre_configured_networks_search_hint">Ağ adına göre ara</string>
+    <string name="pre_configured_networks_title">Ağ ekle</string>
     <string name="profile_accounts_title">Hesaplar</string>
     <string name="profile_accounts_title_2_0">Cüzdanlar</string>
     <string name="profile_language_title">Dil</string>
@@ -1464,6 +1528,7 @@
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Cüzdan</string>
     <string name="today">Bugün</string>
+    <string name="token_price_info_provider_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
     <string name="transaction_details_copy_hash">Hash\'i kopyala</string>
     <string name="transaction_details_extrinsic_fee">Ücret</string>
     <string name="transaction_details_from">Gönderen</string>
