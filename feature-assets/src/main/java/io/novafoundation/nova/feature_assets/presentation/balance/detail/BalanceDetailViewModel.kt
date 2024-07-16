@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -77,10 +78,11 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    // TODO show holds as well
     private val balanceLocksFlow = balanceLocksInteractor.balanceLocksFlow(assetPayload.chainId, assetPayload.chainAssetId)
-        .inBackground()
-        .share()
+        .shareInBackground()
+
+    private val balanceHoldsFlow = balanceLocksInteractor.balanceHoldsFlow(assetPayload.chainId, assetPayload.chainAssetId)
+        .shareInBackground()
 
     private val selectedAccountFlow = accountUseCase.selectedMetaAccountFlow()
         .share()
@@ -95,8 +97,8 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    private val lockedBalanceModel = combine(balanceLocksFlow, externalBalancesFlow, assetFlow) { locks, externalBalances, asset ->
-        mapBalanceLocksToUi(locks, externalBalances, asset)
+    private val lockedBalanceModel = combine(balanceLocksFlow, balanceHoldsFlow, externalBalancesFlow, assetFlow) { locks, holds, externalBalances, asset ->
+        mapBalanceLocksToUi(locks, holds, externalBalances, asset)
     }
         .inBackground()
         .share()
@@ -205,12 +207,20 @@ class BalanceDetailViewModel(
 
     private fun mapBalanceLocksToUi(
         balanceLocks: List<BalanceLock>,
+        holds: List<BalanceHold>,
         externalBalances: List<ExternalBalance>,
         asset: Asset
     ): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.id),
+                mapAmountToAmountModel(it.amountInPlanks, asset)
+            )
+        }
+
+        val mappedHolds = holds.map {
+            BalanceLocksModel.Lock(
+                mapBalanceIdToUi(resourceManager, it.identifier),
                 mapAmountToAmountModel(it.amountInPlanks, asset)
             )
         }
@@ -229,6 +239,7 @@ class BalanceDetailViewModel(
 
         val locks = buildList {
             addAll(mappedLocks)
+            addAll(mappedHolds)
             add(reservedBalance)
             addAll(external)
         }
