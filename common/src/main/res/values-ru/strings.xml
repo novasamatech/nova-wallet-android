@@ -150,7 +150,9 @@
     <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
     <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="add_custom_node">Добавить пользовательскую ноду</string>
     <string name="add_delegation_missing_account_message">Вы должны добавить %s аккаунт в кошелек, чтобы иметь возможность делегировать</string>
+    <string name="add_network_title">Введите данные сети</string>
     <string name="add_proxy_confirmation_delegate_to">Делегировать аккаунту</string>
     <string name="add_proxy_confirmation_delegating_account">Аккаунт делегирования</string>
     <string name="add_proxy_confirmation_delegating_wallet">Кошелек делегирования</string>
@@ -158,6 +160,7 @@
     <string name="add_proxy_deposit_description_message">Депозит остается зарезервированным на вашем счете до тех пор, пока прокси не будет удален.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Вы достигли лимита добавленных прокси (%s) в %s . Удалите прокси, чтобы добавить новые.</string>
     <string name="add_proxy_maximum_reached_error_title">Достигнуто максимальное количество прокси</string>
+    <string name="added_networks_empty_placeholder">Добавленные пользовательские сети\nпоявятся здесь</string>
     <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Введенный адрес контракта присутствует в Nova как токен %s. Вы уверены, что хотите изменить его?</string>
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
@@ -173,7 +176,6 @@
     <string name="assets_add_token">Добавить токен</string>
     <string name="assets_add_token_enter_info_address_label">Адрес контракта</string>
     <string name="assets_add_token_enter_info_decimals_label">Число десятичных знаков</string>
-    <string name="token_price_info_provider_label">Ссылка Coingecko для курса валют (необязательно)</string>
     <string name="assets_add_token_enter_info_symbol_label">Символ</string>
     <string name="assets_add_token_enter_info_title">Введите данные ERC-20 токена</string>
     <string name="assets_add_token_select_chain_title">Выберите сеть для добавления ERC-20 токена</string>
@@ -223,6 +225,8 @@
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
     <string name="buy_provider_open_confirmation_title">Продолжить в браузере?</string>
+    <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>
+    <string name="chain_network_management_enabling">Включить подключение</string>
     <string name="change_cloud_backup_password_subtitle">Введите пароль, который будет использоваться для восстановления ваших кошельков из облачного бэкапа. Этот пароль нельзя будет восстановить в будущем, поэтому обязательно запомните его!</string>
     <string name="change_cloud_backup_password_title">Изменить пароль бэкапа</string>
     <string name="choose_amount_asset">Токен</string>
@@ -280,6 +284,7 @@
     <string name="common_active">Активно</string>
     <string name="common_add">Добавить</string>
     <string name="common_add_delegation">Добавить делегацию</string>
+    <string name="common_add_network">Добавить сеть</string>
     <string name="common_address">Адрес</string>
     <string name="common_advanced">Продвинутый</string>
     <string name="common_all">Все</string>
@@ -316,6 +321,8 @@
     <string name="common_confirm_title">Подтверждение</string>
     <string name="common_confirmation_title">Уверены ли вы?</string>
     <string name="common_confirmed">Подтверждено</string>
+    <string name="common_connected_ms">%d мс</string>
+    <string name="common_connecting">подключение...</string>
     <string name="common_connection_error_message">Пожалуйста, проверьте подключение к интернету и повторите попытку</string>
     <string name="common_connection_error_title">Сбой подключения</string>
     <string name="common_continue">Продолжить</string>
@@ -325,6 +332,7 @@
     <string name="common_crypto_type">Тип ключевой пары</string>
     <string name="common_date">Дата</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s и %s</string>
+    <string name="common_delete">Удалить</string>
     <string name="common_details">Подробности</string>
     <string name="common_disabled">Отключен</string>
     <string name="common_disconnect">Отключить</string>
@@ -336,10 +344,12 @@
     <string name="common_enable">Включить</string>
     <string name="common_enter_address">Введите адрес…</string>
     <string name="common_enter_amount">Введите сумму...</string>
+    <string name="common_enter_details">Введите данные</string>
     <string name="common_enter_password">Введите пароль</string>
     <string name="common_error_general_title">Ошибка</string>
     <string name="common_error_not_enough_tokens">Недостаточно токенов</string>
     <string name="common_event">Событие</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">EVM Адрес</string>
     <string name="common_existential_warning_message_v2_2_0">Ваша учетная запись будет удалена из сети после операции, так как ваш баланс опустится ниже минимального</string>
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
@@ -386,6 +396,7 @@
         <item quantity="other">%d минута</item>
     </plurals>
     <string name="common_missing_account_title">%s аккаунт отсутствует</string>
+    <string name="common_modify">Изменить</string>
     <string name="common_module">Модуль</string>
     <string name="common_network">Сеть</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -460,9 +471,11 @@
     <string name="common_something_went_wrong_title">Что-то пошло не так</string>
     <string name="common_sort_by">Сортировка по</string>
     <string name="common_status">Статус</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Substrate адрес</string>
     <string name="common_tap_to_reveal_title">Нажмите, чтобы открыть</string>
     <string name="common_terms_and_conditions_formatting">Условиями использования</string>
+    <string name="common_testnet">Тестнет</string>
     <string name="common_time_left">Оставшееся время</string>
     <string name="common_title">Заголовок</string>
     <string name="common_to_settings">Открыть Настройки</string>
@@ -500,7 +513,6 @@
     <string name="connection_add_already_exists_error">Узел уже был добавлен ранее. Пожалуйста, попробуйте другой узел.</string>
     <string name="connection_add_invalid_error">Не удается установить соединение с узлом. Пожалуйста, попробуйте другой узел.</string>
     <string name="connection_add_unsupported_error">К сожалению, сеть не поддерживается. Пожалуйста, попробуйте одну из следующих: %s.</string>
-    <string name="common_delete">Удалить</string>
     <string name="connection_delete_description">Подтвердите удаление %s.</string>
     <string name="connection_delete_title">Удалить сеть?</string>
     <string name="connection_error_message_v2_2_0">Пожалуйста, проверьте ваше подключение или повторите позднее</string>
@@ -523,6 +535,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">Пароли совпадают</string>
     <string name="create_cloud_backup_password_subtitle">Пожалуйста, введите пароль для доступа к бэкапу. Пароль восстановлению не подлежит, обязательно запомните его!</string>
     <string name="create_cloud_backup_password_title">Создание пароля для бэкапа</string>
+    <string name="create_network_invalid_chain_id_message">Введенный Chain ID не совпадает с сетью в RPC URL.</string>
+    <string name="create_network_invalid_chain_id_title">Неверный Chain ID</string>
     <string name="crodloan_private_crowdloan_message">Приватные краудлоуны пока не поддерживаются</string>
     <string name="crodloan_private_crowdloan_title">Приватный краудлоун</string>
     <string name="crowdloan_about">О краудлоунах</string>
@@ -579,6 +593,24 @@
     <string name="crowdloan_unlock_hint">Ваши %s токены будут возвращены обратно после срока лизинга парачейна.</string>
     <string name="crowdloan_your_contributions">Ваш вклад</string>
     <string name="crownloans_raised_format" formatted="false">Собрано: %s из %s</string>
+    <string name="custom_network_already_exist_failure_message">Введенный RPC URL присутствует в Nova как %s пользовательская сеть. Вы уверены, что хотите изменить его?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">URL block explorer (необязательно)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">Chain ID</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">Символ валюты</string>
+    <string name="custom_network_name_title">Имя сети</string>
+    <string name="custom_node_add_button_state">Добавить ноду</string>
+    <string name="custom_node_add_title">Добавить пользовательскую ноду для</string>
+    <string name="custom_node_disabled_button_state">Введите данные</string>
+    <string name="custom_node_edit_button_state">Сохранить</string>
+    <string name="custom_node_edit_title">Редактировать пользовательскую ноду для</string>
+    <string name="custom_node_name_hint">Имя</string>
+    <string name="custom_node_name_title">Имя ноды</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">URL ноды</string>
+    <string name="custom_rpc_node_url_title">RPC URL</string>
     <string name="dapp_authorized_description">DApps, к которым вы разрешили доступ, видят ваш адрес, когда вы их используете</string>
     <string name="dapp_authorized_remove_description">”%s” DApp будет удален из Авторизованных</string>
     <string name="dapp_authorized_remove_title">Удалить из Авторизованных?</string>
@@ -615,7 +647,9 @@
     <string name="deep_linking_invalid_derivation_path">Неверный формат пути деривации</string>
     <string name="deep_linking_invalid_mnemonic">Неверный формат мнемоники</string>
     <string name="deep_linking_url_is_invalid">Неверный формат ссылки</string>
+    <string name="default_network_already_exist_failure_message">Введенный RPC URL присутствует в Nova как %s сеть.</string>
     <string name="default_notification_channel_name">Основной канал уведомлений</string>
+    <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Поиск по адресу или имени</string>
     <string name="delegate_search_placeholder_empty">Недопустимый формат адреса. Убедитесь, что адрес принадлежит правильной сети</string>
     <string name="delegate_search_result_count">результаты поиска: %d</string>
@@ -664,6 +698,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">Пароль для бэкапа был обновлен ранее. Чтобы продолжить использование Облачного Бэкапа, %s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">введите новый пароль от бэкапа.</string>
     <string name="deprecated_cloud_backup_password_title">Пароль от бэкапа изменился</string>
+    <string name="disabled_chain_error_message">Вы не можете подписывать транзакции отключенных сетей. Включите %s в настройках и попробуйте снова</string>
+    <string name="disabled_chain_error_title">%s отключена</string>
     <string name="duplicate_proxy_type_message">Вы уже делегируете полномочия этому аккаунту: %s</string>
     <string name="duplicate_proxy_type_title">Делегация уже существует</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH совместимый)</string>
@@ -725,8 +761,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">Используйте свою фразу длинной 12, 15, 18, 21 или 24 слова</string>
     <string name="import_wallet_options_title">Выберите как вы бы хотели импортировать кошелёк</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>
+    <string name="integrate_networks_banner_description">Интегрируйте все функции сети, которую вы создаете, в Nova Wallet, чтобы сделать ее доступной для всех.</string>
+    <string name="integrate_networks_banner_link">Интегрировать вашу сеть</string>
+    <string name="integrate_networks_banner_title">Создаете для Polkadot?</string>
     <string name="invalid_proxy_address_message">Адрес прокси должен быть действительным адресом %s</string>
     <string name="invalid_proxy_address_title">Неверный адрес прокси</string>
+    <string name="invalid_token_symbol_message">Введенный символ валюты (%1$s) не совпадает с сетью (%2$s). Вы хотите использовать правильный символ валюты?</string>
+    <string name="invalid_token_symbol_title">Неверный символ валюты</string>
     <string name="invoice_scan_error_no_info">Не удается декодировать QR</string>
     <string name="invoice_scan_qr_code_title">QR код</string>
     <string name="invoice_scan_upload">Из галереи</string>
@@ -754,10 +795,21 @@
     <string name="ledger_verify_address_subtitle">Нажмите обе кнопки на Вашем %s для подтверждения адреса</string>
     <string name="ledger_wallet_details_description">Этот кошелёк добавлен из Ledger устройства. Nova Wallet поможет создать любую операцию, и вам будет необходимо подписать ее с помощью Ledger устройства</string>
     <string name="ledher_import_select_address_title">Выберите аккаунт для добавления в кошелёк</string>
+    <string name="loading_network_info">Загрузка информации о сети...</string>
     <string name="loocking_backup_progress">В процессе поиска вашего бэкапа...</string>
     <string name="make_payout_transaction_sent">Транзакция на выплату отправлена</string>
     <string name="manage_assets_add_token">Добавить</string>
     <string name="manage_cloud_backup">Управление бэкапом</string>
+    <string name="manage_network_action_delete">Удалить сеть</string>
+    <string name="manage_network_action_edit">Редактировать сеть</string>
+    <string name="manage_network_actions_title">Управление добавленной сетью</string>
+    <string name="manage_network_delete_message">Вы не сможете видеть свои балансы токенов в этой сети на экране активов</string>
+    <string name="manage_network_delete_title">Удалить сеть?</string>
+    <string name="manage_node_action_delete">Удалить ноду</string>
+    <string name="manage_node_action_edit">Редактировать ноду</string>
+    <string name="manage_node_actions_title">Управление добавленной нодой</string>
+    <string name="manage_node_delete_message">Нода \\"%s\\" будет удалена</string>
+    <string name="manage_node_delete_title">Удалить ноду?</string>
     <string name="manual_backup_secrets_custom_key_title">Добавленный ключ</string>
     <string name="manual_backup_secrets_default_key_title">Ключ по умолчанию</string>
     <string name="manual_backup_secrets_subtitle">Не делитесь этой информацией с кем-либо. Если вы это сделаете, вы навсегда и безвозвратно потеряете все свои активы.</string>
@@ -781,9 +833,14 @@
         <item quantity="many">Выберите хотя бы %d кошельков</item>
         <item quantity="other">Выберите хотя бы %d кошельков</item>
     </plurals>
+    <string name="network_already_exist_failure_title">Эта нода уже существует</string>
     <string name="network_fee">Комиссия сети</string>
     <string name="network_info_address">Адрес ноды</string>
     <string name="network_info_title">Информация ноды</string>
+    <string name="network_management_added_page_title">Добавлено</string>
+    <string name="network_management_custom_nodes">пользовательские ноды</string>
+    <string name="network_management_default_nodes">ноды по умолчанию</string>
+    <string name="network_management_default_page_title">По умолчанию</string>
     <string name="network_status_connecting">Подключение…</string>
     <string name="nft_collection">Коллекция</string>
     <string name="nft_created_by">Создатель</string>
@@ -794,6 +851,12 @@
     <string name="nft_owned_by">Владелец</string>
     <string name="nft_price_not_listed">Без цены</string>
     <string name="nft_your_nfts">Ваши NFT</string>
+    <string name="node_already_exist_failure_message">Введенный вами URL уже существует как \"%s\" нода.</string>
+    <string name="node_already_exist_failure_title">Этот Узел уже существует</string>
+    <string name="node_not_alive_message">Введенный вами URL Узла либо не отвечает, либо имеет неверный формат. Формат URL должен начинаться с \"wss://\".</string>
+    <string name="node_not_alive_title">Ошибка ноды</string>
+    <string name="node_not_supported_by_network_message">Введенный вами URL не соответствует ноде для %1$s.\nПожалуйста, введите URL валидной ноды %1$s.</string>
+    <string name="node_not_supported_by_network_title">Неверная сеть</string>
     <string name="nomination_pool_claim_rewards">Забрать награды</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Ваши токены будут добавлены обратно в стейкинг</string>
     <string name="nomination_pools_direct">Прямой</string>
@@ -838,6 +901,10 @@
     <string name="pool_full_failure_title">Пул заполнен</string>
     <string name="pool_inactive_failure_message">Вы не можете присоединиться к не открытому пулу. Пожалуйста, свяжитесь с владельцем пула.</string>
     <string name="pool_inactive_failure_title">Пул не открыт</string>
+    <string name="pre_configured_networks_add_custom_button">Добавить сеть вручную</string>
+    <string name="pre_configured_networks_progress_text">Загрузка списка сетей...</string>
+    <string name="pre_configured_networks_search_hint">Поиск по имени сети</string>
+    <string name="pre_configured_networks_title">Добавить сеть</string>
     <string name="profile_accounts_title">Аккаунты</string>
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
@@ -1483,6 +1550,7 @@
     <string name="tabbar_staking_title">Стейкинг</string>
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="today">Сегодня</string>
+    <string name="token_price_info_provider_label">Ссылка Coingecko для курса валют (необязательно)</string>
     <string name="transaction_details_copy_hash">Копировать хеш</string>
     <string name="transaction_details_extrinsic_fee">Комиссия</string>
     <string name="transaction_details_from">От</string>

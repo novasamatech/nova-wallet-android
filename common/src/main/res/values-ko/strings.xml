@@ -150,7 +150,9 @@
     <string name="accounts_change_chain_account">%s 계정 변경</string>
     <string name="accounts_change_chain_secrets">계정 변경</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="add_custom_node">사용자 정의 노드 추가</string>
     <string name="add_delegation_missing_account_message">위임하기 위해 지갑에 %s 계정을 추가해야 합니다</string>
+    <string name="add_network_title">네트워크 세부사항 입력</string>
     <string name="add_proxy_confirmation_delegate_to">위임할 대상</string>
     <string name="add_proxy_confirmation_delegating_account">위임 계정</string>
     <string name="add_proxy_confirmation_delegating_wallet">위임 지갑</string>
@@ -158,6 +160,7 @@
     <string name="add_proxy_deposit_description_message">프록시가 제거될 때까지 예치금은 계좌에 예약된 상태로 남아 있습니다.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s에서 추가된 프록시 수의 한도에 도달했습니다. 새로운 프록시를 추가하려면 기존 프록시를 제거하세요.</string>
     <string name="add_proxy_maximum_reached_error_title">최대 프록시 수에 도달했습니다</string>
+    <string name="added_networks_empty_placeholder">추가된 사용자 정의 네트워크는 여기에 나타납니다</string>
     <string name="asset_add_evm_token_already_exist_message">입력된 계약 주소는 Nova에서 %s 토큰으로 이미 존재합니다.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">입력된 계약 주소는 Nova에서 %s 토큰으로 존재합니다. 수정하시겠습니까?</string>
     <string name="asset_add_evm_token_already_exist_title">이 토큰은 이미 존재합니다</string>
@@ -173,7 +176,6 @@
     <string name="assets_add_token">토큰 추가</string>
     <string name="assets_add_token_enter_info_address_label">계약 주소</string>
     <string name="assets_add_token_enter_info_decimals_label">소수 자릿수</string>
-    <string name="assets_add_token_enter_info_price_label">가격 정보용 Coingecko 링크 (선택 사항)</string>
     <string name="assets_add_token_enter_info_symbol_label">심볼</string>
     <string name="assets_add_token_enter_info_title">ERC-20 토큰 세부정보 입력</string>
     <string name="assets_add_token_select_chain_title">ERC-20 토큰을 추가할 네트워크 선택</string>
@@ -223,6 +225,8 @@
     <string name="buy_completed">구매가 시작되었습니다! 최대 60분까지 기다려주세요. 이메일에서 상태를 추적할 수 있습니다.</string>
     <string name="buy_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
     <string name="buy_provider_open_confirmation_title">브라우저에서 계속할까요?</string>
+    <string name="chain_network_management_auto_balance">자동 균형 노드</string>
+    <string name="chain_network_management_enabling">연결 활성화</string>
     <string name="change_cloud_backup_password_subtitle">클라우드 백업에서 지갑을 복구하는 데 사용할 비밀번호를 입력하십시오. 이 비밀번호는 나중에 복구할 수 없으므로 반드시 기억해 두십시오!</string>
     <string name="change_cloud_backup_password_title">백업 비밀번호 업데이트</string>
     <string name="choose_amount_asset">자산</string>
@@ -280,6 +284,7 @@
     <string name="common_active">활성화됨</string>
     <string name="common_add">추가</string>
     <string name="common_add_delegation">위임 추가</string>
+    <string name="common_add_network">네트워크 추가</string>
     <string name="common_address">주소</string>
     <string name="common_advanced">고급</string>
     <string name="common_all">전체</string>
@@ -316,6 +321,8 @@
     <string name="common_confirm_title">확인</string>
     <string name="common_confirmation_title">확실합니까?</string>
     <string name="common_confirmed">확인됨</string>
+    <string name="common_connected_ms">%d ms</string>
+    <string name="common_connecting">연결 중...</string>
     <string name="common_connection_error_message">연결을 확인하거나 나중에 다시 시도해주세요</string>
     <string name="common_connection_error_title">연결 실패</string>
     <string name="common_continue">계속</string>
@@ -325,6 +332,7 @@
     <string name="common_crypto_type">키페어 암호화 유형</string>
     <string name="common_date">날짜</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s 및 %s</string>
+    <string name="common_delete">삭제</string>
     <string name="common_details">세부 사항</string>
     <string name="common_disabled">비활성화됨</string>
     <string name="common_disconnect">연결 끊기</string>
@@ -336,10 +344,12 @@
     <string name="common_enable">활성화</string>
     <string name="common_enter_address">주소 입력...</string>
     <string name="common_enter_amount">금액 입력...</string>
+    <string name="common_enter_details">세부사항 입력</string>
     <string name="common_enter_password">비밀번호 입력</string>
     <string name="common_error_general_title">오류</string>
     <string name="common_error_not_enough_tokens">토큰이 부족합니다</string>
     <string name="common_event">이벤트</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">EVM 주소</string>
     <string name="common_existential_warning_message_v2_2_0">이 작업 후 계정의 전체 잔액이 최소 잔액보다 낮아지면 블록체인에서 계정이 제거됩니다</string>
     <string name="common_existential_warning_title">작업이 계정을 제거합니다</string>
@@ -377,6 +387,7 @@
         <item quantity="other">%d 분</item>
     </plurals>
     <string name="common_missing_account_title">%s 계정이 없습니다</string>
+    <string name="common_modify">수정</string>
     <string name="common_module">모듈</string>
     <string name="common_network">네트워크</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -448,9 +459,11 @@
     <string name="common_something_went_wrong_title">문제가 발생했습니다</string>
     <string name="common_sort_by">정렬 기준</string>
     <string name="common_status">상태</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Substrate 주소</string>
     <string name="common_tap_to_reveal_title">누르면 나타납니다</string>
     <string name="common_terms_and_conditions_formatting">이용 약관</string>
+    <string name="common_testnet">Testnet</string>
     <string name="common_time_left">남은 시간</string>
     <string name="common_title">제목</string>
     <string name="common_to_settings">설정 열기</string>
@@ -485,7 +498,6 @@
     <string name="connection_add_already_exists_error">노드는 이미 추가되었습니다. 다른 노드를 시도하십시오.</string>
     <string name="connection_add_invalid_error">노드와 연결할 수 없습니다. 다른 노드를 시도하십시오.</string>
     <string name="connection_add_unsupported_error">안타깝게도, 네트워크가 지원되지 않습니다. 다음 중 하나를 시도해 보세요: %s.</string>
-    <string name="connection_delete_confirm">삭제</string>
     <string name="connection_delete_description">%s 삭제를 확인하세요.</string>
     <string name="connection_delete_title">네트워크를 삭제할까요?</string>
     <string name="connection_error_message_v2_2_0">연결을 확인하거나 나중에 다시 시도해 주세요</string>
@@ -508,6 +520,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">암호가 일치합니다</string>
     <string name="create_cloud_backup_password_subtitle">백업에 접근할 수 있는 암호를 입력하세요. 암호는 복구할 수 없으므로 반드시 기억하세요!</string>
     <string name="create_cloud_backup_password_title">백업 비밀번호 생성</string>
+    <string name="create_network_invalid_chain_id_message">입력한 체인 ID가 RPC URL의 네트워크와 일치하지 않습니다.</string>
+    <string name="create_network_invalid_chain_id_title">유효하지 않은 체인 ID</string>
     <string name="crodloan_private_crowdloan_message">개인 크라우드론은 아직 지원되지 않습니다.</string>
     <string name="crodloan_private_crowdloan_title">개인 크라우드론</string>
     <string name="crowdloan_about">크라우드론에 대해서</string>
@@ -564,6 +578,24 @@
     <string name="crowdloan_unlock_hint">임대 기간이 끝난 후 당신의 %s 토큰이 반환됩니다.</string>
     <string name="crowdloan_your_contributions">당신의 기여</string>
     <string name="crownloans_raised_format" formatted="false">모금액: %s 중 %s</string>
+    <string name="custom_network_already_exist_failure_message">입력한 RPC URL은 Nova에 %s 사용자 정의 네트워크로 이미 존재합니다. 정말로 수정하시겠습니까?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">블록 탐색기 URL (선택 사항)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">체인 ID</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">통화 기호</string>
+    <string name="custom_network_name_title">네트워크 이름</string>
+    <string name="custom_node_add_button_state">노드 추가</string>
+    <string name="custom_node_add_title">사용자 정의 노드 추가</string>
+    <string name="custom_node_disabled_button_state">세부사항 입력</string>
+    <string name="custom_node_edit_button_state">저장</string>
+    <string name="custom_node_edit_title">사용자 정의 노드 수정</string>
+    <string name="custom_node_name_hint">이름</string>
+    <string name="custom_node_name_title">노드 이름</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">노드 URL</string>
+    <string name="custom_rpc_node_url_title">RPC URL</string>
     <string name="dapp_authorized_description">사용 중에 주소 접근을 허용한 DApps</string>
     <string name="dapp_authorized_remove_description">\"%s\" DApp이 인증된 목록에서 제거됩니다</string>
     <string name="dapp_authorized_remove_title">인증된 목록에서 제거하시겠습니까?</string>
@@ -600,6 +632,7 @@
     <string name="deep_linking_invalid_derivation_path">잘못된 파생 경로</string>
     <string name="deep_linking_invalid_mnemonic">잘못된 니모닉</string>
     <string name="deep_linking_url_is_invalid">잘못된 URL</string>
+    <string name="default_network_already_exist_failure_message">입력한 RPC URL은 Nova에 %s 네트워크로 이미 존재합니다.</string>
     <string name="default_notification_channel_name">기본 알림 채널</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">주소나 이름으로 검색</string>
@@ -650,6 +683,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">귀하의 백업 비밀번호가 이전에 업데이트되었습니다. Cloud Backup을 계속 사용하려면 %s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">새 백업 비밀번호를 입력하십시오.</string>
     <string name="deprecated_cloud_backup_password_title">백업 비밀번호가 변경되었습니다</string>
+    <string name="disabled_chain_error_message">비활성화된 네트워크의 트랜잭션을 서명할 수 없습니다. 설정에서 %s를 활성화하고 다시 시도하세요.</string>
+    <string name="disabled_chain_error_title">%s가 비활성화되었습니다</string>
     <string name="duplicate_proxy_type_message">이미 이 계정에 위임하고 있습니다: %s</string>
     <string name="duplicate_proxy_type_title">위임이 이미 존재합니다</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH 호환 가능)</string>
@@ -708,8 +743,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">12, 15, 18, 21 또는 24개의 단어로 된 구문 사용</string>
     <string name="import_wallet_options_title">지갑을 가져올 방법 선택</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>
+    <string name="integrate_networks_banner_description">당신이 구축하고 있는 네트워크의 모든 기능을 Nova Wallet에 통합하여 모든 사람이 접근할 수 있게 만드세요.</string>
+    <string name="integrate_networks_banner_link">네트워크 통합</string>
+    <string name="integrate_networks_banner_title">Polkadot을 위해 개발 중인가요?</string>
     <string name="invalid_proxy_address_message">프록시 주소는 유효한 %s 주소여야 합니다</string>
     <string name="invalid_proxy_address_title">유효하지 않은 프록시 주소</string>
+    <string name="invalid_token_symbol_message">입력한 통화 기호(%1$s)가 네트워크(%2$s)와 일치하지 않습니다. 올바른 통화 기호를 사용하시겠습니까?</string>
+    <string name="invalid_token_symbol_title">유효하지 않은 통화 기호</string>
     <string name="invoice_scan_error_no_info">QR을 해독할 수 없습니다</string>
     <string name="invoice_scan_qr_code_title">QR 코드</string>
     <string name="invoice_scan_upload">갤러리에서 업로드</string>
@@ -737,10 +777,21 @@
     <string name="ledger_verify_address_subtitle">주소를 승인하려면 %s에서 두 버튼을 모두 누르세요</string>
     <string name="ledger_wallet_details_description">이 지갑은 Ledger와 연동되어 있습니다. Nova는 원하는 모든 작업을 생성하는 데 도움을 줄 것이며, Ledger를 사용하여 서명하라는 요청을 받을 것입니다.</string>
     <string name="ledher_import_select_address_title">지갑에 추가할 계정을 선택하세요</string>
+    <string name="loading_network_info">네트워크 정보를 불러오는 중...</string>
     <string name="loocking_backup_progress">백업을 찾고 있습니다...</string>
     <string name="make_payout_transaction_sent">출금 거래가 전송되었습니다</string>
     <string name="manage_assets_add_token">토큰 추가</string>
     <string name="manage_cloud_backup">백업 관리</string>
+    <string name="manage_network_action_delete">네트워크 삭제</string>
+    <string name="manage_network_action_edit">네트워크 편집</string>
+    <string name="manage_network_actions_title">추가된 네트워크 관리</string>
+    <string name="manage_network_delete_message">해당 네트워크에서 자산 화면에서 토큰 잔액을 볼 수 없습니다.</string>
+    <string name="manage_network_delete_title">네트워크 삭제?</string>
+    <string name="manage_node_action_delete">노드 삭제</string>
+    <string name="manage_node_action_edit">노드 편집</string>
+    <string name="manage_node_actions_title">추가된 노드 관리</string>
+    <string name="manage_node_delete_message">노드 \\\"%s\\"이(가) 삭제됩니다</string>
+    <string name="manage_node_delete_title">노드를 삭제하시겠습니까?</string>
     <string name="manual_backup_secrets_custom_key_title">사용자 정의 키</string>
     <string name="manual_backup_secrets_default_key_title">기본 키</string>
     <string name="manual_backup_secrets_subtitle">이 정보를 누구와도 공유하지 마십시오 - 공유하면 모든 자산을 영구적이고 돌이킬 수 없이 잃게 됩니다</string>
@@ -761,9 +812,14 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">최소 %d 개의 지갑을 선택하세요</item>
     </plurals>
+    <string name="network_already_exist_failure_title">이 노드가 이미 존재합니다</string>
     <string name="network_fee">네트워크 수수료</string>
     <string name="network_info_address">노드 주소</string>
     <string name="network_info_title">노드 정보</string>
+    <string name="network_management_added_page_title">추가됨</string>
+    <string name="network_management_custom_nodes">사용자 정의 노드</string>
+    <string name="network_management_default_nodes">기본 노드</string>
+    <string name="network_management_default_page_title">기본</string>
     <string name="network_status_connecting">연결 중…</string>
     <string name="nft_collection">컬렉션</string>
     <string name="nft_created_by">제작자</string>
@@ -774,6 +830,12 @@
     <string name="nft_owned_by">소유자</string>
     <string name="nft_price_not_listed">가격 미정</string>
     <string name="nft_your_nfts">당신의 NFT</string>
+    <string name="node_already_exist_failure_message">입력된 URL이 \\\"%s\\\" 노드로 이미 존재합니다.</string>
+    <string name="node_already_exist_failure_title">이 노드가 이미 존재합니다</string>
+    <string name="node_not_alive_message">입력된 노드 URL이 응답하지 않거나 잘못된 형식을 포함하고 있습니다. URL 형식은 \"wss://\"로 시작해야 합니다.</string>
+    <string name="node_not_alive_title">노드 오류</string>
+    <string name="node_not_supported_by_network_message">입력된 URL이 %1$s의 노드에 해당되지 않습니다.\n유효한 %1$s 노드의 URL을 입력하십시오.</string>
+    <string name="node_not_supported_by_network_title">잘못된 네트워크</string>
     <string name="nomination_pool_claim_rewards">보상 청구</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">귀하의 토큰이 다시 Stake에 추가됩니다</string>
     <string name="nomination_pools_direct">직접</string>
@@ -818,6 +880,10 @@
     <string name="pool_full_failure_title">풀이 가득 찼습니다</string>
     <string name="pool_inactive_failure_message">열려 있지 않은 풀에는 가입할 수 없습니다. 풀 소유자에게 연락해 주세요.</string>
     <string name="pool_inactive_failure_title">풀은 열려 있지 않습니다</string>
+    <string name="pre_configured_networks_add_custom_button">네트워크 수동 추가</string>
+    <string name="pre_configured_networks_progress_text">네트워크 목록을 로드 중...</string>
+    <string name="pre_configured_networks_search_hint">네트워크 이름으로 검색</string>
+    <string name="pre_configured_networks_title">네트워크 추가</string>
     <string name="profile_accounts_title">계정</string>
     <string name="profile_accounts_title_2_0">지갑</string>
     <string name="profile_language_title">언어</string>
@@ -1454,6 +1520,7 @@
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">지갑</string>
     <string name="today">오늘</string>
+    <string name="token_price_info_provider_label">가격 정보용 Coingecko 링크 (선택 사항)</string>
     <string name="transaction_details_copy_hash">해시 복사</string>
     <string name="transaction_details_extrinsic_fee">수수료</string>
     <string name="transaction_details_from">보낸 사람</string>
