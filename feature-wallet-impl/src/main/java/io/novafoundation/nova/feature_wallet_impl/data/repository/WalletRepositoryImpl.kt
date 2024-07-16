@@ -57,8 +57,8 @@ class WalletRepositoryImpl(
             chainRegistry.chainsById,
             assetCache.observeSyncedAssets(metaId)
         ) { chainsById, assetsLocal ->
-            assetsLocal.map { asset ->
-                mapAssetLocalToAsset(asset, chainsById.chainAsset(asset.assetAndChainId))
+            assetsLocal.mapNotNull { asset ->
+                chainsById.chainAsset(asset.assetAndChainId)?.let { mapAssetLocalToAsset(asset, it) }
             }
         }
     }
@@ -67,8 +67,8 @@ class WalletRepositoryImpl(
         val chainsById = chainRegistry.chainsById.first()
         val assetsLocal = assetCache.getSyncedAssets(metaId)
 
-        assetsLocal.map {
-            mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
+        assetsLocal.mapNotNull { asset ->
+            chainsById.chainAsset(asset.assetAndChainId)?.let { mapAssetLocalToAsset(asset, it) }
         }
     }
 
@@ -76,8 +76,8 @@ class WalletRepositoryImpl(
         val chainsById = chainRegistry.chainsById.first()
         val assetsLocal = assetCache.getSupportedAssets(metaId)
 
-        assetsLocal.map {
-            mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
+        assetsLocal.mapNotNull { asset ->
+            chainsById.chainAsset(asset.assetAndChainId)?.let { mapAssetLocalToAsset(asset, it) }
         }
     }
 
@@ -242,7 +242,7 @@ class WalletRepositoryImpl(
         assetCache.getAssetWithToken(metaAccount.id, chainId, assetId)
     }
 
-    private fun Map<ChainId, Chain>.chainAsset(ids: AssetAndChainId): Chain.Asset {
-        return getValue(ids.chainId).assetsById.getValue(ids.assetId)
+    private fun Map<ChainId, Chain>.chainAsset(ids: AssetAndChainId): Chain.Asset? {
+        return get(ids.chainId)?.assetsById?.get(ids.assetId)
     }
 }
