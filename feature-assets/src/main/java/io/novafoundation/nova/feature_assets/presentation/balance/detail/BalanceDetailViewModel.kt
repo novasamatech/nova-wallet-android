@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.unlabeledReserves
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -225,9 +226,11 @@ class BalanceDetailViewModel(
             )
         }
 
+        val unlabeledReserves = asset.unlabeledReserves(holds)
+
         val reservedBalance = BalanceLocksModel.Lock(
             resourceManager.getString(R.string.wallet_balance_reserved),
-            mapAmountToAmountModel(asset.reserved, asset)
+            mapAmountToAmountModel(unlabeledReserves, asset)
         )
 
         val external = externalBalances.map { externalBalance ->

@@ -1,10 +1,13 @@
 package io.novafoundation.nova.feature_assets.domain.breakdown
 
 import io.novafoundation.nova.common.utils.formatting.ABBREVIATED_SCALE
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.percentage
+import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.common.utils.unite
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown.PercentageAmount
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -14,6 +17,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.unlabeledReserves
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -78,7 +82,11 @@ class BalanceBreakdownInteractor(
                     val locksItems = mapLocks(assetsByChainId, locks.orEmpty())
                     val holdsItems = mapHolds(assetsByChainId, holds.orEmpty())
                     val externalBalancesItems = mapExternalBalances(assetsByChainId, externalBalances.orEmpty())
-                    val reserved = getReservedBreakdown(assets)
+
+                    val holdsByAsset = holds.orEmpty()
+                        .groupBy { it.chainAsset.fullId }
+                        .mapValues { (_, holds) -> holds.sumByBigInteger { it.amountInPlanks } }
+                    val reserved = getReservedBreakdown(assets, holdsByAsset)
 
                     val breakdown = locksItems + holdsItems + externalBalancesItems + reserved
 
@@ -162,14 +170,18 @@ class BalanceBreakdownInteractor(
         return TotalAmount(total, transferable, locks)
     }
 
-    private fun getReservedBreakdown(assets: List<Asset>): List<BalanceBreakdown.BreakdownItem> {
+    private fun getReservedBreakdown(assets: List<Asset>, holds: Map<FullChainAssetId, Balance>): List<BalanceBreakdown.BreakdownItem> {
         return assets
             .filter { it.reservedInPlanks > BigInteger.ZERO }
-            .map {
+            .mapNotNull {
+                val labeledReserves = holds[it.token.configuration.fullId].orZero()
+                val unlabeledReserves = it.unlabeledReserves(labeledReserves)
+                if (unlabeledReserves <= BigInteger.ZERO) return@mapNotNull null
+
                 BalanceBreakdown.BreakdownItem(
                     id = BalanceBreakdownIds.RESERVED,
                     token = it.token,
-                    amountInPlanks = it.reservedInPlanks
+                    amountInPlanks = unlabeledReserves
                 )
             }
     }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.holdAndFreezesTransferable
@@ -109,6 +110,14 @@ data class Asset(
     val bonded = token.amountFromPlanks(bondedInPlanks)
     val redeemable = token.amountFromPlanks(redeemableInPlanks)
     val unbonding = token.amountFromPlanks(unbondingInPlanks)
+}
+
+fun Asset.unlabeledReserves(holds: Collection<BalanceHold>): Balance {
+    return unlabeledReserves(holds.sumByBigInteger { it.amountInPlanks })
+}
+
+fun Asset.unlabeledReserves(labeledReserves: Balance): Balance {
+    return reservedInPlanks - labeledReserves
 }
 
 fun Asset.balanceCountedTowardsED(): BigDecimal {

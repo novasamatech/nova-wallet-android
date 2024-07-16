@@ -5,7 +5,7 @@
 
 
     <string name="pool_staking_conflict_title">Pool operations are not available</string>
-    <string name="pool_staking_conflict_message">Pool staking can no longer be used at the same time as Direct staking. It is not possible to manage your pool staking position until you finish Direct staking.</string>
+    <string name="pool_staking_conflict_message">You can no longer use both Direct Staking and Pool Staking from the same account. To manage your Pool  Staking you first need to unstake your tokens from Direct Staking.</string>
 
     <string name="account_ledger_migration_deprecation_message">The Migration app will be unavailable in the near future. Use it to migrate your accounts to the new Ledger app to avoid losing your funds.</string>
 
