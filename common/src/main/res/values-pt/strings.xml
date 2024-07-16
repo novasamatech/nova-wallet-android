@@ -225,6 +225,8 @@
     <string name="buy_completed">Compra iniciada! Por favor, aguarde até 60 minutos. Você pode rastrear o status pelo email.</string>
     <string name="buy_provider_open_confirmation_message">Para continuar a compra você será redirecionado do aplicativo Nova Wallet para %s</string>
     <string name="buy_provider_open_confirmation_title">Continuar no navegador?</string>
+    <string name="chain_network_management_auto_balance">Equilibrar nós automaticamente</string>
+    <string name="chain_network_management_enabling">Ativar conexão</string>
     <string name="change_cloud_backup_password_subtitle">Por favor, insira uma senha que será usada para recuperar suas carteiras do backup na nuvem. Essa senha não pode ser recuperada no futuro, então certifique-se de se lembrar dela!</string>
     <string name="change_cloud_backup_password_title">Atualizar senha de backup</string>
     <string name="choose_amount_asset">Ativo</string>

@@ -225,6 +225,8 @@
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
     <string name="buy_provider_open_confirmation_title">Tarayıcıda devam et?</string>
+    <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>
+    <string name="chain_network_management_enabling">Bağlantıyı etkinleştir</string>
     <string name="change_cloud_backup_password_subtitle">Cüzdanlarınızı bulut yedeklemesinden kurtarmak için kullanılacak bir parola girin. Bu parolanın gelecekte kurtarılamayacağını unutmayın, bu nedenle onu hatırladığınızdan emin olun!</string>
     <string name="change_cloud_backup_password_title">Yedekleme parolasını güncelle</string>
     <string name="choose_amount_asset">Varlık</string>

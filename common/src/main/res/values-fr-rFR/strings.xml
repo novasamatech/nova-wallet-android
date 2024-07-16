@@ -225,6 +225,8 @@
     <string name="buy_completed">L\'achat est lancé ! Veuillez patienter jusqu\'à 60 minutes. Vous pouvez suivre l\'état d\'avancement sur l\'e-mail.</string>
     <string name="buy_provider_open_confirmation_message">Pour poursuivre l\'achat, vous serez redirigé de l\'application Nova Wallet vers %s</string>
     <string name="buy_provider_open_confirmation_title">Continuer dans le navigateur?</string>
+    <string name="chain_network_management_auto_balance">Équilibrage automatique des nœuds</string>
+    <string name="chain_network_management_enabling">Activer la connexion</string>
     <string name="change_cloud_backup_password_subtitle">Veuillez entrer un mot de passe qui sera utilisé pour récupérer vos portefeuilles à partir de la sauvegarde cloud. Ce mot de passe ne pourra pas être récupéré à l\'avenir, alors assurez-vous de vous en souvenir !</string>
     <string name="change_cloud_backup_password_title">Mettre à jour le mot de passe de sauvegarde</string>
     <string name="choose_amount_asset">Actif</string>

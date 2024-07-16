@@ -225,6 +225,8 @@
     <string name="buy_completed">¡Compra iniciada! Por favor, espere hasta 60 minutos. Puede seguir el estado en el correo electrónico.</string>
     <string name="buy_provider_open_confirmation_message">Para continuar la compra será redirigido desde la aplicación Nova Wallet a %s</string>
     <string name="buy_provider_open_confirmation_title">¿Continuar en el navegador?</string>
+    <string name="chain_network_management_auto_balance">Equilibrar nodos automáticamente</string>
+    <string name="chain_network_management_enabling">Habilitar conexión</string>
     <string name="change_cloud_backup_password_subtitle">Por favor, ingresa una contraseña que se usará para recuperar tus billeteras desde el respaldo en la nube. Esta contraseña no podrá ser recuperada en el futuro, ¡así que asegúrate de recordarla!</string>
     <string name="change_cloud_backup_password_title">Actualizar contraseña de respaldo</string>
     <string name="choose_amount_asset">Token</string>

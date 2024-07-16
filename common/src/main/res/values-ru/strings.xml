@@ -225,6 +225,8 @@
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
     <string name="buy_provider_open_confirmation_title">Продолжить в браузере?</string>
+    <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>
+    <string name="chain_network_management_enabling">Включить подключение</string>
     <string name="change_cloud_backup_password_subtitle">Введите пароль, который будет использоваться для восстановления ваших кошельков из облачного бэкапа. Этот пароль нельзя будет восстановить в будущем, поэтому обязательно запомните его!</string>
     <string name="change_cloud_backup_password_title">Изменить пароль бэкапа</string>
     <string name="choose_amount_asset">Токен</string>

@@ -225,6 +225,8 @@
     <string name="buy_completed">구매가 시작되었습니다! 최대 60분까지 기다려주세요. 이메일에서 상태를 추적할 수 있습니다.</string>
     <string name="buy_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
     <string name="buy_provider_open_confirmation_title">브라우저에서 계속할까요?</string>
+    <string name="chain_network_management_auto_balance">자동 균형 노드</string>
+    <string name="chain_network_management_enabling">연결 활성화</string>
     <string name="change_cloud_backup_password_subtitle">클라우드 백업에서 지갑을 복구하는 데 사용할 비밀번호를 입력하십시오. 이 비밀번호는 나중에 복구할 수 없으므로 반드시 기억해 두십시오!</string>
     <string name="change_cloud_backup_password_title">백업 비밀번호 업데이트</string>
     <string name="choose_amount_asset">자산</string>

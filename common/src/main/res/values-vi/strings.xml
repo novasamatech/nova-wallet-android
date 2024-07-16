@@ -225,6 +225,8 @@
     <string name="buy_completed">Mua hàng đã được khởi tạo! Vui lòng đợi tối đa 60 phút. Bạn có thể theo dõi trạng thái trong email.</string>
     <string name="buy_provider_open_confirmation_message">Để tiếp tục mua hàng, bạn sẽ được chuyển hướng từ ứng dụng Nova Wallet tới %s</string>
     <string name="buy_provider_open_confirmation_title">Tiếp tục trong trình duyệt?</string>
+    <string name="chain_network_management_auto_balance">Tự động cân bằng nodes</string>
+    <string name="chain_network_management_enabling">Kích hoạt kết nối</string>
     <string name="change_cloud_backup_password_subtitle">Vui lòng nhập mật khẩu sẽ được sử dụng để khôi phục ví của bạn từ sao lưu đám mây. Mật khẩu này không thể khôi phục trong tương lai, vì vậy hãy đảm bảo ghi nhớ nó!</string>
     <string name="change_cloud_backup_password_title">Cập nhật mật khẩu sao lưu</string>
     <string name="choose_amount_asset">Tài sản</string>

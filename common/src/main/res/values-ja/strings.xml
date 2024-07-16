@@ -225,6 +225,8 @@
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
     <string name="buy_provider_open_confirmation_title">ブラウザで続行しますか？</string>
+    <string name="chain_network_management_auto_balance">自動バランスノード</string>
+    <string name="chain_network_management_enabling">接続を有効にする</string>
     <string name="change_cloud_backup_password_subtitle">クラウドバックアップからウォレットを復元するために使用するパスワードを入力してください。このパスワードは将来的に復元できないため、必ず覚えておいてください！</string>
     <string name="change_cloud_backup_password_title">バックアップパスワードを更新</string>
     <string name="choose_amount_asset">アセット</string>

@@ -225,6 +225,8 @@
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
     <string name="buy_provider_open_confirmation_title">在浏览器中继续？</string>
+    <string name="chain_network_management_auto_balance">自动平衡节点</string>
+    <string name="chain_network_management_enabling">启用连接</string>
     <string name="change_cloud_backup_password_subtitle">请输入用于从云备份恢复钱包的密码。此密码将无法在未来恢复，请务必记住！</string>
     <string name="change_cloud_backup_password_title">更新备份密码</string>
     <string name="choose_amount_asset">资产</string>

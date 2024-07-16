@@ -225,6 +225,8 @@
     <string name="buy_completed">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya melalui email.</string>
     <string name="buy_provider_open_confirmation_message">Untuk melanjutkan pembelian, Anda akan diarahkan dari aplikasi Nova Wallet ke %s</string>
     <string name="buy_provider_open_confirmation_title">Lanjut di browser?</string>
+    <string name="chain_network_management_auto_balance">Node saldo otomatis</string>
+    <string name="chain_network_management_enabling">Aktifkan koneksi</string>
     <string name="change_cloud_backup_password_subtitle">Silakan masukkan kata sandi yang akan digunakan untuk memulihkan dompet Anda dari cadangan cloud. Kata sandi ini tidak dapat dipulihkan di masa depan, jadi pastikan untuk mengingatnya!</string>
     <string name="change_cloud_backup_password_title">Perbarui kata sandi cadangan</string>
     <string name="choose_amount_asset">Aset</string>
