@@ -20,7 +20,7 @@ class RealDelegatedStakeMigrationUseCase(
     private val delegatedStakeRepository: NominationPoolDelegatedStakeRepository,
     private val stakingSharedState: StakingSharedState,
     private val accountRepository: AccountRepository
-): DelegatedStakeMigrationUseCase {
+) : DelegatedStakeMigrationUseCase {
 
     context(ExtrinsicBuilder)
     override suspend fun migrateToDelegatedStakeIfNeeded() {

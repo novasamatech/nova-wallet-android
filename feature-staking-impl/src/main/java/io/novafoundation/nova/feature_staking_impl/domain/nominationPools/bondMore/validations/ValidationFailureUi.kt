@@ -42,6 +42,6 @@ fun nominationPoolsBondMoreValidationFailure(
                 resourceManager.getString(R.string.staking_unable_to_stake_more_message)
         )
 
-        StakingTypesConflict ->TransformedFailure.Default(handlePoolStakingTypesConflictValidationFailure(resourceManager))
+        StakingTypesConflict -> TransformedFailure.Default(handlePoolStakingTypesConflictValidationFailure(resourceManager))
     }
 }

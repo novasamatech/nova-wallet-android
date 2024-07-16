@@ -12,7 +12,7 @@ class BalanceHold(
     val amountInPlanks: Balance,
     val chainAsset: Chain.Asset
 ) : Identifiable {
-    
+
     class HoldId(val module: String, val reason: String)
 
     // Keep in tact with `BalanceBreakdownIds`

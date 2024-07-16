@@ -69,7 +69,6 @@ class NominationPoolsClaimRewardsViewModel(
     val originAddressModelFlow = selectedAccountUseCase.selectedAddressModelFlow { stakingSharedState.chain() }
         .shareInBackground()
 
-
     init {
         listenFee()
     }

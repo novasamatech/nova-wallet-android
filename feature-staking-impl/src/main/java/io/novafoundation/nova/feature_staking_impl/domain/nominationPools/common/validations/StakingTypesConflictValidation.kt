@@ -28,15 +28,17 @@ class StakingTypesConflictValidationFactory(
         error: () -> E,
         checkStakingTypeNotPresent: ConflictingStakingType = ConflictingStakingType.DIRECT
     ) {
-        validate(StakingTypesConflictValidation(
-            accountId = accountId,
-            chainId = chainId,
-            error = error,
-            stakingRepository = stakingRepository,
-            delegatedStakeRepository = delegatedStakeRepository,
-            nominationPoolStakingRepository = nominationPoolStakingRepository,
-            checkStakingTypeNotPresent = checkStakingTypeNotPresent
-        ))
+        validate(
+            StakingTypesConflictValidation(
+                accountId = accountId,
+                chainId = chainId,
+                error = error,
+                stakingRepository = stakingRepository,
+                delegatedStakeRepository = delegatedStakeRepository,
+                nominationPoolStakingRepository = nominationPoolStakingRepository,
+                checkStakingTypeNotPresent = checkStakingTypeNotPresent
+            )
+        )
     }
 }
 
@@ -48,7 +50,7 @@ class StakingTypesConflictValidation<P, E>(
     private val nominationPoolStakingRepository: NominationPoolMembersRepository,
     private val delegatedStakeRepository: NominationPoolDelegatedStakeRepository,
     private val checkStakingTypeNotPresent: ConflictingStakingType
-): Validation<P, E> {
+) : Validation<P, E> {
 
     enum class ConflictingStakingType {
         POOLS, DIRECT
@@ -65,7 +67,7 @@ class StakingTypesConflictValidation<P, E>(
     }
 
     private suspend fun ConflictingStakingType.checkPresent(chainId: ChainId, accountId: AccountId): Boolean {
-        return when(this) {
+        return when (this) {
             ConflictingStakingType.POOLS -> nominationPoolStakingRepository.getPoolMember(chainId, accountId) != null
             ConflictingStakingType.DIRECT -> stakingRepository.ledger(chainId, accountId) != null
         }

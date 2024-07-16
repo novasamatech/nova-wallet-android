@@ -28,7 +28,7 @@ class BalanceLocksInteractorImpl(
     }
 
     override fun balanceHoldsFlow(chainId: ChainId, chainAssetId: Int): Flow<List<BalanceHold>> {
-        return flowOfAll{
+        return flowOfAll {
             val chainAsset = chainRegistry.asset(chainId, chainAssetId)
             val selectedAccount = accountRepository.getSelectedMetaAccount()
             balanceHoldsRepository.observeBalanceHolds(selectedAccount.id, chainAsset)
