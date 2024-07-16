@@ -24,11 +24,13 @@ val ChainNetworkManagement_59_60 = object : Migration(59, 60) {
             """.trimIndent()
         )
 
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_node_selection_preferences_chainId` ON `node_selection_preferences` (`chainId`)")
+
         // Fill new table with default values
         database.execSQL(
             """
             INSERT INTO node_selection_preferences (chainId, autobalanceEnabled, selectedNodeUrl)
-            SELECT id, ${NodeSelectionPreferencesLocal.DEFAULT_AUTO_BALANCE_DEFAULT_STR}, NULL FROM chain
+            SELECT id, ${NodeSelectionPreferencesLocal.DEFAULT_AUTO_BALANCE_DEFAULT_STR}, NULL FROM chains
             """.trimIndent()
         )
     }
