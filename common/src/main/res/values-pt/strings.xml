@@ -150,7 +150,9 @@
     <string name="accounts_change_chain_account">Alterar conta %s</string>
     <string name="accounts_change_chain_secrets">Alterar conta</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="add_custom_node">Adicionar nó personalizado</string>
     <string name="add_delegation_missing_account_message">Você precisa adicionar uma conta %s à carteira para delegar</string>
+    <string name="add_network_title">Inserir detalhes da rede</string>
     <string name="add_proxy_confirmation_delegate_to">Delegar para</string>
     <string name="add_proxy_confirmation_delegating_account">Conta de delegação</string>
     <string name="add_proxy_confirmation_delegating_wallet">Carteira de delegação</string>
@@ -158,6 +160,7 @@
     <string name="add_proxy_deposit_description_message">O depósito permanece reservado em sua conta até que o proxy seja removido.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Você alcançou o limite de %s proxies adicionados em %s. Remova proxies para adicionar novos.</string>
     <string name="add_proxy_maximum_reached_error_title">Número máximo de proxies foi alcançado</string>
+    <string name="added_networks_empty_placeholder">Redes personalizadas adicionadas\naparecerão aqui</string>
     <string name="asset_add_evm_token_already_exist_message">O endereço do contrato inserido já está presente na Nova como um token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">O endereço do contrato inserido já está presente na Nova como um token %s. Tem certeza de que deseja modificá-lo?</string>
     <string name="asset_add_evm_token_already_exist_title">Este token já existe</string>
@@ -173,7 +176,6 @@
     <string name="assets_add_token">Adicionar token</string>
     <string name="assets_add_token_enter_info_address_label">Endereço do contrato</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimais</string>
-    <string name="token_price_info_provider_label">Link Coingecko para informações de preço (Opcional)</string>
     <string name="assets_add_token_enter_info_symbol_label">Símbolo</string>
     <string name="assets_add_token_enter_info_title">Insira os detalhes do token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Selecione a rede para adicionar o token ERC-20</string>
@@ -223,6 +225,8 @@
     <string name="buy_completed">Compra iniciada! Por favor, aguarde até 60 minutos. Você pode rastrear o status pelo email.</string>
     <string name="buy_provider_open_confirmation_message">Para continuar a compra você será redirecionado do aplicativo Nova Wallet para %s</string>
     <string name="buy_provider_open_confirmation_title">Continuar no navegador?</string>
+    <string name="chain_network_management_auto_balance">Equilibrar nós automaticamente</string>
+    <string name="chain_network_management_enabling">Ativar conexão</string>
     <string name="change_cloud_backup_password_subtitle">Por favor, insira uma senha que será usada para recuperar suas carteiras do backup na nuvem. Essa senha não pode ser recuperada no futuro, então certifique-se de se lembrar dela!</string>
     <string name="change_cloud_backup_password_title">Atualizar senha de backup</string>
     <string name="choose_amount_asset">Ativo</string>
@@ -280,6 +284,7 @@
     <string name="common_active">Ativo</string>
     <string name="common_add">Adicionar</string>
     <string name="common_add_delegation">Adicionar delegação</string>
+    <string name="common_add_network">Adicionar rede</string>
     <string name="common_address">Endereço</string>
     <string name="common_advanced">Avançado</string>
     <string name="common_all">Todos</string>
@@ -316,6 +321,8 @@
     <string name="common_confirm_title">Confirmação</string>
     <string name="common_confirmation_title">Tem certeza?</string>
     <string name="common_confirmed">Confirmado</string>
+    <string name="common_connected_ms">%d ms</string>
+    <string name="common_connecting">conectando...</string>
     <string name="common_connection_error_message">Por favor, verifique sua conexão ou tente novamente mais tarde</string>
     <string name="common_connection_error_title">Falha na Conexão</string>
     <string name="common_continue">Continuar</string>
@@ -325,6 +332,7 @@
     <string name="common_crypto_type">Tipo de criptografia da chave</string>
     <string name="common_date">Data</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s e %s</string>
+    <string name="common_delete">Excluir</string>
     <string name="common_details">Detalhes</string>
     <string name="common_disabled">Desativado</string>
     <string name="common_disconnect">Desconectar</string>
@@ -336,10 +344,12 @@
     <string name="common_enable">Ativar</string>
     <string name="common_enter_address">Digite o endereço…</string>
     <string name="common_enter_amount">Digite o valor...</string>
+    <string name="common_enter_details">Inserir detalhes</string>
     <string name="common_enter_password">Digite a senha</string>
     <string name="common_error_general_title">Erro</string>
     <string name="common_error_not_enough_tokens">Tokens insuficientes</string>
     <string name="common_event">Evento</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">Endereço EVM</string>
     <string name="common_existential_warning_message_v2_2_0">Sua conta será removida da blockchain após esta operação, pois faz com que o saldo total seja menor que o mínimo</string>
     <string name="common_existential_warning_title">A operação removerá a conta</string>
@@ -380,6 +390,7 @@
         <item quantity="other">%d minutos</item>
     </plurals>
     <string name="common_missing_account_title">Conta %s está faltando</string>
+    <string name="common_modify">Modificar</string>
     <string name="common_module">Módulo</string>
     <string name="common_network">Rede</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -452,9 +463,11 @@
     <string name="common_something_went_wrong_title">Algo deu errado</string>
     <string name="common_sort_by">Ordenar por</string>
     <string name="common_status">Status</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Endereço Substrate</string>
     <string name="common_tap_to_reveal_title">Toque para revelar</string>
     <string name="common_terms_and_conditions_formatting">Termos e Condições</string>
+    <string name="common_testnet">Testnet</string>
     <string name="common_time_left">Tempo restante</string>
     <string name="common_title">Título</string>
     <string name="common_to_settings">Abrir Configurações</string>
@@ -490,7 +503,6 @@
     <string name="connection_add_already_exists_error">O nó já foi adicionado anteriormente. Por favor, tente outro nó.</string>
     <string name="connection_add_invalid_error">Não é possível estabelecer conexão com o nó. Por favor, tente outro.</string>
     <string name="connection_add_unsupported_error">Infelizmente, a rede não é suportada. Por favor, tente uma das seguintes: %s.</string>
-    <string name="common_delete">Deletar</string>
     <string name="connection_delete_description">Confirme a deleção de %s.</string>
     <string name="connection_delete_title">Deletar rede?</string>
     <string name="connection_error_message_v2_2_0">Por favor, verifique sua conexão ou tente novamente mais tarde</string>
@@ -513,6 +525,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">Senhas coincidem</string>
     <string name="create_cloud_backup_password_subtitle">Por favor, insira uma senha para acessar seu backup a qualquer momento. A senha não pode ser recuperada, certifique-se de lembrá-la!</string>
     <string name="create_cloud_backup_password_title">Crie sua senha de backup</string>
+    <string name="create_network_invalid_chain_id_message">O ID da Cadeia inserido não corresponde à rede no URL RPC.</string>
+    <string name="create_network_invalid_chain_id_title">ID da Cadeia inválido</string>
     <string name="crodloan_private_crowdloan_message">Crowdloans privados ainda não são suportados.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan privado</string>
     <string name="crowdloan_about">Sobre crowdloans</string>
@@ -569,6 +583,24 @@
     <string name="crowdloan_unlock_hint">Seus tokens %s serão devolvidos após o período de locação.</string>
     <string name="crowdloan_your_contributions">Suas contribuições</string>
     <string name="crownloans_raised_format" formatted="false">Arrecadado: %s de %s</string>
+    <string name="custom_network_already_exist_failure_message">O URL RPC inserido está presente no Nova como uma rede personalizada %s. Tem certeza de que deseja modificá-lo?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">URL do explorador de blocos (Opcional)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">ID da Cadeia</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">Símbolo da Moeda</string>
+    <string name="custom_network_name_title">Nome da Rede</string>
+    <string name="custom_node_add_button_state">Adicionar nó</string>
+    <string name="custom_node_add_title">Adicionar nó personalizado para</string>
+    <string name="custom_node_disabled_button_state">Inserir detalhes</string>
+    <string name="custom_node_edit_button_state">Salvar</string>
+    <string name="custom_node_edit_title">Editar nó personalizado para</string>
+    <string name="custom_node_name_hint">Nome</string>
+    <string name="custom_node_name_title">Nome do nó</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">URL do Nó</string>
+    <string name="custom_rpc_node_url_title">URL RPC</string>
     <string name="dapp_authorized_description">DApps para os quais você permitiu acesso para ver seu endereço quando os usa</string>
     <string name="dapp_authorized_remove_description">O DApp “%s” será removido dos Autorizados</string>
     <string name="dapp_authorized_remove_title">Remover dos Autorizados?</string>
@@ -605,6 +637,7 @@
     <string name="deep_linking_invalid_derivation_path">Caminho de derivação inválido</string>
     <string name="deep_linking_invalid_mnemonic">Mnemônico não é válido</string>
     <string name="deep_linking_url_is_invalid">URL inválido</string>
+    <string name="default_network_already_exist_failure_message">O URL RPC inserido está presente no Nova como uma rede %s.</string>
     <string name="default_notification_channel_name">Canal de Notificação Padrão</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Pesquisar por endereço ou nome</string>
@@ -655,6 +688,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">Sua senha de backup foi atualizada anteriormente. Para continuar usando o Backup na Nuvem, %s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">por favor, insira a nova senha de backup.</string>
     <string name="deprecated_cloud_backup_password_title">A senha de backup foi alterada</string>
+    <string name="disabled_chain_error_message">Você não pode assinar transações de redes desativadas. Ative %s nas configurações e tente novamente</string>
+    <string name="disabled_chain_error_title">%s está desativado</string>
     <string name="duplicate_proxy_type_message">Você já está delegando a esta conta: %s</string>
     <string name="duplicate_proxy_type_title">Delegação já existe</string>
     <string name="ecdsa_selection_subtitle">(Compatível com BTC/ETH)</string>
@@ -714,8 +749,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">Use sua frase de 12, 15, 18, 21 ou 24 palavras</string>
     <string name="import_wallet_options_title">Escolha como você gostaria de importar sua carteira</string>
     <string name="import_wallet_options_watch_only_title">Somente visualização</string>
+    <string name="integrate_networks_banner_description">Integre todos os recursos da rede que você está construindo na Nova Wallet, tornando-a acessível a todos.</string>
+    <string name="integrate_networks_banner_link">Integre sua rede</string>
+    <string name="integrate_networks_banner_title">Construindo para Polkadot?</string>
     <string name="invalid_proxy_address_message">O endereço proxy deve ser um endereço %s válido</string>
     <string name="invalid_proxy_address_title">Endereço proxy inválido</string>
+    <string name="invalid_token_symbol_message">O Símbolo da Moeda inserido (%1$s) não corresponde à rede (%2$s). Deseja usar o símbolo correto da moeda?</string>
+    <string name="invalid_token_symbol_title">Símbolo da Moeda inválido</string>
     <string name="invoice_scan_error_no_info">Não foi possível decodificar o QR</string>
     <string name="invoice_scan_qr_code_title">Código QR</string>
     <string name="invoice_scan_upload">Carregar da galeria</string>
@@ -743,10 +783,21 @@
     <string name="ledger_verify_address_subtitle">Pressione ambos os botões no seu %s para aprovar o endereço</string>
     <string name="ledger_wallet_details_description">Esta carteira está pareada com o Ledger. Nova ajudará você a formar quaisquer operações que desejar, e você será solicitado a assiná-las usando o Ledger</string>
     <string name="ledher_import_select_address_title">Selecione a conta para adicionar à carteira</string>
+    <string name="loading_network_info">Carregando informações da rede...</string>
     <string name="loocking_backup_progress">Procurando seu backup...</string>
     <string name="make_payout_transaction_sent">Transação de pagamento enviada</string>
     <string name="manage_assets_add_token">Adicionar token</string>
     <string name="manage_cloud_backup">Gerenciar backup</string>
+    <string name="manage_network_action_delete">Excluir rede</string>
+    <string name="manage_network_action_edit">Editar rede</string>
+    <string name="manage_network_actions_title">Gerenciar rede adicionada</string>
+    <string name="manage_network_delete_message">Você não poderá ver seus saldos de token nessa rede na tela de Ativos</string>
+    <string name="manage_network_delete_title">Excluir rede?</string>
+    <string name="manage_node_action_delete">Excluir nó</string>
+    <string name="manage_node_action_edit">Editar nó</string>
+    <string name="manage_node_actions_title">Gerenciar nó adicionado</string>
+    <string name="manage_node_delete_message">Nó \"%s\" será excluído</string>
+    <string name="manage_node_delete_title">Excluir nó?</string>
     <string name="manual_backup_secrets_custom_key_title">Chave Customizada</string>
     <string name="manual_backup_secrets_default_key_title">Chave Padrão</string>
     <string name="manual_backup_secrets_subtitle">Não compartilhe nenhuma dessas informações com ninguém - Se você fizer isso, perderá permanentemente e irreversivelmente todos os seus ativos</string>
@@ -768,9 +819,14 @@
         <item quantity="one">Selecione pelo menos %d carteira</item>
         <item quantity="other">Selecione pelo menos %d carteiras</item>
     </plurals>
+    <string name="network_already_exist_failure_title">Este Nodo já existe</string>
     <string name="network_fee">Taxa da rede</string>
     <string name="network_info_address">Endereço do nó</string>
     <string name="network_info_title">Informação do Nó</string>
+    <string name="network_management_added_page_title">Adicionado</string>
+    <string name="network_management_custom_nodes">nodos personalizados</string>
+    <string name="network_management_default_nodes">nodos padrão</string>
+    <string name="network_management_default_page_title">Padrão</string>
     <string name="network_status_connecting">Conectando…</string>
     <string name="nft_collection">Coleção</string>
     <string name="nft_created_by">Criado por</string>
@@ -781,6 +837,12 @@
     <string name="nft_owned_by">Propriedade de</string>
     <string name="nft_price_not_listed">Não listado</string>
     <string name="nft_your_nfts">Seus NFTs</string>
+    <string name="node_already_exist_failure_message">A URL que você inseriu já existe como o Nodo \"%s\".</string>
+    <string name="node_already_exist_failure_title">Este Nodo já existe</string>
+    <string name="node_not_alive_message">A URL do Nodo que você inseriu não está respondendo ou contém um formato incorreto. O formato da URL deve começar com \"wss://\".</string>
+    <string name="node_not_alive_title">Erro do nodo</string>
+    <string name="node_not_supported_by_network_message">A URL que você inseriu não corresponde ao Nodo para %1$s.\nPor favor, insira a URL de um nodo %1$s válido.</string>
+    <string name="node_not_supported_by_network_title">Rede errada</string>
     <string name="nomination_pool_claim_rewards">Reivindicar recompensas</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Seus tokens serão adicionados de volta ao stake</string>
     <string name="nomination_pools_direct">Direto</string>
@@ -825,6 +887,10 @@
     <string name="pool_full_failure_title">Pool está cheio</string>
     <string name="pool_inactive_failure_message">Você não pode entrar em um pool que não está aberto. Por favor, entre em contato com o proprietário do pool.</string>
     <string name="pool_inactive_failure_title">Pool não está aberto</string>
+    <string name="pre_configured_networks_add_custom_button">Adicionar rede manualmente</string>
+    <string name="pre_configured_networks_progress_text">Carregando lista de redes...</string>
+    <string name="pre_configured_networks_search_hint">Pesquisar pelo nome da rede</string>
+    <string name="pre_configured_networks_title">Adicionar rede</string>
     <string name="profile_accounts_title">Contas</string>
     <string name="profile_accounts_title_2_0">Carteiras</string>
     <string name="profile_language_title">Idioma</string>
@@ -1464,6 +1530,7 @@
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Carteira</string>
     <string name="today">Hoje</string>
+    <string name="token_price_info_provider_label">Link Coingecko para informações de preço (Opcional)</string>
     <string name="transaction_details_copy_hash">Copiar hash</string>
     <string name="transaction_details_extrinsic_fee">Taxa</string>
     <string name="transaction_details_from">De</string>

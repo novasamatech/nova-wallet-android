@@ -2,6 +2,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="referendum_status_time_confirming_in">Confirming in %s</string>
 
+    <string name="chain_network_management_auto_balance">Auto-balance nodes</string>
+    <string name="chain_network_management_enabling">Enable connection</string>
+
     <string name="account_ledger_migration_deprecation_message">The Migration app will be unavailable in the near future. Use it to migrate your accounts to the new Ledger app to avoid losing your funds.</string>
 
     <string name="account_ledger_migration_app">Polkadot Migration</string>
