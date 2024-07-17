@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.data.network.blockhain.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DelayedThresholdPassing.*
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DelayedThresholdPassing.DelayedPassing
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 interface DelayedThresholdPassing {

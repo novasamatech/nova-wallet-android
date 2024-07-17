@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_api.data.thresold.gov2
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.divideOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DelayedThresholdPassing
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DelayedThresholdPassing.*
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DelayedThresholdPassing.DelayedPassing
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingCurve
