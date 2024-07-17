@@ -19,4 +19,3 @@ fun DelayedPassing.merge(another: DelayedPassing): DelayedPassing {
         passingInFuture = passingInFuture && another.passingInFuture
     )
 }
-

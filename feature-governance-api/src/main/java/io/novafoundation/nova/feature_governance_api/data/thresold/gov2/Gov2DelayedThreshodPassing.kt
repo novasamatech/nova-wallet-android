@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingCurve
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.merge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 class Gov2DelayedThresholdPassing(
