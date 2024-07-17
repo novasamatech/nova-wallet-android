@@ -20,7 +20,7 @@ class Gov2VotingThreshold(
 
         return Threshold(
             value = supportNeededIntegral,
-            passing = tally.support >= supportNeededIntegral
+            currentlyPassing = tally.support >= supportNeededIntegral
         )
     }
 
@@ -30,7 +30,7 @@ class Gov2VotingThreshold(
 
         return Threshold(
             value = approvalThreshold,
-            passing = ayeFraction >= approvalThreshold
+            currentlyPassing = ayeFraction >= approvalThreshold
         )
     }
 }

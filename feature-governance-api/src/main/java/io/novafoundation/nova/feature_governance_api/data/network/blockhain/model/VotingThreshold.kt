@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 
 interface VotingThreshold {
 
-    class Threshold<T>(val value: T, val passing: Boolean) {
+    class Threshold<T>(val value: T, val currentlyPassing: Boolean) {
         companion object;
     }
 
@@ -14,5 +14,8 @@ interface VotingThreshold {
     fun ayesFractionThreshold(tally: Tally, totalIssuance: Balance, passedSinceDecidingFraction: Perbill): Threshold<Perbill>
 }
 
-fun <T> VotingThreshold.Threshold.Companion.passing(value: T) = VotingThreshold.Threshold(value, passing = true)
-fun <T> VotingThreshold.Threshold.Companion.notPassing(value: T) = VotingThreshold.Threshold(value, passing = false)
+fun <T> VotingThreshold.Threshold.Companion.passing(value: T) =
+    VotingThreshold.Threshold(value, currentlyPassing = true)
+
+fun <T> VotingThreshold.Threshold.Companion.notPassing(value: T) =
+    VotingThreshold.Threshold(value, currentlyPassing = false)

@@ -36,7 +36,7 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
 
             return Threshold(
                 value = threshold,
-                passing = aysFraction > threshold
+                currentlyPassing = aysFraction > threshold
             )
         }
     },
@@ -61,7 +61,7 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
 
             return Threshold(
                 value = threshold,
-                passing = aysFraction > threshold
+                currentlyPassing = aysFraction > threshold
             )
         }
     },
@@ -78,7 +78,7 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
 
             return Threshold(
                 value = threshold,
-                passing = aysFraction > threshold
+                currentlyPassing = aysFraction > threshold
             )
         }
     };

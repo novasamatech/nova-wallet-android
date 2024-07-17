@@ -21,4 +21,12 @@ class LinearDecreasingCurve(
     override fun threshold(x: Perbill): Perbill {
         return ceil - x.coerceAtMost(length).divide(length, RoundingMode.DOWN) * (ceil - floor)
     }
+
+    override fun delay(y: Perbill): Perbill {
+        return when {
+            y < floor -> Perbill.ONE
+            y > ceil -> Perbill.ZERO
+            else -> (ceil - y).divide(ceil - floor, RoundingMode.UP).multiply(length)
+        }
+    }
 }
