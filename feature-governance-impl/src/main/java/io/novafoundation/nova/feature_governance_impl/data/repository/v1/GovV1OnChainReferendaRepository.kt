@@ -185,7 +185,7 @@ class GovV1OnChainReferendaRepository(
                     ),
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = false,
-                    threshold = bindThreshold(status["threshold"]),
+                    threshold = threshold,
                     delayedPassing = Gov1DelayedThresholdPassing(threshold)
                 )
             }

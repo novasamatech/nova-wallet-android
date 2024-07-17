@@ -7,6 +7,9 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigDecimal
 
+/**
+ * This class is using as a placeholder for Gov1 since Gov1 doesn't support delaying
+ */
 class Gov1DelayedThresholdPassing(
     val threshold: VotingThreshold
 ) : DelayedThresholdPassing {
