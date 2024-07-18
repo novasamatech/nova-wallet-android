@@ -8,10 +8,12 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
+import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetSubtitle
 import kotlinx.android.synthetic.main.item_list_selector.view.itemSelectorIcon
 import kotlinx.android.synthetic.main.item_list_selector.view.itemSelectorTitle
 
@@ -30,6 +32,7 @@ class DynamicSelectorBottomSheet(
 
     class Payload(
         val titleRes: Int,
+        val subtitle: String?,
         data: List<ListSelectorMixin.Item>
     ) : DynamicListBottomSheet.Payload<ListSelectorMixin.Item>(data)
 
@@ -37,6 +40,7 @@ class DynamicSelectorBottomSheet(
         super.onCreate(savedInstanceState)
 
         setTitle(payload.titleRes)
+        dynamicListSheetSubtitle.setTextOrHide(payload.subtitle)
     }
 
     override fun holderCreator(): HolderCreator<ListSelectorMixin.Item> = { parentView ->

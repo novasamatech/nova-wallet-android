@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.tokens.add
 
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -22,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -51,7 +53,7 @@ class RealAddTokensInteractor(
 ) : AddTokensInteractor {
 
     override fun availableChainsToAddTokenFlow(): Flow<List<Chain>> {
-        return chainRegistry.currentChains.map { chains ->
+        return chainRegistry.enabledChainsFlow().map { chains ->
             chains.filter { it.isEthereumBased }
                 .sortedWith(Chain.defaultComparator())
         }

@@ -44,10 +44,15 @@ fun chainOf(
     prefix = 0,
     isTestNet = false,
     isEthereumBased = false,
-    externalApi = null,
     hasCrowdloans = false,
     additional = "",
-    governance = "governance"
+    governance = "governance",
+    connectionState = ChainLocal.ConnectionStateLocal.FULL_SYNC,
+    pushSupport = true,
+    supportProxy = false,
+    swap = "",
+    hasSubstrateRuntime = true,
+    nodeSelectionStrategy = ChainLocal.NodeSelectionStrategyLocal.ROUND_ROBIN
 )
 
 fun ChainLocal.nodeOf(
@@ -84,7 +89,8 @@ suspend fun ChainDao.addChains(chains: List<JoinedChainInfo>) {
         assetsDiff = addedDiff(chains.flatMap(JoinedChainInfo::assets)),
         nodesDiff = addedDiff(chains.flatMap(JoinedChainInfo::nodes)),
         explorersDiff = addedDiff(chains.flatMap(JoinedChainInfo::explorers)),
-        externalApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::externalApis))
+        externalApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::externalApis)),
+        nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
     )
 }
 
@@ -96,7 +102,8 @@ suspend fun ChainDao.removeChain(joinedChainInfo: JoinedChainInfo) {
         assetsDiff = removedDiff(joinedChainInfo.assets),
         nodesDiff = removedDiff(joinedChainInfo.nodes),
         explorersDiff = removedDiff(joinedChainInfo.explorers),
-        externalApisDiff = removedDiff(joinedChainInfo.externalApis)
+        externalApisDiff = removedDiff(joinedChainInfo.externalApis),
+        nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
     )
 }
 
@@ -106,7 +113,8 @@ suspend fun ChainDao.updateChain(joinedChainInfo: JoinedChainInfo) {
         assetsDiff = updatedDiff(joinedChainInfo.assets),
         nodesDiff = updatedDiff(joinedChainInfo.nodes),
         explorersDiff = updatedDiff(joinedChainInfo.explorers),
-        externalApisDiff = updatedDiff(joinedChainInfo.externalApis)
+        externalApisDiff = updatedDiff(joinedChainInfo.externalApis),
+        nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
     )
 }
 
@@ -148,7 +156,10 @@ fun testMetaAccount(name: String = "Test") = MetaAccountLocal(
     substrateAccountId = byteArrayOf(),
     ethereumAddress = null,
     position = 0,
-    type = MetaAccountLocal.Type.WATCH_ONLY
+    type = MetaAccountLocal.Type.WATCH_ONLY,
+    globallyUniqueId = "",
+    parentMetaId = 1,
+    status = MetaAccountLocal.Status.ACTIVE
 )
 
 fun testChainAccount(

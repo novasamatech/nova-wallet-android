@@ -189,6 +189,15 @@ class DefaultMetamaskState(
 
                 metamaskRequest.reject(MetamaskError.TxSendingFailed())
             }
+
+            is ConfirmTxResponse.ChainIsDisabled -> {
+                hostApi.showError(
+                    resourceManager.getString(R.string.disabled_chain_error_title, response.chainName),
+                    resourceManager.getString(R.string.disabled_chain_error_message, response.chainName)
+                )
+
+                metamaskRequest.reject(MetamaskError.TxSendingFailed())
+            }
         }
     }
 

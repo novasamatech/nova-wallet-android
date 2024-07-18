@@ -24,13 +24,15 @@ fun ConnectionSecrets.saturateUrl(url: String): String? {
     return runCatching { url.formatNamedOrThrow(this) }.getOrNull()
 }
 
-fun List<Chain.Node>.saturateNodeUrls(connectionSecrets: ConnectionSecrets): List<NodeWithSaturatedUrl> {
-    return mapNotNull { node ->
-        val saturatedUrl = connectionSecrets.saturateUrl(node.unformattedUrl) ?: run {
-            Log.w("ConnectionSecrets", "Failed to saturate url ${node.unformattedUrl} due to unknown secrets in the url")
-            return@mapNotNull null
-        }
-
-        NodeWithSaturatedUrl(node, saturatedUrl)
+fun Chain.Node.saturateNodeUrl(connectionSecrets: ConnectionSecrets): NodeWithSaturatedUrl? {
+    val saturatedUrl = connectionSecrets.saturateUrl(unformattedUrl) ?: run {
+        Log.w("ConnectionSecrets", "Failed to saturate url $unformattedUrl due to unknown secrets in the url")
+        return null
     }
+
+    return NodeWithSaturatedUrl(this, saturatedUrl)
+}
+
+fun List<Chain.Node>.saturateNodeUrls(connectionSecrets: ConnectionSecrets): List<NodeWithSaturatedUrl> {
+    return mapNotNull { node -> node.saturateNodeUrl(connectionSecrets) }
 }

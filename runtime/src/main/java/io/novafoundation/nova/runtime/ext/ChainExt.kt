@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.ext
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
@@ -22,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
@@ -40,6 +42,27 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.toHexUntyped
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import java.math.BigInteger
+
+const val EVM_DEFAULT_TOKEN_DECIMALS = 18
+
+private const val EIP_155_PREFIX = "eip155"
+
+val Chain.autoBalanceEnabled: Boolean
+    get() = nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
+
+val Chain.autoBalanceDisabled: Boolean
+    get() = !autoBalanceEnabled
+
+val Chain.selectedNodeUrlOrNull: String?
+    get() = if (nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.SelectedNode) {
+        nodes.nodeSelectionStrategy.nodeUrl
+    } else {
+        null
+    }
+
+val Chain.isCustomNetwork: Boolean
+    get() = source == Chain.Source.CUSTOM
 
 val Chain.typesUsage: TypesUsage
     get() = when {
@@ -61,10 +84,33 @@ val Chain.isSubstrateBased
 val Chain.commissionAsset
     get() = utilityAsset
 
+val Chain.isEnabled
+    get() = connectionState != Chain.ConnectionState.DISABLED
+
+val Chain.isDisabled
+    get() = !isEnabled
+
 fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
     if (staking.isEmpty()) return emptyList()
 
     return staking.filter { it != UNSUPPORTED }
+}
+
+fun Chain.networkType(): NetworkType {
+    return if (hasSubstrateRuntime) {
+        NetworkType.SUBSTRATE
+    } else {
+        NetworkType.EVM
+    }
+}
+
+fun Chain.evmChainIdOrNull(): BigInteger? {
+    return if (id.startsWith(EIP_155_PREFIX)) {
+        id.removePrefix("$EIP_155_PREFIX:")
+            .toBigIntegerOrNull()
+    } else {
+        null
+    }
 }
 
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
@@ -343,7 +389,7 @@ object ChainGeneses {
 
 object ChainIds {
 
-    const val ETHEREUM = "eip155:1"
+    const val ETHEREUM = "$EIP_155_PREFIX:1"
 
     const val MOONBEAM = ChainGeneses.MOONBEAM
     const val MOONRIVER = ChainGeneses.MOONRIVER
@@ -407,6 +453,10 @@ fun Chain.enabledAssets(): List<Chain.Asset> = assets.filter { it.enabled }
 
 fun Chain.disabledAssets(): List<Chain.Asset> = assets.filterNot { it.enabled }
 
+fun evmChainIdFrom(chainId: Int) = "$EIP_155_PREFIX:$chainId"
+
+fun evmChainIdFrom(chainId: BigInteger) = "$EIP_155_PREFIX:$chainId"
+
 fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?): Chain.Asset? {
     return assets.find { asset ->
         if (asset.type !is Type.Orml) return@find false
@@ -446,4 +496,9 @@ fun StatemineAssetId.onChainAssetId(): String {
 
 fun Chain.openGovIfSupported(): Chain.Governance? {
     return Chain.Governance.V2.takeIf { it in governance }
+}
+
+fun Chain.Explorer.normalizedUrl(): String? {
+    val url = listOfNotNull(extrinsic, account, event).firstOrNull()
+    return url?.let { Urls.normalizeUrl(it) }
 }

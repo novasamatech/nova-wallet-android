@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.view.tabs.addTab
-import io.novafoundation.nova.common.view.tabs.setupWithRouter
+import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_vote.R
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureComponent
@@ -17,6 +16,7 @@ import kotlinx.android.synthetic.main.fragment_vote.voteAvatar
 import kotlinx.android.synthetic.main.fragment_vote.voteContainer
 import kotlinx.android.synthetic.main.fragment_vote.voteTabs
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_vote.voteViewPager
 
 class VoteFragment : BaseFragment<VoteViewModel>() {
 
@@ -33,11 +33,9 @@ class VoteFragment : BaseFragment<VoteViewModel>() {
 
     override fun initViews() {
         voteContainer.applyStatusBarInsets()
-
-        voteTabs.addTab(R.string.common_governance)
-        voteTabs.addTab(R.string.crowdloan_crowdloan)
-
-        voteTabs.setupWithRouter(router, viewLifecycleOwner.lifecycle)
+        val adapter = VotePagerAdapter(this, router)
+        voteViewPager.adapter = adapter
+        voteTabs.setupWithViewPager2(voteViewPager, adapter::getPageTitle)
 
         voteAvatar.setOnClickListener { viewModel.avatarClicked() }
     }

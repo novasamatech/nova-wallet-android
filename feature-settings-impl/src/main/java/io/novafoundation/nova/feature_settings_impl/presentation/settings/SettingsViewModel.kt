@@ -241,6 +241,10 @@ class SettingsViewModel(
         router.openSwitchWallet()
     }
 
+    fun networksClicked() {
+        router.openNetworks()
+    }
+
     fun walletConnectClicked() = launch {
         if (walletConnectSessions.first() > 0) {
             router.openWalletConnectSessions()

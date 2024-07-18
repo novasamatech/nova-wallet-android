@@ -28,7 +28,18 @@ data class ChainNodeLocal(
     val name: String,
     @ColumnInfo(defaultValue = "0")
     val orderId: Int,
+    @ColumnInfo(defaultValue = DEFAULT_NODE_SOURCE_STR)
+    val source: Source
 ) : Identifiable {
+
+    companion object {
+
+        const val DEFAULT_NODE_SOURCE_STR = "DEFAULT"
+    }
+
+    enum class Source {
+        DEFAULT, CUSTOM
+    }
 
     @Ignore
     override val identifier: String = "$chainId:$url"

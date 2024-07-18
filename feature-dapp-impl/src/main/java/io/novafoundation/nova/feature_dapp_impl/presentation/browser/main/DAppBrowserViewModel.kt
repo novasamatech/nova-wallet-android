@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
@@ -33,7 +34,11 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.Extern
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.SigningDappMetadata
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.genesisHash
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
+import io.novafoundation.nova.runtime.ext.isDisabled
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -63,7 +68,8 @@ class DAppBrowserViewModel(
     private val dAppSearchRequester: DAppSearchRequester,
     private val initialUrl: String,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val chainRegistry: ChainRegistry
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -118,6 +124,13 @@ class DAppBrowserViewModel(
     }
 
     override suspend fun confirmTx(request: ExternalSignRequest): ConfirmTxResponse {
+        val chainId = request.extractChainId()
+        val chain = chainRegistry.chainsById()[chainId]
+
+        if (chain != null && chain.isDisabled) {
+            return ConfirmTxResponse.ChainIsDisabled(request.id, chain.name)
+        }
+
         val response = withContext(Dispatchers.Main) {
             signRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
         }
@@ -265,5 +278,12 @@ class DAppBrowserViewModel(
             name = dappMetadata.metadata?.name,
             url = dappMetadata.baseUrl,
         )
+    }
+
+    private fun ExternalSignRequest.extractChainId(): String? {
+        return when (this) {
+            is ExternalSignRequest.Evm -> null
+            is ExternalSignRequest.Polkadot -> payload.genesisHash()?.removeHexPrefix()
+        }
     }
 }

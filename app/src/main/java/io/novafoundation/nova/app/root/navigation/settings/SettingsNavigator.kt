@@ -7,6 +7,13 @@ import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkMainFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.ChainNetworkManagementPayload
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.NetworkManagementListFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodeFragment
+import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.CustomNodePayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 
@@ -19,6 +26,50 @@ class SettingsNavigator(
 
     override fun openWallets() {
         delegate.openWallets()
+    }
+
+    override fun openNetworks() {
+        performNavigation(R.id.action_open_networkManagement)
+    }
+
+    override fun openNetworkDetails(payload: ChainNetworkManagementPayload) {
+        performNavigation(
+            R.id.action_open_networkManagementDetails,
+            args = ChainNetworkManagementFragment.getBundle(payload)
+        )
+    }
+
+    override fun openCustomNode(payload: CustomNodePayload) {
+        performNavigation(
+            R.id.action_open_customNode,
+            args = CustomNodeFragment.getBundle(payload)
+        )
+    }
+
+    override fun addNetwork() {
+        performNavigation(R.id.action_open_preConfiguredNetworks)
+    }
+
+    override fun openCreateNetworkFlow() {
+        performNavigation(R.id.action_open_addNetworkFragment)
+    }
+
+    override fun openCreateNetworkFlow(payload: AddNetworkPayload.Mode.Add) {
+        performNavigation(
+            R.id.action_open_addNetworkFragment,
+            args = AddNetworkMainFragment.getBundle(AddNetworkPayload(payload))
+        )
+    }
+
+    override fun finishCreateNetworkFlow() {
+        performNavigation(R.id.action_finishCreateNetworkFlow, args = NetworkManagementListFragment.getBundle(openAddedTab = true))
+    }
+
+    override fun openEditNetwork(payload: AddNetworkPayload.Mode.Edit) {
+        performNavigation(
+            R.id.action_open_editNetwork,
+            args = AddNetworkMainFragment.getBundle(AddNetworkPayload(payload))
+        )
     }
 
     override fun openPushNotificationSettings() {
