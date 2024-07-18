@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.common
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DelayedThresholdPassing
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold.Threshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.merge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -13,7 +13,6 @@ data class ReferendumVoting(
 
     data class Support(
         val threshold: Threshold<Balance>,
-        val delaying: DelayedThresholdPassing.DelayedPassing,
         val turnout: Balance,
         val electorate: Balance,
     )
@@ -22,7 +21,6 @@ data class ReferendumVoting(
         val ayeVotes: Votes,
         val nayVotes: Votes,
         val threshold: Threshold<Perbill>,
-        val delaying: DelayedThresholdPassing.DelayedPassing,
     ) {
 
         // post-conviction
@@ -45,8 +43,8 @@ fun ReferendumVoting.currentlyPassing(): Boolean {
     return support.currentlyPassing() && approval.currentlyPassing()
 }
 
-fun ReferendumVoting.delayedPassing(): DelayedThresholdPassing.DelayedPassing {
-    return support.delaying.merge(approval.delaying)
+fun ReferendumVoting.projectedPassing(): VotingThreshold.ProjectedPassing {
+    return support.threshold.projectedPassing.merge(approval.threshold.projectedPassing)
 }
 
 fun ReferendumVoting.Approval.totalVotes(): Balance {

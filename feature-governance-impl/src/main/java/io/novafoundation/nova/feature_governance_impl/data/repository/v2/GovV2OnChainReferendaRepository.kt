@@ -37,7 +37,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.empty
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
-import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.Gov2DelayedThresholdPassing
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.Gov2VotingThreshold
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.LinearDecreasingCurve
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.ReciprocalCurve
@@ -182,7 +181,6 @@ class GovV2OnChainReferendaRepository(
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = bindBoolean(status["inQueue"]),
                     threshold = Gov2VotingThreshold(track),
-                    delayedPassing = Gov2DelayedThresholdPassing(track)
                 )
             }
 

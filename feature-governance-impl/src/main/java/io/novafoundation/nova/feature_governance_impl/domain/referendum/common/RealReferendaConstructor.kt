@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.currentlyPassing
-import io.novafoundation.nova.feature_governance_api.domain.referendum.common.delayedPassing
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.projectedPassing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline.State
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
@@ -106,15 +106,13 @@ class RealReferendaConstructor(
         return ReferendumVoting(
             support = ReferendumVoting.Support(
                 threshold = status.threshold.supportThreshold(status.tally, electorate, elapsedSinceDecidingFraction),
-                delaying = status.delayedPassing.supportPassingInFuture(status.tally, electorate, elapsedSinceDecidingFraction),
                 turnout = status.tally.support,
                 electorate = electorate
             ),
             approval = ReferendumVoting.Approval(
                 ayeVotes = status.tally.ayeVotes(),
                 nayVotes = status.tally.nayVotes(),
-                threshold = status.threshold.ayesFractionThreshold(status.tally, electorate, elapsedSinceDecidingFraction),
-                delaying = status.delayedPassing.ayePassingInFuture(status.tally, electorate, elapsedSinceDecidingFraction)
+                threshold = status.threshold.ayesFractionThreshold(status.tally, electorate, elapsedSinceDecidingFraction)
             )
         )
     }
@@ -295,34 +293,31 @@ class RealReferendaConstructor(
     ): ReferendumStatus.Ongoing {
         val decidingStatus = status.deciding!!
         val referendumVoting = votingByReferenda[referendumId]
-        val delayedPassing = referendumVoting?.delayedPassing()
+        val delayedPassing = referendumVoting?.projectedPassing()
 
         val isCurrentlyPassing = referendumVoting?.currentlyPassing().orFalse()
         val isPassingAfterDelay = delayedPassing != null && delayedPassing.passingInFuture
 
         return when {
-            isCurrentlyPassing || isPassingAfterDelay -> {
+            // Confirmation period started block
+            isCurrentlyPassing -> {
                 val confirmingStatus = decidingStatus.confirming.cast<ConfirmingSource.OnChain>().status
-                when {
-                    // Confirmation period started
-                    confirmingStatus != null -> {
-                        val approveBlock = confirmingStatus.till
-                        val approveIn = blockDurationEstimator.timerUntil(approveBlock)
+                val approveBlock = confirmingStatus!!.till
+                val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
-                        ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
-                    }
-
-                    // Deciding period that will be approved in delay
-                    else -> {
-                        val delay = delayedPassing!!.delayFraction
-                        val approveBlock = decidingStatus.since.toBigDecimal() + delay * track.decisionPeriod.toBigDecimal()
-                        val approveIn = blockDurationEstimator.timerUntil(approveBlock.toBigInteger())
-
-                        ReferendumStatus.Ongoing.DecidingApprove(confirmingIn = approveIn)
-                    }
-                }
+                ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
             }
 
+            // Deciding period that will be approved in delay block
+            isPassingAfterDelay -> {
+                val delay = delayedPassing!!.delayFraction
+                val approveBlock = decidingStatus.since.toBigDecimal() + delay * track.decisionPeriod.toBigDecimal()
+                val approveIn = blockDurationEstimator.timerUntil(approveBlock.toBigInteger())
+
+                ReferendumStatus.Ongoing.DecidingApprove(confirmingIn = approveIn)
+            }
+
+            // Reject block
             else -> {
                 val rejectBlock = decidingStatus.since + track.decisionPeriod
                 val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)

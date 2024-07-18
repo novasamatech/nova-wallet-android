@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.data.thresold.gov2
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
+import io.novafoundation.nova.common.utils.divideOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingCurve
@@ -18,9 +19,12 @@ class Gov2VotingThreshold(
         val supportNeeded = supportCurve.threshold(passedSinceDecidingFraction) * totalIssuance.toBigDecimal()
         val supportNeededIntegral = supportNeeded.toBigInteger()
 
+        val supportFraction = tally.support.toBigDecimal().divideOrNull(totalIssuance.toBigDecimal()) ?: Perbill.ZERO
+
         return Threshold(
             value = supportNeededIntegral,
-            currentlyPassing = tally.support >= supportNeededIntegral
+            currentlyPassing = tally.support >= supportNeededIntegral,
+            getProjectedPassing(supportCurve, supportFraction)
         )
     }
 
@@ -30,7 +34,18 @@ class Gov2VotingThreshold(
 
         return Threshold(
             value = approvalThreshold,
-            currentlyPassing = ayeFraction >= approvalThreshold
+            currentlyPassing = ayeFraction >= approvalThreshold,
+            getProjectedPassing(approvalCurve, ayeFraction)
+        )
+    }
+
+    private fun getProjectedPassing(curve: VotingCurve, fraction: Perbill): VotingThreshold.ProjectedPassing {
+        val delay = curve.delay(fraction)
+        val threshold = curve.threshold(delay)
+
+        return VotingThreshold.ProjectedPassing(
+            delayFraction = delay,
+            passingInFuture = fraction >= threshold
         )
     }
 }

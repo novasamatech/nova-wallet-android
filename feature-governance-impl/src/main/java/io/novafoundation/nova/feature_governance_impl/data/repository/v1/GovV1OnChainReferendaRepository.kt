@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
-import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.Gov1DelayedThresholdPassing
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.Gov1VotingThreshold
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindProposal
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindTally
@@ -185,8 +184,7 @@ class GovV1OnChainReferendaRepository(
                     ),
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = false,
-                    threshold = threshold,
-                    delayedPassing = Gov1DelayedThresholdPassing(threshold)
+                    threshold = threshold
                 )
             }
 
