@@ -7,25 +7,17 @@ on:
 
 jobs:
   develop-build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@fix/tests_build
     with:
       branch: ${{github.head_ref}}
       gradlew-command: assembleDebug
       upload-name: develop-apk
       run-tests: false
-    secrets: inherit
-
-  test-build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
-    with:
-      branch: ${{github.head_ref}}
-      gradlew-command: assembleDebugAndroidTest
-      upload-name: test-apk
-      run-tests: false
+      build-debug-tests: true
     secrets: inherit
 
   run-tests:
-    needs: [develop-build, test-build]
+    needs: [develop-build]
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
@@ -39,16 +31,6 @@ jobs:
       - name: Debug path
         run: |
           ls -laR app
-
-      - name: Download instrumential test artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: test-apk
-          path: test-app
-
-      - name: Debug path
-        run: |
-          ls -laR test-app
 
       - name: Add permissions
         run: chmod +x .github/scripts/run_balances_test.sh

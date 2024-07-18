@@ -5,7 +5,7 @@ adb devices
 adb -s emulator-5554 install app/debug/app-debug.apk
 
 # Install instrumental tests
-adb -s emulator-5554 install test-app/androidTest/debug/app-debug-androidTest.apk
+adb -s emulator-5554 install app/androidTest/debug/app-debug-androidTest.apk
 
 # Run tests
 adb logcat -c &&
