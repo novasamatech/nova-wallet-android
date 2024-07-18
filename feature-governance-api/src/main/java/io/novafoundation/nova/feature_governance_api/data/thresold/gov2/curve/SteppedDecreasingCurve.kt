@@ -25,13 +25,13 @@ class SteppedDecreasingCurve(
         val passedPeriods = x.divideToIntegralValue(period)
         val decrease = passedPeriods * step
 
-        return (begin - decrease).coerceIn(begin, end)
+        return (begin - decrease).coerceIn(end, begin)
     }
 
     override fun delay(y: Perbill): Perbill {
         return when {
             y < end -> Perbill.ONE
-            else -> period.multiply(begin - y.coerceAtMost(begin) + step.lessEpsilon()).divideToIntegralValue(step)
+            else -> period.multiply((begin - y.coerceAtMost(begin) + step.lessEpsilon()).divideToIntegralValue(step))
         }
     }
 }

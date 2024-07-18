@@ -182,11 +182,17 @@ fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
 
 fun BigDecimal.lessEpsilon(): BigDecimal = when {
     this.isZero -> this
-    else -> this.subtract(BigDecimal.ONE)
+    else -> this.subtract(BigInteger.ONE.toBigDecimal(scale = MathContext.DECIMAL64.precision))
 }
 
 fun BigDecimal.divideOrNull(value: BigDecimal): BigDecimal? = try {
     this.divide(value)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal, mathContext: MathContext): BigDecimal? = try {
+    this.divide(value, mathContext)
 } catch (e: ArithmeticException) {
     null
 }

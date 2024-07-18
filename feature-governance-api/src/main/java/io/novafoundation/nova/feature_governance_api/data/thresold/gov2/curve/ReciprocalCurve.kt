@@ -27,7 +27,7 @@ class ReciprocalCurve(
     }
 
     override fun delay(y: Perbill): Perbill {
-        val maybeTerm = factor.divideOrNull(y - yOffset, RoundingMode.HALF_UP)
+        val maybeTerm = factor.divideOrNull(y - yOffset, MathContext(MathContext.DECIMAL64.precision, RoundingMode.HALF_UP))
 
         return maybeTerm?.let { it - xOffset }
             ?.coerceInOrNull(BigDecimal.ZERO, BigDecimal.ONE)
