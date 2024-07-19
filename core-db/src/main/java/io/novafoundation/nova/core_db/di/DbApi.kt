@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
+import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NftDao
@@ -83,4 +84,6 @@ interface DbApi {
     val stakingDashboardDao: StakingDashboardDao
 
     val externalBalanceDao: ExternalBalanceDao
+
+    val holdsDao: HoldsDao
 }

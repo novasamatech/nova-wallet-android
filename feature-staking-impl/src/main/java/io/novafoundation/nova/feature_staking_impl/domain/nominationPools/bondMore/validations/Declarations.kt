@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolStateValidationFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.validateNotDestroying
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 
@@ -16,7 +17,10 @@ typealias NominationPoolsBondMoreValidationSystemBuilder =
 fun ValidationSystem.Companion.nominationPoolsBondMore(
     poolStateValidationFactory: PoolStateValidationFactory,
     poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
+    stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory
 ): NominationPoolsBondMoreValidationSystem = ValidationSystem {
+    noStakingTypesConflict(stakingTypesConflictValidationFactory)
+
     poolIsNotDestroying(poolStateValidationFactory)
 
     notUnstakingAll()
@@ -24,6 +28,14 @@ fun ValidationSystem.Companion.nominationPoolsBondMore(
     enoughAvailableToStakeInPool(poolAvailableBalanceValidationFactory)
 
     positiveBond()
+}
+
+private fun NominationPoolsBondMoreValidationSystemBuilder.noStakingTypesConflict(factory: StakingTypesConflictValidationFactory) {
+    factory.noStakingTypesConflict(
+        accountId = { it.poolMember.accountId },
+        chainId = { it.asset.token.configuration.chainId },
+        error = { NominationPoolsBondMoreValidationFailure.StakingTypesConflict }
+    )
 }
 
 private fun NominationPoolsBondMoreValidationSystemBuilder.poolIsNotDestroying(factory: PoolStateValidationFactory) {

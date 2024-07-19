@@ -11,7 +11,8 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.delegatedStake.DelegatedStakeMigrationUseCase
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.PoolPendingRewards
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +24,7 @@ import kotlinx.coroutines.withContext
 
 interface NominationPoolsClaimRewardsInteractor {
 
-    fun pendingRewardsFlow(): Flow<Balance>
+    fun pendingRewardsFlow(): Flow<PoolPendingRewards>
 
     suspend fun estimateFee(shouldRestake: Boolean): Fee
 
@@ -35,14 +36,17 @@ class RealNominationPoolsClaimRewardsInteractor(
     private val poolMembersRepository: NominationPoolMembersRepository,
     private val stakingSharedState: StakingSharedState,
     private val extrinsicService: ExtrinsicService,
+    private val migrationUseCase: DelegatedStakeMigrationUseCase
 ) : NominationPoolsClaimRewardsInteractor {
 
-    override fun pendingRewardsFlow(): Flow<Balance> {
+    override fun pendingRewardsFlow(): Flow<PoolPendingRewards> {
         return poolMemberUseCase.currentPoolMemberFlow()
             .filterNotNull()
             .distinctUntilChangedBy { it.lastRecordedRewardCounter }
             .mapLatest { poolMember ->
-                poolMembersRepository.getPendingRewards(poolMember.accountId, stakingSharedState.chainId())
+                val rewards = poolMembersRepository.getPendingRewards(poolMember.accountId, stakingSharedState.chainId())
+
+                PoolPendingRewards(rewards, poolMember)
             }
     }
 
@@ -62,7 +66,9 @@ class RealNominationPoolsClaimRewardsInteractor(
         }
     }
 
-    private fun ExtrinsicBuilder.claimRewards(shouldRestake: Boolean) {
+    private suspend fun ExtrinsicBuilder.claimRewards(shouldRestake: Boolean) {
+        migrationUseCase.migrateToDelegatedStakeIfNeeded()
+
         if (shouldRestake) {
             nominationPools.bondExtra(NominationPoolBondExtraSource.Rewards)
         } else {

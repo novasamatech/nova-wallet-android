@@ -15,7 +15,8 @@ fun mapBalanceIdToUi(resourceManager: ResourceManager, id: String): String {
         "phrelect" -> resourceManager.getString(R.string.assets_balance_details_locks_phrelect)
         BalanceBreakdownIds.RESERVED -> resourceManager.getString(R.string.wallet_balance_reserved)
         BalanceBreakdownIds.CROWDLOAN -> resourceManager.getString(R.string.assets_balance_details_locks_crowdloans)
-        BalanceBreakdownIds.NOMINATION_POOL -> resourceManager.getString(R.string.setup_staking_type_pool_staking)
+        BalanceBreakdownIds.NOMINATION_POOL,
+        BalanceBreakdownIds.NOMINATION_POOL_DELEGATED -> resourceManager.getString(R.string.setup_staking_type_pool_staking)
         else -> id.capitalize()
     }
 }

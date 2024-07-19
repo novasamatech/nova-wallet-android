@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -39,11 +41,15 @@ class BalanceDetailModule {
     @ScreenScope
     fun provideBalanceLocksInteractor(
         chainRegistry: ChainRegistry,
-        balanceLocksRepository: BalanceLocksRepository
+        balanceLocksRepository: BalanceLocksRepository,
+        balanceHoldsRepository: BalanceHoldsRepository,
+        accountRepository: AccountRepository
     ): BalanceLocksInteractor {
         return BalanceLocksInteractorImpl(
-            chainRegistry,
-            balanceLocksRepository
+            chainRegistry = chainRegistry,
+            balanceLocksRepository = balanceLocksRepository,
+            balanceHoldsRepository = balanceHoldsRepository,
+            accountRepository = accountRepository
         )
     }
 

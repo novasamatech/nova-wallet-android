@@ -35,4 +35,6 @@ sealed class StartMultiStakingValidationFailure {
     ) : PoolAvailableBalanceValidation.ValidationError, StartMultiStakingValidationFailure()
 
     object InactivePool : StartMultiStakingValidationFailure()
+
+    object HasConflictingStakingType : StartMultiStakingValidationFailure()
 }

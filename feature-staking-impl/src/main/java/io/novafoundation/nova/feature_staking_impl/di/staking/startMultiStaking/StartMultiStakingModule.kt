@@ -7,6 +7,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConsta
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SearchNominationPoolInteractor
@@ -166,13 +168,17 @@ class StartMultiStakingModule {
         stakingSharedComputation: StakingSharedComputation,
         stakingRepository: StakingRepository,
         stakingConstantsRepository: StakingConstantsRepository,
+        stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
+        selectedAccountUseCase: SelectedAccountUseCase,
     ): SingleStakingPropertiesFactory {
         return DirectStakingPropertiesFactory(
             validatorRecommenderFactory = validatorRecommenderFactory,
             recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
             stakingSharedComputation = stakingSharedComputation,
             stakingRepository = stakingRepository,
-            stakingConstantsRepository = stakingConstantsRepository
+            stakingConstantsRepository = stakingConstantsRepository,
+            stakingTypesConflictValidationFactory = stakingTypesConflictValidationFactory,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 
@@ -186,6 +192,8 @@ class StartMultiStakingModule {
         availableBalanceResolver: NominationPoolsAvailableBalanceResolver,
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
         poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
+        stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
+        selectedAccountUseCase: SelectedAccountUseCase,
     ): SingleStakingPropertiesFactory {
         return NominationPoolStakingPropertiesFactory(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
@@ -193,6 +201,8 @@ class StartMultiStakingModule {
             poolsAvailableBalanceResolver = availableBalanceResolver,
             nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
             poolAvailableBalanceValidationFactory = poolAvailableBalanceValidationFactory,
+            stakingTypesConflictValidationFactory = stakingTypesConflictValidationFactory,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 
