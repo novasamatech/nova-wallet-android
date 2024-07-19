@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.data.repository
 
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.feature_dapp_impl.data.network.phishing.PhishingSitesApi
+import io.novafoundation.nova.feature_dapp_impl.data.phisning.PhishingDetectingService
 import io.novafoundation.nova.test_shared.any
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -21,8 +22,11 @@ class PhishingSitesRepositoryImplTest {
     @Mock
     lateinit var phishingSitesApi: PhishingSitesApi
 
+    @Mock
+    lateinit var phishingDetectingService: PhishingDetectingService
+
     private val phishingSiteRepository by lazy {
-        PhishingSitesRepositoryImpl(phishingDao, phishingSitesApi)
+        PhishingSitesRepositoryImpl(phishingDao, phishingSitesApi, phishingDetectingService)
     }
 
 
