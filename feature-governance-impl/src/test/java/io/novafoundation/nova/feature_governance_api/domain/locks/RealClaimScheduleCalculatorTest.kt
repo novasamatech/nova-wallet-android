@@ -470,10 +470,10 @@ class RealClaimScheduleCalculatorTest {
 
         expect {
             claimable(amount = 10) {
-                removeVote(1, 1)
-                removeVote(1, 2)
+                removeVote(trackId = 1, referendumId = 1)
+                removeVote(trackId = 1, referendumId = 2)
 
-                unlock(1)
+                unlock(trackId = 1)
             }
         }
     }
