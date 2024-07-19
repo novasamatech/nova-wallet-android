@@ -87,7 +87,7 @@ class PhishingSitesRepositoryImplTest {
             // top url is always phishing
             runTest(
                 dbItems = listOf(),
-                checkingUrl = "http://valid.com?redirectUrl=host.top",
+                checkingUrl = "http://invalid.host.top",
                 expectedResult = true
             )
         }
