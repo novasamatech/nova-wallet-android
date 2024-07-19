@@ -25,12 +25,14 @@ class PhishingSitesRepositoryImplTest {
     @Mock
     lateinit var phishingSitesApi: PhishingSitesApi
 
-    var phishingDetectingService: PhishingDetectingService = CompoundPhishingDetectingService(
-        listOf(
-            BlackListPhishingDetectingService(phishingDao),
-            DomainListPhishingDetectingService(listOf("top"))
+    private val phishingDetectingService: PhishingDetectingService by lazy {
+        CompoundPhishingDetectingService(
+            listOf(
+                BlackListPhishingDetectingService(phishingDao),
+                DomainListPhishingDetectingService(listOf("top"))
+            )
         )
-    )
+    }
 
     private val phishingSiteRepository by lazy {
         PhishingSitesRepositoryImpl(phishingDao, phishingSitesApi, phishingDetectingService)
