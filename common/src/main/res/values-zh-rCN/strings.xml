@@ -150,7 +150,9 @@
     <string name="accounts_change_chain_account">更改%s帐户</string>
     <string name="accounts_change_chain_secrets">更改帐户</string>
     <string name="accounts_ledger_legacy">Ledger（旧版）</string>
+    <string name="add_custom_node">添加自定义节点</string>
     <string name="add_delegation_missing_account_message">您需要添加一个%s帐户到钱包才能委托</string>
+    <string name="add_network_title">输入网络详情</string>
     <string name="add_proxy_confirmation_delegate_to">委托给</string>
     <string name="add_proxy_confirmation_delegating_account">委托帐户</string>
     <string name="add_proxy_confirmation_delegating_wallet">委托钱包</string>
@@ -158,6 +160,7 @@
     <string name="add_proxy_deposit_description_message">存款在您的帐户上保留，直到代理被删除。</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">您已达到在%s中添加的代理的上限%s。移除代理以添加新代理。</string>
     <string name="add_proxy_maximum_reached_error_title">已达到代理最大数量</string>
+    <string name="added_networks_empty_placeholder">添加的自定义网络会显示在这里</string>
     <string name="asset_add_evm_token_already_exist_message">输入的合约地址已作为%s代币存在于Nova中。</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">输入的合约地址已作为%s代币存在于Nova中。您确定要修改它吗？</string>
     <string name="asset_add_evm_token_already_exist_title">该代币已存在</string>
@@ -173,7 +176,6 @@
     <string name="assets_add_token">添加代币</string>
     <string name="assets_add_token_enter_info_address_label">合约地址</string>
     <string name="assets_add_token_enter_info_decimals_label">小数点</string>
-    <string name="token_price_info_provider_label">Coingecko链接用于价格信息（可选）</string>
     <string name="assets_add_token_enter_info_symbol_label">符号</string>
     <string name="assets_add_token_enter_info_title">输入 ERC-20 代币详情</string>
     <string name="assets_add_token_select_chain_title">选择网络以添加 ERC-20 代币</string>
@@ -223,6 +225,8 @@
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
     <string name="buy_provider_open_confirmation_title">在浏览器中继续？</string>
+    <string name="chain_network_management_auto_balance">自动平衡节点</string>
+    <string name="chain_network_management_enabling">启用连接</string>
     <string name="change_cloud_backup_password_subtitle">请输入用于从云备份恢复钱包的密码。此密码将无法在未来恢复，请务必记住！</string>
     <string name="change_cloud_backup_password_title">更新备份密码</string>
     <string name="choose_amount_asset">资产</string>
@@ -280,6 +284,7 @@
     <string name="common_active">活跃</string>
     <string name="common_add">添加</string>
     <string name="common_add_delegation">添加委托</string>
+    <string name="common_add_network">添加网络</string>
     <string name="common_address">地址</string>
     <string name="common_advanced">高级</string>
     <string name="common_all">全部</string>
@@ -316,6 +321,8 @@
     <string name="common_confirm_title">确认</string>
     <string name="common_confirmation_title">你确定吗？</string>
     <string name="common_confirmed">已确认</string>
+    <string name="common_connected_ms">%d 毫秒</string>
+    <string name="common_connecting">连接中...</string>
     <string name="common_connection_error_message">请检查您的连接或稍后再试</string>
     <string name="common_connection_error_title">连接失败</string>
     <string name="common_continue">继续</string>
@@ -325,6 +332,7 @@
     <string name="common_crypto_type">密钥对加密类型</string>
     <string name="common_date">日期</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s和%s</string>
+    <string name="common_delete">删除</string>
     <string name="common_details">详细信息</string>
     <string name="common_disabled">已禁用</string>
     <string name="common_disconnect">断开</string>
@@ -336,10 +344,12 @@
     <string name="common_enable">启用</string>
     <string name="common_enter_address">输入地址…</string>
     <string name="common_enter_amount">输入金额…</string>
+    <string name="common_enter_details">输入详情</string>
     <string name="common_enter_password">输入密码</string>
     <string name="common_error_general_title">错误</string>
     <string name="common_error_not_enough_tokens">代币不足</string>
     <string name="common_event">事件</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">EVM 地址</string>
     <string name="common_existential_warning_message_v2_2_0">此操作后，如果您的总余额低于最低余额，您的账户将从区块链中移除</string>
     <string name="common_existential_warning_title">操作将移除账户</string>
@@ -377,6 +387,7 @@
         <item quantity="other">%d 分钟</item>
     </plurals>
     <string name="common_missing_account_title">%s 账户缺失</string>
+    <string name="common_modify">修改</string>
     <string name="common_module">模块</string>
     <string name="common_network">网络</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -448,9 +459,11 @@
     <string name="common_something_went_wrong_title">出了些问题</string>
     <string name="common_sort_by">排序方式</string>
     <string name="common_status">状态</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Substrate 地址</string>
     <string name="common_tap_to_reveal_title">点击显示</string>
     <string name="common_terms_and_conditions_formatting">条款和条件</string>
+    <string name="common_testnet">测试网络</string>
     <string name="common_time_left">剩余时间</string>
     <string name="common_title">标题</string>
     <string name="common_to_settings">打开设置</string>
@@ -485,7 +498,6 @@
     <string name="connection_add_already_exists_error">节点已经之前被添加。请试用另一个节点。</string>
     <string name="connection_add_invalid_error">无法与节点建立连接。请尝试另一个。</string>
     <string name="connection_add_unsupported_error">不幸的是，网络不支持。请尝试以下之一：%s。</string>
-    <string name="common_delete">删除</string>
     <string name="connection_delete_description">确认删除%s。</string>
     <string name="connection_delete_title">删除网络？</string>
     <string name="connection_error_message_v2_2_0">请检查您的连接或稍后再试</string>
@@ -508,6 +520,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">密码匹配</string>
     <string name="create_cloud_backup_password_subtitle">请输入密码以随时访问您的备份。密码无法恢复，请务必记住！</string>
     <string name="create_cloud_backup_password_title">创建备份密码</string>
+    <string name="create_network_invalid_chain_id_message">输入的链 ID 与 RPC URL 中的网络不匹配。</string>
+    <string name="create_network_invalid_chain_id_title">无效的链 ID</string>
     <string name="crodloan_private_crowdloan_message">私有众贷暂不支持。</string>
     <string name="crodloan_private_crowdloan_title">私有众筹</string>
     <string name="crowdloan_about">关于众贷</string>
@@ -564,6 +578,24 @@
     <string name="crowdloan_unlock_hint">租赁期结束后，您的%s代币将被退还。</string>
     <string name="crowdloan_your_contributions">您的贡献</string>
     <string name="crownloans_raised_format" formatted="false">已筹集：%s / %s</string>
+    <string name="custom_network_already_exist_failure_message">输入的 RPC URL 已作为 %s 自定义网络存在于 Nova。确定要修改它吗？</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">区块浏览器 URL（可选）</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">链 ID</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">货币符号</string>
+    <string name="custom_network_name_title">网络名称</string>
+    <string name="custom_node_add_button_state">添加节点</string>
+    <string name="custom_node_add_title">为...添加自定义节点</string>
+    <string name="custom_node_disabled_button_state">输入详情</string>
+    <string name="custom_node_edit_button_state">保存</string>
+    <string name="custom_node_edit_title">编辑自定义节点</string>
+    <string name="custom_node_name_hint">名称</string>
+    <string name="custom_node_name_title">节点名称</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">节点 URL</string>
+    <string name="custom_rpc_node_url_title">RPC URL</string>
     <string name="dapp_authorized_description">DApps，当您使用它们时，允许访问看到您的地址</string>
     <string name="dapp_authorized_remove_description">“%s”DApp将从授权中移除</string>
     <string name="dapp_authorized_remove_title">从授权中删除?</string>
@@ -600,6 +632,7 @@
     <string name="deep_linking_invalid_derivation_path">无效的派生路径</string>
     <string name="deep_linking_invalid_mnemonic">无效的助记词</string>
     <string name="deep_linking_url_is_invalid">无效的URL</string>
+    <string name="default_network_already_exist_failure_message">输入的 RPC URL 已作为 %s 网络存在于 Nova。</string>
     <string name="default_notification_channel_name">默认通知渠道</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">通过地址或名称搜索</string>
@@ -650,6 +683,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">您的备份密码已更新。要继续使用云备份，%s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">请输入新备份密码。</string>
     <string name="deprecated_cloud_backup_password_title">备份密码已更改</string>
+    <string name="disabled_chain_error_message">您无法签署已禁用网络的交易。请在设置中启用 %s 后重试。</string>
+    <string name="disabled_chain_error_title">%s 已禁用</string>
     <string name="duplicate_proxy_type_message">您已经向此账户委托了：%s</string>
     <string name="duplicate_proxy_type_title">委托已存在</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH 兼容)</string>
@@ -708,8 +743,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">使用您 12、15、18、21 或 24 个字的短语</string>
     <string name="import_wallet_options_title">选择您想如何导入您的钱包</string>
     <string name="import_wallet_options_watch_only_title">仅观看</string>
+    <string name="integrate_networks_banner_description">将您构建的网络的所有功能集成到 Nova Wallet，使每个人都能访问。</string>
+    <string name="integrate_networks_banner_link">集成您的网络</string>
+    <string name="integrate_networks_banner_title">为 Polkadot 构建？</string>
     <string name="invalid_proxy_address_message">代理地址应该是一个有效的%s地址</string>
     <string name="invalid_proxy_address_title">代理地址无效</string>
+    <string name="invalid_token_symbol_message">输入的货币符号（%1$s）与网络（%2$s）不匹配。您想使用正确的货币符号吗？</string>
+    <string name="invalid_token_symbol_title">无效的货币符号</string>
     <string name="invoice_scan_error_no_info">无法解码QR</string>
     <string name="invoice_scan_qr_code_title">QR码</string>
     <string name="invoice_scan_upload">从相册上传</string>
@@ -737,10 +777,21 @@
     <string name="ledger_verify_address_subtitle">按下您%s上的两个按钮以批准地址</string>
     <string name="ledger_wallet_details_description">这个钱包与Ledger配对。Nova将帮助您形成任何您想要的操作，并且您将被要求使用Ledger签名</string>
     <string name="ledher_import_select_address_title">选择要添加到钱包的账户</string>
+    <string name="loading_network_info">加载网络信息...</string>
     <string name="loocking_backup_progress">正在寻找您的备份...</string>
     <string name="make_payout_transaction_sent">支付交易已发送</string>
     <string name="manage_assets_add_token">添加代币</string>
     <string name="manage_cloud_backup">管理备份</string>
+    <string name="manage_network_action_delete">删除网络</string>
+    <string name="manage_network_action_edit">编辑网络</string>
+    <string name="manage_network_actions_title">管理已添加的网络</string>
+    <string name="manage_network_delete_message">您将无法在资产屏幕上看到该网络的代币余额。</string>
+    <string name="manage_network_delete_title">删除网络？</string>
+    <string name="manage_node_action_delete">删除节点</string>
+    <string name="manage_node_action_edit">编辑节点</string>
+    <string name="manage_node_actions_title">管理已添加的节点</string>
+    <string name="manage_node_delete_message">节点“%s”将被删除</string>
+    <string name="manage_node_delete_title">删除节点？</string>
     <string name="manual_backup_secrets_custom_key_title">自定义密钥</string>
     <string name="manual_backup_secrets_default_key_title">默认密钥</string>
     <string name="manual_backup_secrets_subtitle">不要与任何人分享这些信息 — 如果您这样做，您将永久且不可恢复地失去所有资产</string>
@@ -761,9 +812,14 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">请至少选择%d个钱包</item>
     </plurals>
+    <string name="network_already_exist_failure_title">该节点已存在</string>
     <string name="network_fee">网络费用</string>
     <string name="network_info_address">节点地址</string>
     <string name="network_info_title">节点信息</string>
+    <string name="network_management_added_page_title">已添加</string>
+    <string name="network_management_custom_nodes">自定义节点</string>
+    <string name="network_management_default_nodes">默认节点</string>
+    <string name="network_management_default_page_title">默认</string>
     <string name="network_status_connecting">正在连接…</string>
     <string name="nft_collection">收藏</string>
     <string name="nft_created_by">创建者</string>
@@ -774,6 +830,12 @@
     <string name="nft_owned_by">拥有者</string>
     <string name="nft_price_not_listed">未上市</string>
     <string name="nft_your_nfts">您的NFT</string>
+    <string name="node_already_exist_failure_message">您输入的 URL 已作为“%s”节点存在。</string>
+    <string name="node_already_exist_failure_title">该节点已存在</string>
+    <string name="node_not_alive_message">您输入的节点 URL 无响应或格式不正确。URL 格式应以“wss://”开头。</string>
+    <string name="node_not_alive_title">节点错误</string>
+    <string name="node_not_supported_by_network_message">您输入的 URL 不对应 %1$s 的节点。\n请输入有效的 %1$s 节点 URL。</string>
+    <string name="node_not_supported_by_network_title">错误的网络</string>
     <string name="nomination_pool_claim_rewards">领取奖励</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">您的代币将被重新加入到质押中</string>
     <string name="nomination_pools_direct">直接</string>
@@ -818,6 +880,10 @@
     <string name="pool_full_failure_title">池已满</string>
     <string name="pool_inactive_failure_message">您无法加入未开放的池。请联系池主。</string>
     <string name="pool_inactive_failure_title">池未开放</string>
+    <string name="pre_configured_networks_add_custom_button">手动添加网络</string>
+    <string name="pre_configured_networks_progress_text">正在加载网络列表...</string>
+    <string name="pre_configured_networks_search_hint">按网络名称搜索</string>
+    <string name="pre_configured_networks_title">添加网络</string>
     <string name="profile_accounts_title">账户</string>
     <string name="profile_accounts_title_2_0">钱包</string>
     <string name="profile_language_title">语言</string>
@@ -1454,6 +1520,7 @@
     <string name="tabbar_staking_title">质押</string>
     <string name="tabbar_wallet_title">钱包</string>
     <string name="today">今天</string>
+    <string name="token_price_info_provider_label">Coingecko链接用于价格信息（可选）</string>
     <string name="transaction_details_copy_hash">复制哈希</string>
     <string name="transaction_details_extrinsic_fee">费用</string>
     <string name="transaction_details_from">来自</string>

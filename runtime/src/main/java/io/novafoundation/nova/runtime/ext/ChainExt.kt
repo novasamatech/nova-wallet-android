@@ -148,6 +148,10 @@ fun Chain.Additional?.isGenericLedgerAppSupported(): Boolean {
     return this?.supportLedgerGenericApp ?: false
 }
 
+fun Chain.Additional?.shouldDisableMetadataHashCheck(): Boolean {
+    return this?.disabledCheckMetadataHash ?: false
+}
+
 fun Chain.Additional?.isMigrationLedgerAppSupported(): Boolean {
     return isGenericLedgerAppSupported()
 }
