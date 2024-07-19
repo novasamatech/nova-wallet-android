@@ -27,6 +27,10 @@ on:
         required: false
         type: string
         default: "apk"
+      build-debug-tests:
+        required: false
+        type: boolean
+        default: false
     secrets:
       ACALA_PROD_AUTH_TOKEN:
         required: true
@@ -173,6 +177,10 @@ jobs:
       - name: 🏗 Build app
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
         run: ./gradlew ${{ inputs.gradlew-command }}
+
+      - name: 🏗 Build debug tests
+        if: ${{ inputs.build-debug-tests }}
+        run: ./gradlew assembleDebugAndroidTest
 
       - name: 🧹 Delete key after building
         if: ${{ !startsWith(inputs.keystore-file-name, 'false') }}
