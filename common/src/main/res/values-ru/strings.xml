@@ -904,7 +904,7 @@
     <string name="pool_full_failure_title">Пул заполнен</string>
     <string name="pool_inactive_failure_message">Вы не можете присоединиться к не открытому пулу. Пожалуйста, свяжитесь с владельцем пула.</string>
     <string name="pool_inactive_failure_title">Пул не открыт</string>
-    <string name="pool_staking_conflict_message">Вы больше не можете использовать одновременно Direct Staking и Pool Staking с одного аккаунта. Для управления Pool Staking вам сначала нужно unstake ваши токены из Direct Staking.</string>
+    <string name="pool_staking_conflict_message">Вы больше не можете использовать одновременно стейкинг напрямую и в пуле с одного аккаунта. Для управления стейкингом в пуле вам сначала нужно вывести ваши токены из стейкинга напрямую.</string>
     <string name="pool_staking_conflict_title">Действия в пуле недоступны</string>
     <string name="pre_configured_networks_add_custom_button">Добавить сеть вручную</string>
     <string name="pre_configured_networks_progress_text">Загрузка списка сетей...</string>
