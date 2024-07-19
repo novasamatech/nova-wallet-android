@@ -3,8 +3,11 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.search
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
@@ -16,19 +19,22 @@ import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
-import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalTime::class, FlowPreview::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class DAppSearchViewModel(
     private val router: DAppRouter,
     private val resourceManager: ResourceManager,
     private val interactor: SearchDappInteractor,
     private val payload: SearchPayload,
     private val dAppSearchResponder: DAppSearchResponder,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val appLinksProvider: AppLinksProvider
 ) : BaseViewModel() {
+
+    val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
 
     val query = MutableStateFlow(payload.initialUrl.orEmpty())
 
@@ -93,17 +99,23 @@ class DAppSearchViewModel(
     }
 
     fun searchResultClicked(searchResult: DappSearchResult) {
-        val newUrl = when (searchResult) {
-            is DappSearchResult.Dapp -> searchResult.dapp.url
-            is DappSearchResult.Search -> searchResult.searchUrl
-            is DappSearchResult.Url -> searchResult.url
-        }
+        launch {
+            val newUrl = when (searchResult) {
+                is DappSearchResult.Dapp -> searchResult.dapp.url
+                is DappSearchResult.Search -> searchResult.searchUrl
+                is DappSearchResult.Url -> searchResult.url
+            }
 
-        if (shouldReportResult()) {
-            dAppSearchResponder.respond(DAppSearchCommunicator.Response(newUrl))
-            router.back()
-        } else {
-            router.openDAppBrowser(newUrl)
+            if (searchResult !is DappSearchResult.Dapp) {
+                dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
+            }
+
+            if (shouldReportResult()) {
+                dAppSearchResponder.respond(DAppSearchCommunicator.Response(newUrl))
+                router.back()
+            } else {
+                router.openDAppBrowser(newUrl)
+            }
         }
     }
 

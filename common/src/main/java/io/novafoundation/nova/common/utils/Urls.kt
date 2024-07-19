@@ -28,6 +28,10 @@ object Urls {
         return URL(url).host
     }
 
+    fun domainOf(url: String): String {
+        return URL(url).authority
+    }
+
     fun isValidWebUrl(url: String): Boolean {
         return Patterns.WEB_URL.matcher(url).matches()
     }

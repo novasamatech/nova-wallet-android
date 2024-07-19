@@ -36,10 +36,6 @@ class YourPoolView @JvmOverloads constructor(
         }
     }
 
-    fun setOnPoolClicked(listener: (View) -> Unit) {
-        setOnClickListener(listener)
-    }
-
     fun showYourPoolState(yourPoolState: LoadingState<YourPoolComponentState>) {
         when (yourPoolState) {
             is LoadingState.Loaded -> showLoaded(yourPoolState.data)

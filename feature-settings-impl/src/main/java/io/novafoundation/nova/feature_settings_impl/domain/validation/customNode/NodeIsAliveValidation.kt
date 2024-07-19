@@ -11,11 +11,15 @@ import kotlin.time.Duration.Companion.seconds
 
 class NetworkNodeIsAliveValidation<P, F>(
     private val nodeHealthStateCheckRequest: suspend (P) -> Unit,
+    private val nodeUrl: (P) -> String,
     private val failure: (P) -> F
 ) : Validation<P, F> {
 
     override suspend fun validate(value: P): ValidationStatus<F> {
         return try {
+            val url = nodeUrl(value)
+            require(url.startsWith("wss://") || url.startsWith("ws://"))
+
             withTimeout(10.seconds) { nodeHealthStateCheckRequest(value) }
 
             valid()
@@ -27,7 +31,8 @@ class NetworkNodeIsAliveValidation<P, F>(
 
 fun <P, F> ValidationSystemBuilder<P, F>.validateNetworkNodeIsAlive(
     nodeHealthStateCheckRequest: suspend (P) -> Unit,
+    nodeUrl: (P) -> String,
     failure: (P) -> F
 ) = validate(
-    NetworkNodeIsAliveValidation(nodeHealthStateCheckRequest, failure)
+    NetworkNodeIsAliveValidation(nodeHealthStateCheckRequest, nodeUrl, failure)
 )
