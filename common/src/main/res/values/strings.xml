@@ -63,7 +63,6 @@
     <string name="manage_network_action_delete">Delete network</string>
     <string name="manage_network_actions_title">Manage added network</string>
 
-    <!--<string name="connection_delete_confirm">Delete</string>-->
     <string name="common_delete">Delete</string>
 
     <string name="add_network_title">Enter network details</string>
@@ -84,10 +83,8 @@
     <string name="common_substrate">Substrate</string>
     <string name="common_evm">EVM</string>
 
-    <!--<string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>-->
     <string name="token_price_info_provider_label">Coingecko link for price info (Optional) </string>
 
-    <!--<string name="assets_add_token_enter_info_price_hint" translatable="false">www.coingecko.com/en/coins/tether</string>-->
     <string name="token_price_info_provider_placeholder" translatable="false">www.coingecko.com/en/coins/tether</string>
 
     <string name="custom_network_block_explorer_title">Block explorer URL (Optional) </string>
