@@ -71,6 +71,16 @@ fun NominationPoolsCalls.claimPayout() {
     )
 }
 
+fun NominationPoolsCalls.migrateDelegation(memberAccount: AccountId) {
+    extrinsicBuilder.call(
+        moduleName = Modules.NOMINATION_POOLS,
+        callName = "migrate_delegation",
+        arguments = mapOf(
+            "member_account" to AddressInstanceConstructor.constructInstance(extrinsicBuilder.runtime.typeRegistry, memberAccount),
+        )
+    )
+}
+
 private fun NominationPoolBondExtraSource.prepareForEncoding(): DictEnum.Entry<*> {
     return when (this) {
         is NominationPoolBondExtraSource.FreeBalance -> DictEnum.Entry("FreeBalance", amount)

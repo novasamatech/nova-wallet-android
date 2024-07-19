@@ -6,12 +6,15 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.handlePoolStakingTypesConflictValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.NotEnoughBalanceToPayFees
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.NotEnoughToUnbond
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.NotPositiveAmount
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.PartialUnbondLeavesLessThanMinBond
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.PoolMemberMaxUnlockingLimitReached
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.PoolUnlockChunksLimitReached
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.StakingTypesConflict
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.ToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleWith
@@ -49,9 +52,11 @@ fun nominationPoolsUnbondValidationFailure(
             )
         }
 
-        is NominationPoolsUnbondValidationFailure.ToStayAboveED -> handleInsufficientBalanceCommission(
+        is ToStayAboveED -> handleInsufficientBalanceCommission(
             failure,
             resourceManager
         ).asDefault()
+
+        StakingTypesConflict -> handlePoolStakingTypesConflictValidationFailure(resourceManager).asDefault()
     }
 }

@@ -134,9 +134,11 @@ class RealGovernanceUnlockInteractor(
 
             val governanceSource = governanceSourceRegistry.sourceFor(governanceSelectedOption)
 
+            val metaAccount = accountRepository.getSelectedMetaAccount()
+
             combine(
                 assetFlow,
-                balanceLocksRepository.observeBalanceLocks(chain, chainAsset),
+                balanceLocksRepository.observeBalanceLocks(metaAccount.id, chain, chainAsset),
                 locksOverviewFlow(scope)
             ) { assetFlow, balanceLocks, locksOverview ->
                 governanceSource.constructGovernanceUnlockAffects(assetFlow, balanceLocks, locksOverview)
