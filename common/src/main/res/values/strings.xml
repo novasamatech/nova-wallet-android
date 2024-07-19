@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="dapp_url_warning_title">Warning! DApp is unknown</string>
+    <string name="dapp_url_warning_subtitle">Malicious DApps can withdraw all your funds. Always do your own research before using a DApp, granting permission, or sending funds out.\n\nIf someone is urging you to visit this DApp, it is likely a scam. When in doubt, please contact Nova Wallet support: %s.</string>
+    <string name="dapp_url_warning_open_anyway">Open anyway</string>
+
     <string name="setup_staking_conflict_title">Already staking</string>
     <string name="setup_staking_conflict_message">You cannot stake with Direct Staking and Nomination Pools at the same time</string>
-
 
     <string name="pool_staking_conflict_title">Pool operations are not available</string>
     <string name="pool_staking_conflict_message">You can no longer use both Direct Staking and Pool Staking from the same account. To manage your Pool  Staking you first need to unstake your tokens from Direct Staking.</string>

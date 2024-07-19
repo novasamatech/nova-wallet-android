@@ -2,6 +2,10 @@ package io.novafoundation.nova.feature_dapp_impl.data.repository
 
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.feature_dapp_impl.data.network.phishing.PhishingSitesApi
+import io.novafoundation.nova.feature_dapp_impl.data.phisning.BlackListPhishingDetectingService
+import io.novafoundation.nova.feature_dapp_impl.data.phisning.CompoundPhishingDetectingService
+import io.novafoundation.nova.feature_dapp_impl.data.phisning.DomainListPhishingDetectingService
+import io.novafoundation.nova.feature_dapp_impl.data.phisning.PhishingDetectingService
 import io.novafoundation.nova.test_shared.any
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -21,8 +25,17 @@ class PhishingSitesRepositoryImplTest {
     @Mock
     lateinit var phishingSitesApi: PhishingSitesApi
 
+    private val phishingDetectingService: PhishingDetectingService by lazy {
+        CompoundPhishingDetectingService(
+            listOf(
+                BlackListPhishingDetectingService(phishingDao),
+                DomainListPhishingDetectingService(listOf("top"))
+            )
+        )
+    }
+
     private val phishingSiteRepository by lazy {
-        PhishingSitesRepositoryImpl(phishingDao, phishingSitesApi)
+        PhishingSitesRepositoryImpl(phishingDao, phishingSitesApi, phishingDetectingService)
     }
 
 
@@ -69,6 +82,13 @@ class PhishingSitesRepositoryImplTest {
                 dbItems = listOf("host.com"),
                 checkingUrl = "http://valid.com?redirectUrl=host.com",
                 expectedResult = false
+            )
+
+            // top url is always phishing
+            runTest(
+                dbItems = listOf(),
+                checkingUrl = "http://invalid.host.top",
+                expectedResult = true
             )
         }
     }
