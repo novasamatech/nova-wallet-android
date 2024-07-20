@@ -624,6 +624,9 @@
     <string name="dapp_sign_error_unsupported_chain">不支持的链，创世哈希%s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">确保操作是正确的</string>
     <string name="dapp_sign_extrinsic_failed">未能签署所请求的操作</string>
+    <string name="dapp_url_warning_open_anyway">仍然打开</string>
+    <string name="dapp_url_warning_subtitle">恶意的 DApps 可以提取你所有的资金。使用 DApp、授予权限或转出资金前请务必自行研究。\n\n如果有人迫使你访问这个 DApp，很可能是骗局。如有疑问，请联系 Nova Wallet 支持：%s。</string>
+    <string name="dapp_url_warning_title">警告！DApp 未知</string>
     <string name="deep_linking_chain_id_is_not_found">未找到链</string>
     <string name="deep_linking_domain_is_not_matched">链接%s中的域名不被允许</string>
     <string name="deep_linking_governance_type_is_not_specified">未指定治理类型</string>
@@ -880,6 +883,8 @@
     <string name="pool_full_failure_title">池已满</string>
     <string name="pool_inactive_failure_message">您无法加入未开放的池。请联系池主。</string>
     <string name="pool_inactive_failure_title">池未开放</string>
+    <string name="pool_staking_conflict_message">你不能再同时使用同一个账号进行直接质押和池质押。要管理你的池质押，首先需要从直接质押中取消质押你的代币。</string>
+    <string name="pool_staking_conflict_title">池操作不可用</string>
     <string name="pre_configured_networks_add_custom_button">手动添加网络</string>
     <string name="pre_configured_networks_progress_text">正在加载网络列表...</string>
     <string name="pre_configured_networks_search_hint">按网络名称搜索</string>
@@ -1114,6 +1119,8 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">维基</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_staking_conflict_message">不能同时使用直接质押和提名池进行质押</string>
+    <string name="setup_staking_conflict_title">已质押</string>
     <string name="setup_staking_type_advanced_options_condition">高级质押管理</string>
     <string name="setup_staking_type_already_used_title">不能更改质押类型</string>
     <string name="setup_staking_type_direct_already_used_message">您已经有了直接质押</string>
