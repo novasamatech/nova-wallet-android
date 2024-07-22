@@ -33,7 +33,7 @@ class SearchCustomValidatorsInteractor(
         if (chain.isValidAddress(query)) {
             val validator = validatorProvider.getValidatorWithoutElectedInfo(chain.id, query)
 
-            if (validator.prefs != null) {
+            if (validator?.prefs != null) {
                 listOf(validator)
             } else {
                 emptyList()

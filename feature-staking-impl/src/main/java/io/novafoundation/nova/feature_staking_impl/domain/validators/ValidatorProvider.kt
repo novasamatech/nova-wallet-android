@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
@@ -33,7 +33,7 @@ class ValidatorProvider(
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val stakingConstantsRepository: StakingConstantsRepository,
     private val stakingSharedComputation: StakingSharedComputation,
-    private val knownNovaValidators: KnownNovaValidators,
+    private val validatorsPreferencesSource: ValidatorsPreferencesSource,
 ) {
 
     suspend fun getValidators(
@@ -44,10 +44,12 @@ class ValidatorProvider(
         val chain = stakingOption.assetWithChain.chain
         val chainId = chain.id
 
-        val novaValidatorIds = knownNovaValidators.getValidatorIds(chainId).toSet()
+        val novaValidatorIds = validatorsPreferencesSource.getValidatorIds(chainId)
+        val excludedValidators = validatorsPreferencesSource.getExcludedValidators(chainId)
         val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
         val requestedValidatorIds = sources.allValidatorIds(chainId, electedValidatorExposures, novaValidatorIds)
+            .filter { it !in excludedValidators }
         // we always need validator prefs for elected validators to construct reward calculator
         val validatorIdsToQueryPrefs = electedValidatorExposures.keys + requestedValidatorIds
 
@@ -81,7 +83,7 @@ class ValidatorProvider(
         }
     }
 
-    suspend fun getValidatorWithoutElectedInfo(chainId: ChainId, address: String): Validator {
+    suspend fun getValidatorWithoutElectedInfo(chainId: ChainId, address: String): Validator? {
         val accountId = address.toHexAccountId()
 
         val accountIdBridged = listOf(accountId)
@@ -91,7 +93,10 @@ class ValidatorProvider(
 
         val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
 
-        val novaValidatorIds = knownNovaValidators.getValidatorIds(chainId).toSet()
+        val novaValidatorIds = validatorsPreferencesSource.getValidatorIds(chainId)
+        val excludedValidators = validatorsPreferencesSource.getExcludedValidators(chainId)
+
+        if (address in excludedValidators) return null
 
         return Validator(
             slashed = slashes.getOrDefault(accountId, false),

@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 
 class ValidatorRecommender(
     val availableValidators: List<Validator>,
-    private val novaValidatorIds: List<String>,
+    private val novaValidatorIds: Set<String>,
 ) {
 
     suspend fun recommendations(settings: RecommendationSettings) = withContext(Dispatchers.Default) {
