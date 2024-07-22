@@ -71,9 +71,9 @@ class AuthorizedDAppsFragment : BaseFragment<AuthorizedDAppsViewModel>(), Author
         viewModel.revokeAuthorizationConfirmation.awaitableActionLiveData.observeEvent {
             warningDialog(
                 context = requireContext(),
-                onConfirm = { it.onSuccess(Unit) },
-                onCancel = it.onCancel,
-                confirmTextRes = R.string.common_remove
+                onPositiveClick = { it.onSuccess(Unit) },
+                onNegativeClick = it.onCancel,
+                positiveTextRes = R.string.common_remove
             ) {
                 setTitle(R.string.dapp_authorized_remove_title)
                 setMessage(getString(R.string.dapp_authorized_remove_description, it.payload))

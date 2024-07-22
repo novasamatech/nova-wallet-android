@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
+import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.Coingeck
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
@@ -66,6 +68,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealPa
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepositoryImpl
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealChainAssetRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
@@ -270,6 +273,15 @@ class WalletFeatureModule {
         lockDao: LockDao
     ): BalanceLocksRepository {
         return RealBalanceLocksRepository(accountRepository, chainRegistry, lockDao)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBalanceHoldsRepository(
+        chainRegistry: ChainRegistry,
+        holdsDao: HoldsDao
+    ): BalanceHoldsRepository {
+        return RealBalanceHoldsRepository(chainRegistry, holdsDao)
     }
 
     @Provides

@@ -13,4 +13,6 @@ sealed class NominationPoolsBondMoreValidationFailure {
     object PoolIsDestroying : NominationPoolsBondMoreValidationFailure()
 
     object UnstakingAll : NominationPoolsBondMoreValidationFailure()
+
+    object StakingTypesConflict : NominationPoolsBondMoreValidationFailure()
 }

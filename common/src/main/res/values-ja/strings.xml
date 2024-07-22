@@ -624,6 +624,9 @@
     <string name="dapp_sign_error_unsupported_chain">生成ハッシュ %s の未対応チェーン</string>
     <string name="dapp_sign_extrinsic_details_subtitle">操作が正しいことを確認してください</string>
     <string name="dapp_sign_extrinsic_failed">要求された操作の署名に失敗しました</string>
+    <string name="dapp_url_warning_open_anyway">それでも開く</string>
+    <string name="dapp_url_warning_subtitle">悪意のあるDAppsはすべての資金を引き出す可能性があります。DAppを使用する前に、許可を与えたり、資金を送金したりする前に、必ず自分で調査してください。\n\n誰かがこのDAppを訪問するよう促している場合、それは詐欺である可能性が高いです。疑わしい場合は、Nova Walletサポートに連絡してください: %s。</string>
+    <string name="dapp_url_warning_title">警告! DAppは未知です</string>
     <string name="deep_linking_chain_id_is_not_found">チェーンが見つかりません</string>
     <string name="deep_linking_domain_is_not_matched">リンクのドメイン %s は許可されていません</string>
     <string name="deep_linking_governance_type_is_not_specified">ガバナンスタイプが指定されていません</string>
@@ -880,6 +883,8 @@
     <string name="pool_full_failure_title">プールが満員です</string>
     <string name="pool_inactive_failure_message">開いていないプールに参加できません。プールのオーナーに連絡してください。</string>
     <string name="pool_inactive_failure_title">プールが開いていません</string>
+    <string name="pool_staking_conflict_message">同じアカウントでDirect StakingとPool Stakingの両方を使用することはできなくなりました。Pool Stakingを管理するには、まずDirect Stakingからトークンをアンステークする必要があります。</string>
+    <string name="pool_staking_conflict_title">プール操作は利用できません</string>
     <string name="pre_configured_networks_add_custom_button">手動でネットワークを追加</string>
     <string name="pre_configured_networks_progress_text">ネットワークリストを読み込み中...</string>
     <string name="pre_configured_networks_search_hint">ネットワーク名で検索</string>
@@ -1114,6 +1119,8 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">ウィキ</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_staking_conflict_message">Direct StakingとNomination Poolsを同時にステークすることはできません</string>
+    <string name="setup_staking_conflict_title">すでにステーキング中</string>
     <string name="setup_staking_type_advanced_options_condition">高度なStaking管理</string>
     <string name="setup_staking_type_already_used_title">Stakingタイプを変更できません</string>
     <string name="setup_staking_type_direct_already_used_message">すでに直接Stakingを行っています</string>

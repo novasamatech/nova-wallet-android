@@ -35,6 +35,7 @@ class NodeAutobalancer(
                     Log.w(this@NodeAutobalancer.LOG_TAG, "No wss nodes available for chain $chainId")
 
                     emit(null)
+                    return@transform
                 }
 
                 val nodeIterator = strategy.generateNodeSequence(wssNodes).iterator()

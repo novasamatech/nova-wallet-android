@@ -66,7 +66,7 @@ class RealVoteReferendumInteractor(
 
             val voterAccountId = metaAccount.accountIdIn(governanceOption.assetWithChain.chain)!!
 
-            voteAssistantFlowSuspend(governanceOption, voterAccountId, referendumId)
+            voteAssistantFlowSuspend(governanceOption, voterAccountId, metaAccount.id, referendumId)
         }
     }
 
@@ -101,6 +101,7 @@ class RealVoteReferendumInteractor(
     private suspend fun voteAssistantFlowSuspend(
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId,
+        metaId: Long,
         referendumId: ReferendumId
     ): Flow<GovernanceVoteAssistant> {
         val chain = selectedGovernanceOption.assetWithChain.chain
@@ -122,7 +123,7 @@ class RealVoteReferendumInteractor(
         val selectedReferendumFlow = governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId)
             .filterNotNull()
 
-        val balanceLocksFlow = locksRepository.observeBalanceLocks(chain, chainAsset)
+        val balanceLocksFlow = locksRepository.observeBalanceLocks(metaId, chain, chainAsset)
 
         return combine(votingInformation, selectedReferendumFlow, balanceLocksFlow) { (locksByTrack, voting, votedReferenda), selectedReferendum, locks ->
             val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)

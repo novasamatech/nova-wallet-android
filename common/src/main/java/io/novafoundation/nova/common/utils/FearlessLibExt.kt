@@ -264,6 +264,10 @@ fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
 fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
 
+fun RuntimeMetadata.delegatedStakingOrNull() = moduleOrNull(Modules.DELEGATED_STAKING)
+
+fun RuntimeMetadata.delegatedStaking() = module(Modules.DELEGATED_STAKING)
+
 fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
 
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
@@ -436,6 +440,8 @@ object Modules {
     const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
 
     const val NOMINATION_POOLS = "NominationPools"
+
+    const val DELEGATED_STAKING = "DelegatedStaking"
 
     const val ASSET_CONVERSION = "AssetConversion"
 
