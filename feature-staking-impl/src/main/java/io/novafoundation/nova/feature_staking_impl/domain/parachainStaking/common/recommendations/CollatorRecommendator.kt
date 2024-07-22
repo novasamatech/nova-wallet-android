@@ -35,7 +35,7 @@ class CollatorRecommendatorFactory(
     suspend fun create(stakingOption: StakingOption, scope: CoroutineScope) = computationalCache.useCache(COLLATORS_CACHE, scope) {
         val collators = collatorProvider.getCollators(stakingOption, CollatorSource.Elected)
 
-        val knownNovaCollators = validatorsPreferencesSource.getValidatorIds(stakingOption.chain.id)
+        val knownNovaCollators = validatorsPreferencesSource.getRecommendedValidatorIds(stakingOption.chain.id)
 
         CollatorRecommendator(collators, knownNovaCollators)
     }

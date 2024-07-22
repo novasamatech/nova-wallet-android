@@ -44,8 +44,8 @@ class ValidatorProvider(
         val chain = stakingOption.assetWithChain.chain
         val chainId = chain.id
 
-        val novaValidatorIds = validatorsPreferencesSource.getValidatorIds(chainId)
-        val excludedValidators = validatorsPreferencesSource.getExcludedValidators(chainId)
+        val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
+        val excludedValidators = validatorsPreferencesSource.getExcludedValidatorIds(chainId)
         val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
         val requestedValidatorIds = sources.allValidatorIds(chainId, electedValidatorExposures, novaValidatorIds)
@@ -93,8 +93,8 @@ class ValidatorProvider(
 
         val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
 
-        val novaValidatorIds = validatorsPreferencesSource.getValidatorIds(chainId)
-        val excludedValidators = validatorsPreferencesSource.getExcludedValidators(chainId)
+        val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
+        val excludedValidators = validatorsPreferencesSource.getExcludedValidatorIds(chainId)
 
         if (address in excludedValidators) return null
 

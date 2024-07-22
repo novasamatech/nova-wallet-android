@@ -13,9 +13,9 @@ import kotlinx.coroutines.sync.withLock
 
 interface ValidatorsPreferencesSource {
 
-    suspend fun getValidatorIds(chainId: ChainId): Set<String>
+    suspend fun getRecommendedValidatorIds(chainId: ChainId): Set<String>
 
-    suspend fun getExcludedValidators(chainId: ChainId): Set<String>
+    suspend fun getExcludedValidatorIds(chainId: ChainId): Set<String>
 }
 
 class RemoteValidatorsPreferencesSource(
@@ -26,11 +26,11 @@ class RemoteValidatorsPreferencesSource(
     private var validatorsPreferences: ValidatorsPreferencesRemote? = null
     private val validatorsMutex = Mutex()
 
-    override suspend fun getValidatorIds(chainId: ChainId): Set<String> {
+    override suspend fun getRecommendedValidatorIds(chainId: ChainId): Set<String> {
         return getValidators().preferred[chainId].orEmpty()
     }
 
-    override suspend fun getExcludedValidators(chainId: ChainId): Set<String> {
+    override suspend fun getExcludedValidatorIds(chainId: ChainId): Set<String> {
         return getValidators().excluded[chainId].orEmpty()
     }
 
