@@ -18,7 +18,8 @@ class FixedKnownNovaPools : KnownNovaPools {
         key(Chain.Geneses.POLKADOT, 54),
         key(Chain.Geneses.KUSAMA, 160),
         key(Chain.Geneses.ALEPH_ZERO, 74),
-        key(Chain.Geneses.VARA, 65)
+        key(Chain.Geneses.VARA, 65),
+        key(Chain.Geneses.AVAIL, 3)
     )
 
     private fun key(chainId: ChainId, poolId: Int) = chainId to PoolId(poolId)
