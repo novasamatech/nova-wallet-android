@@ -33,12 +33,11 @@ class ValidatorRecommenderFactory(
 
         val sources = listOf(ValidatorSource.Elected, ValidatorSource.NovaValidators)
 
-        val excludedValidators = validatorsPreferencesSource.getExcludedValidatorIds(stakingOption.chain.id)
-        val recommendedValidators = validatorsPreferencesSource.getRecommendedValidatorIds(stakingOption.chain.id)
-
         val validators = validatorProvider.getValidators(stakingOption, sources, scope)
-            .filter { it.address !in excludedValidators }
 
-        ValidatorRecommender(validators, recommendedValidators)
+        val recommendedValidators = validatorsPreferencesSource.getRecommendedValidatorIds(stakingOption.chain.id)
+        val excludedValidators = validatorsPreferencesSource.getExcludedValidatorIds(stakingOption.chain.id)
+
+        ValidatorRecommender(validators, recommendedValidators, excludedValidators)
     }
 }

@@ -40,11 +40,11 @@ class RemoteValidatorsPreferencesSource(
                 validatorsPreferences = fetchValidators()
             }
 
-            requireNotNull(validatorsPreferences)
+            validatorsPreferences ?: ValidatorsPreferencesRemote(emptyMap(), emptyMap())
         }
     }
 
-    private suspend fun fetchValidators(): ValidatorsPreferencesRemote {
+    private suspend fun fetchValidators(): ValidatorsPreferencesRemote? {
         return runCatching {
             val chainsById = chainRegistry.chainsById()
             val preferences = validatorsApi.getValidators()
@@ -56,7 +56,7 @@ class RemoteValidatorsPreferencesSource(
             }
 
             ValidatorsPreferencesRemote(recommended, excluded)
-        }.getOrDefault(ValidatorsPreferencesRemote(emptyMap(), emptyMap()))
+        }.getOrNull()
     }
 
     private fun Chain.convertAddressesToAccountIds(addresses: Set<String>): Set<String> {
