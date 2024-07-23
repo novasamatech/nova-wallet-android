@@ -85,7 +85,7 @@ class RealVoteReferendumInteractor(
     }
 
     override suspend fun vote(
-        vote: AccountVote.Standard,
+        vote: AccountVote,
         referendumId: ReferendumId,
     ): Result<ExtrinsicSubmission> {
         val governanceSelectedOption = selectedChainState.selectedOption()

@@ -98,6 +98,10 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
             viewModel.negativeVotesClicked()
         }
 
+        referendumDetailsVotingStatus.setAbstainVotersClickListener() {
+            viewModel.negativeVotesClicked()
+        }
+
         referendumDetailsDappList.onDAppClicked(viewModel::dAppClicked)
 
         referendumFullDetails.setOnClickListener {
@@ -167,6 +171,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsVotingStatus.setVotingModel(model.voting)
         referendumDetailsVotingStatus.setPositiveVoters(model.ayeVoters)
         referendumDetailsVotingStatus.setNegativeVoters(model.nayVoters)
+        referendumDetailsVotingStatus.setAbstainVoters(model.nayVoters)
 
         referendumDetailsTimeline.setTimeline(model.timeline)
     }

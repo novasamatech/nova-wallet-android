@@ -18,6 +18,7 @@ class ReferendumDetailsModel(
     val yourVote: YourMultiVoteModel?,
     val ayeVoters: VotersModel?,
     val nayVoters: VotersModel?,
+    val abstainVoters: VotersModel?,
     val timeEstimation: ReferendumTimeEstimation?,
     val timeline: TimelineLayout.Timeline
 )

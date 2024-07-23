@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
+import kotlinx.android.synthetic.main.view_voting_status.view.abstainVotersDetails
 import kotlinx.android.synthetic.main.view_voting_status.view.negativeVotersDetails
 import kotlinx.android.synthetic.main.view_voting_status.view.positiveVotersDetails
 import kotlinx.android.synthetic.main.view_voting_status.view.votingStatus
@@ -73,6 +74,14 @@ class VotingStatusView @JvmOverloads constructor(
 
     fun setNegativeVotersClickListener(listener: OnClickListener?) {
         negativeVotersDetails.setOnClickListener(listener)
+    }
+
+    fun setAbstainVoters(votersModel: VotersModel?) {
+        abstainVotersDetails.setVoxtersModel(votersModel)
+    }
+
+    fun setAbstainVotersClickListener(listener: OnClickListener?) {
+        abstainVotersDetails.setOnClickListener(listener)
     }
 
     fun setStartVoteOnClickListener(listener: OnClickListener?) {

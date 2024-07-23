@@ -141,6 +141,15 @@ private fun AccountVote.prepareForEncoding(): Any {
             )
         )
 
+        is AccountVote.SplitAbstain -> DictEnum.Entry(
+            name = "SplitAbstain",
+            value = structOf(
+                "aye" to this.aye,
+                "nay" to this.nay,
+                "abstain" to this.abstain
+            )
+        )
+
         else -> error("Not supported yet")
     }
 }

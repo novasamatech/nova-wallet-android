@@ -19,7 +19,7 @@ interface VoteReferendumInteractor {
     suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Fee
 
     suspend fun vote(
-        vote: AccountVote.Standard,
+        vote: AccountVote,
         referendumId: ReferendumId,
     ): Result<ExtrinsicSubmission>
 }

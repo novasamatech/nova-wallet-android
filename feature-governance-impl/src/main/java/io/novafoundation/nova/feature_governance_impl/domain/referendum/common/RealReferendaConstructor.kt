@@ -34,6 +34,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
+import java.math.BigDecimal
 import java.math.BigInteger
 
 interface ReferendaConstructor {
@@ -198,22 +199,27 @@ class RealReferendaConstructor(
                     add(State.CREATED, at = null)
                     add(State.CANCELLED, at = onChainReferendum.status.sinceOrThrow())
                 }
+
                 ReferendumStatus.NotExecuted.Killed -> {
                     add(State.CREATED, at = null)
                     add(State.KILLED, at = onChainReferendum.status.sinceOrThrow())
                 }
+
                 ReferendumStatus.NotExecuted.Rejected -> {
                     add(State.CREATED, at = null)
                     add(State.REJECTED, at = onChainReferendum.status.sinceOrThrow())
                 }
+
                 ReferendumStatus.NotExecuted.TimedOut -> {
                     add(State.CREATED, at = null)
                     add(State.TIMED_OUT, at = onChainReferendum.status.sinceOrThrow())
                 }
+
                 is ReferendumStatus.Approved -> {
                     add(State.CREATED, at = null)
                     // Approved status will be added in another place because this is a historical status but approved is an active status
                 }
+
                 ReferendumStatus.Executed -> {
                     add(State.CREATED, at = null)
                     add(State.APPROVED, at = onChainReferendum.status.sinceOrThrow())

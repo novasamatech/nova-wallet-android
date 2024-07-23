@@ -116,6 +116,7 @@ class SetupVoteReferendumViewModel(
         .shareInBackground()
 
     val ayeButtonStateFlow = buttonStateFlow(VoteType.AYE, R.string.referendum_vote_aye)
+    val abstainButtonStateFlow = buttonStateFlow(VoteType.ABSTAIN, R.string.referendum_vote_abstain)
     val nayButtonStateFlow = buttonStateFlow(VoteType.NAY, R.string.referendum_vote_nay)
 
     val amountChips = voteAssistantFlow.map { voteAssistant ->
@@ -144,6 +145,10 @@ class SetupVoteReferendumViewModel(
         openConfirmIfValid(VoteType.AYE)
     }
 
+    fun abstainClicked() {
+        openConfirmIfValid(VoteType.ABSTAIN)
+    }
+
     fun nayClicked() {
         openConfirmIfValid(VoteType.NAY)
     }
@@ -165,31 +170,33 @@ class SetupVoteReferendumViewModel(
             asset = selectedAsset.first(),
             trackVoting = voteAssistant.trackVoting,
             voteAmount = amountChooserMixin.amount.first(),
-            fee = originFeeMixin.awaitDecimalFee()
+            fee = originFeeMixin.awaitDecimalFee(),
+            voteType = voteType,
+            conviction = selectedConvictionFlow.first()
         )
 
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, action ->
+                handleVoteReferendumValidationFailure(status.reason, action, resourceManager)
+            },
             progressConsumer = validatingVoteType.progressConsumer(voteType),
         ) {
             validatingVoteType.value = null
 
-            openConfirm(it, voteType)
+            openConfirm(it)
         }
     }
 
-    private fun openConfirm(validationPayload: VoteReferendumValidationPayload, voteType: VoteType) = launch {
-        val conviction = selectedConvictionFlow.first()
-
+    private fun openConfirm(validationPayload: VoteReferendumValidationPayload) = launch {
         val confirmPayload = ConfirmVoteReferendumPayload(
             _referendumId = payload._referendumId,
             fee = mapFeeToParcel(validationPayload.fee),
             vote = AccountVoteParcelModel(
                 amount = validationPayload.voteAmount,
-                conviction = conviction,
-                aye = voteType == VoteType.AYE
+                conviction = validationPayload.conviction,
+                voteType = validationPayload.voteType
             )
         )
 

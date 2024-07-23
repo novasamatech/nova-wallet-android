@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 
 data class ReferendumVoting(
     val support: Support,
-    val approval: Approval,
+    val approval: Approval
 ) {
 
     data class Support(
