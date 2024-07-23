@@ -209,7 +209,7 @@ class SelectCustomValidatorsViewModel(
     fun fillRestWithRecommended() {
         mutateSelected { selected ->
             val maxValidatorsPerNominator = maxSelectedValidatorsFlow.first()
-            val defaultSettings = recommendationSettingsProvider().defaultSettings(maxValidatorsPerNominator)
+            val defaultSettings = recommendationSettingsProvider().recommendedSettings(maxValidatorsPerNominator)
             val recommended = recommendator().recommendations(defaultSettings)
 
             val missingFromRecommended = recommended.asSetItems() - selected
