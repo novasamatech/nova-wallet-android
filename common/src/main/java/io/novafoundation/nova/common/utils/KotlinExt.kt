@@ -17,6 +17,7 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.math.RoundingMode
 import java.util.Calendar
 import java.util.Collections
 import java.util.Date
@@ -178,6 +179,35 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
 fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
+
+fun BigDecimal.lessEpsilon(): BigDecimal = when {
+    this.isZero -> this
+    else -> this.subtract(BigInteger.ONE.toBigDecimal(scale = MathContext.DECIMAL64.precision))
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal): BigDecimal? = try {
+    this.divide(value)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal, mathContext: MathContext): BigDecimal? = try {
+    this.divide(value, mathContext)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal, roundingMode: RoundingMode): BigDecimal? = try {
+    this.divide(value, roundingMode)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.coerceInOrNull(from: BigDecimal, to: BigDecimal): BigDecimal? = if (this >= from && this <= to) {
+    this
+} else {
+    null
+}
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 

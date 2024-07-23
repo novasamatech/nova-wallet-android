@@ -17,4 +17,6 @@ interface VotingCurve {
     val name: String
 
     fun threshold(x: Perbill): Perbill
+
+    fun delay(y: Perbill): Perbill
 }

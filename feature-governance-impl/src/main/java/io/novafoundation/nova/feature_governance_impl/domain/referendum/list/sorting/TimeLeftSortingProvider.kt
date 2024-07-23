@@ -32,10 +32,15 @@ class RealReferendaSortingProvider : ReferendaSortingProvider {
                 is ReferendumStatus.Ongoing.Confirming -> status.approveIn.millis
                 is ReferendumStatus.Ongoing.InQueue -> status.timeOutIn.millis
                 is ReferendumStatus.Ongoing.Preparing -> status.timeOutIn.millis
-                is ReferendumStatus.Ongoing.Deciding -> status.rejectIn.millis
+                is ReferendumStatus.Ongoing.DecidingReject -> status.rejectIn.millis
+                is ReferendumStatus.Ongoing.DecidingApprove -> status.confirmingIn.millis
 
-                // other statuses should not be in Ongoing group but just in case - put it at the end
-                else -> Long.MAX_VALUE
+                is ReferendumStatus.Approved,
+                ReferendumStatus.Executed,
+                ReferendumStatus.NotExecuted.Cancelled,
+                ReferendumStatus.NotExecuted.Killed,
+                ReferendumStatus.NotExecuted.Rejected,
+                ReferendumStatus.NotExecuted.TimedOut -> Long.MAX_VALUE
             }
         }
     }

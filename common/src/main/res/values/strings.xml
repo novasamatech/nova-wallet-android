@@ -4,6 +4,8 @@
     <string name="referendum_abstain_vote_invalid_conviction_title">Conviction update</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Abstain votes can only be done with 0.1x conviction. Vote with 0.1x conviction?</string>
 
+    <string name="referendum_status_time_confirming_in">Confirming in %s</string>
+
     <string name="chain_network_management_auto_balance">Auto-balance nodes</string>
     <string name="chain_network_management_enabling">Enable connection</string>
 
