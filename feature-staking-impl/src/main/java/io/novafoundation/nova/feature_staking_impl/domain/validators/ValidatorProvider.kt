@@ -81,7 +81,7 @@ class ValidatorProvider(
         }
     }
 
-    suspend fun getValidatorWithoutElectedInfo(chainId: ChainId, address: String): Validator? {
+    suspend fun getValidatorWithoutElectedInfo(chainId: ChainId, address: String): Validator {
         val accountId = address.toHexAccountId()
 
         val accountIdBridged = listOf(accountId)
@@ -92,9 +92,6 @@ class ValidatorProvider(
         val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
 
         val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
-        val excludedValidators = validatorsPreferencesSource.getExcludedValidatorIds(chainId)
-
-        if (address in excludedValidators) return null
 
         return Validator(
             slashed = slashes.getOrDefault(accountId, false),
