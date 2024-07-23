@@ -45,11 +45,9 @@ class ValidatorProvider(
         val chainId = chain.id
 
         val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
-        val excludedValidators = validatorsPreferencesSource.getExcludedValidatorIds(chainId)
         val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
         val requestedValidatorIds = sources.allValidatorIds(chainId, electedValidatorExposures, novaValidatorIds)
-            .filter { it !in excludedValidators }
         // we always need validator prefs for elected validators to construct reward calculator
         val validatorIdsToQueryPrefs = electedValidatorExposures.keys + requestedValidatorIds
 

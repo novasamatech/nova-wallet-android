@@ -16,7 +16,7 @@ class ValidatorRecommender(
 
     suspend fun recommendations(settings: RecommendationSettings) = withContext(Dispatchers.Default) {
         val all = availableValidators.applyFiltersAdaptingToEmptyResult(settings.allFilters)
-            .filter { it.address !in excludedValidators }
+            .filterExcludedIfNeeded(settings)
             .sortedWith(settings.sorting)
 
         val postprocessed = settings.postProcessors.fold(all) { acc, postProcessor ->
@@ -51,5 +51,11 @@ class ValidatorRecommender(
         }
 
         return filtered
+    }
+
+    private fun List<Validator>.filterExcludedIfNeeded(settings: RecommendationSettings): List<Validator> {
+        if (!settings.filterExcluded) return this
+
+        return filter { it.accountIdHex !in excludedValidators }
     }
 }

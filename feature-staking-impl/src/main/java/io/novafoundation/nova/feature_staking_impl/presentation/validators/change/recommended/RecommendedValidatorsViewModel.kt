@@ -48,7 +48,7 @@ class RecommendedValidatorsViewModel(
     }
 
     private val recommendedSettings by lazyAsync {
-        recommendationSettingsProviderFactory.create(scope = viewModelScope).defaultSettings(maxValidatorsPerNominator())
+        recommendationSettingsProviderFactory.create(scope = viewModelScope).recommendedSettings(maxValidatorsPerNominator())
     }
 
     private val recommendedValidators = flow {
