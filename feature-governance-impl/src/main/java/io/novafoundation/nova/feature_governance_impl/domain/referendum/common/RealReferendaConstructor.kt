@@ -34,7 +34,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
-import java.math.BigDecimal
 import java.math.BigInteger
 
 interface ReferendaConstructor {

@@ -77,7 +77,7 @@ class VotingStatusView @JvmOverloads constructor(
     }
 
     fun setAbstainVoters(votersModel: VotersModel?) {
-        abstainVotersDetails.setVoxtersModel(votersModel)
+        abstainVotersDetails.setVotersModel(votersModel)
     }
 
     fun setAbstainVotersClickListener(listener: OnClickListener?) {
