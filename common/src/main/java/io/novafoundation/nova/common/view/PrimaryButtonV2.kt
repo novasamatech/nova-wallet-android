@@ -12,7 +12,6 @@ import com.github.razir.progressbutton.isProgressActive
 import com.github.razir.progressbutton.showProgress
 import com.google.android.material.button.MaterialButton
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
-import io.novafoundation.nova.common.utils.setVisible
 
 class PrimaryButtonV2 @JvmOverloads constructor(
     context: Context,
