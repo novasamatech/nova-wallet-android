@@ -76,6 +76,7 @@ class GovV1OnChainReferendaRepository(
             name = "root",
             preparePeriod = Balance.ZERO,
             decisionPeriod = runtime.votingPeriod(),
+            confirmPeriod = Balance.ZERO,
             minSupport = null,
             minApproval = null
         )

@@ -241,6 +241,7 @@ class GovV2OnChainReferendaRepository(
                 name = bindString(trackInfoStruct["name"]),
                 preparePeriod = bindBlockNumber(trackInfoStruct["preparePeriod"]),
                 decisionPeriod = bindBlockNumber(trackInfoStruct["decisionPeriod"]),
+                confirmPeriod = bindBlockNumber(trackInfoStruct["confirmPeriod"]),
                 minApproval = bindCurve(trackInfoStruct.getTyped("minApproval")),
                 minSupport = bindCurve(trackInfoStruct.getTyped("minSupport"))
             )

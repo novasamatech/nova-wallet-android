@@ -29,11 +29,10 @@ class RealReferendaSortingProvider : ReferendaSortingProvider {
     private fun getOngoingSorting(): Comparator<ReferendumPreview> {
         return compareBy {
             when (val status = it.status) {
-                is ReferendumStatus.Ongoing.Confirming -> status.approveIn.millis
                 is ReferendumStatus.Ongoing.InQueue -> status.timeOutIn.millis
                 is ReferendumStatus.Ongoing.Preparing -> status.timeOutIn.millis
-                is ReferendumStatus.Ongoing.DecidingReject -> status.rejectIn.millis
-                is ReferendumStatus.Ongoing.DecidingApprove -> status.confirmingIn.millis
+                is ReferendumStatus.Ongoing.Reject -> status.rejectIn.millis
+                is ReferendumStatus.Ongoing.Approve -> status.approveIn.millis
 
                 is ReferendumStatus.Approved,
                 ReferendumStatus.Executed,

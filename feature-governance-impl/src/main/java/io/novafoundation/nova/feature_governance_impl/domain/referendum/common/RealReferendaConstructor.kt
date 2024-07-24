@@ -261,9 +261,9 @@ class RealReferendaConstructor(
                 val passing = votingByReferenda[referendumId]?.currentlyPassing() ?: false
 
                 if (passing) {
-                    ReferendumStatus.Ongoing.Confirming(approveIn = finishIn)
+                    ReferendumStatus.Ongoing.Approve(approveIn = finishIn)
                 } else {
-                    ReferendumStatus.Ongoing.DecidingReject(rejectIn = finishIn)
+                    ReferendumStatus.Ongoing.Reject(rejectIn = finishIn)
                 }
             }
 
@@ -305,16 +305,18 @@ class RealReferendaConstructor(
                 val approveBlock = confirmingStatus!!.till
                 val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
-                ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
+                ReferendumStatus.Ongoing.Approve(approveIn = approveIn)
             }
 
             // Deciding period that will be approved in delay block
             isPassingAfterDelay -> {
                 val delay = delayedPassing!!.delayFraction
-                val approveBlock = decidingStatus.since.toBigDecimal() + delay * track.decisionPeriod.toBigDecimal()
-                val approveIn = blockDurationEstimator.timerUntil(approveBlock.toBigInteger())
+                val blocksToConfirmationPeriod = (delay * track.decisionPeriod.toBigDecimal()).toBigInteger()
 
-                ReferendumStatus.Ongoing.DecidingApprove(confirmingIn = approveIn)
+                val approveBlock = decidingStatus.since + blocksToConfirmationPeriod + track.confirmPeriod
+                val approveIn = blockDurationEstimator.timerUntil(approveBlock)
+
+                ReferendumStatus.Ongoing.Approve(approveIn = approveIn)
             }
 
             // Reject block
@@ -322,7 +324,7 @@ class RealReferendaConstructor(
                 val rejectBlock = decidingStatus.since + track.decisionPeriod
                 val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)
 
-                ReferendumStatus.Ongoing.DecidingReject(rejectIn)
+                ReferendumStatus.Ongoing.Reject(rejectIn)
             }
         }
     }

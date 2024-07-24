@@ -129,15 +129,10 @@ class RealReferendumFormatter(
                 colorRes = R.color.text_secondary
             )
 
-            is ReferendumStatus.Ongoing.DecidingApprove,
-            is ReferendumStatus.Ongoing.DecidingReject -> ReferendumStatusModel(
+            is ReferendumStatus.Ongoing.Approve,
+            is ReferendumStatus.Ongoing.Reject -> ReferendumStatusModel(
                 name = statusName,
                 colorRes = R.color.text_secondary
-            )
-
-            is ReferendumStatus.Ongoing.Confirming -> ReferendumStatusModel(
-                name = statusName,
-                colorRes = R.color.text_positive
             )
 
             is ReferendumStatus.Approved -> ReferendumStatusModel(
@@ -198,19 +193,13 @@ class RealReferendumFormatter(
                 )
             }
 
-            is ReferendumStatus.Ongoing.DecidingReject -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.Reject -> ReferendumTimeEstimation.Timer(
                 time = status.rejectIn,
                 timeFormat = R.string.referendum_status_time_reject_in,
                 textStyleRefresher = status.rejectIn.referendumStatusStyleRefresher()
             )
 
-            is ReferendumStatus.Ongoing.DecidingApprove -> ReferendumTimeEstimation.Timer(
-                time = status.confirmingIn,
-                timeFormat = R.string.referendum_status_time_confirming_in,
-                textStyleRefresher = status.confirmingIn.referendumStatusStyleRefresher()
-            )
-
-            is ReferendumStatus.Ongoing.Confirming -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.Approve -> ReferendumTimeEstimation.Timer(
                 time = status.approveIn,
                 timeFormat = R.string.referendum_status_time_approve_in,
                 textStyleRefresher = status.approveIn.referendumStatusStyleRefresher()

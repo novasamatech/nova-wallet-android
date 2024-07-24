@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <string name="referendum_status_time_confirming_in">Confirming in %s</string>
 
     <string name="chain_network_management_auto_balance">Auto-balance nodes</string>
     <string name="chain_network_management_enabling">Enable connection</string>
