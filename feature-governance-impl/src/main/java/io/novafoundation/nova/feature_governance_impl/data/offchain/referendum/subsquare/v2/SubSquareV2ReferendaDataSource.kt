@@ -81,6 +81,4 @@ class SubSquareV2ReferendaDataSource(
     private fun detailsUrlOf(baseUrl: String, referendumId: ReferendumId) = baseUrl.ensureSuffix("/") + "gov2/referendums/${referendumId.value}"
 
     private fun votesUrlOf(baseUrl: String, referendumId: ReferendumId) = baseUrl.ensureSuffix("/") + "gov2/referenda/${referendumId.value}/votes"
-
-
 }
