@@ -22,4 +22,6 @@ interface VoteReferendumInteractor {
         vote: AccountVote,
         referendumId: ReferendumId,
     ): Result<ExtrinsicSubmission>
+
+    suspend fun isAbstainSupported(): Boolean
 }

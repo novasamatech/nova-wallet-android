@@ -115,9 +115,16 @@ class SetupVoteReferendumViewModel(
     }
         .shareInBackground()
 
-    val ayeButtonStateFlow = buttonStateFlow(VoteType.AYE, R.string.referendum_vote_aye)
-    val abstainButtonStateFlow = buttonStateFlow(VoteType.ABSTAIN, R.string.referendum_vote_abstain)
-    val nayButtonStateFlow = buttonStateFlow(VoteType.NAY, R.string.referendum_vote_nay)
+    val ayeButtonStateFlow = validatingVoteType.map { buttonStateFlow(VoteType.AYE, validationVoteType = it, R.string.referendum_vote_aye) }
+    val abstainButtonStateFlow = validatingVoteType.map {
+        val isAbstainSupported = interactor.isAbstainSupported()
+        if (isAbstainSupported) {
+            buttonStateFlow(VoteType.ABSTAIN, validationVoteType = it, R.string.referendum_vote_abstain)
+        } else {
+            DescriptiveButtonState.Invisible
+        }
+    }
+    val nayButtonStateFlow = validatingVoteType.map { buttonStateFlow(VoteType.NAY, validationVoteType = it, R.string.referendum_vote_nay) }
 
     val amountChips = voteAssistantFlow.map { voteAssistant ->
         val asset = selectedAsset.first()
@@ -203,10 +210,10 @@ class SetupVoteReferendumViewModel(
         router.openConfirmVoteReferendum(confirmPayload)
     }
 
-    private fun buttonStateFlow(forType: VoteType, @StringRes labelRes: Int) = validatingVoteType.map { validationType ->
-        when (validationType) {
+    private fun buttonStateFlow(targetVoteType: VoteType, validationVoteType: VoteType?, @StringRes labelRes: Int): DescriptiveButtonState {
+        return when (validationVoteType) {
             null -> DescriptiveButtonState.Enabled(resourceManager.getString(labelRes))
-            forType -> DescriptiveButtonState.Loading
+            targetVoteType -> DescriptiveButtonState.Loading
             else -> DescriptiveButtonState.Disabled(resourceManager.getString(labelRes))
         }
     }

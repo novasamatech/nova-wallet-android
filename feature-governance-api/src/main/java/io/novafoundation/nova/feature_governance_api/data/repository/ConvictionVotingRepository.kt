@@ -45,4 +45,6 @@ interface ConvictionVotingRepository {
     fun ExtrinsicBuilder.vote(referendumId: ReferendumId, vote: AccountVote)
 
     fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId)
+
+    fun isAbstainVotingAvailable(): Boolean
 }

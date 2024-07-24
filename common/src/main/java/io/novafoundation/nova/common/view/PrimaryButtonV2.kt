@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.bindProgressButton
@@ -71,7 +72,12 @@ class PrimaryButtonV2 @JvmOverloads constructor(
 
 fun PrimaryButtonV2.setState(state: DescriptiveButtonState) {
     isEnabled = state is DescriptiveButtonState.Enabled
-    setVisible(state !is DescriptiveButtonState.Gone)
+
+    visibility = when (state) {
+        DescriptiveButtonState.Gone -> View.GONE
+        DescriptiveButtonState.Invisible -> View.INVISIBLE
+        else -> View.VISIBLE
+    }
 
     if (state == DescriptiveButtonState.Loading) {
         checkPreparedForProgress()

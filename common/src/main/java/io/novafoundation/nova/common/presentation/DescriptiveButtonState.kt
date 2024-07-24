@@ -9,4 +9,6 @@ sealed class DescriptiveButtonState {
     object Loading : DescriptiveButtonState()
 
     object Gone : DescriptiveButtonState()
+
+    object Invisible : DescriptiveButtonState()
 }
