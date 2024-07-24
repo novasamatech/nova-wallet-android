@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.
 
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.response.ReferendaPreviewV2Response
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.response.ReferendumDetailsV2Response
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.response.ReferendumVoteV2Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.http.Url
@@ -16,4 +17,7 @@ interface SubSquareV2Api {
 
     @GET
     suspend fun getReferendumDetails(@Url url: String): ReferendumDetailsV2Response
+
+    @GET
+    suspend fun getReferendumVotes(@Url url: String): List<ReferendumVoteV2Response>
 }

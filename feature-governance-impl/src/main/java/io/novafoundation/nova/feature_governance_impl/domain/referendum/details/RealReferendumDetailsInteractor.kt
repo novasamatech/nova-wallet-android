@@ -121,7 +121,8 @@ class RealReferendumDetailsInteractor(
                 referendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
-                electorate = electorate
+                electorate = electorate,
+                offChainInfo = offChainInfo
             )
 
             val currentStatus = referendaConstructor.constructReferendumStatus(

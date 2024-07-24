@@ -45,7 +45,8 @@ class SubSquareV1ReferendaDataSource(
             description = referendum.content,
             proposerAddress = referendum.author?.address,
             proposerName = referendum.author?.username,
-            timeLine = timeline
+            timeLine = timeline,
+            abstainVotes = null
         )
     }
 
