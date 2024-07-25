@@ -5,10 +5,12 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold.Threshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.merge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import java.math.BigInteger
 
 data class ReferendumVoting(
     val support: Support,
-    val approval: Approval
+    val approval: Approval,
+    val abstainVotes: BigInteger?
 ) {
 
     data class Support(

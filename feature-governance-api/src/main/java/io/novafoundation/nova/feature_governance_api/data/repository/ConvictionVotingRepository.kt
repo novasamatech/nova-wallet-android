@@ -36,6 +36,8 @@ interface ConvictionVotingRepository {
 
     suspend fun votersOf(referendumId: ReferendumId, chain: Chain, type: VoteType): List<ReferendumVoter>
 
+    suspend fun abstainVotes(referendumId: ReferendumId, chain: Chain): Balance?
+
     suspend fun delegatingFor(accountId: AccountId, chainId: ChainId): Map<TrackId, Voting.Delegating> {
         return votingFor(accountId, chainId).delegations()
     }

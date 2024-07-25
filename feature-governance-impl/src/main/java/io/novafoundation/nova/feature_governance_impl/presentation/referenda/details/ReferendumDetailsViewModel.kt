@@ -362,10 +362,12 @@ class ReferendumDetailsViewModel(
             )
 
             VoteType.ABSTAIN -> {
+                val abstainVotes = voting.abstainVotes ?: return null
+
                 VotersModel(
                     voteTypeColorRes = R.color.icon_secondary,
                     voteTypeRes = R.string.referendum_vote_abstain,
-                    votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
+                    votesValue = formatVotesAmount(abstainVotes, chainAsset)
                 )
             }
         }

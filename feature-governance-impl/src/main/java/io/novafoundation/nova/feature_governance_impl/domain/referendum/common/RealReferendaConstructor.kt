@@ -45,6 +45,7 @@ interface ReferendaConstructor {
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
         electorate: Balance,
+        abstainVotes: Balance?,
     ): ReferendumVoting?
 
     suspend fun constructReferendaStatuses(
@@ -87,6 +88,7 @@ class RealReferendaConstructor(
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
         electorate: Balance,
+        abstainVotes: Balance?
     ): ReferendumVoting? {
         val status = referendum.status
 
@@ -113,7 +115,8 @@ class RealReferendaConstructor(
                 ayeVotes = status.tally.ayeVotes(),
                 nayVotes = status.tally.nayVotes(),
                 threshold = status.threshold.ayesFractionThreshold(status.tally, electorate, elapsedSinceDecidingFraction)
-            )
+            ),
+            abstainVotes = abstainVotes
         )
     }
 

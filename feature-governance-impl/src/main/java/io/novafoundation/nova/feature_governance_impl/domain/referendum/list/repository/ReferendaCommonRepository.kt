@@ -179,7 +179,8 @@ class RealReferendaCommonRepository(
                     referendum = it,
                     tracksById = tracksById,
                     currentBlockNumber = currentBlockNumber,
-                    electorate = electorate
+                    electorate = electorate,
+                    abstainVotes = null
                 )
             }
         )

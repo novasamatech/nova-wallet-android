@@ -98,6 +98,7 @@ class RealReferendumDetailsInteractor(
         val electorate = governanceSource.referenda.electorate(chain.id)
 
         val offChainInfo = governanceSource.offChainInfo.referendumDetails(referendumId, chain)
+        val abstainVotes = governanceSource.convictionVoting.abstainVotes(referendumId, chain)
 
         return combine(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
@@ -121,7 +122,8 @@ class RealReferendumDetailsInteractor(
                 referendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
-                electorate = electorate
+                electorate = electorate,
+                abstainVotes = abstainVotes
             )
 
             val currentStatus = referendaConstructor.constructReferendumStatus(
