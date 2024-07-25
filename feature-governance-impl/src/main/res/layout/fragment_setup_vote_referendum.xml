@@ -99,25 +99,39 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
-        <io.novafoundation.nova.common.view.PrimaryButton
+        <io.novafoundation.nova.common.view.PrimaryButtonV2
             android:id="@+id/setupReferendumVoteNay"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_weight="1"
-            android:text="@string/referendum_vote_nay"
-            app:appearance="primaryNegative"
-            app:size="large" />
+            style="@style/Widget.Nova.MaterialButton.Negative.IconOnly"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:textColor="@color/text_primary"
+            app:cornerRadius="48dp"
+            app:icon="@drawable/ic_thumbs_down_filled"
+            app:iconTint="@color/icon_primary" />
 
-        <io.novafoundation.nova.common.view.PrimaryButton
+        <io.novafoundation.nova.common.view.PrimaryButtonV2
+            android:id="@+id/setupReferendumVoteAbstain"
+            style="@style/Widget.Nova.MaterialButton.Secondary.IconOnly"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginHorizontal="40dp"
+            android:textColor="@color/text_primary"
+            app:cornerRadius="48dp"
+            app:icon="@drawable/ic_abstain_vote"
+            app:iconTint="@color/icon_primary" />
+
+        <io.novafoundation.nova.common.view.PrimaryButtonV2
             android:id="@+id/setupReferendumVoteAye"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/referendum_vote_aye"
-            app:appearance="primaryPositive"
-            app:size="large" />
+            style="@style/Widget.Nova.MaterialButton.Positive.IconOnly"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:textColor="@color/text_primary"
+            app:cornerRadius="48dp"
+            app:icon="@drawable/ic_thumbs_up_filled"
+            app:iconTint="@color/icon_primary" />
+
     </LinearLayout>
 </LinearLayout>

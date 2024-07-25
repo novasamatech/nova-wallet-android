@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="referendum_abstain_vote_invalid_conviction_title">Conviction update</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Abstain votes can only be done with 0.1x conviction. Vote with 0.1x conviction?</string>
+
+    <string name="referendum_status_time_confirming_in">Confirming in %s</string>
+
     <string name="dapp_url_warning_title">Warning! DApp is unknown</string>
     <string name="dapp_url_warning_subtitle">Malicious DApps can withdraw all your funds. Always do your own research before using a DApp, granting permission, or sending funds out.\n\nIf someone is urging you to visit this DApp, it is likely a scam. When in doubt, please contact Nova Wallet support: %s.</string>
     <string name="dapp_url_warning_open_anyway">Open anyway</string>

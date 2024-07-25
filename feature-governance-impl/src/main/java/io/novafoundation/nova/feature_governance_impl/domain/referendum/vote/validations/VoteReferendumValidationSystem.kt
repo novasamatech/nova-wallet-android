@@ -40,4 +40,6 @@ fun ValidationSystem.Companion.voteReferendumValidationSystem(
     notDelegatingInTrack()
 
     maximumTrackVotesNotReached(governanceSourceRegistry, governanceSharedState)
+
+    abstainConvictionValid()
 }

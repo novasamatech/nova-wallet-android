@@ -218,6 +218,14 @@ class ReferendumDetailsViewModel(
         router.openReferendumVoters(votersPayload)
     }
 
+    fun abstainVotesClicked() {
+        val votersPayload = ReferendumVotersPayload(
+            payload.referendumId,
+            VoteType.ABSTAIN
+        )
+        router.openReferendumVoters(votersPayload)
+    }
+
     fun dAppClicked(dAppModel: ReferendumDAppModel) {
         router.openDAppBrowser(dAppModel.referendumUrl)
     }
@@ -258,6 +266,7 @@ class ReferendumDetailsViewModel(
             yourVote = referendumDetails.userVote?.let { referendumFormatter.formatUserVote(it, chain, chainAsset) },
             ayeVoters = mapVotersToUi(referendumDetails.voting, VoteType.AYE, chainAsset),
             nayVoters = mapVotersToUi(referendumDetails.voting, VoteType.NAY, chainAsset),
+            abstainVoters = mapVotersToUi(referendumDetails.voting, VoteType.ABSTAIN, chainAsset),
             timeEstimation = timeEstimation,
             timeline = mapTimelineToUi(referendumDetails.timeline, timeEstimation)
         )
@@ -352,7 +361,13 @@ class ReferendumDetailsViewModel(
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )
 
-            VoteType.ABSTAIN -> null
+            VoteType.ABSTAIN -> {
+                VotersModel(
+                    voteTypeColorRes = R.color.icon_secondary,
+                    voteTypeRes = R.string.referendum_vote_abstain,
+                    votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
+                )
+            }
         }
     }
 

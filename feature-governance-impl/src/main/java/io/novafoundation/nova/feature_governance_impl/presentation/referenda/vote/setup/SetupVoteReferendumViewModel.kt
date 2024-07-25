@@ -115,8 +115,16 @@ class SetupVoteReferendumViewModel(
     }
         .shareInBackground()
 
-    val ayeButtonStateFlow = buttonStateFlow(VoteType.AYE, R.string.referendum_vote_aye)
-    val nayButtonStateFlow = buttonStateFlow(VoteType.NAY, R.string.referendum_vote_nay)
+    val ayeButtonStateFlow = validatingVoteType.map { buttonStateFlow(VoteType.AYE, validationVoteType = it, R.string.referendum_vote_aye) }
+    val abstainButtonStateFlow = validatingVoteType.map {
+        val isAbstainSupported = interactor.isAbstainSupported()
+        if (isAbstainSupported) {
+            buttonStateFlow(VoteType.ABSTAIN, validationVoteType = it, R.string.referendum_vote_abstain)
+        } else {
+            DescriptiveButtonState.Invisible
+        }
+    }
+    val nayButtonStateFlow = validatingVoteType.map { buttonStateFlow(VoteType.NAY, validationVoteType = it, R.string.referendum_vote_nay) }
 
     val amountChips = voteAssistantFlow.map { voteAssistant ->
         val asset = selectedAsset.first()
@@ -144,6 +152,10 @@ class SetupVoteReferendumViewModel(
         openConfirmIfValid(VoteType.AYE)
     }
 
+    fun abstainClicked() {
+        openConfirmIfValid(VoteType.ABSTAIN)
+    }
+
     fun nayClicked() {
         openConfirmIfValid(VoteType.NAY)
     }
@@ -165,41 +177,43 @@ class SetupVoteReferendumViewModel(
             asset = selectedAsset.first(),
             trackVoting = voteAssistant.trackVoting,
             voteAmount = amountChooserMixin.amount.first(),
-            fee = originFeeMixin.awaitDecimalFee()
+            fee = originFeeMixin.awaitDecimalFee(),
+            voteType = voteType,
+            conviction = selectedConvictionFlow.first()
         )
 
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, action ->
+                handleVoteReferendumValidationFailure(status.reason, action, resourceManager)
+            },
             progressConsumer = validatingVoteType.progressConsumer(voteType),
         ) {
             validatingVoteType.value = null
 
-            openConfirm(it, voteType)
+            openConfirm(it)
         }
     }
 
-    private fun openConfirm(validationPayload: VoteReferendumValidationPayload, voteType: VoteType) = launch {
-        val conviction = selectedConvictionFlow.first()
-
+    private fun openConfirm(validationPayload: VoteReferendumValidationPayload) = launch {
         val confirmPayload = ConfirmVoteReferendumPayload(
             _referendumId = payload._referendumId,
             fee = mapFeeToParcel(validationPayload.fee),
             vote = AccountVoteParcelModel(
                 amount = validationPayload.voteAmount,
-                conviction = conviction,
-                aye = voteType == VoteType.AYE
+                conviction = validationPayload.conviction,
+                voteType = validationPayload.voteType
             )
         )
 
         router.openConfirmVoteReferendum(confirmPayload)
     }
 
-    private fun buttonStateFlow(forType: VoteType, @StringRes labelRes: Int) = validatingVoteType.map { validationType ->
-        when (validationType) {
+    private fun buttonStateFlow(targetVoteType: VoteType, validationVoteType: VoteType?, @StringRes labelRes: Int): DescriptiveButtonState {
+        return when (validationVoteType) {
             null -> DescriptiveButtonState.Enabled(resourceManager.getString(labelRes))
-            forType -> DescriptiveButtonState.Loading
+            targetVoteType -> DescriptiveButtonState.Loading
             else -> DescriptiveButtonState.Disabled(resourceManager.getString(labelRes))
         }
     }

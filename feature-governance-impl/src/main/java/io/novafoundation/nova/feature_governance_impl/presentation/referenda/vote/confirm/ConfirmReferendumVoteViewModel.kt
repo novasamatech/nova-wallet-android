@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.R
@@ -37,6 +38,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
+import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -142,13 +144,17 @@ class ConfirmReferendumVoteViewModel(
             asset = assetFlow.first(),
             trackVoting = voteAssistant.trackVoting,
             voteAmount = payload.vote.amount,
-            fee = decimalFee
+            fee = decimalFee,
+            conviction = payload.vote.conviction,
+            voteType = payload.vote.voteType
         )
 
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = validationPayload,
-            validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, actions ->
+                handleVoteReferendumValidationFailure(status.reason, actions, resourceManager)
+            },
             progressConsumer = _showNextProgress.progressConsumer(),
         ) {
             performVote()
@@ -179,15 +185,23 @@ class ConfirmReferendumVoteViewModel(
         _showNextProgress.value = false
     }
 
-    private fun constructAccountVote(asset: Asset): AccountVote.Standard {
+    private fun constructAccountVote(asset: Asset): AccountVote {
         val planks = asset.token.planksFromAmount(payload.vote.amount)
 
-        return AccountVote.Standard(
-            vote = Vote(
-                aye = payload.vote.aye,
-                conviction = payload.vote.conviction
-            ),
-            balance = planks
-        )
+        return if (payload.vote.voteType == VoteType.ABSTAIN) {
+            AccountVote.SplitAbstain(
+                aye = BigInteger.ZERO,
+                nay = BigInteger.ZERO,
+                abstain = planks
+            )
+        } else {
+            AccountVote.Standard(
+                vote = Vote(
+                    aye = payload.vote.voteType == VoteType.AYE,
+                    conviction = payload.vote.conviction
+                ),
+                balance = planks
+            )
+        }
     }
 }

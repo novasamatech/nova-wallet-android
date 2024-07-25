@@ -161,6 +161,10 @@ class GovV2ConvictionVotingRepository(
         convictionVotingRemoveVote(trackId, referendumId)
     }
 
+    override fun isAbstainVotingAvailable(): Boolean {
+        return true
+    }
+
     private fun bindTrackLocks(decoded: Any?): List<Pair<TrackId, Balance>> {
         return bindList(decoded) { item ->
             val (trackId, balance) = item.castToList()

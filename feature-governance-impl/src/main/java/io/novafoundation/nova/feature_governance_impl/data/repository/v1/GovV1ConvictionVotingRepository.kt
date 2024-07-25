@@ -116,6 +116,10 @@ class GovV1ConvictionVotingRepository(
         democracyRemoveVote(referendumId)
     }
 
+    override fun isAbstainVotingAvailable(): Boolean {
+        return false
+    }
+
     private fun <T> T?.associatedWithTrack(): Map<TrackId, T> {
         return if (this != null) {
             mapOf(DemocracyTrackId to this)
