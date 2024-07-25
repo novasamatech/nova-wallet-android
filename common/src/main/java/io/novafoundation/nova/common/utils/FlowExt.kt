@@ -301,6 +301,7 @@ fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend
 private class SendingCollector<T>(
     private val channel: SendChannel<T>
 ) : FlowCollector<T> {
+
     override suspend fun emit(value: T): Unit = channel.send(value)
 }
 
@@ -552,6 +553,20 @@ fun <A, B, C, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, transform
         flowB.onEach { bResult = it },
         flowC.onEach { cResult = it },
     ).map { transform(aResult, bResult, cResult) }
+}
+
+fun <A, B, C, D, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, flowD: Flow<D>, transform: (A?, B?, C?, D?) -> R): Flow<R> {
+    var aResult: A? = null
+    var bResult: B? = null
+    var cResult: C? = null
+    var dResult: D? = null
+
+    return merge(
+        flowA.onEach { aResult = it },
+        flowB.onEach { bResult = it },
+        flowC.onEach { cResult = it },
+        flowD.onEach { dResult = it }
+    ).map { transform(aResult, bResult, cResult, dResult) }
 }
 
 fun <T> firstNonEmpty(

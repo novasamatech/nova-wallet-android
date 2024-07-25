@@ -624,6 +624,9 @@
     <string name="dapp_sign_error_unsupported_chain">Rantai tidak didukung dengan hash genesis %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Pastikan operasi sudah benar</string>
     <string name="dapp_sign_extrinsic_failed">Gagal menandatangani operasi yang diminta</string>
+    <string name="dapp_url_warning_open_anyway">Buka saja</string>
+    <string name="dapp_url_warning_subtitle">Aplikasi desentralisasi yang berbahaya dapat menarik semua dana Anda. Selalu lakukan penelitian sendiri sebelum menggunakan aplikasi desentralisasi, memberikan izin, atau mengirim dana keluar.\n\nJika seseorang mendesak Anda untuk mengunjungi aplikasi desentralisasi ini, kemungkinan besar itu adalah penipuan. Jika ragu, harap hubungi dukungan Nova Wallet: %s.</string>
+    <string name="dapp_url_warning_title">Peringatan! Aplikasi desentralisasi tidak dikenal</string>
     <string name="deep_linking_chain_id_is_not_found">Rantai tidak ditemukan</string>
     <string name="deep_linking_domain_is_not_matched">Domain dari tautan %s tidak diizinkan</string>
     <string name="deep_linking_governance_type_is_not_specified">Tipe tata kelola tidak ditentukan</string>
@@ -880,6 +883,8 @@
     <string name="pool_full_failure_title">Pool penuh</string>
     <string name="pool_inactive_failure_message">Anda tidak dapat bergabung dengan pool yang tidak terbuka. Silakan hubungi pemilik pool.</string>
     <string name="pool_inactive_failure_title">Pool tidak terbuka</string>
+    <string name="pool_staking_conflict_message">Anda tidak dapat lagi menggunakan Staking Langsung dan Staking Pool dari akun yang sama. Untuk mengelola Staking Pool Anda, pertama-tama Anda perlu melepaskan token Anda dari Staking Langsung.</string>
+    <string name="pool_staking_conflict_title">Operasi pool tidak tersedia</string>
     <string name="pre_configured_networks_add_custom_button">Tambahkan jaringan secara manual</string>
     <string name="pre_configured_networks_progress_text">Memuat daftar jaringan...</string>
     <string name="pre_configured_networks_search_hint">Cari berdasarkan nama jaringan</string>
@@ -1114,6 +1119,8 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_staking_conflict_message">Anda tidak dapat melakukan staking dengan Staking Langsung dan Pool Nominasi pada saat yang sama</string>
+    <string name="setup_staking_conflict_title">Sudah melakukan staking</string>
     <string name="setup_staking_type_advanced_options_condition">Pengelolaan Staking lanjutan</string>
     <string name="setup_staking_type_already_used_title">Jenis Staking tidak dapat diubah</string>
     <string name="setup_staking_type_direct_already_used_message">Anda sudah memiliki Direct Staking</string>

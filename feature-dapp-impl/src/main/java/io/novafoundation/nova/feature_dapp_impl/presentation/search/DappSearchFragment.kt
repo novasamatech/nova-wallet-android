@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
+import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
@@ -70,10 +71,11 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
     }
 
     override fun subscribe(viewModel: DAppSearchViewModel) {
+        setupDAppNotInCatalogWarning()
         searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe(::submitListPreservingViewPoint)
-
+        viewModel.dAppNotInCatalogWarning
         viewModel.selectQueryTextEvent.observeEvent {
             searchDappSearch.searchInput.content.selectAll()
         }
@@ -94,6 +96,23 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
 
         adapter.submitList(data) {
             searchDappList.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+        }
+    }
+
+    private fun setupDAppNotInCatalogWarning() {
+        viewModel.dAppNotInCatalogWarning.awaitableActionLiveData.observeEvent { event ->
+            warningDialog(
+                context = providedContext,
+                onPositiveClick = { event.onCancel() },
+                positiveTextRes = R.string.common_close,
+                negativeTextRes = R.string.dapp_url_warning_open_anyway,
+                onNegativeClick = { event.onSuccess(Unit) },
+                styleRes = R.style.AccentNegativeAlertDialogTheme
+            ) {
+                setTitle(R.string.dapp_url_warning_title)
+
+                setMessage(requireContext().getString(R.string.dapp_url_warning_subtitle, event.payload.supportEmail))
+            }
         }
     }
 }

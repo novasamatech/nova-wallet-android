@@ -108,7 +108,8 @@ class NominationPoolsRedeemViewModel(
         val payload = NominationPoolsRedeemValidationPayload(
             fee = feeLoaderMixin.awaitDecimalFee(),
             asset = assetFlow.first(),
-            chain = stakingSharedState.chain()
+            chain = stakingSharedState.chain(),
+            poolMember = poolMemberFlow.first()
         )
 
         validationExecutor.requireValid(

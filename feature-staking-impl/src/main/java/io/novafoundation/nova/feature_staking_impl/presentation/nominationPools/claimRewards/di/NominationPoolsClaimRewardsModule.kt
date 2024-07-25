@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimR
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimRewards.validations.NominationPoolsClaimRewardsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimRewards.validations.nominationPoolsClaimRewards
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.delegatedStake.DelegatedStakeMigrationUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.NominationPoolsClaimRewardsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -39,19 +41,22 @@ class NominationPoolsClaimRewardsModule {
         poolMembersRepository: NominationPoolMembersRepository,
         stakingSharedState: StakingSharedState,
         extrinsicService: ExtrinsicService,
+        migrationUseCase: DelegatedStakeMigrationUseCase
     ): NominationPoolsClaimRewardsInteractor = RealNominationPoolsClaimRewardsInteractor(
         poolMemberUseCase = poolMemberUseCase,
         poolMembersRepository = poolMembersRepository,
         stakingSharedState = stakingSharedState,
-        extrinsicService = extrinsicService
+        extrinsicService = extrinsicService,
+        migrationUseCase = migrationUseCase
     )
 
     @Provides
     @ScreenScope
     fun provideValidationSystem(
-        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+        stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory
     ): NominationPoolsClaimRewardsValidationSystem {
-        return ValidationSystem.nominationPoolsClaimRewards(enoughTotalToStayAboveEDValidationFactory)
+        return ValidationSystem.nominationPoolsClaimRewards(enoughTotalToStayAboveEDValidationFactory, stakingTypesConflictValidationFactory)
     }
 
     @Provides

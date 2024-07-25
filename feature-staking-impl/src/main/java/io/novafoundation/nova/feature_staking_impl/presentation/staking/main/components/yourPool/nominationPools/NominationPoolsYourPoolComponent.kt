@@ -64,9 +64,7 @@ class NominationPoolsYourPoolComponent(
     ).shareInBackground()
 
     override fun onAction(action: YourPoolAction) {
-        when (action) {
-            YourPoolAction.PoolInfoClicked -> handlePoolInfoClicked()
-        }
+        // No actions
     }
 
     private fun createState(poolMember: PoolMember): Flow<YourPoolComponentState> {

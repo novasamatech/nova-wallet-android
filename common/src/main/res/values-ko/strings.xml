@@ -624,6 +624,9 @@
     <string name="dapp_sign_error_unsupported_chain">제네시스 해시 %s가 포함된 지원되지 않는 체인</string>
     <string name="dapp_sign_extrinsic_details_subtitle">작업이 정확한지 확인하세요</string>
     <string name="dapp_sign_extrinsic_failed">요청된 작업 서명에 실패했습니다</string>
+    <string name="dapp_url_warning_open_anyway">어쨌든 열기</string>
+    <string name="dapp_url_warning_subtitle">악성 DApp은 모든 자금을 인출할 수 있습니다. DApp을 사용하기 전, 권한을 부여하기 전 또는 자금을 송금하기 전에 항상 철저한 조사를 하십시오.\n\n누군가 이 DApp을 방문하라고 재촉할 경우, 그것은 사기일 가능성이 큽니다. 의심스러울 경우, 노바 월렛 지원팀에 연락하십시오: %s.</string>
+    <string name="dapp_url_warning_title">경고! DApp이 알 수 없습니다</string>
     <string name="deep_linking_chain_id_is_not_found">체인을 찾을 수 없음</string>
     <string name="deep_linking_domain_is_not_matched">링크의 도메인 %s이(가) 허용되지 않습니다</string>
     <string name="deep_linking_governance_type_is_not_specified">거버넌스 유형이 지정되지 않음</string>
@@ -880,6 +883,8 @@
     <string name="pool_full_failure_title">풀이 가득 찼습니다</string>
     <string name="pool_inactive_failure_message">열려 있지 않은 풀에는 가입할 수 없습니다. 풀 소유자에게 연락해 주세요.</string>
     <string name="pool_inactive_failure_title">풀은 열려 있지 않습니다</string>
+    <string name="pool_staking_conflict_message">더 이상 동일한 계정에서 직접 Staking과 Pool Staking을 동시에 사용할 수 없습니다. Pool Staking을 관리하려면 먼저 직접 Staking에서 토큰을 Unstake해야 합니다.</string>
+    <string name="pool_staking_conflict_title">Pool 작업을 사용할 수 없습니다</string>
     <string name="pre_configured_networks_add_custom_button">네트워크 수동 추가</string>
     <string name="pre_configured_networks_progress_text">네트워크 목록을 로드 중...</string>
     <string name="pre_configured_networks_search_hint">네트워크 이름으로 검색</string>
@@ -1114,6 +1119,8 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">위키</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_staking_conflict_message">직접 Staking과 Nomination Pools를 동시에 사용할 수 없습니다</string>
+    <string name="setup_staking_conflict_title">이미 Staking 중</string>
     <string name="setup_staking_type_advanced_options_condition">고급 Staking 관리</string>
     <string name="setup_staking_type_already_used_title">Staking 유형을 변경할 수 없습니다</string>
     <string name="setup_staking_type_direct_already_used_message">이미 Direct Staking을 사용 중입니다</string>

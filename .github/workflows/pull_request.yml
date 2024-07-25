@@ -10,4 +10,5 @@ jobs:
     with:
       branch: ${{github.head_ref}}
       gradlew-command: assembleDevelop
+      build-debug-tests: true
     secrets: inherit

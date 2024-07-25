@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redee
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
@@ -13,10 +14,22 @@ typealias NominationPoolsRedeemValidationSystem = ValidationSystem<NominationPoo
 typealias NominationPoolsRedeemValidationSystemBuilder = ValidationSystemBuilder<NominationPoolsRedeemValidationPayload, NominationPoolsRedeemValidationFailure>
 
 fun ValidationSystem.Companion.nominationPoolsRedeem(
-    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+    stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory
 ): NominationPoolsRedeemValidationSystem = ValidationSystem {
+    noStakingTypesConflict(stakingTypesConflictValidationFactory)
+
     enoughToPayFees()
+
     sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
+}
+
+private fun NominationPoolsRedeemValidationSystemBuilder.noStakingTypesConflict(factory: StakingTypesConflictValidationFactory) {
+    factory.noStakingTypesConflict(
+        accountId = { it.poolMember.accountId },
+        chainId = { it.asset.token.configuration.chainId },
+        error = { NominationPoolsRedeemValidationFailure.StakingTypesConflict }
+    )
 }
 
 private fun NominationPoolsRedeemValidationSystemBuilder.enoughToPayFees() {

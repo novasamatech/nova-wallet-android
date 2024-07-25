@@ -24,7 +24,7 @@ fun BaseFragmentMixin<*>.observeValidations(
                     }
                     level >= DefaultFailureLevel.WARNING -> warningDialog(
                         context = dialogContext,
-                        onConfirm = it.confirmWarning
+                        onPositiveClick = it.confirmWarning
                     ) {
                         setTitle(it.title)
                         setMessage(it.message)

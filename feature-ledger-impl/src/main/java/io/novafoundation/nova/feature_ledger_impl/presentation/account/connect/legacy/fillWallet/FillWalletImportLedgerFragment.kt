@@ -63,10 +63,10 @@ class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewMo
         viewModel.confirmExit.awaitableActionLiveData.observeEvent {
             warningDialog(
                 context = requireContext(),
-                onConfirm = { it.onSuccess(true) },
-                onCancel = { it.onSuccess(false) },
-                cancelTextRes = R.string.common_no,
-                confirmTextRes = R.string.common_yes,
+                onPositiveClick = { it.onSuccess(true) },
+                onNegativeClick = { it.onSuccess(false) },
+                negativeTextRes = R.string.common_no,
+                positiveTextRes = R.string.common_yes,
             ) {
                 setTitle(R.string.common_cancel_operation_warning)
             }

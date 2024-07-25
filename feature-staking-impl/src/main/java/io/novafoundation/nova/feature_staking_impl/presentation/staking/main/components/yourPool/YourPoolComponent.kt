@@ -21,10 +21,7 @@ class YourPoolComponentState(
 
 typealias YourPoolEvent = Nothing
 
-sealed class YourPoolAction {
-
-    object PoolInfoClicked : YourPoolAction()
-}
+object YourPoolAction
 
 class YourPoolComponentFactory(
     private val nominationPoolsFactory: NominationPoolsYourPoolComponentFactory,
