@@ -94,6 +94,10 @@ class GovV1ConvictionVotingRepository(
             .filter { it.vote.votedFor(type) }
     }
 
+    override suspend fun abstainVotes(referendumId: ReferendumId, chain: Chain): Balance? {
+        return null
+    }
+
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
         claimable.actions.forEach { claimAction ->
             when (claimAction) {

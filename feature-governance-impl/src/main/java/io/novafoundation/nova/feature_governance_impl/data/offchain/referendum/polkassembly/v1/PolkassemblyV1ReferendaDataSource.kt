@@ -98,8 +98,7 @@ class PolkassemblyV1ReferendaDataSource(
             description = post.content,
             proposerName = null, // author of the post on PA might not be equal to on-chain submitter so we want to be safe here
             proposerAddress = post.onchainLink?.proposerAddress,
-            timeLine = timeline,
-            abstainVotes = null
+            timeLine = timeline
         )
     }
 

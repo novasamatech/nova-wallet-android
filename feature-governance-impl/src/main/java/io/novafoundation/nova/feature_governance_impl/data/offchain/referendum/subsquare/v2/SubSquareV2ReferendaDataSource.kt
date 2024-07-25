@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2
 
 import io.novafoundation.nova.common.utils.ensureSuffix
-import io.novafoundation.nova.common.utils.sum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumPreview
@@ -9,7 +8,6 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_impl.data.offchain.OffChainReferendaDataSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.response.ReferendaPreviewV2Response
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.response.ReferendumDetailsV2Response
-import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.response.ReferendumVoteV2Response
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.GovernanceReferenda.Source
 
 class SubSquareV2ReferendaDataSource(
@@ -26,12 +24,9 @@ class SubSquareV2ReferendaDataSource(
 
     override suspend fun referendumDetails(referendumId: ReferendumId, baseUrl: String, options: Source.SubSquare): OffChainReferendumDetails {
         val detailsUrl = detailsUrlOf(baseUrl, referendumId)
-        val votesUrl = votesUrlOf(baseUrl, referendumId)
-
         val referendaDetails = subSquareApi.getReferendumDetails(detailsUrl)
-        val referendumVotes = subSquareApi.getReferendumVotes(votesUrl)
 
-        return mapPolkassemblyPostToDetails(referendaDetails, referendumVotes)
+        return mapPolkassemblyPostToDetails(referendaDetails)
     }
 
     private fun mapPolkassemblyPostToPreview(post: ReferendaPreviewV2Response.Referendum): OffChainReferendumPreview {
@@ -42,21 +37,16 @@ class SubSquareV2ReferendaDataSource(
     }
 
     private fun mapPolkassemblyPostToDetails(
-        referendum: ReferendumDetailsV2Response,
-        referendumVotes: List<ReferendumVoteV2Response>
+        referendum: ReferendumDetailsV2Response
     ): OffChainReferendumDetails {
         val timeline = referendum.onchainData.timeline.mapNotNull(::mapReferendumStatusToTimelineEntry)
-
-        val abstainVotes = referendumVotes.mapNotNull { it.abstainVotes }
-            .sum()
 
         return OffChainReferendumDetails(
             title = referendum.title,
             description = referendum.content,
             proposerAddress = referendum.author?.address,
             proposerName = referendum.author?.username,
-            timeLine = timeline,
-            abstainVotes = abstainVotes
+            timeLine = timeline
         )
     }
 
@@ -79,6 +69,4 @@ class SubSquareV2ReferendaDataSource(
     private fun previewsUrlOf(baseUrl: String) = baseUrl.ensureSuffix("/") + "gov2/referendums"
 
     private fun detailsUrlOf(baseUrl: String, referendumId: ReferendumId) = baseUrl.ensureSuffix("/") + "gov2/referendums/${referendumId.value}"
-
-    private fun votesUrlOf(baseUrl: String, referendumId: ReferendumId) = baseUrl.ensureSuffix("/") + "gov2/referenda/${referendumId.value}/votes"
 }

@@ -180,7 +180,7 @@ class RealReferendaCommonRepository(
                     tracksById = tracksById,
                     currentBlockNumber = currentBlockNumber,
                     electorate = electorate,
-                    offChainInfo = null
+                    abstainVotes = null
                 )
             }
         )

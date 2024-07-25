@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.positionOf
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.sinceOrThrow
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -46,7 +45,7 @@ interface ReferendaConstructor {
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
         electorate: Balance,
-        offChainInfo: OffChainReferendumDetails?,
+        abstainVotes: Balance?,
     ): ReferendumVoting?
 
     suspend fun constructReferendaStatuses(
@@ -89,7 +88,7 @@ class RealReferendaConstructor(
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
         electorate: Balance,
-        offChainInfo: OffChainReferendumDetails?,
+        abstainVotes: Balance?
     ): ReferendumVoting? {
         val status = referendum.status
 
@@ -117,7 +116,7 @@ class RealReferendaConstructor(
                 nayVotes = status.tally.nayVotes(),
                 threshold = status.threshold.ayesFractionThreshold(status.tally, electorate, elapsedSinceDecidingFraction)
             ),
-            abstainVotes = offChainInfo?.abstainVotes
+            abstainVotes = abstainVotes
         )
     }
 

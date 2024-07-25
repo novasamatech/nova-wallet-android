@@ -51,8 +51,7 @@ class PolkassemblyV2ReferendaDataSource(
             description = post.content,
             proposerAddress = null,
             proposerName = post.author.username,
-            timeLine = timeline,
-            abstainVotes = null
+            timeLine = timeline
         )
     }
 

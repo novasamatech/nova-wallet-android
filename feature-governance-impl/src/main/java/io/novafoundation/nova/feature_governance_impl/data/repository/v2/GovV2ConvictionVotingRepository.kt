@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.utils.convictionVoting
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.common.utils.sum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Delegation
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.ex
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.DelegationsSubqueryApi
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.ReferendumSplitAbstainVotersRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.ReferendumVotersRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.ReferendumVoterRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.mapMultiVoteRemoteToAccountVote
@@ -111,6 +113,20 @@ class GovV2ConvictionVotingRepository(
         } else {
             getVotersFromChain(referendumId, chain, type)
         }
+    }
+
+    override suspend fun abstainVotes(referendumId: ReferendumId, chain: Chain): Balance? {
+        val api = chain.externalApi<Chain.ExternalApi.GovernanceDelegations>() ?: return null
+
+        return runCatching {
+            val request = ReferendumSplitAbstainVotersRequest(referendumId.value)
+            val response = delegateSubqueryApi.getReferendumAbstainVoters(api.url, request)
+            return response.data
+                .voters
+                .nodes
+                .mapNotNull { it.splitAbstainVote?.abstainAmount }
+                .sum()
+        }.getOrNull()
     }
 
     private suspend fun getVotersFromIndexer(
