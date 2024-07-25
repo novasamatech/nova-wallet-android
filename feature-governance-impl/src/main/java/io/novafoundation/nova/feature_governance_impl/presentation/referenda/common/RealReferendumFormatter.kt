@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
-import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.currentlyPassing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
@@ -70,7 +70,7 @@ class RealReferendumFormatter(
             votingResultIcon = R.drawable.ic_close,
             votingResultIconColor = R.color.icon_negative,
             thresholdInfo = formatThresholdInfo(voting.support, token),
-            thresholdInfoVisible = !voting.support.passing(),
+            thresholdInfoVisible = !voting.support.currentlyPassing(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
                 voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
@@ -129,14 +129,10 @@ class RealReferendumFormatter(
                 colorRes = R.color.text_secondary
             )
 
-            is ReferendumStatus.Ongoing.Deciding -> ReferendumStatusModel(
+            is ReferendumStatus.Ongoing.Approve,
+            is ReferendumStatus.Ongoing.Reject -> ReferendumStatusModel(
                 name = statusName,
                 colorRes = R.color.text_secondary
-            )
-
-            is ReferendumStatus.Ongoing.Confirming -> ReferendumStatusModel(
-                name = statusName,
-                colorRes = R.color.text_positive
             )
 
             is ReferendumStatus.Approved -> ReferendumStatusModel(
@@ -197,13 +193,13 @@ class RealReferendumFormatter(
                 )
             }
 
-            is ReferendumStatus.Ongoing.Deciding -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.Reject -> ReferendumTimeEstimation.Timer(
                 time = status.rejectIn,
                 timeFormat = R.string.referendum_status_time_reject_in,
                 textStyleRefresher = status.rejectIn.referendumStatusStyleRefresher()
             )
 
-            is ReferendumStatus.Ongoing.Confirming -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.Approve -> ReferendumTimeEstimation.Timer(
                 time = status.approveIn,
                 timeFormat = R.string.referendum_status_time_approve_in,
                 textStyleRefresher = status.approveIn.referendumStatusStyleRefresher()

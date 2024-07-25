@@ -36,12 +36,12 @@ sealed class ReferendumStatus {
             override val type = ReferendumStatusType.IN_QUEUE
         }
 
-        data class Deciding(val rejectIn: TimerValue) : Ongoing() {
+        data class Reject(val rejectIn: TimerValue) : Ongoing() {
             override val type = ReferendumStatusType.DECIDING
         }
 
-        data class Confirming(val approveIn: TimerValue) : Ongoing() {
-            override val type = ReferendumStatusType.CONFIRMING
+        data class Approve(val approveIn: TimerValue) : Ongoing() {
+            override val type = ReferendumStatusType.DECIDING
         }
     }
 

@@ -76,6 +76,7 @@ class GovV1OnChainReferendaRepository(
             name = "root",
             preparePeriod = Balance.ZERO,
             decisionPeriod = runtime.votingPeriod(),
+            confirmPeriod = Balance.ZERO,
             minSupport = null,
             minApproval = null
         )
@@ -170,6 +171,8 @@ class GovV1OnChainReferendaRepository(
                 val end = bindBlockNumber(status["end"])
                 val submittedIn = end - votingPeriod
 
+                val threshold = bindThreshold(status["threshold"])
+
                 OnChainReferendumStatus.Ongoing(
                     track = DemocracyTrackId,
                     proposal = bindProposal(status["proposalHash"] ?: status["proposal"], runtime),
@@ -182,7 +185,7 @@ class GovV1OnChainReferendaRepository(
                     ),
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = false,
-                    threshold = bindThreshold(status["threshold"])
+                    threshold = threshold
                 )
             }
 
