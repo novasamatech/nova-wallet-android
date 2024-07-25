@@ -145,9 +145,9 @@ class ChainNetworkManagementFragment :
         viewModel.confirmAccountDeletion.awaitableActionLiveData.observeEvent {
             warningDialog(
                 requireContext(),
-                onConfirm = { it.onSuccess(true) },
-                onCancel = { it.onSuccess(false) },
-                confirmTextRes = R.string.common_delete
+                onPositiveClick = { it.onSuccess(true) },
+                onNegativeClick = { it.onSuccess(false) },
+                positiveTextRes = R.string.common_delete
             ) {
                 setTitle(it.payload.first)
                 setMessage(it.payload.second)

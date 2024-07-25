@@ -7,8 +7,4 @@ fun BaseFragment<*>.setupYourPoolComponent(component: YourPoolComponent, view: Y
     component.state.observe { optionalStakeSummaryState ->
         view.letOrHide(optionalStakeSummaryState, view::showYourPoolState)
     }
-
-    view.setOnPoolClicked {
-        component.onAction(YourPoolAction.PoolInfoClicked)
-    }
 }

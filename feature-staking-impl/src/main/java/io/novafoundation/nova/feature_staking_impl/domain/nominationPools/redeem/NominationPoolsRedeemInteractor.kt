@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.unlockChunksFor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.delegatedStake.DelegatedStakeMigrationUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.chain
@@ -44,6 +45,7 @@ class RealNominationPoolsRedeemInteractor(
     private val stakingSharedState: StakingSharedState,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val stakingSharedComputation: StakingSharedComputation,
+    private val migrationUseCase: DelegatedStakeMigrationUseCase
 ) : NominationPoolsRedeemInteractor {
 
     override fun redeemAmountFlow(poolMember: PoolMember, computationScope: CoroutineScope): Flow<Balance> {
@@ -83,6 +85,8 @@ class RealNominationPoolsRedeemInteractor(
     }
 
     private suspend fun ExtrinsicBuilder.redeem(poolMember: PoolMember) {
+        migrationUseCase.migrateToDelegatedStakeIfNeeded()
+
         val chainId = stakingSharedState.chainId()
         val poolStash = poolAccountDerivation.bondedAccountOf(poolMember.poolId, chainId)
         val slashingSpans = stakingRepository.getSlashingSpan(chainId, poolStash).numberOfSlashingSpans()

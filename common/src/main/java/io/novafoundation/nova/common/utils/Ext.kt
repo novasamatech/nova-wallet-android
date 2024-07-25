@@ -57,12 +57,16 @@ fun Context.sendEmailIntent(
     targetEmail: String,
     title: String = getString(R.string.common_email_chooser_title)
 ) {
-    val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-        putExtra(Intent.EXTRA_EMAIL, targetEmail)
-        type = "message/rfc822"
-        data = Uri.parse("mailto:$targetEmail")
+    try {
+        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+            putExtra(Intent.EXTRA_EMAIL, targetEmail)
+            type = "message/rfc822"
+            data = Uri.parse("mailto:$targetEmail")
+        }
+        startActivity(Intent.createChooser(emailIntent, title))
+    } catch (e: Exception) {
+        Toast.makeText(this, R.string.common_something_went_wrong_title, Toast.LENGTH_SHORT)
     }
-    startActivity(Intent.createChooser(emailIntent, title))
 }
 
 fun @receiver:ColorInt Int.toHexColor(): String {

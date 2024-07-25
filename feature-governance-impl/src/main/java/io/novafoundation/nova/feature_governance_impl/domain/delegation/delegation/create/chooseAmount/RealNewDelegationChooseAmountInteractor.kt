@@ -143,7 +143,9 @@ class RealNewDelegationChooseAmountInteractor(
 
         val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
 
-        val balanceLocksFlow = locksRepository.observeBalanceLocks(chain, chainAsset)
+        val metaId = accountRepository.getSelectedMetaAccount().id
+
+        val balanceLocksFlow = locksRepository.observeBalanceLocks(metaId, chain, chainAsset)
 
         return balanceLocksFlow.map { locks ->
             RealDelegateAssistant(

@@ -629,6 +629,9 @@
     <string name="dapp_sign_error_unsupported_chain">Chaîne non prise en charge avec le hachage de genèse %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Assurez-vous que l’opération est correcte</string>
     <string name="dapp_sign_extrinsic_failed">Échec de la signature de l’opération demandée</string>
+    <string name="dapp_url_warning_open_anyway">Ouvrir quand même</string>
+    <string name="dapp_url_warning_subtitle">Les DApps malveillantes peuvent retirer tous vos fonds. Faites toujours vos propres recherches avant d\'utiliser une DApp, d\'accorder des permissions ou d\'envoyer des fonds.\n\nSi quelqu\'un vous pousse à visiter cette DApp, il est probable que ce soit une escroquerie. En cas de doute, veuillez contacter le support de Nova Wallet : %s.</string>
+    <string name="dapp_url_warning_title">Attention ! DApp inconnue</string>
     <string name="deep_linking_chain_id_is_not_found">Chaîne non trouvée</string>
     <string name="deep_linking_domain_is_not_matched">Le domaine du lien %s n\'est pas autorisé</string>
     <string name="deep_linking_governance_type_is_not_specified">Le type de gouvernance n\'est pas spécifié</string>
@@ -887,6 +890,8 @@
     <string name="pool_full_failure_title">Le pool est complet</string>
     <string name="pool_inactive_failure_message">Vous ne pouvez pas rejoindre un pool qui n\'est pas ouvert. Veuillez contacter le propriétaire du pool.</string>
     <string name="pool_inactive_failure_title">Le pool n\'est pas ouvert</string>
+    <string name="pool_staking_conflict_message">Vous ne pouvez plus utiliser à la fois le Stake direct et le Pool Staking depuis le même compte. Pour gérer votre Pool Staking, vous devez d\'abord unstake vos tokens du Stake direct.</string>
+    <string name="pool_staking_conflict_title">Les opérations de Pool ne sont pas disponibles</string>
     <string name="pre_configured_networks_add_custom_button">Ajouter un réseau manuellement</string>
     <string name="pre_configured_networks_progress_text">Chargement de la liste des réseaux...</string>
     <string name="pre_configured_networks_search_hint">Rechercher par nom de réseau</string>
@@ -1122,6 +1127,8 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">YouTube</string>
+    <string name="setup_staking_conflict_message">Vous ne pouvez pas staker avec le Stake direct et les Pools de Nomination en même temps</string>
+    <string name="setup_staking_conflict_title">Déjà staké</string>
     <string name="setup_staking_type_advanced_options_condition">Gestion avancée du staking</string>
     <string name="setup_staking_type_already_used_title">Le type de staking ne peut pas être modifié</string>
     <string name="setup_staking_type_direct_already_used_message">Vous avez déjà un staking Direct</string>

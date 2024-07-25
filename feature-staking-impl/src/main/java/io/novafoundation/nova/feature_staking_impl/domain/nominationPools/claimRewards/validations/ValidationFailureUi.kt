@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimRewards.validations.NominationPoolsClaimRewardsValidationFailure.NotEnoughBalanceToPayFees
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.handlePoolStakingTypesConflictValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 
@@ -21,5 +22,7 @@ fun nominationPoolsClaimRewardsValidationFailure(
             failure,
             resourceManager
         )
+
+        NominationPoolsClaimRewardsValidationFailure.StakingTypesConflict -> handlePoolStakingTypesConflictValidationFailure(resourceManager)
     }
 }

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbon
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
@@ -19,8 +20,11 @@ typealias NominationPoolsUnbondValidation = Validation<NominationPoolsUnbondVali
 
 fun ValidationSystem.Companion.nominationPoolsUnbond(
     unbondValidationFactory: NominationPoolsUnbondValidationFactory,
-    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+    stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
 ): NominationPoolsUnbondValidationSystem = ValidationSystem {
+    noStakingTypesConflict(stakingTypesConflictValidationFactory)
+
     unbondValidationFactory.poolCanUnbond()
 
     unbondValidationFactory.poolMemberCanUnbond()
@@ -34,6 +38,14 @@ fun ValidationSystem.Companion.nominationPoolsUnbond(
     positiveUnbond()
 
     unbondValidationFactory.partialUnbondLeavesMinBond()
+}
+
+private fun NominationPoolsUnbondValidationSystemBuilder.noStakingTypesConflict(factory: StakingTypesConflictValidationFactory) {
+    factory.noStakingTypesConflict(
+        accountId = { it.poolMember.accountId },
+        chainId = { it.asset.token.configuration.chainId },
+        error = { NominationPoolsUnbondValidationFailure.StakingTypesConflict }
+    )
 }
 
 private fun NominationPoolsUnbondValidationSystemBuilder.enoughToPayFees() {

@@ -139,7 +139,7 @@ class ConfirmMultiStakingViewModel(
         val payload = StartMultiStakingValidationPayload(
             recommendableSelection = recommendableSelection,
             asset = assetFlow.first(),
-            fee = decimalFee
+            fee = decimalFee,
         )
 
         validationExecutor.requireValid(

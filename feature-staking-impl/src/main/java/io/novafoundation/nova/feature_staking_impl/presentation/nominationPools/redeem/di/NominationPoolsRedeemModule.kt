@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.delegatedStake.DelegatedStakeMigrationUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.NominationPoolsRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.RealNominationPoolsRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.validations.NominationPoolsRedeemValidationSystem
@@ -44,21 +46,24 @@ class NominationPoolsRedeemModule {
         stakingSharedState: StakingSharedState,
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         stakingSharedComputation: StakingSharedComputation,
+        migrationUseCase: DelegatedStakeMigrationUseCase
     ): NominationPoolsRedeemInteractor = RealNominationPoolsRedeemInteractor(
         extrinsicService = extrinsicService,
         stakingRepository = stakingRepository,
         poolAccountDerivation = poolAccountDerivation,
         stakingSharedState = stakingSharedState,
         nominationPoolSharedComputation = nominationPoolSharedComputation,
-        stakingSharedComputation = stakingSharedComputation
+        stakingSharedComputation = stakingSharedComputation,
+        migrationUseCase = migrationUseCase
     )
 
     @Provides
     @ScreenScope
     fun provideValidationSystem(
-        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+        stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory
     ): NominationPoolsRedeemValidationSystem {
-        return ValidationSystem.nominationPoolsRedeem(enoughTotalToStayAboveEDValidationFactory)
+        return ValidationSystem.nominationPoolsRedeem(enoughTotalToStayAboveEDValidationFactory, stakingTypesConflictValidationFactory)
     }
 
     @Provides

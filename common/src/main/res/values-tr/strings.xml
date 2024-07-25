@@ -629,6 +629,9 @@
     <string name="dapp_sign_error_unsupported_chain">Desteklenmeyen zincir, genesis hash %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">İşlemin doğru olduğundan emin olun</string>
     <string name="dapp_sign_extrinsic_failed">İstenen işlemi imzalama başarısız oldu</string>
+    <string name="dapp_url_warning_open_anyway">Her neyse aç</string>
+    <string name="dapp_url_warning_subtitle">Kötü niyetli DApp\'ler tüm varlıklarınızı çekebilir. Bir DApp\'i kullanmadan, izin vermeden veya para göndermeden önce her zaman kendi araştırmanızı yapın.\n\nBirisi sizi bu DApp\'e girmeye zorluyorsa, muhtemelen bir dolandırıcılıktır. Şüphe duyduğunuzda, lütfen Nova Wallet desteği ile iletişime geçin: %s.</string>
+    <string name="dapp_url_warning_title">Uyarı! DApp bilinmiyor</string>
     <string name="deep_linking_chain_id_is_not_found">Zincir bulunamadı</string>
     <string name="deep_linking_domain_is_not_matched">Bağlantıdaki %s alan adı izin verilenler listesinde değil</string>
     <string name="deep_linking_governance_type_is_not_specified">Yönetim türü belirtilmemiş</string>
@@ -887,6 +890,8 @@
     <string name="pool_full_failure_title">Havuz dolu</string>
     <string name="pool_inactive_failure_message">Açık olmayan bir havuza katılamazsınız. Lütfen havuz sahibi ile iletişime geçin.</string>
     <string name="pool_inactive_failure_title">Havuz açık değil</string>
+    <string name="pool_staking_conflict_message">Artık aynı hesaptan hem Doğrudan Stake hem de Havuz Stake kullanamazsınız. Havuz Stake\'inizi yönetmek için öncelikle token\'larınızı Doğrudan Stake\'ten çözmeniz gerekmektedir.</string>
+    <string name="pool_staking_conflict_title">Havuz işlemleri kullanılamıyor</string>
     <string name="pre_configured_networks_add_custom_button">Ağı elle ekle</string>
     <string name="pre_configured_networks_progress_text">Ağlar listesi yükleniyor...</string>
     <string name="pre_configured_networks_search_hint">Ağ adına göre ara</string>
@@ -1122,6 +1127,8 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_staking_conflict_message">Aynı anda hem Doğrudan Stake hem de Nomination Havuzlarını kullanarak stake yapamazsınız</string>
+    <string name="setup_staking_conflict_title">Zaten stake edilmekte</string>
     <string name="setup_staking_type_advanced_options_condition">Gelişmiş staking yönetimi</string>
     <string name="setup_staking_type_already_used_title">Staking türü değiştirilemez</string>
     <string name="setup_staking_type_direct_already_used_message">Zaten Direkt staking\'e sahipsiniz</string>
