@@ -115,11 +115,13 @@ class SetupVoteReferendumViewModel(
     }
         .shareInBackground()
 
+    val abstainVotingSupported = flowOf { interactor.isAbstainSupported() }
+        .shareInBackground()
+
     val ayeButtonStateFlow = validatingVoteType.map { buttonStateFlow(VoteType.AYE, validationVoteType = it, R.string.referendum_vote_aye) }
-    val abstainButtonStateFlow = validatingVoteType.map {
-        val isAbstainSupported = interactor.isAbstainSupported()
+    val abstainButtonStateFlow = combine(validatingVoteType, abstainVotingSupported) { type, isAbstainSupported ->
         if (isAbstainSupported) {
-            buttonStateFlow(VoteType.ABSTAIN, validationVoteType = it, R.string.referendum_vote_abstain)
+            buttonStateFlow(VoteType.ABSTAIN, validationVoteType = type, R.string.referendum_vote_abstain)
         } else {
             DescriptiveButtonState.Invisible
         }
