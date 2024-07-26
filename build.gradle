@@ -213,6 +213,8 @@ buildscript {
         firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+        installReferer = "com.android.installreferrer:installreferrer:2.2"
     }
 
     repositories {

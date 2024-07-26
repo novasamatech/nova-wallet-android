@@ -50,6 +50,8 @@ dependencies {
 
     implementation coroutinesDep
 
+    implementation installReferer
+
     implementation daggerDep
     kapt daggerKapt
 }

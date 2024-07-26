@@ -19,6 +19,8 @@ import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLa
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_deep_linking.presentation.deferred.ReferralInstallHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.deferred.ReferralInstallResult
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
@@ -50,6 +52,7 @@ class RootViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    private val referralInstallHandler: ReferralInstallHandler
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -87,6 +90,8 @@ class RootViewModel(
         subscribeDeepLinkCallback()
 
         syncPushSettingsIfNeeded()
+
+        handleReferralInstall()
 
         externalServiceInitializer.initialize()
     }
@@ -181,6 +186,16 @@ class RootViewModel(
                 rootRouter.nonCancellableVerify()
             } else {
                 backgroundAccessObserver.checkPassed()
+            }
+        }
+    }
+
+    private fun handleReferralInstall() = launch {
+        val result = referralInstallHandler.getResult()
+        if (result is ReferralInstallResult.DeeplinkExtracted) {
+            runCatching {
+                val deeplink = Uri.parse(result.deeplink)
+                handleDeepLink(deeplink)
             }
         }
     }
