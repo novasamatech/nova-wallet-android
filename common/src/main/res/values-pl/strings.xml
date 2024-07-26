@@ -985,6 +985,9 @@
     <string name="referenda_search_toolbar_hint">Szukaj według tytułu lub ID</string>
     <string name="referenda_title">Referenda</string>
     <string name="referendim_details_not_found_title">Referendum nie znaleziono</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Wstrzymanie się od głosu może być dokonane tylko z 0.1x conviction. Głosować z 0.1x conviction?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Aktualizacja conviction</string>
+    <string name="referendum_abstain_voters_title">Głosy wstrzymujące się</string>
     <string name="referendum_aye_format">Za: %s</string>
     <string name="referendum_dapp_list_title">Użyj przeglądarki Nova DApp</string>
     <string name="referendum_description_fallback">Tylko wnioskodawca może edytować ten opis i tytuł. Jeśli posiadasz konto wnioskodawcy, odwiedź Polkassembly i uzupełnij informacje o swoim wniosku</string>
@@ -1143,6 +1146,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Conviction zostanie ustawione na 0.1x podczas Wstrzymania się</string>
     <string name="setup_staking_conflict_message">Nie możesz stake z Direct Staking i Nomination Pools jednocześnie</string>
     <string name="setup_staking_conflict_title">Już staking</string>
     <string name="setup_staking_type_advanced_options_condition">Zaawansowane zarządzanie Staking</string>

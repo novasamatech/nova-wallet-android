@@ -964,6 +964,9 @@
     <string name="referenda_search_toolbar_hint">レファレンダムのタイトルまたはIDで検索</string>
     <string name="referenda_title">レファレンダム</string>
     <string name="referendim_details_not_found_title">レファレンダムが見つかりません</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">棄権票は0.1xの信念でのみ行うことができます。0.1xの信念で投票しますか？</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">信念の更新</string>
+    <string name="referendum_abstain_voters_title">棄権票</string>
     <string name="referendum_aye_format">賛成: %s</string>
     <string name="referendum_dapp_list_title">Nova DAppブラウザを使用</string>
     <string name="referendum_description_fallback">提案者のみがこの説明とタイトルを編集できます。提案者のアカウントをお持ちの場合は、Polkassembly にアクセスして提案に関する情報を入力してください</string>
@@ -1119,6 +1122,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">ウィキ</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">棄権時には信念が0.1xに設定されます</string>
     <string name="setup_staking_conflict_message">Direct StakingとNomination Poolsを同時にステークすることはできません</string>
     <string name="setup_staking_conflict_title">すでにステーキング中</string>
     <string name="setup_staking_type_advanced_options_condition">高度なStaking管理</string>

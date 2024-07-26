@@ -964,6 +964,9 @@
     <string name="referenda_search_toolbar_hint">Tìm kiếm theo tiêu đề hoặc ID cuộc trưng cầu dân ý</string>
     <string name="referenda_title">Cuộc trưng cầu dân ý</string>
     <string name="referendim_details_not_found_title">Không tìm thấy cuộc trưng cầu dân ý</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Bỏ phiếu Abstain chỉ có thể thực hiện với độ xác tín 0.1x. Bỏ phiếu với độ xác tín 0.1x?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Cập nhật độ xác tín</string>
+    <string name="referendum_abstain_voters_title">Bỏ phiếu Abstain</string>
     <string name="referendum_aye_format">Đồng ý: %s</string>
     <string name="referendum_dapp_list_title">Sử dụng trình duyệt Nova DApp</string>
     <string name="referendum_description_fallback">Chỉ người đề xuất mới có thể chỉnh sửa mô tả và tiêu đề này. Nếu bạn sở hữu tài khoản của người đề xuất, hãy truy cập Polkassembly và điền thông tin về đề xuất của bạn.</string>
@@ -1119,6 +1122,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Độ xác tín sẽ được đặt là 0.1x khi <font>bỏ phiếu Abstain</font></string>
     <string name="setup_staking_conflict_message">Bạn không thể Stake với Direct Staking và Nomination Pools cùng một lúc</string>
     <string name="setup_staking_conflict_title">Đã staking</string>
     <string name="setup_staking_type_advanced_options_condition">Quản lý Stake nâng cao</string>

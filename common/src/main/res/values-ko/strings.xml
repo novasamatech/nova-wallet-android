@@ -964,6 +964,9 @@
     <string name="referenda_search_toolbar_hint">국민투표 제목 또는 ID로 검색</string>
     <string name="referenda_title">국민투표</string>
     <string name="referendim_details_not_found_title">국민투표를 찾을 수 없습니다</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">기권 투표는 0.1x 확신도로만 가능합니다. 0.1x 확신도로 투표하시겠습니까?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">확신도 업데이트</string>
+    <string name="referendum_abstain_voters_title">기권 투표</string>
     <string name="referendum_aye_format">찬성: %s</string>
     <string name="referendum_dapp_list_title">Nova DApp 브라우저 사용</string>
     <string name="referendum_description_fallback">제안자만 이 설명과 제목을 수정할 수 있습니다. 제안자의 계정을 소유하고 있다면, Polkassembly에 방문하여 제안에 대한 정보를 입력하세요.</string>
@@ -1119,6 +1122,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">위키</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info"><font>기권</font> 시 확신도가 0.1x로 설정됩니다</string>
     <string name="setup_staking_conflict_message">직접 Staking과 Nomination Pools를 동시에 사용할 수 없습니다</string>
     <string name="setup_staking_conflict_title">이미 Staking 중</string>
     <string name="setup_staking_type_advanced_options_condition">고급 Staking 관리</string>
