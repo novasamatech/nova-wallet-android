@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="setup_referendum_vote_conviction_info">Conviction will be set to 0.1x when you vote Abstain</string>
+
     <string name="referendum_abstain_voters_title">Abstain votes</string>
     <string name="referendum_abstain_vote_invalid_conviction_title">Conviction update</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Abstain votes can only be done with 0.1x conviction. Vote with 0.1x conviction?</string>

@@ -71,12 +71,21 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp" />
 
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/setupReferendumVoteAlertView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:alertMode="info"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/setup_referendum_vote_conviction_info"/>
+
             <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
                 android:id="@+id/setupReferendumVoteLockedAmountChanges"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 app:amountChanges_icon="@drawable/ic_lock"
                 app:amountChanges_title="@string/referendum_vote_governance_lock" />
