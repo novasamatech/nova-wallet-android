@@ -68,13 +68,3 @@ object SpannableFormatter {
         fun result(): CharSequence
     }
 }
-
-fun SpannableFormatter.format(resourceManager: ResourceManager, @StringRes resId: Int, vararg args: Any): SpannedString {
-    val format = resourceManager.getString(resId)
-    return format(format, *args)
-}
-
-fun SpannableFormatter.format(context: Context, @StringRes resId: Int, vararg args: Any): SpannedString {
-    val format = context.getString(resId)
-    return format(format, *args)
-}
