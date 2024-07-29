@@ -964,6 +964,9 @@
     <string name="referenda_search_toolbar_hint">按公投标题或 ID 搜索</string>
     <string name="referenda_title">公投</string>
     <string name="referendim_details_not_found_title">未找到公投</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">弃权票只能通过 0.1x 决心投票。是否以 0.1x 决心投票？</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">更新决心</string>
+    <string name="referendum_abstain_voters_title">弃权投票</string>
     <string name="referendum_aye_format">赞成：%s</string>
     <string name="referendum_dapp_list_title">使用 Nova DApp 浏览器</string>
     <string name="referendum_description_fallback">只有提案人可以编辑此描述和标题。如果您拥有提案人的账户，请访问 Polkassembly 并填写有关您提案的信息</string>
@@ -1119,6 +1122,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">维基</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">弃权时将把决心设置为 0.1x</string>
     <string name="setup_staking_conflict_message">不能同时使用直接质押和提名池进行质押</string>
     <string name="setup_staking_conflict_title">已质押</string>
     <string name="setup_staking_type_advanced_options_condition">高级质押管理</string>

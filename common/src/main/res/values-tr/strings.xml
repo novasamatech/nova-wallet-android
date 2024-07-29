@@ -971,6 +971,9 @@
     <string name="referenda_search_toolbar_hint">Referandum başlığı veya ID ile ara</string>
     <string name="referenda_title">Referandumlar</string>
     <string name="referendim_details_not_found_title">Referandum bulunamadı</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Çekimser oylar yalnızca 0.1x inançla yapılabilir. 0.1x inançla oy kullanmak ister misiniz?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">İnanç Güncellemesi</string>
+    <string name="referendum_abstain_voters_title">Çekimser Oylar</string>
     <string name="referendum_aye_format">Evet: %s</string>
     <string name="referendum_dapp_list_title">Nova DApp tarayıcısını kullanın</string>
     <string name="referendum_description_fallback">Bu açıklamayı ve başlığı yalnızca öneren kişi düzenleyebilir. Eğer öneren kişinin hesabına erişiminiz varsa, Polkassembly\'i ziyaret edin ve teklifiniz hakkında bilgi doldurun</string>
@@ -1127,6 +1130,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Çekinmelerde 0.1x olarak Ayarlanacak</string>
     <string name="setup_staking_conflict_message">Aynı anda hem Doğrudan Stake hem de Nomination Havuzlarını kullanarak stake yapamazsınız</string>
     <string name="setup_staking_conflict_title">Zaten stake edilmekte</string>
     <string name="setup_staking_type_advanced_options_condition">Gelişmiş staking yönetimi</string>
