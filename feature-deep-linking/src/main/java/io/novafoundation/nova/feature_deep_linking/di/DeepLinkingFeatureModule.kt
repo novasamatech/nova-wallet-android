@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_deep_linking.di
 
-import android.content.Context
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.AssetDetailsDeepLinkHandler
@@ -8,14 +7,11 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.handler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ImportMnemonicDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.StakingDashboardDeepLinkHandler
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_deep_linking.presentation.deferred.RealReferralInstallHandler
-import io.novafoundation.nova.feature_deep_linking.presentation.deferred.ReferralInstallHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.BuyCallbackDeepLinkHandler
@@ -119,13 +115,5 @@ class DeepLinkingFeatureModule {
         )
 
         return RootDeepLinkHandler(deepLinkHandlers)
-    }
-
-    @Provides
-    fun provideReferralInstallHandler(
-        context: Context,
-        preferences: Preferences
-    ): ReferralInstallHandler {
-        return RealReferralInstallHandler(context, preferences)
     }
 }
