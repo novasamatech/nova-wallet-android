@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold.Threshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import java.math.MathContext
+import java.math.RoundingMode
 
 class Gov2VotingThreshold(
     val supportCurve: VotingCurve,
@@ -19,7 +21,9 @@ class Gov2VotingThreshold(
         val supportNeeded = supportCurve.threshold(passedSinceDecidingFraction) * totalIssuance.toBigDecimal()
         val supportNeededIntegral = supportNeeded.toBigInteger()
 
-        val supportFraction = tally.support.toBigDecimal().divideOrNull(totalIssuance.toBigDecimal()) ?: Perbill.ZERO
+        val currentSupport = tally.support.toBigDecimal()
+        val totalSupport = totalIssuance.toBigDecimal()
+        val supportFraction = currentSupport.divideOrNull(totalSupport, MathContext.DECIMAL64) ?: Perbill.ZERO
 
         return Threshold(
             value = supportNeededIntegral,
