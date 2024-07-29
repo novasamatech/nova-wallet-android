@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_deep_linking.di
 import android.content.Context
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.DAppDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ImportMnemonicDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.AssetDetailsDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.DAppDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ImportMnemonicDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.StakingDashboardDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.StakingDashboardDeepLinkHandler
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -106,7 +106,7 @@ class DeepLinkingFeatureModule {
         referendumDeepLinkHandler: ReferendumDeepLinkHandler,
         buyCallbackDeepLinkHandler: BuyCallbackDeepLinkHandler,
         assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler,
-        walletConnectPairDeeplinkHandler: WalletConnectPairDeeplinkHandler,
+        walletConnectPairDeeplinkHandler: WalletConnectPairDeeplinkHandler
     ): RootDeepLinkHandler {
         val deepLinkHandlers = listOf(
             stakingDashboardDeepLinkHandler,
