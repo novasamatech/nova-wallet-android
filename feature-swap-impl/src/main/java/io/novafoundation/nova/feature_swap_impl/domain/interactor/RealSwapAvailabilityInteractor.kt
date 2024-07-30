@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.runtime.ext.isSwapSupported
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,7 +16,7 @@ class RealSwapAvailabilityInteractor(
 ) : SwapAvailabilityInteractor {
 
     override fun anySwapAvailableFlow(): Flow<Boolean> {
-        return chainRegistry.currentChains.map { it.any(Chain::isSwapSupported) }
+        return chainRegistry.enabledChainsFlow().map { it.any(Chain::isSwapSupported) }
     }
 
     override suspend fun swapAvailableFlow(asset: Chain.Asset, coroutineScope: CoroutineScope): Flow<Boolean> {
