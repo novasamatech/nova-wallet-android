@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Re
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.currentlyPassing
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.isOngoing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
@@ -270,7 +271,8 @@ class RealReferendumFormatter(
             track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
             number = formatId(referendum.id),
             voting = referendum.voting?.let { formatVoting(it, referendum.threshold, token) },
-            yourVote = referendum.referendumVote?.let { mapReferendumVoteToUi(it, token.configuration, chain) }
+            yourVote = referendum.referendumVote?.let { mapReferendumVoteToUi(it, token.configuration, chain) },
+            isOngoing = referendum.status.isOngoing()
         )
     }
 

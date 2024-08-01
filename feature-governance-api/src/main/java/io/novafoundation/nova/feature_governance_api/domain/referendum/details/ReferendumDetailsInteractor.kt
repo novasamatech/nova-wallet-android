@@ -23,4 +23,6 @@ interface ReferendumDetailsInteractor {
     ): ReferendumCall?
 
     suspend fun previewFor(preImage: PreImage): PreimagePreview
+
+    suspend fun isSupportAbstainVoting(selectedGovernanceOption: SupportedGovernanceOption): Boolean
 }

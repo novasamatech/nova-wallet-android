@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
-import io.novafoundation.nova.common.utils.uniteTransform
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
@@ -53,7 +52,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.transform
 
 class RealReferendumDetailsInteractor(
@@ -95,6 +96,12 @@ class RealReferendumDetailsInteractor(
         }
     }
 
+    override suspend fun isSupportAbstainVoting(selectedGovernanceOption: SupportedGovernanceOption): Boolean {
+        return governanceSourceRegistry.sourceFor(selectedGovernanceOption)
+            .convictionVoting
+            .isAbstainVotingAvailable()
+    }
+
     /**
      * Emmit null if referendum is not exist
      */
@@ -108,33 +115,25 @@ class RealReferendumDetailsInteractor(
 
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
 
-        val referendumAndBlockFlow = combineToPair(
+        val offChainInfoDeferred = coroutineScope.async { governanceSource.offChainInfo.referendumDetails(referendumId, chain) }
+        val electorateDeferred = coroutineScope.async { governanceSource.referenda.electorate(chain.id) }
+        val tracksByIdDeferred = coroutineScope.async { governanceSource.referenda.getTracksById(chain.id) }
+
+        return combineTransform(
             referendumFlow(governanceSource, selectedGovernanceOption, referendumId, coroutineScope),
             chainStateRepository.currentBlockNumberFlow(chain.id)
-        )
-
-        val tracksByIdFlow = flowOf { governanceSource.referenda.getTracksById(chain.id) }
-        val electorateFlow = flowOf { governanceSource.referenda.electorate(chain.id) }
-        val offChainInfoFlow = flowOf { governanceSource.offChainInfo.referendumDetails(referendumId, chain) }
-
-        return uniteTransform(
-            referendumAndBlockFlow,
-            tracksByIdFlow,
-            electorateFlow,
-            offChainInfoFlow
-        ) { referendumWithBlock, tracksById, electorate, offChainInfo ->
-            // Await while referendum with block and tracks will be loaded
-            if (referendumWithBlock == null || tracksById == null) return@uniteTransform
-            val (referendumWithVotingDetails, currentBlockNumber) = referendumWithBlock
-
+        ) { referendumWithVotingDetails, currentBlockNumber ->
             // If null it means that referendum with given id doesn't exist
             if (referendumWithVotingDetails == null) {
                 emit(null)
-                return@uniteTransform
+                return@combineTransform
             }
 
             val onChainReferendum = referendumWithVotingDetails.onChainReferendum
             val offChainVotingDetails = referendumWithVotingDetails.votingDetails
+            val offChainInfo = offChainInfoDeferred.await()
+            val electorate = electorateDeferred.await()
+            val tracksById = tracksByIdDeferred.await()
 
             val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
 

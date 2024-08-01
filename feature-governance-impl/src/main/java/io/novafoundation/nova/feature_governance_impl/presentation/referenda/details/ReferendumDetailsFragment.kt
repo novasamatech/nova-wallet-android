@@ -5,13 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -132,18 +136,10 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         observeValidations(viewModel)
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.referendumNotAwaitableAction)
 
-        viewModel.referendumDetailsModelFlow.observeWhenVisible {
-            when (it) {
-                is LoadingState.Loading -> {
-                    setContentVisible(false)
-                }
-
-                is LoadingState.Loaded -> {
-                    setContentVisible(true)
-
-                    setReferendumState(it.data)
-                }
-            }
+        viewModel.referendumDetailsModelFlow.observeWhenVisible { loadingState ->
+            setContentVisible(loadingState.isLoaded())
+            referendumDetailsProgress.isVisible = loadingState.isLoading()
+            loadingState.dataOrNull?.let { setReferendumState(it) }
         }
 
         viewModel.proposerAddressModel.observeWhenVisible(referendumDetailsProposer::setAddressOrHide)
@@ -157,6 +153,13 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         viewModel.showFullDetails.observeWhenVisible(referendumFullDetails::setVisible)
     }
 
+    private fun setContentVisible(visible: Boolean) {
+        referendumDetailsToolbarChips.setVisible(visible)
+        referendumDetailsScrollView.setVisible(visible)
+
+        referendumDetailsProgress.setVisible(!visible)
+    }
+
     private fun setReferendumState(model: ReferendumDetailsModel) {
         referendumDetailsTrack.setReferendumTrackModel(model.track)
         referendumDetailsNumber.setText(model.number)
@@ -166,14 +169,18 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
 
         referendumDetailsYourVote.setModel(model.yourVote)
 
-        referendumDetailsVotingStatus.setStatus(model.statusModel)
+        referendumDetailsVotingStatus.letOrHide(model.statusModel) {
+            referendumDetailsVotingStatus.setStatus(it)
+        }
         referendumDetailsVotingStatus.setTimeEstimation(model.timeEstimation)
         referendumDetailsVotingStatus.setVotingModel(model.voting)
         referendumDetailsVotingStatus.setPositiveVoters(model.ayeVoters)
         referendumDetailsVotingStatus.setNegativeVoters(model.nayVoters)
         referendumDetailsVotingStatus.setAbstainVoters(model.abstainVoters)
 
-        referendumDetailsTimeline.setTimeline(model.timeline)
+        referendumTimelineContainer.letOrHide(model.timeline) {
+            referendumDetailsTimeline.setTimeline(it)
+        }
     }
 
     // TODO we need a better way of managing views for specific calls when multiple calls will be supported
@@ -189,13 +196,6 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
                 referendumDetailsRequestedAmountContainer.makeGone()
             }
         }
-    }
-
-    private fun setContentVisible(visible: Boolean) {
-        referendumDetailsToolbarChips.setVisible(visible)
-        referendumDetailsScrollView.setVisible(visible)
-
-        referendumDetailsProgress.setVisible(!visible)
     }
 
     private fun setDescription(model: ShortenedTextModel?) {
