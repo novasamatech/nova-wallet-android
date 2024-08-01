@@ -13,12 +13,12 @@ class OffChainReferendumVotingDetails(
 
     sealed interface VotingInfo {
 
-        class Abstain(val abstain: Balance) : VotingInfo
+        class Abstain(val abstain: BigDecimal) : VotingInfo
 
         class Full(
             val aye: BigDecimal,
             val nay: BigDecimal,
-            val abstain: Balance,
+            val abstain: BigDecimal,
             val support: Balance
         ) : VotingInfo {
             companion object
@@ -29,7 +29,7 @@ class OffChainReferendumVotingDetails(
 fun VotingInfo.Full.Companion.empty() = VotingInfo.Full(
     aye = BigDecimal.ZERO,
     nay = BigDecimal.ZERO,
-    abstain = Balance.ZERO,
+    abstain = BigDecimal.ZERO,
     support = Balance.ZERO
 )
 
@@ -48,7 +48,7 @@ fun VotingInfo.Full.toTally(): Tally = Tally(
     support = this.support
 )
 
-fun VotingInfo.getAbstain(): Balance {
+fun VotingInfo.getAbstain(): BigDecimal {
     return when (this) {
         is VotingInfo.Abstain -> this.abstain
         is VotingInfo.Full -> this.abstain

@@ -153,7 +153,7 @@ class RealReferendumDetailsInteractor(
                 tally = onChainReferendum.status.asOngoingOrNull()?.tally ?: offChainVotingDetails?.votingInfo?.toTallyOrNull(),
                 currentBlockNumber = currentBlockNumber,
                 electorate = electorate,
-                abstainVotes = offChainVotingDetails?.votingInfo?.getAbstain()
+                abstainVotes = offChainVotingDetails?.votingInfo?.getAbstain()?.toBigInteger()
             )
 
             val threshold = referendaConstructor.constructReferendumThreshold(

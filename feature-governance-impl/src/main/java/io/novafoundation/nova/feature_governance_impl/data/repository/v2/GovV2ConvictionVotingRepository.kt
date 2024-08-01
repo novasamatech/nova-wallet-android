@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votedFor
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
@@ -43,6 +44,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.mapConvictionFromString
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -128,14 +130,15 @@ class GovV2ConvictionVotingRepository(
             val request = ReferendumSplitAbstainVotersRequest(referendumId.value)
             val response = delegateSubqueryApi.getReferendumAbstainVoters(api.url, request)
             val trackId = TrackId(response.data.referendum.trackId)
-            val abstainSum = response.data
+            val abstainAmountSum = response.data
                 .referendum
                 .castingVotings
                 .nodes
                 .mapNotNull { it.splitAbstainVote?.abstainAmount }
                 .sum()
 
-            OffChainReferendumVotingDetails(trackId, VotingInfo.Abstain(abstainSum))
+            val abstainVotes = abstainAmountSum.toBigDecimal() * Conviction.None.amountMultiplier()
+            OffChainReferendumVotingDetails(trackId, VotingInfo.Abstain(abstainVotes))
         }.getOrNull()
     }
 
