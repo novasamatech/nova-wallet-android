@@ -2,14 +2,21 @@ package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.
 
 import java.math.BigInteger
 
-class ReferendumSplitAbstainVotersRequest(referendumId: BigInteger) {
+class ReferendumVotesRequest(referendumId: BigInteger) {
     val query = """
         query {
             referendum(id:"$referendumId") {
                 trackId
-                castingVotings(filter: {splitAbstainVote: {isNull: false}}) {
+                castingVotings {
                     nodes {
+                        splitVote
                         splitAbstainVote
+                        standardVote
+                        delegatorVotes {
+                            nodes {
+                                vote
+                            }
+                        }
                     }
                 }
             }

@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ComputationalCache {
 
+    fun hasCache(key: String): Boolean
+
     /**
      * Caches [computation] between calls until all supplied [scope]s have been cancelled
      */

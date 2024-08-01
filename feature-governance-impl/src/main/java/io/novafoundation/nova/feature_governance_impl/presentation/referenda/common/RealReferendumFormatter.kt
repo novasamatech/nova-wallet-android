@@ -6,10 +6,13 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.let
+import io.novafoundation.nova.common.utils.orTrue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
@@ -63,14 +66,14 @@ class RealReferendumFormatter(
     private val referendaStatusFormatter: ReferendaStatusFormatter
 ) : ReferendumFormatter {
 
-    override fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel {
+    override fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel {
         return ReferendumVotingModel(
             positiveFraction = voting.approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
-            thresholdFraction = voting.approval.threshold.value.toFloat(),
+            thresholdFraction = threshold?.approval?.value?.toFloat(),
             votingResultIcon = R.drawable.ic_close,
             votingResultIconColor = R.color.icon_negative,
-            thresholdInfo = formatThresholdInfo(voting.support, token),
-            thresholdInfoVisible = !voting.support.currentlyPassing(),
+            thresholdInfo = formatThresholdInfo(voting.support, threshold, token),
+            thresholdInfoVisible = !threshold?.support?.currentlyPassing().orTrue(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
                 voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
@@ -79,10 +82,12 @@ class RealReferendumFormatter(
                 R.string.referendum_nay_format,
                 voting.approval.nayVotes.fraction.formatFractionAsPercentage()
             ),
-            thresholdPercentage = resourceManager.getString(
-                R.string.referendum_to_pass_format,
-                voting.approval.threshold.value.formatFractionAsPercentage()
-            )
+            thresholdPercentage = threshold?.let {
+                resourceManager.getString(
+                    R.string.referendum_to_pass_format,
+                    it.approval.value.formatFractionAsPercentage()
+                )
+            }
         )
     }
 
@@ -102,9 +107,12 @@ class RealReferendumFormatter(
 
     private fun formatThresholdInfo(
         support: ReferendumVoting.Support,
+        threshold: ReferendumThreshold?,
         token: Token
-    ): String {
-        val thresholdFormatted = mapAmountToAmountModel(support.threshold.value, token).token
+    ): String? {
+        if (threshold == null) return null
+
+        val thresholdFormatted = mapAmountToAmountModel(threshold.support.value, token).token
         val turnoutFormatted = token.amountFromPlanks(support.turnout).format()
 
         return resourceManager.getString(R.string.referendum_support_threshold_format, turnoutFormatted, thresholdFormatted)
@@ -262,7 +270,7 @@ class RealReferendumFormatter(
             timeEstimation = formatTimeEstimation(referendum.status),
             track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
             number = formatId(referendum.id),
-            voting = referendum.voting?.let { formatVoting(it, token) },
+            voting = referendum.voting?.let { formatVoting(it, referendum.threshold, token) },
             yourVote = referendum.referendumVote?.let { mapReferendumVoteToUi(it, token.configuration, chain) }
         )
     }

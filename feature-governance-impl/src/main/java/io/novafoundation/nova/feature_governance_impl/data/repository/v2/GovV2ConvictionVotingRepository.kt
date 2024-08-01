@@ -17,6 +17,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votedFor
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails.VotingInfo
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.empty
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.plus
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingRemoveVote
@@ -25,9 +29,11 @@ import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.ex
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.DelegationsSubqueryApi
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.ReferendumSplitAbstainVotersRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.ReferendumVotersRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.ReferendumVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.ReferendumVoterRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.mapMultiVoteRemoteToAccountVote
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindVoting
+import io.novafoundation.nova.feature_governance_impl.data.repository.common.toOffChainVotes
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -115,17 +121,21 @@ class GovV2ConvictionVotingRepository(
         }
     }
 
-    override suspend fun abstainVotes(referendumId: ReferendumId, chain: Chain): Balance? {
+    override suspend fun abstainVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails? {
         val api = chain.externalApi<Chain.ExternalApi.GovernanceDelegations>() ?: return null
 
         return runCatching {
             val request = ReferendumSplitAbstainVotersRequest(referendumId.value)
             val response = delegateSubqueryApi.getReferendumAbstainVoters(api.url, request)
-            return response.data
-                .voters
+            val trackId = TrackId(response.data.referendum.trackId)
+            val abstainSum = response.data
+                .referendum
+                .castingVotings
                 .nodes
                 .mapNotNull { it.splitAbstainVote?.abstainAmount }
                 .sum()
+
+            OffChainReferendumVotingDetails(trackId, VotingInfo.Abstain(abstainSum))
         }.getOrNull()
     }
 
@@ -179,6 +189,26 @@ class GovV2ConvictionVotingRepository(
 
     override fun isAbstainVotingAvailable(): Boolean {
         return true
+    }
+
+    override suspend fun fullVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails? {
+        val api = chain.externalApi<Chain.ExternalApi.GovernanceDelegations>() ?: return null
+
+        return runCatching {
+            val referendum = delegateSubqueryApi.getReferendumVotes(api.url, ReferendumVotesRequest(referendumId.value))
+                .data
+                .referendum
+
+            val voters = referendum.castingVotings.nodes
+
+            var totalVoting = VotingInfo.Full.empty()
+
+            voters.forEach {
+                totalVoting += it.toOffChainVotes()
+            }
+
+            OffChainReferendumVotingDetails(TrackId(referendum.trackId), totalVoting)
+        }.getOrNull()
     }
 
     private fun bindTrackLocks(decoded: Any?): List<Pair<TrackId, Balance>> {
