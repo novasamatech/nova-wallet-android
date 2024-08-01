@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.mapConvictionFromString
 import java.math.BigDecimal
-import java.math.BigInteger
 
 fun StandardVoteRemote?.toOffChainVotes(): VotingInfo.Full {
     if (this == null) return VotingInfo.Full.empty()
