@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.common.utils.isZero
-import io.novafoundation.nova.common.utils.let
 import io.novafoundation.nova.common.utils.orTrue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
