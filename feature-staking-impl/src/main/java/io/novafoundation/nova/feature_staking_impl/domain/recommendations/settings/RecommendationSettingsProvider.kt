@@ -56,12 +56,13 @@ class RecommendationSettingsProvider(
 
     fun currentSettings() = customSettingsFlow.value
 
-    fun defaultSettings(maximumValidatorsPerNominator: Int): RecommendationSettings {
+    fun recommendedSettings(maximumValidatorsPerNominator: Int): RecommendationSettings {
         return RecommendationSettings(
             alwaysEnabledFilters = alwaysEnabledFilters,
             customEnabledFilters = customizableFilters,
             sorting = APYSorting,
             postProcessors = allPostProcessors,
+            filterExcluded = true,
             limit = maximumValidatorsPerNominator
         )
     }
@@ -71,6 +72,7 @@ class RecommendationSettingsProvider(
         customEnabledFilters = customizableFilters,
         sorting = APYSorting,
         postProcessors = allPostProcessors,
+        filterExcluded = false,
         limit = null
     )
 

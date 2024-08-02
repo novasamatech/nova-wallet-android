@@ -4,13 +4,13 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.indexOfOrNull
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
-import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import kotlinx.coroutines.CoroutineScope
 
-class CollatorRecommendator(private val allCollators: List<Collator>, private val novaCollatorIds: List<String>) {
+class CollatorRecommendator(private val allCollators: List<Collator>, private val novaCollatorIds: Set<String>) {
 
     fun recommendations(config: CollatorRecommendationConfig): List<Collator> {
         return allCollators.sortedWith(config.sorting)
@@ -29,13 +29,13 @@ private const val COLLATORS_CACHE = "COLLATORS_CACHE"
 class CollatorRecommendatorFactory(
     private val collatorProvider: CollatorProvider,
     private val computationalCache: ComputationalCache,
-    private val knownNovaValidators: KnownNovaValidators
+    private val validatorsPreferencesSource: ValidatorsPreferencesSource
 ) {
 
     suspend fun create(stakingOption: StakingOption, scope: CoroutineScope) = computationalCache.useCache(COLLATORS_CACHE, scope) {
         val collators = collatorProvider.getCollators(stakingOption, CollatorSource.Elected)
 
-        val knownNovaCollators = knownNovaValidators.getValidatorIds(stakingOption.chain.id)
+        val knownNovaCollators = validatorsPreferencesSource.getRecommendedValidatorIds(stakingOption.chain.id)
 
         CollatorRecommendator(collators, knownNovaCollators)
     }
