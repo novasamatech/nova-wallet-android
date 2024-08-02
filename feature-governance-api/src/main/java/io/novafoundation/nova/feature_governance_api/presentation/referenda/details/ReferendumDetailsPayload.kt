@@ -6,7 +6,6 @@ import androidx.annotation.DrawableRes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import java.math.BigInteger
 import kotlinx.android.parcel.Parcelize
-import org.web3j.abi.datatypes.Bool
 
 @Parcelize
 class ReferendumDetailsPayload(

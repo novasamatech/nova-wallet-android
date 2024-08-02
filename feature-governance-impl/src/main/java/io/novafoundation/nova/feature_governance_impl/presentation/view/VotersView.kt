@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteType
 import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteTypeColor
 import kotlinx.android.synthetic.main.view_voters.view.votersViewVotesCount
 import kotlinx.android.synthetic.main.view_voters.view.votersViewVotesCountShimmer
-import org.web3j.abi.datatypes.Bool
 
 class VotersView @JvmOverloads constructor(
     context: Context,

@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstIfLoaded
-import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
@@ -166,7 +165,9 @@ class ReferendumDetailsViewModel(
             referendumDetails == null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
             // Supported all other cases when referendum is loaded
             referendumDetails.isFinished() -> DescriptiveButtonState.Gone
-            referendumDetails.noVote() || referendumDetails.isUserDelegatedVote() -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
+            referendumDetails.noVote() || referendumDetails.isUserDelegatedVote() -> DescriptiveButtonState.Enabled(
+                resourceManager.getString(R.string.vote_vote)
+            )
             referendumDetails.isUserDirectVote() -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
             else -> DescriptiveButtonState.Gone
         }
@@ -285,7 +286,7 @@ class ReferendumDetailsViewModel(
         val referendum = referendumLoadingState.dataOrNull
         val prefilledData = payload.prefilledData
 
-        //If we can't show prefilled data we will show loading state
+        // If we can't show prefilled data we will show loading state
         if (referendum == null && prefilledData == null) return ExtendedLoadingState.Loading
 
         val timeEstimation = referendum?.timeline?.currentStatus?.let { referendumFormatter.formatTimeEstimation(it) }

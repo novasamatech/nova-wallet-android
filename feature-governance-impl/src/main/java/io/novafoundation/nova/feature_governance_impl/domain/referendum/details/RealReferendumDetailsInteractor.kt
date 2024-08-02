@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.combineToPair
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
