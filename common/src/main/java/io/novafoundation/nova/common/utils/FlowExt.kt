@@ -187,6 +187,8 @@ fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Fl
 
 suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
 
+suspend fun <T> Flow<ExtendedLoadingState<T>>.firstIfLoaded(): T? = first().dataOrNull
+
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
@@ -567,26 +569,6 @@ fun <A, B, C, D, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, flowD:
         flowC.onEach { cResult = it },
         flowD.onEach { dResult = it }
     ).map { transform(aResult, bResult, cResult, dResult) }
-}
-
-fun <A, B, C, D, R> uniteTransform(
-    flowA: Flow<A>,
-    flowB: Flow<B>,
-    flowC: Flow<C>,
-    flowD: Flow<D>,
-    transform: suspend FlowCollector<R>.(A?, B?, C?, D?) -> Unit
-): Flow<R> {
-    var aResult: A? = null
-    var bResult: B? = null
-    var cResult: C? = null
-    var dResult: D? = null
-
-    return merge(
-        flowA.onEach { aResult = it },
-        flowB.onEach { bResult = it },
-        flowC.onEach { cResult = it },
-        flowD.onEach { dResult = it }
-    ).transform { transform(aResult, bResult, cResult, dResult) }
 }
 
 fun <T> firstNonEmpty(
