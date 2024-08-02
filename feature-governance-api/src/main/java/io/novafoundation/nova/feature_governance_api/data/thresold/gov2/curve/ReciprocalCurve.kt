@@ -23,11 +23,11 @@ class ReciprocalCurve(
     override val name: String = "Reciprocal"
 
     override fun threshold(x: Perbill): Perbill {
-        return factor.divide(x + xOffset, MathContext.DECIMAL64) + yOffset
+        return factor.divide(x + xOffset, MathContext(MathContext.DECIMAL64.precision, RoundingMode.DOWN)) + yOffset
     }
 
     override fun delay(y: Perbill): Perbill {
-        val maybeTerm = factor.divideOrNull(y - yOffset, MathContext(MathContext.DECIMAL64.precision, RoundingMode.HALF_UP))
+        val maybeTerm = factor.divideOrNull(y - yOffset, MathContext(MathContext.DECIMAL64.precision, RoundingMode.UP))
 
         return maybeTerm?.let { it - xOffset }
             ?.coerceInOrNull(BigDecimal.ZERO, BigDecimal.ONE)
