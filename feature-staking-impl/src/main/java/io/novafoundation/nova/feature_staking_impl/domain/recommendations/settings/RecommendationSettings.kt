@@ -21,6 +21,7 @@ data class RecommendationSettings(
     val customEnabledFilters: List<RecommendationFilter>,
     val postProcessors: List<RecommendationPostProcessor>,
     val sorting: RecommendationSorting,
+    val filterExcluded: Boolean,
     val limit: Int? = null
 ) {
 

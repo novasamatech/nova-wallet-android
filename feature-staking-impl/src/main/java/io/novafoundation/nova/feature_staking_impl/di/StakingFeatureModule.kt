@@ -70,9 +70,9 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
-import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
-import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteKnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -334,7 +334,7 @@ class StakingFeatureModule {
     fun provideKnownNovaValidators(
         novaValidatorsApi: NovaValidatorsApi,
         chainRegistry: ChainRegistry
-    ): KnownNovaValidators = RemoteKnownNovaValidators(novaValidatorsApi, chainRegistry)
+    ): ValidatorsPreferencesSource = RemoteValidatorsPreferencesSource(novaValidatorsApi, chainRegistry)
 
     @Provides
     @FeatureScope
@@ -342,8 +342,8 @@ class StakingFeatureModule {
         validatorProvider: ValidatorProvider,
         computationalCache: ComputationalCache,
         sharedState: StakingSharedState,
-        knownNovaValidators: KnownNovaValidators
-    ) = ValidatorRecommenderFactory(validatorProvider, sharedState, computationalCache, knownNovaValidators)
+        validatorsPreferencesSource: ValidatorsPreferencesSource
+    ) = ValidatorRecommenderFactory(validatorProvider, sharedState, computationalCache, validatorsPreferencesSource)
 
     @Provides
     @FeatureScope
@@ -353,14 +353,14 @@ class StakingFeatureModule {
         rewardCalculatorFactory: RewardCalculatorFactory,
         stakingConstantsRepository: StakingConstantsRepository,
         stakingSharedComputation: StakingSharedComputation,
-        knownNovaValidators: KnownNovaValidators
+        validatorsPreferencesSource: ValidatorsPreferencesSource
     ) = ValidatorProvider(
         stakingRepository = stakingRepository,
         identityRepository = identityRepository,
         rewardCalculatorFactory = rewardCalculatorFactory,
         stakingConstantsRepository = stakingConstantsRepository,
         stakingSharedComputation = stakingSharedComputation,
-        knownNovaValidators = knownNovaValidators
+        validatorsPreferencesSource = validatorsPreferencesSource
     )
 
     @Provides

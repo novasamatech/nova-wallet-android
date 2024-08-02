@@ -148,7 +148,7 @@ data class Chain(
         }
 
         val connectionType = when {
-            unformattedUrl.startsWith("wss://") -> ConnectionType.WSS
+            unformattedUrl.startsWith("wss://") || unformattedUrl.startsWith("ws://") -> ConnectionType.WSS
             unformattedUrl.startsWith("https://") -> ConnectionType.HTTPS
             else -> ConnectionType.UNKNOWN
         }

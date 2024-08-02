@@ -1,9 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.data.validators
 
+import io.novafoundation.nova.feature_staking_impl.BuildConfig
 import retrofit2.http.GET
 
 interface NovaValidatorsApi {
 
-    @GET("https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/nova_validators.json")
-    suspend fun getValidators(): Map<String, List<String>>
+    @GET(BuildConfig.RECOMMENDED_VALIDATORS_URL)
+    suspend fun getValidators(): ValidatorsPreferencesRemote
 }
