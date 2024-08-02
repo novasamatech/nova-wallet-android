@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.MathContext
-import java.math.RoundingMode
 
 class Gov2VotingThreshold(
     val supportCurve: VotingCurve,

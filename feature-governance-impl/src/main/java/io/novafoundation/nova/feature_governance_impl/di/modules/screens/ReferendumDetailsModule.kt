@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
@@ -11,6 +12,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.OffChainReferendumVotingSharedComputation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.RealReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.RealReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallAdapter
@@ -59,6 +61,7 @@ class ReferendumDetailsModule {
         preImageSizer: PreImageSizer,
         @ExtrinsicSerialization callFormatter: Gson,
         identityRepository: OnChainIdentityRepository,
+        offChainReferendumVotingSharedComputation: OffChainReferendumVotingSharedComputation
     ): ReferendumDetailsInteractor = RealReferendumDetailsInteractor(
         preImageParser = preImageParser,
         governanceSourceRegistry = governanceSourceRegistry,
@@ -67,5 +70,13 @@ class ReferendumDetailsModule {
         preImageSizer = preImageSizer,
         callFormatter = callFormatter,
         identityRepository = identityRepository,
+        offChainReferendumVotingSharedComputation = offChainReferendumVotingSharedComputation
     )
+
+    @Provides
+    @FeatureScope
+    fun provideOffChainReferendumVotingSharedComputation(
+        computationalCache: ComputationalCache,
+        governanceSourceRegistry: GovernanceSourceRegistry,
+    ) = OffChainReferendumVotingSharedComputation(computationalCache, governanceSourceRegistry)
 }

@@ -45,6 +45,8 @@ class VotesView @JvmOverloads constructor(
     private var hasPositiveVotes = false
     private var hasNegativeVotes = false
 
+    private var thresholdVisible = true
+
     init {
         val a = context.obtainStyledAttributes(
             attrs,
@@ -138,7 +140,9 @@ class VotesView @JvmOverloads constructor(
             }
         }
 
-        canvas.drawRoundRect(thresholdRect, thresholdCornerRadius, thresholdCornerRadius, thresholdPaint)
+        if (thresholdVisible) {
+            canvas.drawRoundRect(thresholdRect, thresholdCornerRadius, thresholdCornerRadius, thresholdPaint)
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -176,9 +180,14 @@ class VotesView @JvmOverloads constructor(
         requestLayout()
     }
 
-    fun setThreshold(@FloatRange(from = 0.0, to = 1.0) threshold: Float) {
-        require(threshold in 0f..1f)
-        this.threshold = threshold
+    fun setThreshold(@FloatRange(from = 0.0, to = 1.0) threshold: Float?) {
+        thresholdVisible = threshold != null
+
+        if (threshold != null) {
+            require(threshold in 0f..1f)
+            this.threshold = threshold
+        }
+
         requestLayout()
     }
 

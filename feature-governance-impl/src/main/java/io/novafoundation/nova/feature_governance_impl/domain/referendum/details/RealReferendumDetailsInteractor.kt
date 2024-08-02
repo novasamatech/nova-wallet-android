@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.combineToPair
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.uniteTransform
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
@@ -17,6 +20,9 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.submissionDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.getAbstain
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.toTallyOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
@@ -46,8 +52,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.transform
 
 class RealReferendumDetailsInteractor(
     private val preImageParser: ReferendumPreImageParser,
@@ -57,14 +64,16 @@ class RealReferendumDetailsInteractor(
     private val preImageSizer: PreImageSizer,
     private val callFormatter: Gson,
     private val identityRepository: OnChainIdentityRepository,
+    private val offChainReferendumVotingSharedComputation: OffChainReferendumVotingSharedComputation
 ) : ReferendumDetailsInteractor {
 
     override fun referendumDetailsFlow(
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
+        coroutineScope: CoroutineScope
     ): Flow<ReferendumDetails?> {
-        return flowOfAll { referendumDetailsFlowSuspend(referendumId, selectedGovernanceOption, voterAccountId) }
+        return flowOfAll { referendumDetailsFlowSuspend(referendumId, selectedGovernanceOption, voterAccountId, coroutineScope) }
     }
 
     override suspend fun detailsFor(preImage: PreImage, chain: Chain): ReferendumCall? {
@@ -86,28 +95,50 @@ class RealReferendumDetailsInteractor(
         }
     }
 
+    /**
+     * Emmit null if referendum is not exist
+     */
     private suspend fun referendumDetailsFlowSuspend(
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
+        coroutineScope: CoroutineScope
     ): Flow<ReferendumDetails?> {
         val chain = selectedGovernanceOption.assetWithChain.chain
 
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
-        val tracksById = governanceSource.referenda.getTracksById(chain.id)
-        val electorate = governanceSource.referenda.electorate(chain.id)
 
-        val offChainInfo = governanceSource.offChainInfo.referendumDetails(referendumId, chain)
-        val abstainVotes = governanceSource.convictionVoting.abstainVotes(referendumId, chain)
-
-        return combine(
-            governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
+        val referendumAndBlockFlow = combineToPair(
+            referendumFlow(governanceSource, selectedGovernanceOption, referendumId, coroutineScope),
             chainStateRepository.currentBlockNumberFlow(chain.id)
-        ) { onChainReferendum, currentBlockNumber ->
-            if (onChainReferendum == null) return@combine null
+        )
+
+        val tracksByIdFlow = flowOf { governanceSource.referenda.getTracksById(chain.id) }
+        val electorateFlow = flowOf { governanceSource.referenda.electorate(chain.id) }
+        val offChainInfoFlow = flowOf { governanceSource.offChainInfo.referendumDetails(referendumId, chain) }
+
+        return uniteTransform(
+            referendumAndBlockFlow,
+            tracksByIdFlow,
+            electorateFlow,
+            offChainInfoFlow
+        ) { referendumWithBlock, tracksById, electorate, offChainInfo ->
+            // Await while referendum with block and tracks will be loaded
+            if (referendumWithBlock == null || tracksById == null) return@uniteTransform
+            val (referendumWithVotingDetails, currentBlockNumber) = referendumWithBlock
+
+            // If null it means that referendum with given id doesn't exist
+            if (referendumWithVotingDetails == null) {
+                emit(null)
+                return@uniteTransform
+            }
+
+            val onChainReferendum = referendumWithVotingDetails.onChainReferendum
+            val offChainVotingDetails = referendumWithVotingDetails.votingDetails
 
             val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
-            val track = onChainReferendum.track()?.let(tracksById::get)
+
+            val track = (onChainReferendum.track() ?: offChainVotingDetails?.trackId)?.let(tracksById::get)
 
             val vote = voterAccountId?.let {
                 val voteByReferendumId = governanceSource.convictionVoting.votingFor(voterAccountId, chain.id)
@@ -119,11 +150,17 @@ class RealReferendumDetailsInteractor(
             }
 
             val voting = referendaConstructor.constructReferendumVoting(
+                tally = onChainReferendum.status.asOngoingOrNull()?.tally ?: offChainVotingDetails?.votingInfo?.toTallyOrNull(),
+                currentBlockNumber = currentBlockNumber,
+                electorate = electorate,
+                abstainVotes = offChainVotingDetails?.votingInfo?.getAbstain()?.toBigInteger()
+            )
+
+            val threshold = referendaConstructor.constructReferendumThreshold(
                 referendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
-                electorate = electorate,
-                abstainVotes = abstainVotes
+                electorate = electorate
             )
 
             val currentStatus = referendaConstructor.constructReferendumStatus(
@@ -131,10 +168,11 @@ class RealReferendumDetailsInteractor(
                 onChainReferendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
-                votingByReferenda = mapOf(referendumId to voting)
+                votingByReferenda = mapOf(referendumId to voting),
+                thresholdByReferenda = mapOf(referendumId to threshold)
             )
 
-            ReferendumDetails(
+            val referendumDetails = ReferendumDetails(
                 id = onChainReferendum.id,
                 offChainMetadata = offChainInfo?.let {
                     ReferendumDetails.OffChainMetadata(
@@ -151,6 +189,7 @@ class RealReferendumDetailsInteractor(
                 },
                 track = track?.let { ReferendumTrack(mapTrackInfoToTrack(it), sameWithOther = tracksById.size == 1) },
                 voting = voting,
+                threshold = threshold,
                 timeline = ReferendumTimeline(
                     currentStatus = currentStatus,
                     pastEntries = offChainInfo.pastTimeLine(currentStatus) mergeWith referendaConstructor.constructPastTimeline(
@@ -168,6 +207,8 @@ class RealReferendumDetailsInteractor(
                     supportCurve = track?.minSupport,
                 )
             )
+
+            emit(referendumDetails)
         }
     }
 
@@ -241,6 +282,34 @@ class RealReferendumDetailsInteractor(
             else -> true
         }
     }
+
+    private suspend fun referendumFlow(
+        governanceSource: GovernanceSource,
+        governanceOption: SupportedGovernanceOption,
+        referendumId: ReferendumId,
+        coroutineScope: CoroutineScope
+    ): Flow<OnChainReferendaWithVotingDetails?> {
+        return governanceSource.referenda.onChainReferendumFlow(governanceOption.assetWithChain.chain.id, referendumId)
+            .transform { onChainReferendum ->
+                if (onChainReferendum == null) {
+                    emit(null)
+                    return@transform
+                }
+
+                val hasOffChainVotingCache = offChainReferendumVotingSharedComputation.hasCache(onChainReferendum, governanceOption)
+                if (!hasOffChainVotingCache) {
+                    // First time emmit without voting details
+                    emit(OnChainReferendaWithVotingDetails(onChainReferendum, votingDetails = null))
+                }
+
+                emit(
+                    OnChainReferendaWithVotingDetails(
+                        onChainReferendum,
+                        votingDetails = offChainReferendumVotingSharedComputation.votingDetails(onChainReferendum, governanceOption, coroutineScope)
+                    )
+                )
+            }
+    }
 }
 
 private suspend fun PreImageRepository.preImageOf(
@@ -265,3 +334,8 @@ private suspend fun PreImageRepository.preImageOf(
         null -> null
     }
 }
+
+private class OnChainReferendaWithVotingDetails(
+    val onChainReferendum: OnChainReferendum,
+    val votingDetails: OffChainReferendumVotingDetails?
+)

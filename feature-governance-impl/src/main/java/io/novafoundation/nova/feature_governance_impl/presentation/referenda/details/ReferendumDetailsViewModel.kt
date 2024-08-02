@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details
 
+import androidx.lifecycle.viewModelScope
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -108,7 +109,7 @@ class ReferendumDetailsViewModel(
         val selectedGovernanceOption = selectedAssetSharedState.selectedOption()
         val voterAccountId = account.accountIdIn(selectedGovernanceOption.assetWithChain.chain)
 
-        interactor.referendumDetailsFlow(payload.toReferendumId(), selectedGovernanceOption, voterAccountId)
+        interactor.referendumDetailsFlow(payload.toReferendumId(), selectedGovernanceOption, voterAccountId, viewModelScope)
     }.inBackground()
         .shareWhileSubscribed()
 
@@ -251,24 +252,24 @@ class ReferendumDetailsViewModel(
         }
     }
 
-    private suspend fun mapReferendumDetailsToUi(referendumDetails: ReferendumDetails): ReferendumDetailsModel {
-        val timeEstimation = referendumFormatter.formatTimeEstimation(referendumDetails.timeline.currentStatus)
+    private suspend fun mapReferendumDetailsToUi(referendum: ReferendumDetails): ReferendumDetailsModel {
+        val timeEstimation = referendumFormatter.formatTimeEstimation(referendum.timeline.currentStatus)
         val (chain, chainAsset) = selectedAssetSharedState.chainAndAsset()
         val token = tokenFlow.first()
 
         return ReferendumDetailsModel(
-            track = referendumDetails.track?.let { referendumFormatter.formatReferendumTrack(it, chainAsset) },
-            number = referendumFormatter.formatId(referendumDetails.id),
-            title = mapReferendumTitleToUi(referendumDetails),
-            description = mapShortenedMarkdownDescription(referendumDetails),
-            voting = referendumDetails.voting?.let { referendumFormatter.formatVoting(it, token) },
-            statusModel = referendumFormatter.formatStatus(referendumDetails.timeline.currentStatus),
-            yourVote = referendumDetails.userVote?.let { referendumFormatter.formatUserVote(it, chain, chainAsset) },
-            ayeVoters = mapVotersToUi(referendumDetails.voting, VoteType.AYE, chainAsset),
-            nayVoters = mapVotersToUi(referendumDetails.voting, VoteType.NAY, chainAsset),
-            abstainVoters = mapVotersToUi(referendumDetails.voting, VoteType.ABSTAIN, chainAsset),
+            track = referendum.track?.let { referendumFormatter.formatReferendumTrack(it, chainAsset) },
+            number = referendumFormatter.formatId(referendum.id),
+            title = mapReferendumTitleToUi(referendum),
+            description = mapShortenedMarkdownDescription(referendum),
+            voting = referendum.voting?.let { referendumFormatter.formatVoting(it, referendum.threshold, token) },
+            statusModel = referendumFormatter.formatStatus(referendum.timeline.currentStatus),
+            yourVote = referendum.userVote?.let { referendumFormatter.formatUserVote(it, chain, chainAsset) },
+            ayeVoters = mapVotersToUi(referendum.voting, VoteType.AYE, chainAsset),
+            nayVoters = mapVotersToUi(referendum.voting, VoteType.NAY, chainAsset),
+            abstainVoters = mapVotersToUi(referendum.voting, VoteType.ABSTAIN, chainAsset),
             timeEstimation = timeEstimation,
-            timeline = mapTimelineToUi(referendumDetails.timeline, timeEstimation)
+            timeline = mapTimelineToUi(referendum.timeline, timeEstimation)
         )
     }
 

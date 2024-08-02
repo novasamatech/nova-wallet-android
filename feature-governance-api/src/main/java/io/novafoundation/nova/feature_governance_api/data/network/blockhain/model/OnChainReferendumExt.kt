@@ -13,6 +13,10 @@ import java.math.BigInteger
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
+fun OnChainReferendum.isFinished(): Boolean {
+    return status !is OnChainReferendumStatus.Ongoing
+}
+
 fun OnChainReferendum.proposal(): Proposal? {
     return status.asOngoingOrNull()?.proposal
 }

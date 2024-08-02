@@ -5,12 +5,12 @@ import androidx.annotation.DrawableRes
 
 data class ReferendumVotingModel(
     val positiveFraction: Float?,
-    val thresholdFraction: Float,
+    val thresholdFraction: Float?,
     @DrawableRes val votingResultIcon: Int,
     @ColorRes val votingResultIconColor: Int,
-    val thresholdInfo: String,
+    val thresholdInfo: String?,
     val thresholdInfoVisible: Boolean,
     val positivePercentage: String,
     val negativePercentage: String,
-    val thresholdPercentage: String,
+    val thresholdPercentage: String?,
 )
