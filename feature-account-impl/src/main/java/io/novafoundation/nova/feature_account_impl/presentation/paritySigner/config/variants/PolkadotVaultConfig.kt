@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.co
 
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.BuildPolkadotVaultVariantConfig
@@ -15,27 +14,12 @@ internal fun PolkadotVaultConfig(resourceManager: ResourceManager, appLinksProvi
 
         connect {
             instructions {
-                step(
-                    resourceManager.highlightedText(
-                        R.string.account_polkadot_vault_import_start_step_1,
-                        R.string.account_polkadot_vault_import_start_step_1_highlighted
-                    )
-                )
+                step(R.string.account_polkadot_vault_import_start_step_1)
 
-                step(
-                    resourceManager.highlightedText(
-                        R.string.account_polkadot_vault_import_start_step_2,
-                        R.string.account_polkadot_vault_import_start_step_2_highlighted
-                    )
-                )
+                step(R.string.account_polkadot_vault_import_start_step_2)
                 image(R.string.account_polkadot_vault_import_start_empty_derivation_hint, R.drawable.polkadot_vault_account)
 
-                step(
-                    resourceManager.highlightedText(
-                        R.string.account_polkadot_vault_import_start_step_3,
-                        R.string.account_polkadot_vault_import_start_step_3_highlighted
-                    )
-                )
+                step(R.string.account_polkadot_vault_import_start_step_3)
             }
         }
 
