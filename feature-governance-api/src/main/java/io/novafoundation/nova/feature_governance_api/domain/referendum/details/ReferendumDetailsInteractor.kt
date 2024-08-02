@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface ReferendumDetailsInteractor {
@@ -13,6 +14,7 @@ interface ReferendumDetailsInteractor {
         referendumId: ReferendumId,
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
+        coroutineScope: CoroutineScope
     ): Flow<ReferendumDetails?>
 
     suspend fun detailsFor(
@@ -21,4 +23,6 @@ interface ReferendumDetailsInteractor {
     ): ReferendumCall?
 
     suspend fun previewFor(preImage: PreImage): PreimagePreview
+
+    suspend fun isSupportAbstainVoting(selectedGovernanceOption: SupportedGovernanceOption): Boolean
 }

@@ -187,6 +187,8 @@ fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Fl
 
 suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
 
+suspend fun <T> Flow<ExtendedLoadingState<T>>.firstIfLoaded(): T? = first().dataOrNull
+
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.

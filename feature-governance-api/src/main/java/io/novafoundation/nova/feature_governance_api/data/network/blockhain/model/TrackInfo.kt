@@ -8,6 +8,7 @@ data class TrackInfo(
     val name: String,
     val preparePeriod: BlockNumber,
     val decisionPeriod: BlockNumber,
+    val confirmPeriod: BlockNumber,
     val minApproval: VotingCurve?,
     val minSupport: VotingCurve?
 )
@@ -17,4 +18,6 @@ interface VotingCurve {
     val name: String
 
     fun threshold(x: Perbill): Perbill
+
+    fun delay(y: Perbill): Perbill
 }

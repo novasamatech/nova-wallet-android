@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -19,6 +20,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.setChips
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
+import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAbstain
+import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAlertView
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAmount
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAmountChipsContainer
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAmountChipsScroll
@@ -55,9 +58,11 @@ class SetupVoteReferendumFragment : BaseFragment<SetupVoteReferendumViewModel>()
         onBackPressed { viewModel.backClicked() }
 
         setupReferendumVoteAye.prepareForProgress(viewLifecycleOwner)
-        setupReferendumVoteAye.setOnClickListener { viewModel.ayeClicked() }
-
+        setupReferendumVoteAbstain.prepareForProgress(viewLifecycleOwner)
         setupReferendumVoteNay.prepareForProgress(viewLifecycleOwner)
+
+        setupReferendumVoteAye.setOnClickListener { viewModel.ayeClicked() }
+        setupReferendumVoteAbstain.setOnClickListener { viewModel.abstainClicked() }
         setupReferendumVoteNay.setOnClickListener { viewModel.nayClicked() }
     }
 
@@ -92,7 +97,12 @@ class SetupVoteReferendumFragment : BaseFragment<SetupVoteReferendumViewModel>()
         }
 
         viewModel.ayeButtonStateFlow.observe(setupReferendumVoteAye::setState)
+        viewModel.abstainButtonStateFlow.observe(setupReferendumVoteAbstain::setState)
         viewModel.nayButtonStateFlow.observe(setupReferendumVoteNay::setState)
+
+        viewModel.abstainVotingSupported.observe {
+            setupReferendumVoteAlertView.isVisible = it
+        }
     }
 
     private fun setChips(newChips: List<AmountChipModel>) {

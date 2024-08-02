@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votedFor
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.democracyRemoveVote
@@ -94,6 +95,10 @@ class GovV1ConvictionVotingRepository(
             .filter { it.vote.votedFor(type) }
     }
 
+    override suspend fun abstainVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails? {
+        return null
+    }
+
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
         claimable.actions.forEach { claimAction ->
             when (claimAction) {
@@ -114,6 +119,14 @@ class GovV1ConvictionVotingRepository(
 
     override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {
         democracyRemoveVote(referendumId)
+    }
+
+    override fun isAbstainVotingAvailable(): Boolean {
+        return false
+    }
+
+    override suspend fun fullVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails? {
+        return null
     }
 
     private fun <T> T?.associatedWithTrack(): Map<TrackId, T> {

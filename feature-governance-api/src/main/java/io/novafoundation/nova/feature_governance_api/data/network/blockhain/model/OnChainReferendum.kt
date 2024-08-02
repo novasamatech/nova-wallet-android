@@ -38,7 +38,7 @@ sealed class OnChainReferendumStatus {
         val deciding: DecidingStatus?,
         val tally: Tally,
         val inQueue: Boolean,
-        val threshold: VotingThreshold,
+        val threshold: VotingThreshold
     ) : OnChainReferendumStatus()
 
     class Approved(override val since: BlockNumber) : OnChainReferendumStatus(), TimeSinceStatus

@@ -971,6 +971,9 @@
     <string name="referenda_search_toolbar_hint">Recherche par titre de référendum ou ID</string>
     <string name="referenda_title">Référendums</string>
     <string name="referendim_details_not_found_title">Référendum non trouvé</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Les votes d\'abstention ne peuvent se faire qu\'avec une conviction de 0,1x. Voter avec une conviction de 0,1x ?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Mise à jour de la conviction</string>
+    <string name="referendum_abstain_voters_title">Votes d\'abstention</string>
     <string name="referendum_aye_format">Oui : %s</string>
     <string name="referendum_dapp_list_title">Utiliser le navigateur Nova DApp</string>
     <string name="referendum_description_fallback">Seul le proposant peut modifier cette description et le titre. Si vous possédez le compte du proposant, visitez Polkassembly et remplissez les informations relatives à votre proposition.</string>
@@ -1127,6 +1130,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">YouTube</string>
+    <string name="setup_referendum_vote_conviction_info">La conviction sera fixée à 0,1x lorsque vous vous abstenez</string>
     <string name="setup_staking_conflict_message">Vous ne pouvez pas staker avec le Stake direct et les Pools de Nomination en même temps</string>
     <string name="setup_staking_conflict_title">Déjà staké</string>
     <string name="setup_staking_type_advanced_options_condition">Gestion avancée du staking</string>

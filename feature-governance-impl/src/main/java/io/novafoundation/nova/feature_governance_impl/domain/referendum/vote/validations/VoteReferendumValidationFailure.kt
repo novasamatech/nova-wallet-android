@@ -24,4 +24,6 @@ sealed class VoteReferendumValidationFailure {
     object AlreadyDelegatingVotes : VoteReferendumValidationFailure()
 
     class MaxTrackVotesReached(val max: BigInteger) : VoteReferendumValidationFailure()
+
+    object AbstainInvalidConviction : VoteReferendumValidationFailure()
 }

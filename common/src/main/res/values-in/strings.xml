@@ -964,6 +964,9 @@
     <string name="referenda_search_toolbar_hint">Cari berdasarkan judul referendum atau ID</string>
     <string name="referenda_title">Referenda</string>
     <string name="referendim_details_not_found_title">Referendum tidak ditemukan</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Suara Abstain hanya dapat dilakukan dengan keyakinan 0,1x. Pilih dengan keyakinan 0,1x?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Pembaruan keyakinan</string>
+    <string name="referendum_abstain_voters_title">Suara abstain</string>
     <string name="referendum_aye_format">Ya: %s</string>
     <string name="referendum_dapp_list_title">Gunakan browser Nova DApp</string>
     <string name="referendum_description_fallback">Hanya penyarankan yang dapat mengedit deskripsi dan judul ini. Jika Anda memiliki akun penyarankan, kunjungi Polkassembly dan isi informasi tentang proposal Anda</string>
@@ -1119,6 +1122,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Keyakinan akan diatur ke 0,1x ketika Abstain</string>
     <string name="setup_staking_conflict_message">Anda tidak dapat melakukan staking dengan Staking Langsung dan Pool Nominasi pada saat yang sama</string>
     <string name="setup_staking_conflict_title">Sudah melakukan staking</string>
     <string name="setup_staking_type_advanced_options_condition">Pengelolaan Staking lanjutan</string>
