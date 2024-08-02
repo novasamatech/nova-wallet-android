@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amount
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.completedReferendumLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.totalLock
@@ -91,9 +92,9 @@ class RealClaimScheduleCalculator(
      *    However, unlock time for votes is at least unlock time of corresponding prior.
      * c. Find a gap between [votingByTrack] and [trackLocks], which indicates an extra claimable amount
      *    To provide additive effect of gap, we add total voting lock on top of it:
-     if [votingByTrack] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
-     On the other hand, if other tracks have locks bigger than [votingByTrack]'s total lock,
-     trackGap will be partially or full delayed by them
+    if [votingByTrack] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
+    On the other hand, if other tracks have locks bigger than [votingByTrack]'s total lock,
+    trackGap will be partially or full delayed by them
      *
      * During this step we also determine the list of [ClaimAffect],
      * which later gets translated to [ClaimSchedule.ClaimAction].
@@ -187,14 +188,11 @@ class RealClaimScheduleCalculator(
             affected = setOf(ClaimAffect.Track(trackId))
         )
 
-        val standardVotes = voting.votes.mapValuesNotNull { (_, votes) ->
-            votes.castOrNull<AccountVote.Standard>()
-        }
-        val standardVoteLocks = standardVotes.map { (referendumId, standardVote) ->
+        val standardVoteLocks = voting.votes.map { (referendumId, standardVote) ->
             val estimatedEnd = maxConvictionEndOf(standardVote, referendumId)
             val lock = ClaimableLock(
                 claimAt = ClaimTime.At(estimatedEnd),
-                amount = standardVote.balance,
+                amount = standardVote.amount(),
                 affected = setOf(ClaimAffect.Vote(trackId, referendumId))
             )
 
@@ -275,6 +273,7 @@ class RealClaimScheduleCalculator(
                 referendumOutcome = VoteType.AYE,
                 completedSince = status.since
             )
+
             is OnChainReferendumStatus.Rejected -> maxCompletedConvictionEnd(
                 vote = vote,
                 referendumOutcome = VoteType.NAY,
