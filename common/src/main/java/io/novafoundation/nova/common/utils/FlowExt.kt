@@ -571,26 +571,6 @@ fun <A, B, C, D, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, flowD:
     ).map { transform(aResult, bResult, cResult, dResult) }
 }
 
-fun <A, B, C, D, R> uniteTransform(
-    flowA: Flow<A>,
-    flowB: Flow<B>,
-    flowC: Flow<C>,
-    flowD: Flow<D>,
-    transform: suspend FlowCollector<R>.(A?, B?, C?, D?) -> Unit
-): Flow<R> {
-    var aResult: A? = null
-    var bResult: B? = null
-    var cResult: C? = null
-    var dResult: D? = null
-
-    return merge(
-        flowA.onEach { aResult = it },
-        flowB.onEach { bResult = it },
-        flowC.onEach { cResult = it },
-        flowD.onEach { dResult = it }
-    ).transform { transform(aResult, bResult, cResult, dResult) }
-}
-
 fun <T> firstNonEmpty(
     vararg sources: Flow<List<T>>
 ): Flow<List<T>> = accumulate(*sources)

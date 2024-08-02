@@ -153,13 +153,6 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         viewModel.showFullDetails.observeWhenVisible(referendumFullDetails::setVisible)
     }
 
-    private fun setContentVisible(visible: Boolean) {
-        referendumDetailsToolbarChips.setVisible(visible)
-        referendumDetailsScrollView.setVisible(visible)
-
-        referendumDetailsProgress.setVisible(!visible)
-    }
-
     private fun setReferendumState(model: ReferendumDetailsModel) {
         referendumDetailsTrack.setReferendumTrackModel(model.track)
         referendumDetailsNumber.setText(model.number)
@@ -196,6 +189,11 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
                 referendumDetailsRequestedAmountContainer.makeGone()
             }
         }
+    }
+
+    private fun setContentVisible(visible: Boolean) {
+        referendumDetailsToolbarChips.setVisible(visible)
+        referendumDetailsScrollView.setVisible(visible)
     }
 
     private fun setDescription(model: ShortenedTextModel?) {
