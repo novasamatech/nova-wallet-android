@@ -28,6 +28,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import org.junit.Test
 import java.math.BigInteger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 
 class GovernanceIntegrationTest : BaseIntegrationTest() {
@@ -128,7 +130,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val chain = chain()
         val selectedGovernance = supportedGovernanceOption(chain, Chain.Governance.V1)
 
-        val referendumDetails = referendumDetailsInteractor.referendumDetailsFlow(referendumId, selectedGovernance, accountId)
+        val referendumDetails = referendumDetailsInteractor.referendumDetailsFlow(referendumId, selectedGovernance, accountId, CoroutineScope(Dispatchers.Main))
             .first()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumDetails.toString())
