@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.formatting.spannable.*
+import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
@@ -70,5 +70,4 @@ class StartImportGenericLedgerFragment : BaseFragment<StartImportGenericLedgerVi
     override fun subscribe(viewModel: StartImportGenericLedgerViewModel) {
         observeBrowserEvents(viewModel)
     }
-
 }

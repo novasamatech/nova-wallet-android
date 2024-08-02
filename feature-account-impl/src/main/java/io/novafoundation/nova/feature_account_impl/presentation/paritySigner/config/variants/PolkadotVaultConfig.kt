@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.co
 
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig
 import io.novafoundation.nova.feature_account_impl.R
