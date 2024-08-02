@@ -57,22 +57,28 @@ class Gov2DelegationsRepository(
         recentVotesBlockThreshold: BlockNumber,
         chain: Chain
     ): List<DelegateStats> {
-        val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
-        val request = DelegateStatsRequest(recentVotesBlockThreshold)
-        val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
-        val delegateStats = response.data.delegates.nodes
+        return runCatching {
+            val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
+            val request = DelegateStatsRequest(recentVotesBlockThreshold)
+            val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
+            val delegateStats = response.data.delegates.nodes
 
-        return mapDelegateStats(delegateStats, chain)
+            mapDelegateStats(delegateStats, chain)
+        }.getOrNull()
+            .orEmpty()
     }
 
     override suspend fun getDelegatesStatsByAccountIds(recentVotesBlockThreshold: BlockNumber, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
-        val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
-        val addresses = accountIds.map { chain.addressOf(it) }
-        val request = DelegateStatsByAddressesRequest(recentVotesBlockThreshold, addresses = addresses)
-        val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
-        val delegateStats = response.data.delegates.nodes
+        return runCatching {
+            val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
+            val addresses = accountIds.map { chain.addressOf(it) }
+            val request = DelegateStatsByAddressesRequest(recentVotesBlockThreshold, addresses = addresses)
+            val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
+            val delegateStats = response.data.delegates.nodes
 
-        return mapDelegateStats(delegateStats, chain)
+            mapDelegateStats(delegateStats, chain)
+        }.getOrNull()
+            .orEmpty()
     }
 
     override suspend fun getDetailedDelegateStats(
