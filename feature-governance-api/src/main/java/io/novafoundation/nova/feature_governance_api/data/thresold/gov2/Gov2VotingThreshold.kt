@@ -24,10 +24,11 @@ class Gov2VotingThreshold(
         val totalSupport = totalIssuance.toBigDecimal()
         val supportFraction = currentSupport.divideOrNull(totalSupport, MathContext.DECIMAL64) ?: Perbill.ZERO
 
+        val currentlyPassing = tally.support >= supportNeededIntegral
         return Threshold(
             value = supportNeededIntegral,
             currentlyPassing = tally.support >= supportNeededIntegral,
-            getProjectedPassing(supportCurve, supportFraction)
+            getProjectedPassing(supportCurve, supportFraction, currentlyPassing)
         )
     }
 
@@ -35,20 +36,21 @@ class Gov2VotingThreshold(
         val approvalThreshold = approvalCurve.threshold(passedSinceDecidingFraction)
         val ayeFraction = tally.ayeVotes().fraction
 
+        val currentlyPassing = ayeFraction >= approvalThreshold
         return Threshold(
             value = approvalThreshold,
             currentlyPassing = ayeFraction >= approvalThreshold,
-            getProjectedPassing(approvalCurve, ayeFraction)
+            getProjectedPassing(approvalCurve, ayeFraction, currentlyPassing)
         )
     }
 
-    private fun getProjectedPassing(curve: VotingCurve, fraction: Perbill): VotingThreshold.ProjectedPassing {
+    private fun getProjectedPassing(curve: VotingCurve, fraction: Perbill, currentlyPassing: Boolean): VotingThreshold.ProjectedPassing {
         val delay = curve.delay(fraction)
         val threshold = curve.threshold(delay)
 
         return VotingThreshold.ProjectedPassing(
             delayFraction = delay,
-            passingInFuture = fraction >= threshold
+            passingInFuture = currentlyPassing || fraction >= threshold
         )
     }
 }
