@@ -152,9 +152,9 @@ class RealClaimScheduleCalculatorTest {
         expect {
             claimable(amount = 2) {
                 removeVote(trackId = 1, referendumId = 1)
-                unlock(trackId = 1)
-
                 removeVote(trackId = 0, referendumId = 0)
+
+                unlock(trackId = 1)
                 unlock(trackId = 0)
             }
         }
@@ -194,12 +194,11 @@ class RealClaimScheduleCalculatorTest {
         expect {
             claimable(amount = 2) {
                 removeVote(trackId = 2, referendumId = 2)
-                unlock(2)
-
                 removeVote(trackId = 1, referendumId = 1)
-                unlock(1)
-
                 removeVote(trackId = 3, referendumId = 3)
+
+                unlock(2)
+                unlock(1)
                 unlock(3)
             }
         }
@@ -451,6 +450,31 @@ class RealClaimScheduleCalculatorTest {
 
             // 1 is delayed indefinitely because of track 1 delegation
             nonClaimable(amount = 1)
+        }
+    }
+
+    @Test
+    fun `should not dublicate unlcock when claiming multiple chunks`() = ClaimScheduleTest {
+        given {
+            currentBlock(1100)
+
+            track(1) {
+                lock(10)
+
+                voting {
+                    vote(amount = 5, unlockAt = 1002, referendumId = 2)
+                    vote(amount = 10, unlockAt = 1001, referendumId = 1)
+                }
+            }
+        }
+
+        expect {
+            claimable(amount = 10) {
+                removeVote(trackId = 1, referendumId = 1)
+                removeVote(trackId = 1, referendumId = 2)
+
+                unlock(trackId = 1)
+            }
         }
     }
 }
