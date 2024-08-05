@@ -76,7 +76,7 @@ class RealReferendumFormatter(
             thresholdFraction = threshold?.approval?.value?.toFloat(),
             votingResultIcon = R.drawable.ic_close,
             votingResultIconColor = R.color.icon_negative,
-            thresholdInfo = support.let { formatThresholdInfo(it, threshold, token) },
+            thresholdInfo = formatThresholdInfo(support, threshold, token),
             thresholdInfoVisible = !threshold?.support?.currentlyPassing().orTrue(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
