@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.orEmpty
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.positionOf
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.sinceOrThrow
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.till
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.tillOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -328,15 +330,14 @@ class RealReferendaConstructor(
 
         return when {
             // Confirmation period started block
-            isCurrentlyPassing -> {
-                val confirmingStatus = decidingStatus.confirming.cast<ConfirmingSource.OnChain>().status
-                val approveBlock = confirmingStatus!!.till
+            isCurrentlyPassing && decidingStatus.confirming.tillOrNull() != null -> {
+                val approveBlock = decidingStatus.confirming.till()
                 val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
                 ReferendumStatus.Ongoing.Approve(approveIn = approveIn)
             }
 
-            // Deciding period that will be approved in delay block
+            // Deciding period that will be approved in delay + confirmation period block
             isPassingAfterDelay -> {
                 val delay = delayedPassing!!.delayFraction
                 val blocksToConfirmationPeriod = (delay * track.decisionPeriod.toBigDecimal()).toBigInteger()
