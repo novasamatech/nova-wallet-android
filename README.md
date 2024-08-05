@@ -7,7 +7,7 @@
 ## About
 Next gen application for Polkadot & Kusama ecosystem, transparent & community-oriented, focused on convenient UX/UI, fast performance & security.
 Nova Wallet aims to provide as many Polkadot ecosystem features as possible in a form of mobile app, unbiased to any network & without any restrictions/limits to the users.
-Developed by former Fearless Wallet team & based on open source work under Apache 2.0 license.
+Developed by the former Fearless Wallet team & based on open-source work under Apache 2.0 license.
 
 ## License
 Nova Wallet Android is available under the Apache 2.0 license. See the LICENSE file for more info.

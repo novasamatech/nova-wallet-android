@@ -248,10 +248,14 @@ class RealClaimScheduleCalculator(
         val (claimable, nonClaimable) = chunks.partition { it is UnlockChunk.Claimable }
 
         // fold all claimable chunks to single one
-        val initialClaimable = UnlockChunk.Claimable(amount = Balance.ZERO, actions = emptyList())
-        val claimableChunk = (claimable as List<UnlockChunk.Claimable>).fold(initialClaimable) { acc, unlockChunk ->
-            UnlockChunk.Claimable(acc.amount + unlockChunk.amount, acc.actions + unlockChunk.actions)
+        val initialClaimable = Balance.ZERO to emptyList<ClaimAction>()
+
+        val (claimableAmount, claimableActions) = (claimable as List<UnlockChunk.Claimable>).fold(initialClaimable) { (amount, actions), unlockChunk ->
+            val nextAmount = amount + unlockChunk.amount
+            val nextActions = actions + unlockChunk.actions
+            nextAmount to nextActions
         }
+        val claimableChunk = constructClaimableChunk(claimableAmount, claimableActions)
 
         return buildList {
             if (claimableChunk.amount.isPositive()) {
@@ -260,6 +264,19 @@ class RealClaimScheduleCalculator(
 
             addAll(nonClaimable)
         }
+    }
+
+    private fun constructClaimableChunk(
+        claimableAmount: Balance,
+        claimableActions: List<ClaimAction>
+    ): UnlockChunk.Claimable {
+        return UnlockChunk.Claimable(claimableAmount, claimableActions.dedublicateUnlocks())
+    }
+
+    // We want to avoid doing multiple unlocks for the same track
+    // For that we also need to move unlock() calls to the end
+    private fun List<ClaimAction>.dedublicateUnlocks(): List<ClaimAction> {
+        return distinct().sortedBy { it is Unlock }
     }
 
     private fun OnChainReferendum.maxConvictionEnd(vote: AccountVote): BlockNumber {
