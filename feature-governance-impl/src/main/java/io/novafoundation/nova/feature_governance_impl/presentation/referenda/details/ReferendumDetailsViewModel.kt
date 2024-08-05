@@ -344,8 +344,10 @@ class ReferendumDetailsViewModel(
                 }
             }
 
-            is ReferendumStatus.Ongoing.Approve,
-            is ReferendumStatus.Ongoing.Reject -> R.string.referendum_timeline_state_deciding
+            is ReferendumStatus.Ongoing.DecidingApprove,
+            is ReferendumStatus.Ongoing.DecidingReject -> R.string.referendum_timeline_state_deciding
+
+            is ReferendumStatus.Ongoing.Confirming -> R.string.referendum_timeline_state_passing
 
             is ReferendumStatus.Ongoing.InQueue -> R.string.referendum_timeline_state_in_queue
             is ReferendumStatus.Approved -> R.string.referendum_timeline_state_approved
@@ -355,6 +357,7 @@ class ReferendumDetailsViewModel(
             ReferendumStatus.NotExecuted.Killed,
             ReferendumStatus.NotExecuted.Rejected,
             ReferendumStatus.NotExecuted.TimedOut -> null
+
         }
 
         return TimelineLayout.TimelineState.Current(

@@ -289,9 +289,9 @@ class RealReferendaConstructor(
                 val passing = thresholdByReferenda[referendumId]?.currentlyPassing() ?: false
 
                 if (passing) {
-                    ReferendumStatus.Ongoing.Approve(approveIn = finishIn)
+                    ReferendumStatus.Ongoing.DecidingApprove(approveIn = finishIn)
                 } else {
-                    ReferendumStatus.Ongoing.Reject(rejectIn = finishIn)
+                    ReferendumStatus.Ongoing.DecidingReject(rejectIn = finishIn)
                 }
             }
 
@@ -333,7 +333,7 @@ class RealReferendaConstructor(
                 val approveBlock = confirmingStatus!!.till
                 val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
-                ReferendumStatus.Ongoing.Approve(approveIn = approveIn)
+                ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
             }
 
             // Deciding period that will be approved in delay block
@@ -344,7 +344,7 @@ class RealReferendaConstructor(
                 val approveBlock = decidingStatus.since + blocksToConfirmationPeriod + track.confirmPeriod
                 val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
-                ReferendumStatus.Ongoing.Approve(approveIn = approveIn)
+                ReferendumStatus.Ongoing.DecidingApprove(approveIn = approveIn)
             }
 
             // Reject block
@@ -352,7 +352,7 @@ class RealReferendaConstructor(
                 val rejectBlock = decidingStatus.since + track.decisionPeriod
                 val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)
 
-                ReferendumStatus.Ongoing.Reject(rejectIn)
+                ReferendumStatus.Ongoing.DecidingReject(rejectIn)
             }
         }
     }
