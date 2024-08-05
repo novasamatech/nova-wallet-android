@@ -22,7 +22,7 @@ data class ReferendumDetails(
     val threshold: ReferendumThreshold?,
     val userVote: ReferendumVote?,
     val timeline: ReferendumTimeline,
-    val fullDetails: FullDetails,
+    val fullDetails: FullDetails
 ) {
 
     data class FullDetails(

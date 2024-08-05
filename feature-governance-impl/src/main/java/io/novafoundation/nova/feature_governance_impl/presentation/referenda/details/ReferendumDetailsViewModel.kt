@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.loadedAndEmpty
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
@@ -168,6 +170,7 @@ class ReferendumDetailsViewModel(
             referendumDetails.noVote() || referendumDetails.isUserDelegatedVote() -> DescriptiveButtonState.Enabled(
                 resourceManager.getString(R.string.vote_vote)
             )
+
             referendumDetails.isUserDirectVote() -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
             else -> DescriptiveButtonState.Gone
         }
@@ -390,29 +393,38 @@ class ReferendumDetailsViewModel(
         chainAsset: Chain.Asset,
         abstainVotingSupported: Boolean
     ): VotersModel? {
-        return when (type) {
-            VoteType.AYE -> VotersModel(
-                voteTypeColorRes = R.color.aye_indicator,
-                voteTypeRes = R.string.referendum_vote_aye,
-                votesValue = voting?.let { formatVotesAmount(it.approval.ayeVotes.amount, chainAsset) },
-                loading = voting == null
-            )
 
-            VoteType.NAY -> VotersModel(
-                voteTypeColorRes = R.color.nay_indicator,
-                voteTypeRes = R.string.referendum_vote_nay,
-                votesValue = voting?.let { formatVotesAmount(it.approval.nayVotes.amount, chainAsset) },
-                loading = voting == null
-            )
+        return when (type) {
+            VoteType.AYE -> {
+                if (voting?.approval?.loadedAndEmpty() == true) return null
+
+                VotersModel(
+                    voteTypeColorRes = R.color.aye_indicator,
+                    voteTypeRes = R.string.referendum_vote_aye,
+                    votesValue = voting?.approval?.dataOrNull?.let { formatVotesAmount(it.ayeVotes.amount, chainAsset) },
+                    loading = voting == null || voting.approval.isLoading()
+                )
+            }
+
+            VoteType.NAY -> {
+                if (voting?.approval?.loadedAndEmpty() == true) return null
+
+                VotersModel(
+                    voteTypeColorRes = R.color.nay_indicator,
+                    voteTypeRes = R.string.referendum_vote_nay,
+                    votesValue = voting?.approval?.dataOrNull?.let { formatVotesAmount(it.nayVotes.amount, chainAsset) },
+                    loading = voting == null || voting.approval.isLoading()
+                )
+            }
 
             VoteType.ABSTAIN -> {
-                if (!abstainVotingSupported) return null
+                if (!abstainVotingSupported || voting?.abstainVotes?.loadedAndEmpty() == true) return null
 
                 VotersModel(
                     voteTypeColorRes = R.color.icon_secondary,
                     voteTypeRes = R.string.referendum_vote_abstain,
-                    votesValue = voting?.abstainVotes?.let { formatVotesAmount(it, chainAsset) },
-                    loading = voting?.abstainVotes == null
+                    votesValue = voting?.abstainVotes?.dataOrNull?.let { formatVotesAmount(it, chainAsset) },
+                    loading = voting == null || voting.abstainVotes.isLoading()
                 )
             }
         }
@@ -474,8 +486,8 @@ class ReferendumDetailsViewModel(
             supportThreshold = referendumDetails.fullDetails.supportCurve?.name,
             hash = referendumDetails.onChainMetadata?.preImageHash,
             deposit = referendumDetails.fullDetails.deposit,
-            turnout = referendumDetails.voting?.support?.turnout,
-            electorate = referendumDetails.voting?.support?.electorate,
+            turnout = referendumDetails.voting?.support?.dataOrNull?.turnout,
+            electorate = referendumDetails.voting?.support?.dataOrNull?.electorate,
             referendumCall = ReferendumCallPayload(referendumCall),
             preImage = constructPreimagePreviewPayload(referendumDetails.onChainMetadata?.preImage),
         )
