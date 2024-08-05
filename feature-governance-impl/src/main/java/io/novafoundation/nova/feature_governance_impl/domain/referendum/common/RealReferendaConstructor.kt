@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
-import io.novafoundation.nova.common.domain.loadedAndEmpty
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.common.utils.orFalse

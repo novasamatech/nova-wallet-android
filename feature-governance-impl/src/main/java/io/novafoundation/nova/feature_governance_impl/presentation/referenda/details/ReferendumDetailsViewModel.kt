@@ -360,7 +360,6 @@ class ReferendumDetailsViewModel(
             ReferendumStatus.NotExecuted.Killed,
             ReferendumStatus.NotExecuted.Rejected,
             ReferendumStatus.NotExecuted.TimedOut -> null
-
         }
 
         return TimelineLayout.TimelineState.Current(
@@ -393,7 +392,6 @@ class ReferendumDetailsViewModel(
         chainAsset: Chain.Asset,
         abstainVotingSupported: Boolean
     ): VotersModel? {
-
         return when (type) {
             VoteType.AYE -> {
                 if (voting?.approval?.loadedAndEmpty() == true) return null
