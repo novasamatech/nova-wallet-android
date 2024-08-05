@@ -19,7 +19,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 
 interface ReferendumFormatter {
 
-    fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel
+    fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel?
 
     fun formatReferendumTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel
 
