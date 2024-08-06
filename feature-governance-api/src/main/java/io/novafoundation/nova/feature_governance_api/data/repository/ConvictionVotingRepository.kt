@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.delegations
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -45,4 +46,10 @@ interface ConvictionVotingRepository {
     fun ExtrinsicBuilder.vote(referendumId: ReferendumId, vote: AccountVote)
 
     fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId)
+
+    fun isAbstainVotingAvailable(): Boolean
+
+    suspend fun abstainVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails?
+
+    suspend fun fullVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails?
 }

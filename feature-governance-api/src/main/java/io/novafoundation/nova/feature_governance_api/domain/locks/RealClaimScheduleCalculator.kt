@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_governance_api.domain.locks
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.common.utils.castOrNull
-import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingSource
@@ -13,6 +11,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amount
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.completedReferendumLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.maxLockDuration
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.totalLock
@@ -187,14 +186,11 @@ class RealClaimScheduleCalculator(
             affected = setOf(ClaimAffect.Track(trackId))
         )
 
-        val standardVotes = voting.votes.mapValuesNotNull { (_, votes) ->
-            votes.castOrNull<AccountVote.Standard>()
-        }
-        val standardVoteLocks = standardVotes.map { (referendumId, standardVote) ->
+        val standardVoteLocks = voting.votes.map { (referendumId, standardVote) ->
             val estimatedEnd = maxConvictionEndOf(standardVote, referendumId)
             val lock = ClaimableLock(
                 claimAt = ClaimTime.At(estimatedEnd),
-                amount = standardVote.balance,
+                amount = standardVote.amount(),
                 affected = setOf(ClaimAffect.Vote(trackId, referendumId))
             )
 
@@ -252,10 +248,14 @@ class RealClaimScheduleCalculator(
         val (claimable, nonClaimable) = chunks.partition { it is UnlockChunk.Claimable }
 
         // fold all claimable chunks to single one
-        val initialClaimable = UnlockChunk.Claimable(amount = Balance.ZERO, actions = emptyList())
-        val claimableChunk = (claimable as List<UnlockChunk.Claimable>).fold(initialClaimable) { acc, unlockChunk ->
-            UnlockChunk.Claimable(acc.amount + unlockChunk.amount, acc.actions + unlockChunk.actions)
+        val initialClaimable = Balance.ZERO to emptyList<ClaimAction>()
+
+        val (claimableAmount, claimableActions) = (claimable as List<UnlockChunk.Claimable>).fold(initialClaimable) { (amount, actions), unlockChunk ->
+            val nextAmount = amount + unlockChunk.amount
+            val nextActions = actions + unlockChunk.actions
+            nextAmount to nextActions
         }
+        val claimableChunk = constructClaimableChunk(claimableAmount, claimableActions)
 
         return buildList {
             if (claimableChunk.amount.isPositive()) {
@@ -264,6 +264,19 @@ class RealClaimScheduleCalculator(
 
             addAll(nonClaimable)
         }
+    }
+
+    private fun constructClaimableChunk(
+        claimableAmount: Balance,
+        claimableActions: List<ClaimAction>
+    ): UnlockChunk.Claimable {
+        return UnlockChunk.Claimable(claimableAmount, claimableActions.dedublicateUnlocks())
+    }
+
+    // We want to avoid doing multiple unlocks for the same track
+    // For that we also need to move unlock() calls to the end
+    private fun List<ClaimAction>.dedublicateUnlocks(): List<ClaimAction> {
+        return distinct().sortedBy { it is Unlock }
     }
 
     private fun OnChainReferendum.maxConvictionEnd(vote: AccountVote): BlockNumber {
@@ -275,6 +288,7 @@ class RealClaimScheduleCalculator(
                 referendumOutcome = VoteType.AYE,
                 completedSince = status.since
             )
+
             is OnChainReferendumStatus.Rejected -> maxCompletedConvictionEnd(
                 vote = vote,
                 referendumOutcome = VoteType.NAY,

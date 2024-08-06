@@ -13,6 +13,10 @@ import java.math.BigInteger
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
+fun OnChainReferendum.isFinished(): Boolean {
+    return status !is OnChainReferendumStatus.Ongoing
+}
+
 fun OnChainReferendum.proposal(): Proposal? {
     return status.asOngoingOrNull()?.proposal
 }
@@ -126,4 +130,20 @@ fun Set<BigInteger>.toTrackIds(): Set<TrackId> {
 
 fun Set<TrackId>.fromTrackIds(): Set<BigInteger> {
     return mapToSet { it.value }
+}
+
+fun ConfirmingSource.asOnChain(): ConfirmingSource.OnChain {
+    return this as ConfirmingSource.OnChain
+}
+
+fun ConfirmingSource.asOnChainOrNull(): ConfirmingSource.OnChain? {
+    return this as? ConfirmingSource.OnChain
+}
+
+fun ConfirmingSource.till(): BlockNumber {
+    return asOnChain().status!!.till
+}
+
+fun ConfirmingSource.tillOrNull(): BlockNumber? {
+    return asOnChainOrNull()?.status?.till
 }

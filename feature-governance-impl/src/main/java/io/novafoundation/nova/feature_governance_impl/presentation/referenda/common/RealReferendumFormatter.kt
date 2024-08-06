@@ -1,19 +1,23 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.common
 
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.orTrue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
-import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.currentlyPassing
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.isOngoing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
@@ -63,26 +67,31 @@ class RealReferendumFormatter(
     private val referendaStatusFormatter: ReferendaStatusFormatter
 ) : ReferendumFormatter {
 
-    override fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel {
+    override fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel? {
+        val approval = voting.approval.dataOrNull ?: return null
+        val support = voting.support.dataOrNull ?: return null
+
         return ReferendumVotingModel(
-            positiveFraction = voting.approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
-            thresholdFraction = voting.approval.threshold.value.toFloat(),
+            positiveFraction = approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
+            thresholdFraction = threshold?.approval?.value?.toFloat(),
             votingResultIcon = R.drawable.ic_close,
             votingResultIconColor = R.color.icon_negative,
-            thresholdInfo = formatThresholdInfo(voting.support, token),
-            thresholdInfoVisible = !voting.support.passing(),
+            thresholdInfo = formatThresholdInfo(support, threshold, token),
+            thresholdInfoVisible = !threshold?.support?.currentlyPassing().orTrue(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
-                voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
+                approval.ayeVotes.fraction.formatFractionAsPercentage()
             ),
             negativePercentage = resourceManager.getString(
                 R.string.referendum_nay_format,
-                voting.approval.nayVotes.fraction.formatFractionAsPercentage()
+                approval.nayVotes.fraction.formatFractionAsPercentage()
             ),
-            thresholdPercentage = resourceManager.getString(
-                R.string.referendum_to_pass_format,
-                voting.approval.threshold.value.formatFractionAsPercentage()
-            )
+            thresholdPercentage = threshold?.let {
+                resourceManager.getString(
+                    R.string.referendum_to_pass_format,
+                    it.approval.value.formatFractionAsPercentage()
+                )
+            }
         )
     }
 
@@ -102,9 +111,12 @@ class RealReferendumFormatter(
 
     private fun formatThresholdInfo(
         support: ReferendumVoting.Support,
+        threshold: ReferendumThreshold?,
         token: Token
-    ): String {
-        val thresholdFormatted = mapAmountToAmountModel(support.threshold.value, token).token
+    ): String? {
+        if (threshold == null) return null
+
+        val thresholdFormatted = mapAmountToAmountModel(threshold.support.value, token).token
         val turnoutFormatted = token.amountFromPlanks(support.turnout).format()
 
         return resourceManager.getString(R.string.referendum_support_threshold_format, turnoutFormatted, thresholdFormatted)
@@ -129,7 +141,12 @@ class RealReferendumFormatter(
                 colorRes = R.color.text_secondary
             )
 
-            is ReferendumStatus.Ongoing.Deciding -> ReferendumStatusModel(
+            is ReferendumStatus.Ongoing.DecidingApprove -> ReferendumStatusModel(
+                name = statusName,
+                colorRes = R.color.text_secondary
+            )
+
+            is ReferendumStatus.Ongoing.DecidingReject -> ReferendumStatusModel(
                 name = statusName,
                 colorRes = R.color.text_secondary
             )
@@ -197,10 +214,16 @@ class RealReferendumFormatter(
                 )
             }
 
-            is ReferendumStatus.Ongoing.Deciding -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.DecidingReject -> ReferendumTimeEstimation.Timer(
                 time = status.rejectIn,
                 timeFormat = R.string.referendum_status_time_reject_in,
                 textStyleRefresher = status.rejectIn.referendumStatusStyleRefresher()
+            )
+
+            is ReferendumStatus.Ongoing.DecidingApprove -> ReferendumTimeEstimation.Timer(
+                time = status.approveIn,
+                timeFormat = R.string.referendum_status_time_approve_in,
+                textStyleRefresher = status.approveIn.referendumStatusStyleRefresher()
             )
 
             is ReferendumStatus.Ongoing.Confirming -> ReferendumTimeEstimation.Timer(
@@ -266,8 +289,9 @@ class RealReferendumFormatter(
             timeEstimation = formatTimeEstimation(referendum.status),
             track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
             number = formatId(referendum.id),
-            voting = referendum.voting?.let { formatVoting(it, token) },
-            yourVote = referendum.referendumVote?.let { mapReferendumVoteToUi(it, token.configuration, chain) }
+            voting = referendum.voting?.let { formatVoting(it, referendum.threshold, token) },
+            yourVote = referendum.referendumVote?.let { mapReferendumVoteToUi(it, token.configuration, chain) },
+            isOngoing = referendum.status.isOngoing()
         )
     }
 

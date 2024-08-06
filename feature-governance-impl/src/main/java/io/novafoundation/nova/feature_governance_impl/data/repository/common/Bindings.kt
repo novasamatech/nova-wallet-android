@@ -43,12 +43,14 @@ private fun bindProposalBound(decoded: DictEnum.Entry<*>, runtime: RuntimeSnapsh
             val valueAsStruct = decoded.value.castToStruct()
             Proposal.Legacy(bindByteArray(valueAsStruct["hash"]))
         }
+
         "Inline" -> {
             val bytes = bindByteArray(decoded.value)
             val call = GenericCall.fromByteArray(runtime, bytes)
 
             Proposal.Inline(bytes, call)
         }
+
         "Lookup" -> {
             val valueAsStruct = decoded.value.castToStruct()
 
@@ -57,6 +59,7 @@ private fun bindProposalBound(decoded: DictEnum.Entry<*>, runtime: RuntimeSnapsh
                 callLength = bindNumber(valueAsStruct["len"])
             )
         }
+
         else -> incompatible()
     }
 }

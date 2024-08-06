@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '8.3.1'
-        versionCode = 150
+        versionName = '8.4.0'
+        versionCode = 152
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -140,7 +140,7 @@ buildscript {
         // lifecycle scopes
         lifeCycleKtxDep = "androidx.lifecycle:lifecycle-runtime-ktx:$architectureComponentVersion"
 
-        permissionsDep = "com.github.florent37:runtime-permission-kotlin:$permissionsVersion"
+        permissionsDep = "com.github.florent37:RuntimePermission:$permissionsVersion"
 
         roomDep = "androidx.room:room-runtime:$roomVersion"
         roomKtxDep = "androidx.room:room-ktx:$roomVersion"

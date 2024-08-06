@@ -437,6 +437,52 @@
 
     <!-- Buttons -->
 
+    <style name="Widget.Nova.MaterialButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="rippleColor">@color/cell_background_pressed</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Primary" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_primary</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Secondary" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_secondary</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Positive" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_positive</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Negative" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_negative</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Primary.IconOnly" parent="Widget.Nova.MaterialButton.Primary">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Secondary.IconOnly" parent="Widget.Nova.MaterialButton.Secondary">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Positive.IconOnly" parent="Widget.Nova.MaterialButton.Positive">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Negative.IconOnly" parent="Widget.Nova.MaterialButton.Negative">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
     <!-- Input -->
 
     <style name="Widget.Nova.Input.EditText" parent="@android:style/Widget.EditText">

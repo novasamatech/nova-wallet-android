@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.domain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 
 sealed class ExtendedLoadingState<out T> {
 
@@ -19,6 +20,14 @@ inline fun <T, V> Flow<ExtendedLoadingState<T>>.mapLoading(crossinline mapper: s
     return map { loadingState -> loadingState.map { mapper(it) } }
 }
 
+fun <T> Flow<ExtendedLoadingState<T>>.filterLoaded(): Flow<T> {
+    return transform { loadingState ->
+        if (loadingState is ExtendedLoadingState.Loaded) {
+            emit(loadingState.data)
+        }
+    }
+}
+
 inline fun <T, R> ExtendedLoadingState<T>.map(mapper: (T) -> R): ExtendedLoadingState<R> {
     return when (this) {
         is ExtendedLoadingState.Loading -> this
@@ -32,6 +41,11 @@ val <T> ExtendedLoadingState<T>.dataOrNull: T?
         is ExtendedLoadingState.Loaded -> this.data
         else -> null
     }
+
+fun <T> ExtendedLoadingState<T?>.loadedAndEmpty(): Boolean = when (this) {
+    is ExtendedLoadingState.Loaded -> data == null
+    else -> false
+}
 
 fun <T> loadedNothing(): ExtendedLoadingState<T?> {
     return ExtendedLoadingState.Loaded(null)
