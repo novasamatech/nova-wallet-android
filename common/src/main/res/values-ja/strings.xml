@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">導出パスにはサポートされていない記号が含まれているか、構造が正しくありません</string>
     <string name="account_invalid_derivation_path_title">無効な導出パス</string>
     <string name="account_json_file">JSONファイル</string>
-    <string name="account_ledger_generic_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに<font color="#FFFFFF">Genericアプリをインストール</font>してください</string>
-    <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで<font color="#FFFFFF">汎用アプリを開く</font></string>
+    <string name="account_ledger_generic_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに%sしてください</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Genericアプリをインストール</string>
+    <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで%s</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">汎用アプリを開く</string>
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
     <string name="account_ledger_import_start_guide">Ledgerの公式Bluetooth接続ガイド</string>
-    <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに<font color="#FFFFFF">ネットワークアプリをインストール</font>してください</string>
-    <string name="account_ledger_import_start_step_2">Ledger デバイスで<font color="#FFFFFF">アプリを開く</font></string>
-    <string name="account_ledger_import_start_step_3">Nova Walletに<font color="#FFFFFF">Bluetoothと位置情報へのアクセスを許可</font>してください</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">ウォレットに追加するアカウント</font> を選択する。</string>
+    <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使ってLedgerデバイスに%sを確実にしてください</string>
+    <string name="account_ledger_import_start_step_1_highlighted">ネットワークアプリがインストールされている</string>
+    <string name="account_ledger_import_start_step_2">あなたのLedgerデバイス上の%s</string>
+    <string name="account_ledger_import_start_step_2_highlighted">ネットワークアプリを開く</string>
+    <string name="account_ledger_import_start_step_3">Nova Walletに%sしてください</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetoothと位置情報へのアクセスを許可</string>
+    <string name="account_ledger_import_start_step_4">%s を選択する。</string>
+    <string name="account_ledger_import_start_step_4_highlighted">アカウントを選択</string>
     <string name="account_ledger_import_start_title">Ledger Nano Xを接続</string>
     <string name="account_ledger_legacy_warning_message">操作にサインしてアカウントを新しいGeneric Ledgerアプリに移行するには、Migrationアプリをインストールして開いてください。Legacy OldおよびMigration Ledgerアプリは将来サポートされなくなります。</string>
     <string name="account_ledger_legacy_warning_title">新しいLedgerアプリがリリースされました</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">これがあなたのアカウントです</string>
     <string name="account_parity_signer_import_scan_invalid_qr">無効なQRコードです。%sのQRコードをスキャンしていることを確認してください</string>
     <string name="account_parity_signer_import_start_select_top">一番上を選択していることを確認してください</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signerが<font color="#FFFFFF">スキャン用のQRコードを提供します</font></string>
+    <string name="account_parity_signer_import_start_step_1">スマートフォンの%sアプリケーション</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Parity Signer を開く</string>
+    <string name="account_parity_signer_import_start_step_2">%sNova Walletに追加したい</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">キータブに行く。シードを選択し、次にアカウントを選択</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signerはあなたに%sを提供します</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">スキャン用のQRコード</string>
     <string name="account_parity_signer_import_start_title">%sからウォレットを追加</string>
     <string name="account_parity_signer_not_supported_subtitle">%sは任意のメッセージの署名をサポートしていません — トランザクションのみをサポートします</string>
     <string name="account_parity_signer_not_supported_title">署名はサポートされていません</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">%sで署名</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">派生パス名が空であることに注意してください</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">スマートフォンでPolkadot Vault </font>アプリケーションを開きます</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">「キーセット」タブに移動します。</font>キーセット、ネットワーク、Nova Walletに追加するアカウントを選択します</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが<font color="#FFFFFF">スキャン用のQRコードを提供します</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">スマートフォンの%sアプリケーション</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Polkadot Vault を開く</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s キーセット、ネットワーク、Nova Walletに追加するアカウントを選択します</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Key Sets タブに行く。</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが%s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">スキャン用のQRコード</string>
     <string name="account_private_key">プライベートキー</string>
     <string name="account_proxieds">あなたに委任された（プロキシ）</string>
     <string name="account_proxy_type_any">任意の操作</string>
