@@ -67,7 +67,7 @@
     <string name="account_invalid_derivation_path_title">Jalur derivasi tidak valid</string>
     <string name="account_json_file">File JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Pastikan %s di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_1_highlighted">aplikasi Network terpasang</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">aplikasi Generic terpasang</string>
     <string name="account_ledger_generic_import_start_step_2">%s di perangkat Ledger Anda</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Buka aplikasi Generic</string>
     <string name="account_ledger_import_fill_description">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live. Buka aplikasi jaringan di perangkat Ledger Anda.</string>
@@ -122,7 +122,7 @@
     <string name="account_parity_signer_sign_title">Tanda tangani dengan %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Perhatikan, nama jalur derivasi harus kosong</string>
-    <string name="account_polkadot_vault_import_start_step_1">Aplikasi %s] di smartphone Anda</string>
+    <string name="account_polkadot_vault_import_start_step_1">Aplikasi %s di smartphone Anda</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Buka Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_step_2">%s Pilih kumpulan Kunci Anda, Jaringan, lalu akun yang ingin Anda tambahkan ke Nova Wallet</string>
     <string name="account_polkadot_vault_import_start_step_2_highlighted">Pergi ke tab \'Key Sets\'.</string>
