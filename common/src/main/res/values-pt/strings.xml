@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">O seu caminho de derivação contém símbolos não suportados ou tem uma estrutura incorreta</string>
     <string name="account_invalid_derivation_path_title">Caminho de derivação inválido</string>
     <string name="account_json_file">Arquivo JSON</string>
-    <string name="account_ledger_generic_import_start_step_1">Certifique-se de que <font color="#FFFFFF">o aplicativo Genérico está instalado</font> no seu dispositivo Ledger usando o aplicativo Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Abra o aplicativo Generic</font> no seu dispositivo Ledger</string>
+    <string name="account_ledger_generic_import_start_step_1">Certifique-se de que %s no seu dispositivo Ledger usando o aplicativo Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">o aplicativo Genérico está instalado</string>
+    <string name="account_ledger_generic_import_start_step_2">%s no seu dispositivo Ledger</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Abra o aplicativo Generic</string>
     <string name="account_ledger_import_fill_description">Certifique-se de que o aplicativo da Rede está instalado no seu dispositivo Ledger usando o aplicativo Ledger Live. Abra o aplicativo da rede no seu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Adicione pelo menos uma conta</string>
     <string name="account_ledger_import_fill_title">Adicionar contas à sua carteira</string>
     <string name="account_ledger_import_start_guide">Guia Oficial de Conexão Bluetooth da Ledger</string>
-    <string name="account_ledger_import_start_step_1">Certifique-se de que o <font color="#FFFFFF">aplicativo da Rede está instalado</font> no seu dispositivo Ledger usando o aplicativo Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Abra o aplicativo de rede</font> no seu dispositivo Ledger</string>
-    <string name="account_ledger_import_start_step_3">Permitir que a Nova Wallet <font color="#FFFFFF">acesse Bluetooth e Localização</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Selecione a conta</font> para adicionar à carteira</string>
+    <string name="account_ledger_import_start_step_1">Certifique-se de que o %s no seu dispositivo Ledger usando o aplicativo Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">aplicativo da Network está instalado</string>
+    <string name="account_ledger_import_start_step_2">%s no seu dispositivo Ledger</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Abra o aplicativo da rede</string>
+    <string name="account_ledger_import_start_step_3">Permitir que a Nova Wallet %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">acesse Bluetooth e Localização</string>
+    <string name="account_ledger_import_start_step_4">%s para adicionar à carteira</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Selecione a conta</string>
     <string name="account_ledger_import_start_title">Conecte o Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Para assinar operações e migrar suas contas para o novo aplicativo Genérico Ledger, instale e abra o aplicativo Migration. Os aplicativos Legacy Old e Migration Ledger não serão suportados no futuro.</string>
     <string name="account_ledger_legacy_warning_title">Novo aplicativo Ledger foi lançado</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Aqui estão suas contas</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Código QR inválido, por favor certifique-se de que você está escaneando o código QR de %s</string>
     <string name="account_parity_signer_import_start_select_top">Certifique-se de selecionar o primeiro</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Vá para a aba “Chaves”. Selecione a semente e depois a conta</font> que você gostaria de adicionar à Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_3">O Parity Signer fornecerá um <font color="#FFFFFF">código QR para escanear</font></string>
+    <string name="account_parity_signer_import_start_step_1">%s no seu smartphone</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Abra o Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s que você gostaria de adicionar à Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Vá até a aba \'Chaves\'. Selecione seed, depois a conta</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer fornecerá um %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">código QR para escanear</string>
     <string name="account_parity_signer_import_start_title">Adicionar carteira de %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s não suporta a assinatura de mensagens arbitrárias — apenas transações</string>
     <string name="account_parity_signer_not_supported_title">Assinatura não é suportada</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Assinar com %s</string>
     <string name="account_polkadot_vault">Cofre Polkadot</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Atenção, o nome do caminho de derivação deve estar vazio</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Abra o aplicativo Polkadot Vault</font> em seu smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vá para a guia “Conjuntos de Chaves”.</font> Selecione seu conjunto de Chaves, Rede e, em seguida, a conta que você gostaria de adicionar à Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault fornecerá a você <font color="#FFFFFF">QR code para escanear</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">%s no seu smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Abra o Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Selecione seu conjunto de Chaves, Rede e, em seguida, a conta que você gostaria de adicionar à Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Vá para a aba de \'Conjuntos de Chaves\'.</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault fornecerá a você %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">código QR para escanear</string>
     <string name="account_private_key">Chave privada</string>
     <string name="account_proxieds">Delegado para você (Proxieds)</string>
     <string name="account_proxy_type_any">Qualquer</string>
