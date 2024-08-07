@@ -254,6 +254,7 @@ fun mapChainLocalToChain(
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
             swap = mapSwapListFromLocal(swap),
+            customFee = mapCustomFeeFromLocal(customFee),
             connectionState = mapConnectionStateFromLocal(connectionState),
             additional = additional,
             source = mapSourceFromLocal(source)
@@ -305,5 +306,13 @@ private fun mapSwapListFromLocal(swapLocal: String): List<Chain.Swap> {
 
     return swapLocal.split(",").mapNotNull {
         enumValueOfOrNull<Chain.Swap>(swapLocal)
+    }
+}
+
+private fun mapCustomFeeFromLocal(customFee: String): List<Chain.CustomFee> {
+    if (customFee.isEmpty()) return emptyList()
+
+    return customFee.split(",").mapNotNull {
+        enumValueOfOrNull<Chain.CustomFee>(it)
     }
 }

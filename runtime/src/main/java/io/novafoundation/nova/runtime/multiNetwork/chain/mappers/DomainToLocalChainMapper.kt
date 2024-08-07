@@ -124,6 +124,7 @@ fun mapChainToLocal(chain: Chain, gson: Gson): ChainLocal {
         hasCrowdloans = chain.hasCrowdloans,
         supportProxy = chain.supportProxy,
         swap = mapSwapListToLocal(chain.swap),
+        customFee = mapCustomFeeToLocal(chain.customFee),
         governance = mapGovernanceListToLocal(chain.governance),
         additional = chain.additional?.let { gson.toJson(it) },
         connectionState = mapConnectionStateToLocal(chain.connectionState),
