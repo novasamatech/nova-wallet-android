@@ -75,6 +75,13 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp" />
 
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.VotersView
+        android:id="@+id/abstainVotersDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:visibility="gone" />
+
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/votingStatusStartVote"
         style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"

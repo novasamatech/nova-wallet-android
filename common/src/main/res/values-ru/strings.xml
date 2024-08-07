@@ -985,6 +985,9 @@
     <string name="referenda_search_toolbar_hint">Поиск по заголовку или ID</string>
     <string name="referenda_title">Референдумы</string>
     <string name="referendim_details_not_found_title">Референдум не найден</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Голосование с воздержанием возможно только с убежденностью 0.1x. Проголосовать с убежденностью 0.1x?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Обновление убежденности</string>
+    <string name="referendum_abstain_voters_title">Голоса \\"воздержался\\"</string>
     <string name="referendum_aye_format">За: %s</string>
     <string name="referendum_dapp_list_title">Используйте Nova DApp браузер</string>
     <string name="referendum_description_fallback">Только автор референдума может редактировать это описание и заголовок. Если у вас есть доступ к аккаунту автора, посетите Polkassembly и заполните информацию о вашем референдуме</string>
@@ -1143,6 +1146,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Руководство пользователя</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Убежденность будет установлена на 0.1x при Воздержании</string>
     <string name="setup_staking_conflict_message">Невозможно стейкать напрямую и в пуле одновременно</string>
     <string name="setup_staking_conflict_title">Уже застейкано</string>
     <string name="setup_staking_type_advanced_options_condition">Расширенное управление стейкингом</string>

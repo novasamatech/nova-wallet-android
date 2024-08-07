@@ -67,7 +67,7 @@ class ReferendumDeepLinkHandler(
         require(chain.isEnabled)
 
         val governanceType = data.getGovernanceType(chain)
-        val payload = ReferendumDetailsPayload(referendumId)
+        val payload = ReferendumDetailsPayload(referendumId, allowVoting = true, prefilledData = null)
 
         mutableGovernanceState.update(chain.id, chain.utilityAsset.id, governanceType)
         router.openReferendum(payload)

@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingCurve
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.Gov1VotingThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
@@ -18,6 +19,7 @@ data class ReferendumDetails(
     val proposer: ReferendumProposer?,
     val track: ReferendumTrack?,
     val voting: ReferendumVoting?,
+    val threshold: ReferendumThreshold?,
     val userVote: ReferendumVote?,
     val timeline: ReferendumTimeline,
     val fullDetails: FullDetails,

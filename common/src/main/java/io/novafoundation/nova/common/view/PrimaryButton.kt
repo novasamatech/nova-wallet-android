@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.ContextThemeWrapper
+import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.StyleRes
 import androidx.appcompat.widget.AppCompatTextView
@@ -23,7 +24,6 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.getEnum
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
@@ -33,7 +33,8 @@ enum class ButtonState {
     NORMAL,
     DISABLED,
     PROGRESS,
-    GONE
+    GONE,
+    INVISIBLE
 }
 
 private const val ICON_SIZE_DP_DEFAULT = 24
@@ -172,7 +173,12 @@ class PrimaryButton @JvmOverloads constructor(
 
     fun setState(state: ButtonState) {
         isEnabled = state == ButtonState.NORMAL
-        setVisible(state != ButtonState.GONE)
+
+        visibility = when (state) {
+            ButtonState.GONE -> View.GONE
+            ButtonState.INVISIBLE -> View.INVISIBLE
+            else -> View.VISIBLE
+        }
 
         if (state == ButtonState.PROGRESS) {
             checkPreparedForProgress()
@@ -281,6 +287,10 @@ fun PrimaryButton.setState(descriptiveButtonState: DescriptiveButtonState) {
 
         DescriptiveButtonState.Gone -> {
             setState(ButtonState.GONE)
+        }
+
+        DescriptiveButtonState.Invisible -> {
+            setState(ButtonState.INVISIBLE)
         }
     }
 }
