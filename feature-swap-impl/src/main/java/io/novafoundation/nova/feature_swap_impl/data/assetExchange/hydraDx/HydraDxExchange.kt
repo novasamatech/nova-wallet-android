@@ -198,7 +198,8 @@ private class HydraDxExchange(
         }
         val feeInExpectedCurrency = SubstrateFee(
             amount = feeAmountInExpectedCurrency,
-            submissionOrigin = swapFee.submissionOrigin
+            submissionOrigin = swapFee.submissionOrigin,
+            assetId = expectedFeeAsset.fullId
         )
 
         return AssetExchangeFee(networkFee = feeInExpectedCurrency, MinimumBalanceBuyIn.NoBuyInNeeded)

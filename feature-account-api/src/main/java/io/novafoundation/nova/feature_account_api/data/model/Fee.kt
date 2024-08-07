@@ -1,9 +1,10 @@
 package io.novafoundation.nova.feature_account_api.data.model
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
 
-interface Fee {
+sealed interface Fee {
 
     companion object
 
@@ -23,10 +24,15 @@ data class EvmFee(
     override val amount = gasLimit * gasPrice
 }
 
+interface FeeInAsset : Fee {
+    val assetId: FullChainAssetId
+}
+
 class SubstrateFee(
     override val amount: BigInteger,
-    override val submissionOrigin: SubmissionOrigin
-) : Fee
+    override val submissionOrigin: SubmissionOrigin,
+    override val assetId: FullChainAssetId
+) : FeeInAsset
 
 val Fee.requestedAccountPaysFees: Boolean
     get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)

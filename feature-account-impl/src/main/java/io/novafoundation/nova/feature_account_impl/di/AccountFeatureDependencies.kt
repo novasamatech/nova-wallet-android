@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -135,6 +136,8 @@ interface AccountFeatureDependencies {
     fun customDialogProvider(): CustomDialogDisplayer.Presentation
 
     fun provideConditionMixinFactory(): ConditionMixinFactory
+
+    fun multiChainRuntimeCallsApi(): MultiChainRuntimeCallsApi
 
     val systemCallExecutor: SystemCallExecutor
 
