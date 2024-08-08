@@ -275,7 +275,6 @@ private fun Set<String>.swapTypesFromOptions(): List<Chain.Swap> {
     }
 }
 
-
 private fun Set<String>.customFeeTypeFromOptions(): List<Chain.CustomFee> {
     return mapNotNull { option ->
         when (option) {
