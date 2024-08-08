@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
@@ -136,20 +137,12 @@ class RealExtrinsicService(
         usedSigner: FeeSigner,
         submissionOptions: SubmissionOptions
     ): Fee {
-        val chainId = chain.id
-        val baseFee = rpcCalls.getExtrinsicFee(chain, extrinsic).partialFee
+        val nativeFee = estimateNativeFee(chain, extrinsic, usedSigner.submissionOrigin(chain))
 
-        val runtime = chainRegistry.getRuntime(chainId)
+        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
+        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency)
 
-        val decodedExtrinsic = Extrinsic.fromHex(runtime, extrinsic)
-
-        val tip = decodedExtrinsic.tip().orZero()
-
-        return SubstrateFee(
-            amount = tip + baseFee,
-            submissionOrigin = usedSigner.submissionOrigin(chain),
-            submissionOptions.selectedCommissionAsset(chain).fullId
-        )
+        return feePayment.convertNativeFee(nativeFee)
     }
 
     override suspend fun zeroFee(chain: Chain, origin: TransactionOrigin, submissionOptions: SubmissionOptions): Fee {
@@ -179,15 +172,20 @@ class RealExtrinsicService(
 
         if (extrinsics.isEmpty()) return getZeroFee(chain, feeSigner, submissionOptions)
 
-        val fees = extrinsics.map { estimateFee(chain, it, feeSigner) }
+        val fees = extrinsics.map { estimateNativeFee(chain, it, feeSigner.submissionOrigin(chain)) }
 
-        val totalFee = fees.sumByBigInteger { it.amount }
+        val totalFeeAmount = fees.sumByBigInteger { it.amount }
 
-        return SubstrateFee(
-            totalFee,
+        val totalNativeFee = SubstrateFee(
+            totalFeeAmount,
             feeSigner.submissionOrigin(chain),
             submissionOptions.selectedCommissionAsset(chain).fullId
         )
+
+        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
+        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency)
+
+        return feePayment.convertNativeFee(totalNativeFee)
     }
 
     private suspend fun constructSplitExtrinsicsForSubmission(
@@ -287,6 +285,27 @@ class RealExtrinsicService(
             BigInteger.ZERO,
             signer.submissionOrigin(chain),
             submissionOptions.selectedCommissionAsset(chain).fullId
+        )
+    }
+
+    private suspend fun estimateNativeFee(
+        chain: Chain,
+        extrinsic: String,
+        submissionOrigin: SubmissionOrigin
+    ): Fee {
+        val chainId = chain.id
+        val baseFee = rpcCalls.getExtrinsicFee(chain, extrinsic).partialFee
+
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        val decodedExtrinsic = Extrinsic.fromHex(runtime, extrinsic)
+
+        val tip = decodedExtrinsic.tip().orZero()
+
+        return SubstrateFee(
+            amount = tip + baseFee,
+            submissionOrigin = submissionOrigin,
+            chain.commissionAsset.fullId
         )
     }
 }

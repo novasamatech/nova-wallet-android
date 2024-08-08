@@ -15,7 +15,7 @@ internal class RealFeePaymentProviderRegistry(
     override suspend fun providerFor(chain: Chain): FeePaymentProvider {
         return when (chain.id) {
             Chain.Geneses.POLKADOT_ASSET_HUB -> assetHub
-            Chain.Geneses.HYDRA_DX -> TODO("not implemented")
+            Chain.Geneses.HYDRA_DX -> assetHub
             else -> default
         }
     }
