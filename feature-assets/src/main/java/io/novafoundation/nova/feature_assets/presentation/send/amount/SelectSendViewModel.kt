@@ -7,8 +7,10 @@ import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -20,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.view.ChainChipModel
@@ -49,13 +52,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGe
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGeneric
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -89,7 +93,7 @@ class SelectSendViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
     addressInputMixinFactory: AddressInputMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
-    selectAddressMixinFactory: SelectAddressMixin.Factory
+    selectAddressMixinFactory: SelectAddressMixin.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
@@ -102,6 +106,8 @@ class SelectSendViewModel(
 
     private val destinationAsset = destinationChainWithAsset.map { it.asset }
     private val destinationChain = destinationChainWithAsset.map { it.chain }
+
+    private val commissionChainAssetFlow = singleReplaySharedFlow<Chain.Asset>()
 
     private val selectAddressPayloadFlow = combine(
         originChain,
@@ -155,7 +161,7 @@ class SelectSendViewModel(
     private val originAssetFlow = originAsset.flatMapLatest(interactor::assetFlow)
         .shareInBackground()
 
-    private val commissionAssetFlow = originChain.flatMapLatest(interactor::commissionAssetFlow)
+    private val commissionAssetFlow = commissionChainAssetFlow.flatMapLatest { interactor.assetFlow(it) }
         .shareInBackground()
 
     val originFeeMixin = feeLoaderMixinFactory.createGeneric<OriginGenericFee>(commissionAssetFlow)
@@ -179,12 +185,21 @@ class SelectSendViewModel(
         }
     }
 
+    val changeFeeTokenEvent = actionAwaitableMixinFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
+    private val feeTokenWasChangedManually = MutableStateFlow(false)
+
+    val canChangeFeeToken = originChain
+        .map(::isEditFeeTokenAvailable)
+        .shareInBackground()
+
     init {
         subscribeOnChangeDestination()
 
         setInitialState()
 
         setupFees()
+
+        setupCommissionAsset()
     }
 
     fun nextClicked() = launch {
@@ -256,6 +271,24 @@ class SelectSendViewModel(
         }
     }
 
+    fun editFeeTokenClicked() = launch {
+        val originChain = originChain.first()
+        val originAsset = originAsset.first()
+        val selectedCommissionAsset = commissionChainAssetFlow.first()
+
+        val payload = FeeAssetSelectorBottomSheet.Payload(
+            options = listOf(
+                originChain.commissionAsset,
+                originAsset,
+            ),
+            selectedOption = selectedCommissionAsset
+        )
+        val newCommissionAsset = changeFeeTokenEvent.awaitAction(payload)
+        feeTokenWasChangedManually.value = true
+
+        commissionChainAssetFlow.emit(newCommissionAsset)
+    }
+
     private fun showAccountDetails(address: String) {
         launch {
             val chain = destinationChainWithAsset.first().chain
@@ -310,6 +343,10 @@ class SelectSendViewModel(
         return chooseDestinationChain.awaitAction(payload)
     }
 
+    private suspend fun isEditFeeTokenAvailable(chain: Chain): Boolean {
+        return interactor.canPayFeeInCustomAsset(chain)
+    }
+
     private fun setupFees() {
         combine(
             originChainWithAsset,
@@ -319,6 +356,22 @@ class SelectSendViewModel(
             ::recalculateFee
         )
             .inBackground()
+            .launchIn(this)
+    }
+
+    private fun setupCommissionAsset() {
+        // Set selected fee asset only if feeToken wasn't changed manually
+        // When change origin fee set feeTokenWasChangedManually = false
+        val commissionAsset = originChain.map { it.commissionAsset }
+        combineToPair(feeTokenWasChangedManually, commissionAsset)
+            .filter { (tokenWasChangedManually, _) -> !tokenWasChangedManually }
+            .onEach { (_, commissionAsset) ->
+                commissionChainAssetFlow.emit(commissionAsset)
+            }
+            .launchIn(this)
+
+        originChainWithAsset
+            .onEach { feeTokenWasChangedManually.value = false }
             .launchIn(this)
     }
 

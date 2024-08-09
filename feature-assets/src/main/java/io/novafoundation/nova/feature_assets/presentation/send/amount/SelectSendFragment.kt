@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.addInputKeyboardCallback
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.removeInputKeyboardCallback
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupSelectableFeeToken
 import kotlinx.android.synthetic.main.fragment_select_send.chooseAmountContainer
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendAmount
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendCrossChainFee
@@ -93,6 +95,10 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         setupExternalAccounts(viewModel.addressInputMixin, selectSendRecipient)
         setupYourWalletsBtn(selectWallet, viewModel.selectAddressMixin)
 
+        setupSelectableFeeToken(viewModel.canChangeFeeToken, selectSendOriginFee) {
+            viewModel.editFeeTokenClicked()
+        }
+
         viewModel.chooseDestinationChain.awaitableActionLiveData.observeEvent {
             removeInputKeyboardCallback(selectSendRecipient)
             val crossChainDestinationBottomSheet = SelectCrossChainDestinationBottomSheet(
@@ -103,6 +109,15 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
             )
             crossChainDestinationBottomSheet.setOnDismissListener { addInputKeyboardCallback(viewModel.addressInputMixin, selectSendRecipient) }
             crossChainDestinationBottomSheet.show()
+        }
+
+        viewModel.changeFeeTokenEvent.awaitableActionLiveData.observeEvent {
+            FeeAssetSelectorBottomSheet(
+                context = requireContext(),
+                payload = it.payload,
+                onOptionClicked = it.onSuccess,
+                onCancel = it.onCancel
+            ).show()
         }
 
         viewModel.transferDirectionModel.observe {

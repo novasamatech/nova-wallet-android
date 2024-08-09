@@ -22,9 +22,10 @@ import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPa
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
-import io.novafoundation.nova.feature_swap_impl.presentation.main.view.FeeAssetSelectorBottomSheet
+import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupSelectableFeeToken
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
@@ -97,6 +98,10 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput, swapMainSettingsMaxAmount)
         setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, maxAvailableView = null)
         setupFeeLoading(viewModel.feeMixin, swapMainSettingsDetailsNetworkFee)
+        setupSelectableFeeToken(viewModel.canChangeFeeToken, swapMainSettingsDetailsNetworkFee) {
+            viewModel.editFeeTokenClicked()
+        }
+
         buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
 
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
@@ -116,16 +121,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
 
         viewModel.minimumBalanceBuyAlert.observe(swapMainSettingsMinBalanceAlert::setModel)
-
-        viewModel.canChangeFeeToken.observe { canChangeFeeToken ->
-            if (canChangeFeeToken) {
-                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(R.drawable.ic_pencil_edit, R.color.icon_secondary)
-                swapMainSettingsDetailsNetworkFee.setOnValueClickListener { viewModel.editFeeTokenClicked() }
-            } else {
-                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(null)
-                swapMainSettingsDetailsNetworkFee.setOnValueClickListener(null)
-            }
-        }
 
         viewModel.changeFeeTokenEvent.awaitableActionLiveData.observeEvent {
             FeeAssetSelectorBottomSheet(
