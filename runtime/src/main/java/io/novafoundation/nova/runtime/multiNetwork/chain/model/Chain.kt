@@ -36,6 +36,7 @@ data class Chain(
     val supportProxy: Boolean,
     val governance: List<Governance>,
     val swap: List<Swap>,
+    val customFee: List<CustomFee>,
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
@@ -201,6 +202,10 @@ data class Chain(
 
     enum class Swap {
         ASSET_CONVERSION, HYDRA_DX
+    }
+
+    enum class CustomFee {
+        ASSET_HUB, HYDRA_DX
     }
 
     enum class ConnectionState {

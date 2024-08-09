@@ -3,9 +3,13 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
+import io.novafoundation.nova.feature_account_api.data.model.FeeInAsset
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
+import io.novafoundation.nova.runtime.util.FullAssetIdModel
+import io.novafoundation.nova.runtime.util.toDomain
+import io.novafoundation.nova.runtime.util.toModel
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
@@ -36,7 +40,8 @@ class EvmFeeParcelModel(
 class SimpleFeeParcelModel(
     val planks: BigInteger,
     override val amount: BigDecimal,
-    override val submissionOrigin: SubmissionOriginParcelModel
+    override val submissionOrigin: SubmissionOriginParcelModel,
+    val assetId: FullAssetIdModel
 ) : FeeParcelModel
 
 fun mapFeeToParcel(decimalFee: GenericDecimalFee<*>): FeeParcelModel {
@@ -44,7 +49,7 @@ fun mapFeeToParcel(decimalFee: GenericDecimalFee<*>): FeeParcelModel {
 
     return when (val fee = decimalFee.networkFee) {
         is EvmFee -> EvmFeeParcelModel(gasLimit = fee.gasLimit, gasPrice = fee.gasPrice, amount = decimalFee.networkFeeDecimalAmount, submissionOrigin)
-        else -> SimpleFeeParcelModel(decimalFee.networkFee.amount, decimalFee.networkFeeDecimalAmount, submissionOrigin)
+        is FeeInAsset -> SimpleFeeParcelModel(decimalFee.networkFee.amount, decimalFee.networkFeeDecimalAmount, submissionOrigin, fee.assetId.toModel())
     }
 }
 
@@ -57,7 +62,7 @@ fun mapFeeFromParcel(parcelFee: FeeParcelModel): DecimalFee {
 
     val fee = when (parcelFee) {
         is EvmFeeParcelModel -> EvmFee(gasLimit = parcelFee.gasLimit, gasPrice = parcelFee.gasPrice, submissionOrigin)
-        is SimpleFeeParcelModel -> SubstrateFee(parcelFee.planks, submissionOrigin)
+        is SimpleFeeParcelModel -> SubstrateFee(parcelFee.planks, submissionOrigin, parcelFee.assetId.toDomain())
     }
 
     return DecimalFee(SimpleFee(fee), parcelFee.amount)

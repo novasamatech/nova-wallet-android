@@ -385,6 +385,8 @@ object ChainGeneses {
     const val AVAIL = "b91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a"
 
     const val VARA = "fe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763"
+
+    const val POLKADOT_ASSET_HUB = "68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
 }
 
 object ChainIds {

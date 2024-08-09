@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.hydra_dx_math.HydraDxMathConversions.fromBridgeResultToBalance
 import io.novafoundation.nova.hydra_dx_math.stableswap.StableSwapMathBridge

@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi

@@ -23,9 +23,9 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stabl
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StablePoolAsset
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StableSwapPoolInfo
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.quote
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_account_api.data.network.hydration.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable

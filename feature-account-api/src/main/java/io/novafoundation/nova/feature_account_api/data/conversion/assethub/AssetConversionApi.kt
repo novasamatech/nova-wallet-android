@@ -1,6 +1,6 @@
 @file:Suppress("RedundantUnitExpression")
 
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion
+package io.novafoundation.nova.feature_account_api.data.conversion.assethub
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindPair
 import io.novafoundation.nova.common.utils.assetConversionOrNull

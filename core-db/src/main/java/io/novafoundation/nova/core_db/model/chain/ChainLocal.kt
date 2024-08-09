@@ -29,6 +29,7 @@ data class ChainLocal(
     @ColumnInfo(defaultValue = "0")
     val supportProxy: Boolean,
     val swap: String,
+    val customFee: String,
     val governance: String,
     val additional: String?,
     val connectionState: ConnectionStateLocal,

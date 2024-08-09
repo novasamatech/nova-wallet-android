@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets
+package io.novafoundation.nova.feature_account_api.data.network.hydration
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
