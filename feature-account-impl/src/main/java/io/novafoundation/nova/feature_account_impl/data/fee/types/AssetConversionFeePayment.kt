@@ -5,12 +5,15 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNu
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.structOf
+import io.novafoundation.nova.feature_account_api.data.conversion.assethub.assetConversionOrNull
+import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -19,7 +22,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.asNumberOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
@@ -32,6 +38,8 @@ internal class AssetConversionFeePayment(
     private val paymentAsset: Chain.Asset,
     private val chainRegistry: ChainRegistry,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
+    private val remoteStorageSource: StorageDataSource,
+    private val multiLocationConverter: MultiLocationConverter,
 ) : FeePayment {
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
@@ -47,6 +55,25 @@ internal class AssetConversionFeePayment(
         }
 
         return SubstrateFee(amount = quote, submissionOrigin = nativeFee.submissionOrigin, assetId = paymentAsset.fullId)
+    }
+
+    override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {
+        return remoteStorageSource.query(paymentAsset.chainId) {
+            val allPools = metadata.assetConversionOrNull?.pools?.keys().orEmpty()
+
+            constructAvailableCustomFeeAssets(allPools)
+        }
+    }
+
+    private suspend fun constructAvailableCustomFeeAssets(pools: List<Pair<MultiLocation, MultiLocation>>): List<Chain.Asset> {
+        return pools.mapNotNull { (firstLocation, secondLocation) ->
+            val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@mapNotNull null
+            val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@mapNotNull null
+
+            if (!firstAsset.isUtilityAsset) return@mapNotNull null
+
+            secondAsset
+        }
     }
 
     private suspend fun encodableAssetId(): Any {

@@ -9,6 +9,8 @@ interface FeePayment {
     suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder)
 
     suspend fun convertNativeFee(nativeFee: Fee): Fee
+
+    suspend fun availableCustomFeeAssets(): List<Chain.Asset>
 }
 
 interface FeePaymentProvider {

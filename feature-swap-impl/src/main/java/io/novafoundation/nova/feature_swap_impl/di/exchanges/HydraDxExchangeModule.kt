@@ -7,9 +7,9 @@ import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxNovaReferral
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.RealHydraDxNovaReferral
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.RealHydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.XYKSwapSourceFactory

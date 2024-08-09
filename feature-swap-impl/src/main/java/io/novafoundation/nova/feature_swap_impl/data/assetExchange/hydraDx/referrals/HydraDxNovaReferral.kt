@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
+package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals
 
 interface HydraDxNovaReferral {
 
