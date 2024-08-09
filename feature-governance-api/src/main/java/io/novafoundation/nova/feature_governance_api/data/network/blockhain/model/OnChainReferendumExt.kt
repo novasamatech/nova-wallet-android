@@ -131,3 +131,19 @@ fun Set<BigInteger>.toTrackIds(): Set<TrackId> {
 fun Set<TrackId>.fromTrackIds(): Set<BigInteger> {
     return mapToSet { it.value }
 }
+
+fun ConfirmingSource.asOnChain(): ConfirmingSource.OnChain {
+    return this as ConfirmingSource.OnChain
+}
+
+fun ConfirmingSource.asOnChainOrNull(): ConfirmingSource.OnChain? {
+    return this as? ConfirmingSource.OnChain
+}
+
+fun ConfirmingSource.till(): BlockNumber {
+    return asOnChain().status!!.till
+}
+
+fun ConfirmingSource.tillOrNull(): BlockNumber? {
+    return asOnChainOrNull()?.status?.till
+}

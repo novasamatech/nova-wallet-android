@@ -180,7 +180,7 @@ class RealReferendaCommonRepository(
                     tally = it.status.asOngoingOrNull()?.tally,
                     currentBlockNumber = currentBlockNumber,
                     electorate = electorate,
-                    abstainVotes = null
+                    offChainVotingDetails = ExtendedLoadingState.Loaded(null)
                 )
             }
         )
