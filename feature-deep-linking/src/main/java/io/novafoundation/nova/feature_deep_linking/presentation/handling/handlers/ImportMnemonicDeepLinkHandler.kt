@@ -1,4 +1,4 @@
-package io.novafoundation.nova.app.root.presentation.deepLinks.handlers
+package io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers
 
 import android.net.Uri
 import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException

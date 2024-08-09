@@ -32,14 +32,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:textColor="@color/text_primary"
-                android:text="@string/account_ledger_import_start_title" />
+                android:text="@string/account_ledger_import_start_title"
+                android:textColor="@color/text_primary" />
 
             <io.novafoundation.nova.common.view.LinkView
-                android:layout_width="wrap_content"
                 android:id="@+id/startImportGenericLedgerGuideLink"
-                android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
                 app:linkText="@string/account_ledger_import_start_guide" />
 
             <io.novafoundation.nova.common.view.NovaConnectView
@@ -62,8 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:stepNumber="2"
-                app:stepText="@string/account_ledger_generic_import_start_step_2" />
+                app:stepNumber="2" />
 
             <io.novafoundation.nova.common.view.InstructionStepView
                 android:id="@+id/startImportGenericLedgerStep3"
@@ -71,8 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:stepNumber="3"
-                app:stepText="@string/account_ledger_import_start_step_3" />
+                app:stepNumber="3" />
 
             <io.novafoundation.nova.common.view.InstructionStepView
                 android:id="@+id/startImportGenericLedgerStep4"
@@ -80,8 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:stepNumber="4"
-                app:stepText="@string/account_ledger_import_start_step_4" />
+                app:stepNumber="4" />
         </LinearLayout>
 
     </ScrollView>

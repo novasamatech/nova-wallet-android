@@ -32,6 +32,8 @@ interface PolkadotVaultVariantConfigBuilder {
 
             fun step(@StringRes contentRes: Int)
 
+            fun step(content: CharSequence)
+
             fun image(@StringRes labelRes: Int, @DrawableRes imageRes: Int)
         }
     }
@@ -118,19 +120,19 @@ private class RealInstructionsBuilder(
 
     override fun step(contentRes: Int) {
         val content = resourceManager.getText(contentRes)
-        addStep(content)
+        step(content)
+    }
+
+    override fun step(content: CharSequence) {
+        stepsCounter += 1
+
+        val stepInstruction = Instruction.Step(stepsCounter, content)
+        instructions.add(stepInstruction)
     }
 
     override fun image(labelRes: Int, imageRes: Int) {
         val imageInstruction = Instruction.Image(resourceManager.getString(labelRes), imageRes)
         instructions.add(imageInstruction)
-    }
-
-    private fun addStep(content: CharSequence) {
-        stepsCounter += 1
-
-        val stepInstruction = Instruction.Step(stepsCounter, content)
-        instructions.add(stepInstruction)
     }
 
     fun build(): List<Instruction> {
