@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindPermill
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
 import java.math.BigInteger
 
 class StableSwapPoolInfo(

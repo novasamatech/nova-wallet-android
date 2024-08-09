@@ -42,12 +42,13 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.refer
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSystemAsset
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toChainAssetOrThrow
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
+import io.novafoundation.nova.feature_account_api.data.network.hydration.isSystemAsset
+import io.novafoundation.nova.feature_account_api.data.network.hydration.setFeeCurrency
+import io.novafoundation.nova.feature_account_api.data.network.hydration.toChainAssetOrThrow
+import io.novafoundation.nova.feature_account_api.data.network.hydration.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
@@ -456,16 +457,6 @@ private class HydraDxExchange(
             callName = "link_code",
             arguments = mapOf(
                 "code" to referralCode.encodeToByteArray()
-            )
-        )
-    }
-
-    private fun ExtrinsicBuilder.setFeeCurrency(onChainId: HydraDxAssetId) {
-        call(
-            moduleName = Modules.MULTI_TRANSACTION_PAYMENT,
-            callName = "set_currency",
-            arguments = mapOf(
-                "currency" to onChainId
             )
         )
     }

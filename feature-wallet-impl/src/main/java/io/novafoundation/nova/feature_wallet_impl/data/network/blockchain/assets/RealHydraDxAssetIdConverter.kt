@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.ext.decodeOrNull
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

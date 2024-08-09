@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
+import io.novafoundation.nova.feature_account_impl.data.fee.chains.HydrationFeePaymentProvider
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -25,6 +26,16 @@ class CustomFeeModule {
 
     @Provides
     @FeatureScope
+    fun provideHydrationFeePaymentProvider(
+        chainRegistry: ChainRegistry,
+        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
+    ) = HydrationFeePaymentProvider(
+        chainRegistry,
+        multiChainRuntimeCallsApi
+    )
+
+    @Provides
+    @FeatureScope
     fun provideDefaultFeePaymentProvider() = DefaultFeePaymentProvider()
 
     @Provides
@@ -32,5 +43,10 @@ class CustomFeeModule {
     fun provideWatchOnlySigningPresenter(
         defaultFeePaymentProvider: DefaultFeePaymentProvider,
         assetHubFeePaymentProvider: AssetHubFeePaymentProvider,
-    ): FeePaymentProviderRegistry = RealFeePaymentProviderRegistry(defaultFeePaymentProvider, assetHubFeePaymentProvider)
+        hydrationFeePaymentProvider: HydrationFeePaymentProvider
+    ): FeePaymentProviderRegistry = RealFeePaymentProviderRegistry(
+        defaultFeePaymentProvider,
+        assetHubFeePaymentProvider,
+        hydrationFeePaymentProvider
+    )
 }
