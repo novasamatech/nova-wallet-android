@@ -5,13 +5,12 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
@@ -43,31 +42,6 @@ interface AssetExchange {
     suspend fun slippageConfig(): SlippageConfig
 
     fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger>
-}
-
-data class AssetExchangeQuoteArgs(
-    val chainAssetIn: Chain.Asset,
-    val chainAssetOut: Chain.Asset,
-    val amount: Balance,
-    val swapDirection: SwapDirection,
-)
-
-class AssetExchangeQuote(
-    val direction: SwapDirection,
-
-    val quote: Balance,
-
-    val path: QuotePath
-) : Comparable<AssetExchangeQuote> {
-
-    override fun compareTo(other: AssetExchangeQuote): Int {
-        return when (direction) {
-            // When we want to sell a token, the bigger the quote - the better
-            SwapDirection.SPECIFIED_IN -> (quote - other.quote).signum()
-            // When we want to buy a token, the smaller the quote - the better
-            SwapDirection.SPECIFIED_OUT -> (other.quote - quote).signum()
-        }
-    }
 }
 
 class AssetExchangeFee(

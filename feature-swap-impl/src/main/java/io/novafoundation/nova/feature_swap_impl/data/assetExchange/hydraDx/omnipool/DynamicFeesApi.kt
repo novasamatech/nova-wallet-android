@@ -5,7 +5,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omni
 import io.novafoundation.nova.common.utils.dynamicFees
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.bindDynamicFee
-import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1

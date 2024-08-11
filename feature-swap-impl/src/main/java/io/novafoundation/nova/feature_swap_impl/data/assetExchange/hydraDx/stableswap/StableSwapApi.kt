@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.stableSwap
 import io.novafoundation.nova.common.utils.stableSwapOrNull
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StableSwapPoolInfo
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.bindStablePoolInfo
-import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1

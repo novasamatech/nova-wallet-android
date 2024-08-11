@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.omnipool
 import io.novafoundation.nova.common.utils.omnipoolOrNull
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.OmnipoolAssetState
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.bindOmnipoolAssetState
-import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1

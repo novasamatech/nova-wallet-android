@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
-import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 
 class XYKPoolInfo(val firstAsset: HydraDxAssetId, val secondAsset: HydraDxAssetId)
 

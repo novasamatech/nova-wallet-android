@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model
 
 import io.novafoundation.nova.common.utils.atLeastZero
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
-import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.hydra_dx_math.HydraDxMathConversions.fromBridgeResultToBalance
 import io.novafoundation.nova.hydra_dx_math.xyk.HYKSwapMathBridge

@@ -4,13 +4,12 @@ import android.util.Log
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -90,7 +89,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             ),
             customFeeAsset = null,
             nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first(),
-            path = QuotePath(emptyList())
+            path = io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.QuotePath(emptyList())
         )
 
         val fee = swapService.estimateFee(swapArgs)
@@ -114,7 +113,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             ),
             customFeeAsset = siri,
             nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first(),
-            path = QuotePath(emptyList())
+            path = io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.QuotePath(emptyList())
         )
 
         val fee = swapService.estimateFee(swapArgs)
@@ -142,7 +141,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
                 tokenIn = tokenRepository.getToken(from),
                 tokenOut = tokenRepository.getToken(to),
                 amount = from.planksFromAmount(amount.toBigDecimal()),
-                swapDirection = SwapDirection.SPECIFIED_IN,
+                swapDirection = io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection.SPECIFIED_IN,
                 slippage = Percent(1.0),
             )
         ).getOrThrow()

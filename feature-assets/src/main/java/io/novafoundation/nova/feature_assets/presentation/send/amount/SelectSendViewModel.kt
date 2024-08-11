@@ -212,7 +212,7 @@ class SelectSendViewModel(
         )
 
         validationExecutor.requireValid(
-            validationSystem = sendInteractor.validationSystemFor(payload.transfer),
+            validationSystem = sendInteractor.validationSystemFor(payload.transfer, viewModelScope),
             payload = payload,
             progressConsumer = sendInProgressFlow.progressConsumer(),
             autoFixPayload = ::autoFixSendValidationPayload,
@@ -336,7 +336,7 @@ class SelectSendViewModel(
             val assetTransfer = buildTransfer(origin = originAsset, destination = destinationAsset, amount = amount, address = address)
             val planks = originAsset.asset.planksFromAmount(amount)
 
-            val transferFeeModel = sendInteractor.getFee(planks, assetTransfer)
+            val transferFeeModel = sendInteractor.getFee(planks, assetTransfer, viewModelScope)
             val originFee = SimpleGenericFee(transferFeeModel.originFee)
             val crossChainFee = transferFeeModel.crossChainFee?.let { SimpleFee(it) }
 

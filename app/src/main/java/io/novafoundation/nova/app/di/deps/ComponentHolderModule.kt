@@ -51,6 +51,7 @@ import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_core.di.SwapCoreApi
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureHolder
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureHolder
@@ -247,4 +248,11 @@ interface ComponentHolderModule {
     @ClassKey(CloudBackupFeatureApi::class)
     @IntoMap
     fun provideCloudBackupFeatureHolder(holder: CloudBackupFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(SwapCoreApi::class)
+    @IntoMap
+    fun provideSwapCoreFeatureHolder(holder: SwapFeatureHolder): FeatureApiHolder
+
 }

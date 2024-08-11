@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
@@ -14,7 +15,8 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnip
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.XYKSwapSourceFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.RealHydraDxAssetConversionFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -77,6 +79,19 @@ class HydraDxExchangeModule {
         )
     }
 
+
+    @Provides
+    @FeatureScope
+    fun provideHydraDxAssetConversionFactory(
+        swapSourceFactories: Set<@JvmSuppressWildcards HydraDxSwapSource.Factory>,
+        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    ): HydraDxAssetConversionFactory {
+        return RealHydraDxAssetConversionFactory(
+            swapSourceFactories,
+            hydraDxAssetIdConverter
+        )
+    }
+
     @Provides
     @FeatureScope
     fun provideHydraDxExchangeFactory(
@@ -87,6 +102,7 @@ class HydraDxExchangeModule {
         hydraDxNovaReferral: HydraDxNovaReferral,
         swapSourceFactories: Set<@JvmSuppressWildcards HydraDxSwapSource.Factory>,
         assetSourceRegistry: AssetSourceRegistry,
+        hydraDxAssetConversionFactory: HydraDxAssetConversionFactory
     ): HydraDxExchangeFactory {
         return HydraDxExchangeFactory(
             remoteStorageSource = remoteStorageSource,
@@ -95,7 +111,8 @@ class HydraDxExchangeModule {
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             hydraDxNovaReferral = hydraDxNovaReferral,
             swapSourceFactories = swapSourceFactories,
-            assetSourceRegistry = assetSourceRegistry
+            assetSourceRegistry = assetSourceRegistry,
+            assetConversionFactory = hydraDxAssetConversionFactory
         )
     }
 }

@@ -174,7 +174,7 @@ class ConfirmSendViewModel(
         val payload = buildValidationPayload()
 
         validationExecutor.requireValid(
-            validationSystem = sendInteractor.validationSystemFor(payload.transfer),
+            validationSystem = sendInteractor.validationSystemFor(payload.transfer, viewModelScope),
             payload = payload,
             progressConsumer = _transferSubmittingLiveData.progressConsumer(),
             autoFixPayload = ::autoFixSendValidationPayload,
@@ -199,7 +199,7 @@ class ConfirmSendViewModel(
             originFeeMixin.invalidateFee()
             crossChainFeeMixin.invalidateFee()
 
-            val transferFeeModel = sendInteractor.getFee(planks, assetTransfer)
+            val transferFeeModel = sendInteractor.getFee(planks, assetTransfer, viewModelScope)
             val originFee = SimpleGenericFee(transferFeeModel.originFee)
             val crossChainFee = transferFeeModel.crossChainFee?.let { SimpleFee(it) }
 
@@ -242,7 +242,7 @@ class ConfirmSendViewModel(
         originFee: OriginDecimalFee,
         crossChainFee: DecimalFee?
     ) = launch {
-        sendInteractor.performTransfer(transfer, originFee, crossChainFee?.genericFee?.networkFee)
+        sendInteractor.performTransfer(transfer, originFee, crossChainFee?.genericFee?.networkFee, viewModelScope)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 

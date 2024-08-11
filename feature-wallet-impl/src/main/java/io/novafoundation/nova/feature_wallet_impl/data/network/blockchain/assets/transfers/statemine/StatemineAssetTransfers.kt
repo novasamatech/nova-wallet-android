@@ -27,13 +27,11 @@ import java.math.BigInteger
 class StatemineAssetTransfers(
     chainRegistry: ChainRegistry,
     assetSourceRegistry: AssetSourceRegistry,
-    extrinsicService: ExtrinsicService,
+    extrinsicServiceFactory: ExtrinsicService.Factory,
     phishingValidationFactory: PhishingValidationFactory,
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val remoteStorage: StorageDataSource
-) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
-
-    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
+) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
     override suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>> {
         val type = chainAsset.requireStatemine()

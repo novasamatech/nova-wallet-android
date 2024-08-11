@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.feature_account_api.data.network.hydration.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class HydraDxOmniPoolSwapExtractor(
-    hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    hydraDxAssetIdConverter: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter,
 ) : BaseHydraDxSwapExtractor(hydraDxAssetIdConverter) {
 
     private val calls = listOf("buy", "sell")

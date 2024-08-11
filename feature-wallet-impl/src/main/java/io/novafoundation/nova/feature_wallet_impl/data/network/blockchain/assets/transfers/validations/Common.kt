@@ -31,6 +31,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import java.math.BigDecimal
+import kotlinx.coroutines.CoroutineScope
 
 fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
     amount = { it.transfer.amount },
@@ -64,11 +65,12 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
 }
 
 fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
-    assetSourceRegistry: AssetSourceRegistry
+    assetSourceRegistry: AssetSourceRegistry,
+    coroutineScope: CoroutineScope
 ) = checkForFeeChanges(
     calculateFee = { payload ->
         val transfers = assetSourceRegistry.sourceFor(payload.transfer.originChainAsset).transfers
-        val fee = transfers.calculateFee(payload.transfer)
+        val fee = transfers.calculateFee(payload.transfer, coroutineScope)
         SimpleGenericFee(payload.originFee.genericFee.networkFee.copy(networkFee = fee))
     },
     currentFee = { it.originFee },

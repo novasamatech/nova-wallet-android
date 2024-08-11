@@ -13,8 +13,10 @@ import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilit
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.RealHydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
@@ -174,5 +176,13 @@ class SwapFeatureModule {
             assetSourceRegistry = assetSourceRegistry,
             chainRegistry = chainRegistry
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideHydraDxAssetIdConverter(
+        chainRegistry: ChainRegistry
+    ): HydraDxAssetIdConverter {
+        return RealHydraDxAssetIdConverter(chainRegistry)
     }
 }

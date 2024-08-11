@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_api.data.network.hydration
+package io.novafoundation.nova.feature_swap_core.data.network
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger

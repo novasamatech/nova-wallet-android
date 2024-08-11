@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_api.domain.model
+package io.novafoundation.nova.feature_swap_core.domain.model
 
 enum class SwapDirection {
     SPECIFIED_IN, SPECIFIED_OUT

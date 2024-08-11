@@ -23,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
@@ -33,13 +34,15 @@ import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
 import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import java.math.BigInteger
+import kotlinx.coroutines.CoroutineScope
 
 internal class AssetConversionFeePayment(
     private val paymentAsset: Chain.Asset,
     private val chainRegistry: ChainRegistry,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val remoteStorageSource: StorageDataSource,
-    private val multiLocationConverter: MultiLocationConverter,
+    private val multiLocationConverterFactory: MultiLocationConverterFactory,
+    private val coroutineScope: CoroutineScope
 ) : FeePayment {
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
@@ -66,6 +69,8 @@ internal class AssetConversionFeePayment(
     }
 
     private suspend fun constructAvailableCustomFeeAssets(pools: List<Pair<MultiLocation, MultiLocation>>): List<Chain.Asset> {
+        val chain = chainRegistry.getChain(paymentAsset.chainId)
+        val multiLocationConverter = multiLocationConverterFactory.default(chain, coroutineScope)
         return pools.mapNotNull { (firstLocation, secondLocation) ->
             val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@mapNotNull null
             val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@mapNotNull null

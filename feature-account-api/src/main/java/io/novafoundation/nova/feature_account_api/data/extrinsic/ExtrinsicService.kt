@@ -13,6 +13,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: SubmissionOrigin) -> Unit
@@ -44,6 +45,11 @@ class ExtrinsicSubmission(val hash: String, val submissionOrigin: SubmissionOrig
 private val DEFAULT_BATCH_MODE = BatchMode.BATCH_ALL
 
 interface ExtrinsicService {
+
+    interface Factory {
+
+        fun create(coroutineScope: CoroutineScope): ExtrinsicService
+    }
 
     class SubmissionOptions(
         val feePaymentCurrency: FeePaymentCurrency = FeePaymentCurrency.Native

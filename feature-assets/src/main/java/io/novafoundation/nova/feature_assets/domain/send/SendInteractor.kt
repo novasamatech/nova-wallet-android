@@ -29,6 +29,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -66,7 +67,7 @@ class SendInteractor(
         )
     }
 
-    suspend fun getFee(amount: Balance, transfer: AssetTransfer): TransferFeeModel = withContext(Dispatchers.Default) {
+    suspend fun getFee(amount: Balance, transfer: AssetTransfer, coroutineScope: CoroutineScope): TransferFeeModel = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
@@ -78,7 +79,7 @@ class SendInteractor(
 
             TransferFeeModel(originFeeWithSenderPart, crossChainFeeModel.toSubstrateFee(transfer))
         } else {
-            val originFee = getAssetTransfers(transfer).calculateFee(transfer)
+            val originFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
             TransferFeeModel(
                 OriginFee(originFee, null, transfer.commissionAssetToken.configuration),
                 null
@@ -90,6 +91,7 @@ class SendInteractor(
         transfer: WeightedAssetTransfer,
         originFee: OriginDecimalFee,
         crossChainFee: Fee?,
+        coroutineScope: CoroutineScope
     ): Result<*> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
@@ -98,7 +100,7 @@ class SendInteractor(
         } else {
             val networkFee = originFee.networkFeePart()
 
-            getAssetTransfers(transfer).performTransfer(transfer)
+            getAssetTransfers(transfer).performTransfer(transfer, coroutineScope)
                 .onSuccess { submission ->
                     // Insert used fee regardless of who paid it
                     walletRepository.insertPendingTransfer(submission.hash, transfer, networkFee.networkFeeDecimalAmount)
@@ -106,10 +108,11 @@ class SendInteractor(
         }
     }
 
-    fun validationSystemFor(transfer: AssetTransfer) = if (transfer.isCrossChain) {
+    fun validationSystemFor(transfer: AssetTransfer, coroutineScope: CoroutineScope) = if (transfer.isCrossChain) {
         crossChainTransactor.validationSystem
     } else {
-        assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers.validationSystem
+
+        assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers.getValidationSystem(coroutineScope)
     }
 
     suspend fun areTransfersEnabled(asset: Chain.Asset) = assetSourceRegistry.sourceFor(asset).transfers.areTransfersEnabled(asset)

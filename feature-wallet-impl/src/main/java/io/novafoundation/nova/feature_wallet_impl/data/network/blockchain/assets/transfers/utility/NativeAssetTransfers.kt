@@ -32,14 +32,12 @@ import kotlinx.coroutines.flow.map
 class NativeAssetTransfers(
     chainRegistry: ChainRegistry,
     assetSourceRegistry: AssetSourceRegistry,
-    extrinsicService: ExtrinsicService,
+    extrinsicServiceFactory: ExtrinsicService.Factory,
     phishingValidationFactory: PhishingValidationFactory,
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val storageDataSource: StorageDataSource,
     private val accountRepository: AccountRepository,
-) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
-
-    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
+) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
     override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         val chain = chainRegistry.getChain(chainAsset.chainId)
