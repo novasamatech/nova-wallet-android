@@ -171,7 +171,11 @@ private class StableConversionSource(
             .map { }
     }
 
-    private suspend fun subscribeTransferableBalance(subscriptionBuilder: SharedRequestsBuilder, account: AccountId, assetId: HydraDxAssetId): Flow<BigInteger> {
+    private suspend fun subscribeTransferableBalance(
+        subscriptionBuilder: SharedRequestsBuilder,
+        account: AccountId,
+        assetId: HydraDxAssetId
+    ): Flow<BigInteger> {
         // We cant use AssetSource since it require Chain.Asset which might not always be present in case some stable pool assets are not yet in Nova configs
         return remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
             metadata.hydraTokens.accounts.observe(account, assetId).map {
