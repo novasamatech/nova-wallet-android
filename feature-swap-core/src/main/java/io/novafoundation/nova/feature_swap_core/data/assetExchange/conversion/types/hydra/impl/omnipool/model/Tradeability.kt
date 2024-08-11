@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct

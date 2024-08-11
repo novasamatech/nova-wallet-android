@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_swap_core.data.network.toChainAssetOrThrow
 import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.StableConversionSourceFactory
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -171,7 +171,7 @@ class RealHydraDxAssetConversion(
         return buildString {
             append(segment.sourceId)
 
-            if (segment.sourceId == StableSwapSourceFactory.ID) {
+            if (segment.sourceId == StableConversionSourceFactory.ID) {
                 val onChainId = segment.sourceParams.getValue("PoolId").toBigInteger()
                 val chainAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, onChainId)
                 append("[${chainAsset.symbol}]")

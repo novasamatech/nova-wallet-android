@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindInt
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct

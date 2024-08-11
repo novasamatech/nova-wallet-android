@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.MultiMapList
@@ -8,23 +8,21 @@ import io.novafoundation.nova.common.utils.graph.GraphBuilder
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.xyk
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxConversionSource
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxConversionSourceQuoteArgs
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraSwapDirection
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.RemoteAndLocalId
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.localId
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model.XYKPool
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model.XYKPoolAsset
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model.XYKPoolInfo
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model.XYKPools
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model.poolFeesConstant
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.RemoteAndLocalId
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.localId
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.subscribeToTransferableBalance
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model.XYKPool
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model.XYKPoolAsset
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model.XYKPoolInfo
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model.XYKPools
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model.poolFeesConstant
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core.data.network.toOnChainIdOrThrow
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSourceQuoteArgs
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -33,7 +31,7 @@ import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import java.math.BigInteger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -44,28 +42,25 @@ import kotlinx.coroutines.flow.map
 
 private const val POOL_ID_PARAM_KEY = "PoolId"
 
-class XYKSwapSourceFactory(
+class XYKConversionSourceFactory(
     private val remoteStorageSource: StorageDataSource,
-    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    private val assetSourceRegistry: AssetSourceRegistry,
-) : HydraDxSwapSource.Factory {
+    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter
+) : HydraDxConversionSource.Factory {
 
-    override fun create(chain: Chain): HydraDxSwapSource {
-        return XYKSwapSource(
+    override fun create(chain: Chain): HydraDxConversionSource {
+        return XYKConversionSource(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
-            chain = chain,
-            assetSourceRegistry = assetSourceRegistry
+            chain = chain
         )
     }
 }
 
-private class XYKSwapSource(
+private class XYKConversionSource(
     private val remoteStorageSource: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    private val chain: Chain,
-    private val assetSourceRegistry: AssetSourceRegistry,
-) : HydraDxSwapSource {
+    private val chain: Chain
+) : HydraDxConversionSource {
 
     override val identifier: String = "Xyk"
 
@@ -82,11 +77,7 @@ private class XYKSwapSource(
         return poolInitialInfo.allPossibleDirections()
     }
 
-    override suspend fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs) {
-        // We don't need a specific implementation for XYKSwap extrinsics since it is done by HydraDxExchange on the upper level via Router
-    }
-
-    override suspend fun quote(args: HydraDxSwapSourceQuoteArgs): Balance {
+    override suspend fun quote(args: HydraDxConversionSourceQuoteArgs): BigInteger {
         val allPools = xykPools.first()
         val poolAddress = args.params.poolAddressParam()
 
@@ -101,11 +92,10 @@ private class XYKSwapSource(
         assetId: RemoteAndLocalId,
         poolAddress: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Balance> {
+    ): Flow<BigInteger> {
         val chainAsset = chain.assetsById.getValue(assetId.localId.assetId)
-        val assetSource = assetSourceRegistry.sourceFor(chainAsset)
 
-        return assetSource.balance.subscribeTransferableAccountBalance(chain, chainAsset, poolAddress, subscriptionBuilder)
+        return remoteStorageSource.subscribeToTransferableBalance(chainAsset, poolAddress, subscriptionBuilder)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

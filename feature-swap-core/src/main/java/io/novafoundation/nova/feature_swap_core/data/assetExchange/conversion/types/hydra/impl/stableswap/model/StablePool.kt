@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.model
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -6,14 +6,13 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.hydra_dx_math.HydraDxMathConversions.fromBridgeResultToBalance
 import io.novafoundation.nova.hydra_dx_math.stableswap.StableSwapMathBridge
 import java.math.BigInteger
 
 class StablePool(
     val sharedAsset: StablePoolAsset,
-    sharedAssetIssuance: Balance,
+    sharedAssetIssuance: BigInteger,
     val assets: List<StablePoolAsset>,
     val initialAmplification: BigInteger,
     val finalAmplification: BigInteger,
@@ -48,7 +47,7 @@ class StablePool(
 }
 
 class StablePoolAsset(
-    val balance: Balance,
+    val balance: BigInteger,
     val id: HydraDxAssetId,
     val decimals: Int
 )
@@ -56,9 +55,9 @@ class StablePoolAsset(
 fun StablePool.quote(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
-    amount: Balance,
+    amount: BigInteger,
     direction: SwapDirection
-): Balance? {
+): BigInteger? {
     return when (direction) {
         SwapDirection.SPECIFIED_IN -> calculateOutGivenIn(assetIdIn, assetIdOut, amount)
         SwapDirection.SPECIFIED_OUT -> calculateInGivenOut(assetIdIn, assetIdOut, amount)
@@ -68,8 +67,8 @@ fun StablePool.quote(
 fun StablePool.calculateOutGivenIn(
     assetIn: HydraDxAssetId,
     assetOut: HydraDxAssetId,
-    amountIn: Balance,
-): Balance? {
+    amountIn: BigInteger,
+): BigInteger? {
     return when {
         assetIn == sharedAsset.id -> calculateWithdrawOneAsset(assetOut, amountIn)
         assetOut == sharedAsset.id -> calculateShares(assetIn, amountIn)
@@ -80,8 +79,8 @@ fun StablePool.calculateOutGivenIn(
 fun StablePool.calculateInGivenOut(
     assetIn: HydraDxAssetId,
     assetOut: HydraDxAssetId,
-    amountOut: Balance,
-): Balance? {
+    amountOut: BigInteger,
+): BigInteger? {
     return when {
         assetOut == sharedAsset.id -> calculateAddOneAsset(assetIn, amountOut)
         assetIn == sharedAsset.id -> calculateSharesForAmount(assetOut, amountOut)
@@ -91,8 +90,8 @@ fun StablePool.calculateInGivenOut(
 
 private fun StablePool.calculateAddOneAsset(
     assetIn: HydraDxAssetId,
-    amountOut: Balance,
-): Balance? {
+    amountOut: BigInteger,
+): BigInteger? {
     return StableSwapMathBridge.calculate_add_one_asset(
         reserves,
         amountOut.toString(),
@@ -105,8 +104,8 @@ private fun StablePool.calculateAddOneAsset(
 
 private fun StablePool.calculateSharesForAmount(
     assetOut: HydraDxAssetId,
-    amountOut: Balance,
-): Balance? {
+    amountOut: BigInteger,
+): BigInteger? {
     return StableSwapMathBridge.calculate_shares_for_amount(
         reserves,
         assetOut.toInt(),
@@ -120,8 +119,8 @@ private fun StablePool.calculateSharesForAmount(
 private fun StablePool.calculateIn(
     assetIn: HydraDxAssetId,
     assetOut: HydraDxAssetId,
-    amountOut: Balance,
-): Balance? {
+    amountOut: BigInteger,
+): BigInteger? {
     return StableSwapMathBridge.calculate_in_given_out(
         reserves,
         assetIn.toInt(),
@@ -134,8 +133,8 @@ private fun StablePool.calculateIn(
 
 private fun StablePool.calculateWithdrawOneAsset(
     assetOut: HydraDxAssetId,
-    amountIn: Balance,
-): Balance? {
+    amountIn: BigInteger,
+): BigInteger? {
     return StableSwapMathBridge.calculate_liquidity_out_one_asset(
         reserves,
         amountIn.toString(),
@@ -148,8 +147,8 @@ private fun StablePool.calculateWithdrawOneAsset(
 
 private fun StablePool.calculateShares(
     assetIn: HydraDxAssetId,
-    amountIn: Balance,
-): Balance? {
+    amountIn: BigInteger,
+): BigInteger? {
     val assets = listOf(SharesAssetInput(assetIn.toInt(), amountIn.toString()))
     val assetsJson = gson.toJson(assets)
 
@@ -165,8 +164,8 @@ private fun StablePool.calculateShares(
 private fun StablePool.calculateOut(
     assetIn: HydraDxAssetId,
     assetOut: HydraDxAssetId,
-    amountIn: Balance,
-): Balance? {
+    amountIn: BigInteger,
+): BigInteger? {
     return StableSwapMathBridge.calculate_out_given_in(
         this.reserves,
         assetIn.toInt(),

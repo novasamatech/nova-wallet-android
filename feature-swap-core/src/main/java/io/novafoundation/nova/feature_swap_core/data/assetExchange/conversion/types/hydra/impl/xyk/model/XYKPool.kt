@@ -1,9 +1,8 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model
 
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.hydra_dx_math.HydraDxMathConversions.fromBridgeResultToBalance
 import io.novafoundation.nova.hydra_dx_math.xyk.HYKSwapMathBridge
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -18,9 +17,9 @@ class XYKPools(
         poolAddress: AccountId,
         assetIdIn: HydraDxAssetId,
         assetIdOut: HydraDxAssetId,
-        amount: Balance,
+        amount: BigInteger,
         direction: SwapDirection
-    ): Balance? {
+    ): BigInteger? {
         val relevantPool = pools.first { it.address.contentEquals(poolAddress) }
 
         return relevantPool.quote(assetIdIn, assetIdOut, amount, direction, fees)
@@ -43,17 +42,17 @@ class XYKPool(
 }
 
 class XYKPoolAsset(
-    val balance: Balance,
+    val balance: BigInteger,
     val id: HydraDxAssetId,
 )
 
 fun XYKPool.quote(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
-    amount: Balance,
+    amount: BigInteger,
     direction: SwapDirection,
     fees: XYKFees
-): Balance? {
+): BigInteger? {
     return when (direction) {
         SwapDirection.SPECIFIED_IN -> calculateOutGivenIn(assetIdIn, assetIdOut, amount, fees)
         SwapDirection.SPECIFIED_OUT -> calculateInGivenOut(assetIdIn, assetIdOut, amount, fees)
@@ -63,9 +62,9 @@ fun XYKPool.quote(
 private fun XYKPool.calculateOutGivenIn(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
-    amountIn: Balance,
+    amountIn: BigInteger,
     feesConfig: XYKFees
-): Balance? {
+): BigInteger? {
     val assetIn = getAsset(assetIdIn)
     val assetOut = getAsset(assetIdOut)
 
@@ -83,9 +82,9 @@ private fun XYKPool.calculateOutGivenIn(
 private fun XYKPool.calculateInGivenOut(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
-    amountOut: Balance,
+    amountOut: BigInteger,
     feesConfig: XYKFees,
-): Balance? {
+): BigInteger? {
     val assetIn = getAsset(assetIdIn)
     val assetOut = getAsset(assetIdOut)
 
@@ -100,7 +99,7 @@ private fun XYKPool.calculateInGivenOut(
     return amountIn + fees
 }
 
-private fun XYKFees.feeFrom(amount: BigInteger): Balance? {
+private fun XYKFees.feeFrom(amount: BigInteger): BigInteger? {
     return HYKSwapMathBridge.calculate_pool_trade_fee(amount.toString(), nominator.toString(), denominator.toString())
         .fromBridgeResultToBalance()
 }

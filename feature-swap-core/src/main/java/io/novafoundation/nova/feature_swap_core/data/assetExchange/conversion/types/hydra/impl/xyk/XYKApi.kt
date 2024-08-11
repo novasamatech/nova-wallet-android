@@ -1,12 +1,12 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.utils.xyk
 import io.novafoundation.nova.common.utils.xykOrNull
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model.XYKPoolInfo
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.model.bindXYKPoolInfo
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model.XYKPoolInfo
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.model.bindXYKPoolInfo
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1

@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.model
 
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import java.math.BigInteger
 import kotlin.math.floor
 
 class OmniPool(
@@ -16,20 +16,20 @@ class OmniPoolFees(
 )
 
 class OmniPoolToken(
-    val hubReserve: Balance,
-    val shares: Balance,
-    val protocolShares: Balance,
+    val hubReserve: BigInteger,
+    val shares: BigInteger,
+    val protocolShares: BigInteger,
     val tradeability: Tradeability,
-    val balance: Balance,
+    val balance: BigInteger,
     val fees: OmniPoolFees
 )
 
 fun OmniPool.quote(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
-    amount: Balance,
+    amount: BigInteger,
     direction: SwapDirection
-): Balance? {
+): BigInteger? {
     return when (direction) {
         SwapDirection.SPECIFIED_IN -> calculateOutGivenIn(assetIdIn, assetIdOut, amount)
         SwapDirection.SPECIFIED_OUT -> calculateInGivenOut(assetIdIn, assetIdOut, amount)
@@ -39,8 +39,8 @@ fun OmniPool.quote(
 fun OmniPool.calculateOutGivenIn(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
-    amountIn: Balance
-): Balance {
+    amountIn: BigInteger
+): BigInteger {
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 
@@ -70,8 +70,8 @@ fun OmniPool.calculateOutGivenIn(
 fun OmniPool.calculateInGivenOut(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
-    amountOut: Balance
-): Balance? {
+    amountOut: BigInteger
+): BigInteger? {
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 

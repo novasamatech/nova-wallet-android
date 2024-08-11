@@ -1,10 +1,10 @@
 @file:Suppress("RedundantUnitExpression")
 
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool
 
 import io.novafoundation.nova.common.utils.dynamicFees
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.DynamicFee
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model.bindDynamicFee
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.model.DynamicFee
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.model.bindDynamicFee
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule

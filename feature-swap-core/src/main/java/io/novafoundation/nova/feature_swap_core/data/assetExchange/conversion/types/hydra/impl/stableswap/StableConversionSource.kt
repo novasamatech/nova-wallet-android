@@ -1,8 +1,10 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.orEmpty
+import io.novafoundation.nova.common.domain.balance.TransferableMode
+import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.MultiMapList
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
@@ -12,23 +14,19 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxConversionSource
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxConversionSourceQuoteArgs
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraSwapDirection
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.RemoteAndLocalIdOptional
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.omniPoolAccountId
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StablePool
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StablePoolAsset
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.StableSwapPoolInfo
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.quote
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.RemoteAndLocalIdOptional
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.omniPoolAccountId
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.model.StablePool
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.model.StablePoolAsset
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.model.StableSwapPoolInfo
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.model.quote
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core.data.network.toOnChainIdOrThrow
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSourceQuoteArgs
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -39,7 +37,7 @@ import io.novasama.substrate_sdk_android.encrypt.json.asLittleEndianBytes
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -54,19 +52,19 @@ import kotlinx.coroutines.flow.onEach
 
 private const val POOL_ID_PARAM_KEY = "PoolId"
 
-class StableSwapSourceFactory(
+class StableConversionSourceFactory(
     private val remoteStorageSource: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val gson: Gson,
     private val chainStateRepository: ChainStateRepository
-) : HydraDxSwapSource.Factory {
+) : HydraDxConversionSource.Factory {
 
     companion object {
         const val ID = "StableSwap"
     }
 
-    override fun create(chain: Chain): HydraDxSwapSource {
-        return StableSwapSource(
+    override fun create(chain: Chain): HydraDxConversionSource {
+        return StableConversionSource(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             chain = chain,
@@ -76,15 +74,15 @@ class StableSwapSourceFactory(
     }
 }
 
-private class StableSwapSource(
+private class StableConversionSource(
     private val remoteStorageSource: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val chain: Chain,
     private val gson: Gson,
     private val chainStateRepository: ChainStateRepository,
-) : HydraDxSwapSource {
+) : HydraDxConversionSource {
 
-    override val identifier: String = StableSwapSourceFactory.ID
+    override val identifier: String = StableConversionSourceFactory.ID
 
     private val initialPoolsInfo: MutableSharedFlow<Collection<PoolInitialInfo>> = singleReplaySharedFlow()
 
@@ -99,11 +97,7 @@ private class StableSwapSource(
         return poolInitialInfo.allPossibleDirections()
     }
 
-    override suspend fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs) {
-        // We don't need a specific implementation for StableSwap extrinsics since it is done by HydraDxExchange on the upper level via Router
-    }
-
-    override suspend fun quote(args: HydraDxSwapSourceQuoteArgs): Balance {
+    override suspend fun quote(args: HydraDxConversionSourceQuoteArgs): BigInteger {
         val allPools = stablePools.first()
         val poolId = args.params.poolIdParam()
         val relevantPool = allPools.first { it.sharedAsset.id == poolId }
@@ -178,20 +172,20 @@ private class StableSwapSource(
             .map { }
     }
 
-    private suspend fun subscribeTransferableBalance(subscriptionBuilder: SharedRequestsBuilder, account: AccountId, assetId: HydraDxAssetId): Flow<Balance> {
+    private suspend fun subscribeTransferableBalance(subscriptionBuilder: SharedRequestsBuilder, account: AccountId, assetId: HydraDxAssetId): Flow<BigInteger> {
         // We cant use AssetSource since it require Chain.Asset which might not always be present in case some stable pool assets are not yet in Nova configs
         return remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
             metadata.hydraTokens.accounts.observe(account, assetId).map {
-                Asset.TransferableMode.REGULAR.calculateTransferable(it.orEmpty())
+                TransferableMode.REGULAR.calculateTransferable(it.orEmpty())
             }
         }
     }
 
     private fun createStableSwapPool(
         poolInfos: Map<HydraDxAssetId, StableSwapPoolInfo?>,
-        poolSharedAssetBalances: Map<HydraDxAssetId, Balance>,
-        poolParticipatingAssetBalances: Map<Pair<HydraDxAssetId, HydraDxAssetId>, Balance>,
-        totalIssuances: Map<HydraDxAssetId, Balance>,
+        poolSharedAssetBalances: Map<HydraDxAssetId, BigInteger>,
+        poolParticipatingAssetBalances: Map<Pair<HydraDxAssetId, HydraDxAssetId>, BigInteger>,
+        totalIssuances: Map<HydraDxAssetId, BigInteger>,
         currentBlock: BlockNumber,
         precisions: Map<HydraDxAssetId, Int>
     ): List<StablePool> {

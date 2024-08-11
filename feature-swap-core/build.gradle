@@ -30,6 +30,8 @@ dependencies {
     implementation project(':runtime')
     implementation project(":common")
 
+    implementation project(":bindings:hydra-dx-math")
+
     implementation substrateSdkDep
 
     implementation daggerDep

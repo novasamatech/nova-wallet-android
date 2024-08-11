@@ -1,15 +1,15 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.model
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import java.math.BigInteger
 
 class OmnipoolAssetState(
     val tokenId: HydraDxAssetId,
-    val hubReserve: Balance,
-    val shares: Balance,
-    val protocolShares: Balance,
+    val hubReserve: BigInteger,
+    val shares: BigInteger,
+    val protocolShares: BigInteger,
     val tradeability: Tradeability
 )
 

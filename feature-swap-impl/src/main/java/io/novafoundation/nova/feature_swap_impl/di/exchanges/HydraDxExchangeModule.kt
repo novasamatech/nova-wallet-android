@@ -11,9 +11,9 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.Hydra
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.RealHydraDxNovaReferral
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.XYKSwapSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.OmniPoolConversionSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.StableConversionSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.XYKConversionSourceFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.RealHydraDxAssetConversionFactory
@@ -41,7 +41,7 @@ class HydraDxExchangeModule {
         assetSourceRegistry: AssetSourceRegistry,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     ): HydraDxSwapSource.Factory {
-        return OmniPoolSwapSourceFactory(
+        return OmniPoolConversionSourceFactory(
             remoteStorageSource = remoteStorageSource,
             chainRegistry = chainRegistry,
             assetSourceRegistry = assetSourceRegistry,
@@ -57,7 +57,7 @@ class HydraDxExchangeModule {
         gson: Gson,
         chainStateRepository: ChainStateRepository
     ): HydraDxSwapSource.Factory {
-        return StableSwapSourceFactory(
+        return StableConversionSourceFactory(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             gson = gson,
@@ -72,7 +72,7 @@ class HydraDxExchangeModule {
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         assetSourceRegistry: AssetSourceRegistry
     ): HydraDxSwapSource.Factory {
-        return XYKSwapSourceFactory(
+        return XYKConversionSourceFactory(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             assetSourceRegistry = assetSourceRegistry

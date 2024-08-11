@@ -13,8 +13,8 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
+import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
@@ -87,7 +87,7 @@ class OrmlAssetBalance(
                 chainAsset.ormlCurrencyId(runtime),
                 binding = ::bindOrmlAccountBalanceOrEmpty
             ).map {
-                Asset.TransferableMode.REGULAR.calculateTransferable(it)
+                TransferableMode.REGULAR.calculateTransferable(it)
             }
         }
     }

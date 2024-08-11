@@ -34,7 +34,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.As
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxSwapEdge
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.OmniPoolConversionSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -443,11 +443,11 @@ private class HydraDxExchange(
     }
 
     private fun QuotePath.Segment.canOptimizeSingleSegmentTrade(): Boolean {
-        return sourceId == OmniPoolSwapSourceFactory.SOURCE_ID
+        return sourceId == OmniPoolConversionSourceFactory.SOURCE_ID
     }
 
     private fun Iterable<HydraDxSwapSource>.findOmniPool(): HydraDxSwapSource {
-        return firstById(OmniPoolSwapSourceFactory.SOURCE_ID)
+        return firstById(OmniPoolConversionSourceFactory.SOURCE_ID)
     }
 
     private fun createSources(): List<HydraDxSwapSource> {
