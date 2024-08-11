@@ -36,7 +36,6 @@ import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.encrypt.json.asLittleEndianBytes
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -232,12 +231,6 @@ private class StableConversionSource(
         val suffix = poolId.toInt().asLittleEndianBytes()
 
         return (prefix + suffix).blake2b256()
-    }
-
-    override fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*> {
-        val poolId = params.getValue(POOL_ID_PARAM_KEY).toBigInteger()
-
-        return DictEnum.Entry("Stableswap", poolId)
     }
 
     private suspend fun getPools(): Map<HydraDxAssetId, StableSwapPoolInfo> {

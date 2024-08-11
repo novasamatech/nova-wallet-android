@@ -26,7 +26,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ]
 )
 @FeatureScope
-interface SwapFeatureComponent : SwapFeatureApi, SwapCoreApi {
+interface SwapFeatureComponent : SwapFeatureApi {
 
     fun swapMainSettings(): SwapMainSettingsComponent.Factory
 
@@ -51,6 +51,7 @@ interface SwapFeatureComponent : SwapFeatureApi, SwapCoreApi {
             AccountFeatureApi::class,
             BuyFeatureApi::class,
             DbApi::class,
+            SwapCoreApi::class,
         ]
     )
     interface SwapFeatureDependenciesComponent : SwapFeatureDependencies

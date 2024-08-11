@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.firstById
@@ -7,13 +7,11 @@ import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.mapAsync
+import io.novafoundation.nova.common.utils.mergeIfMultiple
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.BuildConfig
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDXAssetConversion
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxSwapEdge
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.toQuotePath
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core.data.network.toChainAssetOrThrow
 import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
@@ -23,19 +21,21 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
+import kotlinx.coroutines.flow.Flow
 
 private const val PATHS_LIMIT = 4
 
 class RealHydraDxAssetConversionFactory(
-    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val conversionSourceFactories: Iterable<HydraDxConversionSource.Factory>,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : HydraDxAssetConversionFactory {
 
     override fun create(chain: Chain): HydraDXAssetConversion {
         return RealHydraDxAssetConversion(
             chain,
-            swapSourceFactories,
+            conversionSourceFactories,
             hydraDxAssetIdConverter
         )
     }
@@ -43,12 +43,12 @@ class RealHydraDxAssetConversionFactory(
 
 class RealHydraDxAssetConversion(
     private val chain: Chain,
-    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val swapSourceFactories: Iterable<HydraDxConversionSource.Factory>,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : HydraDXAssetConversion {
 
-    private val conversionSources: List<HydraDxSwapSource> = createSources()
+    private val conversionSources: List<HydraDxConversionSource> = createSources()
 
     override suspend fun availableSwapDirections(): Graph<FullChainAssetId, HydraDxSwapEdge> {
         val allDirectDirections = conversionSources.mapAsync { source ->
@@ -80,6 +80,12 @@ class RealHydraDxAssetConversion(
         return quotedPaths.max()
     }
 
+    override suspend fun runSubscriptions(userAccountId: AccountId, subscriptionBuilder: SharedRequestsBuilder): Flow<Unit> {
+        return conversionSources.map {
+            it.runSubscriptions(userAccountId, subscriptionBuilder)
+        }.mergeIfMultiple()
+    }
+
     private suspend fun quotePath(
         path: Path<HydraDxSwapEdge>,
         amount: BigInteger,
@@ -96,7 +102,7 @@ class RealHydraDxAssetConversion(
     private suspend fun quotePathBuy(path: Path<HydraDxSwapEdge>, amount: BigInteger): BigInteger? {
         return runCatching {
             path.foldRight(amount) { segment, currentAmount ->
-                val args = HydraDxSwapSourceQuoteArgs(
+                val args = HydraDxConversionSourceQuoteArgs(
                     chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
                     chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
                     amount = currentAmount,
@@ -112,7 +118,7 @@ class RealHydraDxAssetConversion(
     private suspend fun quotePathSell(path: Path<HydraDxSwapEdge>, amount: BigInteger): BigInteger? {
         return runCatching {
             path.fold(amount) { currentAmount, segment ->
-                val args = HydraDxSwapSourceQuoteArgs(
+                val args = HydraDxConversionSourceQuoteArgs(
                     chainAssetIn = chain.assetsById.getValue(segment.from.assetId),
                     chainAssetOut = chain.assetsById.getValue(segment.to.assetId),
                     amount = currentAmount,
@@ -125,11 +131,11 @@ class RealHydraDxAssetConversion(
         }.getOrNull()
     }
 
-    private fun createSources(): List<HydraDxSwapSource> {
+    private fun createSources(): List<HydraDxConversionSource> {
         return swapSourceFactories.map { it.create(chain) }
     }
 
-    private fun HydraDxSwapEdge.swapSource(): HydraDxSwapSource {
+    private fun HydraDxSwapEdge.swapSource(): HydraDxConversionSource {
         return conversionSources.firstById(sourceId)
     }
 

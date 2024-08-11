@@ -17,17 +17,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface HydraDxSwapSource : Identifiable {
 
-    suspend fun availableSwapDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection>
-
     suspend fun ExtrinsicBuilder.executeSwap(args: SwapExecuteArgs)
-
-    @Throws(SwapQuoteException::class)
-    suspend fun quote(args: HydraDxSwapSourceQuoteArgs): Balance
-
-    suspend fun runSubscriptions(
-        userAccountId: AccountId,
-        subscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Unit>
 
     fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*>
 
@@ -36,11 +26,3 @@ interface HydraDxSwapSource : Identifiable {
         fun create(chain: Chain): HydraDxSwapSource
     }
 }
-
-data class HydraDxSwapSourceQuoteArgs(
-    val chainAssetIn: Chain.Asset,
-    val chainAssetOut: Chain.Asset,
-    val amount: Balance,
-    val swapDirection: SwapDirection,
-    val params: Map<String, String>
-)

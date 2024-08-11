@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
@@ -11,6 +11,7 @@ import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import java.math.BigInteger
 
 private val SYSTEM_ON_CHAIN_ASSET_ID = BigInteger.ZERO
+
 
 internal class RealHydraDxAssetIdConverter(
     private val chainRegistry: ChainRegistry

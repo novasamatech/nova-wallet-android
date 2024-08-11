@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDirections
-import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.structOf
@@ -27,7 +26,6 @@ import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetConversion
-import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
@@ -106,8 +104,7 @@ private class HydraDxExchange(
     private val hydraDxNovaReferral: HydraDxNovaReferral,
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val assetConversion: AssetConversion<HydraDxSwapEdge>,
-    private val debug: Boolean = BuildConfig.DEBUG
+    private val assetConversion: AssetConversion<HydraDxSwapEdge>
 ) : AssetExchange {
 
     private val swapSources: List<HydraDxSwapSource> = createSources()
@@ -225,9 +222,7 @@ private class HydraDxExchange(
                 userReferralState.emit(it)
             }
 
-            val sourcesSubscription = swapSources.map {
-                it.runSubscriptions(userAccountId, subscriptionBuilder)
-            }.mergeIfMultiple()
+            val sourcesSubscription = assetConversion.runSubscriptions(userAccountId, subscriptionBuilder)
 
             subscriptionBuilder.subscribe(scope)
 

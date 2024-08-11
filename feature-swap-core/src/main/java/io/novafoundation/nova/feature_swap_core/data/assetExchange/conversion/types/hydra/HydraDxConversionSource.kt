@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 
@@ -23,8 +22,6 @@ interface HydraDxConversionSource : Identifiable {
         userAccountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<Unit>
-
-    fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*>
 
     interface Factory {
 

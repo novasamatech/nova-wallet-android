@@ -30,7 +30,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import java.math.BigInteger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
@@ -128,10 +127,6 @@ private class XYKConversionSource(
             val built = XYKPools(fees, pools)
             xykPools.emit(built)
         }
-    }
-
-    override fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*> {
-        return DictEnum.Entry("XYK", null)
     }
 
     private suspend fun getPools(): Map<AccountIdKey, XYKPoolInfo> {

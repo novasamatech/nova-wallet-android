@@ -16,7 +16,10 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.XYKConversionSourceFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.RealHydraDxAssetConversionFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.RealHydraDxAssetConversionFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.XYKSwapSourceFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -36,59 +39,23 @@ class HydraDxExchangeModule {
     @Provides
     @IntoSet
     fun provideOmniPoolSourceFactory(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        chainRegistry: ChainRegistry,
-        assetSourceRegistry: AssetSourceRegistry,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     ): HydraDxSwapSource.Factory {
-        return OmniPoolConversionSourceFactory(
-            remoteStorageSource = remoteStorageSource,
-            chainRegistry = chainRegistry,
-            assetSourceRegistry = assetSourceRegistry,
+        return OmniPoolSwapSourceFactory(
             hydraDxAssetIdConverter = hydraDxAssetIdConverter
         )
     }
 
     @Provides
     @IntoSet
-    fun provideStableSwapSourceFactory(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-        gson: Gson,
-        chainStateRepository: ChainStateRepository
-    ): HydraDxSwapSource.Factory {
-        return StableConversionSourceFactory(
-            remoteStorageSource = remoteStorageSource,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter,
-            gson = gson,
-            chainStateRepository = chainStateRepository
-        )
+    fun provideStableSwapSourceFactory(): HydraDxSwapSource.Factory {
+        return StableSwapSourceFactory()
     }
 
     @Provides
     @IntoSet
-    fun provideXykSwapSourceFactory(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-        assetSourceRegistry: AssetSourceRegistry
-    ): HydraDxSwapSource.Factory {
-        return XYKConversionSourceFactory(
-            remoteStorageSource = remoteStorageSource,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter,
-            assetSourceRegistry = assetSourceRegistry
-        )
-    }
-
-
-    @Provides
-    @FeatureScope
-    fun provideHydraDxAssetConversionFactory(
-        swapSourceFactories: Set<@JvmSuppressWildcards HydraDxSwapSource.Factory>,
-        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    ): HydraDxAssetConversionFactory {
-        return RealHydraDxAssetConversionFactory(
-            swapSourceFactories,
-            hydraDxAssetIdConverter
+    fun provideXykSwapSourceFactory(): HydraDxSwapSource.Factory {
+        return XYKSwapSourceFactory(
         )
     }
 

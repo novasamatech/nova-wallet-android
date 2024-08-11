@@ -1,10 +1,5 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool
 
-import io.novafoundation.nova.common.data.network.ext.transferableBalance
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
-import io.novafoundation.nova.common.data.network.runtime.binding.bindOrmlAccountBalanceOrEmpty
-import io.novafoundation.nova.common.domain.balance.TransferableMode
-import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMapList
 import io.novafoundation.nova.common.utils.dynamicFees
@@ -14,7 +9,6 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.padEnd
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
-import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxConversionSource
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxConversionSourceQuoteArgs
@@ -33,7 +27,6 @@ import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -41,12 +34,8 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
-import io.novafoundation.nova.runtime.storage.typed.account
-import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -161,10 +150,6 @@ private class OmniPoolConversionSource(
         }
             .onEach(omniPoolFlow::emit)
             .map { }
-    }
-
-    override fun routerPoolTypeFor(params: Map<String, String>): DictEnum.Entry<*> {
-        return DictEnum.Entry("Omnipool", null)
     }
 
     private suspend fun getPooledOnChainAssetIds(): List<BigInteger> {
