@@ -111,7 +111,6 @@ class SendInteractor(
     fun validationSystemFor(transfer: AssetTransfer, coroutineScope: CoroutineScope) = if (transfer.isCrossChain) {
         crossChainTransactor.validationSystem
     } else {
-
         assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers.getValidationSystem(coroutineScope)
     }
 

@@ -25,8 +25,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
-import io.novafoundation.nova.common.domain.balance.TransferableMode
-import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks

@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
@@ -14,8 +15,8 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -27,11 +28,13 @@ class CustomFeeModule {
     @FeatureScope
     fun provideHydraDxQuoteSharedComputation(
         computationalCache: ComputationalCache,
-        assetConversionFactory: HydraDxAssetConversionFactory
+        assetConversionFactory: HydraDxAssetConversionFactory,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
     ): HydraDxQuoteSharedComputation {
         return HydraDxQuoteSharedComputation(
             computationalCache,
-            assetConversionFactory
+            assetConversionFactory,
+            storageSharedRequestsBuilderFactory
         )
     }
 
@@ -54,11 +57,13 @@ class CustomFeeModule {
     fun provideHydrationFeePaymentProvider(
         chainRegistry: ChainRegistry,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-        hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation
+        hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
+        accountRepository: AccountRepository
     ) = HydrationFeePaymentProvider(
         chainRegistry,
         hydraDxAssetIdConverter,
-        hydraDxQuoteSharedComputation
+        hydraDxQuoteSharedComputation,
+        accountRepository
     )
 
     @Provides

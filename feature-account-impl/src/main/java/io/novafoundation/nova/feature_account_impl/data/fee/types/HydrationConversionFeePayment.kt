@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.data.fee.types
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.utils.HydraDxQuoteSharedComputation
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core.data.network.setFeeCurrency
@@ -20,6 +21,7 @@ internal class HydrationConversionFeePayment(
     private val chainRegistry: ChainRegistry,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
+    private val accountRepository: AccountRepository,
     private val coroutineScope: CoroutineScope
 ) : FeePayment {
 
@@ -33,19 +35,23 @@ internal class HydrationConversionFeePayment(
     }
 
     override suspend fun convertNativeFee(nativeFee: Fee): Fee {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = chainRegistry.getChain(paymentAsset.chainId)
+        val accountId = metaAccount.accountIdIn(chain)
         val fromAsset = chain.commissionAsset
-        val quote = hydraDxQuoteSharedComputation.quote(chain, fromAsset = fromAsset, toAsset = paymentAsset, coroutineScope)
+
+        val quote = hydraDxQuoteSharedComputation.quote(chain, accountId!!, fromAsset = fromAsset, toAsset = paymentAsset, coroutineScope)
         return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset.fullId)
     }
 
     override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = chainRegistry.getChain(paymentAsset.chainId)
-
-        val allSwapDirections = hydraDxQuoteSharedComputation.directions(chain, coroutineScope)
-
+        val accountId = metaAccount.accountIdIn(chain)
         val fromAsset = chain.commissionAsset
-        val cimmissionAssetDirections = allSwapDirections.adjacencyList[fromAsset.fullId] ?: emptyList()
-        return cimmissionAssetDirections.map { chainRegistry.asset(it.direction.to) }
+
+        val allSwapDirections = hydraDxQuoteSharedComputation.directions(chain, accountId!!, coroutineScope)
+        val commissionAssetDirections = allSwapDirections.adjacencyList[fromAsset.fullId] ?: emptyList()
+        return commissionAssetDirections.map { chainRegistry.asset(it.direction.to) }
     }
 }

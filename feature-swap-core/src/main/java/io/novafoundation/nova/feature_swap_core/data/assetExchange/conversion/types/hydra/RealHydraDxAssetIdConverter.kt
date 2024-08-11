@@ -12,7 +12,6 @@ import java.math.BigInteger
 
 private val SYSTEM_ON_CHAIN_ASSET_ID = BigInteger.ZERO
 
-
 internal class RealHydraDxAssetIdConverter(
     private val chainRegistry: ChainRegistry
 ) : HydraDxAssetIdConverter {

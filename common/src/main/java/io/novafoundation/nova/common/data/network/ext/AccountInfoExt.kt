@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import java.math.BigInteger
 
-
 fun AccountInfo.transferableBalance(): BigInteger {
     return transferableMode.calculateTransferable(data)
 }

@@ -10,7 +10,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import kotlinx.coroutines.CoroutineScope
 
-
 class RealExtrinsicServiceFactory(
     private val rpcCalls: RpcCalls,
     private val chainRegistry: ChainRegistry,

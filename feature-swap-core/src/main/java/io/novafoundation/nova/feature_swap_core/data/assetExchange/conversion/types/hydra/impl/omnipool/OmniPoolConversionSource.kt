@@ -96,7 +96,6 @@ private class OmniPoolConversionSource(
         )
     }
 
-
     override suspend fun quote(args: HydraDxConversionSourceQuoteArgs): BigInteger {
         val omniPool = omniPoolFlow.first()
 

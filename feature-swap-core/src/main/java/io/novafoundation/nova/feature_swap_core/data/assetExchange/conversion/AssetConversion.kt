@@ -25,5 +25,4 @@ interface AssetConversion<T : Edge<FullChainAssetId>> {
         userAccountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<Unit>
-
 }

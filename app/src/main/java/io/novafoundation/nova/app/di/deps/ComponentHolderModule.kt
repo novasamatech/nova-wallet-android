@@ -255,5 +255,4 @@ interface ComponentHolderModule {
     @ClassKey(SwapCoreApi::class)
     @IntoMap
     fun provideSwapCoreFeatureHolder(holder: SwapCoreHolder): FeatureApiHolder
-
 }

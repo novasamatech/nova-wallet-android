@@ -22,7 +22,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.asNumberOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource

@@ -185,5 +185,3 @@ class RealHydraDxAssetConversion(
         }
     }
 }
-
-
