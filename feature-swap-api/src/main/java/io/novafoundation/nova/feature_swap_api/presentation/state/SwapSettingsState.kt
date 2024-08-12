@@ -14,7 +14,7 @@ interface SwapSettingsState : SelectedOptionSharedState<SwapSettings> {
 
     fun setFeeAsset(asset: Chain.Asset)
 
-    fun setAmount(amount: Balance?, swapDirection: io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection)
+    fun setAmount(amount: Balance?, swapDirection: SwapDirection)
 
     fun setSlippage(slippage: Percent)
 

@@ -10,16 +10,16 @@ enum class SwapDirectionModel : Parcelable {
     SPECIFIED_OUT
 }
 
-fun SwapDirectionModel.mapFromModel(): io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection {
+fun SwapDirectionModel.mapFromModel(): SwapDirection {
     return when (this) {
-        SwapDirectionModel.SPECIFIED_IN -> io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection.SPECIFIED_IN
-        SwapDirectionModel.SPECIFIED_OUT -> io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection.SPECIFIED_OUT
+        SwapDirectionModel.SPECIFIED_IN -> SwapDirection.SPECIFIED_IN
+        SwapDirectionModel.SPECIFIED_OUT -> SwapDirection.SPECIFIED_OUT
     }
 }
 
-fun io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection.mapToModel(): SwapDirectionModel {
+fun SwapDirection.mapToModel(): SwapDirectionModel {
     return when (this) {
-        io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection.SPECIFIED_IN -> SwapDirectionModel.SPECIFIED_IN
-        io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection.SPECIFIED_OUT -> SwapDirectionModel.SPECIFIED_OUT
+        SwapDirection.SPECIFIED_IN -> SwapDirectionModel.SPECIFIED_IN
+        SwapDirection.SPECIFIED_OUT -> SwapDirectionModel.SPECIFIED_OUT
     }
 }

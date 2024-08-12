@@ -12,6 +12,6 @@ data class SwapSettings(
     val assetOut: Chain.Asset? = null,
     val feeAsset: Chain.Asset? = null,
     val amount: Balance? = null,
-    val swapDirection: io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection? = null,
+    val swapDirection: SwapDirection? = null,
     val slippage: Percent
 )

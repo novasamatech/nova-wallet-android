@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class HydraDxOmniPoolSwapExtractor(
-    hydraDxAssetIdConverter: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter,
+    hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : BaseHydraDxSwapExtractor(hydraDxAssetIdConverter) {
 
     private val calls = listOf("buy", "sell")

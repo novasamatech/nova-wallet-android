@@ -16,7 +16,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepo
 
 internal class SubstrateRealtimeOperationFetcherFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
-    private val hydraDxAssetIdConverter: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter,
+    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val eventsRepository: EventsRepository,
     private val extrinsicWalk: ExtrinsicWalk,
 ) : Factory {
