@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
@@ -215,7 +216,7 @@ private class AssetConversionExchange(
         }
 
         return AssetExchangeFee(
-            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin, assetId = customFeeAsset.fullId),
+            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin, paymentAsset = customFeeAsset.toFeePaymentAsset()),
             minimumBalanceBuyIn = minimumBalanceBuyIn
         )
     }

@@ -199,7 +199,12 @@ class EvmSignInteractor(
     }
 
     private fun zeroFee(): Fee {
-        return EvmFee(gasLimit = BigInteger.ZERO, gasPrice = BigInteger.ZERO, submissionOrigin())
+        return EvmFee(
+            gasLimit = BigInteger.ZERO,
+            gasPrice = BigInteger.ZERO,
+            submissionOrigin(),
+            Fee.PaymentAsset.Native
+        )
     }
 
     private suspend fun confirmTx(basedOn: EvmTransaction, upToDateFee: Fee?, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response {
@@ -215,6 +220,7 @@ class EvmSignInteractor(
                 val signedTx = api.signTransaction(tx, signer, originAccountId, evmChainId)
                 ExternalSignCommunicator.Response.Signed(request.id, signedTx)
             }
+
             ConfirmTx.Action.SEND -> {
                 val txHash = api.sendTransaction(tx, signer, originAccountId, evmChainId)
                 ExternalSignCommunicator.Response.Sent(request.id, txHash)
@@ -321,7 +327,7 @@ class EvmSignInteractor(
         )
     }
 
-    private fun RawTransaction.fee(): Fee = EvmFee(gasLimit = gasLimit, gasPrice = gasPrice, submissionOrigin = submissionOrigin())
+    private fun RawTransaction.fee(): Fee = EvmFee(gasLimit = gasLimit, gasPrice = gasPrice, submissionOrigin = submissionOrigin(), Fee.PaymentAsset.Native)
 
     private fun submissionOrigin() = SubmissionOrigin.singleOrigin(originAccountId())
 

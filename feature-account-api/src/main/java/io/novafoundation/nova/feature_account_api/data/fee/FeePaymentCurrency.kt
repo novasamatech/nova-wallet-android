@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.data.fee
 
+import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 sealed interface FeePaymentCurrency {
@@ -17,4 +18,13 @@ sealed interface FeePaymentCurrency {
      * The actual asset used to pay fees will be available in [Fee.asset]
      */
     data class Asset(val asset: Chain.Asset) : FeePaymentCurrency
+
+    companion object
+}
+
+fun Chain.Asset.toFeePaymentCurrency(): FeePaymentCurrency {
+    return when {
+        isCommissionAsset -> FeePaymentCurrency.Native
+        else -> FeePaymentCurrency.Asset(this)
+    }
 }

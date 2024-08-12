@@ -1,9 +1,12 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFeeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -39,7 +42,7 @@ class SendInteractor(
     private val crossChainWeigher: CrossChainWeigher,
     private val crossChainTransactor: CrossChainTransactor,
     private val crossChainTransfersRepository: CrossChainTransfersRepository,
-    private val parachainInfoRepository: ParachainInfoRepository,
+    private val parachainInfoRepository: ParachainInfoRepository
 ) {
 
     // TODO wallet
@@ -129,13 +132,13 @@ class SendInteractor(
         return SubstrateFee(
             amount = amount,
             submissionOrigin = SubmissionOrigin.singleOrigin(accountId),
-            assetId = chain.commissionAsset.fullId
+            paymentAsset = chain.commissionAsset.toFeePaymentAsset()
         )
     }
 
     private fun CrossChainFeeModel.toSubstrateFee(transfer: AssetTransfer) = SubstrateFee(
         amount = holdingPart,
         submissionOrigin = SubmissionOrigin.singleOrigin(transfer.sender.requireAccountIdIn(transfer.originChain)),
-        assetId = transfer.originChain.commissionAsset.fullId // TODO: Support custom assets for xcm transfers
+        paymentAsset = transfer.originChain.commissionAsset.toFeePaymentAsset() // TODO: Support custom assets for xcm transfers
     )
 }

@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.selectedCommiss
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
@@ -181,7 +182,7 @@ class RealExtrinsicService(
         val totalNativeFee = SubstrateFee(
             totalFeeAmount,
             feeSigner.submissionOrigin(chain),
-            submissionOptions.selectedCommissionAsset(chain).fullId
+            submissionOptions.feePaymentCurrency.toFeePaymentAsset()
         )
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
@@ -286,7 +287,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             BigInteger.ZERO,
             signer.submissionOrigin(chain),
-            submissionOptions.selectedCommissionAsset(chain).fullId
+            submissionOptions.feePaymentCurrency.toFeePaymentAsset()
         )
     }
 
@@ -307,7 +308,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             amount = tip + baseFee,
             submissionOrigin = submissionOrigin,
-            chain.commissionAsset.fullId
+            chain.commissionAsset.toFeePaymentAsset()
         )
     }
 }

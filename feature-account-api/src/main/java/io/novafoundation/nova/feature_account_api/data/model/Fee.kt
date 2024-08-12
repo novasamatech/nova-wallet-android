@@ -1,10 +1,14 @@
 package io.novafoundation.nova.feature_account_api.data.model
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.isCommissionAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
 
-sealed interface Fee {
+interface Fee {
 
     companion object
 
@@ -14,25 +18,31 @@ sealed interface Fee {
      * Information about origin that is supposed to send the transaction fee was calculated against
      */
     val submissionOrigin: SubmissionOrigin
+
+    val paymentAsset: PaymentAsset
+
+    sealed interface PaymentAsset {
+
+        object Native : PaymentAsset
+
+        class Asset(val assetId: FullChainAssetId) : PaymentAsset
+    }
 }
 
 data class EvmFee(
     val gasLimit: BigInteger,
     val gasPrice: BigInteger,
-    override val submissionOrigin: SubmissionOrigin
+    override val submissionOrigin: SubmissionOrigin,
+    override val paymentAsset: Fee.PaymentAsset
 ) : Fee {
     override val amount = gasLimit * gasPrice
-}
-
-interface FeeInAsset : Fee {
-    val assetId: FullChainAssetId
 }
 
 class SubstrateFee(
     override val amount: BigInteger,
     override val submissionOrigin: SubmissionOrigin,
-    override val assetId: FullChainAssetId
-) : FeeInAsset
+    override val paymentAsset: Fee.PaymentAsset
+) : Fee
 
 val Fee.requestedAccountPaysFees: Boolean
     get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)
@@ -47,3 +57,17 @@ val BigInteger.asAmountByRequestedAccount: BigInteger
     } else {
         BigInteger.ZERO
     }
+
+fun FeePaymentCurrency.toFeePaymentAsset(): Fee.PaymentAsset {
+    return when (this) {
+        is FeePaymentCurrency.Asset -> Fee.PaymentAsset.Asset(asset.fullId)
+        FeePaymentCurrency.Native -> Fee.PaymentAsset.Native
+    }
+}
+
+fun Chain.Asset.toFeePaymentAsset(): Fee.PaymentAsset {
+    return when {
+        this.isCommissionAsset -> Fee.PaymentAsset.Native
+        else -> Fee.PaymentAsset.Asset(this.fullId)
+    }
+}

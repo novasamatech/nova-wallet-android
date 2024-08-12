@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericFeeModel
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -31,6 +31,13 @@ sealed class FeeStatus<out F : GenericFee> {
     object NoFee : FeeStatus<Nothing>()
 
     object Error : FeeStatus<Nothing>()
+}
+
+sealed interface ChangeFeeTokenState {
+
+    class Editable(val selectedCommissionAsset: Chain.Asset, val availableAssets: List<Chain.Asset>) : ChangeFeeTokenState
+
+    object NotSupported : ChangeFeeTokenState
 }
 
 interface GenericFee {
@@ -52,11 +59,18 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     val feeLiveData: LiveData<FeeStatus<F>>
 
+    val changeFeeTokenState: LiveData<ChangeFeeTokenState>
+
+    suspend fun commissionChainAsset(): Chain.Asset
+
+    suspend fun commissionAsset(): Asset
+
+    fun setCommissionAsset(chainAsset: Chain.Asset)
+
     interface Presentation<F : GenericFee> : GenericFeeLoaderMixin<F> {
 
         suspend fun loadFeeSuspending(
             retryScope: CoroutineScope,
-            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
         )
@@ -67,8 +81,7 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
          */
         fun loadFeeV2Generic(
             coroutineScope: CoroutineScope,
-            expectedChain: ChainId? = null,
-            feeConstructor: suspend (Token) -> F?,
+            feeConstructor: suspend (Token, Chain.Asset) -> F?,
             onRetryCancelled: () -> Unit,
         )
 
@@ -85,6 +98,12 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
             tokenFlow: Flow<Token?>,
             configuration: Configuration<F> = Configuration()
         ): Presentation<F>
+
+        fun <F : GenericFee> createChangeableFeeGeneric(
+            tokenFlow: Flow<Token?>,
+            coroutineScope: CoroutineScope,
+            configuration: Configuration<F> = Configuration()
+        ): Presentation<F>
     }
 }
 
@@ -94,13 +113,11 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
         fun loadFee(
             coroutineScope: CoroutineScope,
-            expectedChain: ChainId? = null,
-            feeConstructor: suspend (Token) -> Fee?,
+            feeConstructor: suspend (Token, Chain.Asset) -> Fee?,
             onRetryCancelled: () -> Unit,
         ) = loadFeeV2Generic(
             coroutineScope = coroutineScope,
-            expectedChain = expectedChain,
-            feeConstructor = { token -> feeConstructor(token)?.let(::SimpleFee) },
+            feeConstructor = { token, chainAsset -> feeConstructor(token, chainAsset)?.let(::SimpleFee) },
             onRetryCancelled = onRetryCancelled
         )
     }
@@ -109,6 +126,12 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
         fun create(
             tokenFlow: Flow<Token?>,
+            configuration: Configuration<SimpleFee> = Configuration()
+        ): Presentation
+
+        fun createChangeableFee(
+            tokenFlow: Flow<Token?>,
+            coroutineScope: CoroutineScope,
             configuration: Configuration<SimpleFee> = Configuration()
         ): Presentation
     }
@@ -153,8 +176,35 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.getDecimalFeeOrNull(): GenericDeci
 }
 
 fun <T : GenericFee> FeeLoaderMixin.Factory.createGeneric(assetFlow: Flow<Asset>) = createGeneric<T>(assetFlow.map { it.token })
+fun <T : GenericFee> FeeLoaderMixin.Factory.createGenericChangeableFee(assetFlow: Flow<Asset>, coroutineScope: CoroutineScope) =
+    createChangeableFeeGeneric<T>(assetFlow.map { it.token }, coroutineScope)
+
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
+
+class FeeLoaderMixinConstructor<I>(
+    val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    val constructor: suspend (token: Token, input: I, chainAsset: Chain.Asset) -> Fee
+)
+
+fun <I> connectWith(
+    inputSource: Flow<I>,
+    scope: CoroutineScope,
+    feeConstructors: List<FeeLoaderMixinConstructor<I>>,
+    onRetryCancelled: () -> Unit = {}
+) {
+    inputSource.onEach { input ->
+        feeConstructors.forEach { feeLoaderMixinConstructor ->
+            feeLoaderMixinConstructor.feeLoaderMixin.loadFee(
+                coroutineScope = scope,
+                feeConstructor = { token, chainAsset -> feeLoaderMixinConstructor.constructor(token, input, chainAsset) },
+                onRetryCancelled = onRetryCancelled
+            )
+        }
+    }
+        .inBackground()
+        .launchIn(scope)
+}
 
 fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource: Flow<I>,
@@ -165,7 +215,7 @@ fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource.onEach { input ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input) },
+            feeConstructor = { token, _ -> token.feeConstructor(input) },
             onRetryCancelled = onRetryCancelled
         )
     }
@@ -186,10 +236,12 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
     ) { input1, input2 ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input1, input2) },
+            feeConstructor = { token, _ -> token.feeConstructor(input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
     }
         .inBackground()
         .launchIn(scope)
 }
+
+fun ChangeFeeTokenState.isEditable() = this is ChangeFeeTokenState.Editable

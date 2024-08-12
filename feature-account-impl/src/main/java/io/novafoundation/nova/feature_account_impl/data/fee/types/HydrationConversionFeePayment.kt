@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.data.fee.types
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.utils.HydraDxQuoteSharedComputation
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
@@ -41,7 +42,7 @@ internal class HydrationConversionFeePayment(
         val fromAsset = chain.commissionAsset
 
         val quote = hydraDxQuoteSharedComputation.quote(chain, accountId!!, fromAsset = fromAsset, toAsset = paymentAsset, coroutineScope)
-        return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset.fullId)
+        return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset.toFeePaymentAsset())
     }
 
     override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {

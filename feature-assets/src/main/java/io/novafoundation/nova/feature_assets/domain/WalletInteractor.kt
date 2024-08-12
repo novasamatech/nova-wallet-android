@@ -61,6 +61,4 @@ interface WalletInteractor {
         assets: List<Asset>,
         externalBalances: List<ExternalBalance>
     ): Map<AssetGroup, List<AssetWithOffChainBalance>>
-
-    fun canPayFeeInCustomAsset(chain: Chain): Boolean
 }

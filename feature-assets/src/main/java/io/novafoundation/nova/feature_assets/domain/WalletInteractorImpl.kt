@@ -176,8 +176,4 @@ class WalletInteractorImpl(
 
         return groupAndSortAssetsByNetwork(assets, externalBalances.aggregatedBalanceByAsset(), chains)
     }
-
-    override fun canPayFeeInCustomAsset(chain: Chain): Boolean {
-
-    }
 }

@@ -18,3 +18,10 @@ fun ExtrinsicService.SubmissionOptions.selectedCommissionAsset(chain: Chain): Ch
         FeePaymentCurrency.Native -> chain.commissionAsset
     }
 }
+
+fun FeePaymentCurrency.Companion.from(chain: Chain, chainAsset: Chain.Asset): FeePaymentCurrency {
+    return when {
+        chainAsset.id == chain.commissionAsset.id -> FeePaymentCurrency.Native
+        else -> FeePaymentCurrency.Asset(chainAsset)
+    }
+}

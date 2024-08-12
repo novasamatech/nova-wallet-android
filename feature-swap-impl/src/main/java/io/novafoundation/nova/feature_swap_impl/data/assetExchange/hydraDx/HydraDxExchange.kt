@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
@@ -178,7 +179,7 @@ private class HydraDxExchange(
         val feeInExpectedCurrency = SubstrateFee(
             amount = feeAmountInExpectedCurrency,
             submissionOrigin = swapFee.submissionOrigin,
-            assetId = expectedFeeAsset.fullId
+            paymentAsset = expectedFeeAsset.toFeePaymentAsset()
         )
 
         return AssetExchangeFee(networkFee = feeInExpectedCurrency, MinimumBalanceBuyIn.NoBuyInNeeded)

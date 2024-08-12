@@ -24,15 +24,33 @@ class FeeView @JvmOverloads constructor(
 
         when (feeStatus) {
             is FeeStatus.Loading -> {
+                isClickable = false
                 showProgress()
             }
+
             is FeeStatus.Error -> {
+                isClickable = false
                 showValue(context.getString(R.string.common_error_general_title))
             }
+
             is FeeStatus.Loaded -> {
+                isClickable = true
                 showAmount(feeStatus.feeModel.display)
             }
-            FeeStatus.NoFee -> {}
+
+            FeeStatus.NoFee -> {
+                isClickable = false
+            }
+        }
+    }
+
+    fun setFeeEditable(editable: Boolean, onEditTokenClick: OnClickListener) {
+        if (editable) {
+            setPrimaryValueStartIcon(R.drawable.ic_pencil_edit, R.color.icon_secondary)
+            setOnValueClickListener(onEditTokenClick)
+        } else {
+            setPrimaryValueStartIcon(null)
+            setOnValueClickListener(null)
         }
     }
 }

@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.fullId
@@ -56,7 +57,7 @@ internal class AssetConversionFeePayment(
             "Failed to calculate fee in ${paymentAsset.symbol}"
         }
 
-        return SubstrateFee(amount = quote, submissionOrigin = nativeFee.submissionOrigin, assetId = paymentAsset.fullId)
+        return SubstrateFee(amount = quote, submissionOrigin = nativeFee.submissionOrigin, paymentAsset = paymentAsset.toFeePaymentAsset())
     }
 
     override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {

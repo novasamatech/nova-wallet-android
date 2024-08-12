@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileCache
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -20,6 +21,7 @@ import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
@@ -42,6 +44,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -54,7 +57,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnou
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
@@ -78,6 +81,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletReposito
 import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
+import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealCustomFeeInteractor
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -214,8 +218,34 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideFeeLoaderMixinFactory(resourceManager: ResourceManager): FeeLoaderMixin.Factory {
-        return FeeLoaderProviderFactory(resourceManager)
+    fun provideCustomFeeInteractor(
+        feePaymentProviderRegistry: FeePaymentProviderRegistry,
+        chainRegistry: ChainRegistry,
+        walletRepository: WalletRepository,
+        accountRepository: AccountRepository
+    ): CustomFeeInteractor {
+        return RealCustomFeeInteractor(
+            feePaymentProviderRegistry,
+            chainRegistry,
+            walletRepository,
+            accountRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideFeeLoaderMixinFactory(
+        customFeeInteractor: CustomFeeInteractor,
+        chainRegistry: ChainRegistry,
+        resourceManager: ResourceManager,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    ): FeeLoaderMixin.Factory {
+        return FeeLoaderProviderFactory(
+            customFeeInteractor,
+            chainRegistry,
+            resourceManager,
+            actionAwaitableMixinFactory
+        )
     }
 
     @Provides

@@ -60,7 +60,12 @@ internal class RealEvmTransactionService(
         val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
         val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-        return EvmFee(gasLimit, gasPrice, SubmissionOrigin.singleOrigin(submittingMetaAccount.requireAccountIdIn(chain)))
+        return EvmFee(
+            gasLimit,
+            gasPrice,
+            SubmissionOrigin.singleOrigin(submittingMetaAccount.requireAccountIdIn(chain)),
+            Fee.PaymentAsset.Native
+        )
     }
 
     override suspend fun transact(
@@ -83,7 +88,12 @@ internal class RealEvmTransactionService(
             val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
             val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-            EvmFee(gasLimit, gasPrice, SubmissionOrigin.singleOrigin(submittingAccountId))
+            EvmFee(
+                gasLimit,
+                gasPrice,
+                SubmissionOrigin.singleOrigin(submittingAccountId),
+                Fee.PaymentAsset.Native
+            )
         }
 
         val nonce = web3Api.getNonce(submittingAddress)
