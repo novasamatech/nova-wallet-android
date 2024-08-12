@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNat
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 abstract class BaseHydraDxSwapExtractor(
-    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val hydraDxAssetIdConverter: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter,
 ) : SubstrateRealtimeOperationFetcher.Extractor {
 
     abstract fun isSwap(call: GenericCall.Instance): Boolean
@@ -61,9 +61,9 @@ abstract class BaseHydraDxSwapExtractor(
     }
 
     protected data class SwapArgs(
-        val assetIn: HydraDxAssetId,
-        val assetOut: HydraDxAssetId,
-        val amountIn: HydraDxAssetId,
-        val amountOut: HydraDxAssetId
+        val assetIn: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId,
+        val assetOut: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId,
+        val amountIn: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId,
+        val amountOut: io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
     )
 }

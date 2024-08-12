@@ -44,10 +44,10 @@ class OrmlAssetsModule {
     fun provideTransfers(
         chainRegistry: ChainRegistry,
         assetSourceRegistry: AssetSourceRegistry,
-        extrinsicService: ExtrinsicService,
+        extrinsicServiceFactory: ExtrinsicService.Factory,
         phishingValidationFactory: PhishingValidationFactory,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
-    ) = OrmlAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory)
+    ) = OrmlAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory)
 
     @Provides
     @FeatureScope

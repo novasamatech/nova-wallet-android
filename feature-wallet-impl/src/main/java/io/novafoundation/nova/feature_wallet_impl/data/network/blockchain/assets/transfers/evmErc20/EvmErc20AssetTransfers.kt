@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.checkForFeeChanges
@@ -23,6 +22,7 @@ import io.novafoundation.nova.runtime.ethereum.transaction.builder.contractCall
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CoroutineScope
 
 // a conservative upper limit. Usually transfer takes around 30-50k
 private val ERC_20_UPPER_GAS_LIMIT = 200_000.toBigInteger()
@@ -33,7 +33,7 @@ class EvmErc20AssetTransfers(
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetTransfers {
 
-    override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
+    override fun getValidationSystem(coroutineScope: CoroutineScope) = ValidationSystem {
         validAddress()
         recipientIsNotSystemAccount()
 
@@ -44,16 +44,16 @@ class EvmErc20AssetTransfers(
 
         recipientCanAcceptTransfer(assetSourceRegistry)
 
-        checkForFeeChanges(assetSourceRegistry)
+        checkForFeeChanges(assetSourceRegistry, coroutineScope)
     }
 
-    override suspend fun calculateFee(transfer: AssetTransfer): Fee {
+    override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {
         return evmTransactionService.calculateFee(transfer.originChain.id, fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT) {
             transfer(transfer)
         }
     }
 
-    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<ExtrinsicSubmission> {
+    override suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission> {
         return evmTransactionService.transact(
             chainId = transfer.originChain.id,
             presetFee = transfer.decimalFee.networkFee,

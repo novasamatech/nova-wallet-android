@@ -24,8 +24,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.I
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -95,6 +96,10 @@ interface SwapFeatureDependencies {
 
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
+    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
+
+    val hydraDxAssetConversionFactory: HydraDxAssetConversionFactory
+
     val runtimeCallsApi: MultiChainRuntimeCallsApi
 
     val assetUseCase: ArbitraryAssetUseCase
@@ -118,8 +123,6 @@ interface SwapFeatureDependencies {
     val operationDao: OperationDao
 
     val multiLocationConverterFactory: MultiLocationConverterFactory
-
-    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
 
     val gson: Gson
 }

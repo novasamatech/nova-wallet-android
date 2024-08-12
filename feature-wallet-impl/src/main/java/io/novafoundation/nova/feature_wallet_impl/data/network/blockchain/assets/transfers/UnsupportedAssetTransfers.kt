@@ -7,17 +7,19 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CoroutineScope
 
 open class UnsupportedAssetTransfers : AssetTransfers {
 
-    override val validationSystem: AssetTransfersValidationSystem
-        get() = throw UnsupportedOperationException("Unsupported")
-
-    override suspend fun calculateFee(transfer: AssetTransfer): Fee {
+    override fun getValidationSystem(coroutineScope: CoroutineScope): AssetTransfersValidationSystem {
         throw UnsupportedOperationException("Unsupported")
     }
 
-    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<ExtrinsicSubmission> {
+    override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {
+        throw UnsupportedOperationException("Unsupported")
+    }
+
+    override suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission> {
         return Result.failure(UnsupportedOperationException("Unsupported"))
     }
 

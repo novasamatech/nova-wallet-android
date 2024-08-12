@@ -41,15 +41,19 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -139,6 +143,13 @@ interface AccountFeatureDependencies {
 
     fun multiChainRuntimeCallsApi(): MultiChainRuntimeCallsApi
 
+    fun hydraDxAssetConversionFactory(): HydraDxAssetConversionFactory
+
+    @Named(REMOTE_STORAGE_SOURCE)
+    fun remoteStorageSource(): StorageDataSource
+
+    fun hydraDxAssetIdConverter(): HydraDxAssetIdConverter
+
     val systemCallExecutor: SystemCallExecutor
 
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
@@ -157,9 +168,6 @@ interface AccountFeatureDependencies {
 
     val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 
-    @Named(REMOTE_STORAGE_SOURCE)
-    fun remoteStorageSource(): StorageDataSource
-
     val extrinsicSplitter: ExtrinsicSplitter
 
     val gasPriceProviderFactory: GasPriceProviderFactory
@@ -171,4 +179,8 @@ interface AccountFeatureDependencies {
     val listSelectorMixinFactory: ListSelectorMixin.Factory
 
     val ledgerMigrationTracker: LedgerMigrationTracker
+
+    val multiLocationConverterFactory: MultiLocationConverterFactory
+
+    val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 }

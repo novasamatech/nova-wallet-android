@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import java.math.BigInteger
+import kotlinx.coroutines.CoroutineScope
 
 class RealExtrinsicService(
     private val rpcCalls: RpcCalls,
@@ -52,7 +53,8 @@ class RealExtrinsicService(
     private val extrinsicBuilderFactory: ExtrinsicBuilderFactory,
     private val signerProvider: SignerProvider,
     private val extrinsicSplitter: ExtrinsicSplitter,
-    private val feePaymentProviderRegistry: FeePaymentProviderRegistry
+    private val feePaymentProviderRegistry: FeePaymentProviderRegistry,
+    private val coroutineScope: CoroutineScope? // TODO: Make it non-nullable
 ) : ExtrinsicService {
 
     override suspend fun submitExtrinsic(
@@ -140,7 +142,7 @@ class RealExtrinsicService(
         val nativeFee = estimateNativeFee(chain, extrinsic, usedSigner.submissionOrigin(chain))
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
-        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency)
+        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         return feePayment.convertNativeFee(nativeFee)
     }
@@ -183,7 +185,7 @@ class RealExtrinsicService(
         )
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
-        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency)
+        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         return feePayment.convertNativeFee(totalNativeFee)
     }
@@ -225,7 +227,7 @@ class RealExtrinsicService(
         val splitCalls = extrinsicSplitter.split(feeSigner, callBuilder, chain)
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
-        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency)
+        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         val extrinsicBuilderIterator = extrinsicBuilderSequence.iterator()
 
@@ -260,7 +262,7 @@ class RealExtrinsicService(
         extrinsicBuilder.formExtrinsic(submissionOrigin)
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
-        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency)
+        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         feePayment.modifyExtrinsic(extrinsicBuilder)
 

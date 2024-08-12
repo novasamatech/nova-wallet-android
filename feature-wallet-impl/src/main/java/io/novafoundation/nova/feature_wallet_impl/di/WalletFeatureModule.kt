@@ -23,10 +23,10 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
@@ -57,7 +57,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.RealHydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
@@ -368,12 +367,4 @@ class WalletFeatureModule {
         walletRepository,
         extrinsicService
     )
-
-    @Provides
-    @FeatureScope
-    fun provideHydraDxAssetIdConverter(
-        chainRegistry: ChainRegistry
-    ): HydraDxAssetIdConverter {
-        return RealHydraDxAssetIdConverter(chainRegistry)
-    }
 }
