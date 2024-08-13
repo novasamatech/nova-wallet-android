@@ -18,7 +18,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 
 internal class HydrationConversionFeePayment(
@@ -55,7 +54,7 @@ internal class HydrationConversionFeePayment(
         val assetConversion = hydraDxQuoteSharedComputation.getAssetConversion(chain, accountId, coroutineScope)
         val paths = hydraDxQuoteSharedComputation.paths(chain, args, accountId, coroutineScope)
         val quote = assetConversion.quote(paths, args)
-        return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset.fullId)
+        return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset.toFeePaymentAsset())
     }
 
     override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {
