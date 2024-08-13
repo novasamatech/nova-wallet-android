@@ -52,13 +52,13 @@ interface ExtrinsicService {
     }
 
     class SubmissionOptions(
-        val feePaymentCurrency: FeePaymentCurrency = FeePaymentCurrency.Native
+        val feePaymentCurrency: FeePaymentCurrency = FeePaymentCurrency.Native,
+        val batchMode: BatchMode = DEFAULT_BATCH_MODE,
     )
 
     suspend fun submitExtrinsic(
         chain: Chain,
         origin: TransactionOrigin,
-        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<ExtrinsicSubmission>
@@ -66,7 +66,6 @@ interface ExtrinsicService {
     suspend fun submitAndWatchExtrinsic(
         chain: Chain,
         origin: TransactionOrigin,
-        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<Flow<ExtrinsicStatus>>
@@ -74,7 +73,6 @@ interface ExtrinsicService {
     suspend fun submitMultiExtrinsicAwaitingInclusion(
         chain: Chain,
         origin: TransactionOrigin,
-        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: FormMultiExtrinsicWithOrigin
     ): RetriableMultiResult<ExtrinsicStatus.InBlock>
@@ -82,7 +80,6 @@ interface ExtrinsicService {
     suspend fun paymentInfo(
         chain: Chain,
         origin: TransactionOrigin,
-        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit
     ): FeeResponse
@@ -90,7 +87,6 @@ interface ExtrinsicService {
     suspend fun estimateFee(
         chain: Chain,
         origin: TransactionOrigin,
-        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit
     ): Fee
@@ -100,7 +96,6 @@ interface ExtrinsicService {
     suspend fun estimateMultiFee(
         chain: Chain,
         origin: TransactionOrigin,
-        batchMode: BatchMode = DEFAULT_BATCH_MODE,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: FormMultiExtrinsic
     ): Fee

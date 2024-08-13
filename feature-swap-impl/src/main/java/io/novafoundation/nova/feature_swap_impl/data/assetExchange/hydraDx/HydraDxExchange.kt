@@ -165,7 +165,11 @@ private class HydraDxExchange(
             null
         }
 
-        val swapFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, BatchMode.FORCE_BATCH) {
+        val swapFee = extrinsicService.estimateFee(
+            chain,
+            TransactionOrigin.SelectedWallet,
+            submissionOptions = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.FORCE_BATCH)
+        ) {
             executeSwap(args, paymentCurrencyToSet, currentFeeTokenId)
         }
 
@@ -200,7 +204,11 @@ private class HydraDxExchange(
         }
 
         return setCurrencyResult.flatMap {
-            extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet, BatchMode.FORCE_BATCH) {
+            extrinsicService.submitExtrinsic(
+                chain,
+                TransactionOrigin.SelectedWallet,
+                submissionOptions = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.FORCE_BATCH)
+            ) {
                 executeSwap(args, paymentCurrencyToSet, currentFeeTokenId)
             }
         }
