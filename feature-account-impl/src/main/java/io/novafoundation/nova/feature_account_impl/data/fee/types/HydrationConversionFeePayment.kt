@@ -48,7 +48,7 @@ internal class HydrationConversionFeePayment(
         val args = AssetExchangeQuoteArgs(
             chainAssetIn = fromAsset,
             chainAssetOut = paymentAsset,
-            amount = BigInteger.ZERO,
+            amount = nativeFee.amount,
             swapDirection = SwapDirection.SPECIFIED_IN
         )
 
