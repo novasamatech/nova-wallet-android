@@ -86,6 +86,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedDecimalFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
@@ -190,7 +191,9 @@ class SwapMainSettingsViewModel(
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
         tokenFlow = feeAssetFlow.map { it?.token },
         configuration = GenericFeeLoaderMixin.Configuration(
-            initialStatusValue = FeeStatus.NoFee
+            initialState = Configuration.InitialState(
+                feeStatus = FeeStatus.NoFee,
+            )
         )
     )
 

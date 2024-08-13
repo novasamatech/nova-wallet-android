@@ -75,11 +75,14 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         .distinctUntilChangedBy { it.configuration.chainId }
         .map { chainRegistry.getChain(it.configuration.chainId) }
 
-    private val availableFeeAssetsFlow: Flow<Map<Int, Chain.Asset>> =
-        selectedTokenFlow.map {
-            interactor.availableCommissionAssetFor(it.configuration, coroutineScope)
-                .associateBy { it.id }
-        }
+    private val supportCustomFeeFlow = MutableStateFlow(configuration.initialState.supportCustomFee)
+
+    private val availableFeeAssetsFlow: Flow<Map<Int, Chain.Asset>> = combine(supportCustomFeeFlow, selectedTokenFlow) { supportCustomFee, selectedToken ->
+        if (!supportCustomFee) return@combine emptyMap()
+
+        interactor.availableCommissionAssetFor(selectedToken.configuration, coroutineScope)
+            .associateBy { it.id }
+    }
 
     private val commissionChainAssetFlow = singleReplaySharedFlow<Chain.Asset>()
 
@@ -95,15 +98,16 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     private val feeMayChangeAutomaticallyFlow = MutableStateFlow(true)
 
     override val changeFeeTokenState = combine(
+        supportCustomFeeFlow,
         selectedTokenFlow,
         commissionChainAssetFlow,
         availableFeeAssetsFlow
-    ) { selectedToken, selectedCommissionAsset, availableFeeAssets ->
-        mapChangeFeeTokenState(selectedToken, selectedCommissionAsset, availableFeeAssets)
+    ) { supportCustomFee, selectedToken, selectedCommissionAsset, availableFeeAssets ->
+        mapChangeFeeTokenState(supportCustomFee, selectedToken, selectedCommissionAsset, availableFeeAssets)
     }.asLiveData(coroutineScope)
 
     init {
-        configuration.initialStatusValue?.let { feeLiveData.postValue(it) }
+        configuration.initialState.feeStatus?.let { feeLiveData.postValue(it) }
 
         setupCustomFee()
     }
@@ -155,6 +159,10 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
     override suspend fun setFeeStatus(feeStatus: FeeStatus<F>) {
         postFeeState(feeStatus)
+    }
+
+    override suspend fun setSupportCustomFee(supportCustomFee: Boolean) {
+        supportCustomFeeFlow.value = supportCustomFee
     }
 
     override suspend fun invalidateFee() {
@@ -217,18 +225,23 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         chainFlow.onEach {
             feeMayChangeAutomaticallyFlow.value = true
             commissionChainAssetFlow.emit(it.commissionAsset)
-        }
-            .launchIn(coroutineScope)
+        }.launchIn(coroutineScope)
+
+        // After supportCustomFee is changed make commission asset default
+        supportCustomFeeFlow.onEach {
+            commissionChainAssetFlow.emit(chainFlow.first().commissionAsset)
+        }.launchIn(coroutineScope)
     }
 
     private suspend fun postFeeState(feeStatus: FeeStatus<F>) {
-        if (feeStatus !is FeeStatus.Loaded || !configuration.supportCustomFee) {
+        if (feeStatus !is FeeStatus.Loaded) {
             feeLiveData.postValue(feeStatus)
             return
         }
 
         val feeMayChangeAutomatically = feeMayChangeAutomaticallyFlow.first()
-        if (!feeMayChangeAutomatically) {
+        val supportCustomFee = supportCustomFeeFlow.first()
+        if (!feeMayChangeAutomatically || !supportCustomFee) {
             feeLiveData.postValue(feeStatus)
             return
         }
@@ -252,6 +265,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     }
 
     private suspend fun mapChangeFeeTokenState(
+        supportCustomFee: Boolean,
         selectedToken: Token,
         customFeeAsset: Chain.Asset,
         availableFeeAssets: Map<Int, Chain.Asset>
@@ -259,7 +273,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         val originChainAsset = selectedToken.configuration
 
         return when {
-            !configuration.supportCustomFee -> ChangeFeeTokenState.NotSupported
+            !supportCustomFee -> ChangeFeeTokenState.NotSupported
 
             originChainAsset.isCommissionAsset -> ChangeFeeTokenState.NotSupported
 

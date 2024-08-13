@@ -45,6 +45,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
@@ -53,6 +54,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGenericChangeableFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -155,7 +157,16 @@ class SelectSendViewModel(
     private val originAssetFlow = originChainAsset.flatMapLatest(interactor::assetFlow)
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinFactory.createGenericChangeableFee<OriginGenericFee>(originAssetFlow, coroutineScope)
+    val originFeeMixin = feeLoaderMixinFactory.createGenericChangeableFee<OriginGenericFee>(
+        originAssetFlow,
+        coroutineScope,
+        configuration = Configuration(
+            initialState = Configuration.InitialState(
+                supportCustomFee = true
+            )
+        )
+    )
+
     val crossChainFeeMixin = feeLoaderMixinFactory.create(originAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
@@ -319,6 +330,11 @@ class SelectSendViewModel(
         )
             .inBackground()
             .launchIn(this)
+
+        // Enable custom fee only for on chain transfers
+        combine(originChain, destinationChain) { originChain, destinationChain ->
+            originFeeMixin.setSupportCustomFee(originChain.id == destinationChain.id)
+        }.launchIn(this)
     }
 
     private suspend fun recalculateFee(

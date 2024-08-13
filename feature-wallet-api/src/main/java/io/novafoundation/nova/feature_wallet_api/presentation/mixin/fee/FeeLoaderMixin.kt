@@ -53,10 +53,14 @@ class SimpleGenericFee<T : Fee>(override val networkFee: T) : GenericFee
 interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     class Configuration<F : GenericFee>(
-        val supportCustomFee: Boolean = false,
         val showZeroFiat: Boolean = true,
-        val initialStatusValue: FeeStatus<F>? = null
-    )
+        val initialState: InitialState<F> = InitialState()
+    ) {
+        class InitialState<F : GenericFee>(
+            val supportCustomFee: Boolean = false,
+            val feeStatus: FeeStatus<F>? = null
+        )
+    }
 
     val feeLiveData: LiveData<FeeStatus<F>>
 
@@ -85,6 +89,8 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
         suspend fun setFee(fee: F?)
 
         suspend fun setFeeStatus(feeStatus: FeeStatus<F>)
+
+        suspend fun setSupportCustomFee(supportCustomFee: Boolean)
 
         suspend fun invalidateFee()
 
@@ -179,8 +185,11 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.getDecimalFeeOrNull(): GenericDeci
 }
 
 fun <T : GenericFee> FeeLoaderMixin.Factory.createGeneric(assetFlow: Flow<Asset>) = createGeneric<T>(assetFlow.map { it.token })
-fun <T : GenericFee> FeeLoaderMixin.Factory.createGenericChangeableFee(assetFlow: Flow<Asset>, coroutineScope: CoroutineScope) =
-    createChangeableFeeGeneric<T>(assetFlow.map { it.token }, coroutineScope)
+fun <T : GenericFee> FeeLoaderMixin.Factory.createGenericChangeableFee(
+    assetFlow: Flow<Asset>,
+    coroutineScope: CoroutineScope,
+    configuration: Configuration<T> = Configuration()
+) = createChangeableFeeGeneric<T>(assetFlow.map { it.token }, coroutineScope, configuration)
 
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())

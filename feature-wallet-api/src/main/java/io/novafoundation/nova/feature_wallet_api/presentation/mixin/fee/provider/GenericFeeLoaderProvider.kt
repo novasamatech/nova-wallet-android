@@ -43,7 +43,7 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
     override val retryEvent = MutableLiveData<Event<RetryPayload>>()
 
     init {
-        configuration.initialStatusValue?.let(feeLiveData::postValue)
+        configuration.initialState.feeStatus?.let(feeLiveData::postValue)
     }
 
     override suspend fun loadFeeSuspending(
@@ -108,6 +108,10 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
 
     override suspend fun setFeeStatus(feeStatus: FeeStatus<F>) {
         feeLiveData.postValue(feeStatus)
+    }
+
+    override suspend fun setSupportCustomFee(supportCustomFee: Boolean) {
+        // Not supported
     }
 
     override suspend fun invalidateFee() {
