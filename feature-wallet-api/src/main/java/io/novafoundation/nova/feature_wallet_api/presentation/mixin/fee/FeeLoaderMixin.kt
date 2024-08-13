@@ -53,6 +53,7 @@ class SimpleGenericFee<T : Fee>(override val networkFee: T) : GenericFee
 interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     class Configuration<F : GenericFee>(
+        val supportCustomFee: Boolean = false,
         val showZeroFiat: Boolean = true,
         val initialStatusValue: FeeStatus<F>? = null
     )

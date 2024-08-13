@@ -5,8 +5,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
-import io.novafoundation.nova.feature_account_api.data.extrinsic.from
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -52,7 +51,7 @@ abstract class BaseAssetTransfers(
     protected abstract suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>>
 
     override suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission> {
-        val feePaymentCurrency = FeePaymentCurrency.from(transfer.originChain, transfer.commissionAsset)
+        val feePaymentCurrency = transfer.commissionAsset.toFeePaymentCurrency()
         val submissionOptions = ExtrinsicService.SubmissionOptions(feePaymentCurrency)
 
         return extrinsicServiceFactory
@@ -63,7 +62,7 @@ abstract class BaseAssetTransfers(
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {
-        val feePaymentCurrency = FeePaymentCurrency.from(transfer.originChain, transfer.commissionAsset)
+        val feePaymentCurrency = transfer.commissionAsset.toFeePaymentCurrency()
         val submissionOptions = ExtrinsicService.SubmissionOptions(feePaymentCurrency)
 
         return extrinsicServiceFactory

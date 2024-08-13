@@ -24,23 +24,18 @@ class FeeView @JvmOverloads constructor(
 
         when (feeStatus) {
             is FeeStatus.Loading -> {
-                isClickable = false
                 showProgress()
             }
 
             is FeeStatus.Error -> {
-                isClickable = false
                 showValue(context.getString(R.string.common_error_general_title))
             }
 
             is FeeStatus.Loaded -> {
-                isClickable = true
                 showAmount(feeStatus.feeModel.display)
             }
 
-            FeeStatus.NoFee -> {
-                isClickable = false
-            }
+            FeeStatus.NoFee -> { }
         }
     }
 
