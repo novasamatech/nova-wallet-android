@@ -93,7 +93,7 @@ class ConfirmSendViewModel(
         .inBackground()
         .share()
 
-    private val commissionAssetFlow = interactor.commissionAssetFlow(transferDraft.origin.chainId)
+    private val commissionAssetFlow = interactor.assetFlow(transferDraft.commission.chainId, transferDraft.commission.chainAssetId)
         .inBackground()
         .share()
 

@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
-import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 import kotlinx.coroutines.flow.Flow
 

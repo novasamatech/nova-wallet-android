@@ -18,13 +18,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericF
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -87,11 +84,11 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
     }
 
     override suspend fun commissionAsset(): Asset {
-        TODO("Not yet implemented")
+        throw IllegalStateException("commissionAsset not supported")
     }
 
     override fun commissionAssetFlow(): Flow<Asset> {
-        TODO("Not yet implemented")
+        throw IllegalStateException("commissionAssetFlow not supported")
     }
 
     override fun setCommissionAsset(chainAsset: Chain.Asset) {
@@ -113,7 +110,7 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
         feeLiveData.postValue(feeStatus)
     }
 
-    override fun invalidateFee() {
+    override suspend fun invalidateFee() {
         feeLiveData.postValue(FeeStatus.Loading)
     }
 

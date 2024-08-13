@@ -222,13 +222,15 @@ class WalletFeatureModule {
         feePaymentProviderRegistry: FeePaymentProviderRegistry,
         chainRegistry: ChainRegistry,
         walletRepository: WalletRepository,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        assetSourceRegistry: AssetSourceRegistry
     ): CustomFeeInteractor {
         return RealCustomFeeInteractor(
             feePaymentProviderRegistry,
             chainRegistry,
             walletRepository,
-            accountRepository
+            accountRepository,
+            assetSourceRegistry
         )
     }
 

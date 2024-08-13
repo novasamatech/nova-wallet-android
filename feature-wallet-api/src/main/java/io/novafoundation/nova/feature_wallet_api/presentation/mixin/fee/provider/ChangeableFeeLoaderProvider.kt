@@ -6,9 +6,7 @@ import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.asLiveData
-import io.novafoundation.nova.common.utils.combineToTriple
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
@@ -26,16 +24,13 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -61,7 +56,8 @@ internal class ChangeableFeeLoaderProviderPresentation(
     actionAwaitableMixinFactory,
     tokenFlow,
     coroutineScope
-), FeeLoaderMixin.Presentation
+),
+    FeeLoaderMixin.Presentation
 
 internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     private val interactor: CustomFeeInteractor,
@@ -75,9 +71,9 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
     private val selectedTokenFlow = nulableSelectedTokenFlow.filterNotNull()
 
-    private val chainFlow = selectedTokenFlow.map { it.configuration.chainId }
-        .distinctUntilChanged()
-        .map { chainRegistry.getChain(it) }
+    private val chainFlow = selectedTokenFlow
+        .distinctUntilChangedBy { it.configuration.chainId }
+        .map { chainRegistry.getChain(it.configuration.chainId) }
 
     private val availableFeeAssetsFlow: Flow<Map<Int, Chain.Asset>> =
         selectedTokenFlow.map {
@@ -88,17 +84,18 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     private val commissionChainAssetFlow = singleReplaySharedFlow<Chain.Asset>()
 
     private val commissionAssetFlow: Flow<Asset> = commissionChainAssetFlow
-        .distinctUntilChanged()
+        .distinctUntilChangedBy { it.fullId }
         .flatMapLatest { interactor.assetFlow(it) }
 
     private val commissionTokenFlow: Flow<Token> = commissionAssetFlow.map { it.token }
 
+    private val feeMediatorFlow = singleReplaySharedFlow<FeeStatus<F>>()
     final override val feeLiveData = MutableLiveData<FeeStatus<F>>()
 
     override val retryEvent = MutableLiveData<Event<RetryPayload>>()
 
     val changeFeeTokenEvent = actionAwaitableMixinFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
-    private val feeTokenWasChangedManually = MutableStateFlow(false)
+    private val feeMayChangeAutomaticallyFlow = MutableStateFlow(true)
 
     override val changeFeeTokenState = combine(
         selectedTokenFlow,
@@ -109,7 +106,10 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     }.asLiveData(coroutineScope)
 
     init {
-        configuration.initialStatusValue?.let(feeLiveData::postValue)
+        configuration.initialStatusValue?.let {
+            coroutineScope.launch { feeMediatorFlow.emit(it) }
+            feeLiveData.postValue(it)
+        }
 
         setupCustomFee()
     }
@@ -119,7 +119,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         feeConstructor: suspend (Token) -> F?,
         onRetryCancelled: () -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
-        feeLiveData.postValue(FeeStatus.Loading)
+        feeMediatorFlow.emit(FeeStatus.Loading)
 
         val token = commissionTokenFlow.first()
 
@@ -130,7 +130,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
             onFailure = { exception -> onError(exception, retryScope, feeConstructor, onRetryCancelled) }
         )
 
-        value?.run { feeLiveData.postValue(this) }
+        value?.run { feeMediatorFlow.emit(this) }
     }
 
     override fun loadFeeV2Generic(
@@ -149,24 +149,22 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
     override suspend fun setFee(fee: F?) {
         if (fee != null) {
-            val commissionAsset = getCommissionAssetFor(fee.networkFee)
-            changeCommissionAsset(commissionAsset)
-            val token = getTokenFor(commissionAsset)
+            val token = commissionTokenFlow.first()
 
             val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
 
-            feeLiveData.postValue(FeeStatus.Loaded(feeModel))
+            postFeeValue(FeeStatus.Loaded(feeModel))
         } else {
-            feeLiveData.postValue(FeeStatus.NoFee)
+            postFeeValue(FeeStatus.NoFee)
         }
     }
 
     override suspend fun setFeeStatus(feeStatus: FeeStatus<F>) {
-        feeLiveData.postValue(feeStatus)
+        postFeeValue(feeStatus)
     }
 
-    override fun invalidateFee() {
-        feeLiveData.postValue(FeeStatus.Loading)
+    override suspend fun invalidateFee() {
+        postFeeValue(FeeStatus.Loading)
     }
 
     override suspend fun commissionChainAsset(): Chain.Asset {
@@ -183,6 +181,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
     override fun setCommissionAsset(chainAsset: Chain.Asset) {
         coroutineScope.launch {
+            feeMayChangeAutomaticallyFlow.value = false
             commissionChainAssetFlow.emit(chainAsset)
         }
     }
@@ -220,36 +219,42 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     }
 
     private fun setupCustomFee() {
-        val selectedChainAssetFlow = selectedTokenFlow.map { it.configuration }
-        combineToTriple(feeTokenWasChangedManually, availableFeeAssetsFlow, selectedChainAssetFlow)
-            .filter { (tokenWasChangedManually, _, _) -> !tokenWasChangedManually }
-            .onEach { (_, availableFeeAssets, selectedChainAsset) ->
-                if (selectedChainAsset.id in availableFeeAssets) {
-                    commissionChainAssetFlow.emit(selectedChainAsset)
-                } else {
-                    val chain = chainFlow.first()
-                    commissionChainAssetFlow.emit(chain.commissionAsset)
-                }
-            }
-            .launchIn(coroutineScope)
+        // Check: if commission asset is insufficient set it as custom asset
+        // checkCommissionAssetSufficiencyFlow().launchIn(coroutineScope)
 
-        nulableSelectedTokenFlow
-            .onEach { feeTokenWasChangedManually.value = false }
-            .launchIn(coroutineScope)
-    }
-
-    private suspend fun getCommissionAssetFor(fee: Fee): Chain.Asset {
-        val feePaymentAsset = fee.paymentAsset
-        return when (feePaymentAsset) {
-            is Fee.PaymentAsset.Asset -> chainRegistry.chainWithAsset(feePaymentAsset.assetId).asset
-            Fee.PaymentAsset.Native -> chainFlow.first().commissionAsset
+        // After chain is changed make commission asset default and reset
+        chainFlow.onEach {
+            feeMayChangeAutomaticallyFlow.value = true
+            commissionChainAssetFlow.emit(it.commissionAsset)
         }
+            .launchIn(coroutineScope)
     }
 
-    private suspend fun changeCommissionAsset(asset: Chain.Asset) {
-        val currentCommissionAsset = commissionChainAssetFlow.first()
-        if (currentCommissionAsset.fullId != asset.fullId) {
-            commissionChainAssetFlow.emit(asset)
+    private suspend fun postFeeValue(feeStatus: FeeStatus<F>) {
+        val feeMayChangeAutomatically = feeMayChangeAutomaticallyFlow.first()
+        if (!feeMayChangeAutomatically) {
+            feeLiveData.postValue(feeStatus)
+            return
+        }
+
+        val commissionAsset = commissionAssetFlow.first()
+        val selectedToken = selectedTokenFlow.first()
+        val availableFeeAssets = availableFeeAssetsFlow.first()
+
+        val selectedAssetIsAvailableToPayFee = selectedToken.configuration.id in availableFeeAssets
+        if (commissionAsset.isCommissionAsset() &&
+            selectedAssetIsAvailableToPayFee &&
+            feeStatus is FeeStatus.Loaded
+        ) {
+            val feeAmount = feeStatus.feeModel.decimalFee.networkFee.amount
+            if (interactor.hasEnoughBalanceToPayFee(commissionAsset, feeAmount)) {
+                feeLiveData.postValue(feeStatus)
+            } else {
+                // Select custom fee asset
+                commissionChainAssetFlow.emit(selectedToken.configuration)
+            }
+        } else {
+            feeLiveData.postValue(feeStatus)
         }
     }
 
@@ -259,7 +264,9 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
             return currentToken
         }
 
-        return interactor.assetFlow(asset).first().token
+        return interactor.assetFlow(asset)
+            .map { it.token }
+            .first { it.configuration.fullId == asset.fullId }
     }
 
     private suspend fun mapChangeFeeTokenState(
@@ -280,5 +287,9 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
             else -> ChangeFeeTokenState.NotSupported
         }
+    }
+
+    private fun Asset.isCommissionAsset(): Boolean {
+        return token.configuration.isCommissionAsset
     }
 }

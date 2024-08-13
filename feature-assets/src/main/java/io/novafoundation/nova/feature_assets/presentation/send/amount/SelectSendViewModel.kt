@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferV
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.commissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
@@ -48,7 +49,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFe
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGenericChangeableFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -71,7 +71,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
-import kotlinx.coroutines.flow.flow
 
 class SelectSendViewModel(
     private val chainRegistry: ChainRegistry,
@@ -372,6 +371,10 @@ class SelectSendViewModel(
                 chainId = validPayload.transfer.originChain.id,
                 chainAssetId = validPayload.transfer.originChainAsset.id
             ),
+            commission = AssetPayload(
+                chainId = validPayload.transfer.commissionAsset.chainId,
+                chainAssetId = validPayload.transfer.commissionAsset.id
+            ),
             destination = AssetPayload(
                 chainId = validPayload.transfer.destinationChain.id,
                 chainAssetId = validPayload.transfer.destinationChainAsset.id
@@ -390,7 +393,6 @@ class SelectSendViewModel(
         amount: BigDecimal,
         address: String,
     ): AssetTransfer {
-
         return buildAssetTransfer(
             metaAccount = selectedAccount.first(),
             commissionAsset = commissionAsset,

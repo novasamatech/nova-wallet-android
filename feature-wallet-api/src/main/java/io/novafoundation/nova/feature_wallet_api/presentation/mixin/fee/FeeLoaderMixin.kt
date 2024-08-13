@@ -61,12 +61,6 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     val changeFeeTokenState: LiveData<ChangeFeeTokenState>
 
-    suspend fun commissionChainAsset(): Chain.Asset
-
-    suspend fun commissionAsset(): Asset
-
-    fun commissionAssetFlow(): Flow<Asset>
-
     fun setCommissionAsset(chainAsset: Chain.Asset)
 
     interface Presentation<F : GenericFee> : GenericFeeLoaderMixin<F> {
@@ -91,7 +85,13 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
         suspend fun setFeeStatus(feeStatus: FeeStatus<F>)
 
-        fun invalidateFee()
+        suspend fun invalidateFee()
+
+        suspend fun commissionChainAsset(): Chain.Asset
+
+        suspend fun commissionAsset(): Asset
+
+        fun commissionAssetFlow(): Flow<Asset>
     }
 
     interface Factory {
