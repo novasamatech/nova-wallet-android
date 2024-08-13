@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.data.fee.utils
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.graph.Graph
+import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetConversion
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
@@ -35,6 +36,21 @@ class HydraDxQuoteSharedComputation(
         }
     }
 
+    suspend fun paths(
+        chain: Chain,
+        args: AssetExchangeQuoteArgs,
+        accountId: AccountId,
+        scope: CoroutineScope
+    ): List<Path<HydraDxSwapEdge>> {
+        val key = "HydraDxPaths:${accountId.toHexString()}"
+
+        return computationalCache.useCache(key, scope) {
+            val assetConversion = getAssetConversion(chain, accountId, scope)
+            val swapDirections = directions(chain, accountId, scope)
+            assetConversion.getPaths(swapDirections, args)
+        }
+    }
+
     suspend fun quote(
         chain: Chain,
         accountId: AccountId,
@@ -42,24 +58,20 @@ class HydraDxQuoteSharedComputation(
         toAsset: Chain.Asset,
         scope: CoroutineScope
     ): AssetExchangeQuote {
-        val key = "HydraDxQuote:${accountId.toHexString()}"
+        val args = AssetExchangeQuoteArgs(
+            chainAssetIn = fromAsset,
+            chainAssetOut = toAsset,
+            amount = BigInteger.ZERO,
+            swapDirection = SwapDirection.SPECIFIED_IN
+        )
 
-        return computationalCache.useCache(key, scope) {
-            val args = AssetExchangeQuoteArgs(
-                chainAssetIn = fromAsset,
-                chainAssetOut = toAsset,
-                amount = BigInteger.ZERO,
-                swapDirection = SwapDirection.SPECIFIED_IN
-            )
-
-            val assetConversion = getAssetConversion(chain, accountId, scope)
-            val swapDirections = directions(chain, accountId, scope)
-            val paths = assetConversion.getPaths(swapDirections, args)
-            assetConversion.quote(paths, args)
-        }
+        val assetConversion = getAssetConversion(chain, accountId, scope)
+        val swapDirections = directions(chain, accountId, scope)
+        val paths = assetConversion.getPaths(swapDirections, args)
+        return assetConversion.quote(paths, args)
     }
 
-    private suspend fun getAssetConversion(
+    suspend fun getAssetConversion(
         chain: Chain,
         accountId: AccountId,
         scope: CoroutineScope
