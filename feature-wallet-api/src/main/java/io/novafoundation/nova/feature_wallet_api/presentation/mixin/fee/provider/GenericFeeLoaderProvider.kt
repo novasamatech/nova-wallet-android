@@ -90,6 +90,10 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
         TODO("Not yet implemented")
     }
 
+    override fun commissionAssetFlow(): Flow<Asset> {
+        TODO("Not yet implemented")
+    }
+
     override fun setCommissionAsset(chainAsset: Chain.Asset) {
         // Not supported
     }

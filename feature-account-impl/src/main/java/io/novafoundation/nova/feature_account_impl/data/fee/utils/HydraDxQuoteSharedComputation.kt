@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.data.fee.utils
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.graph.Graph
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetConversion
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
@@ -15,6 +16,9 @@ import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class HydraDxQuoteSharedComputation(
     private val computationalCache: ComputationalCache,
@@ -31,6 +35,7 @@ class HydraDxQuoteSharedComputation(
 
         return computationalCache.useCache(key, scope) {
             val assetConversion = getAssetConversion(chain, accountId, scope)
+
             assetConversion.availableSwapDirections()
         }
     }
@@ -40,6 +45,7 @@ class HydraDxQuoteSharedComputation(
         accountId: AccountId,
         fromAsset: Chain.Asset,
         toAsset: Chain.Asset,
+        amount: BigInteger,
         scope: CoroutineScope
     ): AssetExchangeQuote {
         val key = "HydraDxQuote:${accountId.toHexString()}"
@@ -48,7 +54,7 @@ class HydraDxQuoteSharedComputation(
             val args = AssetExchangeQuoteArgs(
                 chainAssetIn = fromAsset,
                 chainAssetOut = toAsset,
-                amount = BigInteger.ZERO,
+                amount = amount,
                 swapDirection = SwapDirection.SPECIFIED_IN
             )
 
@@ -67,9 +73,17 @@ class HydraDxQuoteSharedComputation(
         val key = "HydraDxAssetConversion:${accountId.toHexString()}"
 
         return computationalCache.useCache(key, scope) {
-            val storageSharedRequestBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
+            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
             val assetConversion = assetConversionFactory.create(chain)
-            assetConversion.runSubscriptions(accountId, storageSharedRequestBuilder)
+
+            scope.launch {
+                assetConversion.runSubscriptions(accountId, subscriptionBuilder)
+                    .throttleLast(500.milliseconds)
+                    .launchIn(scope)
+
+                subscriptionBuilder.subscribe(scope)
+            }
+
             assetConversion
         }
     }

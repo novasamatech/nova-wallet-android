@@ -195,6 +195,7 @@ class SelectSendViewModel(
             origin = originChainWithAsset.first(),
             destination = destinationChainWithAsset.first(),
             amount = amountChooserMixin.amountState.first().value ?: return@launch,
+            commissionAsset = originFeeMixin.commissionAsset(),
             address = addressInputMixin.getAddress(),
         )
 
@@ -309,34 +310,9 @@ class SelectSendViewModel(
     }
 
     private fun setupFees() {
-        val feePayloadFlow = combine(
-            originChainWithAsset,
-            destinationChainWithAsset,
-            addressInputMixin.inputFlow,
-            amountChooserMixin.backPressuredAmount
-        ) { originAsset, destinationAsset, address, amount ->
-            FeePayload(originAsset, destinationAsset, address, amount)
-        }
-
-        val commissionAssetFlow = flow<Chain.Asset> {  }
-        
-
-        feePayloadFlow.onEach { input ->
-            feeConstructors.forEach { feeLoaderMixinConstructor ->
-                feeLoaderMixinConstructor.feeLoaderMixin.loadFee(
-                    coroutineScope = scope,
-                    feeConstructor = { token, chainAsset -> feeLoaderMixinConstructor.constructor(token, input, chainAsset) },
-                    onRetryCancelled = onRetryCancelled
-                )
-            }
-        }
-            .inBackground()
-            .launchIn(scope)
-
-
-        crossChainFeeMixin.connectWith()
         combine(
             originChainWithAsset,
+            originFeeMixin.commissionAssetFlow(),
             destinationChainWithAsset,
             addressInputMixin.inputFlow,
             amountChooserMixin.backPressuredAmount,
@@ -346,7 +322,13 @@ class SelectSendViewModel(
             .launchIn(this)
     }
 
-    private suspend fun recalculateFee(originAsset: ChainWithAsset, destinationAsset: ChainWithAsset, address: String, amount: BigDecimal) {
+    private suspend fun recalculateFee(
+        originAsset: ChainWithAsset,
+        originCommissionAsset: Asset,
+        destinationAsset: ChainWithAsset,
+        address: String,
+        amount: BigDecimal
+    ) {
         originFeeMixin.invalidateFee()
         val hasCrossChainFee = originAsset.chain.id != destinationAsset.chain.id
 
@@ -357,7 +339,14 @@ class SelectSendViewModel(
         }
 
         try {
-            val assetTransfer = buildTransfer(origin = originAsset, destination = destinationAsset, amount = amount, address = address)
+            val assetTransfer = buildTransfer(
+                origin = originAsset,
+                destination = destinationAsset,
+                amount = amount,
+                commissionAsset = originCommissionAsset,
+                address = address
+            )
+
             val planks = originAsset.asset.planksFromAmount(amount)
 
             val transferFeeModel = sendInteractor.getFee(planks, assetTransfer, viewModelScope)
@@ -396,6 +385,7 @@ class SelectSendViewModel(
 
     private suspend fun buildTransfer(
         origin: ChainWithAsset,
+        commissionAsset: Asset,
         destination: ChainWithAsset,
         amount: BigDecimal,
         address: String,
@@ -403,7 +393,7 @@ class SelectSendViewModel(
 
         return buildAssetTransfer(
             metaAccount = selectedAccount.first(),
-            commissionAsset = originFeeMixin.commissionAsset(),
+            commissionAsset = commissionAsset,
             origin = origin,
             destination = destination,
             amount = amount,
@@ -569,8 +559,8 @@ class SelectSendViewModel(
 }
 
 private class FeePayload(
-    originAsset: ChainWithAsset,
-    destinationAsset: ChainWithAsset,
-    address: String,
-    amount: BigDecimal
+    val originAsset: ChainWithAsset,
+    val destinationAsset: ChainWithAsset,
+    val address: String,
+    val amount: BigDecimal
 )

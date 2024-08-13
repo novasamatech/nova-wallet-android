@@ -65,6 +65,8 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     suspend fun commissionAsset(): Asset
 
+    fun commissionAssetFlow(): Flow<Asset>
+
     fun setCommissionAsset(chainAsset: Chain.Asset)
 
     interface Presentation<F : GenericFee> : GenericFeeLoaderMixin<F> {
@@ -81,7 +83,7 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
          */
         fun loadFeeV2Generic(
             coroutineScope: CoroutineScope,
-            feeConstructor: suspend (Token, Chain.Asset) -> F?,
+            feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
         )
 
@@ -113,11 +115,11 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
         fun loadFee(
             coroutineScope: CoroutineScope,
-            feeConstructor: suspend (Token, Chain.Asset) -> Fee?,
+            feeConstructor: suspend (Token) -> Fee?,
             onRetryCancelled: () -> Unit,
         ) = loadFeeV2Generic(
             coroutineScope = coroutineScope,
-            feeConstructor = { token, chainAsset -> feeConstructor(token, chainAsset)?.let(::SimpleFee) },
+            feeConstructor = { token -> feeConstructor(token)?.let(::SimpleFee) },
             onRetryCancelled = onRetryCancelled
         )
     }
@@ -182,30 +184,6 @@ fun <T : GenericFee> FeeLoaderMixin.Factory.createGenericChangeableFee(assetFlow
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
 
-class FeeLoaderMixinConstructor<I>(
-    val feeLoaderMixin: FeeLoaderMixin.Presentation,
-    val constructor: suspend (token: Token, input: I, chainAsset: Chain.Asset) -> Fee
-)
-
-fun <I> connectWith(
-    inputSource: Flow<I>,
-    scope: CoroutineScope,
-    feeConstructors: List<FeeLoaderMixinConstructor<I>>,
-    onRetryCancelled: () -> Unit = {}
-) {
-    inputSource.onEach { input ->
-        feeConstructors.forEach { feeLoaderMixinConstructor ->
-            feeLoaderMixinConstructor.feeLoaderMixin.loadFee(
-                coroutineScope = scope,
-                feeConstructor = { token, chainAsset -> feeLoaderMixinConstructor.constructor(token, input, chainAsset) },
-                onRetryCancelled = onRetryCancelled
-            )
-        }
-    }
-        .inBackground()
-        .launchIn(scope)
-}
-
 fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource: Flow<I>,
     scope: CoroutineScope,
@@ -215,7 +193,7 @@ fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource.onEach { input ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { token, _ -> token.feeConstructor(input) },
+            feeConstructor = { token -> token.feeConstructor(input) },
             onRetryCancelled = onRetryCancelled
         )
     }
@@ -236,7 +214,7 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
     ) { input1, input2 ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { token, _ -> token.feeConstructor(input1, input2) },
+            feeConstructor = { token -> token.feeConstructor(input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
     }

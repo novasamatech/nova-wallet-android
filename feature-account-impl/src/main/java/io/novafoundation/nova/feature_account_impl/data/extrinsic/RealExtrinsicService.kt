@@ -131,7 +131,7 @@ class RealExtrinsicService(
         extrinsicBuilder.formExtrinsic()
         val extrinsic = extrinsicBuilder.build(batchMode)
 
-        return estimateFee(chain, extrinsic, signer)
+        return estimateFee(chain, extrinsic, signer, submissionOptions)
     }
 
     override suspend fun estimateFee(

@@ -79,8 +79,11 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         .distinctUntilChanged()
         .map { chainRegistry.getChain(it) }
 
-    private val availableFeeAssetsFlow: Flow<List<Chain.Asset>> =
-        selectedTokenFlow.map { interactor.availableCommissionAssetFor(it.configuration, coroutineScope) }
+    private val availableFeeAssetsFlow: Flow<Map<Int, Chain.Asset>> =
+        selectedTokenFlow.map {
+            interactor.availableCommissionAssetFor(it.configuration, coroutineScope)
+                .associateBy { it.id }
+        }
 
     private val commissionChainAssetFlow = singleReplaySharedFlow<Chain.Asset>()
 
@@ -97,10 +100,13 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     val changeFeeTokenEvent = actionAwaitableMixinFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
     private val feeTokenWasChangedManually = MutableStateFlow(false)
 
-    override val changeFeeTokenState =
-        combine(selectedTokenFlow, commissionChainAssetFlow, availableFeeAssetsFlow) { selectedToken, selectedCommissionAsset, availableFeeAssets ->
-            mapChangeFeeTokenState(selectedToken, selectedCommissionAsset, availableFeeAssets)
-        }.asLiveData(coroutineScope)
+    override val changeFeeTokenState = combine(
+        selectedTokenFlow,
+        commissionChainAssetFlow,
+        availableFeeAssetsFlow
+    ) { selectedToken, selectedCommissionAsset, availableFeeAssets ->
+        mapChangeFeeTokenState(selectedToken, selectedCommissionAsset, availableFeeAssets)
+    }.asLiveData(coroutineScope)
 
     init {
         configuration.initialStatusValue?.let(feeLiveData::postValue)
@@ -115,18 +121,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     ): Unit = withContext(Dispatchers.IO) {
         feeLiveData.postValue(FeeStatus.Loading)
 
-        commissionTokenFlow.distinctUntilChangedBy { it.configuration.fullId }
-            .onEach { calculateFee(retryScope, it, feeConstructor, onRetryCancelled) }
-            .launchIn(coroutineScope)
-    }
-
-    private suspend fun calculateFee(
-        retryScope: CoroutineScope,
-        token: Token,
-        feeConstructor: suspend (Token) -> F?,
-        onRetryCancelled: () -> Unit,
-    ) {
-        feeLiveData.postValue(FeeStatus.Loading)
+        val token = commissionTokenFlow.first()
 
         val value = runCatching {
             feeConstructor(token)
@@ -182,6 +177,10 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         return commissionAssetFlow.first()
     }
 
+    override fun commissionAssetFlow(): Flow<Asset> {
+        return commissionAssetFlow
+    }
+
     override fun setCommissionAsset(chainAsset: Chain.Asset) {
         coroutineScope.launch {
             commissionChainAssetFlow.emit(chainAsset)
@@ -225,7 +224,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         combineToTriple(feeTokenWasChangedManually, availableFeeAssetsFlow, selectedChainAssetFlow)
             .filter { (tokenWasChangedManually, _, _) -> !tokenWasChangedManually }
             .onEach { (_, availableFeeAssets, selectedChainAsset) ->
-                if (selectedChainAsset in availableFeeAssets) {
+                if (selectedChainAsset.id in availableFeeAssets) {
                     commissionChainAssetFlow.emit(selectedChainAsset)
                 } else {
                     val chain = chainFlow.first()
@@ -266,14 +265,14 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
     private suspend fun mapChangeFeeTokenState(
         selectedToken: Token,
         customFeeAsset: Chain.Asset,
-        availableFeeAssets: List<Chain.Asset>
+        availableFeeAssets: Map<Int, Chain.Asset>
     ): ChangeFeeTokenState {
         val originChainAsset = selectedToken.configuration
 
         return when {
             originChainAsset.isCommissionAsset -> ChangeFeeTokenState.NotSupported
 
-            (originChainAsset in availableFeeAssets) -> {
+            (originChainAsset.id in availableFeeAssets) -> {
                 val chain = chainRegistry.getChain(originChainAsset.chainId)
                 val selectableAssets = listOf(chain.commissionAsset, originChainAsset)
                 ChangeFeeTokenState.Editable(customFeeAsset, selectableAssets)

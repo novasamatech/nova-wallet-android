@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
@@ -27,7 +25,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -82,9 +79,9 @@ class SendInteractor(
 
             TransferFeeModel(originFeeWithSenderPart, crossChainFeeModel.toSubstrateFee(transfer))
         } else {
-            val originFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
+            val nativeFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
             TransferFeeModel(
-                OriginFee(originFee, null, transfer.commissionAssetToken.configuration),
+                OriginFee(nativeFee, null, transfer.commissionAssetToken.configuration),
                 null
             )
         }

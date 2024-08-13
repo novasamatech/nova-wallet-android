@@ -41,7 +41,14 @@ internal class HydrationConversionFeePayment(
         val accountId = metaAccount.accountIdIn(chain)
         val fromAsset = chain.commissionAsset
 
-        val quote = hydraDxQuoteSharedComputation.quote(chain, accountId!!, fromAsset = fromAsset, toAsset = paymentAsset, coroutineScope)
+        val quote = hydraDxQuoteSharedComputation.quote(
+            chain,
+            accountId!!,
+            fromAsset = fromAsset,
+            toAsset = paymentAsset,
+            amount = nativeFee.amount,
+            coroutineScope
+        )
         return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset.toFeePaymentAsset())
     }
 
