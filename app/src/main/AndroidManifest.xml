@@ -39,10 +39,10 @@
 
         <activity
             android:name="io.novafoundation.nova.app.root.presentation.RootActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.NovaFoundation.Nova"
             android:windowSoftInputMode="adjustResize">
 
@@ -109,6 +109,17 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:scheme="http" />
+                <data android:host="app.novawallet.io" />
             </intent-filter>
         </activity>
 
