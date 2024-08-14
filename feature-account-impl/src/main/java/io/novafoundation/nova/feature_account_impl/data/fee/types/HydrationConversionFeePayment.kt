@@ -17,7 +17,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 
 internal class HydrationConversionFeePayment(

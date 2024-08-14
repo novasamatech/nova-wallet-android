@@ -4,17 +4,14 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetConversion
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxSwapEdge
-import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 
 class HydraDxQuoteSharedComputation(
@@ -28,7 +25,7 @@ class HydraDxQuoteSharedComputation(
         accountId: AccountId,
         scope: CoroutineScope
     ): Graph<FullChainAssetId, HydraDxSwapEdge> {
-        val key = "HydraDxDirections:${accountId.toHexString()}"
+        val key = "HydraDxDirections:${chain.id}:${accountId.toHexString()}"
 
         return computationalCache.useCache(key, scope) {
             val assetConversion = getAssetConversion(chain, accountId, scope)
@@ -42,7 +39,7 @@ class HydraDxQuoteSharedComputation(
         accountId: AccountId,
         scope: CoroutineScope
     ): List<Path<HydraDxSwapEdge>> {
-        val key = "HydraDxPaths:${accountId.toHexString()}"
+        val key = "HydraDxPaths:${chain.id}:${argsToKey(args)}:${accountId.toHexString()}"
 
         return computationalCache.useCache(key, scope) {
             val assetConversion = getAssetConversion(chain, accountId, scope)
@@ -51,32 +48,12 @@ class HydraDxQuoteSharedComputation(
         }
     }
 
-    suspend fun quote(
-        chain: Chain,
-        accountId: AccountId,
-        fromAsset: Chain.Asset,
-        toAsset: Chain.Asset,
-        scope: CoroutineScope
-    ): AssetExchangeQuote {
-        val args = AssetExchangeQuoteArgs(
-            chainAssetIn = fromAsset,
-            chainAssetOut = toAsset,
-            amount = BigInteger.ZERO,
-            swapDirection = SwapDirection.SPECIFIED_IN
-        )
-
-        val assetConversion = getAssetConversion(chain, accountId, scope)
-        val swapDirections = directions(chain, accountId, scope)
-        val paths = assetConversion.getPaths(swapDirections, args)
-        return assetConversion.quote(paths, args)
-    }
-
     suspend fun getAssetConversion(
         chain: Chain,
         accountId: AccountId,
         scope: CoroutineScope
     ): AssetConversion<HydraDxSwapEdge> {
-        val key = "HydraDxAssetConversion:${accountId.toHexString()}"
+        val key = "HydraDxAssetConversion:${chain.id}:${accountId.toHexString()}"
 
         return computationalCache.useCache(key, scope) {
             val storageSharedRequestBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
@@ -84,5 +61,9 @@ class HydraDxQuoteSharedComputation(
             assetConversion.runSubscriptions(accountId, storageSharedRequestBuilder)
             assetConversion
         }
+    }
+
+    private fun argsToKey(args: AssetExchangeQuoteArgs) = args.apply {
+        "${chainAssetIn.id}:${chainAssetOut.id}:${swapDirection.name}"
     }
 }
