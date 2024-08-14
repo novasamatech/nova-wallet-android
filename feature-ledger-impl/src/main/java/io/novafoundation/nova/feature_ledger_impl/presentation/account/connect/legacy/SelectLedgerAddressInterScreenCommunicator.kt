@@ -16,6 +16,7 @@ interface SelectLedgerAddressInterScreenCommunicator : SelectLedgerAddressInterS
 
 @Parcelize
 class LedgerChainAccount(
+    val index: Int,
     val publicKey: ByteArray,
     val encryptionType: EncryptionType,
     val address: String,

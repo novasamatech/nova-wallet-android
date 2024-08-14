@@ -51,6 +51,8 @@ abstract class SelectAddressLedgerViewModel(
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 
+    protected open val needToVerifyAccount = true
+
     private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
     private val loadingAccount = MutableStateFlow(false)
@@ -93,32 +95,40 @@ abstract class SelectAddressLedgerViewModel(
     }
 
     fun accountClicked(accountUi: AccountUi) {
-        verifyAccount(accountUi.id)
+        verifyAccount(accountUi.id.toInt())
     }
 
-    private fun verifyAccount(id: Long) {
+    protected fun verifyAccount(id: Int) {
         verifyAddressJob?.cancel()
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id.toInt() }
 
-            ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
-                resourceManager = resourceManager,
-                address = account.account.address,
-                deviceName = device.first().name,
-                onCancel = ::verifyAddressCancelled,
-            ).event()
-
-            val result = withContext(Dispatchers.Default) {
-                interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
-            }
-
-            result.onFailure {
-                handleLedgerError(it) { verifyAccount(id) }
-            }.onSuccess {
-                ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
-
+            if (needToVerifyAccount) {
+                verifyAccountInternal(account)
+            } else {
                 onAccountVerified(account)
             }
+        }
+    }
+
+    private suspend fun verifyAccountInternal(account: LedgerAccountWithBalance) {
+        ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
+            resourceManager = resourceManager,
+            address = account.account.address,
+            deviceName = device.first().name,
+            onCancel = ::verifyAddressCancelled,
+        ).event()
+
+        val result = withContext(Dispatchers.Default) {
+            interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
+        }
+
+        result.onFailure {
+            handleLedgerError(it) { verifyAccount(account.index) }
+        }.onSuccess {
+            ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+
+            onAccountVerified(account)
         }
     }
 

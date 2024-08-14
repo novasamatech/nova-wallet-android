@@ -33,6 +33,8 @@ class SelectAddressImportGenericLedgerViewModel(
     messageFormatter = messageFormatter
 ) {
 
+    override val needToVerifyAccount = false
+
     override fun onAccountVerified(account: LedgerAccountWithBalance) {
         launch {
             val device = interactor.getDevice(payload.deviceId)
