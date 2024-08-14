@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.l
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.SelectLedgerAddressInterScreenResponder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-class SelectAddressImportLedgerViewModel(
+class SelectAddressImportLedgerLegacyViewModel(
     private val router: LedgerRouter,
     private val payload: SelectLedgerAddressPayload,
     private val responder: SelectLedgerAddressInterScreenResponder,

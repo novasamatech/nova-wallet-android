@@ -27,7 +27,22 @@
         tools:layout="@layout/fragment_select_ledger">
 
         <action
-            android:id="@+id/action_selectLedgerGenericImportFragment_to_previewImportGenericLedgerFragment"
+            android:id="@+id/action_selectLedgerGenericImportFragment_to_selectAddressImportGenericLedgerFragment"
+            app:destination="@id/selectAddressImportGenericLedgerFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectAddressImportGenericLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectAddress.SelectAddressImportGenericLedgerFragment"
+        android:label="SelectLedgerGenericImportFragment"
+        tools:layout="@layout/fragment_select_ledger">
+
+        <action
+            android:id="@+id/action_selectAddressImportGenericLedgerFragment_to_previewImportGenericLedgerFragment"
             app:destination="@id/previewImportGenericLedgerFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"

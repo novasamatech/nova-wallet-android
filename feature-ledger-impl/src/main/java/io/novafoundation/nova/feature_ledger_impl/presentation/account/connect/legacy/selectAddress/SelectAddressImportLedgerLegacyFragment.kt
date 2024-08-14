@@ -5,11 +5,11 @@ import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerFragment
 
-class SelectAddressImportLedgerFragment : SelectAddressLedgerFragment<SelectAddressImportLedgerViewModel>() {
+class SelectAddressImportLedgerLegacyFragment : SelectAddressLedgerFragment<SelectAddressImportLedgerLegacyViewModel>() {
 
     override fun inject() {
         FeatureUtils.getFeature<LedgerFeatureComponent>(requireContext(), LedgerFeatureApi::class.java)
-            .selectAddressImportLedgerComponentFactory()
+            .selectAddressImportLedgerLegacyComponentFactory()
             .create(this, payload())
             .inject(this)
     }

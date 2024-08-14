@@ -16,7 +16,7 @@ interface PreviewImportGenericLedgerInteractor {
 
     suspend fun availableChainAccounts(addressFromLedger: String): List<ChainAccountPreview>
 
-    suspend fun verifyAddressOnLedger(deviceId: String): Result<Unit>
+    suspend fun verifyAddressOnLedger(accountIndex: Int, deviceId: String): Result<Unit>
 }
 
 class RealPreviewImportGenericLedgerInteractor(
@@ -40,11 +40,11 @@ class RealPreviewImportGenericLedgerInteractor(
         }
     }
 
-    override suspend fun verifyAddressOnLedger(deviceId: String): Result<Unit> = withContext(Dispatchers.IO) {
+    override suspend fun verifyAddressOnLedger(accountIndex: Int, deviceId: String): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
             val device = ledgerDiscoveryService.findDeviceOrThrow(deviceId)
 
-            genericSubstrateLedgerApplication.getUniversalAccount(device, confirmAddress = true)
+            genericSubstrateLedgerApplication.getUniversalAccount(device, accountIndex, confirmAddress = true)
 
             Unit
         }

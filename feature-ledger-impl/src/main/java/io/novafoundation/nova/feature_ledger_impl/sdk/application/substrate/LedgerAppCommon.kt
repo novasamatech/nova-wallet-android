@@ -78,7 +78,7 @@ object SubstrateLedgerAppCommon {
         return junctions.serializeInLedgerFormat()
     }
 
-    fun parseAccountResponse(raw: ByteArray, requestDerivationPath: String): LedgerSubstrateAccount {
+    fun parseAccountResponse(accountIndex: Int, raw: ByteArray, requestDerivationPath: String): LedgerSubstrateAccount {
         val dataWithoutResponseCode = processResponseCode(raw)
 
         val publicKey = dataWithoutResponseCode.copyBytes(0, PUBLIC_KEY_LENGTH)
@@ -96,6 +96,7 @@ object SubstrateLedgerAppCommon {
         val encryptionType = mapCryptoSchemeToEncryptionType(defaultCryptoScheme())
 
         return LedgerSubstrateAccount(
+            index = accountIndex,
             address = address,
             publicKey = publicKey,
             encryptionType = encryptionType,

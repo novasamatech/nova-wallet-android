@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 
 abstract class SelectAddressLedgerViewModel(
     private val router: LedgerRouter,
-    private val interactor: SelectAddressLedgerInteractor,
+    internal val interactor: SelectAddressLedgerInteractor,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,

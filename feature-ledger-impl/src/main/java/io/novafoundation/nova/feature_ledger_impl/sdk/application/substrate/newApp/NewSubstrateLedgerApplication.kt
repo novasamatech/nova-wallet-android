@@ -54,7 +54,7 @@ abstract class NewSubstrateLedgerApplication(
 
         Log.w("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
 
-        return parseAccountResponse(rawResponse, derivationPath)
+        return parseAccountResponse(accountIndex, rawResponse, derivationPath)
     }
 
     override suspend fun getSignature(

@@ -5,15 +5,15 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectAddress.SelectAddressImportLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectAddress.SelectAddressImportLedgerLegacyFragment
 
 @Subcomponent(
     modules = [
-        SelectAddressImportLedgerModule::class
+        SelectAddressImportLedgerLegacyModule::class
     ]
 )
 @ScreenScope
-interface SelectAddressImportLedgerComponent {
+interface SelectAddressImportLedgerLegacyComponent {
 
     @Subcomponent.Factory
     interface Factory {
@@ -21,8 +21,8 @@ interface SelectAddressImportLedgerComponent {
         fun create(
             @BindsInstance fragment: Fragment,
             @BindsInstance payload: SelectLedgerAddressPayload,
-        ): SelectAddressImportLedgerComponent
+        ): SelectAddressImportLedgerLegacyComponent
     }
 
-    fun inject(fragment: SelectAddressImportLedgerFragment)
+    fun inject(fragment: SelectAddressImportLedgerLegacyFragment)
 }
