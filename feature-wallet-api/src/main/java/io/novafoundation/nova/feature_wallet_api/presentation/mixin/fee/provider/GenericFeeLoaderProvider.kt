@@ -79,14 +79,6 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
         }
     }
 
-    override suspend fun commissionChainAsset(): Chain.Asset {
-        return tokenFlow.firstNotNull().configuration
-    }
-
-    override suspend fun commissionAsset(): Asset {
-        throw IllegalStateException("commissionAsset not supported")
-    }
-
     override fun commissionAssetFlow(): Flow<Asset> {
         throw IllegalStateException("commissionAssetFlow not supported")
     }

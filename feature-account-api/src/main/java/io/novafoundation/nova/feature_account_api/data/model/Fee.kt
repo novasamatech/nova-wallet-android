@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigi
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
@@ -19,21 +20,14 @@ interface Fee {
      */
     val submissionOrigin: SubmissionOrigin
 
-    val paymentAsset: PaymentAsset
-
-    sealed interface PaymentAsset {
-
-        object Native : PaymentAsset
-
-        class Asset(val assetId: FullChainAssetId) : PaymentAsset
-    }
+    val asset: Chain.Asset
 }
 
 data class EvmFee(
     val gasLimit: BigInteger,
     val gasPrice: BigInteger,
     override val submissionOrigin: SubmissionOrigin,
-    override val paymentAsset: Fee.PaymentAsset
+    override val asset: Chain.Asset
 ) : Fee {
     override val amount = gasLimit * gasPrice
 }
@@ -41,7 +35,7 @@ data class EvmFee(
 class SubstrateFee(
     override val amount: BigInteger,
     override val submissionOrigin: SubmissionOrigin,
-    override val paymentAsset: Fee.PaymentAsset
+    override val asset: Chain.Asset
 ) : Fee
 
 val Fee.requestedAccountPaysFees: Boolean
@@ -58,16 +52,9 @@ val BigInteger.asAmountByRequestedAccount: BigInteger
         BigInteger.ZERO
     }
 
-fun FeePaymentCurrency.toFeePaymentAsset(): Fee.PaymentAsset {
+fun FeePaymentCurrency.toFeePaymentAsset(chain: Chain): Chain.Asset {
     return when (this) {
-        is FeePaymentCurrency.Asset -> Fee.PaymentAsset.Asset(asset.fullId)
-        FeePaymentCurrency.Native -> Fee.PaymentAsset.Native
-    }
-}
-
-fun Chain.Asset.toFeePaymentAsset(): Fee.PaymentAsset {
-    return when {
-        this.isCommissionAsset -> Fee.PaymentAsset.Native
-        else -> Fee.PaymentAsset.Asset(this.fullId)
+        is FeePaymentCurrency.Asset -> asset
+        FeePaymentCurrency.Native -> chain.utilityAsset
     }
 }

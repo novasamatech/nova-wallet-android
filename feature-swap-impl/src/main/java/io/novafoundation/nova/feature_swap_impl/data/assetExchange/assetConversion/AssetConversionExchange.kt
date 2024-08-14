@@ -216,7 +216,7 @@ private class AssetConversionExchange(
         }
 
         return AssetExchangeFee(
-            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin, paymentAsset = customFeeAsset.toFeePaymentAsset()),
+            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin, asset = customFeeAsset),
             minimumBalanceBuyIn = minimumBalanceBuyIn
         )
     }

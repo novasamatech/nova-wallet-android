@@ -169,14 +169,6 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         postFeeState(FeeStatus.Loading)
     }
 
-    override suspend fun commissionChainAsset(): Chain.Asset {
-        return commissionChainAssetFlow.first()
-    }
-
-    override suspend fun commissionAsset(): Asset {
-        return commissionAssetFlow.first()
-    }
-
     override fun commissionAssetFlow(): Flow<Asset> {
         return commissionAssetFlow
     }

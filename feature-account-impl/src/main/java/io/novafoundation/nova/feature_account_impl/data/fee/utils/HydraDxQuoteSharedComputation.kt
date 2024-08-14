@@ -64,12 +64,12 @@ class HydraDxQuoteSharedComputation(
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
             val assetConversion = assetConversionFactory.create(chain)
 
-            scope.launch {
+            launch {
                 assetConversion.runSubscriptions(accountId, subscriptionBuilder)
                     .throttleLast(500.milliseconds)
-                    .launchIn(scope)
+                    .launchIn(this)
 
-                subscriptionBuilder.subscribe(scope)
+                subscriptionBuilder.subscribe(this)
             }
 
             assetConversion

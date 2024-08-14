@@ -94,10 +94,6 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
         suspend fun invalidateFee()
 
-        suspend fun commissionChainAsset(): Chain.Asset
-
-        suspend fun commissionAsset(): Asset
-
         fun commissionAssetFlow(): Flow<Asset>
     }
 
@@ -233,3 +229,7 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
 }
 
 fun ChangeFeeTokenState.isEditable() = this is ChangeFeeTokenState.Editable
+
+suspend fun GenericFeeLoaderMixin.Presentation<*>.commissionAsset(): Asset {
+    return commissionAssetFlow().first()
+}

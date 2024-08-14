@@ -23,7 +23,7 @@ data class OriginFee(
 
     override val submissionOrigin: SubmissionOrigin = networkFee.submissionOrigin
 
-    override val paymentAsset: Fee.PaymentAsset = networkFee.paymentAsset
+    override val asset = networkFee.asset
 }
 
 fun OriginDecimalFee.networkFeePart(): GenericDecimalFee<GenericFee> {

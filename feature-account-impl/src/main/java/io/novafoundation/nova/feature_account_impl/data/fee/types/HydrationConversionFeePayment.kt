@@ -54,7 +54,7 @@ internal class HydrationConversionFeePayment(
         val assetConversion = hydraDxQuoteSharedComputation.getAssetConversion(chain, accountId, coroutineScope)
         val paths = hydraDxQuoteSharedComputation.paths(chain, args, accountId, coroutineScope)
         val quote = assetConversion.quote(paths, args)
-        return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset.toFeePaymentAsset())
+        return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset)
     }
 
     override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {

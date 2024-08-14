@@ -172,7 +172,7 @@ class RealExtrinsicService(
         val totalNativeFee = SubstrateFee(
             totalFeeAmount,
             feeSigner.submissionOrigin(chain),
-            submissionOptions.feePaymentCurrency.toFeePaymentAsset()
+            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
         )
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
@@ -274,7 +274,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             BigInteger.ZERO,
             signer.submissionOrigin(chain),
-            submissionOptions.feePaymentCurrency.toFeePaymentAsset()
+            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
         )
     }
 
@@ -295,7 +295,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             amount = tip + baseFee,
             submissionOrigin = submissionOrigin,
-            chain.commissionAsset.toFeePaymentAsset()
+            chain.commissionAsset
         )
     }
 }

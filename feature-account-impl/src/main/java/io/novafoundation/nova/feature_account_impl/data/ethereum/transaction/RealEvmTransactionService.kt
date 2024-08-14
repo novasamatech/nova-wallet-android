@@ -20,6 +20,7 @@ import io.novafoundation.nova.runtime.ethereum.EvmRpcException
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -64,7 +65,7 @@ internal class RealEvmTransactionService(
             gasLimit,
             gasPrice,
             SubmissionOrigin.singleOrigin(submittingMetaAccount.requireAccountIdIn(chain)),
-            Fee.PaymentAsset.Native
+            chain.commissionAsset
         )
     }
 
@@ -92,7 +93,7 @@ internal class RealEvmTransactionService(
                 gasLimit,
                 gasPrice,
                 SubmissionOrigin.singleOrigin(submittingAccountId),
-                Fee.PaymentAsset.Native
+                chain.commissionAsset
             )
         }
 

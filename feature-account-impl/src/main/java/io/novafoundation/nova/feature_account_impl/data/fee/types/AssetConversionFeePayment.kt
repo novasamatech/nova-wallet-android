@@ -56,7 +56,7 @@ internal class AssetConversionFeePayment(
             "Failed to calculate fee in ${paymentAsset.symbol}"
         }
 
-        return SubstrateFee(amount = quote, submissionOrigin = nativeFee.submissionOrigin, paymentAsset = paymentAsset.toFeePaymentAsset())
+        return SubstrateFee(amount = quote, submissionOrigin = nativeFee.submissionOrigin, asset = paymentAsset)
     }
 
     override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {

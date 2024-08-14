@@ -77,7 +77,7 @@ data class Chain(
         val source: Source,
         val name: String,
         val enabled: Boolean,
-    ) : Identifiable {
+    ) : Identifiable, Serializable {
 
         enum class Source {
             DEFAULT, ERC20, MANUAL

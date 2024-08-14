@@ -129,13 +129,13 @@ class SendInteractor(
         return SubstrateFee(
             amount = amount,
             submissionOrigin = SubmissionOrigin.singleOrigin(accountId),
-            paymentAsset = chain.commissionAsset.toFeePaymentAsset()
+            asset = chain.commissionAsset
         )
     }
 
     private fun CrossChainFeeModel.toSubstrateFee(transfer: AssetTransfer) = SubstrateFee(
         amount = holdingPart,
         submissionOrigin = SubmissionOrigin.singleOrigin(transfer.sender.requireAccountIdIn(transfer.originChain)),
-        paymentAsset = transfer.originChain.commissionAsset.toFeePaymentAsset() // TODO: Support custom assets for xcm transfers
+        asset = transfer.originChain.commissionAsset // TODO: Support custom assets for xcm transfers
     )
 }
