@@ -25,12 +25,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Deprecated("Use ChangeableFeeLoaderProviderPresentation instead")
 internal class GenericFeeLoaderProviderPresentation(
     resourceManager: ResourceManager,
     configuration: GenericFeeLoaderMixin.Configuration<SimpleFee>,
     tokenFlow: Flow<Token?>,
 ) : GenericFeeLoaderProvider<SimpleFee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation
 
+@Deprecated("Use ChangeableFeeLoaderProvider instead")
 internal open class GenericFeeLoaderProvider<F : GenericFee>(
     protected val resourceManager: ResourceManager,
     protected val configuration: GenericFeeLoaderMixin.Configuration<F>,

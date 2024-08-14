@@ -99,6 +99,7 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     interface Factory {
 
+        @Deprecated("Use createChangeableFeeGeneric instead")
         fun <F : GenericFee> createGeneric(
             tokenFlow: Flow<Token?>,
             configuration: Configuration<F> = Configuration()
@@ -134,6 +135,7 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
             configuration: Configuration<SimpleFee> = Configuration()
         ): Presentation
 
+        @Deprecated("Use createChangeableFee instead")
         fun createChangeableFee(
             tokenFlow: Flow<Token?>,
             coroutineScope: CoroutineScope,
@@ -180,14 +182,19 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.getDecimalFeeOrNull(): GenericDeci
         ?.decimalFee
 }
 
+@Deprecated("Use createGenericChangeableFee instead")
 fun <T : GenericFee> FeeLoaderMixin.Factory.createGeneric(assetFlow: Flow<Asset>) = createGeneric<T>(assetFlow.map { it.token })
+
 fun <T : GenericFee> FeeLoaderMixin.Factory.createGenericChangeableFee(
     assetFlow: Flow<Asset>,
     coroutineScope: CoroutineScope,
     configuration: Configuration<T> = Configuration()
 ) = createChangeableFeeGeneric<T>(assetFlow.map { it.token }, coroutineScope, configuration)
 
+@Deprecated("Use createChangeableFee instead")
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
+
+@Deprecated("Use createChangeableFee instead")
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
 
 fun <I> FeeLoaderMixin.Presentation.connectWith(
