@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
@@ -117,6 +116,10 @@ private class HydraDxExchange(
     private val quotePathsCache: MutableStateFlow<Map<QuotePathsCacheKey, QuotePathsCache>?> = MutableStateFlow(null)
 
     private val graphState: MutableSharedFlow<HydraSwapGraph> = singleReplaySharedFlow()
+
+    override suspend fun sync() {
+        assetConversion.sync()
+    }
 
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
         val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)

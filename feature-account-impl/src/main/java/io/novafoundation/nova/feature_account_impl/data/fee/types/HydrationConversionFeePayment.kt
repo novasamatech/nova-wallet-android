@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types
 
+import io.novafoundation.nova.common.utils.graph.findAllPossibleDirections
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_impl.data.fee.utils.HydraDxQuoteSharedComputation
@@ -64,7 +64,7 @@ internal class HydrationConversionFeePayment(
         val fromAsset = chain.commissionAsset
 
         val allSwapDirections = hydraDxQuoteSharedComputation.directions(chain, accountId!!, coroutineScope)
-        val commissionAssetDirections = allSwapDirections.adjacencyList[fromAsset.fullId] ?: emptyList()
-        return commissionAssetDirections.map { chainRegistry.asset(it.direction.to) }
+        val directions = allSwapDirections.findAllPossibleDirections(fromAsset.fullId)
+        return directions.map { chainRegistry.asset(it) }
     }
 }

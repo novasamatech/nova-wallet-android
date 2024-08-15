@@ -318,6 +318,8 @@ class SwapMainSettingsViewModel(
         feeMixin.setupFees()
 
         setCustomFeeAssetIfNotEnoughNative()
+
+        launch { swapInteractor.sync() }
     }
 
     fun selectPayToken() {

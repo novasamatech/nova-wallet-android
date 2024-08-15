@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface HydraDxConversionSource : Identifiable {
 
+    suspend fun sync()
+
     suspend fun availableSwapDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection>
 
     @Throws(SwapQuoteException::class)

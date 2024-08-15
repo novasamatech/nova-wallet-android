@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface SwapService {
 
+    suspend fun sync()
+
     suspend fun assetsAvailableForSwap(computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
 
     suspend fun availableSwapDirectionsFor(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>

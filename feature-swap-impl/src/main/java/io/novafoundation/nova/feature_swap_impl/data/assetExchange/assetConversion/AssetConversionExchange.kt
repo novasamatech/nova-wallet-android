@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
@@ -92,6 +91,10 @@ private class AssetConversionExchange(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange {
+
+    override suspend fun sync() {
+        // Nothing to sync
+    }
 
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
         // any asset is usable as a fee as soon as it has associated pool

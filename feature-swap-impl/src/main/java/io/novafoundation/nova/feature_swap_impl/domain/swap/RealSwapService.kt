@@ -58,7 +58,7 @@ private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
-    private val hydraDxOmnipoolFactory: HydraDxExchangeFactory,
+    private val hydraDxExchangeFactory: HydraDxExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
@@ -74,6 +74,12 @@ internal class RealSwapService(
         // TODO we disable custom fee tokens payment for account types where current account is not the one who pays fees (e.g. it is proxied).
         // This restriction can be removed once we consider all corner-cases
         isCustomFeeToken && exchange.canPayFeeInNonUtilityToken(asset) && currentMetaAccount.type.requestedAccountPaysFees()
+    }
+
+    override suspend fun sync() = withContext(Dispatchers.Default) {
+        exchanges(CoroutineScope(coroutineContext))
+            .values
+            .forEach { it.sync() }
     }
 
     override suspend fun assetsAvailableForSwap(
@@ -202,7 +208,7 @@ internal class RealSwapService(
     private suspend fun createExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
         val factory = when {
             chain.swap.assetConversionSupported() -> assetConversionFactory
-            chain.swap.hydraDxSupported() -> hydraDxOmnipoolFactory
+            chain.swap.hydraDxSupported() -> hydraDxExchangeFactory
             else -> null
         }
 

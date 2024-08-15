@@ -54,6 +54,10 @@ fun <N, E : Edge<N>> Graph<N, E>.findConnectedComponents(): List<ConnectedCompon
     return result
 }
 
+fun <N, E : Edge<N>> Graph<N, E>.findConnectedComponentFor(vertex: N): ConnectedComponent<N> {
+    return connectedComponentsDfs(vertex, adjacencyList, visited = mutableSetOf())
+}
+
 fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirections(): MultiMap<N, N> {
     val connectedComponents = findConnectedComponents()
     return connectedComponents.findAllPossibleDirections()
@@ -62,6 +66,11 @@ fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirections(): MultiMap<N, N> {
 fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
     val connectedComponents = findConnectedComponents()
     return connectedComponents.findAllPossibleDirectionsToList()
+}
+
+fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirections(vertex: N): Set<N> {
+    val connectedComponent = findConnectedComponentFor(vertex)
+    return connectedComponent.findAllPossibleDirectionsFor(vertex)
 }
 
 fun <N> List<ConnectedComponent<N>>.findAllPossibleDirections(): MultiMap<N, N> {
@@ -77,6 +86,16 @@ fun <N> List<ConnectedComponent<N>>.findAllPossibleDirections(): MultiMap<N, N> 
     }
 
     return result
+}
+
+fun <N> ConnectedComponent<N>.findAllPossibleDirectionsFor(node: N): Set<N> {
+    val nodeSet = this.toSet()
+
+    return if (nodeSet.contains(node)) {
+        nodeSet - node
+    } else {
+        emptySet()
+    }
 }
 
 fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {

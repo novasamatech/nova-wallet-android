@@ -64,6 +64,10 @@ class SwapInteractor(
     private val swapTransactionHistoryRepository: SwapTransactionHistoryRepository
 ) {
 
+    suspend fun sync() {
+        swapService.sync()
+    }
+
     suspend fun getUpdateSystem(chainFlow: Flow<Chain>, coroutineScope: CoroutineScope): UpdateSystem {
         return swapUpdateSystemFactory.create(chainFlow, coroutineScope)
     }

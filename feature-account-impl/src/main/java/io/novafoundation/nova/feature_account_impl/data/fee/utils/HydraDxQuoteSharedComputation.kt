@@ -15,7 +15,6 @@ import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 class HydraDxQuoteSharedComputation(
@@ -64,13 +63,12 @@ class HydraDxQuoteSharedComputation(
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
             val assetConversion = assetConversionFactory.create(chain)
 
-            launch {
-                assetConversion.runSubscriptions(accountId, subscriptionBuilder)
-                    .throttleLast(500.milliseconds)
-                    .launchIn(this)
+            assetConversion.sync()
+            assetConversion.runSubscriptions(accountId, subscriptionBuilder)
+                .throttleLast(500.milliseconds)
+                .launchIn(this@useCache)
 
-                subscriptionBuilder.subscribe(this)
-            }
+            subscriptionBuilder.subscribe(this@useCache)
 
             assetConversion
         }

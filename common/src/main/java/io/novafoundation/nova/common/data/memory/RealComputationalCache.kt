@@ -42,7 +42,7 @@ internal class RealComputationalCache : ComputationalCache, CoroutineScope by Co
         computation: suspend CoroutineScope.() -> T
     ): T = withContext(Dispatchers.Default) {
         useCacheInternal(key, scope) {
-            val deferred = async { computation() }
+            val deferred = async { this@useCacheInternal.computation() }
 
             return@useCacheInternal { deferred.await() }
         }

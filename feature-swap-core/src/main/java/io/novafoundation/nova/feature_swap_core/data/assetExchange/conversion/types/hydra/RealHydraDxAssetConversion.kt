@@ -50,6 +50,10 @@ class RealHydraDxAssetConversion(
 
     private val conversionSources: List<HydraDxConversionSource> = createSources()
 
+    override suspend fun sync() {
+        conversionSources.forEach { it.sync() }
+    }
+
     override suspend fun availableSwapDirections(): Graph<FullChainAssetId, HydraDxSwapEdge> {
         val allDirectDirections = conversionSources.mapAsync { source ->
             source.availableSwapDirections().mapValues { (from, directions) ->

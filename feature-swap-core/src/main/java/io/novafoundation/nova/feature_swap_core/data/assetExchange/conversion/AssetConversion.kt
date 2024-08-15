@@ -15,6 +15,8 @@ interface AssetConversion<T : Edge<FullChainAssetId>> {
         fun create(chain: Chain): AssetConversion<T>
     }
 
+    suspend fun sync()
+
     suspend fun availableSwapDirections(): Graph<FullChainAssetId, T>
 
     suspend fun getPaths(graph: Graph<FullChainAssetId, T>, args: AssetExchangeQuoteArgs): List<Path<T>>

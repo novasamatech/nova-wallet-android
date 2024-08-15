@@ -43,7 +43,6 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSig
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForSimpleFeeChanges
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -64,7 +63,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionDecoder
-import java.math.BigInteger
 
 class EvmSignInteractorFactory(
     private val chainRegistry: ChainRegistry,

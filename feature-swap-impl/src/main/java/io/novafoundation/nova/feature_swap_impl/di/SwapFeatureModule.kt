@@ -51,7 +51,7 @@ class SwapFeatureModule {
     ): SwapService {
         return RealSwapService(
             assetConversionFactory = assetConversionExchangeFactory,
-            hydraDxOmnipoolFactory = hydraDxExchangeFactory,
+            hydraDxExchangeFactory = hydraDxExchangeFactory,
             computationalCache = computationalCache,
             chainRegistry = chainRegistry,
             accountRepository = accountRepository

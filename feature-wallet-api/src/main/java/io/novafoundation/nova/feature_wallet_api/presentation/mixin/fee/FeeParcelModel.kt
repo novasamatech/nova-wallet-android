@@ -3,14 +3,10 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.runtime.util.ChainAssetParcel
-import io.novafoundation.nova.runtime.util.FullAssetIdModel
-import io.novafoundation.nova.runtime.util.toDomain
-import io.novafoundation.nova.runtime.util.toModel
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
