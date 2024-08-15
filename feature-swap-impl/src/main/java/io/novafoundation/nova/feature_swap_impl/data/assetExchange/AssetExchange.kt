@@ -23,6 +23,8 @@ interface AssetExchange {
         suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange?
     }
 
+    suspend fun sync()
+
     /**
      * Implementations should expect `asset` to be non-utility asset,
      * e.g. they don't need to additionally check whether asset is utility or not

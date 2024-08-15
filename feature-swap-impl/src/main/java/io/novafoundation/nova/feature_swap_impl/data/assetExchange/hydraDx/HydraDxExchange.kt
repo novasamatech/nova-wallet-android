@@ -117,6 +117,10 @@ private class HydraDxExchange(
 
     private val graphState: MutableSharedFlow<HydraSwapGraph> = singleReplaySharedFlow()
 
+    override suspend fun sync() {
+        assetConversion.sync()
+    }
+
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
         val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)
 
@@ -219,8 +223,6 @@ private class HydraDxExchange(
 
     override fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return withFlowScope { scope ->
-            assetConversion.sync()
-
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
             val userAccountId = metaAccount.requireAccountIdIn(chain)
 

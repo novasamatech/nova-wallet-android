@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.commissionChainAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeList
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeListInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
@@ -59,8 +60,8 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
     enoughTotalToStayAboveEDValidationFactory.validate(
         fee = { it.originFee.networkFeePart() },
         balance = { it.originCommissionAsset.balanceCountedTowardsED() },
-        chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
-        error = { payload, error -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset, error) }
+        chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.commissionChainAsset) },
+        error = { payload, error -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.commissionChainAsset, error) }
     )
 }
 
@@ -74,7 +75,7 @@ fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
         SimpleGenericFee(payload.originFee.genericFee.networkFee.copy(networkFee = fee))
     },
     currentFee = { it.originFee },
-    chainAsset = { it.transfer.commissionAssetToken.configuration },
+    chainAsset = { it.commissionChainAsset },
     error = AssetTransferValidationFailure::FeeChangeDetected
 )
 
@@ -95,7 +96,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
     feeExtractor = { it.originFeeList },
     error = { context ->
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
-            chainAsset = context.payload.transfer.originChain.commissionAsset,
+            chainAsset = context.payload.commissionChainAsset,
             fee = context.fee,
             maxUsable = context.maxUsable
         )

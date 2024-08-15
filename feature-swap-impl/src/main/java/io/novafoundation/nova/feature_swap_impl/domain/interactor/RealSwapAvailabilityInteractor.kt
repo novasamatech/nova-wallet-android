@@ -15,6 +15,10 @@ class RealSwapAvailabilityInteractor(
     private val swapService: SwapService
 ) : SwapAvailabilityInteractor {
 
+    override suspend fun sync(coroutineScope: CoroutineScope) {
+        swapService.sync(coroutineScope)
+    }
+
     override fun anySwapAvailableFlow(): Flow<Boolean> {
         return chainRegistry.enabledChainsFlow().map { it.any(Chain::isSwapSupported) }
     }
