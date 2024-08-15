@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types
 
-import io.novafoundation.nova.common.utils.graph.findAllPossibleDirections
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDirectionsFor
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
