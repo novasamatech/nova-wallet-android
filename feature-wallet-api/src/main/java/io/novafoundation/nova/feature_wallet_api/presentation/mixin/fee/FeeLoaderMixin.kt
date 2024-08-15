@@ -130,12 +130,12 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
     interface Factory : GenericFeeLoaderMixin.Factory {
 
+        @Deprecated("Use createChangeableFee instead")
         fun create(
             tokenFlow: Flow<Token?>,
             configuration: Configuration<SimpleFee> = Configuration()
         ): Presentation
 
-        @Deprecated("Use createChangeableFee instead")
         fun createChangeableFee(
             tokenFlow: Flow<Token?>,
             coroutineScope: CoroutineScope,

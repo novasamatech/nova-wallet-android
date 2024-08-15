@@ -66,9 +66,9 @@ class HydraDxQuoteSharedComputation(
             assetConversion.sync()
             assetConversion.runSubscriptions(accountId, subscriptionBuilder)
                 .throttleLast(500.milliseconds)
-                .launchIn(this@useCache)
+                .launchIn(this)
 
-            subscriptionBuilder.subscribe(this@useCache)
+            subscriptionBuilder.subscribe(this)
 
             assetConversion
         }
