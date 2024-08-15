@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProviderRegistry
@@ -18,6 +19,8 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -26,15 +29,29 @@ class CustomFeeModule {
 
     @Provides
     @FeatureScope
+    fun provideBlockNumberUpdater(
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache
+    ): BlockNumberUpdater {
+        return BlockNumberUpdater(
+            chainRegistry,
+            storageCache
+        )
+    }
+
+    @Provides
+    @FeatureScope
     fun provideHydraDxQuoteSharedComputation(
         computationalCache: ComputationalCache,
         assetConversionFactory: HydraDxAssetConversionFactory,
-        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+        blockNumberUpdater: BlockNumberUpdater
     ): HydraDxQuoteSharedComputation {
         return HydraDxQuoteSharedComputation(
             computationalCache,
             assetConversionFactory,
-            storageSharedRequestsBuilderFactory
+            storageSharedRequestsBuilderFactory,
+            blockNumberUpdater
         )
     }
 

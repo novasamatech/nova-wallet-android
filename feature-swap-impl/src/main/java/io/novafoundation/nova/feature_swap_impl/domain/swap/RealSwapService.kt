@@ -76,12 +76,6 @@ internal class RealSwapService(
         isCustomFeeToken && exchange.canPayFeeInNonUtilityToken(asset) && currentMetaAccount.type.requestedAccountPaysFees()
     }
 
-    override suspend fun sync() = withContext(Dispatchers.Default) {
-        exchanges(CoroutineScope(coroutineContext))
-            .values
-            .forEach { it.sync() }
-    }
-
     override suspend fun assetsAvailableForSwap(
         computationScope: CoroutineScope
     ): Flow<Set<FullChainAssetId>> {

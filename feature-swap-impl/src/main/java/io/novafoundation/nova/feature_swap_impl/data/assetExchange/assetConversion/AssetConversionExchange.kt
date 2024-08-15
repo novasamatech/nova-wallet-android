@@ -92,10 +92,6 @@ private class AssetConversionExchange(
     private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange {
 
-    override suspend fun sync() {
-        // Nothing to sync
-    }
-
     override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
         // any asset is usable as a fee as soon as it has associated pool
         return true

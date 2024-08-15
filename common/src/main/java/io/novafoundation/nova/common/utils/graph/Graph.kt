@@ -68,7 +68,7 @@ fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirectionsToList(): MultiMapList
     return connectedComponents.findAllPossibleDirectionsToList()
 }
 
-fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirections(vertex: N): Set<N> {
+fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirectionsFor(vertex: N): Set<N> {
     val connectedComponent = findConnectedComponentFor(vertex)
     return connectedComponent.findAllPossibleDirectionsFor(vertex)
 }

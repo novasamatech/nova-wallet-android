@@ -32,6 +32,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -183,4 +184,6 @@ interface AccountFeatureDependencies {
     val multiLocationConverterFactory: MultiLocationConverterFactory
 
     val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val storageCache: StorageCache
 }
