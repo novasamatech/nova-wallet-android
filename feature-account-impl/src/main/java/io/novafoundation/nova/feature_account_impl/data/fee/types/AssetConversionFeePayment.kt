@@ -13,15 +13,10 @@ import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
-import io.novafoundation.nova.runtime.ext.palletNameOrDefault
-import io.novafoundation.nova.runtime.ext.requireStatemine
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.asNumberOrThrow
-import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
@@ -32,15 +27,12 @@ import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
 import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import java.math.BigInteger
-import kotlinx.coroutines.CoroutineScope
 
 internal class AssetConversionFeePayment(
     private val paymentAsset: Chain.Asset,
-    private val chainRegistry: ChainRegistry,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val remoteStorageSource: StorageDataSource,
-    private val multiLocationConverterFactory: MultiLocationConverterFactory,
-    private val coroutineScope: CoroutineScope
+    private val multiLocationConverter: MultiLocationConverter
 ) : FeePayment {
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
@@ -67,8 +59,6 @@ internal class AssetConversionFeePayment(
     }
 
     private suspend fun constructAvailableCustomFeeAssets(pools: List<Pair<MultiLocation, MultiLocation>>): List<Chain.Asset> {
-        val chain = chainRegistry.getChain(paymentAsset.chainId)
-        val multiLocationConverter = multiLocationConverterFactory.default(chain, coroutineScope)
         return pools.mapNotNull { (firstLocation, secondLocation) ->
             val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@mapNotNull null
             val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@mapNotNull null
@@ -80,21 +70,7 @@ internal class AssetConversionFeePayment(
     }
 
     private suspend fun encodableAssetId(): Any {
-        val runtime = chainRegistry.getRuntime(paymentAsset.chainId)
-        val assetsType = paymentAsset.requireStatemine()
-        val index = assetsType.id.asNumberOrThrow()
-
-        val pallet = runtime.metadata.module(assetsType.palletNameOrDefault())
-
-        val multiLocation = MultiLocation(
-            parents = BigInteger.ZERO,
-            interior = Junctions(
-                MultiLocation.Junction.PalletInstance(pallet.index),
-                MultiLocation.Junction.GeneralIndex(index)
-            )
-        )
-
-        return multiLocation.toEncodableInstance()
+        return multiLocationConverter.toMultiLocationOrThrow(paymentAsset).toEncodableInstance()
     }
 
     private fun encodableNativeAssetId(): Any {

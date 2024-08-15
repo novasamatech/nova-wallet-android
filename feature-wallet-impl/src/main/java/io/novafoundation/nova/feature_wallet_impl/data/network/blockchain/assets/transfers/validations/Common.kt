@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
