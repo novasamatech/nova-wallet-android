@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">您的派生路径包含不支持的符号或结构不正确</string>
     <string name="account_invalid_derivation_path_title">无效的派生路径</string>
     <string name="account_json_file">JSON文件</string>
-    <string name="account_ledger_generic_import_start_step_1">确保已安装<font color="#FFFFFF">Generic 应用程序</font>到您的 Ledger 设备，使用 Ledger Live 应用程序</string>
-    <string name="account_ledger_generic_import_start_step_2">在 Ledger 设备上<font color="#FFFFFF">打开 Generic 应用程序</font></string>
+    <string name="account_ledger_generic_import_start_step_1">确保已安装%s到您的 Ledger 设备，使用 Ledger Live 应用程序</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Generic 应用程序</string>
+    <string name="account_ledger_generic_import_start_step_2">在 Ledger 设备上%s</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">打开 Generic 应用程序</string>
     <string name="account_ledger_import_fill_description">确保通过Ledger Live应用把网络应用安装到您的Ledger设备上。在您的Ledger设备上打开网络应用。</string>
     <string name="account_ledger_import_fill_disabled_hint">至少添加一个账户</string>
     <string name="account_ledger_import_fill_title">将账户添加到您的钱包</string>
     <string name="account_ledger_import_start_guide">Ledger官方蓝牙连接指南</string>
-    <string name="account_ledger_import_start_step_1">确保<font color="#FFFFFF">网络应用已安装</font>到您的Ledger设备中，使用Ledger Live应用</string>
-    <string name="account_ledger_import_start_step_2">在您的Ledger设备上<font color="#FFFFFF">打开网络应用程序</font></string>
-    <string name="account_ledger_import_start_step_3">允许Nova Wallet<font color="#FFFFFF">访问蓝牙和位置</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">选择帐户</font>添加到钱包</string>
+    <string name="account_ledger_import_start_step_1">确保%s到您的Ledger设备中，使用Ledger Live应用</string>
+    <string name="account_ledger_import_start_step_1_highlighted">Network应用程序已安装</string>
+    <string name="account_ledger_import_start_step_2">在您的Ledger设备上%s</string>
+    <string name="account_ledger_import_start_step_2_highlighted">打开network应用程序</string>
+    <string name="account_ledger_import_start_step_3">允许Nova Wallet%s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">访问蓝牙和位置</string>
+    <string name="account_ledger_import_start_step_4">%s添加到钱包</string>
+    <string name="account_ledger_import_start_step_4_highlighted">选择账户</string>
     <string name="account_ledger_import_start_title">连接Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">要进行操作签名并将您的账户迁移到新的 Generic Ledger 应用程序，请安装并打开 Migration 应用程序。旧版 Legacy 和 Migration Ledger 应用程序将来不会被支持。</string>
     <string name="account_ledger_legacy_warning_title">新版 Ledger 应用程序已发布</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">这里是您的账户</string>
     <string name="account_parity_signer_import_scan_invalid_qr">无效的QR码，请确保您正在扫描来自%s的QR码</string>
     <string name="account_parity_signer_import_start_select_top">请确保选择最上面的一个</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">转到“按键”选项卡。 选择种子，然后选择您想要添加到 Nova 钱包的帐户</font></string>
-    <string name="account_parity_signer_import_start_step_3">Parity签名器将为您提供<font color="#FFFFFF">扫描的QR码</font></string>
+    <string name="account_parity_signer_import_start_step_1">您智能手机上的 %s 应用程序</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">打开Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s您想要添加到 Nova 钱包</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">前往“Keys”标签。选择种子，然后账户</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer将为您提供%s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">QR 码扫描</string>
     <string name="account_parity_signer_import_start_title">从%s添加钱包</string>
     <string name="account_parity_signer_not_supported_subtitle">%s不支持签名任意消息 — 只有交易</string>
     <string name="account_parity_signer_not_supported_title">不支持签名</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">使用 %s 签名</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">注意，衍生路径名称应为空</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">在您的智能手机上打开 Polkadot Vault</font> 应用程序</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">转到“密钥集”选项卡。</font>选择您的密钥集、网络，然后选择您想要添加到 Nova 钱包的帐户</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault 将提供给您<font color="#FFFFFF">要扫描的二维码</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">您智能手机上的 %s 应用程序</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">打开Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s 选择您的密钥集、网络，然后选择您想要添加到 Nova 钱包的帐户</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">前往“Key Sets”标签页。</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault 将提供给您%s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">QR 码扫描</string>
     <string name="account_private_key">私钥</string>
     <string name="account_proxieds">委托给您的（代理）</string>
     <string name="account_proxy_type_any">任何</string>

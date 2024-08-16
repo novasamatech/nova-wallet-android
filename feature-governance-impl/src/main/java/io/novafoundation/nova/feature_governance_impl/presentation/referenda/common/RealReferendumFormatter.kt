@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.common
 
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.format
@@ -66,21 +67,24 @@ class RealReferendumFormatter(
     private val referendaStatusFormatter: ReferendaStatusFormatter
 ) : ReferendumFormatter {
 
-    override fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel {
+    override fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel? {
+        val approval = voting.approval.dataOrNull ?: return null
+        val support = voting.support.dataOrNull ?: return null
+
         return ReferendumVotingModel(
-            positiveFraction = voting.approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
+            positiveFraction = approval.ayeVotesIfNotEmpty()?.fraction?.toFloat(),
             thresholdFraction = threshold?.approval?.value?.toFloat(),
             votingResultIcon = R.drawable.ic_close,
             votingResultIconColor = R.color.icon_negative,
-            thresholdInfo = formatThresholdInfo(voting.support, threshold, token),
+            thresholdInfo = formatThresholdInfo(support, threshold, token),
             thresholdInfoVisible = !threshold?.support?.currentlyPassing().orTrue(),
             positivePercentage = resourceManager.getString(
                 R.string.referendum_aye_format,
-                voting.approval.ayeVotes.fraction.formatFractionAsPercentage()
+                approval.ayeVotes.fraction.formatFractionAsPercentage()
             ),
             negativePercentage = resourceManager.getString(
                 R.string.referendum_nay_format,
-                voting.approval.nayVotes.fraction.formatFractionAsPercentage()
+                approval.nayVotes.fraction.formatFractionAsPercentage()
             ),
             thresholdPercentage = threshold?.let {
                 resourceManager.getString(
@@ -137,10 +141,19 @@ class RealReferendumFormatter(
                 colorRes = R.color.text_secondary
             )
 
-            is ReferendumStatus.Ongoing.Approve,
-            is ReferendumStatus.Ongoing.Reject -> ReferendumStatusModel(
+            is ReferendumStatus.Ongoing.DecidingApprove -> ReferendumStatusModel(
                 name = statusName,
                 colorRes = R.color.text_secondary
+            )
+
+            is ReferendumStatus.Ongoing.DecidingReject -> ReferendumStatusModel(
+                name = statusName,
+                colorRes = R.color.text_secondary
+            )
+
+            is ReferendumStatus.Ongoing.Confirming -> ReferendumStatusModel(
+                name = statusName,
+                colorRes = R.color.text_positive
             )
 
             is ReferendumStatus.Approved -> ReferendumStatusModel(
@@ -201,13 +214,19 @@ class RealReferendumFormatter(
                 )
             }
 
-            is ReferendumStatus.Ongoing.Reject -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.DecidingReject -> ReferendumTimeEstimation.Timer(
                 time = status.rejectIn,
                 timeFormat = R.string.referendum_status_time_reject_in,
                 textStyleRefresher = status.rejectIn.referendumStatusStyleRefresher()
             )
 
-            is ReferendumStatus.Ongoing.Approve -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.DecidingApprove -> ReferendumTimeEstimation.Timer(
+                time = status.approveIn,
+                timeFormat = R.string.referendum_status_time_approve_in,
+                textStyleRefresher = status.approveIn.referendumStatusStyleRefresher()
+            )
+
+            is ReferendumStatus.Ongoing.Confirming -> ReferendumTimeEstimation.Timer(
                 time = status.approveIn,
                 timeFormat = R.string.referendum_status_time_approve_in,
                 textStyleRefresher = status.approveIn.referendumStatusStyleRefresher()

@@ -42,6 +42,11 @@ val <T> ExtendedLoadingState<T>.dataOrNull: T?
         else -> null
     }
 
+fun <T> ExtendedLoadingState<T?>.loadedAndEmpty(): Boolean = when (this) {
+    is ExtendedLoadingState.Loaded -> data == null
+    else -> false
+}
+
 fun <T> loadedNothing(): ExtendedLoadingState<T?> {
     return ExtendedLoadingState.Loaded(null)
 }

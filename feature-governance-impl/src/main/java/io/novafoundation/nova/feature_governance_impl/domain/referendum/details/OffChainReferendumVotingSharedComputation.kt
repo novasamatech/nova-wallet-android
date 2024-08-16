@@ -14,14 +14,6 @@ class OffChainReferendumVotingSharedComputation(
     private val governanceSourceRegistry: GovernanceSourceRegistry
 ) {
 
-    fun hasCache(
-        onChainReferendum: OnChainReferendum,
-        governanceOption: SupportedGovernanceOption
-    ): Boolean {
-        val key = buildKey(onChainReferendum, governanceOption)
-        return computationalCache.hasCache(key)
-    }
-
     suspend fun votingDetails(
         onChainReferendum: OnChainReferendum,
         governanceOption: SupportedGovernanceOption,
