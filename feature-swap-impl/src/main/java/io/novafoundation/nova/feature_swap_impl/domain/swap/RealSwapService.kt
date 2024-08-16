@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toPercent
@@ -72,7 +73,7 @@ internal class RealSwapService(
     override suspend fun sync(coroutineScope: CoroutineScope) {
         exchanges(coroutineScope)
             .values
-            .forEach { it.sync() }
+            .forEachAsync { it.sync() }
     }
 
     override suspend fun assetsAvailableForSwap(

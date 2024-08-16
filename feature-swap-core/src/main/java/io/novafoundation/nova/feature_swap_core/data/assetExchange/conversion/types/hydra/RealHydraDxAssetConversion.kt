@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.firstById
+import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.create
@@ -59,7 +60,7 @@ class RealHydraDxAssetConversion(
     private val conversionSources: List<HydraDxConversionSource> = createSources()
 
     override suspend fun sync() {
-        conversionSources.forEach { it.sync() }
+        conversionSources.forEachAsync { it.sync() }
     }
 
     override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
