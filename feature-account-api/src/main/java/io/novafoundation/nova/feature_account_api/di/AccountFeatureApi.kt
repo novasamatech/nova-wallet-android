@@ -55,6 +55,8 @@ interface AccountFeatureApi {
 
     fun extrinsicService(): ExtrinsicService
 
+    fun extrinsicServiceFactory(): ExtrinsicService.Factory
+
     fun importTypeChooserMixin(): ImportTypeChooserMixin.Presentation
 
     fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor

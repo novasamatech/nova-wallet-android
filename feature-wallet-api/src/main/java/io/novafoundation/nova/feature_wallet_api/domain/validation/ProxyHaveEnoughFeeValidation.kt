@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.validation
 
+import io.novafoundation.nova.common.domain.balance.calculateBalanceCountedTowardsEd
+import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -12,8 +14,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateBalanceCountedTowardsEd
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
