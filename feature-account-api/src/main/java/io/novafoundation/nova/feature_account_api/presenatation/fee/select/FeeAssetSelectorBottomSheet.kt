@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.main.view
+package io.novafoundation.nova.feature_account_api.presenatation.fee.select
 
 import android.content.Context
 import android.os.Bundle
 import io.novafoundation.nova.common.utils.indexOfFirstOrNull
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.android.synthetic.main.bottom_sheet_fee_selection.bottomSheetFeeSelectionAssets
 

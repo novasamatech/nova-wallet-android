@@ -92,7 +92,11 @@ private class AssetConversionExchange(
     private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange {
 
-    override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
+    override suspend fun sync() {
+        // Nothing to sync
+    }
+
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
         // any asset is usable as a fee as soon as it has associated pool
         return true
     }
@@ -215,7 +219,7 @@ private class AssetConversionExchange(
         }
 
         return AssetExchangeFee(
-            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin, assetId = customFeeAsset.fullId),
+            networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin, asset = customFeeAsset),
             minimumBalanceBuyIn = minimumBalanceBuyIn
         )
     }

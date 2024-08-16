@@ -20,6 +20,7 @@ import io.novafoundation.nova.runtime.ethereum.EvmRpcException
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -60,7 +61,12 @@ internal class RealEvmTransactionService(
         val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
         val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-        return EvmFee(gasLimit, gasPrice, SubmissionOrigin.singleOrigin(submittingMetaAccount.requireAccountIdIn(chain)))
+        return EvmFee(
+            gasLimit,
+            gasPrice,
+            SubmissionOrigin.singleOrigin(submittingMetaAccount.requireAccountIdIn(chain)),
+            chain.commissionAsset
+        )
     }
 
     override suspend fun transact(
@@ -83,7 +89,12 @@ internal class RealEvmTransactionService(
             val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
             val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-            EvmFee(gasLimit, gasPrice, SubmissionOrigin.singleOrigin(submittingAccountId))
+            EvmFee(
+                gasLimit,
+                gasPrice,
+                SubmissionOrigin.singleOrigin(submittingAccountId),
+                chain.commissionAsset
+            )
         }
 
         val nonce = web3Api.getNonce(submittingAddress)

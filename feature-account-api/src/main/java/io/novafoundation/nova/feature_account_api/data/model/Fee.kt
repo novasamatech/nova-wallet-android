@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_account_api.data.model
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-sealed interface Fee {
+interface Fee {
 
     companion object
 
@@ -14,25 +16,24 @@ sealed interface Fee {
      * Information about origin that is supposed to send the transaction fee was calculated against
      */
     val submissionOrigin: SubmissionOrigin
+
+    val asset: Chain.Asset
 }
 
 data class EvmFee(
     val gasLimit: BigInteger,
     val gasPrice: BigInteger,
-    override val submissionOrigin: SubmissionOrigin
+    override val submissionOrigin: SubmissionOrigin,
+    override val asset: Chain.Asset
 ) : Fee {
     override val amount = gasLimit * gasPrice
-}
-
-interface FeeInAsset : Fee {
-    val assetId: FullChainAssetId
 }
 
 class SubstrateFee(
     override val amount: BigInteger,
     override val submissionOrigin: SubmissionOrigin,
-    override val assetId: FullChainAssetId
-) : FeeInAsset
+    override val asset: Chain.Asset
+) : Fee
 
 val Fee.requestedAccountPaysFees: Boolean
     get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)
@@ -47,3 +48,10 @@ val BigInteger.asAmountByRequestedAccount: BigInteger
     } else {
         BigInteger.ZERO
     }
+
+fun FeePaymentCurrency.toFeePaymentAsset(chain: Chain): Chain.Asset {
+    return when (this) {
+        is FeePaymentCurrency.Asset -> asset
+        FeePaymentCurrency.Native -> chain.utilityAsset
+    }
+}

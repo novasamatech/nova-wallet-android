@@ -133,7 +133,6 @@ class ConfirmRemoveStakingProxyViewModel(
 
             feeMixin.loadFee(
                 this,
-                chain.id,
                 feeConstructor = { removeStakingProxyInteractor.estimateFee(chain, proxiedAccountId) },
                 onRetryCancelled = ::backClicked
             )

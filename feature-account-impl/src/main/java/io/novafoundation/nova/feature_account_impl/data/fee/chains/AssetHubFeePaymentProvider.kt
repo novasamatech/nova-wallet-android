@@ -20,14 +20,15 @@ class AssetHubFeePaymentProvider(
 
     override suspend fun feePaymentFor(feePaymentCurrency: FeePaymentCurrency, coroutineScope: CoroutineScope?): FeePayment {
         return when (feePaymentCurrency) {
-            is FeePaymentCurrency.Asset -> AssetConversionFeePayment(
-                paymentAsset = feePaymentCurrency.asset,
-                chainRegistry = chainRegistry,
-                multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
-                remoteStorageSource = remoteStorageSource,
-                multiLocationConverterFactory = multiLocationConverterFactory,
-                coroutineScope = coroutineScope!!
-            )
+            is FeePaymentCurrency.Asset -> {
+                val chain = chainRegistry.getChain(feePaymentCurrency.asset.chainId)
+                AssetConversionFeePayment(
+                    paymentAsset = feePaymentCurrency.asset,
+                    multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
+                    remoteStorageSource = remoteStorageSource,
+                    multiLocationConverter = multiLocationConverterFactory.default(chain, coroutineScope!!)
+                )
+            }
 
             FeePaymentCurrency.Native -> NativeFeePayment()
         }

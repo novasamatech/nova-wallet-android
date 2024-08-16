@@ -87,11 +87,15 @@ private class StableConversionSource(
 
     private val stablePools: MutableSharedFlow<List<StablePool>> = singleReplaySharedFlow()
 
-    override suspend fun availableSwapDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection> {
+    override suspend fun sync() {
         val pools = getPools()
 
         val poolInitialInfo = pools.matchIdsWithLocal()
         initialPoolsInfo.emit(poolInitialInfo)
+    }
+
+    override suspend fun availableSwapDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection> {
+        val poolInitialInfo = initialPoolsInfo.first()
 
         return poolInitialInfo.allPossibleDirections()
     }
@@ -262,7 +266,7 @@ private class StableConversionSource(
         }
     }
 
-    private fun List<PoolInitialInfo>.allPossibleDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection> {
+    private fun Collection<PoolInitialInfo>.allPossibleDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection> {
         val perPoolMaps = map { (poolAssetId, poolAssets) ->
             val allPoolAssetIds = buildList {
                 addAll(poolAssets.mapNotNull { it.second })

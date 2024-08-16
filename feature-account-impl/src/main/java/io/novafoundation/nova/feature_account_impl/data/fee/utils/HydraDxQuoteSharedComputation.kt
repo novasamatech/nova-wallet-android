@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.data.fee.utils
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.graph.Graph
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetConversion
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
@@ -10,14 +11,18 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlin.time.Duration.Companion.milliseconds
 
 class HydraDxQuoteSharedComputation(
     private val computationalCache: ComputationalCache,
     private val assetConversionFactory: HydraDxAssetConversionFactory,
-    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+    private val blockNumberUpdater: BlockNumberUpdater
 ) {
 
     suspend fun directions(
@@ -29,6 +34,7 @@ class HydraDxQuoteSharedComputation(
 
         return computationalCache.useCache(key, scope) {
             val assetConversion = getAssetConversion(chain, accountId, scope)
+
             assetConversion.availableSwapDirections()
         }
     }
@@ -56,9 +62,20 @@ class HydraDxQuoteSharedComputation(
         val key = "HydraDxAssetConversion:${chain.id}:${accountId.toHexString()}"
 
         return computationalCache.useCache(key, scope) {
-            val storageSharedRequestBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
+            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
             val assetConversion = assetConversionFactory.create(chain)
-            assetConversion.runSubscriptions(accountId, storageSharedRequestBuilder)
+
+            // Required at least for stable swap
+            blockNumberUpdater.listenForUpdates(subscriptionBuilder, chain)
+                .launchIn(this)
+
+            assetConversion.sync()
+            assetConversion.runSubscriptions(accountId, subscriptionBuilder)
+                .throttleLast(500.milliseconds)
+                .launchIn(this)
+
+            subscriptionBuilder.subscribe(this)
+
             assetConversion
         }
     }

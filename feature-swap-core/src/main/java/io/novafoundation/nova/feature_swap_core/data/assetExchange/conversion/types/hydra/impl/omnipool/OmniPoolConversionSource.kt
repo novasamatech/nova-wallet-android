@@ -79,11 +79,15 @@ private class OmniPoolConversionSource(
 
     private val omniPoolFlow: MutableSharedFlow<OmniPool> = singleReplaySharedFlow()
 
-    override suspend fun availableSwapDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection> {
+    override suspend fun sync() {
         val pooledOnChainAssetIds = getPooledOnChainAssetIds()
 
         val pooledChainAssetsIds = matchKnownChainAssetIds(pooledOnChainAssetIds)
         pooledOnChainAssetIdsState.emit(pooledChainAssetsIds)
+    }
+
+    override suspend fun availableSwapDirections(): MultiMapList<FullChainAssetId, HydraSwapDirection> {
+        val pooledChainAssetsIds = pooledOnChainAssetIdsState.first()
 
         return pooledChainAssetsIds.associateBy(
             keySelector = { it.second },

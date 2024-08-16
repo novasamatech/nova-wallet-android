@@ -15,7 +15,7 @@ internal class NativeFeePayment : FeePayment {
         return nativeFee
     }
 
-    override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {
-        return emptyList()
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
+        return false
     }
 }

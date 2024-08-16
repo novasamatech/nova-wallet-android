@@ -3,13 +3,10 @@ package io.novafoundation.nova.feature_wallet_api.domain.model
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.FeeInAsset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
 
 typealias OriginGenericFee = SimpleGenericFee<OriginFee>
@@ -20,13 +17,13 @@ data class OriginFee(
     val networkFee: Fee,
     val deliveryPart: Fee?,
     val chainAsset: Chain.Asset
-) : FeeInAsset {
-
-    override val assetId: FullChainAssetId = chainAsset.fullId
+) : Fee {
 
     override val amount: BigInteger = networkFee.amount + deliveryPart?.amount.orZero()
 
     override val submissionOrigin: SubmissionOrigin = networkFee.submissionOrigin
+
+    override val asset = networkFee.asset
 }
 
 fun OriginDecimalFee.networkFeePart(): GenericDecimalFee<GenericFee> {

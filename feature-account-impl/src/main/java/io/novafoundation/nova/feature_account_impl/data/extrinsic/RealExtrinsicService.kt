@@ -15,17 +15,16 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWi
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
-import io.novafoundation.nova.feature_account_api.data.extrinsic.selectedCommissionAsset
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
@@ -124,7 +123,7 @@ class RealExtrinsicService(
         extrinsicBuilder.formExtrinsic()
         val extrinsic = extrinsicBuilder.build(submissionOptions.batchMode)
 
-        return estimateFee(chain, extrinsic, signer)
+        return estimateFee(chain, extrinsic, signer, submissionOptions)
     }
 
     override suspend fun estimateFee(
@@ -173,7 +172,7 @@ class RealExtrinsicService(
         val totalNativeFee = SubstrateFee(
             totalFeeAmount,
             feeSigner.submissionOrigin(chain),
-            submissionOptions.selectedCommissionAsset(chain).fullId
+            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
         )
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
@@ -275,7 +274,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             BigInteger.ZERO,
             signer.submissionOrigin(chain),
-            submissionOptions.selectedCommissionAsset(chain).fullId
+            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
         )
     }
 
@@ -296,7 +295,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             amount = tip + baseFee,
             submissionOrigin = submissionOrigin,
-            chain.commissionAsset.fullId
+            chain.commissionAsset
         )
     }
 }

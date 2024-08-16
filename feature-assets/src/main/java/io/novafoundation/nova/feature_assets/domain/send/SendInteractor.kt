@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.RecipientSearchResult
 import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -39,7 +38,7 @@ class SendInteractor(
     private val crossChainWeigher: CrossChainWeigher,
     private val crossChainTransactor: CrossChainTransactor,
     private val crossChainTransfersRepository: CrossChainTransfersRepository,
-    private val parachainInfoRepository: ParachainInfoRepository,
+    private val parachainInfoRepository: ParachainInfoRepository
 ) {
 
     // TODO wallet
@@ -79,9 +78,9 @@ class SendInteractor(
 
             TransferFeeModel(originFeeWithSenderPart, crossChainFeeModel.toSubstrateFee(transfer))
         } else {
-            val originFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
+            val nativeFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
             TransferFeeModel(
-                OriginFee(originFee, null, transfer.commissionAssetToken.configuration),
+                OriginFee(nativeFee, null, transfer.commissionAssetToken.configuration),
                 null
             )
         }
@@ -129,13 +128,13 @@ class SendInteractor(
         return SubstrateFee(
             amount = amount,
             submissionOrigin = SubmissionOrigin.singleOrigin(accountId),
-            assetId = chain.commissionAsset.fullId
+            asset = chain.commissionAsset
         )
     }
 
     private fun CrossChainFeeModel.toSubstrateFee(transfer: AssetTransfer) = SubstrateFee(
         amount = holdingPart,
         submissionOrigin = SubmissionOrigin.singleOrigin(transfer.sender.requireAccountIdIn(transfer.originChain)),
-        assetId = transfer.originChain.commissionAsset.fullId // TODO: Support custom assets for xcm transfers
+        asset = transfer.originChain.commissionAsset // TODO: Support custom assets for xcm transfers
     )
 }

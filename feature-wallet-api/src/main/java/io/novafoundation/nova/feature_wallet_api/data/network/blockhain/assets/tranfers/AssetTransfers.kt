@@ -72,6 +72,9 @@ fun AssetTransfer.senderAccountId(): AccountId {
     return sender.requireAccountIdIn(originChain)
 }
 
+val AssetTransfer.commissionAsset
+    get() = commissionAssetToken.configuration
+
 interface AssetTransfers {
 
     fun getValidationSystem(coroutineScope: CoroutineScope): AssetTransfersValidationSystem
