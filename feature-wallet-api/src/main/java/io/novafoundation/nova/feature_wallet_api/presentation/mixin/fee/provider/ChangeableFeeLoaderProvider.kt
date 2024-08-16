@@ -77,7 +77,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
     private val supportCustomFeeFlow = MutableStateFlow(configuration.initialState.supportCustomFee)
 
-    private val availableFeeAssetsFlow: Flow<Boolean> = combine(supportCustomFeeFlow, selectedTokenFlow) { supportCustomFee, selectedToken ->
+    private val canPayFeeInCustomAssetFlow: Flow<Boolean> = combine(supportCustomFeeFlow, selectedTokenFlow) { supportCustomFee, selectedToken ->
         if (!supportCustomFee) return@combine false
 
         interactor.canPayFeeInNonUtilityAsset(selectedToken.configuration, coroutineScope)
@@ -100,9 +100,9 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         supportCustomFeeFlow,
         selectedTokenFlow,
         commissionChainAssetFlow,
-        availableFeeAssetsFlow
-    ) { supportCustomFee, selectedToken, selectedCommissionAsset, availableFeeAssets ->
-        mapChangeFeeTokenState(supportCustomFee, selectedToken, selectedCommissionAsset, availableFeeAssets)
+        canPayFeeInCustomAssetFlow
+    ) { supportCustomFee, selectedToken, selectedCommissionAsset, canPayFeeInCustomAsset ->
+        mapChangeFeeTokenState(supportCustomFee, selectedToken, selectedCommissionAsset, canPayFeeInCustomAsset)
     }.asLiveData(coroutineScope)
 
     init {
@@ -239,7 +239,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
         val commissionAsset = commissionAssetFlow.first()
         val selectedToken = selectedTokenFlow.first()
-        val selectedAssetIsAvailableToPayFee = availableFeeAssetsFlow.first()
+        val selectedAssetIsAvailableToPayFee = canPayFeeInCustomAssetFlow.first()
 
         if (commissionAsset.isCommissionAsset() && selectedAssetIsAvailableToPayFee) {
             val feeAmount = feeStatus.feeModel.decimalFee.networkFee.amount
