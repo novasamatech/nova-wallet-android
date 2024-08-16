@@ -107,7 +107,7 @@ class PreferencesImpl(
 
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key in keys) {
-                trySend(listOf(key))
+                trySend(listOfNotNull(key))
             }
         }
 
