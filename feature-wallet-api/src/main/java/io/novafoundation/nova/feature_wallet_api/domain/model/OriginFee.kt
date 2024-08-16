@@ -22,6 +22,8 @@ data class OriginFee(
     override val amount: BigInteger = networkFee.amount + deliveryPart?.amount.orZero()
 
     override val submissionOrigin: SubmissionOrigin = networkFee.submissionOrigin
+
+    override val asset = networkFee.asset
 }
 
 fun OriginDecimalFee.networkFeePart(): GenericDecimalFee<GenericFee> {

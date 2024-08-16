@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Ваш путь деривации содержит неподдерживаемые символы или имеет некорректную структуру</string>
     <string name="account_invalid_derivation_path_title">Некорректный путь деривации</string>
     <string name="account_json_file">JSON файл</string>
-    <string name="account_ledger_generic_import_start_step_1">Удостоверьтесь, что <font color="#FFFFFF">Generic приложение установлено</font> на Ваше устройство Ledger, используя приложение Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Откройте Generic приложение</font> на своем устройстве Ledger</string>
+    <string name="account_ledger_generic_import_start_step_1">Удостоверьтесь, что %s на Ваше устройство Ledger, используя приложение Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Generic приложение установлено</string>
+    <string name="account_ledger_generic_import_start_step_2">%s на своем устройстве Ledger</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Откройте Generic приложение</string>
     <string name="account_ledger_import_fill_description">Убедитесь, что приложение сети установлено на вашем Ledger устройстве через приложение Ledger Live. Откройте приложение сети на вашем Ledger устройстве.</string>
     <string name="account_ledger_import_fill_disabled_hint">Добавьте аккаунт</string>
     <string name="account_ledger_import_fill_title">Добавьте аккаунты в Ваш кошелёк</string>
     <string name="account_ledger_import_start_guide">Инструкция по подключению Ledger</string>
-    <string name="account_ledger_import_start_step_1">Удостоверьтесь, что <font color="#FFFFFF">приложение Сети установлено</font> на Ваше устройство Ledger, используя приложение Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Откройте приложение Сети</font> на Вашем Ledger устройстве</string>
-    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth и Гео-локации</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Выберите аккаунт</font> для добавления в кошелёк</string>
+    <string name="account_ledger_import_start_step_1">Удостоверьтесь, что %s на Ваше устройство Ledger, используя приложение Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">приложение Сети установлено</string>
+    <string name="account_ledger_import_start_step_2">%s на Вашем Ledger устройстве</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Откройте приложение Сети</string>
+    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">доступ к Bluetooth и Гео-локации</string>
+    <string name="account_ledger_import_start_step_4">%s для добавления в кошелёк</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Выберите аккаунт</string>
     <string name="account_ledger_import_start_title">Подключите Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Чтобы подписать операции и перенести свои учетные записи в новое приложение Generic Ledger, установите и откройте приложение Migration. Приложения Ledger (Legacy) и Migration Ledger не будут поддерживаться в будущем.</string>
     <string name="account_ledger_legacy_warning_title">Выпущено новое приложение Ledger</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Вот ваши аккаунты</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Неверный QR-код, пожалуйста, убедитесь, что вы сканируете QR-код из %s</string>
     <string name="account_parity_signer_import_start_select_top">Убедитесь, что выбрали самый верхний</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Откройте приложение Parity Signer</font> на смартфоне.</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</font>, который вы хотите добавить в Nova Wallet.</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
+    <string name="account_parity_signer_import_start_step_1">%s на вашем смартфоне</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Откройте приложение Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s, который вы хотите добавить в Nova Wallet.</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">QR-код для сканирования</string>
     <string name="account_parity_signer_import_start_title">Добавить кошелёк из %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s не поддерживает подписание произвольных сообщений — только транзакции</string>
     <string name="account_parity_signer_not_supported_title">Подписание не поддерживается</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Подписать с %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Обратите внимание, имя пути деривации должно быть пустым</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Откройте приложение Polkadot Vault</font> на своем смартфоне</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Наборы ключей».</font> Выберите свой набор ключей, сеть, а затем учетную запись, которую вы хотите добавить в Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">%s на смартфоне</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Откройте приложение Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Выберите свой набор ключей, сеть, а затем учетную запись, которую вы хотите добавить в Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Перейдите на вкладку «Key Sets».</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault предоставит вам %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-код для сканирования</string>
     <string name="account_private_key">Приватный ключ</string>
     <string name="account_proxieds">Делегировано вам (проксированные)</string>
     <string name="account_proxy_type_any">Любые действия</string>

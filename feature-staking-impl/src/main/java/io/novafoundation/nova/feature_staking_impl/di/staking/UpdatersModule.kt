@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.relaychain.Relaych
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
 import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
@@ -41,7 +41,7 @@ class UpdatersModule {
     @FeatureScope
     fun provideCommonUpdaters(
         blockTimeUpdater: BlockTimeUpdater,
-        blockNumberUpdater: BlockNumberUpdater,
+        blockNumberUpdater: SharedAssetBlockNumberUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater
     ) = StakingUpdaters.Group(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater)
 
@@ -92,7 +92,7 @@ class UpdatersModule {
         chainRegistry: ChainRegistry,
         crowdloanSharedState: StakingSharedState,
         storageCache: StorageCache,
-    ) = BlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
+    ) = SharedAssetBlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
 
     @Provides
     @FeatureScope

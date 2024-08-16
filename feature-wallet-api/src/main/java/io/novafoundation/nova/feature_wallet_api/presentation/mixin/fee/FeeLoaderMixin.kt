@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericFeeModel
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -33,6 +33,13 @@ sealed class FeeStatus<out F : GenericFee> {
     object Error : FeeStatus<Nothing>()
 }
 
+sealed interface ChangeFeeTokenState {
+
+    class Editable(val selectedCommissionAsset: Chain.Asset, val availableAssets: List<Chain.Asset>) : ChangeFeeTokenState
+
+    object NotSupported : ChangeFeeTokenState
+}
+
 interface GenericFee {
 
     val networkFee: Fee
@@ -47,16 +54,24 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     class Configuration<F : GenericFee>(
         val showZeroFiat: Boolean = true,
-        val initialStatusValue: FeeStatus<F>? = null
-    )
+        val initialState: InitialState<F> = InitialState()
+    ) {
+        class InitialState<F : GenericFee>(
+            val supportCustomFee: Boolean = false,
+            val feeStatus: FeeStatus<F>? = null
+        )
+    }
 
     val feeLiveData: LiveData<FeeStatus<F>>
+
+    val changeFeeTokenState: LiveData<ChangeFeeTokenState>
+
+    fun setCommissionAsset(chainAsset: Chain.Asset)
 
     interface Presentation<F : GenericFee> : GenericFeeLoaderMixin<F> {
 
         suspend fun loadFeeSuspending(
             retryScope: CoroutineScope,
-            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
         )
@@ -67,7 +82,6 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
          */
         fun loadFeeV2Generic(
             coroutineScope: CoroutineScope,
-            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
         )
@@ -76,13 +90,24 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
         suspend fun setFeeStatus(feeStatus: FeeStatus<F>)
 
-        fun invalidateFee()
+        suspend fun setSupportCustomFee(supportCustomFee: Boolean)
+
+        suspend fun invalidateFee()
+
+        fun commissionAssetFlow(): Flow<Asset>
     }
 
     interface Factory {
 
+        @Deprecated("Use createChangeableFeeGeneric instead")
         fun <F : GenericFee> createGeneric(
             tokenFlow: Flow<Token?>,
+            configuration: Configuration<F> = Configuration()
+        ): Presentation<F>
+
+        fun <F : GenericFee> createChangeableFeeGeneric(
+            tokenFlow: Flow<Token?>,
+            coroutineScope: CoroutineScope,
             configuration: Configuration<F> = Configuration()
         ): Presentation<F>
     }
@@ -94,12 +119,10 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
         fun loadFee(
             coroutineScope: CoroutineScope,
-            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> Fee?,
             onRetryCancelled: () -> Unit,
         ) = loadFeeV2Generic(
             coroutineScope = coroutineScope,
-            expectedChain = expectedChain,
             feeConstructor = { token -> feeConstructor(token)?.let(::SimpleFee) },
             onRetryCancelled = onRetryCancelled
         )
@@ -107,8 +130,15 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
     interface Factory : GenericFeeLoaderMixin.Factory {
 
+        @Deprecated("Use createChangeableFee instead")
         fun create(
             tokenFlow: Flow<Token?>,
+            configuration: Configuration<SimpleFee> = Configuration()
+        ): Presentation
+
+        fun createChangeableFee(
+            tokenFlow: Flow<Token?>,
+            coroutineScope: CoroutineScope,
             configuration: Configuration<SimpleFee> = Configuration()
         ): Presentation
     }
@@ -152,8 +182,19 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.getDecimalFeeOrNull(): GenericDeci
         ?.decimalFee
 }
 
+@Deprecated("Use createGenericChangeableFee instead")
 fun <T : GenericFee> FeeLoaderMixin.Factory.createGeneric(assetFlow: Flow<Asset>) = createGeneric<T>(assetFlow.map { it.token })
+
+fun <T : GenericFee> FeeLoaderMixin.Factory.createGenericChangeableFee(
+    assetFlow: Flow<Asset>,
+    coroutineScope: CoroutineScope,
+    configuration: Configuration<T> = Configuration()
+) = createChangeableFeeGeneric<T>(assetFlow.map { it.token }, coroutineScope, configuration)
+
+@Deprecated("Use createChangeableFee instead")
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
+
+@Deprecated("Use createChangeableFee instead")
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
 
 fun <I> FeeLoaderMixin.Presentation.connectWith(
@@ -165,7 +206,7 @@ fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource.onEach { input ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input) },
+            feeConstructor = { token -> token.feeConstructor(input) },
             onRetryCancelled = onRetryCancelled
         )
     }
@@ -186,10 +227,16 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
     ) { input1, input2 ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input1, input2) },
+            feeConstructor = { token -> token.feeConstructor(input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
     }
         .inBackground()
         .launchIn(scope)
+}
+
+fun ChangeFeeTokenState.isEditable() = this is ChangeFeeTokenState.Editable
+
+suspend fun GenericFeeLoaderMixin.Presentation<*>.commissionAsset(): Asset {
+    return commissionAssetFlow().first()
 }

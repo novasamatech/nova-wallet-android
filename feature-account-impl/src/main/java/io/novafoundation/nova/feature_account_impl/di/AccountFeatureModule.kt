@@ -58,6 +58,8 @@ import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.feature_account_impl.RealBiometricServiceFactory
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.events.RealMetaAccountChangesEventBus
@@ -100,6 +102,8 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Star
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicServiceFactory
+import io.novafoundation.nova.feature_account_impl.di.modules.CustomFeeModule
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.RealCommonExportSecretsInteractor
@@ -128,6 +132,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBack
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -152,7 +157,8 @@ import javax.inject.Named
         IdentityProviderModule::class,
         AdvancedEncryptionStoreModule::class,
         AddAccountsModule::class,
-        CloudBackupModule::class
+        CloudBackupModule::class,
+        CustomFeeModule::class
     ]
 )
 class AccountFeatureModule {
@@ -174,13 +180,34 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideExtrinsicServiceFactory(
+        accountRepository: AccountRepository,
+        rpcCalls: RpcCalls,
+        extrinsicBuilderFactory: ExtrinsicBuilderFactory,
+        chainRegistry: ChainRegistry,
+        signerProvider: SignerProvider,
+        extrinsicSplitter: ExtrinsicSplitter,
+        feePaymentProviderRegistry: FeePaymentProviderRegistry
+    ): ExtrinsicService.Factory = RealExtrinsicServiceFactory(
+        rpcCalls,
+        chainRegistry,
+        accountRepository,
+        extrinsicBuilderFactory,
+        signerProvider,
+        extrinsicSplitter,
+        feePaymentProviderRegistry
+    )
+
+    @Provides
+    @FeatureScope
     fun provideExtrinsicService(
         accountRepository: AccountRepository,
         rpcCalls: RpcCalls,
         extrinsicBuilderFactory: ExtrinsicBuilderFactory,
         chainRegistry: ChainRegistry,
         signerProvider: SignerProvider,
-        extrinsicSplitter: ExtrinsicSplitter
+        extrinsicSplitter: ExtrinsicSplitter,
+        feePaymentProviderRegistry: FeePaymentProviderRegistry
     ): ExtrinsicService = RealExtrinsicService(
         rpcCalls,
         chainRegistry,
@@ -188,6 +215,8 @@ class AccountFeatureModule {
         extrinsicBuilderFactory,
         signerProvider,
         extrinsicSplitter,
+        feePaymentProviderRegistry,
+        coroutineScope = null
     )
 
     @Provides
@@ -688,4 +717,10 @@ class AccountFeatureModule {
             commonExportSecretsInteractor
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideCustomFeeCapabilityFacade(
+        accountRepository: AccountRepository
+    ): CustomFeeCapabilityFacade = RealCustomCustomFeeCapabilityFacade(accountRepository)
 }

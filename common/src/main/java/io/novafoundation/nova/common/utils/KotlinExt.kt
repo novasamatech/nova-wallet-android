@@ -105,6 +105,10 @@ suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     }.awaitAll()
 }
 
+suspend fun <T, R> Iterable<T>.forEachAsync(operation: suspend (T) -> R) {
+    mapAsync(operation)
+}
+
 fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     if (prefix.size > size) return false
 

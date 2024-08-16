@@ -57,7 +57,7 @@ class NativeAssetsModule {
     fun provideTransfers(
         chainRegistry: ChainRegistry,
         assetSourceRegistry: AssetSourceRegistry,
-        extrinsicService: ExtrinsicService,
+        extrinsicServiceFactory: ExtrinsicService.Factory,
         phishingValidationFactory: PhishingValidationFactory,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
         @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
@@ -65,7 +65,7 @@ class NativeAssetsModule {
     ) = NativeAssetTransfers(
         chainRegistry,
         assetSourceRegistry,
-        extrinsicService,
+        extrinsicServiceFactory,
         phishingValidationFactory,
         enoughTotalToStayAboveEDValidationFactory,
         storageDataSource,

@@ -10,8 +10,8 @@ import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TokenWithCurrency
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyFromLocal
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.EDCountingMode
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.TransferableMode
+import io.novafoundation.nova.common.domain.balance.EDCountingMode
+import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

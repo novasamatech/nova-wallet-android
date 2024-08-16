@@ -47,7 +47,7 @@ class EquilibriumAssetsModule {
     fun provideTransfers(
         chainRegistry: ChainRegistry,
         assetSourceRegistry: AssetSourceRegistry,
-        extrinsicService: ExtrinsicService,
+        extrinsicServiceFactory: ExtrinsicService.Factory,
         phishingValidationFactory: PhishingValidationFactory,
         @Named(REMOTE_STORAGE_SOURCE)
         remoteStorageSource: StorageDataSource,
@@ -55,7 +55,7 @@ class EquilibriumAssetsModule {
     ) = EquilibriumAssetTransfers(
         chainRegistry,
         assetSourceRegistry,
-        extrinsicService,
+        extrinsicServiceFactory,
         phishingValidationFactory,
         remoteStorageSource,
         enoughTotalToStayAboveEDValidationFactory

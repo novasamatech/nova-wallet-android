@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
-import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.common.domain.balance.EDCountingMode
+import io.novafoundation.nova.common.domain.balance.TransferableMode
+import io.novafoundation.nova.common.domain.balance.calculateBalanceCountedTowardsEd
+import io.novafoundation.nova.common.domain.balance.calculateTransferable
+import io.novafoundation.nova.common.domain.balance.totalBalance
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.holdAndFreezesTransferable
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.legacyTransferable
 import java.math.BigDecimal
 
 data class Asset(
@@ -34,49 +34,6 @@ data class Asset(
     val redeemableInPlanks: Balance,
     val unbondingInPlanks: Balance
 ) {
-
-    companion object {
-
-        fun TransferableMode.calculateTransferable(free: Balance, frozen: Balance, reserved: Balance): Balance {
-            return when (this) {
-                TransferableMode.REGULAR -> legacyTransferable(free, frozen)
-                TransferableMode.HOLDS_AND_FREEZES -> holdAndFreezesTransferable(free, frozen, reserved)
-            }
-        }
-
-        fun TransferableMode.calculateTransferable(accountBalance: AccountBalance): Balance {
-            return calculateTransferable(accountBalance.free, accountBalance.frozen, accountBalance.reserved)
-        }
-
-        fun EDCountingMode.calculateBalanceCountedTowardsEd(free: Balance, reserved: Balance): Balance {
-            return when (this) {
-                EDCountingMode.TOTAL -> totalBalance(free, reserved)
-                EDCountingMode.FREE -> free
-            }
-        }
-
-        fun legacyTransferable(free: Balance, frozen: Balance): Balance {
-            return (free - frozen).atLeastZero()
-        }
-
-        fun holdAndFreezesTransferable(free: Balance, frozen: Balance, reserved: Balance): Balance {
-            val freeCannotDropBelow = (frozen - reserved).atLeastZero()
-
-            return (free - freeCannotDropBelow).atLeastZero()
-        }
-
-        fun totalBalance(free: Balance, reserved: Balance): Balance {
-            return free + reserved
-        }
-    }
-
-    enum class TransferableMode {
-        REGULAR, HOLDS_AND_FREEZES
-    }
-
-    enum class EDCountingMode {
-        TOTAL, FREE
-    }
 
     /**
      *  Liquid balance that can be transferred from an account
@@ -129,5 +86,5 @@ fun Asset.transferableReplacingFrozen(newFrozen: Balance): Balance {
 }
 
 fun Asset.regularTransferableBalance(): Balance {
-    return Asset.TransferableMode.REGULAR.calculateTransferable(freeInPlanks, frozenInPlanks, reservedInPlanks)
+    return TransferableMode.REGULAR.calculateTransferable(freeInPlanks, frozenInPlanks, reservedInPlanks)
 }
