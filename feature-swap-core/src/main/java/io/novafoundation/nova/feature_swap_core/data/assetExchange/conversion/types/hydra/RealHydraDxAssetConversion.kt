@@ -85,7 +85,10 @@ class RealHydraDxAssetConversion(
         return Graph.create(allDirectDirections)
     }
 
-    override suspend fun getPaths(graph: Graph<FullChainAssetId, HydraDxSwapEdge>, args: AssetExchangeQuoteArgs): List<Path<HydraDxSwapEdge>> {
+    override suspend fun getPaths(
+        graph: Graph<FullChainAssetId, HydraDxSwapEdge>,
+        args: AssetExchangeQuoteArgs
+    ): List<Path<HydraDxSwapEdge>> {
         val from = args.chainAssetIn.fullId
         val to = args.chainAssetOut.fullId
 
@@ -166,8 +169,10 @@ class RealHydraDxAssetConversion(
 
     private suspend fun logQuotes(args: AssetExchangeQuoteArgs, quotes: List<AssetExchangeQuote>) {
         val allCandidates = quotes.sortedDescending().map {
-            val formattedIn = args.amount.toBigDecimal(scale = args.chainAssetIn.precision.value).toString() + " " + args.chainAssetIn.symbol
-            val formattedOut = it.quote.toBigDecimal(scale = args.chainAssetOut.precision.value).toString() + " " + args.chainAssetOut.symbol
+            val chainAssetIn = args.chainAssetIn
+            val chainAssetOut = args.chainAssetOut
+            val formattedIn = args.amount.toBigDecimal(scale = chainAssetIn.precision.value).toString() + " " + chainAssetIn.symbol
+            val formattedOut = it.quote.toBigDecimal(scale = chainAssetOut.precision.value).toString() + " " + chainAssetOut.symbol
             val formattedPath = formatPath(it.path)
 
             "$formattedIn to $formattedOut via $formattedPath"
