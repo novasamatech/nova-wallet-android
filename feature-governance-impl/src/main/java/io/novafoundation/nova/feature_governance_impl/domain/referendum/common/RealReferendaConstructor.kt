@@ -3,6 +3,11 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.common
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.asLoaded
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingSource
@@ -20,7 +25,12 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.orEmpty
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.positionOf
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.sinceOrThrow
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.till
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.tillOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.getAbstain
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.toTallyOrNull
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -46,8 +56,8 @@ interface ReferendaConstructor {
         tally: Tally?,
         currentBlockNumber: BlockNumber,
         electorate: Balance?,
-        abstainVotes: Balance?
-    ): ReferendumVoting?
+        offChainVotingDetails: ExtendedLoadingState<OffChainReferendumVotingDetails?>
+    ): ReferendumVoting
 
     fun constructReferendumThreshold(
         referendum: OnChainReferendum,
@@ -98,21 +108,37 @@ class RealReferendaConstructor(
         tally: Tally?,
         currentBlockNumber: BlockNumber,
         electorate: Balance?,
-        abstainVotes: Balance?
-    ): ReferendumVoting? {
-        if (tally == null || electorate == null) return null
-
+        offChainVotingDetails: ExtendedLoadingState<OffChainReferendumVotingDetails?>
+    ): ReferendumVoting {
         return ReferendumVoting(
-            support = ReferendumVoting.Support(
-                turnout = tally.support,
-                electorate = electorate
-            ),
-            approval = ReferendumVoting.Approval(
-                ayeVotes = tally.ayeVotes(),
-                nayVotes = tally.nayVotes(),
-            ),
-            abstainVotes = abstainVotes
+            support = votingLoadingState(tally, electorate, offChainVotingDetails) { _tally, _electorate ->
+                ReferendumVoting.Support(
+                    turnout = _tally.support,
+                    electorate = _electorate
+                )
+            },
+            approval = votingLoadingState(tally, electorate, offChainVotingDetails) { _tally, _ ->
+                ReferendumVoting.Approval(
+                    ayeVotes = _tally.ayeVotes(),
+                    nayVotes = _tally.nayVotes(),
+                )
+            },
+            abstainVotes = offChainVotingDetails.map { it?.votingInfo?.getAbstain()?.toBigInteger() }
         )
+    }
+
+    private fun <T> votingLoadingState(
+        onChainTally: Tally?,
+        electorate: Balance?,
+        offChainVotingDetails: ExtendedLoadingState<OffChainReferendumVotingDetails?>,
+        onLoaded: (Tally, Balance) -> T
+    ): ExtendedLoadingState<T?> {
+        val tallyOrNull = onChainTally ?: offChainVotingDetails.dataOrNull?.votingInfo?.toTallyOrNull()
+        return when {
+            tallyOrNull != null && electorate != null -> onLoaded(tallyOrNull, electorate).asLoaded()
+            offChainVotingDetails.isLoading() || electorate == null -> ExtendedLoadingState.Loading
+            else -> ExtendedLoadingState.Loaded(null)
+        }
     }
 
     override fun constructReferendumThreshold(
@@ -289,9 +315,9 @@ class RealReferendaConstructor(
                 val passing = thresholdByReferenda[referendumId]?.currentlyPassing() ?: false
 
                 if (passing) {
-                    ReferendumStatus.Ongoing.Approve(approveIn = finishIn)
+                    ReferendumStatus.Ongoing.DecidingApprove(approveIn = finishIn)
                 } else {
-                    ReferendumStatus.Ongoing.Reject(rejectIn = finishIn)
+                    ReferendumStatus.Ongoing.DecidingReject(rejectIn = finishIn)
                 }
             }
 
@@ -328,15 +354,14 @@ class RealReferendaConstructor(
 
         return when {
             // Confirmation period started block
-            isCurrentlyPassing -> {
-                val confirmingStatus = decidingStatus.confirming.cast<ConfirmingSource.OnChain>().status
-                val approveBlock = confirmingStatus!!.till
+            isCurrentlyPassing && decidingStatus.confirming.tillOrNull() != null -> {
+                val approveBlock = decidingStatus.confirming.till()
                 val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
-                ReferendumStatus.Ongoing.Approve(approveIn = approveIn)
+                ReferendumStatus.Ongoing.Confirming(approveIn = approveIn)
             }
 
-            // Deciding period that will be approved in delay block
+            // Deciding period that will be approved in delay + confirmation period block
             isPassingAfterDelay -> {
                 val delay = delayedPassing!!.delayFraction
                 val blocksToConfirmationPeriod = (delay * track.decisionPeriod.toBigDecimal()).toBigInteger()
@@ -344,7 +369,7 @@ class RealReferendaConstructor(
                 val approveBlock = decidingStatus.since + blocksToConfirmationPeriod + track.confirmPeriod
                 val approveIn = blockDurationEstimator.timerUntil(approveBlock)
 
-                ReferendumStatus.Ongoing.Approve(approveIn = approveIn)
+                ReferendumStatus.Ongoing.DecidingApprove(approveIn = approveIn)
             }
 
             // Reject block
@@ -352,7 +377,7 @@ class RealReferendaConstructor(
                 val rejectBlock = decidingStatus.since + track.decisionPeriod
                 val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)
 
-                ReferendumStatus.Ongoing.Reject(rejectIn)
+                ReferendumStatus.Ongoing.DecidingReject(rejectIn)
             }
         }
     }

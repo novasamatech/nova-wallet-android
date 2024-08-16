@@ -1,13 +1,14 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.common
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigInteger
 
 data class ReferendumVoting(
-    val support: Support,
-    val approval: Approval,
-    val abstainVotes: BigInteger?
+    val support: ExtendedLoadingState<Support?>,
+    val approval: ExtendedLoadingState<Approval?>,
+    val abstainVotes: ExtendedLoadingState<BigInteger?>
 ) {
 
     data class Support(

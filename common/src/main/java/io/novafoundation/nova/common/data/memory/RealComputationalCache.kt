@@ -32,10 +32,6 @@ internal class RealComputationalCache : ComputationalCache, CoroutineScope by Co
     private val memory = mutableMapOf<String, Entry>()
     private val mutex = Mutex()
 
-    override fun hasCache(key: String): Boolean {
-        return key in memory
-    }
-
     override suspend fun <T> useCache(
         key: String,
         scope: CoroutineScope,

@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.asLoaded
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
@@ -18,7 +21,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.getAbstain
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.toTallyOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
@@ -53,7 +55,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combineTransform
-import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.withIndex
 
 class RealReferendumDetailsInteractor(
     private val preImageParser: ReferendumPreImageParser,
@@ -135,7 +138,7 @@ class RealReferendumDetailsInteractor(
 
             val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
 
-            val track = (onChainReferendum.track() ?: offChainVotingDetails?.trackId)?.let(tracksById::get)
+            val track = (onChainReferendum.track() ?: offChainVotingDetails.dataOrNull?.trackId)?.let(tracksById::get)
 
             val vote = voterAccountId?.let {
                 val voteByReferendumId = governanceSource.convictionVoting.votingFor(voterAccountId, chain.id)
@@ -147,10 +150,10 @@ class RealReferendumDetailsInteractor(
             }
 
             val voting = referendaConstructor.constructReferendumVoting(
-                tally = onChainReferendum.status.asOngoingOrNull()?.tally ?: offChainVotingDetails?.votingInfo?.toTallyOrNull(),
+                tally = onChainReferendum.status.asOngoingOrNull()?.tally ?: offChainVotingDetails.dataOrNull?.votingInfo?.toTallyOrNull(),
+                offChainVotingDetails = offChainVotingDetails,
                 currentBlockNumber = currentBlockNumber,
                 electorate = electorate,
-                abstainVotes = offChainVotingDetails?.votingInfo?.getAbstain()?.toBigInteger()
             )
 
             val threshold = referendaConstructor.constructReferendumThreshold(
@@ -287,22 +290,23 @@ class RealReferendumDetailsInteractor(
         coroutineScope: CoroutineScope
     ): Flow<OnChainReferendaWithVotingDetails?> {
         return governanceSource.referenda.onChainReferendumFlow(governanceOption.assetWithChain.chain.id, referendumId)
-            .transform { onChainReferendum ->
+            .withIndex()
+            .transformLatest { (index, onChainReferendum) ->
                 if (onChainReferendum == null) {
                     emit(null)
-                    return@transform
+                    return@transformLatest
                 }
 
-                val hasOffChainVotingCache = offChainReferendumVotingSharedComputation.hasCache(onChainReferendum, governanceOption)
-                if (!hasOffChainVotingCache) {
-                    // First time emmit without voting details
-                    emit(OnChainReferendaWithVotingDetails(onChainReferendum, votingDetails = null))
+                // First time emmit without voting details
+                if (index == 0) {
+                    emit(OnChainReferendaWithVotingDetails(onChainReferendum, votingDetails = ExtendedLoadingState.Loading))
                 }
 
                 emit(
                     OnChainReferendaWithVotingDetails(
                         onChainReferendum,
                         votingDetails = offChainReferendumVotingSharedComputation.votingDetails(onChainReferendum, governanceOption, coroutineScope)
+                            .asLoaded()
                     )
                 )
             }
@@ -334,5 +338,5 @@ private suspend fun PreImageRepository.preImageOf(
 
 private class OnChainReferendaWithVotingDetails(
     val onChainReferendum: OnChainReferendum,
-    val votingDetails: OffChainReferendumVotingDetails?
+    val votingDetails: ExtendedLoadingState<OffChainReferendumVotingDetails?>
 )

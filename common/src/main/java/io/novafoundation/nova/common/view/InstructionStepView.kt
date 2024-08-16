@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.core.content.res.getResourceIdOrThrow
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_instruction_step.view.instructionStepIndicator
 import kotlinx.android.synthetic.main.view_instruction_step.view.instructionStepText
@@ -37,7 +37,7 @@ class InstructionStepView @JvmOverloads constructor(
         instructionStepIndicator.text = stepNumber
 
         // use getResourceId() instead of getString() since resources might contain spans which will be lost if getString() is used
-        val stepText = it.getResourceIdOrThrow(R.styleable.InstructionStepView_stepText)
-        instructionStepText.setText(stepText)
+        val stepText = it.getResourceIdOrNull(R.styleable.InstructionStepView_stepText)
+        stepText?.let { instructionStepText.setText(it) }
     }
 }
