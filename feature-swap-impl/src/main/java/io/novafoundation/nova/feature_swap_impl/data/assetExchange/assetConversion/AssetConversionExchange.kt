@@ -96,7 +96,7 @@ private class AssetConversionExchange(
         // Nothing to sync
     }
 
-    override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
         // any asset is usable as a fee as soon as it has associated pool
         return true
     }

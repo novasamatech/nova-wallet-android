@@ -77,11 +77,10 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
     private val supportCustomFeeFlow = MutableStateFlow(configuration.initialState.supportCustomFee)
 
-    private val availableFeeAssetsFlow: Flow<Map<Int, Chain.Asset>> = combine(supportCustomFeeFlow, selectedTokenFlow) { supportCustomFee, selectedToken ->
-        if (!supportCustomFee) return@combine emptyMap()
+    private val availableFeeAssetsFlow: Flow<Boolean> = combine(supportCustomFeeFlow, selectedTokenFlow) { supportCustomFee, selectedToken ->
+        if (!supportCustomFee) return@combine false
 
-        interactor.availableCommissionAssetFor(selectedToken.configuration, coroutineScope)
-            .associateBy { it.id }
+        interactor.canPayFeeInNonUtilityAsset(selectedToken.configuration, coroutineScope)
     }
 
     private val commissionChainAssetFlow = singleReplaySharedFlow<Chain.Asset>()
@@ -240,9 +239,8 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
         val commissionAsset = commissionAssetFlow.first()
         val selectedToken = selectedTokenFlow.first()
-        val availableFeeAssets = availableFeeAssetsFlow.first()
+        val selectedAssetIsAvailableToPayFee = availableFeeAssetsFlow.first()
 
-        val selectedAssetIsAvailableToPayFee = selectedToken.configuration.id in availableFeeAssets
         if (commissionAsset.isCommissionAsset() && selectedAssetIsAvailableToPayFee) {
             val feeAmount = feeStatus.feeModel.decimalFee.networkFee.amount
             if (interactor.hasEnoughBalanceToPayFee(commissionAsset, feeAmount)) {
@@ -260,7 +258,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         supportCustomFee: Boolean,
         selectedToken: Token,
         customFeeAsset: Chain.Asset,
-        availableFeeAssets: Map<Int, Chain.Asset>
+        canPayFeeInCustomAsset: Boolean
     ): ChangeFeeTokenState {
         val originChainAsset = selectedToken.configuration
 
@@ -269,7 +267,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
 
             originChainAsset.isCommissionAsset -> ChangeFeeTokenState.NotSupported
 
-            (originChainAsset.id in availableFeeAssets) -> {
+            canPayFeeInCustomAsset -> {
                 val chain = chainRegistry.getChain(originChainAsset.chainId)
                 val selectableAssets = listOf(chain.commissionAsset, originChainAsset)
                 ChangeFeeTokenState.Editable(customFeeAsset, selectableAssets)

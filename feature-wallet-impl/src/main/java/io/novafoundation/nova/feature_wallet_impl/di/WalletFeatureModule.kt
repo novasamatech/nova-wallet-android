@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
@@ -223,14 +224,16 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry,
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
-        assetSourceRegistry: AssetSourceRegistry
+        assetSourceRegistry: AssetSourceRegistry,
+        customFeeCapabilityFacade: CustomFeeCapabilityFacade
     ): CustomFeeInteractor {
         return RealCustomFeeInteractor(
             feePaymentProviderRegistry,
             chainRegistry,
             walletRepository,
             accountRepository,
-            assetSourceRegistry
+            assetSourceRegistry,
+            customFeeCapabilityFacade
         )
     }
 

@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -158,4 +159,6 @@ interface WalletFeatureDependencies {
     val feePaymentProviderRegistry: FeePaymentProviderRegistry
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val customFeeCapabilityFacade: CustomFeeCapabilityFacade
 }

@@ -50,15 +50,17 @@ internal class AssetConversionFeePayment(
         return SubstrateFee(amount = quote, submissionOrigin = nativeFee.submissionOrigin, asset = paymentAsset)
     }
 
-    override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {
-        return remoteStorageSource.query(paymentAsset.chainId) {
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
+        val availableFeeAssets = remoteStorageSource.query(paymentAsset.chainId) {
             val allPools = metadata.assetConversionOrNull?.pools?.keys().orEmpty()
 
             constructAvailableCustomFeeAssets(allPools)
         }
+
+        return availableFeeAssets.containsKey(chainAsset.id)
     }
 
-    private suspend fun constructAvailableCustomFeeAssets(pools: List<Pair<MultiLocation, MultiLocation>>): List<Chain.Asset> {
+    private suspend fun constructAvailableCustomFeeAssets(pools: List<Pair<MultiLocation, MultiLocation>>): Map<Int, Chain.Asset> {
         return pools.mapNotNull { (firstLocation, secondLocation) ->
             val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@mapNotNull null
             val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@mapNotNull null
@@ -66,7 +68,7 @@ internal class AssetConversionFeePayment(
             if (!firstAsset.isUtilityAsset) return@mapNotNull null
 
             secondAsset
-        }
+        }.associateBy { it.id }
     }
 
     private suspend fun encodableAssetId(): Any {

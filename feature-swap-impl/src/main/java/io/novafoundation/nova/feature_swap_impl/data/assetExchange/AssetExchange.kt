@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
@@ -16,7 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
-interface AssetExchange {
+interface AssetExchange : CustomFeeCapability {
 
     interface Factory {
 
@@ -30,7 +31,6 @@ interface AssetExchange {
      * e.g. they don't need to additionally check whether asset is utility or not
      * They can also expect this method is called only when asset is present in [AssetExchange.availableSwapDirections]
      */
-    suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean
 
     suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId>
 

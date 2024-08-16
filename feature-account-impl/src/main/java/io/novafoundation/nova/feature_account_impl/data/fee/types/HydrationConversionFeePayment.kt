@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types
 
-import io.novafoundation.nova.common.utils.graph.findAllPossibleDirectionsFor
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
@@ -13,9 +12,7 @@ import io.novafoundation.nova.feature_swap_core.data.network.setFeeCurrency
 import io.novafoundation.nova.feature_swap_core.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -57,14 +54,12 @@ internal class HydrationConversionFeePayment(
         return SubstrateFee(quote.quote, nativeFee.submissionOrigin, paymentAsset)
     }
 
-    override suspend fun availableCustomFeeAssets(): List<Chain.Asset> {
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = chainRegistry.getChain(paymentAsset.chainId)
-        val accountId = metaAccount.accountIdIn(chain)
-        val fromAsset = chain.commissionAsset
+        val accountId = metaAccount.requireAccountIdIn(chain)
 
-        val allSwapDirections = hydraDxQuoteSharedComputation.directions(chain, accountId!!, coroutineScope)
-        val directions = allSwapDirections.findAllPossibleDirectionsFor(fromAsset.fullId)
-        return directions.map { chainRegistry.asset(it) }
+        val assetConversion = hydraDxQuoteSharedComputation.getAssetConversion(chain, accountId, coroutineScope)
+        return assetConversion.canPayFeeInNonUtilityToken(paymentAsset)
     }
 }

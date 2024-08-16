@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
+import io.novafoundation.nova.common.utils.multiTransactionPayment
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.BuildConfig
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
@@ -18,9 +19,13 @@ import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.StableConversionSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.network.isSystemAsset
+import io.novafoundation.nova.feature_swap_core.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +33,7 @@ import kotlinx.coroutines.flow.Flow
 private const val PATHS_LIMIT = 4
 
 class RealHydraDxAssetConversionFactory(
+    private val remoteStorageSource: StorageDataSource,
     private val conversionSourceFactories: Iterable<HydraDxConversionSource.Factory>,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : HydraDxAssetConversionFactory {
@@ -35,6 +41,7 @@ class RealHydraDxAssetConversionFactory(
     override fun create(chain: Chain): HydraDXAssetConversion {
         return RealHydraDxAssetConversion(
             chain,
+            remoteStorageSource,
             conversionSourceFactories,
             hydraDxAssetIdConverter
         )
@@ -43,6 +50,7 @@ class RealHydraDxAssetConversionFactory(
 
 class RealHydraDxAssetConversion(
     private val chain: Chain,
+    private val remoteStorageSource: StorageDataSource,
     private val swapSourceFactories: Iterable<HydraDxConversionSource.Factory>,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val debug: Boolean = BuildConfig.DEBUG
@@ -52,6 +60,18 @@ class RealHydraDxAssetConversion(
 
     override suspend fun sync() {
         conversionSources.forEach { it.sync() }
+    }
+
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
+        val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(chainAsset)
+
+        if (hydraDxAssetIdConverter.isSystemAsset(onChainId)) return true
+
+        val fallbackPrice = remoteStorageSource.query(chain.id) {
+            metadata.multiTransactionPayment.acceptedCurrencies.query(onChainId)
+        }
+
+        return fallbackPrice != null
     }
 
     override suspend fun availableSwapDirections(): Graph<FullChainAssetId, HydraDxSwapEdge> {

@@ -32,14 +32,15 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.As
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxSwapEdge
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.accountCurrencyMap
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.OmniPoolConversionSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.multiTransactionPayment
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
-import io.novafoundation.nova.feature_swap_core.data.network.isSystemAsset
 import io.novafoundation.nova.feature_swap_core.data.network.setFeeCurrency
 import io.novafoundation.nova.feature_swap_core.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
@@ -121,16 +122,8 @@ private class HydraDxExchange(
         assetConversion.sync()
     }
 
-    override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
-        val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)
-
-        if (hydraDxAssetIdConverter.isSystemAsset(onChainId)) return true
-
-        val fallbackPrice = remoteStorageSource.query(chain.id) {
-            metadata.multiTransactionPayment.acceptedCurrencies.query(onChainId)
-        }
-
-        return fallbackPrice != null
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
+        return assetConversion.canPayFeeInNonUtilityToken(chainAsset)
     }
 
     override suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId> {

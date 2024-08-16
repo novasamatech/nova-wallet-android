@@ -27,4 +27,6 @@ interface AssetConversion<T : Edge<FullChainAssetId>> {
         userAccountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<Unit>
+
+    suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean
 }

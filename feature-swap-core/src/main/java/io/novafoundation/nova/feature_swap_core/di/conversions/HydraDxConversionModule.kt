@@ -66,10 +66,12 @@ class HydraDxConversionModule {
     @Provides
     @FeatureScope
     fun provideHydraDxAssetConversionFactory(
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         conversionSourceFactories: Set<@JvmSuppressWildcards HydraDxConversionSource.Factory>,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     ): HydraDxAssetConversionFactory {
         return RealHydraDxAssetConversionFactory(
+            remoteStorageSource = remoteStorageSource,
             conversionSourceFactories = conversionSourceFactories,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter
         )

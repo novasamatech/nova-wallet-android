@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CustomFeeInteractor {
 
-    suspend fun availableCommissionAssetFor(chainAsset: Chain.Asset, coroutineScope: CoroutineScope): List<Chain.Asset>
+    suspend fun canPayFeeInNonUtilityAsset(chainAsset: Chain.Asset, coroutineScope: CoroutineScope): Boolean
 
     suspend fun assetFlow(asset: Chain.Asset): Flow<Asset>
 

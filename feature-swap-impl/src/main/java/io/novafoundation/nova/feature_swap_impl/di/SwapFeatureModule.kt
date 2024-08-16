@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilit
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
@@ -47,14 +48,14 @@ class SwapFeatureModule {
         hydraDxExchangeFactory: HydraDxExchangeFactory,
         computationalCache: ComputationalCache,
         chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository
+        customFeeCapabilityFacade: CustomFeeCapabilityFacade
     ): SwapService {
         return RealSwapService(
             assetConversionFactory = assetConversionExchangeFactory,
             hydraDxExchangeFactory = hydraDxExchangeFactory,
             computationalCache = computationalCache,
             chainRegistry = chainRegistry,
-            accountRepository = accountRepository
+            customFeeCapabilityFacade = customFeeCapabilityFacade
         )
     }
 
