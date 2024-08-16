@@ -7,7 +7,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class LedgerGenericAccountParcel(
-    val index: Int,
     val address: String,
     val publicKey: ByteArray,
     val encryptionType: EncryptionType,
@@ -15,9 +14,9 @@ class LedgerGenericAccountParcel(
 ) : Parcelable
 
 fun LedgerSubstrateAccount.toGenericParcel(): LedgerGenericAccountParcel {
-    return LedgerGenericAccountParcel(index, address, publicKey, encryptionType, derivationPath)
+    return LedgerGenericAccountParcel(address, publicKey, encryptionType, derivationPath)
 }
 
 fun LedgerGenericAccountParcel.toDomain(): LedgerSubstrateAccount {
-    return LedgerSubstrateAccount(index, address, publicKey, encryptionType, derivationPath)
+    return LedgerSubstrateAccount(address, publicKey, encryptionType, derivationPath)
 }

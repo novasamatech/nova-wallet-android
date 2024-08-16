@@ -38,7 +38,6 @@ class SelectAddressImportLedgerLegacyViewModel(
 
     private fun screenResponseFrom(account: LedgerAccountWithBalance): LedgerChainAccount {
         return LedgerChainAccount(
-            index = account.index,
             publicKey = account.account.publicKey,
             address = account.account.address,
             chainId = payload.chainId,

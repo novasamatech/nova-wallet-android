@@ -37,10 +37,9 @@ class SelectAddressImportGenericLedgerViewModel(
 
     override fun onAccountVerified(account: LedgerAccountWithBalance) {
         launch {
-            val device = interactor.getDevice(payload.deviceId)
-            val universalAccount = substrateApplication.getUniversalAccount(device, account.index, confirmAddress = false)
             val payload = PreviewImportGenericLedgerPayload(
-                account = universalAccount.toGenericParcel(),
+                accountIndex = account.index,
+                account = account.account.toGenericParcel(),
                 deviceId = payload.deviceId
             )
 

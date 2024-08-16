@@ -74,7 +74,6 @@ class FillWalletImportLedgerViewModel(
         val filledAccounts = filledAccountsFlow.first()
         val parcelableAccounts = filledAccounts.map { (chainId, account) ->
             LedgerChainAccount(
-                index = account.index,
                 publicKey = account.publicKey,
                 encryptionType = account.encryptionType,
                 address = account.address,
@@ -110,7 +109,7 @@ class FillWalletImportLedgerViewModel(
     }
 
     private fun addAccount(response: LedgerChainAccount) {
-        val account = LedgerSubstrateAccount(response.index, response.address, response.publicKey, response.encryptionType, response.derivationPath)
+        val account = LedgerSubstrateAccount(response.address, response.publicKey, response.encryptionType, response.derivationPath)
 
         filledAccountsFlow.value = filledAccountsFlow.value.inserted(response.chainId, account)
     }

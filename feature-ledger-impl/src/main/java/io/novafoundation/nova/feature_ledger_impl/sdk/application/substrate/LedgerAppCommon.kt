@@ -96,7 +96,6 @@ object SubstrateLedgerAppCommon {
         val encryptionType = mapCryptoSchemeToEncryptionType(defaultCryptoScheme())
 
         return LedgerSubstrateAccount(
-            index = accountIndex,
             address = address,
             publicKey = publicKey,
             encryptionType = encryptionType,
