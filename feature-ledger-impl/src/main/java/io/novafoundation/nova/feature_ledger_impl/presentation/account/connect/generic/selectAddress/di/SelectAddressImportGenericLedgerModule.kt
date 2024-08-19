@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.fo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectAddress.SelectAddressImportGenericLedgerViewModel
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -33,7 +32,6 @@ class SelectAddressImportGenericLedgerModule {
     @IntoMap
     @ViewModelKey(SelectAddressImportGenericLedgerViewModel::class)
     fun provideViewModel(
-        substrateApplication: GenericSubstrateLedgerApplication,
         router: LedgerRouter,
         interactor: SelectAddressLedgerInteractor,
         addressIconGenerator: AddressIconGenerator,
@@ -43,7 +41,6 @@ class SelectAddressImportGenericLedgerModule {
         messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return SelectAddressImportGenericLedgerViewModel(
-            substrateApplication = substrateApplication,
             router = router,
             interactor = interactor,
             addressIconGenerator = addressIconGenerator,
