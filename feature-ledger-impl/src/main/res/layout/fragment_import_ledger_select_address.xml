@@ -20,24 +20,24 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:textColor="@color/icon_primary"
-        android:text="@string/ledher_import_select_address_title" />
+        android:text="@string/ledher_import_select_address_title"
+        android:textColor="@color/icon_primary" />
 
     <io.novafoundation.nova.feature_account_api.view.ChainChipView
-        android:layout_width="wrap_content"
         android:id="@+id/ledgerSelectAddressChain"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ledgerSelectAddressContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingBottom="16dp"
-        android:id="@+id/ledgerSelectAddressContent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="3"
         tools:listitem="@layout/item_account" />

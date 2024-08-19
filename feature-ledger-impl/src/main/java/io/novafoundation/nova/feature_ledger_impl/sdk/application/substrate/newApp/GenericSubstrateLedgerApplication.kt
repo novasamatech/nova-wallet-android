@@ -27,9 +27,10 @@ class GenericSubstrateLedgerApplication(
 
     suspend fun getUniversalAccount(
         device: LedgerDevice,
+        accountIndex: Int,
         confirmAddress: Boolean
     ): LedgerSubstrateAccount {
-        return getAccount(device, Chain.Geneses.POLKADOT, accountIndex = 0, confirmAddress)
+        return getAccount(device, Chain.Geneses.POLKADOT, accountIndex = accountIndex, confirmAddress)
     }
 
     override suspend fun getDerivationPath(chainId: ChainId, accountIndex: Int): String {
