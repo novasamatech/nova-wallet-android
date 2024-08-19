@@ -67,9 +67,9 @@
     <string name="account_invalid_derivation_path_title">无效的派生路径</string>
     <string name="account_json_file">JSON文件</string>
     <string name="account_ledger_generic_import_start_step_1">确保已安装%s到您的 Ledger 设备，使用 Ledger Live 应用程序</string>
-    <string name="account_ledger_generic_import_start_step_1_highlighted">Generic 应用程序</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot 应用程序</string>
     <string name="account_ledger_generic_import_start_step_2">在 Ledger 设备上%s</string>
-    <string name="account_ledger_generic_import_start_step_2_highlighted">打开 Generic 应用程序</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">打开 Polkadot 应用程序</string>
     <string name="account_ledger_import_fill_description">确保通过Ledger Live应用把网络应用安装到您的Ledger设备上。在您的Ledger设备上打开网络应用。</string>
     <string name="account_ledger_import_fill_disabled_hint">至少添加一个账户</string>
     <string name="account_ledger_import_fill_title">将账户添加到您的钱包</string>
@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Migration 应用程序在不久的将来将无法使用。使用它将您的账户迁移到新的 Ledger 应用程序，以免丢失资金。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X（通用应用程序）</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot 应用程序)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X（旧版）</string>
     <string name="account_ledger_select_device_description">请在手机设置和Ledger设备中启用蓝牙。解锁您的Ledger设备并打开%s应用。</string>
     <string name="account_ledger_select_device_title">选择您的Ledger设备</string>

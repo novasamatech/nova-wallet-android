@@ -67,9 +67,9 @@
     <string name="account_invalid_derivation_path_title">Percorso di derivazione non valido</string>
     <string name="account_json_file">File JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Assicurati che %s sul tuo dispositivo Ledger utilizzando l\'app Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_1_highlighted">l\'app Generic sia installata</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">l\'app Polkadot sia installata</string>
     <string name="account_ledger_generic_import_start_step_2">%s sul tuo dispositivo Ledger</string>
-    <string name="account_ledger_generic_import_start_step_2_highlighted">Apri l\'app Generic</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Apri l\'app Polkadot</string>
     <string name="account_ledger_import_fill_description">Assicurati che l\'app di rete sia installata sul tuo dispositivo Ledger utilizzando l\'app Ledger Live. Apri l\'app di rete sul tuo dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Aggiungi almeno un account</string>
     <string name="account_ledger_import_fill_title">Aggiungi account al tuo portafoglio</string>
@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">L\'app Migration sarà non più disponibile nel prossimo futuro. Usala per migrare i tuoi account alla nuova app Ledger per evitare di perdere i tuoi fondi.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (App Generico)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (applicazione Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Si prega di abilitare Bluetooth nelle impostazioni del telefono e sul dispositivo Ledger. Sblocca il tuo dispositivo Ledger e apri l\'app %s.</string>
     <string name="account_ledger_select_device_title">Seleziona il tuo dispositivo Ledger</string>

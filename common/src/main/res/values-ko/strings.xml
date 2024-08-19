@@ -67,9 +67,9 @@
     <string name="account_invalid_derivation_path_title">잘못된 파생 경로</string>
     <string name="account_json_file">JSON 파일</string>
     <string name="account_ledger_generic_import_start_step_1">Ledger Live 앱을 사용하여 Ledger 장치에 %s되어 있는지 확인하십시오</string>
-    <string name="account_ledger_generic_import_start_step_1_highlighted">Generic 앱이 설치</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">폴카닷 앱이 설치되었습니다</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger 기기에서 %s</string>
-    <string name="account_ledger_generic_import_start_step_2_highlighted">일반 앱을 엽니다</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Polkadot 앱 열기</string>
     <string name="account_ledger_import_fill_description">Ledger Live 앱을 사용하여 Ledger 장치에 Network 앱이 설치되어 있는지 확인하십시오. Ledger 장치에서 네트워크 앱을 여십시오.</string>
     <string name="account_ledger_import_fill_disabled_hint">계정을 적어도 하나 추가하십시오</string>
     <string name="account_ledger_import_fill_title">지갑에 계정을 추가하십시오</string>
@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Migration 앱은 곧 사용 불가능할 것입니다. 자금을 잃지 않기 위해 새 Ledger 앱으로 계정을 마이그레이션하세요.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X(Generic Polkadot 앱)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">전화 설정에서 Bluetooth를 활성화하고 Ledger 장치를 여십시오. Ledger 장치를 잠금 해제하고 %s 앱을 여십시오.</string>
     <string name="account_ledger_select_device_title">Ledger 장치를 선택하십시오</string>
