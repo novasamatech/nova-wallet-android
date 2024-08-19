@@ -40,12 +40,12 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -193,7 +193,7 @@ internal class RealSwapService(
     }
 
     private suspend fun createExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
-        return chainRegistry.chainsById.first().mapValues { (_, chain) ->
+        return chainRegistry.enabledChainById().mapValues { (_, chain) ->
             createExchange(coroutineScope, chain)
         }
             .filterNotNull()
