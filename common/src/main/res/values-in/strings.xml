@@ -67,9 +67,9 @@
     <string name="account_invalid_derivation_path_title">Jalur derivasi tidak valid</string>
     <string name="account_json_file">File JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Pastikan %s di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_1_highlighted">aplikasi Generic terpasang</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Aplikasi Polkadot sudah terinstal</string>
     <string name="account_ledger_generic_import_start_step_2">%s di perangkat Ledger Anda</string>
-    <string name="account_ledger_generic_import_start_step_2_highlighted">Buka aplikasi Generic</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Buka aplikasi Polkadot</string>
     <string name="account_ledger_import_fill_description">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live. Buka aplikasi jaringan di perangkat Ledger Anda.</string>
     <string name="account_ledger_import_fill_disabled_hint">Tambahkan setidaknya satu akun</string>
     <string name="account_ledger_import_fill_title">Tambahkan akun ke dompet Anda</string>
@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Aplikasi Migrasi akan tidak tersedia dalam waktu dekat. Gunakan untuk memigrasikan akun Anda ke aplikasi Ledger baru untuk menghindari kehilangan dana Anda.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Aplikasi Generik)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (aplikasi Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Harap, aktifkan Bluetooth dalam pengaturan ponsel Anda dan perangkat Ledger. Buka perangkat Ledger Anda dan buka aplikasi %s.</string>
     <string name="account_ledger_select_device_title">Pilih Perangkat Ledger Anda</string>

@@ -67,9 +67,9 @@
     <string name="account_invalid_derivation_path_title">Chemin de dérivation non valide</string>
     <string name="account_json_file">Fichier JSON</string>
     <string name="account_ledger_generic_import_start_step_1">Assurez-vous que %s sur votre appareil Ledger en utilisant l\'application Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_1_highlighted">l\'application Generic est installée</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">L\'application Polkadot est installée</string>
     <string name="account_ledger_generic_import_start_step_2">%s sur votre appareil Ledger</string>
-    <string name="account_ledger_generic_import_start_step_2_highlighted">Ouvrez l\'application Generic</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Ouvrez l\'application Polkadot</string>
     <string name="account_ledger_import_fill_description">Assurez-vous que l\'application réseau est installée sur votre Ledger à l\'aide de l\'application Ledger Live. Puis ouvrez l\'application réseau sur votre Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Ajoutez au moins un compte</string>
     <string name="account_ledger_import_fill_title">Ajouter des comptes à votre portefeuille</string>
@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">L\'application Migration sera bientôt indisponible. Utilisez-la pour migrer vos comptes vers la nouvelle application Ledger afin d\'éviter de perdre vos fonds.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Application Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Veuillez activer le Bluetooth dans les paramètres de votre téléphone et de votre appareil Ledger. Déverrouillez votre Ledger et ouvrez l\'application %s.</string>
     <string name="account_ledger_select_device_title">Sélectionnez votre appareil Ledger</string>

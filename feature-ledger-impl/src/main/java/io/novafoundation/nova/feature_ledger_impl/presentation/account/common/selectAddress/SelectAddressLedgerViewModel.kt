@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -48,6 +49,8 @@ abstract class SelectAddressLedgerViewModel(
 ) : BaseViewModel(),
     LedgerMessageCommands,
     Browserable.Presentation by Browserable() {
+
+    abstract val ledgerVariant: LedgerVariant
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 
@@ -120,7 +123,7 @@ abstract class SelectAddressLedgerViewModel(
         ).event()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
+            interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index, ledgerVariant)
         }
 
         result.onFailure {
@@ -149,7 +152,7 @@ abstract class SelectAddressLedgerViewModel(
             loadingAccount.withFlagSet {
                 val nextAccountIndex = loadedAccounts.value.size
 
-                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex)
+                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex, ledgerVariant)
                     .onSuccess {
                         loadedAccounts.value = loadedAccounts.value.added(it)
                     }.onFailure {
