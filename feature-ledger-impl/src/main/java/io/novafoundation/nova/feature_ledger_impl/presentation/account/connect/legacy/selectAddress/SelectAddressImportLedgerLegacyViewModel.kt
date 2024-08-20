@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -30,6 +31,8 @@ class SelectAddressImportLedgerLegacyViewModel(
     chainRegistry = chainRegistry,
     messageFormatter = messageFormatter
 ) {
+
+    override val ledgerVariant: LedgerVariant = LedgerVariant.LEGACY
 
     override fun onAccountVerified(account: LedgerAccountWithBalance) {
         responder.respond(screenResponseFrom(account))

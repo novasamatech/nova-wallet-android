@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -10,12 +11,10 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toGenericParcel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.launch
 
 class SelectAddressImportGenericLedgerViewModel(
-    private val substrateApplication: GenericSubstrateLedgerApplication,
     private val router: LedgerRouter,
     private val payload: SelectLedgerAddressPayload,
     interactor: SelectAddressLedgerInteractor,
@@ -32,6 +31,8 @@ class SelectAddressImportGenericLedgerViewModel(
     chainRegistry = chainRegistry,
     messageFormatter = messageFormatter
 ) {
+
+    override val ledgerVariant: LedgerVariant = LedgerVariant.GENERIC
 
     override val needToVerifyAccount = false
 
