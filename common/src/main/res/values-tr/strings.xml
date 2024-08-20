@@ -67,9 +67,9 @@
     <string name="account_invalid_derivation_path_title">Geçersiz türetme yolu</string>
     <string name="account_json_file">JSON dosyası</string>
     <string name="account_ledger_generic_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınıza %s olduğundan emin olun</string>
-    <string name="account_ledger_generic_import_start_step_1_highlighted">Generic uygulamanın yüklü</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot uygulamanın yüklü</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda %s açın</string>
-    <string name="account_ledger_generic_import_start_step_2_highlighted">Generic uygulamayı</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Polkadot uygulamasını açın</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Genel Uygulama)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot uygulaması)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Eski)</string>
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
