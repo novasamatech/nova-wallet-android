@@ -10,25 +10,25 @@ import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuoteArgs
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -36,17 +36,16 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
-import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -58,22 +57,23 @@ private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
-    private val hydraDxOmnipoolFactory: HydraDxExchangeFactory,
+    private val hydraDxExchangeFactory: HydraDxExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
-    private val accountRepository: AccountRepository,
+    private val customFeeCapabilityFacade: CustomFeeCapabilityFacade
 ) : SwapService {
 
     override suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean = withContext(Dispatchers.Default) {
         val computationScope = CoroutineScope(coroutineContext)
 
         val exchange = exchanges(computationScope).getValue(asset.chainId)
-        val isCustomFeeToken = !asset.isCommissionAsset
-        val currentMetaAccount = accountRepository.getSelectedMetaAccount()
+        customFeeCapabilityFacade.canPayFeeInNonUtilityToken(asset, exchange)
+    }
 
-        // TODO we disable custom fee tokens payment for account types where current account is not the one who pays fees (e.g. it is proxied).
-        // This restriction can be removed once we consider all corner-cases
-        isCustomFeeToken && exchange.canPayFeeInNonUtilityToken(asset) && currentMetaAccount.type.requestedAccountPaysFees()
+    override suspend fun sync(coroutineScope: CoroutineScope) {
+        exchanges(coroutineScope)
+            .values
+            .forEachAsync { it.sync() }
     }
 
     override suspend fun assetsAvailableForSwap(
@@ -193,7 +193,7 @@ internal class RealSwapService(
     }
 
     private suspend fun createExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
-        return chainRegistry.chainsById.first().mapValues { (_, chain) ->
+        return chainRegistry.enabledChainById().mapValues { (_, chain) ->
             createExchange(coroutineScope, chain)
         }
             .filterNotNull()
@@ -202,7 +202,7 @@ internal class RealSwapService(
     private suspend fun createExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
         val factory = when {
             chain.swap.assetConversionSupported() -> assetConversionFactory
-            chain.swap.hydraDxSupported() -> hydraDxOmnipoolFactory
+            chain.swap.hydraDxSupported() -> hydraDxExchangeFactory
             else -> null
         }
 

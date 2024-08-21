@@ -32,16 +32,17 @@ abstract class NewSubstrateLedgerApplication(
 
     abstract suspend fun getDerivationPath(metaId: Long, chainId: ChainId): String
 
+    abstract suspend fun getAddressPrefix(chainId: ChainId): Short
+
     override suspend fun getAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int, confirmAddress: Boolean): LedgerSubstrateAccount {
         val displayVerificationDialog = SubstrateLedgerAppCommon.DisplayVerificationDialog.fromBoolean(confirmAddress)
 
         val derivationPath = getDerivationPath(chainId, accountIndex)
         val encodedDerivationPath = encodeDerivationPath(derivationPath)
 
-        val chain = chainRegistry.getChain(chainId)
-        val ss58Prefix = chain.addressPrefix.toShort()
+        val addressPrefix = getAddressPrefix(chainId)
 
-        val payload = encodedDerivationPath + ss58Prefix.littleEndianBytes
+        val payload = encodedDerivationPath + addressPrefix.littleEndianBytes
 
         val rawResponse = transport.send(
             cla = cla,

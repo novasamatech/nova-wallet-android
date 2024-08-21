@@ -66,6 +66,7 @@ fun chainOf(
     hasSubstrateRuntime = true,
     nodeSelectionStrategy = ChainLocal.NodeSelectionStrategyLocal.ROUND_ROBIN,
     source = ChainLocal.Source.CUSTOM,
+    customFee = ""
 )
 
 fun ChainLocal.nodeOf(

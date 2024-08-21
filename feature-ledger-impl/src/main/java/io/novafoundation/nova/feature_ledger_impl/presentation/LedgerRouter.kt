@@ -29,6 +29,8 @@ interface LedgerRouter : ReturnableRouter {
 
     fun openSelectLedgerGeneric()
 
+    fun openSelectAddressGenericLedger(payload: SelectLedgerAddressPayload)
+
     fun openPreviewLedgerAccountsGeneric(payload: PreviewImportGenericLedgerPayload)
 
     fun openFinishImportLedgerGeneric(payload: FinishImportGenericLedgerPayload)

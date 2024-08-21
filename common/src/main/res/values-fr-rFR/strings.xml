@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Votre chemin de dérivation contient des symboles non pris en charge ou a une structure incorrecte.</string>
     <string name="account_invalid_derivation_path_title">Chemin de dérivation non valide</string>
     <string name="account_json_file">Fichier JSON</string>
-    <string name="account_ledger_generic_import_start_step_1">Assurez-vous que <font color="#FFFFFF">l\'application Generic est installée</font> sur votre appareil Ledger en utilisant l\'application Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Ouvrez l\'application Generic</font> sur votre appareil Ledger</string>
+    <string name="account_ledger_generic_import_start_step_1">Assurez-vous que %s sur votre appareil Ledger en utilisant l\'application Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">L\'application Polkadot est installée</string>
+    <string name="account_ledger_generic_import_start_step_2">%s sur votre appareil Ledger</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Ouvrez l\'application Polkadot</string>
     <string name="account_ledger_import_fill_description">Assurez-vous que l\'application réseau est installée sur votre Ledger à l\'aide de l\'application Ledger Live. Puis ouvrez l\'application réseau sur votre Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Ajoutez au moins un compte</string>
     <string name="account_ledger_import_fill_title">Ajouter des comptes à votre portefeuille</string>
     <string name="account_ledger_import_start_guide">Guide officiel de connexion Bluetooth de Ledger</string>
-    <string name="account_ledger_import_start_step_1">Assurez-vous que <font color="#FFFFFF"> l\'application réseau est installée </font> sur votre appareil Ledger à l\'aide de l\'application Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Ouvrez l\'application réseau</font> sur votre appareil Ledger</string>
-    <string name="account_ledger_import_start_step_3">Autorisez Nova Wallet à <font color="#FFFFFF">accéder au Bluetooth et à la localisation</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Sélectionnez le compte</font> à ajouter au portefeuille</string>
+    <string name="account_ledger_import_start_step_1">Assurez-vous que %s sur votre appareil Ledger à l\'aide de l\'application Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">l\'application Network est installée</string>
+    <string name="account_ledger_import_start_step_2">%s sur votre appareil Ledger</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Ouvrez l\'application réseau</string>
+    <string name="account_ledger_import_start_step_3">Autorisez Nova Wallet à %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">accéder au Bluetooth et à la localisation</string>
+    <string name="account_ledger_import_start_step_4">%s à ajouter au portefeuille</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Sélectionnez un compte</string>
     <string name="account_ledger_import_start_title">Connecter Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Pour signer des opérations et migrer vos comptes vers la nouvelle application Generic Ledger, installez et ouvrez l\'application Migration. Les applications Ledger Legacy Old et Migration ne seront plus supportées à l\'avenir.</string>
     <string name="account_ledger_legacy_warning_title">Une nouvelle application Ledger a été publiée</string>
@@ -83,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">L\'application Migration sera bientôt indisponible. Utilisez-la pour migrer vos comptes vers la nouvelle application Ledger afin d\'éviter de perdre vos fonds.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Application Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Veuillez activer le Bluetooth dans les paramètres de votre téléphone et de votre appareil Ledger. Déverrouillez votre Ledger et ouvrez l\'application %s.</string>
     <string name="account_ledger_select_device_title">Sélectionnez votre appareil Ledger</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Voici vos comptes</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Code QR invalide, vérifiez que vous êtes bien en train de scanner le code QR de %s</string>
     <string name="account_parity_signer_import_start_select_top">Assurez-vous de sélectionner le premier</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Ouvrez l’application Parity Signer</font> sur votre smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Allez dans l’onglet «Clés». Sélectionnez la clé, puis le compte</font> que vous souhaitez ajouter au portefeuille Nova</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer vous fournira un <font color="#FFFFFF">code QR à scanner</font>.</string>
+    <string name="account_parity_signer_import_start_step_1">%s sur votre smartphone</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Ouvrez Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s que vous souhaitez ajouter au portefeuille Nova</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Allez dans l’onglet «Clés». Sélectionnez la clé, puis le compte</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer vous fournira un %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">code QR à scanner</string>
     <string name="account_parity_signer_import_start_title">Ajouter un portefeuille à partir de %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s ne prend pas en charge la signature de messages arbitraires, uniquement les transactions</string>
     <string name="account_parity_signer_not_supported_title">La signature n’est pas prise en charge</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Signer avec %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Faites attention, le nom du chemin de dérivation doit être vide</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Ouvrez l\'application Polkadot Vault</font> sur votre smartphone</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Allez dans l\'onglet «Jeux de clés».</font> Sélectionnez votre jeu de clés, votre réseau, puis le compte que vous souhaitez ajouter à Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault vous fournira un <font color="#FFFFFF">QR code à scanner</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">%s sur votre smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Ouvrir Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Sélectionnez votre jeu de clés, votre réseau, puis le compte que vous souhaitez ajouter à Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Allez dans l\'onglet \"Key Sets\".</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault vous fournira un %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">code QR à scanner</string>
     <string name="account_private_key">Clé privée</string>
     <string name="account_proxieds">Délégué à vous (Proxieds)</string>
     <string name="account_proxy_type_any">N\'importe quel</string>

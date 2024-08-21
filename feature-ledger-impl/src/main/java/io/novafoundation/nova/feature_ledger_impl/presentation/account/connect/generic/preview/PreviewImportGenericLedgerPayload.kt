@@ -6,6 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class PreviewImportGenericLedgerPayload(
+    val accountIndex: Int,
     val account: LedgerGenericAccountParcel,
     val deviceId: String
 ) : Parcelable

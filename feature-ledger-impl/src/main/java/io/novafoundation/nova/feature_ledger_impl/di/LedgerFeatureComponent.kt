@@ -14,12 +14,13 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.di.AddChainAccountSelectLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.di.FinishImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.di.PreviewImportGenericLedgerComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectAddress.di.SelectAddressImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.di.SelectLedgerGenericImportComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.start.di.StartImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.SelectLedgerAddressInterScreenCommunicator
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.di.FillWalletImportLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.finish.di.FinishImportLedgerComponent
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectAddress.di.SelectAddressImportLedgerComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectAddress.di.SelectAddressImportLedgerLegacyComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.di.SelectLedgerImportLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.di.StartImportLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.di.SignLedgerComponent
@@ -51,7 +52,8 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
     fun startImportLedgerComponentFactory(): StartImportLedgerComponent.Factory
     fun fillWalletImportLedgerComponentFactory(): FillWalletImportLedgerComponent.Factory
     fun selectLedgerImportComponentFactory(): SelectLedgerImportLedgerComponent.Factory
-    fun selectAddressImportLedgerComponentFactory(): SelectAddressImportLedgerComponent.Factory
+    fun selectAddressImportLedgerLegacyComponentFactory(): SelectAddressImportLedgerLegacyComponent.Factory
+    fun selectAddressImportLedgerGenericComponentFactory(): SelectAddressImportGenericLedgerComponent.Factory
     fun finishImportLedgerComponentFactory(): FinishImportLedgerComponent.Factory
 
     fun signLedgerComponentFactory(): SignLedgerComponent.Factory

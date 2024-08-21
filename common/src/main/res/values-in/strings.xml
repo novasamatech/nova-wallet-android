@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Jalur derivasi Anda mengandung simbol yang tidak didukung atau memiliki struktur yang salah</string>
     <string name="account_invalid_derivation_path_title">Jalur derivasi tidak valid</string>
     <string name="account_json_file">File JSON</string>
-    <string name="account_ledger_generic_import_start_step_1">Pastikan aplikasi Generic terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Buka aplikasi Generic</font> di perangkat Ledger Anda</string>
+    <string name="account_ledger_generic_import_start_step_1">Pastikan %s di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Aplikasi Polkadot sudah terinstal</string>
+    <string name="account_ledger_generic_import_start_step_2">%s di perangkat Ledger Anda</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Buka aplikasi Polkadot</string>
     <string name="account_ledger_import_fill_description">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live. Buka aplikasi jaringan di perangkat Ledger Anda.</string>
     <string name="account_ledger_import_fill_disabled_hint">Tambahkan setidaknya satu akun</string>
     <string name="account_ledger_import_fill_title">Tambahkan akun ke dompet Anda</string>
     <string name="account_ledger_import_start_guide">Panduan Koneksi Bluetooth Resmi Ledger</string>
-    <string name="account_ledger_import_start_step_1">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Buka aplikasi</font> pada perangkat Ledger Anda</string>
-    <string name="account_ledger_import_start_step_3">Izinkan Nova Wallet untuk mengakses Bluetooth dan Lokasi</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Pilih akun</font> untuk ditambahkan ke dompet</string>
+    <string name="account_ledger_import_start_step_1">Pastikan %s di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">aplikasi Network terpasang</string>
+    <string name="account_ledger_import_start_step_2">%s pada perangkat Ledger Anda</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Buka aplikasi jaringan</string>
+    <string name="account_ledger_import_start_step_3">Izinkan Nova Wallet untuk %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">akses Bluetooth dan Lokasi</string>
+    <string name="account_ledger_import_start_step_4">%s untuk ditambahkan ke dompet</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Pilih akun</string>
     <string name="account_ledger_import_start_title">Hubungkan Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Untuk menandatangani operasi dan memigrasikan akun Anda ke aplikasi Ledger Generik yang baru, instal dan buka aplikasi Migrasi. Aplikasi Ledger Lama dan Ledger Migrasi tidak akan didukung di masa depan.</string>
     <string name="account_ledger_legacy_warning_title">Aplikasi Ledger Baru Telah Dirilis</string>
@@ -83,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Aplikasi Migrasi akan tidak tersedia dalam waktu dekat. Gunakan untuk memigrasikan akun Anda ke aplikasi Ledger baru untuk menghindari kehilangan dana Anda.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Aplikasi Generik)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (aplikasi Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Harap, aktifkan Bluetooth dalam pengaturan ponsel Anda dan perangkat Ledger. Buka perangkat Ledger Anda dan buka aplikasi %s.</string>
     <string name="account_ledger_select_device_title">Pilih Perangkat Ledger Anda</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Berikut adalah akun Anda</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Kode QR tidak valid, pastikan Anda memindai kode QR dari %s</string>
     <string name="account_parity_signer_import_start_select_top">Pastikan untuk memilih yang paling atas</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer akan memberikan Anda kode QR untuk dipindai</string>
+    <string name="account_parity_signer_import_start_step_1">Aplikasi %s di smartphone Anda</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">buka Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s yang ingin Anda tambahkan ke Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Pergi ke tab Keys. Pilih seed, kemudian akun</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer akan menyediakan Anda %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">kode QR untuk dipindai</string>
     <string name="account_parity_signer_import_start_title">Tambahkan dompet dari %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s tidak mendukung penandatanganan pesan sembarangan — hanya transaksi</string>
     <string name="account_parity_signer_not_supported_title">Penandatanganan tidak didukung</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Tanda tangani dengan %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Perhatikan, nama jalur derivasi harus kosong</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Buka aplikasi Polkadot Vault</font> di ponsel cerdas Anda</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Buka tab “Kumpulan Kunci”.</font> Pilih kumpulan Kunci Anda, Jaringan, lalu akun yang ingin Anda tambahkan ke Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault akan memberikan Anda kode QR untuk dipindai</string>
+    <string name="account_polkadot_vault_import_start_step_1">Aplikasi %s di smartphone Anda</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Buka Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Pilih kumpulan Kunci Anda, Jaringan, lalu akun yang ingin Anda tambahkan ke Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Pergi ke tab \'Key Sets\'.</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault akan memberikan Anda %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">kode QR untuk dipindai</string>
     <string name="account_private_key">Kunci privat</string>
     <string name="account_proxieds">Didelegasikan kepada Anda (Proxieds)</string>
     <string name="account_proxy_type_any">Sembarang</string>

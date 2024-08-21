@@ -37,6 +37,7 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
     implementation project(':feature-swap-api')
+    implementation project(":feature-swap-core")
     implementation project(':feature-currency-api')
     implementation project(':feature-buy-api')
 

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.presentation.confirmation.paylo
 
 import io.novafoundation.nova.common.utils.asPercent
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
+import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel

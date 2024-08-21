@@ -10,13 +10,11 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toGenericParcel
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 
 class SelectLedgerGenericImportViewModel(
-    private val substrateApplication: GenericSubstrateLedgerApplication,
     private val router: LedgerRouter,
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
@@ -37,12 +35,13 @@ class SelectLedgerGenericImportViewModel(
     override suspend fun verifyConnection(device: LedgerDevice) {
         ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
 
-        val universalAccount = substrateApplication.getUniversalAccount(device, confirmAddress = false)
-        val payload = PreviewImportGenericLedgerPayload(
-            account = universalAccount.toGenericParcel(),
-            deviceId = device.id
+        val payload = SelectLedgerAddressPayload(
+            deviceId = device.id,
+            chainId = getPreviewBalanceChainId()
         )
 
-        router.openPreviewLedgerAccountsGeneric(payload)
+        router.openSelectAddressGenericLedger(payload)
     }
+
+    private fun getPreviewBalanceChainId() = ChainGeneses.POLKADOT
 }

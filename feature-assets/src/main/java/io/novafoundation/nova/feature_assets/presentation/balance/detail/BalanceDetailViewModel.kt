@@ -144,6 +144,8 @@ class BalanceDetailViewModel(
 
     fun sync() {
         launch {
+            swapAvailabilityInteractor.sync(viewModelScope)
+
             val currency = currencyInteractor.getSelectedCurrency()
             val deferredAssetSync = async { walletInteractor.syncAssetsRates(currency) }
             val deferredTransactionsSync = async { transactionHistoryMixin.syncFirstOperationsPage() }

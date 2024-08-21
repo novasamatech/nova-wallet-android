@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -30,12 +31,15 @@ import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -116,6 +120,8 @@ interface WalletFeatureDependencies {
 
     fun extrinsicService(): ExtrinsicService
 
+    fun extrinsicServiceFactory(): ExtrinsicService.Factory
+
     fun imageLoader(): ImageLoader
 
     fun selectedAccountUseCase(): SelectedAccountUseCase
@@ -125,6 +131,8 @@ interface WalletFeatureDependencies {
     fun eventsRepository(): EventsRepository
 
     fun coinPriceDao(): CoinPriceDao
+
+    fun hydraDxAssetIdConverter(): HydraDxAssetIdConverter
 
     val fileCache: FileCache
 
@@ -147,4 +155,10 @@ interface WalletFeatureDependencies {
     val extrinsicWalk: ExtrinsicWalk
 
     val holdsDao: HoldsDao
+
+    val feePaymentProviderRegistry: FeePaymentProviderRegistry
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val customFeeCapabilityFacade: CustomFeeCapabilityFacade
 }

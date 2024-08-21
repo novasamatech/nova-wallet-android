@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -39,7 +40,7 @@ import kotlinx.coroutines.withContext
 
 abstract class SelectAddressLedgerViewModel(
     private val router: LedgerRouter,
-    private val interactor: SelectAddressLedgerInteractor,
+    protected val interactor: SelectAddressLedgerInteractor,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,
@@ -49,7 +50,11 @@ abstract class SelectAddressLedgerViewModel(
     LedgerMessageCommands,
     Browserable.Presentation by Browserable() {
 
+    abstract val ledgerVariant: LedgerVariant
+
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
+
+    protected open val needToVerifyAccount = true
 
     private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
@@ -93,32 +98,40 @@ abstract class SelectAddressLedgerViewModel(
     }
 
     fun accountClicked(accountUi: AccountUi) {
-        verifyAccount(accountUi.id)
+        verifyAccount(accountUi.id.toInt())
     }
 
-    private fun verifyAccount(id: Long) {
+    protected fun verifyAccount(id: Int) {
         verifyAddressJob?.cancel()
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id.toInt() }
 
-            ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
-                resourceManager = resourceManager,
-                address = account.account.address,
-                deviceName = device.first().name,
-                onCancel = ::verifyAddressCancelled,
-            ).event()
-
-            val result = withContext(Dispatchers.Default) {
-                interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
-            }
-
-            result.onFailure {
-                handleLedgerError(it) { verifyAccount(id) }
-            }.onSuccess {
-                ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
-
+            if (needToVerifyAccount) {
+                verifyAccountInternal(account)
+            } else {
                 onAccountVerified(account)
             }
+        }
+    }
+
+    private suspend fun verifyAccountInternal(account: LedgerAccountWithBalance) {
+        ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
+            resourceManager = resourceManager,
+            address = account.account.address,
+            deviceName = device.first().name,
+            onCancel = ::verifyAddressCancelled,
+        ).event()
+
+        val result = withContext(Dispatchers.Default) {
+            interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index, ledgerVariant)
+        }
+
+        result.onFailure {
+            handleLedgerError(it) { verifyAccount(account.index) }
+        }.onSuccess {
+            ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+
+            onAccountVerified(account)
         }
     }
 
@@ -139,7 +152,7 @@ abstract class SelectAddressLedgerViewModel(
             loadingAccount.withFlagSet {
                 val nextAccountIndex = loadedAccounts.value.size
 
-                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex)
+                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex, ledgerVariant)
                     .onSuccess {
                         loadedAccounts.value = loadedAccounts.value.added(it)
                     }.onFailure {

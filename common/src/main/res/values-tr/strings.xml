@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Türetme yolu desteklenmeyen semboller içeriyor ya da yanlış yapıda</string>
     <string name="account_invalid_derivation_path_title">Geçersiz türetme yolu</string>
     <string name="account_json_file">JSON dosyası</string>
-    <string name="account_ledger_generic_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınıza <font color="#FFFFFF">Generic uygulamanın yüklü</font> olduğundan emin olun</string>
-    <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda <font color="#FFFFFF">Generic uygulamayı</font> açın</string>
+    <string name="account_ledger_generic_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınıza %s olduğundan emin olun</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot uygulamanın yüklü</string>
+    <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda %s açın</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Polkadot uygulamasını açın</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
     <string name="account_ledger_import_start_guide">Ledger’ın resmi Bluetooth Bağlantı Kılavuzu</string>
-    <string name="account_ledger_import_start_step_1">Network uygulamasının Ledger cihazınıza Ledger Live uygulaması kullanılarak kurulduğundan <font color="#FFFFFF">emin olun</font></string>
-    <string name="account_ledger_import_start_step_2">Ledger cihazınızda <font color="#FFFFFF">ağ uygulamasını açın</font></string>
-    <string name="account_ledger_import_start_step_3">Nova Cüzdan\'ın <font color="#FFFFFF">Bluetooth ve Konum\'a erişimini</font> izin verin</string>
-    <string name="account_ledger_import_start_step_4">Cüzdana eklenecek <font color="#FFFFFF">Hesabı seçin</font></string>
+    <string name="account_ledger_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınızda %s olduğundan emin olun</string>
+    <string name="account_ledger_import_start_step_1_highlighted">ağ uygulaması yüklendi</string>
+    <string name="account_ledger_import_start_step_2">Ledger cihazınızda %s</string>
+    <string name="account_ledger_import_start_step_2_highlighted">ağ uygulamasını açın</string>
+    <string name="account_ledger_import_start_step_3">Nova Cüzdan\'ın %s izin verin</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth ve Konum\'a erişimini</string>
+    <string name="account_ledger_import_start_step_4">Cüzdana eklenecek %s</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Hesabı seçin</string>
     <string name="account_ledger_import_start_title">Ledger Nano X’i bağlayın</string>
     <string name="account_ledger_legacy_warning_message">İşlemleri imzalamak ve hesaplarınızı yeni Generic Ledger uygulamasına taşımak için Migration uygulamasını yükleyin ve açın. Eski Legacy ve Migration Ledger uygulamaları gelecekte desteklenmeyecektir.</string>
     <string name="account_ledger_legacy_warning_title">Yeni Ledger uygulaması yayımlandı</string>
@@ -83,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Genel Uygulama)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot uygulaması)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Eski)</string>
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">İşte hesaplarınız</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Geçersiz QR kodu, lütfen %s\'ten QR kodu taradığınızdan emin olun</string>
     <string name="account_parity_signer_import_start_select_top">En üstte olanı seçtiğinizden emin olun</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">“Tuşlar” sekmesine gidin. Nova Cüzdan\'a eklemek istediğiniz tohumu ve ardından hesabı</font> seçin</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer, size <font color="#FFFFFF">taramak için QR kodu</font> sağlayacak</string>
+    <string name="account_parity_signer_import_start_step_1">%s uygulamasını açın</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Parity Signer\'ı açın</string>
+    <string name="account_parity_signer_import_start_step_2">%s Nova Cüzdan\'a eklemek istediğiniz hesabı seçin</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">‘Anahtarlar’ sekmesine gidin. Seed seçin, ardından hesap seçin</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer size %s sağlayacak</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">taramak için QR kodu</string>
     <string name="account_parity_signer_import_start_title">%s\'tan cüzdan ekle</string>
     <string name="account_parity_signer_not_supported_subtitle">%s, rasgele mesajların imzalanmasını desteklemez - yalnızca işlemler</string>
     <string name="account_parity_signer_not_supported_title">İmza desteklenmiyor</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">%s ile imzala</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Dikkat edin, türev yol adı boş olmalıdır</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Akıllı telefonunuzda Polkadot Vault</font> uygulamasını açın</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">“Anahtar Setleri” sekmesine gidin.</font> Anahtar setinizi, Ağınızı ve ardından Nova Wallet\'a eklemek istediğiniz hesabı seçin.</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size <font color="#FFFFFF">taramak için QR kodu sağlayacak</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">%s uygulamasını açın</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Polkadot Vault\'u açın</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Anahtar setinizi, Ağınızı ve ardından Nova Wallet\'a eklemek istediğiniz hesabı seçin.</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">‘Key Sets’ sekmesine gidin.</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">taramak için QR kodu</string>
     <string name="account_private_key">Özel anahtar</string>
     <string name="account_proxieds">Size Delege Edilenler (Proksi)</string>
     <string name="account_proxy_type_any">Herhangi</string>

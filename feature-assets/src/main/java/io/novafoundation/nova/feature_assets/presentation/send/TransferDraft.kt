@@ -9,6 +9,7 @@ import java.math.BigDecimal
 class TransferDraft(
     val amount: BigDecimal,
     val origin: AssetPayload,
+    val commission: AssetPayload,
     val destination: AssetPayload,
     val recipientAddress: String,
     val openAssetDetailsOnCompletion: Boolean,

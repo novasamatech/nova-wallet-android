@@ -132,6 +132,7 @@ class CustomChainFactory(
             supportProxy = prefilledChain?.supportProxy.orFalse(),
             governance = prefilledChain?.governance.orEmpty(),
             swap = prefilledChain?.swap.orEmpty(),
+            customFee = prefilledChain?.customFee.orEmpty(),
             connectionState = Chain.ConnectionState.FULL_SYNC,
             additional = prefilledChain?.additional,
         )

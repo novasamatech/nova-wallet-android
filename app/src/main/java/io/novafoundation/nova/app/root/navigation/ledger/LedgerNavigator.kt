@@ -54,8 +54,12 @@ class LedgerNavigator(
 
     override fun openSelectLedgerGeneric() = performNavigation(R.id.action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment)
 
+    override fun openSelectAddressGenericLedger(payload: SelectLedgerAddressPayload) = performNavigation(
+        actionId = R.id.action_selectLedgerGenericImportFragment_to_selectAddressImportGenericLedgerFragment,
+        args = SelectAddressLedgerFragment.getBundle(payload)
+    )
     override fun openPreviewLedgerAccountsGeneric(payload: PreviewImportGenericLedgerPayload) = performNavigation(
-        actionId = R.id.action_selectLedgerGenericImportFragment_to_previewImportGenericLedgerFragment,
+        actionId = R.id.action_selectAddressImportGenericLedgerFragment_to_previewImportGenericLedgerFragment,
         args = PreviewImportGenericLedgerFragment.getBundle(payload)
     )
 
