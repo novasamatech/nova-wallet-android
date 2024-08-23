@@ -82,10 +82,10 @@ class MercurioCardWebViewController(
                         fiatCurrency: 'EUR',
                         paymentMethod: 'fiat_card_open',
                         width: '100%',
+                        height: window.innerHeight,
                         hideRefundAddress: true,
                         refundAddress: '12gkMmfdKq7aEnAXwb2NSxh9vLqKifoCaoafLrR6E6swZRmc',
                         fixPaymentMethod: true,
-                        height: window.innerHeight,
                         showSpendCardDetails: true,
                         onStatusChange: data => {
                             console.log('onStatusChange:', data);
