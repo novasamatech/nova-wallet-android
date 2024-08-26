@@ -25,7 +25,7 @@ android {
             keyAlias readRawSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
             keyPassword readRawSecretOrNull('CI_KEYSTORE_KEY_PASS')
         }
-        debug {
+        debugFixedKey {
             storeFile file('develop_key.jks')
             storePassword readRawSecretOrNull('CI_KEYSTORE_PASS')
             keyAlias readRawSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
@@ -46,10 +46,17 @@ android {
     }
     buildTypes {
         debug {
+            signingConfig signingConfigs.debugFixedKey
+
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
 
             buildConfigField "String", "BuildType", "\"debug\""
+        }
+        debugLocal {
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
+            signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false
