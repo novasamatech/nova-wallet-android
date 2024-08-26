@@ -224,6 +224,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_topUpCard"
+        app:destination="@id/topUpCardFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_pushNotificationsWelcome"
         app:destination="@id/pushNotificationsWelcomeFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -949,6 +957,12 @@
             app:popUpTo="@id/mainFragment" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/topUpCardFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment"
+        android:label="fragment_top_up"
+        tools:layout="@layout/fragment_push_welcome" />
 
     <fragment
         android:id="@+id/selectGovernanceTracks"

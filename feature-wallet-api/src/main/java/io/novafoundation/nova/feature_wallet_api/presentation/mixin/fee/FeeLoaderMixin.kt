@@ -235,6 +235,23 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
         .launchIn(scope)
 }
 
+fun <I, F : GenericFee> GenericFeeLoaderMixin.Presentation<F>.connectGenericWith(
+    inputSource: Flow<I>,
+    scope: CoroutineScope,
+    feeConstructor: suspend Token.(input: I) -> F,
+    onRetryCancelled: () -> Unit = {}
+) {
+    inputSource.onEach { input ->
+        this.loadFeeSuspending(
+            retryScope = scope,
+            feeConstructor = { token -> token.feeConstructor(input) },
+            onRetryCancelled = onRetryCancelled
+        )
+    }
+        .inBackground()
+        .launchIn(scope)
+}
+
 fun ChangeFeeTokenState.isEditable() = this is ChangeFeeTokenState.Editable
 
 suspend fun GenericFeeLoaderMixin.Presentation<*>.commissionAsset(): Asset {

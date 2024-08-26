@@ -74,16 +74,20 @@ class SendInteractor(
             val crossChainFeeModel = crossChainWeigher.estimateFee(amount, config)
 
             val deliveryPartFee = getDeliveryFee(transfer.originChain, crossChainFeeModel.senderPart, transfer.senderAccountId())
-            val originFeeWithSenderPart = OriginFee(originFee, deliveryPartFee, transfer.commissionAssetToken.configuration)
+            val originFeeWithSenderPart = OriginFee(originFee, deliveryPartFee)
 
             TransferFeeModel(originFeeWithSenderPart, crossChainFeeModel.toSubstrateFee(transfer))
         } else {
-            val nativeFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
             TransferFeeModel(
-                OriginFee(nativeFee, null, transfer.commissionAssetToken.configuration),
+                getOriginFee(transfer, coroutineScope),
                 null
             )
         }
+    }
+
+    suspend fun getOriginFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): OriginFee = withContext(Dispatchers.Default) {
+        val networkFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
+        OriginFee(networkFee, null)
     }
 
     suspend fun performTransfer(

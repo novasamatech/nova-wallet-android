@@ -25,13 +25,24 @@ class GenericDecimalFee<F : GenericFee>(
     val networkFee: Fee = genericFee.networkFee
 
     companion object {
+
+        @Deprecated("Use from(genericFee: F) instead")
         fun <F : GenericFee> from(genericFee: F, chainAsset: Chain.Asset): GenericDecimalFee<F> {
             val decimalAmount = chainAsset.amountFromPlanks(genericFee.networkFee.amount)
             return GenericDecimalFee(genericFee, decimalAmount)
         }
 
+        fun <F : GenericFee> from(genericFee: F): GenericDecimalFee<F> {
+            return from(genericFee, genericFee.networkFee.asset)
+        }
+
+        @Deprecated("Use from(fee: Fee) instead")
         fun from(fee: Fee, chainAsset: Chain.Asset): GenericDecimalFee<GenericFee> {
             return from(SimpleFee(fee), chainAsset)
+        }
+
+        fun from(fee: Fee): GenericDecimalFee<GenericFee> {
+            return from(SimpleFee(fee), fee.asset)
         }
     }
 }

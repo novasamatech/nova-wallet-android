@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGrou
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency

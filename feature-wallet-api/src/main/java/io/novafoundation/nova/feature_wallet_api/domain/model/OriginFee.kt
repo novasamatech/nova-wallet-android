@@ -15,8 +15,7 @@ typealias OriginDecimalFee = GenericDecimalFee<OriginGenericFee>
 
 data class OriginFee(
     val networkFee: Fee,
-    val deliveryPart: Fee?,
-    val chainAsset: Chain.Asset
+    val deliveryPart: Fee?
 ) : Fee {
 
     override val amount: BigInteger = networkFee.amount + deliveryPart?.amount.orZero()
@@ -27,12 +26,12 @@ data class OriginFee(
 }
 
 fun OriginDecimalFee.networkFeePart(): GenericDecimalFee<GenericFee> {
-    return GenericDecimalFee.from(genericFee.networkFee.networkFee, genericFee.networkFee.chainAsset)
+    return GenericDecimalFee.from(genericFee.networkFee.networkFee, genericFee.networkFee.asset)
 }
 
 fun OriginDecimalFee.deliveryFeePart(): GenericDecimalFee<GenericFee>? {
     return genericFee.networkFee.deliveryPart?.let {
-        GenericDecimalFee.from(genericFee.networkFee.deliveryPart, genericFee.networkFee.chainAsset)
+        GenericDecimalFee.from(genericFee.networkFee.deliveryPart, genericFee.networkFee.asset)
     }
 }
 
