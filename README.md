@@ -23,7 +23,7 @@ Instal NDK version `26.1.10909125` from SDK Manager by going to Tools -> SDK Mma
 
 #### Instal Rust
 
-Install Rust by following [official instruction]([url](https://www.rust-lang.org/tools/install)). Use "Using rustup" option
+Install Rust by following [official instruction](https://www.rust-lang.org/tools/install). Use "Using rustup" option
 
 Run the following commands to add Android build targets to rustup:
 
