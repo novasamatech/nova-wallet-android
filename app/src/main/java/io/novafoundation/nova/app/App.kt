@@ -3,6 +3,7 @@ package io.novafoundation.nova.app
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
+import android.webkit.WebView
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.android.relay.ConnectionType
@@ -45,6 +46,7 @@ open class App : Application(), FeatureContainer {
 
     override fun onCreate() {
         super.onCreate()
+        WebView.setWebContentsDebuggingEnabled(true)
         val contextManger = ContextManager.getInstanceOrInit(this, languagesHolder)
 
         appComponent = io.novafoundation.nova.app.di.app.DaggerAppComponent
