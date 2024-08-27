@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setAddress
 import io.novafoundation.nova.feature_assets.R
@@ -49,14 +48,11 @@ class TopUpCardViewModel(
     private val payload: TopUpCardPayload,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    private val externalActions: ExternalActions.Presentation,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     addressInputMixinFactory: AddressInputMixinFactory,
-) : BaseViewModel(),
-    Validatable by validationExecutor,
-    ExternalActions by externalActions {
+) : BaseViewModel(), Validatable by validationExecutor {
 
     private val chainWithAssetFlow = flowOf { chainRegistry.chainWithAsset(payload.asset.chainId, payload.asset.chainAssetId) }
 

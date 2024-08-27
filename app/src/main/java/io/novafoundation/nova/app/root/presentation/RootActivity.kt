@@ -2,7 +2,6 @@ package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import io.novafoundation.nova.app.R
@@ -18,11 +17,10 @@ import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewController
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.activity_root.mainView
-import kotlinx.android.synthetic.main.activity_root.webView
 
 class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
@@ -35,7 +33,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     @Inject
     lateinit var contextManager: ContextManager
 
-    var controller: MercurioCardWebViewController? = null
+    var controller: NovaCardWebViewController? = null
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
@@ -73,12 +71,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
         viewModel.applySafeModeIfEnabled()
 //        processJsonOpenIntent()
-
-        mainView.setOnLongClickListener {
-            webView.isVisible = true
-            controller = MercurioCardWebViewController(webView, systemCallExecutor, viewModel)
-            true
-        }
     }
 
     override fun onDestroy() {

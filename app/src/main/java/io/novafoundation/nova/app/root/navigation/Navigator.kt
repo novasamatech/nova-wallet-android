@@ -398,6 +398,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_swapSetupAmount, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
     }
 
+    override fun openNovaCard() {
+        navController?.navigate(R.id.action_open_novaCard)
+    }
+
     override fun openTopUpCard(payload: TopUpCardPayload) {
         navController?.navigate(R.id.action_open_topUpCard, TopUpCardFragment.getBundle(payload))
     }

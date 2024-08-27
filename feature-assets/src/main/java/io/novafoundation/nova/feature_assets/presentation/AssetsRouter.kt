@@ -73,6 +73,8 @@ interface AssetsRouter {
 
     fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
+    fun openNovaCard()
+
     fun openTopUpCard(payload: TopUpCardPayload)
 
     fun openStaking()

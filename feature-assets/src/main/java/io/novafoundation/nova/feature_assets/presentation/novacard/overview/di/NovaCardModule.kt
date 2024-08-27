@@ -3,59 +3,56 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.overview.di
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
-import io.novafoundation.nova.feature_assets.domain.WalletInteractor
-import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
+import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class NovaCardModule {
 
     @Provides
+    fun provideNovaCardWebViewControllerFactory(
+        systemCallExecutor: SystemCallExecutor,
+        permissionsAskerFactory: PermissionsAskerFactory,
+        appLinksProvider: AppLinksProvider,
+        fileProvider: FileProvider,
+        gson: Gson
+    ): NovaCardWebViewControllerFactory {
+        return NovaCardWebViewControllerFactory(
+            systemCallExecutor,
+            fileProvider,
+            permissionsAskerFactory,
+            appLinksProvider,
+            gson,
+            BuildConfig.NOVA_CARD_WIDGET_ID
+        )
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(NovaCardViewModel::class)
     fun provideViewModel(
         chainRegistry: ChainRegistry,
-        interactor: WalletInteractor,
-        sendInteractor: SendInteractor,
-        router: AssetsRouter,
-        payload: TopUpCardPayload,
-        validationExecutor: ValidationExecutor,
-        resourceManager: ResourceManager,
-        externalActions: ExternalActions.Presentation,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        selectedAccountUseCase: SelectedAccountUseCase,
-        addressInputMixinFactory: AddressInputMixinFactory,
-        amountChooserMixinFactory: AmountChooserMixin.Factory
+        accountInteractor: AccountInteractor,
+        assetsRouter: AssetsRouter
     ): ViewModel {
         return NovaCardViewModel(
             chainRegistry = chainRegistry,
-            interactor = interactor,
-            sendInteractor = sendInteractor,
-            router = router,
-            payload = payload,
-            validationExecutor = validationExecutor,
-            resourceManager = resourceManager,
-            externalActions = externalActions,
-            feeLoaderMixinFactory = feeLoaderMixinFactory,
-            selectedAccountUseCase = selectedAccountUseCase,
-            addressInputMixinFactory = addressInputMixinFactory,
-            amountChooserMixinFactory = amountChooserMixinFactory,
+            accountInteractor = accountInteractor,
+            assetsRouter = assetsRouter
         )
     }
 

@@ -42,6 +42,8 @@ android {
         buildConfigField "String", "LEDGER_BLEUTOOTH_GUIDE", "\"https://support.ledger.com/hc/en-us/articles/360019138694-Set-up-Bluetooth-connection\""
 
         buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://play.google.com/store/apps/details?id=io.novafoundation.nova.market\""
+
+        buildConfigField "String", "NOVA_CARD_WIDGET_URL", "\"https://exchange.mercuryo.io\""
     }
 
     buildTypes {

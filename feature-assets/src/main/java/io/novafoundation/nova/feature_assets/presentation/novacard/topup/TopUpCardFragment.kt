@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.topup
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -39,6 +39,8 @@ class TopUpCardFragment : BaseFragment<TopUpCardViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_top_up_card, container, false)
 
     override fun initViews() {
+        requireView().findViewById<View>(R.id.topUpCardToolbar)
+
         topUpCardContainer.applyStatusBarInsets(false)
 
         topUpCardToolbar.setHomeButtonListener { viewModel.backClicked() }
@@ -58,7 +60,6 @@ class TopUpCardFragment : BaseFragment<TopUpCardViewModel>() {
     }
 
     override fun subscribe(viewModel: TopUpCardViewModel) {
-        setupExternalActions(viewModel)
         observeValidations(viewModel)
         setupFeeLoading(viewModel.feeMixin, topUpCardFee)
         setupAmountChooser(viewModel.amountChooserMixin, topUpCardAmount)

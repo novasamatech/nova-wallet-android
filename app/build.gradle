@@ -265,8 +265,6 @@ dependencies {
     implementation navigationFragmentDep
     implementation navigationUiDep
 
-    implementation browser
-
     implementation roomDep
 
     implementation substrateSdkDep

@@ -92,8 +92,6 @@ buildscript {
         googleApiClientVersion = "1.32.1"
         googleDriveVersion = "v3-rev20210919-1.32.1"
 
-        browserVersion = "1.2.0"
-
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
             exclude group: "androidx.fragment", module: "fragment-ktx"
@@ -215,8 +213,6 @@ buildscript {
         firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-
-        browser = "androidx.browser:browser:$browserVersion"
     }
 
     repositories {
