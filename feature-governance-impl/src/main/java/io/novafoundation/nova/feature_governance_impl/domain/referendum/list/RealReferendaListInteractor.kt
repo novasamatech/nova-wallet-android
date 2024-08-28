@@ -122,13 +122,24 @@ class RealReferendaListInteractor(
 
                     val filteredReferenda = referendaState.referenda.applyFilter(referendumFilter)
 
+                    val availableToVoteReferenda = filterAvailableToVoteReferenda(referendaState.referenda, trackLocks.keys)
+
                     ReferendaListState(
                         groupedReferenda = sortReferendaPreviews(filteredReferenda),
+                        availableToVoteReferenda = availableToVoteReferenda,
                         locksOverview = locksOverview,
                         delegated = determineDelegatedState(referendaState.voting, delegationSupported),
                     )
                 }
             }
+        }
+    }
+
+    private fun filterAvailableToVoteReferenda(referenda: List<ReferendumPreview>, delegatedTracks: Set<TrackId>): List<ReferendumPreview> {
+        return referenda.filter {
+            it.status is ReferendumStatus.Ongoing
+                && it.referendumVote == null
+                && it.track?.track?.id !in delegatedTracks
         }
     }
 
