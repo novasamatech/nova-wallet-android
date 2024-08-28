@@ -504,3 +504,7 @@ fun Chain.Explorer.normalizedUrl(): String? {
     val url = listOfNotNull(extrinsic, account, event).firstOrNull()
     return url?.let { Urls.normalizeUrl(it) }
 }
+
+fun Chain.hasReferendaSummaryApi(): Boolean {
+    return externalApi<Chain.ExternalApi.ReferendumSummary>() != null
+}

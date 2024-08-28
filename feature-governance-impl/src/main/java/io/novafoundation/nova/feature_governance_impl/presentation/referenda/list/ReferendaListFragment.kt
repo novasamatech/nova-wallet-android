@@ -62,6 +62,10 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
             referendaHeaderAdapter.setDelegations(it.dataOrNull)
         }
 
+        viewModel.tinderGovBanner.observeWhenVisible {
+            referendaHeaderAdapter.setTinderGovBanner(it)
+        }
+
         viewModel.referendaFilterIcon.observeWhenVisible {
             referendaHeaderAdapter.setFilterIcon(it)
         }

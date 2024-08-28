@@ -134,7 +134,7 @@ class CustomChainFactory(
             swap = prefilledChain?.swap.orEmpty(),
             customFee = prefilledChain?.customFee.orEmpty(),
             connectionState = Chain.ConnectionState.FULL_SYNC,
-            additional = prefilledChain?.additional,
+            additional = prefilledChain?.additional
         )
     }
 
