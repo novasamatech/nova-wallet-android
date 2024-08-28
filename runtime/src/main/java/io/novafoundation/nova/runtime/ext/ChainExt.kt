@@ -496,10 +496,6 @@ fun StatemineAssetId.onChainAssetId(): String {
     }
 }
 
-fun Chain.supportOpenGov(): Boolean {
-    return Chain.Governance.V2 in governance
-}
-
 fun Chain.openGovIfSupported(): Chain.Governance? {
     return Chain.Governance.V2.takeIf { it in governance }
 }

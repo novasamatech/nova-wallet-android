@@ -122,7 +122,6 @@ class NovaChipView @JvmOverloads constructor(
         val backgroundTintColor = typedArray.getResourceId(R.styleable.NovaChipView_backgroundColor, R.color.chips_background)
         setChipBackground(backgroundTintColor)
 
-
         val text = typedArray.getString(R.styleable.NovaChipView_android_text)
         setText(text)
 
@@ -226,7 +225,6 @@ class NovaChipView @JvmOverloads constructor(
         chipText.setTextOrHide(text)
         invalidateDrawablePadding()
     }
-
 
     fun setTextAllCaps(value: Boolean) {
         chipText.isAllCaps = value

@@ -137,9 +137,9 @@ class RealReferendaListInteractor(
 
     private fun filterAvailableToVoteReferenda(referenda: List<ReferendumPreview>, delegatedTracks: Set<TrackId>): List<ReferendumPreview> {
         return referenda.filter {
-            it.status is ReferendumStatus.Ongoing
-                && it.referendumVote == null
-                && it.track?.track?.id !in delegatedTracks
+            it.status is ReferendumStatus.Ongoing &&
+                it.referendumVote == null &&
+                it.track?.track?.id !in delegatedTracks
         }
     }
 
