@@ -15,8 +15,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
-import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
 
 class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(), ReferendaListHeaderAdapter.Handler {
 
@@ -95,5 +95,9 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
 
     override fun onClickReferendaFilters() {
         viewModel.filtersClicked()
+    }
+
+    override fun onTinderGovBannerClicked() {
+        viewModel.openTinderGovCards()
     }
 }

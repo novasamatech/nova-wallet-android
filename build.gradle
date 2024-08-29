@@ -213,6 +213,8 @@ buildscript {
         firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+        cardStackView = 'com.github.yuyakaido:cardstackview:2.3.4'
     }
 
     repositories {

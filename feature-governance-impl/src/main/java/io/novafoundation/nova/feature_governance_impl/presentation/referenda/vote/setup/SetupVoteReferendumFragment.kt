@@ -20,16 +20,14 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.setChips
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAbstain
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAlertView
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAmount
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAmountChipsContainer
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAmountChipsScroll
-import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteAye
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteContainer
+import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteControlView
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteLockedAmountChanges
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteLockedPeriodChanges
-import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteNay
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteTitle
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteToolbar
 import kotlinx.android.synthetic.main.fragment_setup_vote_referendum.setupReferendumVoteVotePower
@@ -57,13 +55,13 @@ class SetupVoteReferendumFragment : BaseFragment<SetupVoteReferendumViewModel>()
         setupReferendumVoteToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        setupReferendumVoteAye.prepareForProgress(viewLifecycleOwner)
-        setupReferendumVoteAbstain.prepareForProgress(viewLifecycleOwner)
-        setupReferendumVoteNay.prepareForProgress(viewLifecycleOwner)
+        setupReferendumVoteControlView.ayeButton.prepareForProgress(viewLifecycleOwner)
+        setupReferendumVoteControlView.abstainButton.prepareForProgress(viewLifecycleOwner)
+        setupReferendumVoteControlView.nayButton.prepareForProgress(viewLifecycleOwner)
 
-        setupReferendumVoteAye.setOnClickListener { viewModel.ayeClicked() }
-        setupReferendumVoteAbstain.setOnClickListener { viewModel.abstainClicked() }
-        setupReferendumVoteNay.setOnClickListener { viewModel.nayClicked() }
+        setupReferendumVoteControlView.setAyeClickListener { viewModel.ayeClicked() }
+        setupReferendumVoteControlView.setAbstainClickListener { viewModel.abstainClicked() }
+        setupReferendumVoteControlView.setNayClickListener { viewModel.nayClicked() }
     }
 
     override fun inject() {
@@ -96,9 +94,9 @@ class SetupVoteReferendumFragment : BaseFragment<SetupVoteReferendumViewModel>()
             setupReferendumVoteVotePower.votePowerVotesText.text = it
         }
 
-        viewModel.ayeButtonStateFlow.observe(setupReferendumVoteAye::setState)
-        viewModel.abstainButtonStateFlow.observe(setupReferendumVoteAbstain::setState)
-        viewModel.nayButtonStateFlow.observe(setupReferendumVoteNay::setState)
+        viewModel.ayeButtonStateFlow.observe(setupReferendumVoteControlView.ayeButton::setState)
+        viewModel.abstainButtonStateFlow.observe(setupReferendumVoteControlView.abstainButton::setState)
+        viewModel.nayButtonStateFlow.observe(setupReferendumVoteControlView.nayButton::setState)
 
         viewModel.abstainVotingSupported.observe {
             setupReferendumVoteAlertView.isVisible = it

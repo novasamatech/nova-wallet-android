@@ -79,4 +79,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openDelegateSearch()
 
     fun openSelectGovernanceTracks(bundle: Bundle)
+
+    fun openTinderGovCards()
 }

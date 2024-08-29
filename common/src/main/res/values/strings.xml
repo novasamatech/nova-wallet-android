@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="tinder_gov_card_empty_state_text">You have already voted for all available referenda or there are no referenda to vote right now. Come back later.</string>
     <string name="tinder_gov_title">TinderGov</string>
     <string name="referenda_tinder_gov_banner_subtitle">A new way to easily distribute\nyour votes across the Referenda</string>
     <string name="referenda_tindergov_banner_chip">%d referenda</string>

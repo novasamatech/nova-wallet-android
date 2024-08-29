@@ -122,6 +122,10 @@ class GovernanceNavigator(
         performNavigation(R.id.action_open_select_governance_tracks, args = bundle)
     }
 
+    override fun openTinderGovCards() {
+        performNavigation(R.id.action_openTinderGovCards)
+    }
+
     override fun openReferendaSearch() {
         performNavigation(R.id.action_open_referenda_search)
     }
