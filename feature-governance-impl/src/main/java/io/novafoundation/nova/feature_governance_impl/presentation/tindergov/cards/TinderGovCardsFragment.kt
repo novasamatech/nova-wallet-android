@@ -85,7 +85,6 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
     }
 
     override fun subscribe(viewModel: TinderGovCardsViewModel) {
-
     }
 
     private fun getScaleIntervalForPadding(desiredPadding: Int): Float {
