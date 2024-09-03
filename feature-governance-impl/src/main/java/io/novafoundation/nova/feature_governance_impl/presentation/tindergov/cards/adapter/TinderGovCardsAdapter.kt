@@ -7,15 +7,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.isLoadingOrError
-import io.novafoundation.nova.common.domain.orLoading
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.letOrHide
-import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter.Handler
 import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardAmountContainer

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.tinderg
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
@@ -22,7 +21,6 @@ import io.novafoundation.nova.runtime.state.selectedOption
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 class RealTinderGovInteractor(
@@ -54,7 +52,7 @@ class RealTinderGovInteractor(
     override suspend fun loadReferendumSummary(id: ReferendumId): String? {
         val chain = governanceSharedState.chain()
         val summaryApi = chain.summaryApiOrNull() ?: return null
-        return referendumSummaryDataSource.loadSummary(id, summaryApi.url)
+        return referendumSummaryDataSource.loadSummary(chain, id, summaryApi.url)
     }
 
     override suspend fun loadReferendumAmount(referendumPreview: ReferendumPreview): BigInteger? {

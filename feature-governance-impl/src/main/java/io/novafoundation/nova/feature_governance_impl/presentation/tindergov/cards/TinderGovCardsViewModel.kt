@@ -85,7 +85,7 @@ class TinderGovCardsViewModel(
                 val newReferenda = referenda.associateBy { it.id }
                     .filter { it.key !in currentReferendaIds }
 
-                sortedReferendaFlow.value += newReferenda.values
+                sortedReferendaFlow.value += newReferenda.values // To add new coming referenda to the end of list
             }
             .launchIn(this)
 

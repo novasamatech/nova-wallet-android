@@ -78,7 +78,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         viewModel.cardsFlow.observe { adapter.submitList(it) }
 
         viewModel.skipCardEvent.observeEvent {
-            swipeCardToDirection(Direction.Bottom, force = true)
+            swipeCardToDirection(Direction.Bottom, forced = true)
         }
 
         viewModel.isCardDraggingAvailable.observe { draggingAvailable ->
@@ -130,9 +130,9 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         }
     }
 
-    private fun swipeCardToDirection(direction: Direction, force: Boolean = false) {
+    private fun swipeCardToDirection(direction: Direction, forced: Boolean = false) {
         val layoutManager = tinderGovCardsStack.cardLayoutManager()
-        if (force || layoutManager.canScrollVertically() && layoutManager.canScrollHorizontally()) {
+        if (forced || layoutManager.canScrollVertically() && layoutManager.canScrollHorizontally()) {
             val setting = SwipeAnimationSetting.Builder()
                 .setDirection(direction)
                 .setDuration(Duration.Normal.duration)

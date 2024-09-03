@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.utils.search.SearchComparator
 import io.novafoundation.nova.common.utils.search.SearchFilter
 import io.novafoundation.nova.common.utils.applyFilter
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.search.filterWith
 import io.novafoundation.nova.common.utils.search.CachedPhraseSearch
@@ -33,7 +32,6 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.supportTinderGov
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.AccountId

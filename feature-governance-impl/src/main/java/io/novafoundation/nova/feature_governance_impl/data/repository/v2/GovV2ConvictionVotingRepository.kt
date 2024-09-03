@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
-import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.utils.convictionVoting
 import io.novafoundation.nova.common.utils.filterNotNull
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.sum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
@@ -80,17 +78,6 @@ class GovV2ConvictionVotingRepository(
         return remoteStorageSource.subscribe(chainAssetId.chainId) {
             runtime.metadata.convictionVoting().storage("ClassLocksFor").observe(accountId, binding = ::bindTrackLocks)
                 .map { it.toMap() }
-        }
-    }
-
-    override suspend fun observeVotingFor(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Voting>> {
-        return flowOf { emptyMap() }
-        return remoteStorageSource.subscribe(chainId) {
-            runtime.metadata.convictionVoting().storage("VotingFor").observeByPrefix(
-                accountId,
-                keyExtractor = { (_: AccountId, trackId: BigInteger) -> TrackId(trackId) },
-                binding = { decoded, _ -> bindVoting(decoded!!) }
-            )
         }
     }
 

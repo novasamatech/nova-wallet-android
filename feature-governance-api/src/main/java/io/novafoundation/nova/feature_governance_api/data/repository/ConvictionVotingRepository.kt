@@ -18,7 +18,6 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
-import kotlinx.coroutines.flow.map
 
 interface ConvictionVotingRepository {
 
@@ -29,8 +28,6 @@ interface ConvictionVotingRepository {
     suspend fun maxTrackVotes(chainId: ChainId): BigInteger
 
     fun trackLocksFlow(accountId: AccountId, chainAssetId: FullChainAssetId): Flow<Map<TrackId, Balance>>
-
-    suspend fun observeVotingFor(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Voting>>
 
     suspend fun votingFor(accountId: AccountId, chainId: ChainId): Map<TrackId, Voting>
 

@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.ExtendedLoadingState.*
+import io.novafoundation.nova.common.domain.ExtendedLoadingState.Loading
+import io.novafoundation.nova.common.domain.ExtendedLoadingState.Loaded
+import io.novafoundation.nova.common.domain.ExtendedLoadingState.Error
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -15,11 +17,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
