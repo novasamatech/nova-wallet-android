@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovern
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
@@ -64,6 +65,8 @@ interface ReferendaCommonRepository {
         selectedGovernanceOption: SupportedGovernanceOption,
         onlyRecentVotes: Boolean
     ): Flow<List<ReferendumPreview>>
+
+    fun filterAvailableToVoteReferenda(referenda: List<ReferendumPreview>, voting: Map<TrackId, Voting>): List<ReferendumPreview>
 }
 
 class RealReferendaCommonRepository(
@@ -144,6 +147,17 @@ class RealReferendaCommonRepository(
                 val sorting = referendaSortingProvider.getReferendumSorting()
                 referenda.onlyVoted().sortedWith(sorting)
             }
+        }
+    }
+
+    override fun filterAvailableToVoteReferenda(referenda: List<ReferendumPreview>, voting: Map<TrackId, Voting>): List<ReferendumPreview> {
+        val delegationTracks = voting.filterValues { it is Voting.Delegating }
+            .keys
+
+        return referenda.filter {
+            it.status is ReferendumStatus.Ongoing &&
+                it.referendumVote == null &&
+                it.track?.track?.id !in delegationTracks
         }
     }
 

@@ -505,6 +505,14 @@ fun Chain.Explorer.normalizedUrl(): String? {
     return url?.let { Urls.normalizeUrl(it) }
 }
 
+fun Chain.supportTinderGov(): Boolean {
+    return hasReferendaSummaryApi()
+}
+
 fun Chain.hasReferendaSummaryApi(): Boolean {
     return externalApi<Chain.ExternalApi.ReferendumSummary>() != null
+}
+
+fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
+    return externalApi<Chain.ExternalApi.ReferendumSummary>()
 }

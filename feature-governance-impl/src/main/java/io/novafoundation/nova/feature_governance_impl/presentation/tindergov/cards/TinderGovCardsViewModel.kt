@@ -1,29 +1,197 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.isError
+import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.domain.orLoading
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.orFalse
+import io.novafoundation.nova.common.utils.safeSubList
+import io.novafoundation.nova.common.utils.sendEvent
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class TinderGovCardsViewModel(
-    private val router: GovernanceRouter
+    private val router: GovernanceRouter,
+    private val tinderGovCardsDataHelper: TinderGovCardsDataHelper,
+    private val interactor: TinderGovInteractor,
+    private val referendumFormatter: ReferendumFormatter,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : BaseViewModel() {
+
+    private val cardsSummaryFlow = tinderGovCardsDataHelper.cardsSummaryFlow
+        .shareInBackground()
+
+    private val cardsAmountFlow = tinderGovCardsDataHelper.cardsAmountFlow
+        .shareInBackground()
+
+    private val topCardIndex = MutableStateFlow(0)
+    private val sortedReferendaFlow = MutableStateFlow(listOf<ReferendumPreview>())
+
+    val cardsFlow = combine(
+        sortedReferendaFlow,
+        cardsSummaryFlow,
+        cardsAmountFlow,
+        ::mapCards
+    )
+
+    val retryReferendumInfoLoadingAction = actionAwaitableMixinFactory.confirmingOrDenyingAction<Unit>()
+
+    private val _skipCardEvent = MutableLiveData<Event<Unit>>()
+    val skipCardEvent: LiveData<Event<Unit>> = _skipCardEvent
+
+    private val topReferendumWithDetails = combine(topCardIndex, cardsSummaryFlow, cardsAmountFlow) { topCardIndex, cardsSummary, cardsAmount ->
+        val referendum = sortedReferendaFlow.value.getOrNull(topCardIndex) ?: return@combine null
+        val cardSummary = cardsSummary[referendum.id]
+        val cardAmount = cardsAmount[referendum.id]
+
+        Triple(referendum, cardSummary, cardAmount)
+    }.filterNotNull()
+        .distinctUntilChangedBy { it.first.id to it.second to it.third }
+        .shareInBackground()
+
+    val isCardDraggingAvailable = topReferendumWithDetails
+        .map { (_, summary, amount) ->
+            val summaryLoaded = summary?.isLoaded().orFalse()
+            val amountLoaded = amount?.isLoaded().orFalse()
+            summaryLoaded && amountLoaded
+        }
+
+    init {
+        interactor.observeReferendaAvailableToVote(this)
+            .onEach { referenda ->
+                val currentReferendaIds = sortedReferendaFlow.value.map { it.id }.toSet()
+                val newReferenda = referenda.associateBy { it.id }
+                    .filter { it.key !in currentReferendaIds }
+
+                sortedReferendaFlow.value += newReferenda.values
+            }
+            .launchIn(this)
+
+        setupReferendumRetryAction()
+
+        tinderGovCardsDataHelper.init(this)
+    }
 
     fun back() {
         router.back()
     }
 
-    fun ayeClicked() {
-        showMessage("Not implemented yet")
-    }
+    fun ayeClicked(position: Int) = writeVote(position)
 
-    fun abstainClicked() {
-        showMessage("Not implemented yet")
-    }
+    fun abstainClicked(position: Int) = writeVote(position)
 
-    fun nayClicked() {
-        showMessage("Not implemented yet")
-    }
+    fun nayClicked(position: Int) = writeVote(position)
 
     fun openReadMore(item: TinderGovCardRvItem) {
         showMessage("Not implemented yet")
+    }
+
+    fun onCardOnTop(position: Int) {
+        topCardIndex.value = position
+    }
+
+    fun loadContentForCardByPosition(position: Int) {
+        // Get 3 first referenda to load content for
+        val referenda = sortedReferendaFlow.value.safeSubList(position, position + 3)
+
+        // Load summary and amount for each referendum
+        referenda.forEach {
+            tinderGovCardsDataHelper.loadSummary(it, this)
+            tinderGovCardsDataHelper.loadAmount(it, this)
+        }
+    }
+
+    private fun skipCard() {
+        _skipCardEvent.sendEvent()
+    }
+
+    private fun writeVote(position: Int) = launch {
+        cardsFlow.first()
+            .getOrNull(0)
+            ?.let { showMessage("Not implemented yet") }
+    }
+
+    private fun mapReferendumToUi(
+        referendumPreview: ReferendumPreview,
+        summary: ExtendedLoadingState<String?>?,
+        amount: ExtendedLoadingState<AmountModel?>?
+    ): TinderGovCardRvItem {
+        return TinderGovCardRvItem(
+            referendumPreview.id,
+            summary = summary?.map { mapSummaryToUi(it, referendumPreview) }.orLoading(),
+            requestedAmount = amount.orLoading(),
+            backgroundRes = R.drawable.ic_tinder_gov_entry_banner_background,
+        )
+    }
+
+    private fun mapSummaryToUi(summary: String?, referendumPreview: ReferendumPreview): String {
+        return summary ?: referendumFormatter.formatReferendumName(referendumPreview)
+    }
+
+    private fun setupReferendumRetryAction() {
+        topReferendumWithDetails
+            .map { (referendum, summary, amount) ->
+                val isLoadingError = summary?.isError().orFalse() || amount?.isError().orFalse()
+                referendum to isLoadingError
+            }
+            .distinctUntilChangedBy { (referendum, isLoadingError) -> referendum.id to isLoadingError }
+            .onEach { (referendum, isLoadingError) ->
+                if (isLoadingError) {
+                    showRetryDialog(referendum)
+                }
+            }.launchIn(this)
+    }
+
+    private suspend fun showRetryDialog(referendum: ReferendumPreview) {
+        val retryConfirmed = retryReferendumInfoLoadingAction.awaitAction(Unit)
+        if (retryConfirmed) {
+            reloadContentForReferendum(referendum)
+        } else {
+            skipCard()
+        }
+    }
+
+    private fun reloadContentForReferendum(referendum: ReferendumPreview) = launch {
+        // Remove old summary and amount for referendum
+        tinderGovCardsDataHelper.removeSummary(referendum.id)
+        tinderGovCardsDataHelper.removeAmount(referendum.id)
+
+        // Load summary and amount for referendum
+        tinderGovCardsDataHelper.loadSummary(referendum, this)
+        tinderGovCardsDataHelper.loadAmount(referendum, this)
+    }
+
+    private fun mapCards(
+        sortedReferenda: List<ReferendumPreview>,
+        summaries: Map<ReferendumId, ExtendedLoadingState<String?>>,
+        amounts: Map<ReferendumId, ExtendedLoadingState<AmountModel?>>
+    ): List<TinderGovCardRvItem> {
+        return sortedReferenda.map {
+            val summary = summaries[it.id]
+            val amount = amounts[it.id]
+            mapReferendumToUi(it, summary, amount)
+        }
     }
 }

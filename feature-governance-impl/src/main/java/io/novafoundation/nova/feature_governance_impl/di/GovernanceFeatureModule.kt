@@ -11,10 +11,12 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
@@ -29,6 +31,7 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.screens.Referen
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumUnlockModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVoteModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVotersModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.screens.TinderGovModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1
 import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.v2.GovernanceV2
@@ -37,6 +40,9 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.RealTinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.track.RealTracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.RealTrackCategorizer
@@ -73,7 +79,8 @@ import javax.inject.Named
         ReferendumVoteModule::class,
         ReferendumUnlockModule::class,
         DelegateModule::class,
-        GovernanceDAppsModule::class
+        GovernanceDAppsModule::class,
+        TinderGovModule::class
     ]
 )
 class GovernanceFeatureModule {
@@ -192,4 +199,5 @@ class GovernanceFeatureModule {
         governanceSharedState: GovernanceSharedState,
         governanceSourceRegistry: GovernanceSourceRegistry,
     ): TracksUseCase = RealTracksUseCase(governanceSharedState, governanceSourceRegistry)
+
 }

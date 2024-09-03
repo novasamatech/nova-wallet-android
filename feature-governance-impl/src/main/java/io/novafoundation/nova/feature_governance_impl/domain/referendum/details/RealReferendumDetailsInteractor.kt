@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRep
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition.ALWAYS
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
+import io.novafoundation.nova.feature_governance_api.data.repository.preImageOf
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -310,29 +311,6 @@ class RealReferendumDetailsInteractor(
                     )
                 )
             }
-    }
-}
-
-private suspend fun PreImageRepository.preImageOf(
-    proposal: Proposal?,
-    chainId: ChainId,
-): PreImage? {
-    return when (proposal) {
-        is Proposal.Inline -> {
-            PreImage(encodedCall = proposal.encodedCall, call = proposal.call)
-        }
-
-        is Proposal.Legacy -> {
-            val request = PreImageRequest(proposal.hash, knownSize = null, fetchIf = ALWAYS)
-            getPreimageFor(request, chainId)
-        }
-
-        is Proposal.Lookup -> {
-            val request = PreImageRequest(proposal.hash, knownSize = proposal.callLength, fetchIf = ALWAYS)
-            getPreimageFor(request, chainId)
-        }
-
-        null -> null
     }
 }
 

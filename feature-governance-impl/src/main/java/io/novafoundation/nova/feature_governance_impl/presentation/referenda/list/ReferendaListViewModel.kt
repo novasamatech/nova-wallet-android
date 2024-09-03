@@ -39,10 +39,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.hasReferendaSummaryApi
+import io.novafoundation.nova.runtime.ext.supportTinderGov
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -172,7 +171,7 @@ class ReferendaListViewModel(
     }
 
     private fun mapTinderGovToUi(chain: Chain, referendaListState: ReferendaListState?): TinderGovBannerModel? {
-        if (!chain.hasReferendaSummaryApi()) return null
+        if (!chain.supportTinderGov()) return null
 
         val availableToVote = referendaListState?.availableToVoteReferenda.orEmpty()
 

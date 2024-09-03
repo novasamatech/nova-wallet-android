@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="tinder_gov_card_data_loading_error_title">No data retrived</string>
+    <string name="tinder_gov_card_data_loading_error_message">The data of the referendum could not be loaded</string>
+
+    <string name="tinder_gov_card_requested_title">Requested:</string>
     <string name="tinder_gov_card_empty_state_text">You have already voted for all available referenda or there are no referenda to vote right now. Come back later.</string>
     <string name="tinder_gov_title">TinderGov</string>
     <string name="referenda_tinder_gov_banner_subtitle">A new way to easily distribute\nyour votes across the Referenda</string>

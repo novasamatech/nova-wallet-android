@@ -55,6 +55,14 @@ fun ExtendedLoadingState<*>.isLoading(): Boolean {
     return this is ExtendedLoadingState.Loading
 }
 
+fun ExtendedLoadingState<*>.isError(): Boolean {
+    return this is ExtendedLoadingState.Error
+}
+
+fun ExtendedLoadingState<*>.isLoadingOrError(): Boolean {
+    return isLoading() || isError()
+}
+
 fun ExtendedLoadingState<*>.isLoaded(): Boolean {
     return this is ExtendedLoadingState.Loaded
 }
@@ -101,6 +109,12 @@ inline fun <T> ExtendedLoadingState<T>.onError(action: (Throwable) -> Unit): Ext
     if (this is ExtendedLoadingState.Error) {
         action(exception)
     }
+
+    return this
+}
+
+fun <T> ExtendedLoadingState<T>?.orLoading(): ExtendedLoadingState<T> {
+    if (this == null) return ExtendedLoadingState.Loading
 
     return this
 }

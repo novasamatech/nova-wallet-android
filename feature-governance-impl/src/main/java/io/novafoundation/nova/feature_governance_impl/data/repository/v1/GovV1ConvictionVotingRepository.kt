@@ -64,6 +64,15 @@ class GovV1ConvictionVotingRepository(
         }
     }
 
+    override suspend fun observeVotingFor(accountId: AccountId, chainId: ChainId): Flow<Map<TrackId, Voting>> {
+        return remoteStorageSource.subscribe(chainId) {
+            runtime.metadata.democracy().storage("VotingOf").observe(
+                accountId,
+                binding = { decoded -> decoded?.let(::bindVoting) }
+            )
+        }.map { it.associatedWithTrack() }
+    }
+
     override suspend fun votingFor(accountId: AccountId, chainId: ChainId): Map<TrackId, Voting> {
         return votingFor(accountId, chainId, DemocracyTrackId).associatedWithTrack()
     }

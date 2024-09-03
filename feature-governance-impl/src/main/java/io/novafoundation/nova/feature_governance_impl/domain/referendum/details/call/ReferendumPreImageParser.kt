@@ -11,6 +11,8 @@ import kotlinx.coroutines.withContext
 interface ReferendumPreImageParser {
 
     suspend fun parse(preImage: PreImage, chainId: ChainId): ReferendumCall?
+
+    suspend fun parsePreimageCall(call: GenericCall.Instance, chainId: ChainId): ReferendumCall?
 }
 
 interface ReferendumCallAdapter {
@@ -34,10 +36,14 @@ class RealReferendumPreImageParser(
 ) : ReferendumPreImageParser {
 
     override suspend fun parse(preImage: PreImage, chainId: ChainId): ReferendumCall? {
+        return parsePreimageCall(preImage.call, chainId)
+    }
+
+    override suspend fun parsePreimageCall(call: GenericCall.Instance, chainId: ChainId): ReferendumCall? {
         val context = RealReferendumCallParseContext(chainId, knownAdapters)
 
         return withContext(Dispatchers.IO) {
-            context.parse(preImage.call)
+            context.parse(call)
         }
     }
 
