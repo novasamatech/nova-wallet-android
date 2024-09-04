@@ -16,13 +16,19 @@ import com.yuyakaido.android.cardstackview.SwipeAnimationSetting
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.setImageTintRes
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.dialog.warningDialog
+import io.novafoundation.nova.common.view.shape.toColorStateList
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBack
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketChevron
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketItems
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketState
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsControlView
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStack
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStatusBarInsetsContainer
@@ -87,6 +93,17 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                     setCanScrollHorizontal(draggingAvailable)
                     setCanScrollVertical(draggingAvailable)
                 }
+        }
+
+        viewModel.basketModelFlow.observe {
+            tinderGovCardsBasketItems.text = it.items.toString()
+            tinderGovCardsBasketItems.setTextColorRes(it.textColorRes)
+            tinderGovCardsBasketItems.backgroundTintList = requireContext().getColor(it.backgroundColorRes).toColorStateList()
+
+            tinderGovCardsBasketState.setText(it.textRes)
+            tinderGovCardsBasketState.setTextColorRes(it.textColorRes)
+
+            tinderGovCardsBasketChevron.setImageTintRes(it.imageTintRes)
         }
 
         viewModel.retryReferendumInfoLoadingAction.awaitableActionLiveData.observeEvent {

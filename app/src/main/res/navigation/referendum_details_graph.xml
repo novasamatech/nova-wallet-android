@@ -76,7 +76,7 @@
 
     <fragment
         android:id="@+id/setupVoteReferendumFragment"
-        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.referenda.SetupReferendumVoteFragment"
         android:label="SetupVoteReferendumFragment">
 
         <action

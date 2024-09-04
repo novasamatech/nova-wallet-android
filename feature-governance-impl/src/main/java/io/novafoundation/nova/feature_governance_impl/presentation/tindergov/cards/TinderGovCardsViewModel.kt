@@ -14,7 +14,9 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.safeSubList
 import io.novafoundation.nova.common.utils.sendEvent
+import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
@@ -26,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -48,6 +49,9 @@ class TinderGovCardsViewModel(
 
     private val topCardIndex = MutableStateFlow(0)
     private val sortedReferendaFlow = MutableStateFlow(listOf<ReferendumPreview>())
+
+    private val basketFlow = interactor.observeTinderGovBasket()
+        .shareInBackground()
 
     val cardsFlow = combine(
         sortedReferendaFlow,
@@ -78,6 +82,9 @@ class TinderGovCardsViewModel(
             summaryLoaded && amountLoaded
         }
 
+    val basketModelFlow = basketFlow
+        .map { items -> mapBasketModel(items) }
+
     init {
         interactor.observeReferendaAvailableToVote(this)
             .onEach { referenda ->
@@ -98,11 +105,11 @@ class TinderGovCardsViewModel(
         router.back()
     }
 
-    fun ayeClicked(position: Int) = writeVote(position)
+    fun ayeClicked(position: Int) = writeVote(position, VoteType.AYE)
 
-    fun abstainClicked(position: Int) = writeVote(position)
+    fun abstainClicked(position: Int) = writeVote(position, VoteType.ABSTAIN)
 
-    fun nayClicked(position: Int) = writeVote(position)
+    fun nayClicked(position: Int) = writeVote(position, VoteType.NAY)
 
     fun openReadMore(item: TinderGovCardRvItem) {
         showMessage("Not implemented yet")
@@ -127,10 +134,10 @@ class TinderGovCardsViewModel(
         _skipCardEvent.sendEvent()
     }
 
-    private fun writeVote(position: Int) = launch {
-        cardsFlow.first()
-            .getOrNull(0)
-            ?.let { showMessage("Not implemented yet") }
+    private fun writeVote(position: Int, voteType: VoteType) = launch {
+        val referendum = sortedReferendaFlow.value.getOrNull(position) ?: return@launch
+
+        interactor.addItemToBasket(referendum.id, voteType)
     }
 
     private fun mapReferendumToUi(
@@ -193,5 +200,15 @@ class TinderGovCardsViewModel(
             val amount = amounts[it.id]
             mapReferendumToUi(it, summary, amount)
         }
+    }
+
+    private fun mapBasketModel(items: List<TinderGovBasketItem>): BasketLabelModel {
+        return BasketLabelModel(
+            items = items.size,
+            backgroundColorRes = if (items.isEmpty()) R.color.icon_inactive else R.color.icon_accent,
+            textColorRes = if (items.isEmpty()) R.color.button_text_inactive else R.color.text_primary,
+            textRes = if (items.isEmpty()) R.string.tinder_gov_cards_voting_list_empty else R.string.tinder_gov_cards_voting_list,
+            imageTintRes = if (items.isEmpty()) R.color.icon_inactive else R.color.chip_icon,
+        )
     }
 }

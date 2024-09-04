@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="tinder_gov_vote_title">Voting power</string>
+    <string name="tinder_gov_vote_subtitle">Voting will be set for future votes in TinderGov</string>
+    <string name="tinder_gov_cards_voting_list">Voting list</string>
+    <string name="tinder_gov_cards_voting_list_empty">No votes</string>
     <string name="tinder_gov_card_data_loading_error_title">No data retrived</string>
     <string name="tinder_gov_card_data_loading_error_message">The data of the referendum could not be loaded</string>
     <string name="tinder_gov_card_requested_title">Requested:</string>
