@@ -108,7 +108,8 @@ class RealTinderGovInteractor(
     }
 
     override suspend fun setVotingPower(chainId: ChainId, amount: BigInteger, conviction: Conviction) {
-        tinderGovVotingPowerRepository.setVotingPower(VotingPower(chainId, amount, conviction))
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        tinderGovVotingPowerRepository.setVotingPower(VotingPower(metaAccount.id, chainId, amount, conviction))
     }
 
     override suspend fun getVotingPower(chainId: ChainId): VotingPower? {

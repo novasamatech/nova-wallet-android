@@ -5,6 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Con
 import java.math.BigInteger
 
 class VotingPower(
+    val metaId: Long,
     val chainId: ChainId,
     val amount: BigInteger,
     val conviction: Conviction

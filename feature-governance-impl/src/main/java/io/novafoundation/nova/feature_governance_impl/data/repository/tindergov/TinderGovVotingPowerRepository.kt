@@ -18,6 +18,7 @@ class RealTinderGovVotingPowerRepository(
 
     override suspend fun setVotingPower(votingPower: VotingPower) {
         val local = TinderGovVotingPowerLocal(
+            metaId = votingPower.metaId,
             chainId = votingPower.chainId,
             amount = votingPower.amount,
             conviction = votingPower.conviction.toLocal()
@@ -29,6 +30,7 @@ class RealTinderGovVotingPowerRepository(
     override suspend fun getVotingPower(chainId: ChainId): VotingPower? {
         val local = tinderGovDao.getVotingPower(chainId) ?: return null
         return VotingPower(
+            metaId = local.metaId,
             chainId = local.chainId,
             amount = local.amount,
             conviction = local.conviction.toDomain()
