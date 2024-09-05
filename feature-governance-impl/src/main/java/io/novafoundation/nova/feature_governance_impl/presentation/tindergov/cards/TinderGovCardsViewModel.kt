@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.car
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -34,16 +35,20 @@ import kotlinx.coroutines.launch
 
 class TinderGovCardsViewModel(
     private val router: GovernanceRouter,
-    private val tinderGovCardsDataHelper: TinderGovCardsDataHelper,
+    private val tinderGovCardDetailsLoader: TinderGovCardDetailsLoader,
     private val interactor: TinderGovInteractor,
     private val referendumFormatter: ReferendumFormatter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : BaseViewModel() {
 
-    private val cardsSummaryFlow = tinderGovCardsDataHelper.cardsSummaryFlow
+    companion object {
+        const val CARD_STACK_SIZE = 3
+    }
+
+    private val cardsSummaryFlow = tinderGovCardDetailsLoader.cardsSummaryFlow
         .shareInBackground()
 
-    private val cardsAmountFlow = tinderGovCardsDataHelper.cardsAmountFlow
+    private val cardsAmountFlow = tinderGovCardDetailsLoader.cardsAmountFlow
         .shareInBackground()
 
     private val topCardIndex = MutableStateFlow(0)
@@ -66,15 +71,15 @@ class TinderGovCardsViewModel(
         val cardSummary = cardsSummary[referendum.id]
         val cardAmount = cardsAmount[referendum.id]
 
-        Triple(referendum, cardSummary, cardAmount)
+        CardWithDetails(referendum, cardSummary, cardAmount)
     }.filterNotNull()
-        .distinctUntilChangedBy { it.first.id to it.second to it.third }
+        .distinctUntilChanged()
         .shareInBackground()
 
     val isCardDraggingAvailable = topReferendumWithDetails
-        .map { (_, summary, amount) ->
-            val summaryLoaded = summary?.isLoaded().orFalse()
-            val amountLoaded = amount?.isLoaded().orFalse()
+        .map {
+            val summaryLoaded = it.summary?.isLoaded().orFalse()
+            val amountLoaded = it.amount?.isLoaded().orFalse()
             summaryLoaded && amountLoaded
         }
 
@@ -82,16 +87,13 @@ class TinderGovCardsViewModel(
         interactor.observeReferendaAvailableToVote(this)
             .onEach { referenda ->
                 val currentReferendaIds = sortedReferendaFlow.value.map { it.id }.toSet()
-                val newReferenda = referenda.associateBy { it.id }
-                    .filter { it.key !in currentReferendaIds }
+                val newReferenda = referenda.associateBy { it.id } - currentReferendaIds
 
                 sortedReferendaFlow.value += newReferenda.values // To add new coming referenda to the end of list
             }
             .launchIn(this)
 
         setupReferendumRetryAction()
-
-        tinderGovCardsDataHelper.init(this)
     }
 
     fun back() {
@@ -108,18 +110,16 @@ class TinderGovCardsViewModel(
         showMessage("Not implemented yet")
     }
 
-    fun onCardOnTop(position: Int) {
+    fun onCardAppeared(position: Int) {
         topCardIndex.value = position
-    }
 
-    fun loadContentForCardByPosition(position: Int) {
         // Get 3 first referenda to load content for
-        val referenda = sortedReferendaFlow.value.safeSubList(position, position + 3)
+        val referenda = sortedReferendaFlow.value.safeSubList(position, position + CARD_STACK_SIZE)
 
         // Load summary and amount for each referendum
         referenda.forEach {
-            tinderGovCardsDataHelper.loadSummary(it, this)
-            tinderGovCardsDataHelper.loadAmount(it, this)
+            tinderGovCardDetailsLoader.loadSummary(it, this)
+            tinderGovCardDetailsLoader.loadAmount(it, this)
         }
     }
 
@@ -152,9 +152,9 @@ class TinderGovCardsViewModel(
 
     private fun setupReferendumRetryAction() {
         topReferendumWithDetails
-            .map { (referendum, summary, amount) ->
-                val isLoadingError = summary?.isError().orFalse() || amount?.isError().orFalse()
-                referendum to isLoadingError
+            .map {
+                val isLoadingError = it.summary?.isError().orFalse() || it.amount?.isError().orFalse()
+                it.referendum to isLoadingError
             }
             .distinctUntilChangedBy { (referendum, isLoadingError) -> referendum.id to isLoadingError }
             .onEach { (referendum, isLoadingError) ->
@@ -167,20 +167,15 @@ class TinderGovCardsViewModel(
     private suspend fun showRetryDialog(referendum: ReferendumPreview) {
         val retryConfirmed = retryReferendumInfoLoadingAction.awaitAction(Unit)
         if (retryConfirmed) {
-            reloadContentForReferendum(referendum)
+            reloadDetailsForReferendum(referendum)
         } else {
             skipCard()
         }
     }
 
-    private fun reloadContentForReferendum(referendum: ReferendumPreview) = launch {
-        // Remove old summary and amount for referendum
-        tinderGovCardsDataHelper.removeSummary(referendum.id)
-        tinderGovCardsDataHelper.removeAmount(referendum.id)
-
-        // Load summary and amount for referendum
-        tinderGovCardsDataHelper.loadSummary(referendum, this)
-        tinderGovCardsDataHelper.loadAmount(referendum, this)
+    private fun reloadDetailsForReferendum(referendum: ReferendumPreview) = launch {
+        tinderGovCardDetailsLoader.reloadSummary(referendum, this)
+        tinderGovCardDetailsLoader.reloadAmount(referendum, this)
     }
 
     private fun mapCards(
@@ -193,5 +188,19 @@ class TinderGovCardsViewModel(
             val amount = amounts[it.id]
             mapReferendumToUi(it, summary, amount)
         }
+    }
+}
+
+private class CardWithDetails(
+    val referendum: ReferendumPreview,
+    val summary: ExtendedLoadingState<String?>?,
+    val amount: ExtendedLoadingState<AmountModel?>?
+) {
+
+    override fun equals(other: Any?): Boolean {
+        return other is CardWithDetails &&
+            referendum.id == other.referendum.id &&
+            summary == other.summary &&
+            amount == other.amount
     }
 }

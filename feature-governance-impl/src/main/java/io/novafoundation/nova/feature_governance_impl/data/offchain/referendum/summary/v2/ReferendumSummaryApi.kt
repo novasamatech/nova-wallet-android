@@ -10,7 +10,7 @@ interface ReferendumSummaryApi {
     @GET
     suspend fun getReferendumSummary(
         @Url url: String,
-        @Header("x-network") networkHeader: String,
+        @Header("x-network") networkHeader: String?,
         @Header("x-ai-summary-api-key") summaryApiKey: String,
         @Query("postId") postId: Int,
         @Query("proposalType") proposalType: String = "referendums_v2"
