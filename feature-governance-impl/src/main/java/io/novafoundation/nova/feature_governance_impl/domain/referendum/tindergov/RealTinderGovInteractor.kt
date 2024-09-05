@@ -74,14 +74,16 @@ class RealTinderGovInteractor(
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = governanceSharedState.chain()
 
+        val votingPower = getVotingPower(metaAccount.id, chain.id)!!
+
         tinderGovBasketRepository.add(
             TinderGovBasketItem(
                 metaId = metaAccount.id,
                 chainId = chain.id,
                 referendumId = referendumId,
                 vote = voteType,
-                conviction = Conviction.None,
-                amount = BigInteger.ZERO
+                conviction = votingPower.conviction,
+                amount = votingPower.amount
             )
         )
     }

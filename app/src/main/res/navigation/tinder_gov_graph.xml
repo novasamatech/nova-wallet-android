@@ -25,6 +25,7 @@
         android:id="@+id/setupTinderGovVoteFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.SetupTinderGovVoteFragment"
         android:label="SetupTinderGovVoteFragment"
+        app:useAdd="true"
         tools:layout="@layout/fragment_setup_vote" />
 
 </navigation>
