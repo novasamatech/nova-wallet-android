@@ -6,9 +6,10 @@ import java.math.BigInteger
 
 @Entity(
     tableName = "tinder_gov_voting_power",
-    primaryKeys = ["chainId"]
+    primaryKeys = ["metaId", "chainId"]
 )
 data class TinderGovVotingPowerLocal(
+    val metaId: Long,
     val chainId: String,
     val amount: BigInteger,
     val conviction: ConvictionLocal

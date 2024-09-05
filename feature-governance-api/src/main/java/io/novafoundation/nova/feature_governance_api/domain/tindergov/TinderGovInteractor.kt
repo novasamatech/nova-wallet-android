@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import java.math.BigInteger

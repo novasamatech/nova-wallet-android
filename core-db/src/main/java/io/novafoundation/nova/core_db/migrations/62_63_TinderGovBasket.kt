@@ -23,10 +23,11 @@ val TinderGovBasket_62_63 = object : Migration(62, 63) {
         database.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `tinder_gov_basket` (
+                `metaId` INTEGER NOT NULL, 
                 `chainId` TEXT NOT NULL, 
                 `amount` TEXT NOT NULL,
                 `conviction` TEXT NOT NULL, 
-                PRIMARY KEY(`chainId`)
+                PRIMARY KEY(`metaId`, `chainId`)
             )
             """.trimIndent()
         )

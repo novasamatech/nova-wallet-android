@@ -3,14 +3,10 @@ package io.novafoundation.nova.feature_governance_impl.data.repository.tindergov
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.TinderGovDao
 import io.novafoundation.nova.core_db.model.TinderGovBasketItemLocal
-import io.novafoundation.nova.core_db.model.TinderGovBasketItemLocal.*
-import io.novafoundation.nova.core_db.model.common.ConvictionLocal
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.core_db.model.TinderGovBasketItemLocal.VoteType as LocalVoteType
-import io.novafoundation.nova.core_db.model.common.ConvictionLocal as LocalConviction
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
-import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.Flow
 
 interface TinderGovBasketRepository {

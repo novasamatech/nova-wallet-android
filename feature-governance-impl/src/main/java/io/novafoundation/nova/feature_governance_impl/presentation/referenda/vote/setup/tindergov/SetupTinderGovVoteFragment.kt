@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVoteFragment
 import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteSubtitle
-import kotlinx.android.synthetic.main.layout_setup_vote_control_aye_nay_abstain.setupReferendumVoteControlView
 import kotlinx.android.synthetic.main.layout_setup_vote_control_continue.setupTinderGovVoteContinue
 
 class SetupTinderGovVoteFragment : SetupVoteFragment<SetupTinderGovVoteViewModel>() {
