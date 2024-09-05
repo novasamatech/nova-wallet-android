@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model
 
 class LocksChangeModel(
     val amountChange: AmountChangeModel,

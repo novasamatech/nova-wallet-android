@@ -128,6 +128,7 @@ import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.core_db.model.StakingRewardPeriodLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TinderGovBasketItemLocal
+import io.novafoundation.nova.core_db.model.TinderGovVotingPowerLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
 import io.novafoundation.nova.core_db.model.WalletConnectPairingLocal
@@ -190,7 +191,8 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         ProxyAccountLocal::class,
         BalanceHoldLocal::class,
         NodeSelectionPreferencesLocal::class,
-        TinderGovBasketItemLocal::class
+        TinderGovBasketItemLocal::class,
+        TinderGovVotingPowerLocal::class
     ],
 )
 @TypeConverters(

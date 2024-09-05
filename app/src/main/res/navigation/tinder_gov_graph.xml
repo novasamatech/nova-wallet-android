@@ -9,6 +9,22 @@
         android:id="@+id/tinderGovCards"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsFragment"
         android:label="TinderGovCardsFragment"
-        tools:layout="@layout/fragment_tinder_gov_cards" />
+        tools:layout="@layout/fragment_tinder_gov_cards">
+
+        <action
+            android:id="@+id/action_tinderGovCards_to_setupTinderGovVoteFragment"
+            app:destination="@id/setupTinderGovVoteFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/setupTinderGovVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.SetupTinderGovVoteFragment"
+        android:label="SetupTinderGovVoteFragment"
+        tools:layout="@layout/fragment_setup_vote" />
 
 </navigation>

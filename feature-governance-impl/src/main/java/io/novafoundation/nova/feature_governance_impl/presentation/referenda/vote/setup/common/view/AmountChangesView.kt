@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.AmountChangeModel
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesDifference
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesFrom
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesFromGroup

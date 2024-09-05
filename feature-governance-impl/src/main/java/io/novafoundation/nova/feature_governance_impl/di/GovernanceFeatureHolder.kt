@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class GovernanceFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: GovernanceRouter,
-    private val selectTracksCommunicator: SelectTracksCommunicator
+    private val selectTracksCommunicator: SelectTracksCommunicator,
+    private val tinderGovVoteCommunicator: TinderGovVoteCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -33,7 +35,8 @@ class GovernanceFeatureHolder @Inject constructor(
             .create(
                 accountFeatureDependencies,
                 router,
-                selectTracksCommunicator = selectTracksCommunicator
+                selectTracksCommunicator = selectTracksCommunicator,
+                tinderGovVoteCommunicator = tinderGovVoteCommunicator
             )
     }
 }

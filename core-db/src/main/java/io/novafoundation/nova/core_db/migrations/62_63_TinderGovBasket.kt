@@ -14,7 +14,20 @@ val TinderGovBasket_62_63 = object : Migration(62, 63) {
                 `chainId` TEXT NOT NULL, 
                 `amount` TEXT NOT NULL,
                 `conviction` TEXT NOT NULL, 
-                `voteType` TEXT NOT NULL)
+                `voteType` TEXT NOT NULL,
+                PRIMARY KEY(`referendumId`, `metaId`, `chainId`)
+            )
+            """.trimIndent()
+        )
+
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `tinder_gov_basket` (
+                `chainId` TEXT NOT NULL, 
+                `amount` TEXT NOT NULL,
+                `conviction` TEXT NOT NULL, 
+                PRIMARY KEY(`chainId`)
+            )
             """.trimIndent()
         )
     }

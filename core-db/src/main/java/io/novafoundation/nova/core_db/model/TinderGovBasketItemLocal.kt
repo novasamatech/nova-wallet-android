@@ -1,6 +1,7 @@
 package io.novafoundation.nova.core_db.model
 
 import androidx.room.Entity
+import io.novafoundation.nova.core_db.model.common.ConvictionLocal
 import java.math.BigInteger
 
 @Entity(
@@ -12,19 +13,9 @@ data class TinderGovBasketItemLocal(
     val metaId: Long,
     val chainId: String,
     val amount: BigInteger,
-    val conviction: Conviction,
+    val conviction: ConvictionLocal,
     val voteType: VoteType
 ) {
-
-    enum class Conviction {
-        None,
-        LOCKED_1x,
-        LOCKED_2x,
-        LOCKED_3x,
-        LOCKED_4x,
-        LOCKED_5x,
-        LOCKED_6x
-    }
 
     enum class VoteType {
         AYE, NAY, ABSTAIN

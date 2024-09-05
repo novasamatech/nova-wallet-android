@@ -87,6 +87,10 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
             swipeCardToDirection(Direction.Bottom, forced = true)
         }
 
+        viewModel.rewindCardEvent.observeEvent {
+            tinderGovCardsStack.rewind()
+        }
+
         viewModel.isCardDraggingAvailable.observe { draggingAvailable ->
             tinderGovCardsStack.cardLayoutManager()
                 .apply {
@@ -134,15 +138,16 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
 
     override fun onCardAppeared(view: View, position: Int) {
         viewModel.onCardOnTop(position)
-        viewModel.loadContentForCardByPosition(position)
+        viewModel.loadContentForCardsFromPosition(position)
     }
 
     override fun onCardSwiped(direction: Direction) {
-        val position = tinderGovCardsStack.cardLayoutManager().topPosition
+        val topPosition = tinderGovCardsStack.cardLayoutManager().topPosition
+        val swipedPosition = topPosition - 1
         when (direction) {
-            Direction.Left -> viewModel.nayClicked(position)
-            Direction.Right -> viewModel.ayeClicked(position)
-            Direction.Top -> viewModel.abstainClicked(position)
+            Direction.Left -> viewModel.nayClicked(swipedPosition)
+            Direction.Right -> viewModel.ayeClicked(swipedPosition)
+            Direction.Top -> viewModel.abstainClicked(swipedPosition)
             Direction.Bottom -> {}
         }
     }
