@@ -14,8 +14,8 @@ interface TinderGovDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun setVotingPower(item: TinderGovVotingPowerLocal)
 
-    @Query("SELECT * FROM tinder_gov_voting_power WHERE chainId = :chainId")
-    suspend fun getVotingPower(chainId: String): TinderGovVotingPowerLocal?
+    @Query("SELECT * FROM tinder_gov_voting_power WHERE metaId = :metaId AND chainId = :chainId")
+    suspend fun getVotingPower(metaId: Long, chainId: String): TinderGovVotingPowerLocal?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToBasket(item: TinderGovBasketItemLocal)

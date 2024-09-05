@@ -85,12 +85,13 @@ class TinderGovCardsViewModel(
         .distinctUntilChangedBy { it.first.id to it.second to it.third }
         .shareInBackground()
 
-    val isCardDraggingAvailable = topReferendumWithDetails
-        .map { (_, summary, amount) ->
-            val summaryLoaded = summary?.isLoaded().orFalse()
-            val amountLoaded = amount?.isLoaded().orFalse()
-            summaryLoaded && amountLoaded
-        }
+    private var isVotingInProgress = MutableStateFlow(false)
+
+    val isCardDraggingAvailable = combine(isVotingInProgress, topReferendumWithDetails) { isVotingInProgress, (_, summary, amount) ->
+        val summaryLoaded = summary?.isLoaded().orFalse()
+        val amountLoaded = amount?.isLoaded().orFalse()
+        !isVotingInProgress && summaryLoaded && amountLoaded
+    }
 
     val basketModelFlow = basketFlow
         .map { items -> mapBasketModel(items.values.toList()) }
@@ -156,19 +157,26 @@ class TinderGovCardsViewModel(
         _skipCardEvent.sendEvent()
     }
 
-    private fun writeVote(position: Int, voteType: VoteType) = launch {
-        val referendum = sortedReferendaFlow.value.getOrNull(position) ?: return@launch
+    private fun writeVote(position: Int, voteType: VoteType) {
+        if (isVotingInProgress.value) return
+        isVotingInProgress.value = true
 
-        if (!interactor.isSufficientAmountToVote()) {
-            val response = tinderGovVoteRequester.awaitResponse(TinderGovVoteRequester.Request(referendum.id.value))
+        launch {
+            val referendum = sortedReferendaFlow.value.getOrNull(position) ?: return@launch
 
-            if (!response.success) {
-                _rewindCardEvent.sendEvent()
-                return@launch
+            if (!interactor.isVotingPowerAvailable()) {
+                val response = tinderGovVoteRequester.awaitResponse(TinderGovVoteRequester.Request(referendum.id.value))
+
+                if (!response.success) {
+                    _rewindCardEvent.sendEvent()
+                    isVotingInProgress.value = false
+                    return@launch
+                }
             }
-        }
 
-        interactor.addItemToBasket(referendum.id, voteType)
+            interactor.addItemToBasket(referendum.id, voteType)
+            isVotingInProgress.value = false
+        }
     }
 
     private fun mapReferendumToUi(

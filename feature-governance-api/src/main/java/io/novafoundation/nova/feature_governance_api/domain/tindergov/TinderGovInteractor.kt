@@ -25,7 +25,9 @@ interface TinderGovInteractor {
 
     suspend fun setVotingPower(chainId: ChainId, amount: BigInteger, conviction: Conviction)
 
-    suspend fun getVotingPower(chainId: ChainId): VotingPower?
+    suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower?
+
+    suspend fun isVotingPowerAvailable(): Boolean
 
     suspend fun isSufficientAmountToVote(): Boolean
 }

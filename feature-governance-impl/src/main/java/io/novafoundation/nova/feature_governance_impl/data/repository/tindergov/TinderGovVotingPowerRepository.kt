@@ -9,7 +9,7 @@ interface TinderGovVotingPowerRepository {
 
     suspend fun setVotingPower(votingPower: VotingPower)
 
-    suspend fun getVotingPower(chainId: ChainId): VotingPower?
+    suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower?
 }
 
 class RealTinderGovVotingPowerRepository(
@@ -27,8 +27,8 @@ class RealTinderGovVotingPowerRepository(
         tinderGovDao.setVotingPower(local)
     }
 
-    override suspend fun getVotingPower(chainId: ChainId): VotingPower? {
-        val local = tinderGovDao.getVotingPower(chainId) ?: return null
+    override suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower? {
+        val local = tinderGovDao.getVotingPower(metaId, chainId) ?: return null
         return VotingPower(
             metaId = local.metaId,
             chainId = local.chainId,

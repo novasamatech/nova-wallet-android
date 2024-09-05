@@ -112,14 +112,20 @@ class RealTinderGovInteractor(
         tinderGovVotingPowerRepository.setVotingPower(VotingPower(metaAccount.id, chainId, amount, conviction))
     }
 
-    override suspend fun getVotingPower(chainId: ChainId): VotingPower? {
-        return tinderGovVotingPowerRepository.getVotingPower(chainId)
+    override suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower? {
+        return tinderGovVotingPowerRepository.getVotingPower(metaId, chainId)
+    }
+
+    override suspend fun isVotingPowerAvailable(): Boolean {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = governanceSharedState.chain()
+        return getVotingPower(metaAccount.id, chain.id) != null
     }
 
     override suspend fun isSufficientAmountToVote(): Boolean {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = governanceSharedState.chain()
-        val votingPower = getVotingPower(chain.id) ?: return false
+        val votingPower = getVotingPower(metaAccount.id, chain.id) ?: return false
         val asset = walletRepository.getAsset(metaAccount.id, chain.utilityAsset) ?: return false
 
         return asset.totalInPlanks >= votingPower.amount
