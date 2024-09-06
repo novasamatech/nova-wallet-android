@@ -285,7 +285,7 @@ class RealReferendumFormatter(
         return ReferendumModel(
             id = referendum.id,
             status = formatStatus(referendum.status),
-            name = mapReferendumNameToUi(referendum),
+            name = formatReferendumName(referendum),
             timeEstimation = formatTimeEstimation(referendum.status),
             track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
             number = formatId(referendum.id),
@@ -295,7 +295,7 @@ class RealReferendumFormatter(
         )
     }
 
-    private fun mapReferendumNameToUi(referendum: ReferendumPreview): String {
+    override fun formatReferendumName(referendum: ReferendumPreview): String {
         return referendum.getName() ?: formatUnknownReferendumTitle(referendum.id)
     }
 

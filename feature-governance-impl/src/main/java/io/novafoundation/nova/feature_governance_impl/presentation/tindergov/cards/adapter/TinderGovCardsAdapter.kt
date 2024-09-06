@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards
+package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -7,14 +7,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.isLoadingOrError
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.letOrHide
-import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsAdapter.Handler
+import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter.Handler
 import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardAmountContainer
 import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardAmountShimmering
 import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardDivider
@@ -54,19 +53,19 @@ class TinderGovCardViewHolder(
     }
 
     fun bind(item: TinderGovCardRvItem) {
-        itemView.tinderGovCardReadMore.setOnClickListener { handler.onReadMoreClicked(item) }
-
         itemView.itemTinderGovCardSummary.setTextOrHide(item.summary.dataOrNull)
-        itemView.itemTinderGovCardSummaryShimmering.isVisible = item.summary.isLoading()
+        itemView.itemTinderGovCardSummaryShimmering.isVisible = item.summary.isLoadingOrError()
 
-        itemView.itemTinderGovCardAmountContainer.letOrHide(item.requestedAmount?.dataOrNull) {
+        itemView.itemTinderGovCardAmountContainer.letOrHide(item.requestedAmount.dataOrNull) {
             itemView.itemTinderGovCardRequestedAmount.setTextOrHide(it.token)
             itemView.itemTinderGovCardRequestedFiat.setTextOrHide(it.fiat)
         }
 
-        itemView.itemTinderGovCardDivider.isVisible = item.requestedAmount != null
-        itemView.itemTinderGovCardAmountShimmering.isVisible = item.requestedAmount?.isLoading().orFalse()
+        itemView.itemTinderGovCardDivider.isVisible = item.requestedAmount.isLoadingOrError() || item.requestedAmount.dataOrNull != null
+        itemView.itemTinderGovCardAmountShimmering.isVisible = item.requestedAmount.isLoadingOrError()
         itemView.tinderGovCardContainer.setBackgroundResource(item.backgroundRes)
+
+        itemView.tinderGovCardReadMore.setOnClickListener { handler.onReadMoreClicked(item) }
     }
 }
 

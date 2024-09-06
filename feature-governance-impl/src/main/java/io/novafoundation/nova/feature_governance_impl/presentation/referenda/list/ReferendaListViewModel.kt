@@ -39,12 +39,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.hasReferendaSummaryApi
+import io.novafoundation.nova.runtime.ext.supportTinderGov
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -105,8 +103,9 @@ class ReferendaListViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
-    val tinderGovBanner = combine(selectedChainAndAssetFlow, referendaListStateFlow) { selectedState, referenda ->
-        mapTinderGovToUi(selectedState.assetWithChain.chain, referenda.dataOrNull)
+    val tinderGovBanner = referendaListStateFlow.map { referenda ->
+        val chain = selectedAssetSharedState.chain()
+        mapTinderGovToUi(chain, referenda.dataOrNull)
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -172,9 +171,10 @@ class ReferendaListViewModel(
     }
 
     private fun mapTinderGovToUi(chain: Chain, referendaListState: ReferendaListState?): TinderGovBannerModel? {
-        if (!chain.hasReferendaSummaryApi()) return null
+        if (!chain.supportTinderGov()) return null
+        if (referendaListState == null) return null
 
-        val availableToVote = referendaListState?.availableToVoteReferenda.orEmpty()
+        val availableToVote = referendaListState.availableToVoteReferenda
 
         return TinderGovBannerModel(
             chipText = if (availableToVote.isEmpty()) {

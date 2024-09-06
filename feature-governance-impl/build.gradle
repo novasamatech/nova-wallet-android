@@ -17,6 +17,8 @@ android {
         buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/governance/v2/dapps_dev.json\""
 
         buildConfigField "String", "DELEGATION_TUTORIAL_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/governance/add-delegate-information\""
+
+        buildConfigField "String", "SUMMARY_API_KEY", "\"QUkgU3VtbWFyeSBBUEkgRm9yIE5PVkE=\""
     }
 
     buildTypes {

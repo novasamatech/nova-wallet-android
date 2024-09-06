@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.Identi
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoingOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
@@ -23,10 +22,8 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.toTallyOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
-import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
-import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
-import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition.ALWAYS
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
+import io.novafoundation.nova.feature_governance_api.data.repository.preImageOf
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -48,7 +45,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
@@ -310,29 +306,6 @@ class RealReferendumDetailsInteractor(
                     )
                 )
             }
-    }
-}
-
-private suspend fun PreImageRepository.preImageOf(
-    proposal: Proposal?,
-    chainId: ChainId,
-): PreImage? {
-    return when (proposal) {
-        is Proposal.Inline -> {
-            PreImage(encodedCall = proposal.encodedCall, call = proposal.call)
-        }
-
-        is Proposal.Legacy -> {
-            val request = PreImageRequest(proposal.hash, knownSize = null, fetchIf = ALWAYS)
-            getPreimageFor(request, chainId)
-        }
-
-        is Proposal.Lookup -> {
-            val request = PreImageRequest(proposal.hash, knownSize = proposal.callLength, fetchIf = ALWAYS)
-            getPreimageFor(request, chainId)
-        }
-
-        null -> null
     }
 }
 

@@ -40,4 +40,6 @@ interface ReferendumFormatter {
         token: Token,
         chain: Chain
     ): ReferendumModel
+
+    fun formatReferendumName(referendum: ReferendumPreview): String
 }
