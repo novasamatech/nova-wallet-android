@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
@@ -34,6 +35,7 @@ class SetupTinderGovVoteModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         assetUseCase: AssetUseCase,
         tinderGovInteractor: TinderGovInteractor,
+        accountRepository: AccountRepository,
         tinderGovVoteCommunicator: TinderGovVoteCommunicator,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         interactor: VoteReferendumInteractor,
@@ -60,7 +62,8 @@ class SetupTinderGovVoteModule {
             convictionValuesProvider = convictionValuesProvider,
             locksFormatter = locksFormatter,
             tinderGovInteractor = tinderGovInteractor,
-            tinderGovVoteResponder = tinderGovVoteCommunicator
+            tinderGovVoteResponder = tinderGovVoteCommunicator,
+            accountRepository = accountRepository
         )
     }
 

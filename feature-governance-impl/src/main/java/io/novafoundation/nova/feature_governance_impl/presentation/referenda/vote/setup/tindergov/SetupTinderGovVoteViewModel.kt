@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vo
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
@@ -29,6 +30,7 @@ class SetupTinderGovVoteViewModel(
     private val router: GovernanceRouter,
     private val tinderGovInteractor: TinderGovInteractor,
     private val tinderGovVoteResponder: TinderGovVoteResponder,
+    private val accountRepository: AccountRepository,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     assetUseCase: AssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -59,9 +61,10 @@ class SetupTinderGovVoteViewModel(
 
     init {
         launch {
+            val metaAccount = accountRepository.getSelectedMetaAccount()
             val asset = selectedAsset.first()
             val chainAsset = asset.token.configuration
-            val votingPower = tinderGovInteractor.getVotingPower(asset.token.configuration.chainId) ?: return@launch
+            val votingPower = tinderGovInteractor.getVotingPower(metaAccount.id, asset.token.configuration.chainId) ?: return@launch
             val amount = chainAsset.amountFromPlanks(votingPower.amount)
             amountChooserMixin.setAmount(amount, false)
             selectedConvictionIndex.value = votingPower.conviction.ordinal
