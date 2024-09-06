@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.1.2'
+        substrateSdkVersion = '2.1.3'
 
         gifVersion = '1.2.19'
 
@@ -91,6 +91,8 @@ buildscript {
         playServicesAuthVersion = "20.0.0"
         googleApiClientVersion = "1.32.1"
         googleDriveVersion = "v3-rev20210919-1.32.1"
+
+        cardStackVersion = "2.3.4"
 
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
@@ -213,6 +215,8 @@ buildscript {
         firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+        cardStackView = 'com.github.yuyakaido:cardstackview:$cardStackVersion'
     }
 
     repositories {

@@ -68,6 +68,8 @@ dependencies {
 
     implementation shimmerDep
 
+    implementation cardStackView
+
     implementation daggerDep
     kapt daggerKapt
 

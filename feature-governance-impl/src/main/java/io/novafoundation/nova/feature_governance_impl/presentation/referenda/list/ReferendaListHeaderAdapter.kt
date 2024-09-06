@@ -36,6 +36,8 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         fun onClickReferendaSearch()
 
         fun onClickReferendaFilters()
+
+        fun onTinderGovBannerClicked()
     }
 
     private var assetModel: AssetSelectorModel? = null
@@ -115,6 +117,7 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
 
             referendaHeaderSearch.setOnClickListener { handler.onClickReferendaSearch() }
             referendaHeaderFilter.setOnClickListener { handler.onClickReferendaFilters() }
+            referendaTindergovBanner.setOnClickListener { handler.onTinderGovBannerClicked() }
         }
     }
 

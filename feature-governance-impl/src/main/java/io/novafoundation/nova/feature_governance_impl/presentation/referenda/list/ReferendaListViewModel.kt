@@ -139,6 +139,10 @@ class ReferendaListViewModel(
         governanceRouter.openReferendum(payload)
     }
 
+    fun openTinderGovCards() {
+        governanceRouter.openTinderGovCards()
+    }
+
     private fun mapLocksOverviewToUi(locksOverview: GovernanceLocksOverview?, asset: Asset): GovernanceLocksModel? {
         if (locksOverview == null) return null
 
