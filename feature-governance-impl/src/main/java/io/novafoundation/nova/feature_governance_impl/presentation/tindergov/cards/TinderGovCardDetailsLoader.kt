@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState.Loading
 import io.novafoundation.nova.common.domain.ExtendedLoadingState.Loaded
 import io.novafoundation.nova.common.domain.ExtendedLoadingState.Error
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.utils.share
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
@@ -23,12 +24,24 @@ import kotlinx.coroutines.sync.withLock
 private typealias SummaryLoadingState = Map<ReferendumId, ExtendedLoadingState<String?>>
 private typealias AmountLoadingState = Map<ReferendumId, ExtendedLoadingState<AmountModel?>>
 
-class TinderGovCardDetailsLoader(
+class TinderGovCardsDetailsLoaderFactory(
     private val interactor: TinderGovInteractor,
     private val assetUseCase: AssetUseCase
 ) {
 
+    fun create(coroutineScope: CoroutineScope): TinderGovCardDetailsLoader {
+        return TinderGovCardDetailsLoader(interactor, assetUseCase, coroutineScope)
+    }
+}
+
+class TinderGovCardDetailsLoader(
+    private val interactor: TinderGovInteractor,
+    private val assetUseCase: AssetUseCase,
+    private val coroutineScope: CoroutineScope
+) : CoroutineScope by coroutineScope {
+
     private val assetFlow = assetUseCase.currentAssetFlow()
+        .share()
 
     private val summaryMutex = Mutex()
     private val amountMutex = Mutex()
@@ -44,18 +57,18 @@ class TinderGovCardDetailsLoader(
             _cardsSummary.update { it - referendumPreview.id }
         }
 
-        loadSummary(referendumPreview, coroutineScope)
+        loadSummary(referendumPreview)
     }
 
-    suspend fun reloadAmount(referendumPreview: ReferendumPreview, coroutineScope: CoroutineScope) {
+    suspend fun reloadAmount(referendumPreview: ReferendumPreview) {
         amountMutex.withLock {
             _cardsAmount.update { it - referendumPreview.id }
         }
 
-        loadAmount(referendumPreview, coroutineScope)
+        loadAmount(referendumPreview)
     }
 
-    fun loadSummary(referendumPreview: ReferendumPreview, coroutineScope: CoroutineScope) {
+    fun loadSummary(referendumPreview: ReferendumPreview) {
         coroutineScope.launch {
             val id = referendumPreview.id
             if (_cardsSummary.first().containsKey(id)) return@launch
@@ -67,7 +80,7 @@ class TinderGovCardDetailsLoader(
         }
     }
 
-    fun loadAmount(referendumPreview: ReferendumPreview, coroutineScope: CoroutineScope) {
+    fun loadAmount(referendumPreview: ReferendumPreview) {
         coroutineScope.launch {
             val id = referendumPreview.id
             if (_cardsAmount.first().containsKey(id)) return@launch

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.domain.orLoading
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.safeSubList
 import io.novafoundation.nova.common.utils.sendEvent
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 
 class TinderGovCardsViewModel(
     private val router: GovernanceRouter,
-    private val tinderGovCardDetailsLoader: TinderGovCardDetailsLoader,
+    private val tinderGovCardDetailsLoaderFactory: TinderGovCardsDetailsLoaderFactory,
     private val interactor: TinderGovInteractor,
     private val referendumFormatter: ReferendumFormatter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -44,6 +45,8 @@ class TinderGovCardsViewModel(
     companion object {
         const val CARD_STACK_SIZE = 3
     }
+
+    private val tinderGovCardDetailsLoader = tinderGovCardDetailsLoaderFactory.create(coroutineScope = this)
 
     private val cardsSummaryFlow = tinderGovCardDetailsLoader.cardsSummaryFlow
         .shareInBackground()
@@ -86,7 +89,7 @@ class TinderGovCardsViewModel(
     init {
         interactor.observeReferendaAvailableToVote(this)
             .onEach { referenda ->
-                val currentReferendaIds = sortedReferendaFlow.value.map { it.id }.toSet()
+                val currentReferendaIds = sortedReferendaFlow.value.mapToSet { it.id }
                 val newReferenda = referenda.associateBy { it.id } - currentReferendaIds
 
                 sortedReferendaFlow.value += newReferenda.values // To add new coming referenda to the end of list
@@ -118,8 +121,8 @@ class TinderGovCardsViewModel(
 
         // Load summary and amount for each referendum
         referenda.forEach {
-            tinderGovCardDetailsLoader.loadSummary(it, this)
-            tinderGovCardDetailsLoader.loadAmount(it, this)
+            tinderGovCardDetailsLoader.loadSummary(it)
+            tinderGovCardDetailsLoader.loadAmount(it)
         }
     }
 
@@ -175,7 +178,7 @@ class TinderGovCardsViewModel(
 
     private fun reloadDetailsForReferendum(referendum: ReferendumPreview) = launch {
         tinderGovCardDetailsLoader.reloadSummary(referendum, this)
-        tinderGovCardDetailsLoader.reloadAmount(referendum, this)
+        tinderGovCardDetailsLoader.reloadAmount(referendum)
     }
 
     private fun mapCards(

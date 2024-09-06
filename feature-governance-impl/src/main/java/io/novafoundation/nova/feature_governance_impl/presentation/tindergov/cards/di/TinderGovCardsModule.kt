@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardDetailsLoader
+import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsDetailsLoaderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 
@@ -23,8 +23,8 @@ class TinderGovCardsModule {
     fun provideTinderGovCardsDataHelper(
         interactor: TinderGovInteractor,
         assetUseCase: AssetUseCase,
-    ): TinderGovCardDetailsLoader {
-        return TinderGovCardDetailsLoader(
+    ): TinderGovCardsDetailsLoaderFactory {
+        return TinderGovCardsDetailsLoaderFactory(
             interactor,
             assetUseCase
         )
@@ -36,13 +36,13 @@ class TinderGovCardsModule {
     fun provideViewModel(
         router: GovernanceRouter,
         tinderGovInteractor: TinderGovInteractor,
-        tinderGovCardDetailsLoader: TinderGovCardDetailsLoader,
+        tinderGovCardDetailsLoaderFactory: TinderGovCardsDetailsLoaderFactory,
         referendumFormatter: ReferendumFormatter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return TinderGovCardsViewModel(
             router,
-            tinderGovCardDetailsLoader,
+            tinderGovCardDetailsLoaderFactory,
             tinderGovInteractor,
             referendumFormatter,
             actionAwaitableMixinFactory
