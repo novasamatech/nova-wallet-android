@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketI
 import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId

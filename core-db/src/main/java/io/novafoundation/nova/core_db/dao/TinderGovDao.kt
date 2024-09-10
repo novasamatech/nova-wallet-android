@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import io.novafoundation.nova.core_db.model.TinderGovBasketItemLocal
 import io.novafoundation.nova.core_db.model.TinderGovVotingPowerLocal
-import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 
 @Dao

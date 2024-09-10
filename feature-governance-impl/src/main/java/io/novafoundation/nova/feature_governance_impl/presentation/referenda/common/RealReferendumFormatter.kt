@@ -48,9 +48,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatT
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import java.math.BigDecimal
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 

@@ -15,9 +15,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.TinderGovBasketViewModel
-import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsDataHelper
 
 @Module(includes = [ViewModelModule::class])
 class TinderGovBasketModule {

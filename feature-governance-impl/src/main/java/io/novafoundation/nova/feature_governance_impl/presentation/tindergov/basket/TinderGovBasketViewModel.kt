@@ -54,8 +54,11 @@ class TinderGovBasketViewModel(
         .shareInBackground()
 
     val editModeButtonText = inEditModeFlow.map {
-        if (it) resourceManager.getString(R.string.common_done)
-        else resourceManager.getString(R.string.common_edit)
+        if (it) {
+            resourceManager.getString(R.string.common_done)
+        } else {
+            resourceManager.getString(R.string.common_edit)
+        }
     }
 
     val basketFlow = combine(availableToVoteReferendaFlow, basketItemsFlow) { referendaById, basketItems ->
@@ -83,7 +86,6 @@ class TinderGovBasketViewModel(
             val title = resourceManager.getString(R.string.tinder_gov_basket_remove_item_confirm_title, refId)
 
             if (removeReferendumAction.awaitAction(title)) {
-
                 val referendum = basketItemsFlow.first()
                     .associateBy { it.referendumId }
                     .get(item.id) ?: return@launch
