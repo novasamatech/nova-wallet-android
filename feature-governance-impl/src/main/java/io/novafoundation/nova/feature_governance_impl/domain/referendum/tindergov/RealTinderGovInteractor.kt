@@ -17,10 +17,12 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.ReferendumSummaryDataSource
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovBasketRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovVotingPowerRepository
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.ReferendumDetailsRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.runtime.ext.summaryApiOrNull
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -33,14 +35,14 @@ import kotlinx.coroutines.flow.map
 
 class RealTinderGovInteractor(
     private val governanceSharedState: GovernanceSharedState,
-    private val referendaCommonRepository: ReferendaCommonRepository,
     private val referendaSharedComputation: ReferendaSharedComputation,
     private val accountRepository: AccountRepository,
-    private val referendumSummaryDataSource: ReferendumSummaryDataSource,
+    private val referendumDetailsRepository: ReferendumDetailsRepository,
     private val preImageParser: ReferendumPreImageParser,
     private val tinderGovBasketRepository: TinderGovBasketRepository,
     private val walletRepository: WalletRepository,
     private val tinderGovVotingPowerRepository: TinderGovVotingPowerRepository,
+    private val referendaFilteringProvider: ReferendaFilteringProvider,
 ) : TinderGovInteractor {
 
     override fun observeReferendaAvailableToVote(coroutineScope: CoroutineScope): Flow<List<ReferendumPreview>> {
@@ -56,7 +58,7 @@ class RealTinderGovInteractor(
                 governanceSharedState.selectedOption(),
                 coroutineScope
             ).filterLoaded()
-                .map { referendaCommonRepository.filterAvailableToVoteReferenda(it.referenda, it.voting) }
+                .map { referendaFilteringProvider.filterAvailableToVoteReferenda(it.referenda, it.voting) }
         }
     }
 
@@ -90,7 +92,7 @@ class RealTinderGovInteractor(
     override suspend fun loadReferendumSummary(id: ReferendumId): String? {
         val chain = governanceSharedState.chain()
         val summaryApi = chain.summaryApiOrNull() ?: return null
-        return referendumSummaryDataSource.loadSummary(chain, id, summaryApi.url)
+        return referendumDetailsRepository.loadSummary(chain, id, summaryApi.url)
     }
 
     override suspend fun loadReferendumAmount(referendumPreview: ReferendumPreview): BigInteger? {

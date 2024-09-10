@@ -92,6 +92,8 @@ buildscript {
         googleApiClientVersion = "1.32.1"
         googleDriveVersion = "v3-rev20210919-1.32.1"
 
+        cardStackVersion = "2.3.4"
+
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
             exclude group: "androidx.fragment", module: "fragment-ktx"
@@ -214,7 +216,7 @@ buildscript {
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
-        cardStackView = 'com.github.yuyakaido:cardstackview:2.3.4'
+        cardStackView = 'com.github.yuyakaido:cardstackview:$cardStackVersion'
     }
 
     repositories {

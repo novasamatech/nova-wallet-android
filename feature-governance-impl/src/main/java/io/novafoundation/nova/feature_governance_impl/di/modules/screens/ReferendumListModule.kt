@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFi
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.RealReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.RealReferendaFilteringProvider
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.RealReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.RealReferendaSortingProvider
@@ -42,6 +44,12 @@ class ReferendumListModule {
     @FeatureScope
     fun provideReferendaSortingProvider(): ReferendaSortingProvider {
         return RealReferendaSortingProvider()
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaFilteringProvider(): ReferendaFilteringProvider {
+        return RealReferendaFilteringProvider()
     }
 
     @Provides
@@ -79,11 +87,13 @@ class ReferendumListModule {
         referendaSharedComputation: ReferendaSharedComputation,
         governanceSourceRegistry: GovernanceSourceRegistry,
         referendaSortingProvider: ReferendaSortingProvider,
+        referendaFilteringProvider: ReferendaFilteringProvider
     ): ReferendaListInteractor = RealReferendaListInteractor(
         referendaCommonRepository = referendaCommonRepository,
         governanceSharedState = governanceSharedState,
         referendaSharedComputation = referendaSharedComputation,
         governanceSourceRegistry = governanceSourceRegistry,
         referendaSortingProvider = referendaSortingProvider,
+        referendaFilteringProvider = referendaFilteringProvider
     )
 }

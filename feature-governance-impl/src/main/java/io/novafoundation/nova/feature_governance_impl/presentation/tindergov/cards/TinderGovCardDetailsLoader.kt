@@ -5,21 +5,17 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState.Loading
 import io.novafoundation.nova.common.domain.ExtendedLoadingState.Loaded
 import io.novafoundation.nova.common.domain.ExtendedLoadingState.Error
 import io.novafoundation.nova.common.domain.map
-import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.common.utils.share
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
-import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -28,46 +24,51 @@ import kotlinx.coroutines.sync.withLock
 private typealias SummaryLoadingState = Map<ReferendumId, ExtendedLoadingState<String?>>
 private typealias AmountLoadingState = Map<ReferendumId, ExtendedLoadingState<AmountModel?>>
 
-class TinderGovCardsDataHelper(
-    private val accountRepository: AccountRepository,
-    private val walletRepository: WalletRepository,
+class TinderGovCardsDetailsLoaderFactory(
     private val interactor: TinderGovInteractor,
-    private val governanceSharedState: GovernanceSharedState,
+    private val assetUseCase: AssetUseCase
 ) {
 
-    private val assetFlow = combine(accountRepository.selectedMetaAccountFlow(), governanceSharedState.selectedAssetFlow()) { metaAccount, chainAsset ->
-        walletRepository.getAsset(metaAccount.id, chainAsset)
+    fun create(coroutineScope: CoroutineScope): TinderGovCardDetailsLoader {
+        return TinderGovCardDetailsLoader(interactor, assetUseCase, coroutineScope)
     }
+}
+
+class TinderGovCardDetailsLoader(
+    private val interactor: TinderGovInteractor,
+    private val assetUseCase: AssetUseCase,
+    private val coroutineScope: CoroutineScope
+) : CoroutineScope by coroutineScope {
+
+    private val assetFlow = assetUseCase.currentAssetFlow()
+        .share()
 
     private val summaryMutex = Mutex()
     private val amountMutex = Mutex()
 
-    private val _cardsSummary = singleReplaySharedFlow<SummaryLoadingState>()
-    private val _cardsAmount = singleReplaySharedFlow<AmountLoadingState>()
+    private val _cardsSummary = MutableStateFlow<SummaryLoadingState>(emptyMap())
+    private val _cardsAmount = MutableStateFlow<AmountLoadingState>(emptyMap())
 
     val cardsSummaryFlow: Flow<SummaryLoadingState> = _cardsSummary
     val cardsAmountFlow: Flow<AmountLoadingState> = _cardsAmount
 
-    fun init(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
-            _cardsSummary.emit(emptyMap())
-            _cardsAmount.emit(emptyMap())
-        }
-    }
-
-    suspend fun removeSummary(referendumId: ReferendumId) {
+    suspend fun reloadSummary(referendumPreview: ReferendumPreview, coroutineScope: CoroutineScope) {
         summaryMutex.withLock {
-            _cardsSummary.update { it - referendumId }
+            _cardsSummary.update { it - referendumPreview.id }
         }
+
+        loadSummary(referendumPreview)
     }
 
-    suspend fun removeAmount(referendumId: ReferendumId) {
+    suspend fun reloadAmount(referendumPreview: ReferendumPreview) {
         amountMutex.withLock {
-            _cardsAmount.update { it - referendumId }
+            _cardsAmount.update { it - referendumPreview.id }
         }
+
+        loadAmount(referendumPreview)
     }
 
-    fun loadSummary(referendumPreview: ReferendumPreview, coroutineScope: CoroutineScope) {
+    fun loadSummary(referendumPreview: ReferendumPreview) {
         coroutineScope.launch {
             val id = referendumPreview.id
             if (containsSummary(id)) return@launch
@@ -79,7 +80,7 @@ class TinderGovCardsDataHelper(
         }
     }
 
-    fun loadAmount(referendumPreview: ReferendumPreview, coroutineScope: CoroutineScope) {
+    fun loadAmount(referendumPreview: ReferendumPreview) {
         coroutineScope.launch {
             val id = referendumPreview.id
             if (containsAmount(id)) return@launch
@@ -109,7 +110,7 @@ class TinderGovCardsDataHelper(
         amountMutex.withLock {
             val amountModel = amount.map {
                 it ?: return@map null
-                val asset = assetFlow.first() ?: return@map null
+                val asset = assetFlow.first()
                 mapAmountToAmountModel(it, asset)
             }
 
@@ -118,6 +119,6 @@ class TinderGovCardsDataHelper(
     }
 }
 
-private suspend fun <T> MutableSharedFlow<T>.update(updater: (T) -> T) {
-    emit(updater(first()))
+private fun <T> MutableStateFlow<T>.update(updater: (T) -> T) {
+    value = updater(value)
 }
