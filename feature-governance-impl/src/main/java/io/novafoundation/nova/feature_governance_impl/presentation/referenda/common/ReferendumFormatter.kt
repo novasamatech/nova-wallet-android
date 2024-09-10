@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.common
 
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
@@ -15,7 +16,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourMultiVoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import java.math.BigDecimal
 
 interface ReferendumFormatter {
 

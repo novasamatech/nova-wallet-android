@@ -131,6 +131,10 @@ class GovernanceNavigator(
         performNavigation(R.id.action_openTinderGovCards)
     }
 
+    override fun openTinderGovBasket() {
+        performNavigation(R.id.action_tinderGovCards_to_tinderGovBasket)
+    }
+
     override fun openReferendaSearch() {
         performNavigation(R.id.action_open_referenda_search)
     }

@@ -9,7 +9,7 @@ class TinderGovBasketItem(
     val metaId: Long,
     val chainId: String,
     val referendumId: ReferendumId,
-    val vote: VoteType,
+    val voteType: VoteType,
     val conviction: Conviction,
     val amount: BigInteger
 )

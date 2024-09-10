@@ -4,6 +4,8 @@ import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketI
 import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
@@ -12,6 +14,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface TinderGovInteractor {
+
+    fun observeReferendaState(coroutineScope: CoroutineScope): Flow<ReferendaState>
 
     fun observeReferendaAvailableToVote(coroutineScope: CoroutineScope): Flow<List<ReferendumPreview>>
 
@@ -30,4 +34,10 @@ interface TinderGovInteractor {
     suspend fun isVotingPowerAvailable(): Boolean
 
     suspend fun isSufficientAmountToVote(): Boolean
+
+    suspend fun removeReferendumFromBasket(item: TinderGovBasketItem)
+
+    suspend fun removeBasketItems(items: Collection<TinderGovBasketItem>)
+
+    suspend fun isBasketEmpty(): Boolean
 }
