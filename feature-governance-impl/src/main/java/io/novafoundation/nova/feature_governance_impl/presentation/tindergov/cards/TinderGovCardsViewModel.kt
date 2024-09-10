@@ -120,7 +120,7 @@ class TinderGovCardsViewModel(
             if (allReferendaVoted) {
                 router.openTinderGovBasket()
             }
-        }
+        }.launchIn(this)
     }
 
     fun back() {
