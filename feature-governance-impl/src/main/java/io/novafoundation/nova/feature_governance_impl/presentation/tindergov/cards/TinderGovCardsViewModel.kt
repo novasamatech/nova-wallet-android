@@ -100,11 +100,9 @@ class TinderGovCardsViewModel(
         val referendaWithBasket = combineToPair(interactor.observeReferendaAvailableToVote(this), basketFlow)
         referendaWithBasket.onEach { (referenda, basket) ->
             val currentReferendaIds = sortedReferendaFlow.value.map { it.id }.toSet()
-            val newReferenda = referenda.associateBy { it.id }
-                .filter { it.key !in currentReferendaIds }
-                .filter { it.key !in basket }
+            val newReferenda = referenda.filter { it.id !in currentReferendaIds && it.id !in basket }
 
-            sortedReferendaFlow.value += newReferenda.values // To add new coming referenda to the end of list
+            sortedReferendaFlow.value += newReferenda // To add new coming referenda to the end of list
         }.launchIn(this)
 
         setupReferendumRetryAction()
@@ -162,7 +160,12 @@ class TinderGovCardsViewModel(
         isVotingInProgress.value = true
 
         launch {
-            val referendum = sortedReferendaFlow.value.getOrNull(position) ?: return@launch
+            val referendum = sortedReferendaFlow.value.getOrNull(position)
+
+            if (referendum == null) {
+                isVotingInProgress.value = false
+                return@launch
+            }
 
             if (!interactor.isVotingPowerAvailable()) {
                 val response = tinderGovVoteRequester.awaitResponse(TinderGovVoteRequester.Request(referendum.id.value))

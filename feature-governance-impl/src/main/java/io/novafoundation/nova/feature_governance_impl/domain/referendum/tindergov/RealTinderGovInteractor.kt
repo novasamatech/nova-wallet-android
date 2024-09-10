@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.runtime.ext.summaryApiOrNull
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedOption
 import java.math.BigInteger
@@ -109,9 +108,8 @@ class RealTinderGovInteractor(
         }
     }
 
-    override suspend fun setVotingPower(chainId: ChainId, amount: BigInteger, conviction: Conviction) {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        tinderGovVotingPowerRepository.setVotingPower(VotingPower(metaAccount.id, chainId, amount, conviction))
+    override suspend fun setVotingPower(votingPower: VotingPower) {
+        tinderGovVotingPowerRepository.setVotingPower(votingPower)
     }
 
     override suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower? {
@@ -130,6 +128,6 @@ class RealTinderGovInteractor(
         val votingPower = getVotingPower(metaAccount.id, chain.id) ?: return false
         val asset = walletRepository.getAsset(metaAccount.id, chain.utilityAsset) ?: return false
 
-        return asset.totalInPlanks >= votingPower.amount
+        return asset.freeInPlanks >= votingPower.amount
     }
 }
