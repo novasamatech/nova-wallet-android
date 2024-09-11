@@ -14,13 +14,11 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.toCa
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.user
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.ReferendumSummaryDataSource
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovBasketRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovVotingPowerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.ReferendumDetailsRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
