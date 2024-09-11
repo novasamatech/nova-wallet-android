@@ -145,13 +145,7 @@ class TinderGovCardsViewModel(
 
     fun onCardAppeared(position: Int) {
         topCardIndex.value = position
-    }
 
-    fun onBasketClicked() {
-        router.openTinderGovBasket()
-    }
-
-    fun loadContentForCardsFromPosition(position: Int) {
         // Get 3 first referenda to load content for
         val referenda = sortedReferendaFlow.value.safeSubList(position, position + CARD_STACK_SIZE)
 
@@ -162,10 +156,14 @@ class TinderGovCardsViewModel(
         }
     }
 
+    fun onBasketClicked() {
+        router.openTinderGovBasket()
+    }
+
     fun editVotingPowerClicked() {
         launch {
             val topReferendum = topReferendumWithDetails.first()
-            tinderGovVoteRequester.openRequest(TinderGovVoteRequester.Request(topReferendum.first.id.value))
+            tinderGovVoteRequester.openRequest(TinderGovVoteRequester.Request(topReferendum.referendum.id.value))
         }
     }
 
