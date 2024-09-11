@@ -95,9 +95,9 @@ class TinderGovCardsViewModel(
 
     private var isVotingInProgress = MutableStateFlow(false)
 
-    val isCardDraggingAvailable = combine(isVotingInProgress, topReferendumWithDetails) { isVotingInProgress, (_, summary, amount) ->
-        val summaryLoaded = summary?.isLoaded().orFalse()
-        val amountLoaded = amount?.isLoaded().orFalse()
+    val isCardDraggingAvailable = combine(isVotingInProgress, topReferendumWithDetails) { isVotingInProgress, cardWithDetails ->
+        val summaryLoaded = cardWithDetails.summary?.isLoaded().orFalse()
+        val amountLoaded = cardWithDetails.summary?.isLoaded().orFalse()
         !isVotingInProgress && summaryLoaded && amountLoaded
     }
 
