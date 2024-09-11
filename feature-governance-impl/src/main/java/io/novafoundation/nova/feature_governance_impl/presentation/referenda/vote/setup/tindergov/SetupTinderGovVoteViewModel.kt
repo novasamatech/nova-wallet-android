@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
@@ -82,9 +83,11 @@ class SetupTinderGovVoteViewModel(
 
     override fun onFinish(validationPayload: VoteReferendumValidationPayload) {
         launch {
+            val metaAccount = accountRepository.getSelectedMetaAccount()
             val chainAsset = validationPayload.asset.token.configuration
             val amount = chainAsset.planksFromAmount(validationPayload.voteAmount)
-            tinderGovInteractor.setVotingPower(chainAsset.chainId, amount, validationPayload.conviction)
+            val votingPower = VotingPower(metaAccount.id, chainAsset.chainId, amount, validationPayload.conviction)
+            tinderGovInteractor.setVotingPower(votingPower)
             tinderGovVoteResponder.respond(TinderGovVoteResponder.Response(success = true))
             router.back()
         }

@@ -15,9 +15,11 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.RealTinderGovVotingPowerRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovBasketRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovVotingPowerRepository
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.RealReferendumDetailsRepository
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.ReferendumDetailsRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.RealTinderGovInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 
@@ -54,25 +56,33 @@ class TinderGovModule {
 
     @Provides
     @FeatureScope
+    fun provideReferendumDetailsRepository(
+        dataSource: ReferendumSummaryDataSource
+    ): ReferendumDetailsRepository {
+        return RealReferendumDetailsRepository(dataSource)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideTinderGovInteractor(
         governanceSharedState: GovernanceSharedState,
-        referendaCommonRepository: ReferendaCommonRepository,
         referendaSharedComputation: ReferendaSharedComputation,
         accountRepository: AccountRepository,
-        referendumSummaryDataSource: ReferendumSummaryDataSource,
+        referendumDetailsRepository: ReferendumDetailsRepository,
         preImageParser: ReferendumPreImageParser,
         tinderGovBasketRepository: TinderGovBasketRepository,
         walletRepository: WalletRepository,
         tinderGovVotingPowerRepository: TinderGovVotingPowerRepository,
+        referendaFilteringProvider: ReferendaFilteringProvider
     ): TinderGovInteractor = RealTinderGovInteractor(
         governanceSharedState,
-        referendaCommonRepository,
         referendaSharedComputation,
         accountRepository,
-        referendumSummaryDataSource,
+        referendumDetailsRepository,
         preImageParser,
         tinderGovBasketRepository,
         walletRepository,
-        tinderGovVotingPowerRepository
+        tinderGovVotingPowerRepository,
+        referendaFilteringProvider
     )
 }

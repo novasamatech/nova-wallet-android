@@ -52,14 +52,16 @@ class RealTinderGovBasketRepository(private val dao: TinderGovDao) : TinderGovBa
             metaId = this.metaId,
             chainId = this.chainId,
             referendumId = this.referendumId.value,
-            voteType = when (this.voteType) {
-                VoteType.AYE -> LocalVoteType.AYE
-                VoteType.NAY -> LocalVoteType.NAY
-                VoteType.ABSTAIN -> LocalVoteType.ABSTAIN
-            },
+            voteType = this.voteTypeToLocal(),
             conviction = this.conviction.toLocal(),
             amount = this.amount
         )
+    }
+
+    private fun TinderGovBasketItem.voteTypeToLocal() = when (this.voteType) {
+        VoteType.AYE -> LocalVoteType.AYE
+        VoteType.NAY -> LocalVoteType.NAY
+        VoteType.ABSTAIN -> LocalVoteType.ABSTAIN
     }
 
     private fun TinderGovBasketItemLocal.toDomain(): TinderGovBasketItem {
@@ -67,13 +69,15 @@ class RealTinderGovBasketRepository(private val dao: TinderGovDao) : TinderGovBa
             metaId = this.metaId,
             chainId = this.chainId,
             referendumId = ReferendumId(this.referendumId),
-            voteType = when (this.voteType) {
-                LocalVoteType.AYE -> VoteType.AYE
-                LocalVoteType.NAY -> VoteType.NAY
-                LocalVoteType.ABSTAIN -> VoteType.ABSTAIN
-            },
+            voteType = this.voteTypeToDomain(),
             conviction = this.conviction.toDomain(),
             amount = this.amount
         )
+    }
+
+    private fun TinderGovBasketItemLocal.voteTypeToDomain() = when (this.voteType) {
+        LocalVoteType.AYE -> VoteType.AYE
+        LocalVoteType.NAY -> VoteType.NAY
+        LocalVoteType.ABSTAIN -> VoteType.ABSTAIN
     }
 }

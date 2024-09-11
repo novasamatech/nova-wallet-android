@@ -62,7 +62,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
             .apply {
                 setStackFrom(StackFrom.Bottom)
                 setDirections(listOf(Direction.Left, Direction.Right, Direction.Top))
-                setVisibleCount(3)
+                setVisibleCount(TinderGovCardsViewModel.CARD_STACK_SIZE)
                 setTranslationInterval(8f)
                 setScaleInterval(getScaleIntervalForPadding(16.dp))
                 setOverlayInterpolator(CardsOverlayInterpolator(delay = 0.15f, maxResult = 0.64f))
@@ -146,8 +146,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
     }
 
     override fun onCardAppeared(view: View, position: Int) {
-        viewModel.onCardOnTop(position)
-        viewModel.loadContentForCardsFromPosition(position)
+        viewModel.onCardAppeared(position)
     }
 
     override fun onCardSwiped(direction: Direction) {

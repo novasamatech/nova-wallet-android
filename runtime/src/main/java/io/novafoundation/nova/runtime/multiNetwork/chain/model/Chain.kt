@@ -195,7 +195,7 @@ data class Chain(
 
         data class GovernanceDelegations(override val url: String) : ExternalApi()
 
-        data class ReferendumSummary(override val url: String) : ExternalApi()
+        data class ReferendumSummary(override val url: String, val network: String?) : ExternalApi()
     }
 
     enum class Governance {
