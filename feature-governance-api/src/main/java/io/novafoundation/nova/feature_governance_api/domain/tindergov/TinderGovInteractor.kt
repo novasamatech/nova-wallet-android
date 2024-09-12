@@ -38,4 +38,6 @@ interface TinderGovInteractor {
     suspend fun removeBasketItems(items: Collection<TinderGovBasketItem>)
 
     suspend fun isBasketEmpty(): Boolean
+
+    suspend fun clearBasket()
 }

@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amount
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoingOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.LocksChange
@@ -17,7 +16,7 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.Reusa
 import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.addIfPositive
 import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.maximize
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VotingLocksEstimator
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
@@ -25,7 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 
-internal class RealGovernanceLocksEstimator(
+internal class RealVotingLocksEstimator(
     override val onChainReferenda: List<OnChainReferendum>,
     private val voting: Map<TrackId, Voting>,
     private val votedReferenda: Map<ReferendumId, OnChainReferendum>,
@@ -36,7 +35,7 @@ internal class RealGovernanceLocksEstimator(
     voteLockingPeriod: BlockNumber,
     balanceLocks: List<BalanceLock>,
     governanceLocksByTrack: Map<TrackId, Balance>,
-) : GovernanceVoteAssistant {
+) : VotingLocksEstimator {
 
     private val referendaById = onChainReferenda.associateBy { it.id }
 
@@ -60,8 +59,6 @@ internal class RealGovernanceLocksEstimator(
 
     private val allMaxLocked = balanceLocks.maxOfOrNull { it.amountInPlanks }
         .orZero()
-
-    override val trackVoting: List<Voting> = voting.findVotingFor(onChainReferenda)
 
     override suspend fun estimateLocks(votes: Map<ReferendumId, AccountVote>, asset: Asset): LocksChange {
         return votes.map { estimateForVote(it.key, it.value, asset) }
@@ -135,21 +132,5 @@ internal class RealGovernanceLocksEstimator(
         return flattenedVotes.maxOfOrNull { (referendumId, vote) ->
             claimScheduleCalculator.maxConvictionEndOf(vote, referendumId)
         }.orZero()
-    }
-
-    private fun Map<TrackId, Voting>.findVotingFor(onChainReferenda: List<OnChainReferendum>): List<Voting> {
-        return onChainReferenda.mapNotNull { referendum ->
-            val asOngoing = referendum.status.asOngoingOrNull()
-
-            if (asOngoing != null) {
-                // fast-path - we have direct access to trackId
-                get(asOngoing.track)
-            } else {
-                // slow path - referendum is completed so have to find by referendumId
-                values.firstOrNull {
-                    it is Voting.Casting && referendum.id in it.votes.keys
-                }
-            }
-        }
     }
 }

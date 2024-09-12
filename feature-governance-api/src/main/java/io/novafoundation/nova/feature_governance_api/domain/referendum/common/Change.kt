@@ -23,6 +23,13 @@ fun Change<Balance>.absoluteDifference(): Balance {
     }
 }
 
+fun Change<Duration>.absoluteDifference(): Duration {
+    return when (this) {
+        is Change.Changed -> absoluteDifference
+        is Change.Same -> Duration.ZERO
+    }
+}
+
 fun <T : Comparable<T>> Change(
     previousValue: T,
     newValue: T,

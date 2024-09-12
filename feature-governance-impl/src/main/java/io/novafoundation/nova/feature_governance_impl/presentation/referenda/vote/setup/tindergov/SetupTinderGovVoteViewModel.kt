@@ -5,10 +5,11 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendaValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
@@ -22,6 +23,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
+import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -78,15 +81,20 @@ class SetupTinderGovVoteViewModel(
     }
 
     fun continueClicked() {
-        validateVote(voteType = null)
+        validateVote(voteType = VoteType.AYE) // Use AYE as a stub
     }
 
-    override fun onFinish(validationPayload: VoteReferendumValidationPayload) {
+    override fun onFinish(
+        amount: BigDecimal,
+        conviction: Conviction,
+        voteType: VoteType,
+        validationPayload: VoteReferendaValidationPayload
+    ) {
         launch {
             val metaAccount = accountRepository.getSelectedMetaAccount()
             val chainAsset = validationPayload.asset.token.configuration
-            val amount = chainAsset.planksFromAmount(validationPayload.voteAmount)
-            val votingPower = VotingPower(metaAccount.id, chainAsset.chainId, amount, validationPayload.conviction)
+            val amountInPlanks = chainAsset.planksFromAmount(amount)
+            val votingPower = VotingPower(metaAccount.id, chainAsset.chainId, amountInPlanks, conviction)
             tinderGovInteractor.setVotingPower(votingPower)
             tinderGovVoteResponder.respond(TinderGovVoteResponder.Response(success = true))
             router.back()

@@ -186,6 +186,12 @@ class GovV2ConvictionVotingRepository(
         convictionVotingVote(referendumId, vote)
     }
 
+    override fun ExtrinsicBuilder.vote(votes: Map<ReferendumId, AccountVote>) {
+        votes.forEach { (referendumId, vote) ->
+            convictionVotingVote(referendumId, vote)
+        }
+    }
+
     override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {
         convictionVotingRemoveVote(trackId, referendumId)
     }

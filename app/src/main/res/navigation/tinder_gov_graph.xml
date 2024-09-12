@@ -41,6 +41,33 @@
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.TinderGovBasketFragment"
         android:label="TinderGovBasketFragment"
         app:useAdd="true"
-        tools:layout="@layout/fragment_tinder_gov_basket" />
+        tools:layout="@layout/fragment_tinder_gov_basket">
+
+        <action
+            android:id="@+id/action_setupTinderGovBasket_to_confirmTinderGovVote"
+            app:destination="@id/confirmTinderGovVoteFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmTinderGovVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm.ConfirmTinderGovVoteFragment"
+        android:label="ConfirmTinderGovVoteFragment"
+        app:useAdd="true">
+
+        <action
+            android:id="@+id/action_confirmTinderGovVote_to_tinderGovCards"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@id/tinderGovCards" />
+
+    </fragment>
+
 
 </navigation>

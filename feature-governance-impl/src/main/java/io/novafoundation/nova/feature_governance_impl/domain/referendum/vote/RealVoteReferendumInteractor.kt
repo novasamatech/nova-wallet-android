@@ -1,29 +1,32 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AyeVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
+import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -43,40 +46,58 @@ class RealVoteReferendumInteractor(
 ) : VoteReferendumInteractor {
 
     override fun voteAssistantFlow(referendumId: ReferendumId, scope: CoroutineScope): Flow<GovernanceVoteAssistant> {
+        return voteAssistantFlow(listOf(referendumId), scope)
+    }
+
+    override fun voteAssistantFlow(referendaIds: List<ReferendumId>, scope: CoroutineScope): Flow<GovernanceVoteAssistant> {
         return computationalCache.useSharedFlow(VOTE_ASSISTANT_CACHE_KEY, scope) {
             val governanceOption = selectedChainState.selectedOption()
             val metaAccount = accountRepository.getSelectedMetaAccount()
 
             val voterAccountId = metaAccount.accountIdIn(governanceOption.assetWithChain.chain)!!
 
-            voteAssistantFlowSuspend(governanceOption, voterAccountId, metaAccount.id, referendumId)
+            voteAssistantFlowSuspend(governanceOption, voterAccountId, metaAccount.id, referendaIds)
         }
     }
 
-    override suspend fun estimateFee(amount: Balance, conviction: Conviction, referendumId: ReferendumId): Fee {
+    override suspend fun estimateFee(votes: Map<ReferendumId, AccountVote>): Fee {
+        return estimateFeeInternal { it.vote(votes) }
+    }
+
+    override suspend fun estimateFee(referendumId: ReferendumId, vote: AccountVote): Fee {
+        return estimateFeeInternal { it.vote(referendumId, vote) }
+    }
+
+    private suspend inline fun estimateFeeInternal(crossinline builder: ConvictionVotingRepository.(ExtrinsicBuilder) -> Unit): Fee {
         val governanceOption = selectedChainState.selectedOption()
         val chain = governanceOption.assetWithChain.chain
 
-        val vote = AyeVote(amount, conviction) // vote direction does not influence fee estimation
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
 
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             with(governanceSource.convictionVoting) {
-                vote(referendumId, vote)
+                builder(this@estimateFee)
             }
         }
     }
 
-    override suspend fun vote(
-        vote: AccountVote,
-        referendumId: ReferendumId,
-    ): Result<ExtrinsicSubmission> {
-        val governanceSelectedOption = selectedChainState.selectedOption()
-        val governanceSource = governanceSourceRegistry.sourceFor(governanceSelectedOption)
+    override suspend fun vote(votes: Map<ReferendumId, AccountVote>): Result<ExtrinsicSubmission> {
+        return voteInternal { it.vote(votes) }
+    }
 
-        return extrinsicService.submitExtrinsic(governanceSelectedOption.assetWithChain.chain, TransactionOrigin.SelectedWallet) {
+    override suspend fun vote(referendumId: ReferendumId, vote: AccountVote): Result<ExtrinsicSubmission> {
+        return voteInternal { it.vote(referendumId, vote) }
+    }
+
+    private suspend inline fun voteInternal(crossinline builder: ConvictionVotingRepository.(ExtrinsicBuilder) -> Unit): Result<ExtrinsicSubmission> {
+        val governanceOption = selectedChainState.selectedOption()
+        val chain = governanceOption.assetWithChain.chain
+
+        val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
+
+        return extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) {
             with(governanceSource.convictionVoting) {
-                vote(referendumId, vote)
+                builder(this@submitExtrinsic)
             }
         }
     }
@@ -92,7 +113,7 @@ class RealVoteReferendumInteractor(
         selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId,
         metaId: Long,
-        referendumId: ReferendumId
+        referendaIds: List<ReferendumId>
     ): Flow<GovernanceVoteAssistant> {
         val chain = selectedGovernanceOption.assetWithChain.chain
         val chainAsset = selectedGovernanceOption.assetWithChain.asset
@@ -110,16 +131,15 @@ class RealVoteReferendumInteractor(
             Triple(locksByTrack, voting, votedReferenda)
         }
 
-        val selectedReferendumFlow = governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId)
-            .filterNotNull()
+        val selectedReferendaFlow = getOnChainReferendaFlow(governanceSource, chain, referendaIds)
 
         val balanceLocksFlow = locksRepository.observeBalanceLocks(metaId, chain, chainAsset)
 
-        return combine(votingInformation, selectedReferendumFlow, balanceLocksFlow) { (locksByTrack, voting, votedReferenda), selectedReferendum, locks ->
+        return combine(votingInformation, selectedReferendaFlow, balanceLocksFlow) { (locksByTrack, voting, votedReferenda), selectedReferenda, locks ->
             val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
 
             RealGovernanceLocksEstimator(
-                onChainReferendum = selectedReferendum,
+                onChainReferenda = selectedReferenda,
                 balanceLocks = locks,
                 governanceLocksByTrack = locksByTrack,
                 voting = voting,
@@ -132,5 +152,19 @@ class RealVoteReferendumInteractor(
             )
         }
     }
-}
 
+    private suspend fun getOnChainReferendaFlow(
+        governanceSource: GovernanceSource,
+        chain: Chain,
+        referendaIds: List<ReferendumId>
+    ): Flow<List<OnChainReferendum>> {
+        return if (referendaIds.size == 1) {
+            governanceSource.referenda.onChainReferendumFlow(chain.id, referendaIds.first())
+                .filterNotNull()
+                .map { listOf(it) }
+        } else {
+            flowOf { governanceSource.referenda.getOnChainReferenda(chain.id, referendaIds) }
+                .map { it.values.toList() }
+        }
+    }
+}

@@ -11,43 +11,25 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
-import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.LocksChange
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendaValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.LocksChangeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourMultiVoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.chainAndAsset
-import java.math.BigDecimal
-import java.math.BigInteger
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 abstract class ConfirmVoteViewModel(
     private val router: GovernanceRouter,
@@ -75,8 +57,6 @@ abstract class ConfirmVoteViewModel(
 
     abstract val accountVoteUi: Flow<YourMultiVoteModel?>
 
-    protected abstract val decimalFeeFlow: Flow<DecimalFee>
-
     protected val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
@@ -97,13 +77,9 @@ abstract class ConfirmVoteViewModel(
 
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
-    init {
-        setFee()
-    }
-
     protected abstract suspend fun performVote()
 
-    protected abstract suspend fun getValidationPayload(): VoteReferendumValidationPayload
+    protected abstract suspend fun getValidationPayload(): VoteReferendaValidationPayload
 
     fun accountClicked() = launch {
         val addressModel = currentAddressModelFlow.first()
@@ -133,9 +109,5 @@ abstract class ConfirmVoteViewModel(
 
     fun backClicked() {
         router.back()
-    }
-
-    private fun setFee() = launch {
-        originFeeMixin.setFee(decimalFeeFlow.first().genericFee)
     }
 }

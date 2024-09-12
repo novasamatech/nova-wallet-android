@@ -21,6 +21,8 @@ interface TinderGovBasketRepository {
 
     suspend fun isBasketEmpty(): Boolean
 
+    suspend fun clearBasket()
+
     fun observeBasket(metaId: Long, chainId: String): Flow<List<TinderGovBasketItem>>
 }
 
@@ -45,6 +47,10 @@ class RealTinderGovBasketRepository(private val dao: TinderGovDao) : TinderGovBa
 
     override suspend fun isBasketEmpty(): Boolean {
         return withContext(Dispatchers.Default) { dao.basketSize() == 0 }
+    }
+
+    override suspend fun clearBasket() {
+        withContext(Dispatchers.Default) { dao.clearBasket() }
     }
 
     private fun TinderGovBasketItem.toLocal(): TinderGovBasketItemLocal {

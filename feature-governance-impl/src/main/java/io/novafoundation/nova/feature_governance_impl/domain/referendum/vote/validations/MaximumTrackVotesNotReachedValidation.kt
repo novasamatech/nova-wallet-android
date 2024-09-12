@@ -12,15 +12,13 @@ class MaximumTrackVotesNotReachedValidation(
     private val governanceSharedState: GovernanceSharedState,
 ) : VoteReferendumValidation {
 
-    override suspend fun validate(value: VoteReferendumValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
+    override suspend fun validate(value: VoteReferendaValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
         val selectedGovernanceOption = governanceSharedState.selectedOption()
         val source = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val chainId = selectedGovernanceOption.assetWithChain.chain.id
 
         val maxTrackVotes = source.convictionVoting.maxTrackVotes(chainId)
-        val trackVotesNumber = value.trackVoting?.trackVotesNumber() ?: 0
-
-        val reachedMaxVotes = trackVotesNumber >= maxTrackVotes.toInt()
+        val reachedMaxVotes = value.trackVoting.any { it.trackVotesNumber() >= maxTrackVotes.toInt() }
 
         return reachedMaxVotes isFalseOrError {
             VoteReferendumValidationFailure.MaxTrackVotesReached(maxTrackVotes)

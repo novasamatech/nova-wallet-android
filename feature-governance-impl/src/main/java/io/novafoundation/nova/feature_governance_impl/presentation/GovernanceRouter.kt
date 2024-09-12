@@ -85,4 +85,8 @@ interface GovernanceRouter : ReturnableRouter {
     fun openTinderGovCards()
 
     fun openTinderGovBasket()
+
+    fun openConfirmTinderGovVote()
+
+    fun backToTinderGovCards()
 }

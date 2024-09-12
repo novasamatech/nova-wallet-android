@@ -11,19 +11,15 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteViewModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm.ConfirmTinderGovVoteViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -49,8 +45,8 @@ class ConfirmTinderGovVoteModule {
         validationExecutor: ValidationExecutor,
         resourceManager: ResourceManager,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        referendumFormatter: ReferendumFormatter,
         locksChangeFormatter: LocksChangeFormatter,
+        tinderGovInteractor: TinderGovInteractor
     ): ViewModel {
         return ConfirmTinderGovVoteViewModel(
             router = router,
@@ -66,8 +62,8 @@ class ConfirmTinderGovVoteModule {
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
-            referendumFormatter = referendumFormatter,
-            locksChangeFormatter = locksChangeFormatter
+            locksChangeFormatter = locksChangeFormatter,
+            tinderGovInteractor = tinderGovInteractor
         )
     }
 

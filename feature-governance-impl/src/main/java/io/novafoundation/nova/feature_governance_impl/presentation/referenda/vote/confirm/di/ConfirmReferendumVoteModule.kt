@@ -11,8 +11,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -42,7 +40,6 @@ class ConfirmReferendumVoteModule {
         walletUiUseCase: WalletUiUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
         addressIconGenerator: AddressIconGenerator,
-        @LocalIdentity localIdentityProvider: IdentityProvider,
         interactor: VoteReferendumInteractor,
         assetUseCase: AssetUseCase,
         payload: ConfirmVoteReferendumPayload,
@@ -62,7 +59,6 @@ class ConfirmReferendumVoteModule {
             walletUiUseCase = walletUiUseCase,
             selectedAccountUseCase = selectedAccountUseCase,
             addressIconGenerator = addressIconGenerator,
-            localIdentityProvider = localIdentityProvider,
             interactor = interactor,
             assetUseCase = assetUseCase,
             payload = payload,

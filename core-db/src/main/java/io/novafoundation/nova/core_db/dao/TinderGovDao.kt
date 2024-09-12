@@ -32,4 +32,7 @@ interface TinderGovDao {
 
     @Query("SELECT COUNT(*) FROM tinder_gov_basket")
     fun basketSize(): Int
+
+    @Query("DELETE FROM tinder_gov_basket")
+    fun clearBasket()
 }
