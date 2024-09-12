@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view
 
 import android.content.Context
 import android.util.AttributeSet

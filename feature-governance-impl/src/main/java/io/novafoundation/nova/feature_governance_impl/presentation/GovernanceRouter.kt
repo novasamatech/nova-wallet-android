@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVotePayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 
 interface GovernanceRouter : ReturnableRouter {
@@ -34,7 +34,9 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun openReferendumVoters(payload: ReferendumVotersPayload)
 
-    fun openSetupVoteReferendum(payload: SetupVoteReferendumPayload)
+    fun openSetupReferendumVote(payload: SetupVotePayload)
+
+    fun openSetupTinderGovVote(payload: SetupVotePayload)
 
     fun openConfirmGovernanceUnlock()
 

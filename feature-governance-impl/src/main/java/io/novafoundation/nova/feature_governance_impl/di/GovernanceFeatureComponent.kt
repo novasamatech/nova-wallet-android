@@ -29,7 +29,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.search.di.ReferendaSearchComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.di.ConfirmReferendumVoteComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di.SetupVoteReferendumComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.referenda.di.SetupReferendumVoteComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.di.SetupTinderGovVoteComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di.ReferendumVotersComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.di.TinderGovCardsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.governanceTracks.di.SelectGovernanceTracksComponent
@@ -59,7 +61,9 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
 
     fun referendumFullDetailsFactory(): ReferendumFullDetailsComponent.Factory
 
-    fun setupVoteReferendumFactory(): SetupVoteReferendumComponent.Factory
+    fun setupReferendumVoteFactory(): SetupReferendumVoteComponent.Factory
+
+    fun setupTinderGovVoteFactory(): SetupTinderGovVoteComponent.Factory
 
     fun confirmReferendumVoteFactory(): ConfirmReferendumVoteComponent.Factory
 
@@ -105,7 +109,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
         fun create(
             deps: GovernanceFeatureDependencies,
             @BindsInstance router: GovernanceRouter,
-            @BindsInstance selectTracksCommunicator: SelectTracksCommunicator
+            @BindsInstance selectTracksCommunicator: SelectTracksCommunicator,
+            @BindsInstance tinderGovVoteCommunicator: TinderGovVoteCommunicator
         ): GovernanceFeatureComponent
     }
 

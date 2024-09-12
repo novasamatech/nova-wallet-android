@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
+import io.novafoundation.nova.core_db.dao.TinderGovDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -96,6 +97,8 @@ interface GovernanceFeatureDependencies {
     val computationalCache: ComputationalCache
 
     val governanceDAppsDao: GovernanceDAppsDao
+
+    val tinderGovDao: TinderGovDao
 
     val networkApiCreator: NetworkApiCreator
 

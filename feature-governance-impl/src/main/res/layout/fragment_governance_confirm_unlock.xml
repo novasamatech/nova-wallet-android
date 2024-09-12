@@ -57,14 +57,14 @@
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="16dp">
 
-                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.AmountChangesView
                         android:layout_width="match_parent"
                         android:id="@+id/confirmReferendumUnlockTransferableChange"
                         android:layout_height="wrap_content"
                         app:amountChanges_icon="@drawable/ic_transferable"
                         app:amountChanges_title="@string/wallet_balance_transferable" />
 
-                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.AmountChangesView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/confirmReferendumUnlockGovernanceLockChange"

@@ -71,7 +71,7 @@ class TinderGovCardDetailsLoader(
     fun loadSummary(referendumPreview: ReferendumPreview) {
         coroutineScope.launch {
             val id = referendumPreview.id
-            if (_cardsSummary.first().containsKey(id)) return@launch
+            if (containsSummary(id)) return@launch
 
             setSummaryLoadingState(id, Loading)
             runCatching { interactor.loadReferendumSummary(id) }
@@ -83,7 +83,7 @@ class TinderGovCardDetailsLoader(
     fun loadAmount(referendumPreview: ReferendumPreview) {
         coroutineScope.launch {
             val id = referendumPreview.id
-            if (_cardsAmount.first().containsKey(id)) return@launch
+            if (containsAmount(id)) return@launch
 
             setAmountLoadingState(id, Loading)
             runCatching { interactor.loadReferendumAmount(referendumPreview) }
@@ -92,9 +92,17 @@ class TinderGovCardDetailsLoader(
         }
     }
 
+    private suspend fun containsSummary(id: ReferendumId): Boolean {
+        return summaryMutex.withLock { _cardsSummary.first().containsKey(id) }
+    }
+
+    private suspend fun containsAmount(id: ReferendumId): Boolean {
+        return amountMutex.withLock { _cardsAmount.first().containsKey(id) }
+    }
+
     private suspend fun setSummaryLoadingState(id: ReferendumId, summary: ExtendedLoadingState<String?>) {
         summaryMutex.withLock {
-            _cardsSummary.update { it.minus(id).plus(id to summary) }
+            _cardsSummary.update { it.plus(id to summary) }
         }
     }
 

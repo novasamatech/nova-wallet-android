@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel.DifferenceModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.AmountChangeModel.DifferenceModel
 
 class AmountChangeModel(
     val to: String,

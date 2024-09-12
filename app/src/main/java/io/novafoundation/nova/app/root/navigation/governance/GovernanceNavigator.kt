@@ -35,8 +35,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmReferendumVoteFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumFragment
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVoteFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVotePayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 
@@ -65,9 +65,14 @@ class GovernanceNavigator(
         args = ReferendumVotersFragment.getBundle(payload)
     )
 
-    override fun openSetupVoteReferendum(payload: SetupVoteReferendumPayload) = performNavigation(
+    override fun openSetupReferendumVote(payload: SetupVotePayload) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_setupVoteReferendumFragment,
-        args = SetupVoteReferendumFragment.getBundle(payload)
+        args = SetupVoteFragment.getBundle(payload)
+    )
+
+    override fun openSetupTinderGovVote(payload: SetupVotePayload) = performNavigation(
+        actionId = R.id.action_tinderGovCards_to_setupTinderGovVoteFragment,
+        args = SetupVoteFragment.getBundle(payload)
     )
 
     override fun backToReferendumDetails() = performNavigation(R.id.action_confirmReferendumVote_to_referendumDetailsFragment)

@@ -14,6 +14,6 @@ data class VoteReferendumValidationPayload(
     val trackVoting: Voting?,
     val voteAmount: BigDecimal,
     val fee: DecimalFee,
-    val voteType: VoteType,
+    val voteType: VoteType?,
     val conviction: Conviction
 )
