@@ -94,7 +94,7 @@ class ConfirmTinderGovVoteViewModel(
     private val locksChangeFlow = combine(votesFlow, voteAssistantFlow) { accountVotes, voteAssistant ->
         val asset = assetFlow.first()
 
-        voteAssistant.estimateLocks(accountVotes, asset)
+        voteAssistant.estimateLocksAfterVoting(accountVotes, asset)
     }
 
     override val locksChangeUiFlow = locksChangeFlow.map {

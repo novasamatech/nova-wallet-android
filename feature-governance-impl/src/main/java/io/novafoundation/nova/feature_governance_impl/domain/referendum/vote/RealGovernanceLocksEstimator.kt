@@ -63,7 +63,7 @@ internal class RealGovernanceLocksEstimator(
 
     override val trackVoting: List<Voting> = voting.findVotingFor(onChainReferenda)
 
-    override suspend fun estimateLocks(votes: Map<ReferendumId, AccountVote>, asset: Asset): LocksChange {
+    override suspend fun estimateLocksAfterVoting(votes: Map<ReferendumId, AccountVote>, asset: Asset): LocksChange {
         return votes.map { estimateForVote(it.key, it.value, asset) }
             .maximize()
     }

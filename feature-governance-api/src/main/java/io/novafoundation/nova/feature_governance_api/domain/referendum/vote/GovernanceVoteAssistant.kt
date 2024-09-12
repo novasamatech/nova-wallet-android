@@ -14,11 +14,11 @@ interface GovernanceVoteAssistant {
 
     val trackVoting: List<Voting>
 
-    suspend fun estimateLocks(votes: Map<ReferendumId, AccountVote>, asset: Asset): LocksChange
+    suspend fun estimateLocksAfterVoting(votes: Map<ReferendumId, AccountVote>, asset: Asset): LocksChange
 
     suspend fun reusableLocks(): List<ReusableLock>
 }
 
 suspend fun GovernanceVoteAssistant.estimateLocksAfterVoting(referendumId: ReferendumId, accountVote: AccountVote, asset: Asset): LocksChange {
-    return estimateLocks(mapOf(referendumId to accountVote), asset)
+    return estimateLocksAfterVoting(mapOf(referendumId to accountVote), asset)
 }
