@@ -27,6 +27,14 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_tinderGovCards_to_referendumInfo"
+            app:destination="@id/referendumInfoFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit" />
+
     </fragment>
 
     <fragment
@@ -51,6 +59,14 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_setupTinderGovBasket_to_referendumInfo"
+            app:destination="@id/referendumInfoFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit" />
+
     </fragment>
 
     <fragment
@@ -69,5 +85,10 @@
 
     </fragment>
 
+    <fragment
+        android:id="@+id/referendumInfoFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoFragment"
+        android:label="ConfirmTinderGovVoteFragment"
+        app:useAdd="true" />
 
 </navigation>

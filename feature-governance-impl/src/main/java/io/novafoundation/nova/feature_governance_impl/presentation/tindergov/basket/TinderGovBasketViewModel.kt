@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovI
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.adpter.TinderGovBasketRvItem
@@ -77,7 +78,7 @@ class TinderGovBasketViewModel(
     }
 
     fun onItemClicked(item: TinderGovBasketRvItem) {
-        showMessage("Not implemented yet")
+        router.openReferendumInfo(ReferendumInfoPayload(item.id.value))
     }
 
     fun onItemDeleteClicked(item: TinderGovBasketRvItem) {

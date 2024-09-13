@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteRequester
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
@@ -139,7 +140,7 @@ class TinderGovCardsViewModel(
     fun nayClicked(position: Int) = writeVote(position, VoteType.NAY)
 
     fun openReadMore(item: TinderGovCardRvItem) {
-        showMessage("Not implemented yet")
+        router.openReferendumInfo(ReferendumInfoPayload(item.id.value))
     }
 
     fun onCardAppeared(position: Int) {
