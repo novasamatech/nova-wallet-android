@@ -28,6 +28,9 @@ interface TinderGovDao {
     suspend fun removeFromBasket(items: List<TinderGovBasketItemLocal>)
 
     @Query("SELECT * FROM tinder_gov_basket WHERE metaId = :metaId AND chainId == :chainId")
+    suspend fun getBasket(metaId: Long, chainId: String): List<TinderGovBasketItemLocal>
+
+    @Query("SELECT * FROM tinder_gov_basket WHERE metaId = :metaId AND chainId == :chainId")
     fun observeBasket(metaId: Long, chainId: String): Flow<List<TinderGovBasketItemLocal>>
 
     @Query("SELECT COUNT(*) FROM tinder_gov_basket")

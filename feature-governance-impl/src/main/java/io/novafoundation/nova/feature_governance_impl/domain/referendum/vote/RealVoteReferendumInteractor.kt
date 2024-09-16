@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
@@ -11,7 +12,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
-import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -21,12 +21,12 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Vote
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -61,14 +61,19 @@ class RealVoteReferendumInteractor(
     }
 
     override suspend fun estimateFee(votes: Map<ReferendumId, AccountVote>): Fee {
-        return estimateFeeInternal { it.vote(votes) }
+        val governanceOption = selectedChainState.selectedOption()
+        val chain = governanceOption.assetWithChain.chain
+
+        val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
+
+        return extrinsicService.estimateMultiFee(chain, TransactionOrigin.SelectedWallet) {
+            with(governanceSource.convictionVoting) {
+                votes.forEach { (referendumId, vote) -> vote(referendumId, vote) }
+            }
+        }
     }
 
     override suspend fun estimateFee(referendumId: ReferendumId, vote: AccountVote): Fee {
-        return estimateFeeInternal { it.vote(referendumId, vote) }
-    }
-
-    private suspend inline fun estimateFeeInternal(crossinline builder: ConvictionVotingRepository.(ExtrinsicBuilder) -> Unit): Fee {
         val governanceOption = selectedChainState.selectedOption()
         val chain = governanceOption.assetWithChain.chain
 
@@ -76,20 +81,25 @@ class RealVoteReferendumInteractor(
 
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             with(governanceSource.convictionVoting) {
-                builder(this@estimateFee)
+                vote(referendumId, vote)
             }
         }
     }
 
-    override suspend fun vote(votes: Map<ReferendumId, AccountVote>): Result<ExtrinsicSubmission> {
-        return voteInternal { it.vote(votes) }
+    override suspend fun voteReferenda(votes: Map<ReferendumId, AccountVote>): RetriableMultiResult<ExtrinsicStatus.InBlock> {
+        val governanceOption = selectedChainState.selectedOption()
+        val chain = governanceOption.assetWithChain.chain
+
+        val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
+
+        return extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) {
+            with(governanceSource.convictionVoting) {
+                votes.forEach { (referendumId, vote) -> vote(referendumId, vote) }
+            }
+        }
     }
 
-    override suspend fun vote(referendumId: ReferendumId, vote: AccountVote): Result<ExtrinsicSubmission> {
-        return voteInternal { it.vote(referendumId, vote) }
-    }
-
-    private suspend inline fun voteInternal(crossinline builder: ConvictionVotingRepository.(ExtrinsicBuilder) -> Unit): Result<ExtrinsicSubmission> {
+    override suspend fun voteReferendum(referendumId: ReferendumId, vote: AccountVote): Result<ExtrinsicSubmission> {
         val governanceOption = selectedChainState.selectedOption()
         val chain = governanceOption.assetWithChain.chain
 
@@ -97,7 +107,7 @@ class RealVoteReferendumInteractor(
 
         return extrinsicService.submitExtrinsic(chain, TransactionOrigin.SelectedWallet) {
             with(governanceSource.convictionVoting) {
-                builder(this@submitExtrinsic)
+                vote(referendumId, vote)
             }
         }
     }

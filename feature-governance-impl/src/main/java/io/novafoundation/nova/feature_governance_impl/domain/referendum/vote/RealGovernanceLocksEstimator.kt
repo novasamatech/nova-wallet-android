@@ -15,8 +15,8 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimSched
 import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.ReusableLock
 import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.addIfPositive
-import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.maximize
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.absoluteDifference
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
+import java.math.BigInteger
+import kotlin.time.Duration
 
 internal class RealGovernanceLocksEstimator(
     override val onChainReferenda: List<OnChainReferendum>,
@@ -151,5 +153,17 @@ internal class RealGovernanceLocksEstimator(
                 }
             }
         }
+    }
+
+    fun List<LocksChange>.maximize(): LocksChange {
+        val maxLockedAmountChange = this.maxByOrNull { it.lockedAmountChange.absoluteDifference() }
+        val maxLockedPeriodChange = this.maxByOrNull { it.lockedPeriodChange.absoluteDifference() }
+        val maxTransferableChange = this.maxByOrNull { it.transferableChange.absoluteDifference() }
+
+        return LocksChange(
+            maxLockedAmountChange?.lockedAmountChange ?: Change(BigInteger.ZERO, BigInteger.ZERO),
+            maxLockedPeriodChange?.lockedPeriodChange ?: Change(Duration.ZERO, Duration.ZERO),
+            maxTransferableChange?.transferableChange ?: Change(BigInteger.ZERO, BigInteger.ZERO)
+        )
     }
 }

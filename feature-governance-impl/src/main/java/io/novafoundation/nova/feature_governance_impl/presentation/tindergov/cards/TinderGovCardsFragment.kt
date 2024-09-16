@@ -145,7 +145,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         viewModel.openReadMore(item)
     }
 
-    override fun onCardAppeared(view: View, position: Int) {
+    override fun onCardAppeared(view: View?, position: Int) {
         viewModel.onCardAppeared(position)
     }
 

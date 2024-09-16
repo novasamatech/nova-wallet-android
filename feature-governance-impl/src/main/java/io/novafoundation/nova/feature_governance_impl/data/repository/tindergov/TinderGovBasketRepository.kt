@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketI
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.core_db.model.TinderGovBasketItemLocal.VoteType as LocalVoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -22,6 +23,8 @@ interface TinderGovBasketRepository {
     suspend fun isBasketEmpty(): Boolean
 
     suspend fun clearBasket()
+
+    suspend fun getBasket(metaId: Long, chainId: ChainId): List<TinderGovBasketItem>
 
     fun observeBasket(metaId: Long, chainId: String): Flow<List<TinderGovBasketItem>>
 }
@@ -43,6 +46,10 @@ class RealTinderGovBasketRepository(private val dao: TinderGovDao) : TinderGovBa
     override fun observeBasket(metaId: Long, chainId: String): Flow<List<TinderGovBasketItem>> {
         return dao.observeBasket(metaId, chainId)
             .mapList { it.toDomain() }
+    }
+
+    override suspend fun getBasket(metaId: Long, chainId: ChainId): List<TinderGovBasketItem> {
+        return withContext(Dispatchers.Default) { dao.getBasket(metaId, chainId).map { it.toDomain() } }
     }
 
     override suspend fun isBasketEmpty(): Boolean {

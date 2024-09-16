@@ -67,7 +67,7 @@ class TinderGovBasketViewModel(
             val referendum = referendaById[it.referendumId] ?: return@mapNotNull null
             mapBasketItem(governanceSharedState.chainAsset(), it, referendum)
         }
-    }
+    }.shareInBackground()
 
     init {
         validateReferendaAndRemove()
@@ -88,8 +88,8 @@ class TinderGovBasketViewModel(
 
             if (removeReferendumAction.awaitAction(title)) {
                 val referendum = basketItemsFlow.first()
-                    .associateBy { it.referendumId }
-                    .get(item.id) ?: return@launch
+                    .firstOrNull { it.referendumId == item.id }
+                    ?: return@launch
 
                 interactor.removeReferendumFromBasket(referendum)
 
@@ -136,13 +136,12 @@ class TinderGovBasketViewModel(
     private fun validateReferendaAndRemove() {
         launch {
             val basket = basketItemsFlow.first()
-                .associateBy { it.referendumId }
 
             val availableToVoteReferenda = availableToVoteReferendaFlow.first()
 
-            val removedReferenda = basket.filterKeys { availableToVoteReferenda.contains(it).not() }
+            val removedReferenda = basket.filter { availableToVoteReferenda.contains(it.referendumId).not() }
             if (removedReferenda.isNotEmpty()) {
-                interactor.removeBasketItems(removedReferenda.values)
+                interactor.removeBasketItems(removedReferenda)
 
                 itemsWasRemovedFromBasketAction.awaitAction()
 

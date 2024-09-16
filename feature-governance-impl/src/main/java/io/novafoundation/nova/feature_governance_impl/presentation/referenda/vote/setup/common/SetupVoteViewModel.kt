@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.validation.ProgressConsumer
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.constructAccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.estimateLocksAfterVoting
@@ -23,7 +24,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.convic
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.constructAccountVote
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -186,6 +186,6 @@ abstract class SetupVoteViewModel(
         amount: BigInteger,
         conviction: Conviction
     ): AccountVote {
-        return constructAccountVote(amount, conviction, VoteType.AYE)
+        return AccountVote.constructAccountVote(amount, conviction, VoteType.AYE)
     }
 }
