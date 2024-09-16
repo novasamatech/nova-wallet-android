@@ -61,11 +61,13 @@
 
         <action
             android:id="@+id/action_confirmTinderGovVote_to_tinderGovCards"
+            app:destination="@id/tinderGovCards"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_open_exit"
-            app:popUpTo="@id/tinderGovCards" />
+            app:popUpTo="@id/tinderGovCards"
+            app:popUpToInclusive="true" />
 
     </fragment>
 

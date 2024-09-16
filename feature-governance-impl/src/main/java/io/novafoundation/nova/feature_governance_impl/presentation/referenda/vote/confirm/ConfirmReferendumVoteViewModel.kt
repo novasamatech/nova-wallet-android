@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.constructAccountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.estimateLocksAfterVoting
@@ -20,7 +21,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.constructAccountVote
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -111,7 +111,7 @@ class ConfirmReferendumVoteViewModel(
         val accountVote = accountVoteFlow.first()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.vote(payload.referendumId, accountVote)
+            interactor.voteReferendum(payload.referendumId, accountVote)
         }
 
         result.onSuccess {
@@ -138,7 +138,7 @@ class ConfirmReferendumVoteViewModel(
     private fun constructAccountVote(asset: Asset): AccountVote {
         val planks = asset.token.planksFromAmount(payload.vote.amount)
 
-        return constructAccountVote(planks, payload.vote.conviction, payload.vote.voteType)
+        return AccountVote.constructAccountVote(planks, payload.vote.conviction, payload.vote.voteType)
     }
 
     private fun setFee() = launch {

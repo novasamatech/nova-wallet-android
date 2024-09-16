@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm
 
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteFragment
@@ -15,5 +16,11 @@ class ConfirmTinderGovVoteFragment : ConfirmVoteFragment<ConfirmTinderGovVoteVie
             .confirmTinderGovVoteFactory()
             .create(this)
             .inject(this)
+    }
+
+    override fun subscribe(viewModel: ConfirmTinderGovVoteViewModel) {
+        super.subscribe(viewModel)
+
+        observeRetries(viewModel.partialRetriableMixin)
     }
 }

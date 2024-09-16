@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -46,7 +47,8 @@ class ConfirmTinderGovVoteModule {
         resourceManager: ResourceManager,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         locksChangeFormatter: LocksChangeFormatter,
-        tinderGovInteractor: TinderGovInteractor
+        tinderGovInteractor: TinderGovInteractor,
+        partialRetriableMixinFactory: PartialRetriableMixin.Factory,
     ): ViewModel {
         return ConfirmTinderGovVoteViewModel(
             router = router,
@@ -63,7 +65,8 @@ class ConfirmTinderGovVoteModule {
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
             locksChangeFormatter = locksChangeFormatter,
-            tinderGovInteractor = tinderGovInteractor
+            tinderGovInteractor = tinderGovInteractor,
+            partialRetriableMixinFactory = partialRetriableMixinFactory
         )
     }
 

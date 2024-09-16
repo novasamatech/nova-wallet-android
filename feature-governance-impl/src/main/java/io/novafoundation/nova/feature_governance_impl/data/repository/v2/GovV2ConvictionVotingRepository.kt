@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.common.vot
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.externalApi
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -186,10 +187,8 @@ class GovV2ConvictionVotingRepository(
         convictionVotingVote(referendumId, vote)
     }
 
-    override fun ExtrinsicBuilder.vote(votes: Map<ReferendumId, AccountVote>) {
-        votes.forEach { (referendumId, vote) ->
-            convictionVotingVote(referendumId, vote)
-        }
+    override fun CallBuilder.vote(referendumId: ReferendumId, vote: AccountVote) {
+        convictionVotingVote(referendumId, vote)
     }
 
     override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {

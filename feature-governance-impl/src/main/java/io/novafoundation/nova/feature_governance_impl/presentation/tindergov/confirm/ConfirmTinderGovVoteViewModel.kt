@@ -4,7 +4,9 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -52,7 +54,8 @@ class ConfirmTinderGovVoteViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val locksChangeFormatter: LocksChangeFormatter,
-    private val tinderGovInteractor: TinderGovInteractor
+    private val tinderGovInteractor: TinderGovInteractor,
+    partialRetriableMixinFactory: PartialRetriableMixin.Factory,
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -102,6 +105,8 @@ class ConfirmTinderGovVoteViewModel(
     }
         .shareInBackground()
 
+    val partialRetriableMixin = partialRetriableMixinFactory.create(scope = this)
+
     init {
         launch {
             originFeeMixin.loadFeeSuspending(
@@ -121,15 +126,25 @@ class ConfirmTinderGovVoteViewModel(
         val votes = votesFlow.first()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.vote(votes)
+            interactor.voteReferenda(votes)
         }
 
-        result.onSuccess {
-            showMessage(resourceManager.getString(R.string.tinder_gov_convirm_votes_success_message, votes.size))
+        partialRetriableMixin.handleMultiResult(
+            multiResult = result,
+            onSuccess = {
+                onVoteSuccess(votes.size)
+            },
+            progressConsumer = null,
+            onRetryCancelled = { router.back() }
+        )
+    }
+
+    private fun onVoteSuccess(voteSize: Int) {
+        launch {
+            showMessage(resourceManager.getString(R.string.tinder_gov_convirm_votes_success_message, voteSize))
             tinderGovInteractor.clearBasket()
             router.backToTinderGovCards()
         }
-            .onFailure(::showError)
     }
 
     override suspend fun getValidationPayload(): VoteReferendaValidationPayload {
