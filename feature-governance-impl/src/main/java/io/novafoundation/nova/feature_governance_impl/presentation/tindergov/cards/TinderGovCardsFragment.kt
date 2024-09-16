@@ -53,11 +53,8 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         tinderGovCardsSettings.setOnClickListener { viewModel.editVotingPowerClicked() }
 
         tinderGovCardsStack.adapter = adapter
-        tinderGovCardsStack.itemAnimator.apply {
-            if (this is DefaultItemAnimator) {
-                supportsChangeAnimations = false
-            }
-        }
+        tinderGovCardsStack.itemAnimator = null
+
         tinderGovCardsStack.layoutManager = CardStackLayoutManager(requireContext(), this)
             .apply {
                 setStackFrom(StackFrom.Bottom)
