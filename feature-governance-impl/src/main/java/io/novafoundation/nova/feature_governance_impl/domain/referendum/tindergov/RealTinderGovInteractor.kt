@@ -72,6 +72,13 @@ class RealTinderGovInteractor(
         }
     }
 
+    override suspend fun getTinderGovBasket(): List<TinderGovBasketItem> {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = governanceSharedState.chain()
+
+        return tinderGovBasketRepository.getBasket(metaAccount.id, chain.id)
+    }
+
     override suspend fun addItemToBasket(referendumId: ReferendumId, voteType: VoteType) {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = governanceSharedState.chain()
