@@ -54,6 +54,8 @@ class TinderGovCardsViewModel(
         const val CARD_STACK_SIZE = 3
     }
 
+    private val cardsBackground = createCardsBackground()
+
     private val tinderGovCardDetailsLoader = tinderGovCardDetailsLoaderFactory.create(coroutineScope = this)
 
     private val cardsSummaryFlow = tinderGovCardDetailsLoader.cardsSummaryFlow
@@ -211,13 +213,14 @@ class TinderGovCardsViewModel(
     private fun mapReferendumToUi(
         referendumPreview: ReferendumPreview,
         summary: ExtendedLoadingState<String?>?,
-        amount: ExtendedLoadingState<AmountModel?>?
+        amount: ExtendedLoadingState<AmountModel?>?,
+        backgroundRes: Int
     ): TinderGovCardRvItem {
         return TinderGovCardRvItem(
             referendumPreview.id,
             summary = summary?.map { mapSummaryToUi(it, referendumPreview) }.orLoading(),
             requestedAmount = amount.orLoading(),
-            backgroundRes = R.drawable.ic_tinder_gov_entry_banner_background,
+            backgroundRes = backgroundRes,
         )
     }
 
@@ -258,10 +261,12 @@ class TinderGovCardsViewModel(
         summaries: Map<ReferendumId, ExtendedLoadingState<String?>>,
         amounts: Map<ReferendumId, ExtendedLoadingState<AmountModel?>>
     ): List<TinderGovCardRvItem> {
-        return sortedReferenda.map {
-            val summary = summaries[it.id]
-            val amount = amounts[it.id]
-            mapReferendumToUi(it, summary, amount)
+        return sortedReferenda.mapIndexed { index, referendum ->
+            val backgroundRes = cardsBackground[index % cardsBackground.size]
+
+            val summary = summaries[referendum.id]
+            val amount = amounts[referendum.id]
+            mapReferendumToUi(referendum, summary, amount, backgroundRes)
         }
     }
 
@@ -307,6 +312,23 @@ class TinderGovCardsViewModel(
                 _resetCards.sendEvent()
             }
         }
+    }
+
+    private fun createCardsBackground(): List<Int> {
+        return listOf(
+            R.drawable.tinder_gov_card_background_1,
+            R.drawable.tinder_gov_card_background_2,
+            R.drawable.tinder_gov_card_background_3,
+            R.drawable.tinder_gov_card_background_4,
+            R.drawable.tinder_gov_card_background_5,
+            R.drawable.tinder_gov_card_background_6,
+            R.drawable.tinder_gov_card_background_5,
+            R.drawable.tinder_gov_card_background_4,
+            R.drawable.tinder_gov_card_background_3,
+            R.drawable.tinder_gov_card_background_2,
+            R.drawable.tinder_gov_card_background_1,
+            R.drawable.tinder_gov_card_background_0,
+        )
     }
 }
 
