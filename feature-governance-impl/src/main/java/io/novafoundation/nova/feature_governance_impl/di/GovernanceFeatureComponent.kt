@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.di.DescriptionComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.di.ReferendumInfoComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.di.DelegateDelegatorsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.di.DelegateDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.di.VotedReferendaComponent
@@ -60,6 +61,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun referendumDetailsFactory(): ReferendumDetailsComponent.Factory
 
     fun descriptionFactory(): DescriptionComponent.Factory
+
+    fun referendumInfoFactory(): ReferendumInfoComponent.Factory
 
     fun referendumFullDetailsFactory(): ReferendumFullDetailsComponent.Factory
 

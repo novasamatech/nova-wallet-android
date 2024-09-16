@@ -17,10 +17,10 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Re
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.currentlyPassing
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.isOngoing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.WithDifferentVoter
@@ -299,11 +299,10 @@ class RealReferendumFormatter(
         return referendum.getName() ?: formatUnknownReferendumTitle(referendum.id)
     }
 
-    private fun mapReferendumOnChainNameToUi(referendum: ReferendumPreview): String? {
-        return when (val proposal = referendum.onChainMetadata?.proposal) {
-            is ReferendumProposal.Call -> formatOnChainName(proposal.call)
-            else -> null
-        }
+    override fun formatReferendumName(referendum: ReferendumDetails): String {
+        return referendum.offChainMetadata?.title
+            ?: referendum.onChainMetadata?.preImage?.let { formatOnChainName(it.call) }
+            ?: formatUnknownReferendumTitle(referendum.id)
     }
 
     private fun mapReferendumVoteToUi(
