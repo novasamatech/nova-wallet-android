@@ -19,6 +19,8 @@ interface TinderGovInteractor {
 
     fun observeTinderGovBasket(): Flow<List<TinderGovBasketItem>>
 
+    suspend fun getTinderGovBasket(): List<TinderGovBasketItem>
+
     suspend fun addItemToBasket(referendumId: ReferendumId, voteType: VoteType)
 
     suspend fun loadReferendumSummary(id: ReferendumId): String?
