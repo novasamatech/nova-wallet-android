@@ -1,44 +1,45 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm
+package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.constructAccountVote
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
+import io.novafoundation.nova.feature_governance_api.data.model.accountVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amount
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.estimateLocksAfterVoting
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendaValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteViewModel
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.chainAndAsset
+import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ConfirmReferendumVoteViewModel(
+class ConfirmTinderGovVoteViewModel(
     private val router: GovernanceRouter,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val externalActions: ExternalActions.Presentation,
@@ -49,12 +50,12 @@ class ConfirmReferendumVoteViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: VoteReferendumInteractor,
     private val assetUseCase: AssetUseCase,
-    private val payload: ConfirmVoteReferendumPayload,
     private val validationSystem: VoteReferendumValidationSystem,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    private val referendumFormatter: ReferendumFormatter,
     private val locksChangeFormatter: LocksChangeFormatter,
+    private val tinderGovInteractor: TinderGovInteractor,
+    partialRetriableMixinFactory: PartialRetriableMixin.Factory,
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -70,36 +71,33 @@ class ConfirmReferendumVoteViewModel(
     resourceManager
 ) {
 
-    override val titleFlow: Flow<String> = flowOf {
-        val formattedNumber = referendumFormatter.formatId(payload.referendumId)
-        resourceManager.getString(R.string.referendum_vote_setup_title, formattedNumber)
-    }.shareInBackground()
-
-    override val amountModelFlow: Flow<AmountModel> = assetFlow.map {
-        mapAmountToAmountModel(payload.vote.amount, it)
-    }.shareInBackground()
-
-    private val accountVoteFlow = assetFlow.map(::constructAccountVote)
+    private val basketFlow = tinderGovInteractor.observeTinderGovBasket()
+        .map { it.associateBy { it.referendumId } }
         .shareInBackground()
 
-    private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, viewModelScope)
-
-    override val accountVoteUi = accountVoteFlow.map {
-        val referendumVote = ReferendumVote.UserDirect(it)
-        val (chain, chainAsset) = governanceSharedState.chainAndAsset()
-
-        referendumFormatter.formatUserVote(referendumVote, chain, chainAsset)
+    private val votesFlow = basketFlow.map { basket ->
+        basket.mapValues { it.value.accountVote() }
     }.shareInBackground()
 
-    private val locksChangeFlow = voteAssistantFlow.map { voteAssistant ->
+    override val titleFlow: Flow<String> = basketFlow.map {
+        resourceManager.getString(R.string.tinder_gov_vote_setup_title, it.size)
+    }.shareInBackground()
+
+    override val amountModelFlow: Flow<AmountModel> = combine(assetFlow, basketFlow) { asset, basket ->
+        val maxAmount = basket.values.maxOfOrNull { it.amount } ?: BigInteger.ZERO
+        mapAmountToAmountModel(maxAmount, asset)
+    }.shareInBackground()
+
+    override val accountVoteUi = flowOf { null }
+
+    private val voteAssistantFlow = basketFlow.flatMapLatest { basketItems ->
+        interactor.voteAssistantFlow(basketItems.keys.toList(), viewModelScope)
+    }.shareInBackground()
+
+    private val locksChangeFlow = combine(votesFlow, voteAssistantFlow) { accountVotes, voteAssistant ->
         val asset = assetFlow.first()
-        val accountVote = constructAccountVote(asset)
 
-        voteAssistant.estimateLocksAfterVoting(payload.referendumId, accountVote, asset)
-    }
-
-    init {
-        setFee()
+        voteAssistant.estimateLocksAfterVoting(accountVotes, asset)
     }
 
     override val locksChangeUiFlow = locksChangeFlow.map {
@@ -107,41 +105,62 @@ class ConfirmReferendumVoteViewModel(
     }
         .shareInBackground()
 
+    val partialRetriableMixin = partialRetriableMixinFactory.create(scope = this)
+
+    init {
+        launch {
+            originFeeMixin.loadFeeSuspending(
+                retryScope = this,
+                feeConstructor = {
+                    val fee = interactor.estimateFee(votesFlow.first())
+                    SimpleFee(fee)
+                },
+                onRetryCancelled = {
+                    router.back()
+                }
+            )
+        }
+    }
+
     override suspend fun performVote() {
-        val accountVote = accountVoteFlow.first()
+        val votes = votesFlow.first()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.voteReferendum(payload.referendumId, accountVote)
+            interactor.voteReferenda(votes)
         }
 
-        result.onSuccess {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-            router.backToReferendumDetails()
+        partialRetriableMixin.handleMultiResult(
+            multiResult = result,
+            onSuccess = {
+                onVoteSuccess(votes.size)
+            },
+            progressConsumer = null,
+            onRetryCancelled = { router.back() }
+        )
+    }
+
+    private fun onVoteSuccess(voteSize: Int) {
+        launch {
+            showMessage(resourceManager.getString(R.string.tinder_gov_convirm_votes_success_message, voteSize))
+            tinderGovInteractor.clearBasket()
+            router.backToTinderGovCards()
         }
-            .onFailure(::showError)
     }
 
     override suspend fun getValidationPayload(): VoteReferendaValidationPayload {
         val voteAssistant = voteAssistantFlow.first()
+        val asset = assetFlow.first()
+        val votes = votesFlow.first().values
+        val maxAmount = votes.maxOf { it.amount() }
 
         return VoteReferendaValidationPayload(
             onChainReferenda = voteAssistant.onChainReferenda,
             asset = assetFlow.first(),
             trackVoting = voteAssistant.trackVoting,
-            maxAmount = payload.vote.amount,
-            conviction = payload.vote.conviction,
-            voteType = payload.vote.voteType,
-            fee = originFeeMixin.awaitDecimalFee()
+            fee = originFeeMixin.awaitDecimalFee(),
+            maxAmount = asset.token.amountFromPlanks(maxAmount),
+            conviction = null,
+            voteType = null
         )
-    }
-
-    private fun constructAccountVote(asset: Asset): AccountVote {
-        val planks = asset.token.planksFromAmount(payload.vote.amount)
-
-        return AccountVote.constructAccountVote(planks, payload.vote.conviction, payload.vote.voteType)
-    }
-
-    private fun setFee() = launch {
-        originFeeMixin.setFee(mapFeeFromParcel(payload.fee).genericFee)
     }
 }

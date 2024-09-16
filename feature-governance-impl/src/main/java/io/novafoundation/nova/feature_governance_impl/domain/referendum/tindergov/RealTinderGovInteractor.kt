@@ -153,6 +153,10 @@ class RealTinderGovInteractor(
         return tinderGovBasketRepository.isBasketEmpty()
     }
 
+    override suspend fun clearBasket() {
+        tinderGovBasketRepository.clearBasket()
+    }
+
     private suspend fun filterAvailableToVoteReferenda(referendaState: ReferendaState): List<ReferendumPreview> {
         return referendaFilteringProvider.filterAvailableToVoteReferenda(referendaState.referenda, referendaState.voting)
     }

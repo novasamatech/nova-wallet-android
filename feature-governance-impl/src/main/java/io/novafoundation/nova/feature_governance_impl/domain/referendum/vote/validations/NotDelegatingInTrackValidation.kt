@@ -6,8 +6,8 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 
 class NotDelegatingInTrackValidation : VoteReferendumValidation {
 
-    override suspend fun validate(value: VoteReferendumValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
-        val isDelegating = value.trackVoting is Voting.Delegating
+    override suspend fun validate(value: VoteReferendaValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
+        val isDelegating = value.trackVoting.any { it is Voting.Delegating }
 
         return isDelegating isFalseOrError {
             VoteReferendumValidationFailure.AlreadyDelegatingVotes

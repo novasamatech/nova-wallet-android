@@ -14,7 +14,7 @@ interface TinderGovCardStackListener : CardStackListener {
 
     override fun onCardCanceled() {}
 
-    override fun onCardAppeared(view: View, position: Int) {}
+    override fun onCardAppeared(view: View?, position: Int) {}
 
-    override fun onCardDisappeared(view: View, position: Int) {}
+    override fun onCardDisappeared(view: View?, position: Int) {}
 }

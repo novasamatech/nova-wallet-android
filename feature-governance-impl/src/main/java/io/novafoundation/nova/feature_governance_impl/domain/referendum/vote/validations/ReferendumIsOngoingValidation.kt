@@ -6,8 +6,8 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 
 class ReferendumIsOngoingValidation : VoteReferendumValidation {
 
-    override suspend fun validate(value: VoteReferendumValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
-        val isOngoing = value.onChainReferendum.status is OnChainReferendumStatus.Ongoing
+    override suspend fun validate(value: VoteReferendaValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
+        val isOngoing = value.onChainReferenda.all { it.status is OnChainReferendumStatus.Ongoing }
 
         return isOngoing isTrueOrError {
             VoteReferendumValidationFailure.ReferendumCompleted

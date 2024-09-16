@@ -9,11 +9,14 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ProgressConsumer
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.constructAccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.estimateLocksAfterVoting
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendaValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -31,6 +34,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeL
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -86,8 +92,8 @@ abstract class SetupVoteViewModel(
         voteAssistantFlow
     ) { amount, conviction, voteAssistant ->
         val amountPlanks = selectedAsset.first().token.planksFromAmount(amount)
-
-        voteAssistant.estimateLocksAfterVoting(amountPlanks, conviction, selectedAsset.first())
+        val accountVote = constructAccountVote(amountPlanks, conviction)
+        voteAssistant.estimateLocksAfterVoting(payload.referendumId, accountVote, selectedAsset.first())
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -122,10 +128,10 @@ abstract class SetupVoteViewModel(
             inputSource2 = selectedConvictionFlow,
             scope = this,
             feeConstructor = { amount, conviction ->
+                val accountVote = constructAccountVote(amount.toPlanks(), conviction)
                 interactor.estimateFee(
-                    amount = amount.toPlanks(),
-                    conviction = conviction,
-                    referendumId = payload.referendumId
+                    referendumId = payload.referendumId,
+                    vote = accountVote
                 )
             }
         )
@@ -139,18 +145,21 @@ abstract class SetupVoteViewModel(
         amountChooserMixin.setAmountInput(chipModel.amountInput)
     }
 
-    protected fun validateVote(voteType: VoteType?) = launch {
+    protected fun validateVote(voteType: VoteType) = launch {
         validatingVoteType.value = voteType
         val voteAssistant = voteAssistantFlow.first()
+        val asset = selectedAsset.first()
+        val amount = amountChooserMixin.amount.first()
+        val conviction = selectedConvictionFlow.first()
 
-        val payload = VoteReferendumValidationPayload(
-            onChainReferendum = voteAssistant.onChainReferendum,
-            asset = selectedAsset.first(),
+        val payload = VoteReferendaValidationPayload(
+            onChainReferenda = voteAssistant.onChainReferenda,
+            asset = asset,
             trackVoting = voteAssistant.trackVoting,
-            voteAmount = amountChooserMixin.amount.first(),
-            fee = originFeeMixin.awaitDecimalFee(),
+            maxAmount = amount,
             voteType = voteType,
-            conviction = selectedConvictionFlow.first()
+            conviction = conviction,
+            fee = originFeeMixin.awaitDecimalFee()
         )
 
         validationExecutor.requireValid(
@@ -163,13 +172,20 @@ abstract class SetupVoteViewModel(
         ) {
             validatingVoteType.value = null
 
-            onFinish(it)
+            onFinish(amount, conviction, voteType, it)
         }
     }
 
-    abstract fun onFinish(validationPayload: VoteReferendumValidationPayload)
+    abstract fun onFinish(amount: BigDecimal, conviction: Conviction, voteType: VoteType, validationPayload: VoteReferendaValidationPayload)
 
     private fun MutableStateFlow<VoteType?>.progressConsumer(voteType: VoteType?): ProgressConsumer = { inProgress ->
         value = voteType.takeIf { inProgress }
+    }
+
+    private fun constructAccountVote(
+        amount: BigInteger,
+        conviction: Conviction
+    ): AccountVote {
+        return AccountVote.constructAccountVote(amount, conviction, VoteType.AYE)
     }
 }

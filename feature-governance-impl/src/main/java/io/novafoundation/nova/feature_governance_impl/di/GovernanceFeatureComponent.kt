@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di.ReferendumVotersComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.di.TinderGovBasketComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.di.TinderGovCardsComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm.di.ConfirmTinderGovVoteComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.governanceTracks.di.SelectGovernanceTracksComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.di.ConfirmGovernanceUnlockComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.di.GovernanceLocksOverviewComponent
@@ -67,6 +68,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun setupTinderGovVoteFactory(): SetupTinderGovVoteComponent.Factory
 
     fun confirmReferendumVoteFactory(): ConfirmReferendumVoteComponent.Factory
+
+    fun confirmTinderGovVoteFactory(): ConfirmTinderGovVoteComponent.Factory
 
     fun referendumVotersFactory(): ReferendumVotersComponent.Factory
 

@@ -98,7 +98,7 @@ class TinderGovBasketViewModel(
     }
 
     fun voteClicked() {
-        showMessage("Not implemented yet")
+        router.openConfirmTinderGovVote()
     }
 
     fun toggleEditMode() {

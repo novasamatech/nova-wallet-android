@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="tinder_gov_convirm_votes_success_message">You have successfully voted for %d referenda</string>
+
+    <string name="tinder_gov_vote_setup_title">Vote for %d referenda</string>
     <string name="tinder_gov_basket_remove_item_confirm_title">Remove referendum %s from vote list?</string>
     <string name="tinder_gov_basket_remove_item_confirm_message">You always can vote for this referendum later </string>
 

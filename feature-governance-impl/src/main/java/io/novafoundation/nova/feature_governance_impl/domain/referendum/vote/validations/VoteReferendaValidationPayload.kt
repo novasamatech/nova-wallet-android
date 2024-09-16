@@ -8,12 +8,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import java.math.BigDecimal
 
-data class VoteReferendumValidationPayload(
-    val onChainReferendum: OnChainReferendum,
+data class VoteReferendaValidationPayload(
+    val onChainReferenda: List<OnChainReferendum>,
     val asset: Asset,
-    val trackVoting: Voting?,
-    val voteAmount: BigDecimal,
-    val fee: DecimalFee,
+    val trackVoting: List<Voting>,
+    val maxAmount: BigDecimal,
     val voteType: VoteType?,
-    val conviction: Conviction
+    val conviction: Conviction?,
+    val fee: DecimalFee
 )

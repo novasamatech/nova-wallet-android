@@ -8,7 +8,9 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Con
 
 class AbstainConvictionValidation : VoteReferendumValidation {
 
-    override suspend fun validate(value: VoteReferendumValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
+    override suspend fun validate(value: VoteReferendaValidationPayload): ValidationStatus<VoteReferendumValidationFailure> {
+        if (value.voteType == null && value.conviction == null) return valid()
+
         val isAbstainVote = value.voteType == VoteType.ABSTAIN
         val isConvictionNone = value.conviction == Conviction.None
 
