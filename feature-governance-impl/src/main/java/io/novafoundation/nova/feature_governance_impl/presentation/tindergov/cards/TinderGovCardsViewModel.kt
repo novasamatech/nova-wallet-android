@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.combineToPair
+import io.novafoundation.nova.common.utils.onEachWithPrevious
 import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.safeSubList
 import io.novafoundation.nova.common.utils.sendEvent
@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteRequester
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -82,6 +83,9 @@ class TinderGovCardsViewModel(
     private val _rewindCardEvent = MutableLiveData<Event<Unit>>()
     val rewindCardEvent: LiveData<Event<Unit>> = _rewindCardEvent
 
+    private val _resetCards = MutableLiveData<Event<Unit>>()
+    val resetCardsEvent: LiveData<Event<Unit>> = _resetCards
+
     private val topReferendumWithDetails = combine(topCardIndex, cardsSummaryFlow, cardsAmountFlow) { topCardIndex, cardsSummary, cardsAmount ->
         val referendum = sortedReferendaFlow.value.getOrNull(topCardIndex) ?: return@combine null
         val cardSummary = cardsSummary[referendum.id]
@@ -104,13 +108,7 @@ class TinderGovCardsViewModel(
         .map { items -> mapBasketModel(items.values.toList()) }
 
     init {
-        val referendaWithBasket = combineToPair(interactor.observeReferendaAvailableToVote(this), basketFlow)
-        referendaWithBasket.onEach { (referenda, basket) ->
-            val currentReferendaIds = sortedReferendaFlow.value.map { it.id }.toSet()
-            val newReferenda = referenda.filter { it.id !in currentReferendaIds && it.id !in basket }
-
-            sortedReferendaFlow.value += newReferenda // To add new coming referenda to the end of list
-        }.launchIn(this)
+        observeReferendaAndAddToCards()
 
         setupReferendumRetryAction()
 
@@ -144,6 +142,17 @@ class TinderGovCardsViewModel(
         }
     }
 
+    fun onBasketClicked() {
+        router.openTinderGovBasket()
+    }
+
+    fun editVotingPowerClicked() {
+        launch {
+            val topReferendum = topReferendumWithDetails.first()
+            tinderGovVoteRequester.openRequest(TinderGovVoteRequester.Request(topReferendum.referendum.id.value))
+        }
+    }
+
     private fun loadFirstCards() {
         launch {
             sortedReferendaFlow
@@ -170,7 +179,7 @@ class TinderGovCardsViewModel(
                 return@launch
             }
 
-            if (!interactor.isVotingPowerAvailable()) {
+            if (!interactor.isSufficientAmountToVote()) {
                 val response = tinderGovVoteRequester.awaitResponse(TinderGovVoteRequester.Request(referendum.id.value))
 
                 if (!response.success) {
@@ -181,7 +190,20 @@ class TinderGovCardsViewModel(
             }
 
             interactor.addItemToBasket(referendum.id, voteType)
+            checkAllReferendaWasVotedAndOpenBasket()
+
             isVotingInProgress.value = false
+        }
+    }
+
+    private suspend fun checkAllReferendaWasVotedAndOpenBasket() {
+        val basket = interactor.getTinderGovBasket()
+            .associateBy { it.referendumId }
+        val referenda = sortedReferendaFlow.value
+
+        val allReferendaVoted = referenda.all { it.id in basket }
+        if (allReferendaVoted) {
+            router.openTinderGovBasket()
         }
     }
 
@@ -251,7 +273,46 @@ class TinderGovCardsViewModel(
             imageTintRes = if (items.isEmpty()) R.color.icon_inactive else R.color.chip_icon,
         )
     }
+
+    private fun observeReferendaAndAddToCards() {
+        combine(interactor.observeReferendaAvailableToVote(this), basketFlow) { referenda, basket ->
+            ReferendaWithBasket(referenda, basket)
+        }
+            .addNewReferendaToCards()
+            .launchIn(this)
+    }
+
+    private fun Flow<ReferendaWithBasket>.addNewReferendaToCards(): Flow<ReferendaWithBasket> {
+        return onEachWithPrevious { old, new ->
+            val oldBasket = old?.basket.orEmpty()
+            val newReferenda = new.referenda
+            val newBasket = new.basket
+
+            val currentReferenda = sortedReferendaFlow.value
+            val currentReferendaIds = currentReferenda.map { it.id }.toMutableSet()
+
+            val isBasketItemRemoved = oldBasket.size > newBasket.size
+
+            val result = if (isBasketItemRemoved) {
+                newReferenda.filter { it.id !in newBasket } // Take only referenda that are not in basket
+            } else {
+                val newComingReferenda = newReferenda.filter { it.id !in currentReferendaIds && it.id !in newBasket }
+                currentReferenda + newComingReferenda // Take old referenda and new coming referenda
+            }
+
+            sortedReferendaFlow.value = result
+
+            if (isBasketItemRemoved) {
+                _resetCards.sendEvent()
+            }
+        }
+    }
 }
+
+private class ReferendaWithBasket(
+    val referenda: List<ReferendumPreview>,
+    val basket: Map<ReferendumId, TinderGovBasketItem>
+)
 
 private class CardWithDetails(
     val referendum: ReferendumPreview,

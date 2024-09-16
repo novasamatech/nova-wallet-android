@@ -83,4 +83,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openSelectGovernanceTracks(bundle: Bundle)
 
     fun openTinderGovCards()
+
+    fun openTinderGovBasket()
 }

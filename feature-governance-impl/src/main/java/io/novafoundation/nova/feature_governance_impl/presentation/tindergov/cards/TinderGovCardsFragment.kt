@@ -26,10 +26,12 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBack
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketButton
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketChevron
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketItems
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketState
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsControlView
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSettings
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStack
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStatusBarInsetsContainer
 
@@ -48,6 +50,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
     override fun initViews() {
         tinderGovCardsStatusBarInsetsContainer.applyStatusBarInsets()
         tinderGovCardsBack.setOnClickListener { viewModel.back() }
+        tinderGovCardsSettings.setOnClickListener { viewModel.editVotingPowerClicked() }
 
         tinderGovCardsStack.adapter = adapter
         tinderGovCardsStack.itemAnimator.apply {
@@ -68,6 +71,8 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         tinderGovCardsControlView.setAyeClickListener { swipeCardToDirection(Direction.Right) }
         tinderGovCardsControlView.setAbstainClickListener { swipeCardToDirection(Direction.Top) }
         tinderGovCardsControlView.setNayClickListener { swipeCardToDirection(Direction.Left) }
+
+        tinderGovCardsBasketButton.setOnClickListener { viewModel.onBasketClicked() }
     }
 
     override fun inject() {
@@ -89,6 +94,10 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
 
         viewModel.rewindCardEvent.observeEvent {
             tinderGovCardsStack.rewind()
+        }
+
+        viewModel.resetCardsEvent.observeEvent {
+            tinderGovCardsStack.cardLayoutManager().topPosition = 0
         }
 
         viewModel.isCardDraggingAvailable.observe { draggingAvailable ->

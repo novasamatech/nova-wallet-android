@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="tinder_gov_basket_remove_item_confirm_title">Remove referendum %s from vote list?</string>
+    <string name="tinder_gov_basket_remove_item_confirm_message">You always can vote for this referendum later </string>
+
+    <string name="tinder_gov_basket_removed_items_title">Some of the referenda excluded from vote list</string>
+    <string name="tinder_gov_basket_removed_items_message">They have been excluded from this list due to the change of Voting power</string>
+
+    <string name="tinder_gov_aye_format">Aye: %s</string>
+    <string name="tinder_gov_nay_format">Nay: %s</string>
+    <string name="tinder_gov_abstain_format">Abstain: %s</string>
+
     <string name="tinder_gov_vote_title">Voting power</string>
     <string name="tinder_gov_vote_subtitle">Voting will be set for future votes in TinderGov</string>
     <string name="tinder_gov_cards_voting_list">Voting list</string>

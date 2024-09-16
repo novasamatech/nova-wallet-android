@@ -5,12 +5,15 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter.ConvictionVote
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
+import java.math.BigDecimal
 
 interface VotersFormatter {
 
@@ -28,12 +31,20 @@ interface VotersFormatter {
         voteModel: VoteModel
     ): VoterModel
 
-    suspend fun formatConvictionVoteDetails(
+    fun formatConvictionVoteDetails(
         convictionVote: ConvictionVote,
         chainAsset: Chain.Asset
     ): String
 
-    suspend fun formatTotalVotes(vote: GenericVoter.Vote?): String
+    fun formatTotalVotes(vote: GenericVoter.Vote?): String
+
+    fun formatVoteType(voteType: VoteType): VoteDirectionModel
+
+    fun formatVotes(
+        amount: BigDecimal,
+        voteType: VoteType,
+        conviction: Conviction
+    ): String
 }
 
 suspend fun VotersFormatter.formatConvictionVote(convictionVote: ConvictionVote, chainAsset: Chain.Asset): VoteModel {
@@ -78,7 +89,7 @@ class RealVotersFormatter(
         )
     }
 
-    override suspend fun formatConvictionVoteDetails(convictionVote: ConvictionVote, chainAsset: Chain.Asset): String {
+    override fun formatConvictionVoteDetails(convictionVote: ConvictionVote, chainAsset: Chain.Asset): String {
         val preConvictionAmountFormatted = convictionVote.amount.formatTokenAmount(chainAsset)
         val multiplierFormatted = convictionVote.conviction.amountMultiplier().format()
 
@@ -89,7 +100,25 @@ class RealVotersFormatter(
         )
     }
 
-    override suspend fun formatTotalVotes(vote: GenericVoter.Vote?): String {
+    override fun formatVotes(amount: BigDecimal, voteType: VoteType, conviction: Conviction): String {
+        val votes = if (voteType == VoteType.ABSTAIN) {
+            amount
+        } else {
+            amount * conviction.amountMultiplier()
+        }
+
+        return resourceManager.getString(R.string.referendum_voter_vote, votes.format())
+    }
+
+    override fun formatVoteType(voteType: VoteType): VoteDirectionModel {
+        return when (voteType) {
+            VoteType.AYE -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_aye), R.color.text_positive)
+            VoteType.NAY -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_nay), R.color.text_negative)
+            VoteType.ABSTAIN -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_abstain), R.color.text_secondary)
+        }
+    }
+
+    override fun formatTotalVotes(vote: GenericVoter.Vote?): String {
         val formattedAmount = vote?.totalVotes.orZero().format()
 
         return resourceManager.getString(R.string.referendum_voter_vote, formattedAmount)
