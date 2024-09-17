@@ -116,6 +116,19 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
             tinderGovCardsBasketChevron.setImageTintRes(it.imageTintRes)
         }
 
+        viewModel.insufficientBalanceChangeAction.awaitableActionLiveData.observeEvent {
+            warningDialog(
+                requireContext(),
+                onPositiveClick = { it.onSuccess(true) },
+                onNegativeClick = { it.onSuccess(false) },
+                positiveTextRes = R.string.common_change,
+                negativeTextRes = R.string.common_close
+            ) {
+                setTitle(it.payload.first)
+                setMessage(it.payload.second)
+            }
+        }
+
         viewModel.retryReferendumInfoLoadingAction.awaitableActionLiveData.observeEvent {
             warningDialog(
                 requireContext(),

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.tinderg
 
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
@@ -20,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.VotingPowerState
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.runtime.ext.summaryApiOrNull
@@ -126,19 +128,17 @@ class RealTinderGovInteractor(
         return tinderGovVotingPowerRepository.getVotingPower(metaId, chainId)
     }
 
-    override suspend fun isVotingPowerAvailable(): Boolean {
+    override suspend fun getVotingPowerState(): VotingPowerState {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = governanceSharedState.chain()
-        return getVotingPower(metaAccount.id, chain.id) != null
-    }
+        val votingPower = getVotingPower(metaAccount.id, chain.id) ?: return VotingPowerState.Empty
+        val asset = walletRepository.getAsset(metaAccount.id, chain.utilityAsset)
 
-    override suspend fun isSufficientAmountToVote(): Boolean {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val chain = governanceSharedState.chain()
-        val votingPower = getVotingPower(metaAccount.id, chain.id) ?: return false
-        val asset = walletRepository.getAsset(metaAccount.id, chain.utilityAsset) ?: return false
-
-        return asset.freeInPlanks >= votingPower.amount
+        return if (asset?.freeInPlanks.orZero() >= votingPower.amount) {
+            VotingPowerState.SufficientAmount(votingPower)
+        } else {
+            VotingPowerState.InsufficientAmount(votingPower)
+        }
     }
 
     override suspend fun removeReferendumFromBasket(item: TinderGovBasketItem) {

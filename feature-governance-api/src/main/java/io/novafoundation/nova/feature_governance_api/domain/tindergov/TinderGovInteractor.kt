@@ -7,9 +7,19 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+
+sealed interface VotingPowerState {
+
+    object Empty : VotingPowerState
+
+    class InsufficientAmount(val votingPower: VotingPower) : VotingPowerState
+
+    class SufficientAmount(val votingPower: VotingPower) : VotingPowerState
+}
 
 interface TinderGovInteractor {
 
@@ -31,9 +41,7 @@ interface TinderGovInteractor {
 
     suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower?
 
-    suspend fun isVotingPowerAvailable(): Boolean
-
-    suspend fun isSufficientAmountToVote(): Boolean
+    suspend fun getVotingPowerState(): VotingPowerState
 
     suspend fun removeReferendumFromBasket(item: TinderGovBasketItem)
 
