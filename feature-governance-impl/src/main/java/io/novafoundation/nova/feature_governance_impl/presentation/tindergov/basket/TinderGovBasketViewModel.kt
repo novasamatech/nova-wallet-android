@@ -22,7 +22,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.info.R
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.adpter.TinderGovBasketRvItem
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,12 +41,13 @@ class TinderGovBasketViewModel(
     private val votersFormatter: VotersFormatter,
     private val referendumFormatter: ReferendumFormatter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val assetUseCase: AssetUseCase
 ) : BaseViewModel() {
 
     val removeReferendumAction = actionAwaitableMixinFactory.confirmingOrDenyingAction<String>()
 
-    val itemsWasRemovedFromBasketAction = actionAwaitableMixinFactory.confirmingAction<Unit>()
+    val itemsWasRemovedFromBasketAction = actionAwaitableMixinFactory.confirmingAction<String>()
 
     val inEditModeFlow = MutableStateFlow(false)
 
@@ -140,14 +144,21 @@ class TinderGovBasketViewModel(
             val availableToVoteReferenda = availableToVoteReferendaFlow.first()
 
             val removedReferenda = basket.filter { availableToVoteReferenda.contains(it.referendumId).not() }
+                .filter { interactor.basketItemValidForVote(it) }
+
             if (removedReferenda.isNotEmpty()) {
                 interactor.removeBasketItems(removedReferenda)
 
-                itemsWasRemovedFromBasketAction.awaitAction()
+                itemsWasRemovedFromBasketAction.awaitAction(getFormattedAmountAvailableToVote())
 
                 closeScreenIfBasketIsEmpty()
             }
         }
+    }
+
+    private suspend fun getFormattedAmountAvailableToVote(): String {
+        val asset = assetUseCase.getCurrentAsset()
+        return asset.free.formatTokenAmount(asset.token.configuration)
     }
 
     private suspend fun closeScreenIfBasketIsEmpty() {

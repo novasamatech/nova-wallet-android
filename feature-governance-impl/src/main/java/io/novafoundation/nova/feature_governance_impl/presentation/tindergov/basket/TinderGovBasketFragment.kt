@@ -82,7 +82,7 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
                 setPositiveButton(R.string.common_ok) { _, _ -> event.onSuccess(Unit) }
 
                 setTitle(R.string.tinder_gov_basket_removed_items_title)
-                setMessage(R.string.tinder_gov_basket_removed_items_message)
+                setMessage(requireContext().getString(R.string.tinder_gov_basket_removed_items_message, event.payload))
             }
         }
     }

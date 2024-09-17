@@ -10,7 +10,7 @@
     <string name="tinder_gov_basket_remove_item_confirm_message">You always can vote for this referendum later </string>
 
     <string name="tinder_gov_basket_removed_items_title">Some of the referenda excluded from vote list</string>
-    <string name="tinder_gov_basket_removed_items_message">They have been excluded from this list due to the change of Voting power</string>
+    <string name="tinder_gov_basket_removed_items_message">Some of the referenda are no longer available for voting or you may not have enough tokens available to vote. Available to vote: %s.</string>
 
     <string name="tinder_gov_aye_format">Aye: %s</string>
     <string name="tinder_gov_nay_format">Nay: %s</string>

@@ -27,6 +27,7 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -92,7 +93,11 @@ class RealVoteReferendumInteractor(
 
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
 
-        return extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) {
+        return extrinsicService.submitMultiExtrinsicAwaitingInclusion(
+            chain = chain,
+            origin = TransactionOrigin.SelectedWallet,
+            submissionOptions = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+        ) {
             with(governanceSource.convictionVoting) {
                 votes.forEach { (referendumId, vote) -> vote(referendumId, vote) }
             }

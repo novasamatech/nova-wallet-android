@@ -134,7 +134,7 @@ class ConfirmTinderGovVoteViewModel(
             onSuccess = {
                 onVoteSuccess(votes.size)
             },
-            progressConsumer = null,
+            progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }
         )
     }

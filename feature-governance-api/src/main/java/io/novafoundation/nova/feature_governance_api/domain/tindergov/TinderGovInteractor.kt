@@ -50,4 +50,6 @@ interface TinderGovInteractor {
     suspend fun isBasketEmpty(): Boolean
 
     suspend fun clearBasket()
+
+    suspend fun basketItemValidForVote(item: TinderGovBasketItem): Boolean
 }

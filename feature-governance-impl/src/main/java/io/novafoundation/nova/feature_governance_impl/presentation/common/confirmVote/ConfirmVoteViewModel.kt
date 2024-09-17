@@ -73,7 +73,7 @@ abstract class ConfirmVoteViewModel(
         addressIconGenerator.createAccountAddressModel(chain, metaAccount)
     }.shareInBackground()
 
-    private val _showNextProgress = MutableStateFlow(false)
+    protected val _showNextProgress = MutableStateFlow(false)
 
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
