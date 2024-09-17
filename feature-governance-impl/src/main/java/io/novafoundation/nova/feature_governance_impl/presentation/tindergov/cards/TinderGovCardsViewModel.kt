@@ -355,6 +355,7 @@ class TinderGovCardsViewModel(
 
             if (isBasketItemRemoved) {
                 _resetCards.sendEvent()
+                loadFirstCards()
             }
         }
     }
