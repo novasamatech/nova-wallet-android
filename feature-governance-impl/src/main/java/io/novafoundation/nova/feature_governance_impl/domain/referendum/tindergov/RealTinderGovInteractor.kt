@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.fil
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.runtime.ext.summaryApiOrNull
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedOption
