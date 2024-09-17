@@ -102,7 +102,7 @@ class RealVotersFormatter(
 
     override fun formatVotes(amount: BigDecimal, voteType: VoteType, conviction: Conviction): String {
         val votes = if (voteType == VoteType.ABSTAIN) {
-            amount
+            amount * Conviction.None.amountMultiplier()
         } else {
             amount * conviction.amountMultiplier()
         }
