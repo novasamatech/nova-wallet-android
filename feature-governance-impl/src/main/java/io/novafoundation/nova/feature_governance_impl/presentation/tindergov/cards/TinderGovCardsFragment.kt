@@ -136,8 +136,8 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 positiveTextRes = R.string.common_retry,
                 negativeTextRes = R.string.common_skip
             ) {
-                setTitle(R.string.tinder_gov_card_data_loading_error_title)
-                setMessage(R.string.tinder_gov_card_data_loading_error_message)
+                setTitle(R.string.swipe_gov_card_data_loading_error_title)
+                setMessage(R.string.swipe_gov_card_data_loading_error_message)
             }
         }
     }

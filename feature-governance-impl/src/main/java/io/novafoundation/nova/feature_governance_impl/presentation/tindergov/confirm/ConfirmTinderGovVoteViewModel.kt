@@ -80,7 +80,7 @@ class ConfirmTinderGovVoteViewModel(
     }.shareInBackground()
 
     override val titleFlow: Flow<String> = basketFlow.map {
-        resourceManager.getString(R.string.tinder_gov_vote_setup_title, it.size)
+        resourceManager.getString(R.string.swipe_gov_vote_setup_title, it.size)
     }.shareInBackground()
 
     override val amountModelFlow: Flow<AmountModel> = combine(assetFlow, basketFlow) { asset, basket ->
@@ -141,7 +141,7 @@ class ConfirmTinderGovVoteViewModel(
 
     private fun onVoteSuccess(voteSize: Int) {
         launch {
-            showMessage(resourceManager.getString(R.string.tinder_gov_convirm_votes_success_message, voteSize))
+            showMessage(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, voteSize))
             tinderGovInteractor.clearBasket()
             router.backToTinderGovCards()
         }

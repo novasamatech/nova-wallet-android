@@ -180,7 +180,7 @@ class ReferendaListViewModel(
             chipText = if (availableToVote.isEmpty()) {
                 null
             } else {
-                resourceManager.getString(R.string.referenda_tindergov_banner_chip, availableToVote.size)
+                resourceManager.getString(R.string.referenda_swipe_gov_banner_chip, availableToVote.size)
             }
         )
     }

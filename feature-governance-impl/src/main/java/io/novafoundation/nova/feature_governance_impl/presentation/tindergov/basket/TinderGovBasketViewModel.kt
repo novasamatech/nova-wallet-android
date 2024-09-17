@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.ba
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -88,7 +87,7 @@ class TinderGovBasketViewModel(
     fun onItemDeleteClicked(item: TinderGovBasketRvItem) {
         launch {
             val refId = referendumFormatter.formatId(item.id)
-            val title = resourceManager.getString(R.string.tinder_gov_basket_remove_item_confirm_title, refId)
+            val title = resourceManager.getString(R.string.swipe_gov_basket_remove_item_confirm_title, refId)
 
             if (removeReferendumAction.awaitAction(title)) {
                 val referendum = basketItemsFlow.first()
@@ -116,9 +115,9 @@ class TinderGovBasketViewModel(
         referendum: ReferendumPreview
     ): TinderGovBasketRvItem {
         val voteType = when (item.voteType) {
-            VoteType.AYE -> resourceManager.getString(R.string.tinder_gov_aye_format).withColor(R.color.text_positive)
-            VoteType.NAY -> resourceManager.getString(R.string.tinder_gov_nay_format).withColor(R.color.text_negative)
-            VoteType.ABSTAIN -> resourceManager.getString(R.string.tinder_gov_abstain_format).withColor(R.color.text_secondary)
+            VoteType.AYE -> resourceManager.getString(R.string.swipe_gov_aye_format).withColor(R.color.text_positive)
+            VoteType.NAY -> resourceManager.getString(R.string.swipe_gov_nay_format).withColor(R.color.text_negative)
+            VoteType.ABSTAIN -> resourceManager.getString(R.string.swipe_gov_abstain_format).withColor(R.color.text_secondary)
         }
 
         val votesAmount = chainAsset.amountFromPlanks(item.amount)

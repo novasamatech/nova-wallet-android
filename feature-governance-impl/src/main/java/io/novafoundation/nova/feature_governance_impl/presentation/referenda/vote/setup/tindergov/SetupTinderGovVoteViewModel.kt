@@ -60,7 +60,7 @@ class SetupTinderGovVoteViewModel(
     locksFormatter
 ) {
     override val title: Flow<String> = flowOf {
-        resourceManager.getString(R.string.tinder_gov_vote_title)
+        resourceManager.getString(R.string.swipe_gov_vote_title)
     }
 
     init {

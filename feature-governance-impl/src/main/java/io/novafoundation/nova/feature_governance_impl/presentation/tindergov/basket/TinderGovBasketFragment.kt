@@ -71,7 +71,7 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
                 negativeTextRes = R.string.common_cancel
             ) {
                 setTitle(event.payload)
-                setMessage(R.string.tinder_gov_basket_remove_item_confirm_message)
+                setMessage(R.string.swipe_gov_basket_remove_item_confirm_message)
             }
         }
 
@@ -81,8 +81,8 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
             ) {
                 setPositiveButton(R.string.common_ok) { _, _ -> event.onSuccess(Unit) }
 
-                setTitle(R.string.tinder_gov_basket_removed_items_title)
-                setMessage(requireContext().getString(R.string.tinder_gov_basket_removed_items_message, event.payload))
+                setTitle(R.string.swipe_gov_basket_removed_items_title)
+                setMessage(requireContext().getString(R.string.swipe_gov_basket_removed_items_message, event.payload))
             }
         }
     }

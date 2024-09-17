@@ -19,7 +19,7 @@ class SetupTinderGovVoteFragment : SetupVoteFragment<SetupTinderGovVoteViewModel
 
     override fun initViews() {
         super.initViews()
-        setupReferendumVoteSubtitle.text = getString(R.string.tinder_gov_vote_subtitle)
+        setupReferendumVoteSubtitle.text = getString(R.string.swipe_gov_vote_subtitle)
 
         setupTinderGovVoteContinue.setOnClickListener { viewModel.continueClicked() }
         onBackPressed { viewModel.backClicked() }

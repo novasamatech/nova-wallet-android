@@ -229,8 +229,8 @@ class TinderGovCardsViewModel(
         val formattedAmount = amount.formatTokenAmount(chainAsset.symbol)
         val conviction = votingPower.conviction.amountMultiplier().format()
 
-        val title = resourceManager.getString(R.string.tinder_gov_insufficient_balance_dialog_title)
-        val message = resourceManager.getString(R.string.tinder_gov_insufficient_balance_dialog_message, formattedAmount, conviction)
+        val title = resourceManager.getString(R.string.swipe_gov_insufficient_balance_dialog_title)
+        val message = resourceManager.getString(R.string.swipe_gov_insufficient_balance_dialog_message, formattedAmount, conviction)
         val openChangeVotingPowerScreen = insufficientBalanceChangeAction.awaitAction(TitleAndMessage(title, message))
 
         return if (openChangeVotingPowerScreen) {
@@ -320,7 +320,7 @@ class TinderGovCardsViewModel(
             items = items.size,
             backgroundColorRes = if (items.isEmpty()) R.color.icon_inactive else R.color.icon_accent,
             textColorRes = if (items.isEmpty()) R.color.button_text_inactive else R.color.text_primary,
-            textRes = if (items.isEmpty()) R.string.tinder_gov_cards_voting_list_empty else R.string.tinder_gov_cards_voting_list,
+            textRes = if (items.isEmpty()) R.string.swipe_gov_cards_voting_list_empty else R.string.swipe_gov_cards_voting_list,
             imageTintRes = if (items.isEmpty()) R.color.icon_inactive else R.color.chip_icon,
         )
     }
