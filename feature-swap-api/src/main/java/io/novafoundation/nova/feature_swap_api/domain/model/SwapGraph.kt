@@ -16,6 +16,8 @@ interface SwapGraphEdge : QuotableEdge {
      * [beginOperation]
      */
     suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
+
+    suspend fun debugLabel(): String
 }
 
 interface QuotableEdge : Edge<FullChainAssetId> {

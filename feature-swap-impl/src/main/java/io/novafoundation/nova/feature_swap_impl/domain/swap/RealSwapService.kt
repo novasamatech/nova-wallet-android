@@ -48,11 +48,13 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -372,6 +374,8 @@ internal class RealSwapService(
         }
 
         val quotedPaths = paths.mapNotNull { path -> quotePath(path, amount, swapDirection) }
+        logQuotes(quotedPaths)
+
         if (paths.isEmpty()) {
             throw SwapQuoteException.NotEnoughLiquidity
         }
@@ -394,52 +398,34 @@ internal class RealSwapService(
         }
     }
 
-    // TOOD rework path logging
-//    private suspend fun logQuotes(args: SwapQuoteArgs, quotes: List<AssetExchangeQuote>) {
-//        val allCandidates = quotes.sortedDescending().map {
-//            val formattedIn = args.amount.formatPlanks(args.tokenIn.configuration)
-//            val formattedOut = it.quote.formatPlanks(args.tokenOut.configuration)
-//            val formattedPath = formatPath(it.path)
-//
-//            "$formattedIn to $formattedOut via $formattedPath"
-//        }.joinToString(separator = "\n")
-//
-//        Log.d("RealSwapService", "-------- New quote ----------")
-//        Log.d("RealSwapService", allCandidates)
-//        Log.d("RealSwapService", "-------- Done quote ----------\n\n\n")
-//    }
-//
-//    private suspend fun formatPath(path: QuotePath): String {
-//        val assets = chain.assetsById
-//
-//        return buildString {
-//            val firstSegment = path.segments.first()
-//
-//            append(assets.getValue(firstSegment.from.assetId).symbol)
-//
-//            append("  -- ${formatSource(firstSegment)} -->  ")
-//
-//            append(assets.getValue(firstSegment.to.assetId).symbol)
-//
-//            path.segments.subList(1, path.segments.size).onEach { segment ->
-//                append("  -- ${formatSource(segment)} -->  ")
-//
-//                append(assets.getValue(segment.to.assetId).symbol)
-//            }
-//        }
-//    }
-//
-//    private suspend fun formatSource(segment: QuotePath.Segment): String {
-//        return buildString {
-//            append(segment.sourceId)
-//
-//            if (segment.sourceId == StableSwapSourceFactory.ID) {
-//                val onChainId = segment.sourceParams.getValue("PoolId").toBigInteger()
-//                val chainAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, onChainId)
-//                append("[${chainAsset.symbol}]")
-//            }
-//        }
-//    }
+    private suspend fun logQuotes(quotedTrades: List<QuotedTrade>) {
+        val allCandidates = quotedTrades.sortedDescending()
+            .map { trade -> formatTrade(trade) }
+            .joinToString(separator = "\n")
+
+        Log.d("RealSwapService", "-------- New quote ----------")
+        Log.d("RealSwapService", allCandidates)
+        Log.d("RealSwapService", "-------- Done quote ----------\n\n\n")
+    }
+
+    private suspend fun formatTrade(trade: QuotedTrade): String {
+        return buildString {
+            trade.path.onEachIndexed { index, quotedSwapEdge ->
+                if (index == 0) {
+                    val assetIn = chainRegistry.asset(quotedSwapEdge.edge.from)
+                    val initialAmount = quotedSwapEdge.quotedAmount.formatPlanks(assetIn)
+                    append(initialAmount)
+                }
+
+                append(" --- "+ quotedSwapEdge.edge.debugLabel() + " ---> ")
+
+                val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
+                val outAmount = quotedSwapEdge.quote.formatPlanks(assetOut)
+
+                append(outAmount)
+            }
+        }
+    }
 }
 
 abstract class BaseSwapGraphEdge(

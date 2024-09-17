@@ -144,7 +144,7 @@ private class XYKSwapSource(
         return buildList {
             this@allPossibleDirections.forEach { poolInfo ->
                 add(
-                    HYKSwapDirection(
+                    XYKSwapDirection(
                         fromAsset = poolInfo.firstAsset,
                         toAsset = poolInfo.secondAsset,
                         poolAddress = poolInfo.poolAddress
@@ -152,7 +152,7 @@ private class XYKSwapSource(
                 )
 
                 add(
-                    HYKSwapDirection(
+                    XYKSwapDirection(
                         fromAsset = poolInfo.secondAsset,
                         toAsset = poolInfo.firstAsset,
                         poolAddress = poolInfo.poolAddress
@@ -162,7 +162,7 @@ private class XYKSwapSource(
         }
     }
 
-    inner class HYKSwapDirection(
+    inner class XYKSwapDirection(
         private val fromAsset: RemoteAndLocalId,
         private val toAsset: RemoteAndLocalId,
         private val poolAddress: AccountId
@@ -173,6 +173,9 @@ private class XYKSwapSource(
         override val to: FullChainAssetId = toAsset.second
 
         override val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder? = null
+        override suspend fun debugLabel(): String {
+            return "XYK"
+        }
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
             return DictEnum.Entry("XYK", null)

@@ -168,6 +168,10 @@ private class AssetConversionExchange(
             return null
         }
 
+        override suspend fun debugLabel(): String {
+            return "AssetConversion"
+        }
+
         override suspend fun quote(
             amount: Balance,
             direction: SwapDirection

@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stabl
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.model.quote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toChainAssetOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
@@ -278,6 +279,10 @@ private class StableSwapSource(
         override val to: FullChainAssetId = toAsset.second
 
         override val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder? = null
+        override suspend fun debugLabel(): String {
+            val poolAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, poolId)
+            return "StableSwap.${poolAsset.symbol}"
+        }
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
             return DictEnum.Entry("Stableswap", poolId)

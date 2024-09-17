@@ -197,6 +197,10 @@ private class HydraDxExchange(
 
             return currentTransaction.appendSegment(HydraDxSwapTransactionSegment(sourceQuotableEdge, args))
         }
+
+        override suspend fun debugLabel(): String {
+            return "Hydration.${sourceQuotableEdge.debugLabel()}"
+        }
     }
 
     inner class HydraDxOperation private constructor(

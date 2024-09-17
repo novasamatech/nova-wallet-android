@@ -21,6 +21,8 @@ interface HydraDxSourceEdge : QuotableEdge {
      * Whether hydra swap source is able to perform optimized standalone swap without using Router
      */
     val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder?
+
+    suspend fun debugLabel(): String
 }
 
 interface HydraDxSwapSource : Identifiable {

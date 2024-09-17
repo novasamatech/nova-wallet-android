@@ -256,6 +256,10 @@ private class OmniPoolSwapSource(
             executeSwap(it)
         }
 
+        override suspend fun debugLabel(): String {
+            return "OmniPool"
+        }
+
         override suspend fun quote(amount: Balance, direction: SwapDirection): Balance {
             val omniPool = omniPoolFlow.first()
 
