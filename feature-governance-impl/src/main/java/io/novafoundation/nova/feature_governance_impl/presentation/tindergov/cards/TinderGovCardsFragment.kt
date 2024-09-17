@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import androidx.recyclerview.widget.DefaultItemAnimator
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
