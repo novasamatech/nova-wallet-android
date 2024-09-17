@@ -29,16 +29,11 @@ import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.common.validation.ValidationFlowActions
-import io.novafoundation.nova.common.validation.ValidationStatus
-import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
-import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -55,11 +50,9 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -76,7 +69,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
@@ -86,12 +78,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedDecimalFeeOrNullFlow
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
-import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -143,8 +133,8 @@ class SwapMainSettingsViewModel(
     private val buyMixinFactory: BuyMixin.Factory,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapRateFormatter: SwapRateFormatter,
-    private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val swapStateStoreProvider: SwapStateStoreProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -248,10 +238,6 @@ class SwapMainSettingsViewModel(
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
-    val minimumBalanceBuyAlert = feeMixin.loadedFeeOrNullFlow()
-        .map(::prepareMinimumBalanceBuyInAlertIfNeeded)
-        .shareInBackground()
-
     val canChangeFeeToken = chainAssetIn
         .map(::isEditFeeTokenAvailable)
         .shareInBackground()
@@ -339,18 +325,29 @@ class SwapMainSettingsViewModel(
 
     fun continueButtonClicked() {
         launch {
-            val validationSystem = swapInteractor.validationSystem()
-            val payload = getValidationPayload() ?: return@launch
+            val quotingState = quotingState.value
+            if (quotingState !is QuotingState.Loaded) return@launch
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                progressConsumer = _validationProgress.progressConsumer(),
-                validationFailureTransformerCustom = ::formatValidationFailure,
-            ) { validPayload ->
-                _validationProgress.value = false
-                openSwapConfirmation(validPayload)
-            }
+            val swapState = SwapState(
+                quote = quotingState.value,
+                fee = feeMixin.awaitDecimalFee().genericFee,
+                slippage = swapSettings.first().slippage
+            )
+            swapStateStoreProvider.getStore(viewModelScope).setState(swapState)
+            swapRouter.openSwapConfirmation()
+
+//            val validationSystem = swapInteractor.validationSystem()
+//            val payload = getValidationPayload() ?: return@launch
+//
+//            validationExecutor.requireValid(
+//                validationSystem = validationSystem,
+//                payload = payload,
+//                progressConsumer = _validationProgress.progressConsumer(),
+//                validationFailureTransformerCustom = ::formatValidationFailure,
+//            ) { validPayload ->
+//                _validationProgress.value = false
+//                openSwapConfirmation(validPayload)
+//            }
         }
     }
 
@@ -534,10 +531,8 @@ class SwapMainSettingsViewModel(
                 }
             }
             .mapLatest { quoteState ->
-                val swapArgs = quoteState.quoteArgs.toExecuteArgs(
-                    quote = quoteState.value,
-                    customFeeAsset = quoteState.feeAsset,
-                    nativeAsset = nativeAssetFlow.first()
+                val swapArgs = quoteState.value.toExecuteArgs(
+                    slippage = swapSettings.first().slippage
                 )
 
                 loadFeeSuspending(
@@ -691,30 +686,10 @@ class SwapMainSettingsViewModel(
                 tokenOut = tokenOut(assetOut!!),
                 amount = amount!!,
                 swapDirection = swapDirection!!,
-                slippage = slippage
             )
         } else {
             null
         }
-    }
-
-    private fun prepareMinimumBalanceBuyInAlertIfNeeded(swapFee: SwapFee?): SimpleAlertModel? {
-        if (swapFee == null) return null
-        val minimumBalanceBuyIn = swapFee.minimumBalanceBuyIn
-        if (minimumBalanceBuyIn !is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance) return null
-
-        val feeAssetSymbol = minimumBalanceBuyIn.commissionAsset.symbol
-        val nativeAssetSymbol = minimumBalanceBuyIn.nativeAsset.symbol
-        val feeAssetNeededForBuyIn = minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn.formatPlanks(minimumBalanceBuyIn.commissionAsset)
-        val nativeMinimumBalance = minimumBalanceBuyIn.nativeMinimumBalance.formatPlanks(minimumBalanceBuyIn.nativeAsset)
-
-        return resourceManager.getString(
-            R.string.swap_minimum_balance_buy_in_alert,
-            feeAssetSymbol,
-            feeAssetNeededForBuyIn,
-            nativeMinimumBalance,
-            nativeAssetSymbol
-        )
     }
 
     private fun handleInputChanges(
@@ -770,31 +745,31 @@ class SwapMainSettingsViewModel(
         return swapReceiveAmountAboveEDFieldValidatorFactory.create(assetOutFlow)
     }
 
-    private suspend fun getValidationPayload(): SwapValidationPayload? {
-        val quotingState = quotingState.value
-        if (quotingState !is QuotingState.Loaded) return null
-        val swapSettings = swapSettings.first()
-        return swapInteractor.getValidationPayload(
-            assetIn = swapSettings.assetIn ?: return null,
-            assetOut = swapSettings.assetOut ?: return null,
-            feeAsset = swapSettings.feeAsset ?: return null,
-            quoteArgs = quotingState.quoteArgs,
-            swapQuote = quotingState.value,
-            swapFee = feeMixin.loadedDecimalFeeOrNullFlow().first() ?: return null
-        )
-    }
+//    private suspend fun getValidationPayload(): SwapValidationPayload? {
+//        val quotingState = quotingState.value
+//        if (quotingState !is QuotingState.Loaded) return null
+//        val swapSettings = swapSettings.first()
+//        return swapInteractor.getValidationPayload(
+//            assetIn = swapSettings.assetIn ?: return null,
+//            assetOut = swapSettings.assetOut ?: return null,
+//            feeAsset = swapSettings.feeAsset ?: return null,
+//            quoteArgs = quotingState.quoteArgs,
+//            swapQuote = quotingState.value,
+//            swapFee = feeMixin.loadedDecimalFeeOrNullFlow().first() ?: return null
+//        )
+//    }
 
-    private fun formatValidationFailure(
-        status: ValidationStatus.NotValid<SwapValidationFailure>,
-        actions: ValidationFlowActions<SwapValidationPayload>
-    ) = viewModelScope.mapSwapValidationFailureToUI(
-        resourceManager,
-        status,
-        actions,
-        ::setFee,
-        ::setMaxAvailableAmountIn,
-        ::setMinAmountOut,
-    )
+//    private fun formatValidationFailure(
+//        status: ValidationStatus.NotValid<SwapValidationFailure>,
+//        actions: ValidationFlowActions<SwapValidationPayload>
+//    ) = viewModelScope.mapSwapValidationFailureToUI(
+//        resourceManager,
+//        status,
+//        actions,
+//        ::setFee,
+//        ::setMaxAvailableAmountIn,
+//        ::setMinAmountOut,
+//    )
 
     private fun setFee(swapFee: SwapFee) {
         launch {
@@ -813,18 +788,6 @@ class SwapMainSettingsViewModel(
             amountOutInput.requestFocusLiveData.sendEvent()
             amountOutInput.setAmount(chainAsset.amountFromPlanks(amountInPlanks))
         }
-    }
-
-    private fun openSwapConfirmation(validPayload: SwapValidationPayload) {
-        val payload = SwapConfirmationPayload(
-            swapQuoteModel = swapConfirmationPayloadFormatter.mapSwapQuoteToModel(validPayload.swapQuote),
-            feeAsset = validPayload.feeAsset.token.configuration.fullId.toAssetPayload(),
-            rate = validPayload.swapQuote.swapRate(),
-            slippage = validPayload.slippage.value,
-            swapFee = swapConfirmationPayloadFormatter.mapFeeToModel(validPayload.decimalFee)
-        )
-
-        swapRouter.openSwapConfirmation(payload)
     }
 
     private fun Flow<Asset?>.token(): Flow<Token?> = map { it?.token }

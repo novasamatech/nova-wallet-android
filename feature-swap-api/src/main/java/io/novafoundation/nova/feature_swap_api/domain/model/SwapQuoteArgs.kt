@@ -4,9 +4,7 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.fraction
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
 data class SwapQuoteArgs(
@@ -14,7 +12,6 @@ data class SwapQuoteArgs(
     val tokenOut: Token,
     val amount: Balance,
     val swapDirection: SwapDirection,
-    val slippage: Percent,
 )
 
 class SwapExecuteArgs(
@@ -25,11 +22,7 @@ class SwapExecuteArgs(
 
 class SegmentExecuteArgs(
     val quotedSwapEdge: QuotedSwapEdge,
-    val customFeeAsset: Chain.Asset?,
 )
-
-val SwapExecuteArgs.feeAsset: Chain.Asset
-    get() = customFeeAsset ?: assetIn
 
 sealed class SwapLimit {
 
@@ -46,19 +39,12 @@ sealed class SwapLimit {
     ) : SwapLimit()
 }
 
-fun SwapQuoteArgs.toExecuteArgs(quote: SwapQuote, customFeeAsset: Chain.Asset?, nativeAsset: Asset): SwapExecuteArgs {
+fun SwapQuote.toExecuteArgs(slippage: Percent): SwapExecuteArgs {
     return SwapExecuteArgs(
-        assetIn = tokenIn.configuration,
-        assetOut = tokenOut.configuration,
-        swapLimit = swapLimits(quote.quotedBalance),
-        customFeeAsset = customFeeAsset,
-        nativeAsset = nativeAsset,
-        path = quote.path
+        slippage = slippage,
+        direction = direction,
+        executionPath = path.map { quotedSwapEdge -> SegmentExecuteArgs(quotedSwapEdge) }
     )
-}
-
-fun SwapQuoteArgs.swapLimits(quotedBalance: Balance): SwapLimit {
-    return SwapLimit(swapDirection, amount, slippage, quotedBalance)
 }
 
 fun SwapLimit(direction: SwapDirection, amount: Balance, slippage: Percent, quotedBalance: Balance): SwapLimit {

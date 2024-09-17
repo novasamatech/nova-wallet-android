@@ -15,9 +15,7 @@ class AtomicSwapOperationArgs(
     val customFeeAsset: Chain.Asset?,
 )
 
-class AtomicSwapOperationFee(
-    networkFee: Fee, val minimumBalanceBuyIn: MinimumBalanceBuyIn
-) : Fee by networkFee
+typealias AtomicSwapOperationFee = Fee
 
 // TODO this will later be used to perform more accurate non-atomic swaps
 // So next segments can correct tx args based on outcome of previous segments

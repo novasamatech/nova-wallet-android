@@ -20,13 +20,12 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationViewModel
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -40,7 +39,6 @@ class SwapConfirmationModule {
         swapRouter: SwapRouter,
         swapInteractor: SwapInteractor,
         resourceManager: ResourceManager,
-        swapConfirmationPayload: SwapConfirmationPayload,
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
@@ -52,33 +50,32 @@ class SwapConfirmationModule {
         validationExecutor: ValidationExecutor,
         tokenRepository: TokenRepository,
         externalActions: ExternalActions.Presentation,
-        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         assetUseCase: ArbitraryAssetUseCase,
-        maxActionProviderFactory: MaxActionProviderFactory
+        maxActionProviderFactory: MaxActionProviderFactory,
+        swapStateStoreProvider: SwapStateStoreProvider
     ): ViewModel {
         return SwapConfirmationViewModel(
-            swapRouter,
-            swapInteractor,
-            resourceManager,
-            swapConfirmationPayload,
-            walletRepository,
-            accountRepository,
-            chainRegistry,
-            swapRateFormatter,
-            priceImpactFormatter,
-            walletUiUseCase,
-            slippageAlertMixinFactory,
-            addressIconGenerator,
-            validationExecutor,
-            tokenRepository,
-            externalActions,
-            swapConfirmationPayloadFormatter,
-            feeLoaderMixinFactory,
-            descriptionBottomSheetLauncher,
-            assetUseCase,
-            maxActionProviderFactory
+            swapRouter = swapRouter,
+            swapInteractor = swapInteractor,
+            resourceManager = resourceManager,
+            walletRepository = walletRepository,
+            accountRepository = accountRepository,
+            chainRegistry = chainRegistry,
+            swapRateFormatter = swapRateFormatter,
+            priceImpactFormatter = priceImpactFormatter,
+            walletUiUseCase = walletUiUseCase,
+            slippageAlertMixinFactory = slippageAlertMixinFactory,
+            addressIconGenerator = addressIconGenerator,
+            validationExecutor = validationExecutor,
+            tokenRepository = tokenRepository,
+            externalActions = externalActions,
+            swapStateStoreProvider = swapStateStoreProvider,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
+            arbitraryAssetUseCase = assetUseCase,
+            maxActionProviderFactory = maxActionProviderFactory
         )
     }
 

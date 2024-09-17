@@ -5,13 +5,13 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.assetConversion
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
-import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
@@ -21,9 +21,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -55,11 +53,14 @@ class AssetConversionExchangeFactory(
     private val remoteStorageSource: StorageDataSource,
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
     private val extrinsicService: ExtrinsicService,
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange.Factory {
 
-    override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
+    override suspend fun create(
+        chain: Chain,
+        parentQuoter: AssetExchange.ParentQuoter,
+        coroutineScope: CoroutineScope
+    ): AssetExchange {
         val converter = multiLocationConverterFactory.default(chain, coroutineScope)
 
         return AssetConversionExchange(
@@ -68,13 +69,10 @@ class AssetConversionExchangeFactory(
             remoteStorageSource = remoteStorageSource,
             multiChainRuntimeCallsApi = runtimeCallsApi,
             extrinsicService = extrinsicService,
-            assetSourceRegistry = assetSourceRegistry,
             chainStateRepository = chainStateRepository
         )
     }
 }
-
-private const val SOURCE_ID = "AssetConversion"
 
 private class AssetConversionExchange(
     private val chain: Chain,
@@ -82,7 +80,6 @@ private class AssetConversionExchange(
     private val remoteStorageSource: StorageDataSource,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val extrinsicService: ExtrinsicService,
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange {
 
@@ -190,7 +187,7 @@ private class AssetConversionExchange(
         private val transactionArgs: AtomicSwapOperationArgs,
         private val fromAsset: Chain.Asset,
         private val toAsset: Chain.Asset
-    ): AtomicSwapOperation {
+    ) : AtomicSwapOperation {
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
             val nativeAssetFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
@@ -206,6 +203,8 @@ private class AssetConversionExchange(
             return extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { submissionOrigin ->
                 // Send swapped funds to the requested origin since it the account doing the swap
                 executeSwap(sendTo = submissionOrigin.requestedOrigin)
+            }.awaitInBlock().map {
+                SwapExecutionCorrection()
             }
         }
 
@@ -213,9 +212,9 @@ private class AssetConversionExchange(
             val customFeeAsset = transactionArgs.customFeeAsset
 
             return if (customFeeAsset != null && !customFeeAsset.isCommissionAsset()) {
-                calculateCustomTokenFee(nativeTokenFee, transactionArgs.nativeAsset, customFeeAsset)
+                calculateCustomTokenFee(nativeTokenFee, customFeeAsset)
             } else {
-                AtomicSwapOperationFee(nativeTokenFee, MinimumBalanceBuyIn.NoBuyInNeeded)
+                nativeTokenFee
             }
         }
 
@@ -267,39 +266,12 @@ private class AssetConversionExchange(
         // We should adapt it if we decide to remove the restriction
         private suspend fun calculateCustomTokenFee(
             nativeTokenFee: Fee,
-            nativeAsset: Asset,
             customFeeAsset: Chain.Asset
         ): AtomicSwapOperationFee {
-            val nativeChainAsset = nativeAsset.token.configuration
             val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
-            val assetBalances = assetSourceRegistry.sourceFor(nativeChainAsset).balance
-
-            val minimumBalance = assetBalances.existentialDeposit(chain, nativeChainAsset)
-            // https://github.com/paritytech/polkadot-sdk/blob/39c04fdd9622792ba8478b1c1c300417943a034b/substrate/frame/transaction-payment/asset-conversion-tx-payment/src/payment.rs#L114
-            val shouldBuyMinimumBalance = nativeAsset.balanceCountedTowardsEDInPlanks < minimumBalance + nativeTokenFee.amount
-
             val toBuyNativeFee = runtimeCallsApi.quoteFeeConversion(nativeTokenFee.amount, customFeeAsset)
 
-            val minimumBalanceBuyIn = if (shouldBuyMinimumBalance) {
-                val totalConverted = nativeTokenFee.amount + minimumBalance
-
-                val forFeesAndMinBalance = runtimeCallsApi.quoteFeeConversion(totalConverted, customFeeAsset)
-                val forMinBalance = forFeesAndMinBalance - toBuyNativeFee
-
-                MinimumBalanceBuyIn.NeedsToBuyMinimumBalance(
-                    nativeAsset = nativeAsset.token.configuration,
-                    nativeMinimumBalance = minimumBalance,
-                    commissionAsset = customFeeAsset,
-                    commissionAssetToSpendOnBuyIn = forMinBalance
-                )
-            } else {
-                MinimumBalanceBuyIn.NoBuyInNeeded
-            }
-
-            return AtomicSwapOperationFee(
-                networkFee = SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin),
-                minimumBalanceBuyIn = minimumBalanceBuyIn
-            )
+            return SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin)
         }
 
         private suspend fun RuntimeCallsApi.quoteFeeConversion(commissionAmountOut: Balance, customFeeToken: Chain.Asset): Balance {

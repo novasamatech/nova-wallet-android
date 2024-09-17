@@ -41,6 +41,7 @@ fun <N, E : Edge<N>> Graph.Companion.create(multiMaps: List<MultiMapList<N, E>>)
     }.build()
 }
 
+@JvmName("createFromEdges")
 fun <N, E : Edge<N>> Graph.Companion.create(edges: List<E>): Graph<N, E> {
     return build {
         edges.forEach {

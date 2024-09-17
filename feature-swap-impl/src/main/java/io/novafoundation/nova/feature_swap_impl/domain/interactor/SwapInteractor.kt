@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -11,15 +10,14 @@ import io.novafoundation.nova.feature_buy_api.domain.hasProvidersFor
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
 import io.novafoundation.nova.feature_swap_impl.domain.validation.availableSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.checkForFeeChanges
@@ -40,8 +38,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.incomingCrossChainDirectionsAvailable
-import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -51,6 +47,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -83,29 +80,26 @@ class SwapInteractor(
     }
 
     suspend fun quote(quoteArgs: SwapQuoteArgs): Result<SwapQuote> {
-        return swapService.quote(quoteArgs)
+        return swapService.quote(quoteArgs, CoroutineScope(coroutineContext))
     }
 
-    suspend fun executeSwap(
-        swapExecuteArgs: SwapExecuteArgs,
-        decimalFee: GenericDecimalFee<SwapFee>
-    ): Result<ExtrinsicSubmission> = withContext(Dispatchers.IO) {
+    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs): Result<SwapExecutionCorrection> = withContext(Dispatchers.IO) {
         swapService.swap(swapExecuteArgs)
-            .onSuccess { submission ->
-                swapTransactionHistoryRepository.insertPendingSwap(
-                    chainAsset = swapExecuteArgs.assetIn,
-                    swapArgs = swapExecuteArgs,
-                    fee = decimalFee.genericFee,
-                    txSubmission = submission
-                )
-
-                swapTransactionHistoryRepository.insertPendingSwap(
-                    chainAsset = swapExecuteArgs.assetOut,
-                    swapArgs = swapExecuteArgs,
-                    fee = decimalFee.genericFee,
-                    txSubmission = submission
-                )
-            }
+//            .onSuccess { submission ->
+//                swapTransactionHistoryRepository.insertPendingSwap(
+//                    chainAsset = swapExecuteArgs.assetIn,
+//                    swapArgs = swapExecuteArgs,
+//                    fee = decimalFee.genericFee,
+//                    txSubmission = submission
+//                )
+//
+//                swapTransactionHistoryRepository.insertPendingSwap(
+//                    chainAsset = swapExecuteArgs.assetOut,
+//                    swapArgs = swapExecuteArgs,
+//                    fee = decimalFee.genericFee,
+//                    txSubmission = submission
+//                )
+//            }
     }
 
     suspend fun canPayFeeInCustomAsset(asset: Chain.Asset): Boolean {
@@ -168,41 +162,41 @@ class SwapInteractor(
         }
     }
 
-    suspend fun getValidationPayload(
-        assetIn: Chain.Asset,
-        assetOut: Chain.Asset,
-        feeAsset: Chain.Asset,
-        quoteArgs: SwapQuoteArgs,
-        swapQuote: SwapQuote,
-        swapFee: GenericDecimalFee<SwapFee>
-    ): SwapValidationPayload? {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val chainIn = chainRegistry.getChain(swapQuote.assetIn.chainId)
-        val chainOut = chainRegistry.getChain(swapQuote.assetOut.chainId)
-        val nativeChainAssetIn = chainIn.commissionAsset
-
-        val executeArgs = quoteArgs.toExecuteArgs(
-            quote = swapQuote,
-            customFeeAsset = feeAsset,
-            nativeAsset = walletRepository.getAsset(metaAccount.id, nativeChainAssetIn) ?: return null
-        )
-        return SwapValidationPayload(
-            detailedAssetIn = SwapValidationPayload.SwapAssetData(
-                chain = chainIn,
-                asset = walletRepository.getAsset(metaAccount.id, assetIn) ?: return null,
-                amountInPlanks = swapQuote.planksIn
-            ),
-            detailedAssetOut = SwapValidationPayload.SwapAssetData(
-                chain = chainOut,
-                asset = walletRepository.getAsset(metaAccount.id, assetOut) ?: return null,
-                amountInPlanks = swapQuote.planksOut
-            ),
-            slippage = quoteArgs.slippage,
-            feeAsset = walletRepository.getAsset(metaAccount.id, feeAsset) ?: return null,
-            decimalFee = swapFee,
-            swapQuote = swapQuote,
-            swapQuoteArgs = quoteArgs,
-            swapExecuteArgs = executeArgs
-        )
-    }
+//    suspend fun getValidationPayload(
+//        assetIn: Chain.Asset,
+//        assetOut: Chain.Asset,
+//        feeAsset: Chain.Asset,
+//        quoteArgs: SwapQuoteArgs,
+//        swapQuote: SwapQuote,
+//        swapFee: GenericDecimalFee<SwapFee>
+//    ): SwapValidationPayload? {
+//        val metaAccount = accountRepository.getSelectedMetaAccount()
+//        val chainIn = chainRegistry.getChain(swapQuote.assetIn.chainId)
+//        val chainOut = chainRegistry.getChain(swapQuote.assetOut.chainId)
+//        val nativeChainAssetIn = chainIn.commissionAsset
+//
+//        val executeArgs = quoteArgs.toExecuteArgs(
+//            quote = swapQuote,
+//            customFeeAsset = feeAsset,
+//            nativeAsset = walletRepository.getAsset(metaAccount.id, nativeChainAssetIn) ?: return null
+//        )
+//        return SwapValidationPayload(
+//            detailedAssetIn = SwapValidationPayload.SwapAssetData(
+//                chain = chainIn,
+//                asset = walletRepository.getAsset(metaAccount.id, assetIn) ?: return null,
+//                amountInPlanks = swapQuote.planksIn
+//            ),
+//            detailedAssetOut = SwapValidationPayload.SwapAssetData(
+//                chain = chainOut,
+//                asset = walletRepository.getAsset(metaAccount.id, assetOut) ?: return null,
+//                amountInPlanks = swapQuote.planksOut
+//            ),
+//            slippage = quoteArgs.slippage,
+//            feeAsset = walletRepository.getAsset(metaAccount.id, feeAsset) ?: return null,
+//            decimalFee = swapFee,
+//            swapQuote = swapQuote,
+//            swapQuoteArgs = quoteArgs,
+//            swapExecuteArgs = executeArgs
+//        )
+//    }
 }

@@ -27,7 +27,8 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactF
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapStateStoreProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -56,12 +57,6 @@ class SwapFeatureModule {
             chainRegistry = chainRegistry,
             accountRepository = accountRepository
         )
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideSwapConfirmationPayloadFormatter(chainRegistry: ChainRegistry): SwapConfirmationPayloadFormatter {
-        return SwapConfirmationPayloadFormatter(chainRegistry)
     }
 
     @Provides
@@ -174,5 +169,11 @@ class SwapFeatureModule {
             assetSourceRegistry = assetSourceRegistry,
             chainRegistry = chainRegistry
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSwapQuoteStoreProvider(computationalCache: ComputationalCache): SwapStateStoreProvider {
+        return RealSwapStateStoreProvider(computationalCache)
     }
 }

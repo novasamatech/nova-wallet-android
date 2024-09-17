@@ -77,42 +77,7 @@ class SwapFee(
     // TODO handle multi-segment fee display
     override val networkFee: Fee
         get() = atomicOperationFees.first()
-
-    // TODO handle multi-segment minimumBalanceBuyIn
-    val minimumBalanceBuyIn: MinimumBalanceBuyIn
-        get() = atomicOperationFees.first().minimumBalanceBuyIn
 }
 
 val SwapFee.totalDeductedPlanks: Balance
-    get() = networkFee.amountByRequestedAccount + minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
-
-sealed class MinimumBalanceBuyIn {
-
-    class NeedsToBuyMinimumBalance(
-        val nativeAsset: Chain.Asset,
-        val nativeMinimumBalance: Balance,
-        val commissionAsset: Chain.Asset,
-        val commissionAssetToSpendOnBuyIn: Balance
-    ) : MinimumBalanceBuyIn()
-
-    object NoBuyInNeeded : MinimumBalanceBuyIn()
-}
-
-val MinimumBalanceBuyIn.commissionAssetToSpendOnBuyIn: Balance
-    get() = when (this) {
-        is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> commissionAssetToSpendOnBuyIn
-        MinimumBalanceBuyIn.NoBuyInNeeded -> Balance.ZERO
-    }
-
-fun MinimumBalanceBuyIn.requireNativeAsset(): Chain.Asset {
-    return when (this) {
-        is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> nativeAsset
-        MinimumBalanceBuyIn.NoBuyInNeeded -> throw IllegalStateException("No buy-in needed")
-    }
-}
-
-val MinimumBalanceBuyIn.nativeMinimumBalance: Balance
-    get() = when (this) {
-        is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> nativeMinimumBalance
-        MinimumBalanceBuyIn.NoBuyInNeeded -> Balance.ZERO
-    }
+    get() = networkFee.amountByRequestedAccount

@@ -22,7 +22,6 @@ class AssetConversionExchangeModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         runtimeCallsApi: MultiChainRuntimeCallsApi,
         extrinsicService: ExtrinsicService,
-        assetSourceRegistry: AssetSourceRegistry,
         multiLocationConverterFactory: MultiLocationConverterFactory,
         chainStateRepository: ChainStateRepository
     ): AssetConversionExchangeFactory {
@@ -31,7 +30,6 @@ class AssetConversionExchangeModule {
             remoteStorageSource = remoteStorageSource,
             runtimeCallsApi = runtimeCallsApi,
             extrinsicService = extrinsicService,
-            assetSourceRegistry = assetSourceRegistry,
             multiLocationConverterFactory = multiLocationConverterFactory
         )
     }

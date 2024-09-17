@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.QuotedSwapEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -154,7 +153,8 @@ internal class RealSwapService(
 
             val operationArgs = AtomicSwapOperationArgs(
                 swapLimit = SwapLimit(direction, quotedEdge.quotedAmount, perSegmentSlippage, quotedEdge.quote),
-                customFeeAsset = segmentExecuteArgs.customFeeAsset,
+                // TODO custom fee assets
+                customFeeAsset = null,
             )
 
             // Initial case - begin first operation
@@ -178,6 +178,7 @@ internal class RealSwapService(
 
         return finishedSwapTxs
     }
+
 
     private suspend fun quoteInternal(
         args: SwapQuoteArgs,
@@ -445,17 +446,6 @@ abstract class BaseSwapGraphEdge(
     val fromAsset: Chain.Asset,
     val toAsset: Chain.Asset
 ) : SwapGraphEdge {
-
-    final override val from: FullChainAssetId = fromAsset.fullId
-
-    final override val to: FullChainAssetId = toAsset.fullId
-}
-
-
-abstract class BaseQuotableEdge(
-    val fromAsset: Chain.Asset,
-    val toAsset: Chain.Asset
-) : QuotableEdge {
 
     final override val from: FullChainAssetId = fromAsset.fullId
 
