@@ -266,7 +266,11 @@ class TinderGovCardsViewModel(
     }
 
     private fun mapSummaryToUi(summary: String?, referendumPreview: ReferendumPreview): String {
-        return summary ?: referendumFormatter.formatReferendumName(referendumPreview)
+        return if (summary.isNullOrBlank()) {
+            referendumFormatter.formatReferendumName(referendumPreview)
+        } else {
+            summary
+        }
     }
 
     private fun setupReferendumRetryAction() {
