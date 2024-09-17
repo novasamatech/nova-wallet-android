@@ -48,6 +48,90 @@
 
     </LinearLayout>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/referendaTindergovBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/governanceLocksHeader"
+        app:strokeColor="@color/container_border"
+        app:strokeWidth="1dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_tinder_gov_entry_banner_background">
+
+            <ImageView
+                android:id="@+id/referendaTinderGovImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:src="@drawable/tinder_gov"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/referendaTinderGovTitle"
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginBottom="8dp"
+                android:includeFontPadding="false"
+                android:text="@string/tinder_gov_title"
+                app:layout_constraintBottom_toTopOf="@id/referendaTinderGovSubtitle"
+                app:layout_constraintStart_toEndOf="@+id/referendaTinderGovImage"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/referendaTinderGovSubtitle"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/referenda_tinder_gov_banner_subtitle"
+                android:textColor="@color/text_secondary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/referendaTinderGovChevron"
+                app:layout_constraintStart_toEndOf="@+id/referendaTinderGovImage"
+                app:layout_constraintTop_toBottomOf="@id/referendaTinderGovTitle" />
+
+            <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
+                android:id="@+id/referendaTinderGovChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textAllCaps="false"
+                app:chipSize="sum"
+                android:textColor="@color/chip_text"
+                app:chipTextAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                app:layout_constraintBottom_toBottomOf="@+id/referendaTinderGovTitle"
+                app:layout_constraintStart_toEndOf="@+id/referendaTinderGovTitle"
+                app:layout_constraintTop_toTopOf="@+id/referendaTinderGovTitle"
+                tools:text="32 referenda" />
+
+            <ImageView
+                android:id="@+id/referendaTinderGovChevron"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_chevron_right"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/icon_secondary" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <TextView
         android:id="@+id/referendaHeaderListTitle"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
@@ -57,18 +141,18 @@
         android:layout_marginTop="28dp"
         android:text="@string/referenda_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/governanceLocksHeader" />
+        app:layout_constraintTop_toBottomOf="@+id/referendaTindergovBanner" />
 
     <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/referendaHeaderSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        app:tint="@color/chip_icon"
         android:src="@drawable/ic_search"
         app:layout_constraintBottom_toBottomOf="@+id/referendaHeaderListTitle"
         app:layout_constraintEnd_toStartOf="@+id/referendaHeaderFilter"
-        app:layout_constraintTop_toTopOf="@+id/referendaHeaderListTitle" />
+        app:layout_constraintTop_toTopOf="@+id/referendaHeaderListTitle"
+        app:tint="@color/chip_icon" />
 
     <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/referendaHeaderFilter"

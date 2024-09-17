@@ -8,9 +8,9 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.domain.validation.hasEnoughFreeBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
-typealias VoteReferendumValidationSystem = ValidationSystem<VoteReferendumValidationPayload, VoteReferendumValidationFailure>
-typealias VoteReferendumValidation = Validation<VoteReferendumValidationPayload, VoteReferendumValidationFailure>
-typealias VoteReferendumValidationSystemBuilder = ValidationSystemBuilder<VoteReferendumValidationPayload, VoteReferendumValidationFailure>
+typealias VoteReferendumValidationSystem = ValidationSystem<VoteReferendaValidationPayload, VoteReferendumValidationFailure>
+typealias VoteReferendumValidation = Validation<VoteReferendaValidationPayload, VoteReferendumValidationFailure>
+typealias VoteReferendumValidationSystemBuilder = ValidationSystemBuilder<VoteReferendaValidationPayload, VoteReferendumValidationFailure>
 
 fun ValidationSystem.Companion.voteReferendumValidationSystem(
     governanceSourceRegistry: GovernanceSourceRegistry,
@@ -19,7 +19,7 @@ fun ValidationSystem.Companion.voteReferendumValidationSystem(
     hasEnoughFreeBalance(
         asset = { it.asset },
         fee = { it.fee },
-        requestedAmount = { it.voteAmount },
+        requestedAmount = { it.maxAmount },
         error = VoteReferendumValidationFailure::AmountIsTooBig
     )
 

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:minHeight="50dp"
+    android:paddingEnd="16dp">
+
+    <ImageView
+        android:id="@+id/itemTinderGovBasketDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:src="@drawable/ic_delete_symbol"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/itemTinderGovBasketId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chip_8"
+        android:includeFontPadding="false"
+        android:paddingHorizontal="11.5dp"
+        android:paddingVertical="4.5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemTinderGovBasketDelete"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="16dp"
+        tools:text="#314" />
+
+    <TextView
+        android:id="@+id/itemTinderGovBasketTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@+id/itemTinderGovBasketSubtitle"
+        app:layout_constraintEnd_toStartOf="@+id/itemTinderGovBasketArrow"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/itemTinderGovBasketId"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Kusama participation in the 10th Pais Dig" />
+
+    <TextView
+        android:id="@+id/itemTinderGovBasketSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemTinderGovBasketArrow"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/itemTinderGovBasketId"
+        app:layout_constraintTop_toBottomOf="@+id/itemTinderGovBasketTitle"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Aye: 3 votes" />
+
+    <ImageView
+        android:id="@+id/itemTinderGovBasketArrow"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_info"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

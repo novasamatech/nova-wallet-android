@@ -13,7 +13,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Con
 
 fun handleVoteReferendumValidationFailure(
     failure: VoteReferendumValidationFailure,
-    actions: ValidationFlowActions<VoteReferendumValidationPayload>,
+    actions: ValidationFlowActions<VoteReferendaValidationPayload>,
     resourceManager: ResourceManager
 ): TransformedFailure {
     return when (failure) {

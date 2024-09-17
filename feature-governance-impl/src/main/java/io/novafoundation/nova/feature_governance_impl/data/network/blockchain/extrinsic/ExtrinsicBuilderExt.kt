@@ -31,6 +31,20 @@ fun ExtrinsicBuilder.convictionVotingVote(
     )
 }
 
+fun CallBuilder.convictionVotingVote(
+    referendumId: ReferendumId,
+    vote: AccountVote
+): CallBuilder {
+    return addCall(
+        moduleName = Modules.CONVICTION_VOTING,
+        callName = "vote",
+        arguments = mapOf(
+            "poll_index" to referendumId.value,
+            "vote" to vote.prepareForEncoding()
+        )
+    )
+}
+
 fun ExtrinsicBuilder.convictionVotingUnlock(
     trackId: TrackId,
     accountId: AccountId
@@ -64,6 +78,20 @@ fun ExtrinsicBuilder.democracyVote(
     vote: AccountVote
 ): ExtrinsicBuilder {
     return call(
+        moduleName = Modules.DEMOCRACY,
+        callName = "vote",
+        arguments = mapOf(
+            "ref_index" to referendumId.value,
+            "vote" to vote.prepareForEncoding()
+        )
+    )
+}
+
+fun CallBuilder.democracyVote(
+    referendumId: ReferendumId,
+    vote: AccountVote
+): CallBuilder {
+    return addCall(
         moduleName = Modules.DEMOCRACY,
         callName = "vote",
         arguments = mapOf(

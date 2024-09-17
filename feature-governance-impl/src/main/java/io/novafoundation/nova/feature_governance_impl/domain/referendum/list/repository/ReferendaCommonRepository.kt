@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
@@ -46,14 +47,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import java.math.BigInteger
-
-class ReferendaState(
-    val voting: Map<TrackId, Voting>,
-    val currentBlockNumber: BlockNumber,
-    val onChainReferenda: Map<ReferendumId, OnChainReferendum>,
-    val referenda: List<ReferendumPreview>,
-    val tracksById: Map<TrackId, TrackInfo>,
-)
 
 interface ReferendaCommonRepository {
 

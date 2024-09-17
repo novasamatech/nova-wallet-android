@@ -42,6 +42,7 @@ import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
+import io.novafoundation.nova.core_db.dao.TinderGovDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
@@ -103,6 +104,7 @@ import io.novafoundation.nova.core_db.migrations.RefactorOperations_49_50
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.migrations.RemoveColorFromChains_17_18
 import io.novafoundation.nova.core_db.migrations.StakingRewardPeriods_42_43
+import io.novafoundation.nova.core_db.migrations.TinderGovBasket_62_63
 import io.novafoundation.nova.core_db.migrations.TransferFiatAmount_40_41
 import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
 import io.novafoundation.nova.core_db.model.AccountLocal
@@ -125,6 +127,8 @@ import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.core_db.model.StakingRewardPeriodLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
+import io.novafoundation.nova.core_db.model.TinderGovBasketItemLocal
+import io.novafoundation.nova.core_db.model.TinderGovVotingPowerLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
 import io.novafoundation.nova.core_db.model.WalletConnectPairingLocal
@@ -146,7 +150,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 62,
+    version = 63,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -186,7 +190,9 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         ExternalBalanceLocal::class,
         ProxyAccountLocal::class,
         BalanceHoldLocal::class,
-        NodeSelectionPreferencesLocal::class
+        NodeSelectionPreferencesLocal::class,
+        TinderGovBasketItemLocal::class,
+        TinderGovVotingPowerLocal::class
     ],
 )
 @TypeConverters(
@@ -242,6 +248,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddFungibleNfts_55_56, ChainPushSupport_56_57)
                     .addMigrations(AddLocalMigratorVersionToChainRuntimes_57_58, AddGloballyUniqueIdToMetaAccounts_58_59)
                     .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
+                    .addMigrations(TinderGovBasket_62_63)
                     .build()
             }
             return instance!!
@@ -301,4 +308,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun externalBalanceDao(): ExternalBalanceDao
 
     abstract fun holdsDao(): HoldsDao
+
+    abstract fun tinderGovDao(): TinderGovDao
 }

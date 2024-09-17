@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaState
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
