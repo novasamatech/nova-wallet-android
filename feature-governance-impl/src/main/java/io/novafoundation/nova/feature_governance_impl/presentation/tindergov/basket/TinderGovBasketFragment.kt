@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DefaultItemAnimator
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -35,6 +36,10 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
         tinderGovBasketToolbar.setHomeButtonListener { viewModel.backClicked() }
         tinderGovBasketToolbar.setRightActionClickListener { viewModel.toggleEditMode() }
 
+        tinderGovBasketList.itemAnimator = DefaultItemAnimator()
+            .apply {
+                supportsChangeAnimations = false
+            }
         tinderGovBasketList.adapter = adapter
         tinderGovBasketButton.setOnClickListener { viewModel.voteClicked() }
     }
