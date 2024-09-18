@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.validation
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
@@ -32,7 +33,7 @@ class HasEnoughFreeBalanceValidation<P, E>(
         val freeBalanceAfterFees = asset(value).free - fee(value).networkFeeByRequestedAccountOrZero
 
         return (freeBalanceAfterFees >= requestedAmount(value)) isTrueOrError {
-            error(asset(value).token.configuration, freeBalanceAfterFees)
+            error(asset(value).token.configuration, freeBalanceAfterFees.atLeastZero())
         }
     }
 }
