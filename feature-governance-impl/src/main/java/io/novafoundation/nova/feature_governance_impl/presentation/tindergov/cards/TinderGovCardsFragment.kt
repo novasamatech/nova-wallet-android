@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import androidx.core.view.isVisible
+import androidx.transition.Visibility
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
@@ -17,6 +19,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.shape.toColorStateList
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -33,6 +36,7 @@ import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsCo
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSettings
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStack
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStatusBarInsetsContainer
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSubtitle
 
 class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGovCardsAdapter.Handler, TinderGovCardStackListener {
 
@@ -82,6 +86,10 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
     }
 
     override fun subscribe(viewModel: TinderGovCardsViewModel) {
+        viewModel.referendumCounterFlow.observe {
+            tinderGovCardsSubtitle.text = it
+        }
+
         viewModel.cardsFlow.observe { adapter.submitList(it) }
 
         viewModel.skipCardEvent.observeEvent {
@@ -139,6 +147,10 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 setTitle(R.string.swipe_gov_card_data_loading_error_title)
                 setMessage(R.string.swipe_gov_card_data_loading_error_message)
             }
+        }
+
+        viewModel.isButtonsVisibleFlow.observe {
+            tinderGovCardsControlView.setVisible(it, falseState = View.INVISIBLE)
         }
     }
 

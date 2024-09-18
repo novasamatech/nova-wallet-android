@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAc
 import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.countBy
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.onEachWithPrevious
@@ -123,6 +124,22 @@ class TinderGovCardsViewModel(
 
     val basketModelFlow = basketFlow
         .map { items -> mapBasketModel(items.values.toList()) }
+
+    private val votingReferendaCounterFlow = combine(basketFlow, sortedReferendaFlow) { basket, referenda ->
+        val currentBasketSize = referenda.countBy { it.id in basket }
+        ReferendaCounterModel(currentBasketSize, referenda.size)
+    }.shareInBackground()
+
+    val referendumCounterFlow = votingReferendaCounterFlow.map {
+        if (it.hasReferendaToVote()) {
+            val currentItemIndex = it.itemsInBasket + 1
+            resourceManager.getString(R.string.swipe_gov_cards_counter, currentItemIndex, it.referendaSize)
+        } else {
+            resourceManager.getString(R.string.swipe_gov_cards_no_referenda_to_vote)
+        }
+    }
+
+    val isButtonsVisibleFlow = votingReferendaCounterFlow.map { it.hasReferendaToVote() }
 
     init {
         observeReferendaAndAddToCards()
@@ -394,5 +411,14 @@ private class CardWithDetails(
             referendum.id == other.referendum.id &&
             summary == other.summary &&
             amount == other.amount
+    }
+}
+
+private class ReferendaCounterModel(
+    val itemsInBasket: Int,
+    val referendaSize: Int
+) {
+    fun hasReferendaToVote(): Boolean {
+        return referendaSize > itemsInBasket
     }
 }
