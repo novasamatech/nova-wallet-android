@@ -50,5 +50,5 @@ interface TinderGovInteractor {
 
     suspend fun clearBasket()
 
-    suspend fun basketItemValidForVote(item: TinderGovBasketItem): Boolean
+    suspend fun getBasketItemsToRemove(coroutineScope: CoroutineScope): List<TinderGovBasketItem>
 }

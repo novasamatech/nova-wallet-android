@@ -138,12 +138,7 @@ class TinderGovBasketViewModel(
 
     private fun validateReferendaAndRemove() {
         launch {
-            val basket = basketItemsFlow.first()
-
-            val availableToVoteReferenda = availableToVoteReferendaFlow.first()
-
-            val removedReferenda = basket.filter { availableToVoteReferenda.contains(it.referendumId).not() }
-                .filter { interactor.basketItemValidForVote(it) }
+            val removedReferenda = interactor.getBasketItemsToRemove(coroutineScope)
 
             if (removedReferenda.isNotEmpty()) {
                 interactor.removeBasketItems(removedReferenda)
