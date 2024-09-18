@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_use_max">Use max</string>
+
     <string name="swipe_gov_insufficient_balance_dialog_title">Insufficient balance for voting</string>
     <string name="swipe_gov_insufficient_balance_dialog_message">You don\'t have enough balance to vote with the current voting power %s (%sx). Please change voting power or add more funds to your wallet.</string>
     <string name="swipe_gov_convirm_votes_success_message">You have successfully voted for %d referenda</string>

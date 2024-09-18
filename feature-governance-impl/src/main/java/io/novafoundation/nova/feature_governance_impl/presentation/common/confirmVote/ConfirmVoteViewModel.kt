@@ -3,18 +3,13 @@ package io.novafoundation.nova.feature_governance_impl.presentation.common.confi
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendaValidationPayload
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.LocksChangeModel
@@ -41,9 +36,7 @@ abstract class ConfirmVoteViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val addressIconGenerator: AddressIconGenerator,
     private val assetUseCase: AssetUseCase,
-    private val validationSystem: VoteReferendumValidationSystem,
-    private val validationExecutor: ValidationExecutor,
-    private val resourceManager: ResourceManager,
+    private val validationExecutor: ValidationExecutor
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     WithFeeLoaderMixin,
@@ -77,10 +70,6 @@ abstract class ConfirmVoteViewModel(
 
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
-    protected abstract suspend fun performVote()
-
-    protected abstract suspend fun getValidationPayload(): VoteReferendaValidationPayload
-
     fun accountClicked() = launch {
         val addressModel = currentAddressModelFlow.first()
         val type = ExternalActions.Type.Address(addressModel.address)
@@ -88,24 +77,7 @@ abstract class ConfirmVoteViewModel(
         externalActions.showExternalActions(type, governanceSharedState.chain())
     }
 
-    fun confirmClicked() = launch {
-        val validationPayload = getValidationPayload()
-
-        validationExecutor.requireValid(
-            validationSystem = validationSystem,
-            payload = validationPayload,
-            validationFailureTransformerCustom = { status, actions ->
-                handleVoteReferendumValidationFailure(status.reason, actions, resourceManager)
-            },
-            progressConsumer = _showNextProgress.progressConsumer(),
-        ) {
-            launch {
-                performVote()
-
-                _showNextProgress.value = false
-            }
-        }
-    }
+    abstract fun confirmClicked()
 
     fun backClicked() {
         router.back()

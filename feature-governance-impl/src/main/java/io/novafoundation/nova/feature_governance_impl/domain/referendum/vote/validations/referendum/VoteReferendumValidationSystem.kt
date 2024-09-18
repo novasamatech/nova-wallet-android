@@ -1,10 +1,13 @@
-package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations
+package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum
 
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.MaximumTrackVotesNotReachedValidation
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.NotDelegatingInTrackValidation
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.ReferendumIsOngoingValidation
 import io.novafoundation.nova.feature_wallet_api.domain.validation.hasEnoughFreeBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
@@ -42,4 +45,27 @@ fun ValidationSystem.Companion.voteReferendumValidationSystem(
     maximumTrackVotesNotReached(governanceSourceRegistry, governanceSharedState)
 
     abstainConvictionValid()
+}
+
+fun VoteReferendumValidationSystemBuilder.maximumTrackVotesNotReached(
+    governanceSourceRegistry: GovernanceSourceRegistry,
+    governanceSharedState: GovernanceSharedState,
+) {
+    validate(
+        MaximumTrackVotesNotReachedValidation(
+            governanceSourceRegistry,
+            governanceSharedState,
+            VoteReferendumValidationFailure::MaxTrackVotesReached
+        )
+    )
+}
+
+fun VoteReferendumValidationSystemBuilder.notDelegatingInTrack() {
+    validate(
+        NotDelegatingInTrackValidation { VoteReferendumValidationFailure.AlreadyDelegatingVotes }
+    )
+}
+
+fun VoteReferendumValidationSystemBuilder.referendumIsOngoing() {
+    validate(ReferendumIsOngoingValidation(VoteReferendumValidationFailure::ReferendumCompleted))
 }

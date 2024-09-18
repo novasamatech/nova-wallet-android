@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations
+package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum
 
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
