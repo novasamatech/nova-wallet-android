@@ -13,9 +13,9 @@ interface PartialRetriableMixin : Retriable {
 
     interface Presentation : PartialRetriableMixin {
 
-        fun <T> handleMultiResult(
+        suspend fun <T> handleMultiResult(
             multiResult: RetriableMultiResult<T>,
-            onSuccess: (List<T>) -> Unit,
+            onSuccess: suspend (List<T>) -> Unit,
             progressConsumer: ProgressConsumer? = null,
             onRetryCancelled: () -> Unit
         )
