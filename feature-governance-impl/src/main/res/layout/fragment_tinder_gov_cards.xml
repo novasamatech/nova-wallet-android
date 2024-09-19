@@ -136,6 +136,7 @@
         app:layout_constraintTop_toBottomOf="@+id/view" />
 
     <TextView
+        android:id="@+id/tinderGovCardsEmptyStateDescription"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -143,22 +144,40 @@
         android:layout_marginTop="16dp"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:text="@string/swipe_gov_card_empty_state_text"
-        android:textColor="@color/button_text_inactive"
+        android:text="@string/swipe_gov_card_placeholder_basket_empty_text"
+        android:textColor="@color/text_secondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tinderGovCardsEmptyStateImage" />
 
-    <com.yuyakaido.android.cardstackview.CardStackView
+    <TextView
+        android:id="@+id/tinderGovCardsEmptyStateButton"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="80dp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:text="@string/swipe_gov_cards_placeholder_button"
+        android:textColor="@color/button_text_accent"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tinderGovCardsEmptyStateDescription"
+        tools:visibility="visible" />
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceCardsStackView
         android:id="@+id/tinderGovCardsStack"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="24dp"
-        android:paddingBottom="16dp"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingHorizontal="24dp"
+        android:paddingBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/tinderGovCardsControlView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
