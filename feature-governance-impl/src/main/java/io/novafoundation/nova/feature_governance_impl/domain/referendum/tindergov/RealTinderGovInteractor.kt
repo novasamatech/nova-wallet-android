@@ -35,6 +35,7 @@ import io.novafoundation.nova.runtime.state.selectedOption
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -178,6 +179,19 @@ class RealTinderGovInteractor(
             .mapToSet { it.id }
 
         return basket.filter { it.isItemNotAvailableToVote(availableToVoteReferenda, asset) }
+    }
+
+    override suspend fun awaitAllItemsVoted(coroutineScope: CoroutineScope, basket: List<TinderGovBasketItem>) {
+        observeReferendaState(coroutineScope)
+            .filter { referendaState ->
+                val referenda = referendaState.referenda.associateBy { it.id }
+                val allBasketItemsVoted = basket.all {
+                    val referendum = referenda[it.referendumId]
+                    referendum?.referendumVote != null
+                }
+
+                allBasketItemsVoted
+            }.first()
     }
 
     private fun TinderGovBasketItem.isItemNotAvailableToVote(

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.accountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
@@ -149,19 +150,23 @@ class ConfirmTinderGovVoteViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                onVoteSuccess(accountVotes.size)
+                onVoteSuccess(payload.basket)
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }
         )
     }
 
-    private fun onVoteSuccess(voteSize: Int) {
-        launch {
-            showMessage(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, voteSize))
-            tinderGovInteractor.clearBasket()
-            router.backToTinderGovCards()
-        }
+    private suspend fun onVoteSuccess(basket: List<TinderGovBasketItem>) {
+        awaitVotedReferendaStateUpdate(basket)
+
+        showMessage(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, basket.size))
+        tinderGovInteractor.clearBasket()
+        router.backToTinderGovCards()
+    }
+
+    private suspend fun awaitVotedReferendaStateUpdate(basket: List<TinderGovBasketItem>) {
+        tinderGovInteractor.awaitAllItemsVoted(coroutineScope, basket)
     }
 
     private suspend fun getValidationPayload(): VoteTinderGovValidationPayload {
