@@ -11,6 +11,15 @@ import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
+sealed interface VotingPowerState {
+
+    object Empty : VotingPowerState
+
+    class InsufficientAmount(val votingPower: VotingPower) : VotingPowerState
+
+    class SufficientAmount(val votingPower: VotingPower) : VotingPowerState
+}
+
 interface TinderGovInteractor {
 
     fun observeReferendaState(coroutineScope: CoroutineScope): Flow<ReferendaState>
@@ -31,9 +40,7 @@ interface TinderGovInteractor {
 
     suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower?
 
-    suspend fun isVotingPowerAvailable(): Boolean
-
-    suspend fun isSufficientAmountToVote(): Boolean
+    suspend fun getVotingPowerState(): VotingPowerState
 
     suspend fun removeReferendumFromBasket(item: TinderGovBasketItem)
 
@@ -42,4 +49,6 @@ interface TinderGovInteractor {
     suspend fun isBasketEmpty(): Boolean
 
     suspend fun clearBasket()
+
+    suspend fun getBasketItemsToRemove(coroutineScope: CoroutineScope): List<TinderGovBasketItem>
 }

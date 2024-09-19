@@ -11,19 +11,18 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.model.accountVote
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amount
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendaValidationPayload
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.handleVoteTinderGovValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
@@ -50,7 +49,7 @@ class ConfirmTinderGovVoteViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: VoteReferendumInteractor,
     private val assetUseCase: AssetUseCase,
-    private val validationSystem: VoteReferendumValidationSystem,
+    private val validationSystem: VoteTinderGovValidationSystem,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val locksChangeFormatter: LocksChangeFormatter,
@@ -66,9 +65,7 @@ class ConfirmTinderGovVoteViewModel(
     selectedAccountUseCase,
     addressIconGenerator,
     assetUseCase,
-    validationSystem,
-    validationExecutor,
-    resourceManager
+    validationExecutor
 ) {
 
     private val basketFlow = tinderGovInteractor.observeTinderGovBasket()
@@ -80,7 +77,7 @@ class ConfirmTinderGovVoteViewModel(
     }.shareInBackground()
 
     override val titleFlow: Flow<String> = basketFlow.map {
-        resourceManager.getString(R.string.tinder_gov_vote_setup_title, it.size)
+        resourceManager.getString(R.string.swipe_gov_vote_setup_title, it.size)
     }.shareInBackground()
 
     override val amountModelFlow: Flow<AmountModel> = combine(assetFlow, basketFlow) { asset, basket ->
@@ -122,45 +119,61 @@ class ConfirmTinderGovVoteViewModel(
         }
     }
 
-    override suspend fun performVote() {
-        val votes = votesFlow.first()
+    override fun confirmClicked() {
+        launch {
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = getValidationPayload(),
+                validationFailureTransformerCustom = { status, actions ->
+                    handleVoteTinderGovValidationFailure(status.reason, actions, resourceManager)
+                },
+                progressConsumer = _showNextProgress.progressConsumer(),
+            ) {
+                launch {
+                    performVote(it)
+
+                    _showNextProgress.value = false
+                }
+            }
+        }
+    }
+
+    private suspend fun performVote(payload: VoteTinderGovValidationPayload) {
+        val accountVotes = payload.basket.associateBy { it.referendumId }
+            .mapValues { (_, value) -> value.accountVote() }
 
         val result = withContext(Dispatchers.Default) {
-            interactor.voteReferenda(votes)
+            interactor.voteReferenda(accountVotes)
         }
 
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                onVoteSuccess(votes.size)
+                onVoteSuccess(accountVotes.size)
             },
-            progressConsumer = null,
+            progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }
         )
     }
 
     private fun onVoteSuccess(voteSize: Int) {
         launch {
-            showMessage(resourceManager.getString(R.string.tinder_gov_convirm_votes_success_message, voteSize))
+            showMessage(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, voteSize))
             tinderGovInteractor.clearBasket()
             router.backToTinderGovCards()
         }
     }
 
-    override suspend fun getValidationPayload(): VoteReferendaValidationPayload {
+    private suspend fun getValidationPayload(): VoteTinderGovValidationPayload {
         val voteAssistant = voteAssistantFlow.first()
-        val asset = assetFlow.first()
-        val votes = votesFlow.first().values
-        val maxAmount = votes.maxOf { it.amount() }
+        val basket = basketFlow.first().values.toList()
 
-        return VoteReferendaValidationPayload(
+        return VoteTinderGovValidationPayload(
             onChainReferenda = voteAssistant.onChainReferenda,
             asset = assetFlow.first(),
             trackVoting = voteAssistant.trackVoting,
             fee = originFeeMixin.awaitDecimalFee(),
-            maxAmount = asset.token.amountFromPlanks(maxAmount),
-            conviction = null,
-            voteType = null
+            basket = basket
         )
     }
 }

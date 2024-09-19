@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.ca
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.isError
 import io.novafoundation.nova.common.domain.isLoaded
@@ -11,22 +12,31 @@ import io.novafoundation.nova.common.domain.orLoading
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.navigation.awaitResponse
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.formatTokenAmount
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.onEachWithPrevious
 import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.safeSubList
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
+import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.VotingPowerState
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteRequester
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,12 +57,16 @@ class TinderGovCardsViewModel(
     private val interactor: TinderGovInteractor,
     private val referendumFormatter: ReferendumFormatter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val tinderGovVoteRequester: TinderGovVoteRequester
+    private val tinderGovVoteRequester: TinderGovVoteRequester,
+    private val assetUseCase: AssetUseCase,
+    private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
     companion object {
         const val CARD_STACK_SIZE = 3
     }
+
+    private val cardsBackground = createCardsBackground()
 
     private val tinderGovCardDetailsLoader = tinderGovCardDetailsLoaderFactory.create(coroutineScope = this)
 
@@ -77,6 +91,8 @@ class TinderGovCardsViewModel(
     )
 
     val retryReferendumInfoLoadingAction = actionAwaitableMixinFactory.confirmingOrDenyingAction<Unit>()
+
+    val insufficientBalanceChangeAction = actionAwaitableMixinFactory.confirmingOrDenyingAction<TitleAndMessage>()
 
     private val _skipCardEvent = MutableLiveData<Event<Unit>>()
     val skipCardEvent: LiveData<Event<Unit>> = _skipCardEvent
@@ -107,6 +123,22 @@ class TinderGovCardsViewModel(
 
     val basketModelFlow = basketFlow
         .map { items -> mapBasketModel(items.values.toList()) }
+
+    private val votingReferendaCounterFlow = combine(basketFlow, sortedReferendaFlow) { basket, referenda ->
+        val currentBasketSize = referenda.count { it.id in basket }
+        ReferendaCounterModel(currentBasketSize, referenda.size)
+    }.shareInBackground()
+
+    val referendumCounterFlow = votingReferendaCounterFlow.map {
+        if (it.hasReferendaToVote()) {
+            val currentItemIndex = it.itemsInBasket + 1
+            resourceManager.getString(R.string.swipe_gov_cards_counter, currentItemIndex, it.referendaSize)
+        } else {
+            resourceManager.getString(R.string.swipe_gov_cards_no_referenda_to_vote)
+        }
+    }
+
+    val isButtonsVisibleFlow = votingReferendaCounterFlow.map { it.hasReferendaToVote() }
 
     init {
         observeReferendaAndAddToCards()
@@ -180,20 +212,47 @@ class TinderGovCardsViewModel(
                 return@launch
             }
 
-            if (!interactor.isSufficientAmountToVote()) {
-                val response = tinderGovVoteRequester.awaitResponse(TinderGovVoteRequester.Request(referendum.id.value))
+            val votingPowerState = interactor.getVotingPowerState()
+            val isSufficientAmount = when (votingPowerState) {
+                VotingPowerState.Empty -> openSetVotingPowerScreen(referendum.id)
+                is VotingPowerState.InsufficientAmount -> showInsufficientBalanceDialog(referendum.id, votingPowerState.votingPower)
 
-                if (!response.success) {
-                    _rewindCardEvent.sendEvent()
-                    isVotingInProgress.value = false
-                    return@launch
-                }
+                is VotingPowerState.SufficientAmount -> true
             }
 
-            interactor.addItemToBasket(referendum.id, voteType)
-            checkAllReferendaWasVotedAndOpenBasket()
+            if (isSufficientAmount) {
+                interactor.addItemToBasket(referendum.id, voteType)
+                checkAllReferendaWasVotedAndOpenBasket()
+            } else {
+                _rewindCardEvent.sendEvent()
+            }
 
             isVotingInProgress.value = false
+        }
+    }
+
+    private suspend fun openSetVotingPowerScreen(referendumId: ReferendumId): Boolean {
+        val response = tinderGovVoteRequester.awaitResponse(TinderGovVoteRequester.Request(referendumId.value))
+
+        return response.success
+    }
+
+    private suspend fun showInsufficientBalanceDialog(referendumId: ReferendumId, votingPower: VotingPower): Boolean {
+        val asset = assetUseCase.getCurrentAsset()
+        val chainAsset = asset.token.configuration
+
+        val amount = chainAsset.amountFromPlanks(votingPower.amount)
+        val formattedAmount = amount.formatTokenAmount(chainAsset.symbol)
+        val conviction = votingPower.conviction.amountMultiplier().format()
+
+        val title = resourceManager.getString(R.string.swipe_gov_insufficient_balance_dialog_title)
+        val message = resourceManager.getString(R.string.swipe_gov_insufficient_balance_dialog_message, formattedAmount, conviction)
+        val openChangeVotingPowerScreen = insufficientBalanceChangeAction.awaitAction(TitleAndMessage(title, message))
+
+        return if (openChangeVotingPowerScreen) {
+            openSetVotingPowerScreen(referendumId)
+        } else {
+            false
         }
     }
 
@@ -211,18 +270,23 @@ class TinderGovCardsViewModel(
     private fun mapReferendumToUi(
         referendumPreview: ReferendumPreview,
         summary: ExtendedLoadingState<String?>?,
-        amount: ExtendedLoadingState<AmountModel?>?
+        amount: ExtendedLoadingState<AmountModel?>?,
+        backgroundRes: Int
     ): TinderGovCardRvItem {
         return TinderGovCardRvItem(
             referendumPreview.id,
             summary = summary?.map { mapSummaryToUi(it, referendumPreview) }.orLoading(),
             requestedAmount = amount.orLoading(),
-            backgroundRes = R.drawable.ic_tinder_gov_entry_banner_background,
+            backgroundRes = backgroundRes,
         )
     }
 
     private fun mapSummaryToUi(summary: String?, referendumPreview: ReferendumPreview): String {
-        return summary ?: referendumFormatter.formatReferendumName(referendumPreview)
+        return if (summary.isNullOrBlank()) {
+            referendumFormatter.formatReferendumName(referendumPreview)
+        } else {
+            summary
+        }
     }
 
     private fun setupReferendumRetryAction() {
@@ -258,10 +322,12 @@ class TinderGovCardsViewModel(
         summaries: Map<ReferendumId, ExtendedLoadingState<String?>>,
         amounts: Map<ReferendumId, ExtendedLoadingState<AmountModel?>>
     ): List<TinderGovCardRvItem> {
-        return sortedReferenda.map {
-            val summary = summaries[it.id]
-            val amount = amounts[it.id]
-            mapReferendumToUi(it, summary, amount)
+        return sortedReferenda.mapIndexed { index, referendum ->
+            val backgroundRes = cardsBackground[index % cardsBackground.size]
+
+            val summary = summaries[referendum.id]
+            val amount = amounts[referendum.id]
+            mapReferendumToUi(referendum, summary, amount, backgroundRes)
         }
     }
 
@@ -270,7 +336,7 @@ class TinderGovCardsViewModel(
             items = items.size,
             backgroundColorRes = if (items.isEmpty()) R.color.icon_inactive else R.color.icon_accent,
             textColorRes = if (items.isEmpty()) R.color.button_text_inactive else R.color.text_primary,
-            textRes = if (items.isEmpty()) R.string.tinder_gov_cards_voting_list_empty else R.string.tinder_gov_cards_voting_list,
+            textRes = if (items.isEmpty()) R.string.swipe_gov_cards_voting_list_empty else R.string.swipe_gov_cards_voting_list,
             imageTintRes = if (items.isEmpty()) R.color.icon_inactive else R.color.chip_icon,
         )
     }
@@ -305,8 +371,26 @@ class TinderGovCardsViewModel(
 
             if (isBasketItemRemoved) {
                 _resetCards.sendEvent()
+                loadFirstCards()
             }
         }
+    }
+
+    private fun createCardsBackground(): List<Int> {
+        return listOf(
+            R.drawable.tinder_gov_card_background_1,
+            R.drawable.tinder_gov_card_background_2,
+            R.drawable.tinder_gov_card_background_3,
+            R.drawable.tinder_gov_card_background_4,
+            R.drawable.tinder_gov_card_background_5,
+            R.drawable.tinder_gov_card_background_6,
+            R.drawable.tinder_gov_card_background_5,
+            R.drawable.tinder_gov_card_background_4,
+            R.drawable.tinder_gov_card_background_3,
+            R.drawable.tinder_gov_card_background_2,
+            R.drawable.tinder_gov_card_background_1,
+            R.drawable.tinder_gov_card_background_0,
+        )
     }
 }
 
@@ -326,5 +410,14 @@ private class CardWithDetails(
             referendum.id == other.referendum.id &&
             summary == other.summary &&
             amount == other.amount
+    }
+}
+
+private class ReferendaCounterModel(
+    val itemsInBasket: Int,
+    val referendaSize: Int
+) {
+    fun hasReferendaToVote(): Boolean {
+        return referendaSize > itemsInBasket
     }
 }

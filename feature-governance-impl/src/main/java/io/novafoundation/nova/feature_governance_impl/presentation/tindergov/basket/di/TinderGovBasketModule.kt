@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.TinderGovBasketViewModel
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 
 @Module(includes = [ViewModelModule::class])
 class TinderGovBasketModule {
@@ -30,7 +31,8 @@ class TinderGovBasketModule {
         votersFormatter: VotersFormatter,
         referendumFormatter: ReferendumFormatter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        assetUseCase: AssetUseCase
     ): ViewModel {
         return TinderGovBasketViewModel(
             governanceSharedState = governanceSharedState,
@@ -39,7 +41,8 @@ class TinderGovBasketModule {
             votersFormatter = votersFormatter,
             referendumFormatter = referendumFormatter,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            assetUseCase
         )
     }
 

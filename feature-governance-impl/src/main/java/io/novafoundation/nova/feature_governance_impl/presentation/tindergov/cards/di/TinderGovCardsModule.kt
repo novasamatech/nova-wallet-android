@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
@@ -40,7 +41,9 @@ class TinderGovCardsModule {
         tinderGovCardDetailsLoaderFactory: TinderGovCardsDetailsLoaderFactory,
         referendumFormatter: ReferendumFormatter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        tinderGovVoteCommunicator: TinderGovVoteCommunicator
+        tinderGovVoteCommunicator: TinderGovVoteCommunicator,
+        resourceManager: ResourceManager,
+        assetUseCase: AssetUseCase
     ): ViewModel {
         return TinderGovCardsViewModel(
             router,
@@ -48,7 +51,9 @@ class TinderGovCardsModule {
             tinderGovInteractor,
             referendumFormatter,
             actionAwaitableMixinFactory,
-            tinderGovVoteCommunicator
+            tinderGovVoteCommunicator,
+            assetUseCase,
+            resourceManager
         )
     }
 

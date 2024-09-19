@@ -88,3 +88,7 @@ fun Asset.transferableReplacingFrozen(newFrozen: Balance): Balance {
 fun Asset.regularTransferableBalance(): Balance {
     return TransferableMode.REGULAR.calculateTransferable(freeInPlanks, frozenInPlanks, reservedInPlanks)
 }
+
+fun Asset.availableToVote(): Balance {
+    return freeInPlanks
+}

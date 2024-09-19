@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -15,8 +16,9 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Vote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.estimateLocksAfterVoting
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendaValidationPayload
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.VoteReferendaValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.VoteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
@@ -65,9 +67,7 @@ class ConfirmReferendumVoteViewModel(
     selectedAccountUseCase,
     addressIconGenerator,
     assetUseCase,
-    validationSystem,
-    validationExecutor,
-    resourceManager
+    validationExecutor
 ) {
 
     override val titleFlow: Flow<String> = flowOf {
@@ -107,7 +107,26 @@ class ConfirmReferendumVoteViewModel(
     }
         .shareInBackground()
 
-    override suspend fun performVote() {
+    override fun confirmClicked() {
+        launch {
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = getValidationPayload(),
+                validationFailureTransformerCustom = { status, actions ->
+                    handleVoteReferendumValidationFailure(status.reason, actions, resourceManager)
+                },
+                progressConsumer = _showNextProgress.progressConsumer(),
+            ) {
+                launch {
+                    performVote()
+
+                    _showNextProgress.value = false
+                }
+            }
+        }
+    }
+
+    private suspend fun performVote() {
         val accountVote = accountVoteFlow.first()
 
         val result = withContext(Dispatchers.Default) {
@@ -121,7 +140,17 @@ class ConfirmReferendumVoteViewModel(
             .onFailure(::showError)
     }
 
-    override suspend fun getValidationPayload(): VoteReferendaValidationPayload {
+    private fun constructAccountVote(asset: Asset): AccountVote {
+        val planks = asset.token.planksFromAmount(payload.vote.amount)
+
+        return AccountVote.constructAccountVote(planks, payload.vote.conviction, payload.vote.voteType)
+    }
+
+    private fun setFee() = launch {
+        originFeeMixin.setFee(mapFeeFromParcel(payload.fee).genericFee)
+    }
+
+    private suspend fun getValidationPayload(): VoteReferendaValidationPayload {
         val voteAssistant = voteAssistantFlow.first()
 
         return VoteReferendaValidationPayload(
@@ -133,15 +162,5 @@ class ConfirmReferendumVoteViewModel(
             voteType = payload.vote.voteType,
             fee = originFeeMixin.awaitDecimalFee()
         )
-    }
-
-    private fun constructAccountVote(asset: Asset): AccountVote {
-        val planks = asset.token.planksFromAmount(payload.vote.amount)
-
-        return AccountVote.constructAccountVote(planks, payload.vote.conviction, payload.vote.voteType)
-    }
-
-    private fun setFee() = launch {
-        originFeeMixin.setFee(mapFeeFromParcel(payload.fee).genericFee)
     }
 }

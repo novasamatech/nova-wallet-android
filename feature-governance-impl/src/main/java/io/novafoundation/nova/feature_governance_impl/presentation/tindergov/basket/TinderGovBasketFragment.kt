@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DefaultItemAnimator
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -35,6 +36,10 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
         tinderGovBasketToolbar.setHomeButtonListener { viewModel.backClicked() }
         tinderGovBasketToolbar.setRightActionClickListener { viewModel.toggleEditMode() }
 
+        tinderGovBasketList.itemAnimator = DefaultItemAnimator()
+            .apply {
+                supportsChangeAnimations = false
+            }
         tinderGovBasketList.adapter = adapter
         tinderGovBasketButton.setOnClickListener { viewModel.voteClicked() }
     }
@@ -66,7 +71,7 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
                 negativeTextRes = R.string.common_cancel
             ) {
                 setTitle(event.payload)
-                setMessage(R.string.tinder_gov_basket_remove_item_confirm_message)
+                setMessage(R.string.swipe_gov_basket_remove_item_confirm_message)
             }
         }
 
@@ -76,8 +81,8 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
             ) {
                 setPositiveButton(R.string.common_ok) { _, _ -> event.onSuccess(Unit) }
 
-                setTitle(R.string.tinder_gov_basket_removed_items_title)
-                setMessage(R.string.tinder_gov_basket_removed_items_message)
+                setTitle(R.string.swipe_gov_basket_removed_items_title)
+                setMessage(requireContext().getString(R.string.swipe_gov_basket_removed_items_message, event.payload))
             }
         }
     }

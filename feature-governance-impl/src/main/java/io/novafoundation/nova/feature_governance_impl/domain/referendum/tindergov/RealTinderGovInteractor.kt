@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.tinderg
 
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
@@ -20,16 +21,21 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.VotingPowerState
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.availableToVote
 import io.novafoundation.nova.runtime.ext.summaryApiOrNull
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedOption
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class RealTinderGovInteractor(
@@ -42,6 +48,7 @@ class RealTinderGovInteractor(
     private val walletRepository: WalletRepository,
     private val tinderGovVotingPowerRepository: TinderGovVotingPowerRepository,
     private val referendaFilteringProvider: ReferendaFilteringProvider,
+    private val assetUseCase: AssetUseCase
 ) : TinderGovInteractor {
 
     override fun observeReferendaState(coroutineScope: CoroutineScope): Flow<ReferendaState> = flowOfAll {
@@ -126,19 +133,17 @@ class RealTinderGovInteractor(
         return tinderGovVotingPowerRepository.getVotingPower(metaId, chainId)
     }
 
-    override suspend fun isVotingPowerAvailable(): Boolean {
+    override suspend fun getVotingPowerState(): VotingPowerState {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val chain = governanceSharedState.chain()
-        return getVotingPower(metaAccount.id, chain.id) != null
-    }
+        val votingPower = getVotingPower(metaAccount.id, chain.id) ?: return VotingPowerState.Empty
+        val asset = assetUseCase.getCurrentAsset()
 
-    override suspend fun isSufficientAmountToVote(): Boolean {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val chain = governanceSharedState.chain()
-        val votingPower = getVotingPower(metaAccount.id, chain.id) ?: return false
-        val asset = walletRepository.getAsset(metaAccount.id, chain.utilityAsset) ?: return false
-
-        return asset.freeInPlanks >= votingPower.amount
+        return if (asset.availableToVote() >= votingPower.amount) {
+            VotingPowerState.SufficientAmount(votingPower)
+        } else {
+            VotingPowerState.InsufficientAmount(votingPower)
+        }
     }
 
     override suspend fun removeReferendumFromBasket(item: TinderGovBasketItem) {
@@ -155,6 +160,26 @@ class RealTinderGovInteractor(
 
     override suspend fun clearBasket() {
         tinderGovBasketRepository.clearBasket()
+    }
+
+    override suspend fun getBasketItemsToRemove(coroutineScope: CoroutineScope): List<TinderGovBasketItem> {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = governanceSharedState.chain()
+        val asset = assetUseCase.getCurrentAsset()
+        val basket = tinderGovBasketRepository.getBasket(metaAccount.id, chain.id)
+
+        val availableToVoteReferenda = observeReferendaAvailableToVote(coroutineScope).first()
+            .mapToSet { it.id }
+
+        return basket.filter { it.isItemNotAvailableToVote(availableToVoteReferenda, asset) }
+    }
+
+    private fun TinderGovBasketItem.isItemNotAvailableToVote(
+        availableToVoteReferenda: Set<ReferendumId>,
+        asset: Asset
+    ): Boolean {
+        val notEnoughBalance = this.amount > asset.availableToVote()
+        return (this.referendumId !in availableToVoteReferenda) || notEnoughBalance
     }
 
     private suspend fun filterAvailableToVoteReferenda(referendaState: ReferendaState): List<ReferendumPreview> {

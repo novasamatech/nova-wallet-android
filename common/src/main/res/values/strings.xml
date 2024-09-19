@@ -1,30 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="tinder_gov_convirm_votes_success_message">You have successfully voted for %d referenda</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">No referenda to vote</string>
+    <string name="swipe_gov_cards_counter">%d of %d</string>
 
-    <string name="tinder_gov_vote_setup_title">Vote for %d referenda</string>
-    <string name="tinder_gov_basket_remove_item_confirm_title">Remove referendum %s from vote list?</string>
-    <string name="tinder_gov_basket_remove_item_confirm_message">You always can vote for this referendum later </string>
+    <string name="common_use_max">Use max</string>
 
-    <string name="tinder_gov_basket_removed_items_title">Some of the referenda excluded from vote list</string>
-    <string name="tinder_gov_basket_removed_items_message">They have been excluded from this list due to the change of Voting power</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Insufficient balance for voting</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message">You don\'t have enough balance to vote with the current voting power %s (%sx). Please change voting power or add more funds to your wallet.</string>
+    <string name="swipe_gov_convirm_votes_success_message">You have successfully voted for %d referenda</string>
 
-    <string name="tinder_gov_aye_format">Aye: %s</string>
-    <string name="tinder_gov_nay_format">Nay: %s</string>
-    <string name="tinder_gov_abstain_format">Abstain: %s</string>
+    <string name="swipe_gov_vote_setup_title">Vote for %d referenda</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Remove referendum %s from vote list?</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">You always can vote for this referendum later </string>
 
-    <string name="tinder_gov_vote_title">Voting power</string>
-    <string name="tinder_gov_vote_subtitle">Voting will be set for future votes in TinderGov</string>
-    <string name="tinder_gov_cards_voting_list">Voting list</string>
-    <string name="tinder_gov_cards_voting_list_empty">No votes</string>
-    <string name="tinder_gov_card_data_loading_error_title">No data retrived</string>
-    <string name="tinder_gov_card_data_loading_error_message">The data of the referendum could not be loaded</string>
-    <string name="tinder_gov_card_requested_title">Requested:</string>
-    <string name="tinder_gov_card_empty_state_text">You have already voted for all available referenda or there are no referenda to vote right now. Come back later.</string>
-    <string name="tinder_gov_title">TinderGov</string>
-    <string name="referenda_tinder_gov_banner_subtitle">A new way to easily distribute\nyour votes across the Referenda</string>
-    <string name="referenda_tindergov_banner_chip">%d referenda</string>
+    <string name="swipe_gov_basket_removed_items_title">Some of the referenda excluded from vote list</string>
+    <string name="swipe_gov_basket_removed_items_message">Some of the referenda are no longer available for voting or you may not have enough tokens available to vote. Available to vote: %s.</string>
+
+    <string name="swipe_gov_aye_format">Aye: %s</string>
+    <string name="swipe_gov_nay_format">Nay: %s</string>
+    <string name="swipe_gov_abstain_format">Abstain: %s</string>
+
+    <string name="swipe_gov_vote_title">Voting power</string>
+    <string name="swipe_gov_vote_subtitle">Voting will be set for future votes in SwipeGov</string>
+    <string name="swipe_gov_cards_voting_list">Voting list</string>
+    <string name="swipe_gov_cards_voting_list_empty">No votes</string>
+    <string name="swipe_gov_card_data_loading_error_title">No data retrived</string>
+    <string name="swipe_gov_card_data_loading_error_message">The data of the referendum could not be loaded</string>
+    <string name="swipe_gov_card_requested_title">Requested:</string>
+    <string name="swipe_gov_card_empty_state_text">You have already voted for all available referenda or there are no referenda to vote right now. Come back later.</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="referenda_swipe_gov_banner_subtitle">A new way to easily distribute\nyour votes across the Referenda</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referenda</string>
 
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot app)</string>
 

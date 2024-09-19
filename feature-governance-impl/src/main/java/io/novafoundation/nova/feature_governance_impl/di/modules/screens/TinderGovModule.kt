@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.RealTinderGovInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 
 @Module
@@ -73,7 +74,8 @@ class TinderGovModule {
         tinderGovBasketRepository: TinderGovBasketRepository,
         walletRepository: WalletRepository,
         tinderGovVotingPowerRepository: TinderGovVotingPowerRepository,
-        referendaFilteringProvider: ReferendaFilteringProvider
+        referendaFilteringProvider: ReferendaFilteringProvider,
+        assetUseCase: AssetUseCase
     ): TinderGovInteractor = RealTinderGovInteractor(
         governanceSharedState,
         referendaSharedComputation,
@@ -83,6 +85,7 @@ class TinderGovModule {
         tinderGovBasketRepository,
         walletRepository,
         tinderGovVotingPowerRepository,
-        referendaFilteringProvider
+        referendaFilteringProvider,
+        assetUseCase
     )
 }

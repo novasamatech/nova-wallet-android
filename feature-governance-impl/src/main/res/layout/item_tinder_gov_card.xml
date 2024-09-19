@@ -9,7 +9,7 @@
     app:strokeColor="@color/container_border"
     app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/tinderGovCardContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,9 +20,15 @@
             android:id="@+id/itemTinderGovCardSummary"
             style="@style/TextAppearance.NovaFoundation.Regular.Title3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:autoSizeMaxTextSize="26sp"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeTextType="uniform"
+            android:ellipsize="end"
             android:textColor="@color/text_primary"
             android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Sovereign Nature proposes DOTphin Event Multipass with WalletConnect integration and dynamic NFTs by Unique Network for Polkadot events, aiming for unified proof of attendance and immersive engagement."
             tools:visibility="visible" />
 
@@ -31,7 +37,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:layout_width="match_parent"
@@ -51,26 +58,37 @@
                 android:background="@drawable/bg_shimmering" />
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            tools:layout_height="300dp"
-            tools:layout_weight="0" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
 
         <View
             android:id="@+id/itemTinderGovCardDivider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/divider" />
+            android:background="@color/divider"
+            app:layout_constraintBottom_toTopOf="@+id/amountBarrier"
+            tools:layout_editor_absoluteX="24dp" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/amountBarrier"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:barrierDirection="top"
+            app:constraint_referenced_ids="itemTinderGovCardAmountContainer, itemTinderGovCardAmountShimmering" />
 
         <LinearLayout
             android:id="@+id/itemTinderGovCardAmountContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:orientation="vertical"
             android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/tinderGovCardReadMore"
+            app:layout_constraintStart_toStartOf="parent"
             tools:visibility="visible">
 
             <TextView
@@ -78,8 +96,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:textColor="@color/text_secondary"
-                android:text="@string/tinder_gov_card_requested_title" />
+                android:text="@string/swipe_gov_card_requested_title"
+                android:textColor="@color/text_secondary" />
 
             <TextView
                 android:id="@+id/itemTinderGovCardRequestedAmount"
@@ -105,8 +123,11 @@
             android:id="@+id/itemTinderGovCardAmountShimmering"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
+            android:layout_marginBottom="18dp"
+            android:orientation="vertical"
+            android:paddingTop="12dp"
+            app:layout_constraintBottom_toTopOf="@+id/tinderGovCardReadMore"
+            app:layout_constraintStart_toStartOf="parent">
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:layout_width="69dp"
@@ -131,12 +152,12 @@
             style="@style/Widget.Nova.MaterialButton.Secondary.Transparent"
             android:layout_width="match_parent"
             android:layout_height="44dp"
-            android:layout_marginTop="16dp"
             android:text="@string/common_read_more"
             android:textColor="@color/text_primary"
-            app:cornerRadius="10dp" />
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/right_overlay"

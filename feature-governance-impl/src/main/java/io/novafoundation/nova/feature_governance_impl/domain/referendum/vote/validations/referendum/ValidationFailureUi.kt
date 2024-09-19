@@ -1,14 +1,15 @@
-package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations
+package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum
 
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
-import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFreeBalanceError
 import io.novafoundation.nova.common.validation.TransformedFailure.Default
 import io.novafoundation.nova.common.validation.ValidationFlowActions
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.handleAmountIsTooBig
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.handleMaxTrackVotesReached
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.handleReferendumCompleted
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 
 fun handleVoteReferendumValidationFailure(
@@ -24,23 +25,11 @@ fun handleVoteReferendumValidationFailure(
                 resourceManager.getString(R.string.refrendum_vote_already_delegating_message)
         )
 
-        is VoteReferendumValidationFailure.AmountIsTooBig -> Default(
-            handleNotEnoughFreeBalanceError(
-                error = failure,
-                resourceManager = resourceManager,
-                descriptionFormat = R.string.refrendum_vote_not_enough_available_message
-            )
-        )
+        is VoteReferendumValidationFailure.AmountIsTooBig -> handleAmountIsTooBig(resourceManager, failure)
 
-        is VoteReferendumValidationFailure.MaxTrackVotesReached -> Default(
-            resourceManager.getString(R.string.refrendum_vote_max_votes_reached_title) to
-                resourceManager.getString(R.string.refrendum_vote_max_votes_reached_message, failure.max.format())
-        )
+        is VoteReferendumValidationFailure.MaxTrackVotesReached -> handleMaxTrackVotesReached(resourceManager, failure)
 
-        VoteReferendumValidationFailure.ReferendumCompleted -> Default(
-            resourceManager.getString(R.string.refrendum_vote_already_completed_title) to
-                resourceManager.getString(R.string.refrendum_vote_already_completed_message)
-        )
+        is VoteReferendumValidationFailure.ReferendumCompleted -> handleReferendumCompleted(resourceManager, failure)
 
         VoteReferendumValidationFailure.AbstainInvalidConviction -> {
             TransformedFailure.Custom(

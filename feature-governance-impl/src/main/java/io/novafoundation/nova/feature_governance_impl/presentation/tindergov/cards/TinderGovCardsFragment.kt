@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import androidx.recyclerview.widget.DefaultItemAnimator
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
@@ -18,6 +17,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.shape.toColorStateList
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -34,6 +34,7 @@ import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsCo
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSettings
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStack
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStatusBarInsetsContainer
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSubtitle
 
 class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGovCardsAdapter.Handler, TinderGovCardStackListener {
 
@@ -53,11 +54,8 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         tinderGovCardsSettings.setOnClickListener { viewModel.editVotingPowerClicked() }
 
         tinderGovCardsStack.adapter = adapter
-        tinderGovCardsStack.itemAnimator.apply {
-            if (this is DefaultItemAnimator) {
-                supportsChangeAnimations = false
-            }
-        }
+        tinderGovCardsStack.itemAnimator = null
+
         tinderGovCardsStack.layoutManager = CardStackLayoutManager(requireContext(), this)
             .apply {
                 setStackFrom(StackFrom.Bottom)
@@ -86,6 +84,10 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
     }
 
     override fun subscribe(viewModel: TinderGovCardsViewModel) {
+        viewModel.referendumCounterFlow.observe {
+            tinderGovCardsSubtitle.text = it
+        }
+
         viewModel.cardsFlow.observe { adapter.submitList(it) }
 
         viewModel.skipCardEvent.observeEvent {
@@ -119,6 +121,20 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
             tinderGovCardsBasketChevron.setImageTintRes(it.imageTintRes)
         }
 
+        viewModel.insufficientBalanceChangeAction.awaitableActionLiveData.observeEvent {
+            warningDialog(
+                requireContext(),
+                onPositiveClick = { it.onSuccess(true) },
+                onNegativeClick = { it.onSuccess(false) },
+                positiveTextRes = R.string.common_change,
+                negativeTextRes = R.string.common_close,
+                styleRes = R.style.AccentAlertDialogTheme
+            ) {
+                setTitle(it.payload.first)
+                setMessage(it.payload.second)
+            }
+        }
+
         viewModel.retryReferendumInfoLoadingAction.awaitableActionLiveData.observeEvent {
             warningDialog(
                 requireContext(),
@@ -127,9 +143,13 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 positiveTextRes = R.string.common_retry,
                 negativeTextRes = R.string.common_skip
             ) {
-                setTitle(R.string.tinder_gov_card_data_loading_error_title)
-                setMessage(R.string.tinder_gov_card_data_loading_error_message)
+                setTitle(R.string.swipe_gov_card_data_loading_error_title)
+                setMessage(R.string.swipe_gov_card_data_loading_error_message)
             }
+        }
+
+        viewModel.isButtonsVisibleFlow.observe {
+            tinderGovCardsControlView.setVisible(it, falseState = View.INVISIBLE)
         }
     }
 
