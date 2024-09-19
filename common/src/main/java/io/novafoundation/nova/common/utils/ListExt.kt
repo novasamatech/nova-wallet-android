@@ -50,7 +50,3 @@ fun <T> List<T>.rangeCheck(fromIndex: Int, toIndex: Int) {
         toIndex > size -> throw IndexOutOfBoundsException("toIndex ($toIndex) is greater than size ($size).")
     }
 }
-
-fun <T> List<T>.countBy(predicate: (T) -> Boolean): Int {
-    return filter { predicate(it) }.size
-}

@@ -25,7 +25,6 @@ fun handleVoteTinderGovValidationFailure(
         VoteTinderGovValidationFailure.AlreadyDelegatingVotes -> handleAlreadyDelegatingVotes(resourceManager)
 
         is VoteTinderGovValidationFailure.AmountIsTooBig -> {
-            handleAmountIsTooBig(resourceManager, failure)
             val titleAndMessage = handleAmountIsTooBig(resourceManager, failure).titleAndMessage
             TransformedFailure.Custom(
                 CustomDialogDisplayer.Payload(

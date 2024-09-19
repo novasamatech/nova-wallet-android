@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAc
 import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.countBy
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.onEachWithPrevious
@@ -126,7 +125,7 @@ class TinderGovCardsViewModel(
         .map { items -> mapBasketModel(items.values.toList()) }
 
     private val votingReferendaCounterFlow = combine(basketFlow, sortedReferendaFlow) { basket, referenda ->
-        val currentBasketSize = referenda.countBy { it.id in basket }
+        val currentBasketSize = referenda.count { it.id in basket }
         ReferendaCounterModel(currentBasketSize, referenda.size)
     }.shareInBackground()
 
