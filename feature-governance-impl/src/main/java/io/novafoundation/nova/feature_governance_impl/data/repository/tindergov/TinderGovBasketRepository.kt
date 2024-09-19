@@ -20,9 +20,9 @@ interface TinderGovBasketRepository {
 
     suspend fun remove(items: Collection<TinderGovBasketItem>)
 
-    suspend fun isBasketEmpty(): Boolean
+    suspend fun isBasketEmpty(metaId: Long, chainId: ChainId): Boolean
 
-    suspend fun clearBasket()
+    suspend fun clearBasket(metaId: Long, chainId: ChainId)
 
     suspend fun getBasket(metaId: Long, chainId: ChainId): List<TinderGovBasketItem>
 
@@ -52,12 +52,12 @@ class RealTinderGovBasketRepository(private val dao: TinderGovDao) : TinderGovBa
         return withContext(Dispatchers.Default) { dao.getBasket(metaId, chainId).map { it.toDomain() } }
     }
 
-    override suspend fun isBasketEmpty(): Boolean {
-        return withContext(Dispatchers.Default) { dao.basketSize() == 0 }
+    override suspend fun isBasketEmpty(metaId: Long, chainId: ChainId): Boolean {
+        return withContext(Dispatchers.Default) { dao.basketSize(metaId, chainId) == 0 }
     }
 
-    override suspend fun clearBasket() {
-        withContext(Dispatchers.Default) { dao.clearBasket() }
+    override suspend fun clearBasket(metaId: Long, chainId: ChainId) {
+        withContext(Dispatchers.Default) { dao.clearBasket(metaId, chainId) }
     }
 
     private fun TinderGovBasketItem.toLocal(): TinderGovBasketItemLocal {

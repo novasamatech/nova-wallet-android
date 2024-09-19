@@ -141,7 +141,8 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 onPositiveClick = { it.onSuccess(true) },
                 onNegativeClick = { it.onSuccess(false) },
                 positiveTextRes = R.string.common_retry,
-                negativeTextRes = R.string.common_skip
+                negativeTextRes = R.string.common_skip,
+                styleRes = R.style.AccentAlertDialogTheme
             ) {
                 setTitle(R.string.swipe_gov_card_data_loading_error_title)
                 setMessage(R.string.swipe_gov_card_data_loading_error_message)

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
@@ -72,6 +73,14 @@ class TinderGovBasketViewModel(
         }
     }.shareInBackground()
 
+    val voteButtonStateFlow = inEditModeFlow.map {
+        if (it) {
+            DescriptiveButtonState.Disabled(resourceManager.getString(R.string.vote_vote))
+        } else {
+            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
+        }
+    }
+
     init {
         validateReferendaAndRemove()
     }
@@ -81,7 +90,11 @@ class TinderGovBasketViewModel(
     }
 
     fun onItemClicked(item: TinderGovBasketRvItem) {
-        router.openReferendumInfo(ReferendumInfoPayload(item.id.value))
+        launch {
+            if (inEditModeFlow.value) return@launch
+
+            router.openReferendumInfo(ReferendumInfoPayload(item.id.value))
+        }
     }
 
     fun onItemDeleteClicked(item: TinderGovBasketRvItem) {

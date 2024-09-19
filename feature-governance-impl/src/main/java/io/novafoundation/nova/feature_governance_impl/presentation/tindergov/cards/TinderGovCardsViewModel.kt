@@ -176,7 +176,11 @@ class TinderGovCardsViewModel(
     }
 
     fun onBasketClicked() {
-        router.openTinderGovBasket()
+        launch {
+            if (basketFlow.first().isEmpty()) return@launch
+
+            router.openTinderGovBasket()
+        }
     }
 
     fun editVotingPowerClicked() {

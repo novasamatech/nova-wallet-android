@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="swipe_gov_cards_basket_title">Vote list</string>
     <string name="swipe_gov_cards_no_referenda_to_vote">No referenda to vote</string>
     <string name="swipe_gov_cards_counter">%d of %d</string>
 

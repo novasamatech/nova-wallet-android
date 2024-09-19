@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
 import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketDelete
 import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketId
+import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketInfo
 import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketSubtitle
 import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketTitle
 
@@ -56,6 +57,7 @@ class TinderGovBasketViewHolder(
         itemView.itemTinderGovBasketDelete.setOnClickListener { handler.onItemDeleteClicked(item) }
 
         itemView.itemTinderGovBasketDelete.isVisible = editMode
+        itemView.itemTinderGovBasketInfo.isVisible = !editMode
         itemView.itemTinderGovBasketId.text = item.idStr
         itemView.itemTinderGovBasketTitle.text = item.title
         itemView.itemTinderGovBasketSubtitle.text = item.subtitle
