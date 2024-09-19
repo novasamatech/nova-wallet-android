@@ -138,7 +138,20 @@ class TinderGovCardsViewModel(
         }
     }
 
-    val isButtonsVisibleFlow = votingReferendaCounterFlow.map { it.hasReferendaToVote() }
+    val hasReferendaToVote = votingReferendaCounterFlow.map { it.hasReferendaToVote() }
+        .distinctUntilChanged()
+
+    val placeholderTextFlow = basketFlow.map {
+        if (it.isEmpty()) {
+            resourceManager.getString(R.string.swipe_gov_card_placeholder_basket_empty_text)
+        } else {
+            resourceManager.getString(R.string.swipe_gov_card_placeholder_basket_full_text)
+        }
+    }
+        .distinctUntilChanged()
+
+    val showConfirmButtonFlow = basketFlow.map { it.isNotEmpty() }
+        .distinctUntilChanged()
 
     init {
         observeReferendaAndAddToCards()

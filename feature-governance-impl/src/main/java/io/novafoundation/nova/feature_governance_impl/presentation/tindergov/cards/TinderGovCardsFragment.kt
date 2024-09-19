@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import androidx.core.view.isVisible
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
@@ -31,6 +32,8 @@ import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBa
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketItems
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketState
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsControlView
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsEmptyStateButton
+import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsEmptyStateDescription
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSettings
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStack
 import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStatusBarInsetsContainer
@@ -71,6 +74,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         tinderGovCardsControlView.setNayClickListener { swipeCardToDirection(Direction.Left) }
 
         tinderGovCardsBasketButton.setOnClickListener { viewModel.onBasketClicked() }
+        tinderGovCardsEmptyStateButton.setOnClickListener { viewModel.onBasketClicked() }
     }
 
     override fun inject() {
@@ -89,6 +93,14 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         }
 
         viewModel.cardsFlow.observe { adapter.submitList(it) }
+
+        viewModel.placeholderTextFlow.observe {
+            tinderGovCardsEmptyStateDescription.text = it
+        }
+
+        viewModel.showConfirmButtonFlow.observe {
+            tinderGovCardsEmptyStateButton.isVisible = it
+        }
 
         viewModel.skipCardEvent.observeEvent {
             swipeCardToDirection(Direction.Bottom, forced = true)
@@ -149,8 +161,11 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
             }
         }
 
-        viewModel.isButtonsVisibleFlow.observe {
+        viewModel.hasReferendaToVote.observe {
             tinderGovCardsControlView.setVisible(it, falseState = View.INVISIBLE)
+
+            // To avoid click if referenda cards is empty
+            tinderGovCardsStack.isEnabled = it
         }
     }
 
