@@ -55,10 +55,7 @@ class AssetSearchInteractor(
         val assetsComparator = getAssetBaseComparator { it.balanceWithOffchain.transferable.fiat }
 
         return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, groupComparator, assetsComparator) { asset ->
-            val chainAsset = asset.token.configuration
-            asset.transferableInPlanks.isPositive() &&
-                assetSourceRegistry.sourceFor(chainAsset)
-                    .transfers.areTransfersEnabled(chainAsset)
+            asset.transferableInPlanks.isPositive()
         }
     }
 
