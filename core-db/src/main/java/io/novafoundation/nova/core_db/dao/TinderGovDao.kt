@@ -33,9 +33,9 @@ interface TinderGovDao {
     @Query("SELECT * FROM tinder_gov_basket WHERE metaId = :metaId AND chainId == :chainId")
     fun observeBasket(metaId: Long, chainId: String): Flow<List<TinderGovBasketItemLocal>>
 
-    @Query("SELECT COUNT(*) FROM tinder_gov_basket")
-    fun basketSize(): Int
+    @Query("SELECT COUNT(*) FROM tinder_gov_basket WHERE metaId = :metaId AND chainId == :chainId")
+    fun basketSize(metaId: Long, chainId: String): Int
 
-    @Query("DELETE FROM tinder_gov_basket")
-    fun clearBasket()
+    @Query("DELETE FROM tinder_gov_basket WHERE metaId = :metaId AND chainId == :chainId")
+    fun clearBasket(metaId: Long, chainId: String)
 }

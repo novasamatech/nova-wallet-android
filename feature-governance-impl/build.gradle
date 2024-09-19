@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply from: '../scripts/secrets.gradle'
 
 android {
     namespace 'io.novafoundation.nova.feature_governance_impl'
@@ -18,7 +19,7 @@ android {
 
         buildConfigField "String", "DELEGATION_TUTORIAL_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/governance/add-delegate-information\""
 
-        buildConfigField "String", "SUMMARY_API_KEY", "\"QUkgU3VtbWFyeSBBUEkgRm9yIE5PVkE=\""
+        buildConfigField "String", "SUMMARY_API_KEY", readStringSecret("POLKASSEMBLY_SUMMARY_API_KEY")
     }
 
     buildTypes {

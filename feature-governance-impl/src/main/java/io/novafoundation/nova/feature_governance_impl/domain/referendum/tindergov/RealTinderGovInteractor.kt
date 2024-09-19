@@ -155,11 +155,17 @@ class RealTinderGovInteractor(
     }
 
     override suspend fun isBasketEmpty(): Boolean {
-        return tinderGovBasketRepository.isBasketEmpty()
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = governanceSharedState.chain()
+
+        return tinderGovBasketRepository.isBasketEmpty(metaAccount.id, chain.id)
     }
 
     override suspend fun clearBasket() {
-        tinderGovBasketRepository.clearBasket()
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val chain = governanceSharedState.chain()
+
+        tinderGovBasketRepository.clearBasket(metaAccount.id, chain.id)
     }
 
     override suspend fun getBasketItemsToRemove(coroutineScope: CoroutineScope): List<TinderGovBasketItem> {

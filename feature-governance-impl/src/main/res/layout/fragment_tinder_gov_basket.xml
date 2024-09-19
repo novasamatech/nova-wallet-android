@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:layout_constraintTop_toTopOf="parent"
-        app:textRight="@string/common_edit" />
+        app:textRight="@string/common_edit"
+        app:titleText="@string/swipe_gov_cards_basket_title" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tinderGovBasketList"

@@ -46,7 +46,7 @@
         android:textColor="@color/text_primary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@+id/itemTinderGovBasketSubtitle"
-        app:layout_constraintEnd_toStartOf="@+id/itemTinderGovBasketArrow"
+        app:layout_constraintEnd_toStartOf="@+id/itemTinderGovBasketInfo"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/itemTinderGovBasketId"
         app:layout_constraintTop_toTopOf="parent"
@@ -65,7 +65,7 @@
         android:lines="1"
         android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/itemTinderGovBasketArrow"
+        app:layout_constraintEnd_toStartOf="@+id/itemTinderGovBasketInfo"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/itemTinderGovBasketId"
         app:layout_constraintTop_toBottomOf="@+id/itemTinderGovBasketTitle"
@@ -73,7 +73,7 @@
         tools:text="Aye: 3 votes" />
 
     <ImageView
-        android:id="@+id/itemTinderGovBasketArrow"
+        android:id="@+id/itemTinderGovBasketInfo"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:src="@drawable/ic_info"

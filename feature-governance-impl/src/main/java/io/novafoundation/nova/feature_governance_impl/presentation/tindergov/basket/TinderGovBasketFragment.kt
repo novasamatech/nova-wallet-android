@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.infoDialog
 import io.novafoundation.nova.common.view.dialog.warningDialog
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -62,13 +63,18 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
             adapter.submitList(it)
         }
 
+        viewModel.voteButtonStateFlow.observe {
+            tinderGovBasketButton.setState(it)
+        }
+
         viewModel.removeReferendumAction.awaitableActionLiveData.observeEvent { event ->
             warningDialog(
                 requireContext(),
                 onPositiveClick = { event.onSuccess(true) },
                 onNegativeClick = { event.onSuccess(false) },
                 positiveTextRes = R.string.common_remove,
-                negativeTextRes = R.string.common_cancel
+                negativeTextRes = R.string.common_cancel,
+                styleRes = R.style.AccentNegativeAlertDialogTheme,
             ) {
                 setTitle(event.payload)
                 setMessage(R.string.swipe_gov_basket_remove_item_confirm_message)
