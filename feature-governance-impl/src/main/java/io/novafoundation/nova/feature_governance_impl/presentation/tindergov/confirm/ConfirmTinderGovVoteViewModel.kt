@@ -130,16 +130,12 @@ class ConfirmTinderGovVoteViewModel(
                 },
                 progressConsumer = _showNextProgress.progressConsumer(),
             ) {
-                launch {
-                    performVote(it)
-
-                    _showNextProgress.value = false
-                }
+                performVote(it)
             }
         }
     }
 
-    private suspend fun performVote(payload: VoteTinderGovValidationPayload) {
+    private fun performVote(payload: VoteTinderGovValidationPayload) = launch {
         val accountVotes = payload.basket.associateBy { it.referendumId }
             .mapValues { (_, value) -> value.accountVote() }
 
