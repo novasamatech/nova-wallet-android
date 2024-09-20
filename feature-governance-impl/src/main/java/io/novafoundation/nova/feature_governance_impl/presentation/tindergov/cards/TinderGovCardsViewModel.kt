@@ -353,7 +353,7 @@ class TinderGovCardsViewModel(
             items = items.size,
             backgroundColorRes = if (items.isEmpty()) R.color.icon_inactive else R.color.icon_accent,
             textColorRes = if (items.isEmpty()) R.color.button_text_inactive else R.color.text_primary,
-            textRes = if (items.isEmpty()) R.string.swipe_gov_cards_voting_list_empty else R.string.swipe_gov_cards_voting_list,
+            textRes = if (items.isEmpty()) R.string.swipe_gov_cards_voting_list_empty else R.string.swipe_gov_cards_full_list,
             imageTintRes = if (items.isEmpty()) R.color.icon_inactive else R.color.chip_icon,
         )
     }
