@@ -132,7 +132,7 @@ class TinderGovCardsViewModel(
     val referendumCounterFlow = votingReferendaCounterFlow.map {
         if (it.hasReferendaToVote()) {
             val currentItemIndex = it.itemsInBasket + 1
-            resourceManager.getString(R.string.swipe_gov_cards_counter, currentItemIndex, it.referendaSize)
+            resourceManager.getString(R.string.swipe_gov_cards_counter, currentItemIndex)
         } else {
             resourceManager.getString(R.string.swipe_gov_cards_no_referenda_to_vote)
         }

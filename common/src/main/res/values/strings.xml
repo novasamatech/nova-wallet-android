@@ -5,7 +5,7 @@
     <string name="swipe_gov_cards_placeholder_button">Confirm your votes</string>
     <string name="swipe_gov_cards_basket_title">Vote list</string>
     <string name="swipe_gov_cards_no_referenda_to_vote">No referenda to vote</string>
-    <string name="swipe_gov_cards_counter">%d of %d</string>
+    <string name="swipe_gov_cards_counter">%d left</string>
 
     <string name="common_use_max">Use max</string>
 
