@@ -117,16 +117,12 @@ class ConfirmReferendumVoteViewModel(
                 },
                 progressConsumer = _showNextProgress.progressConsumer(),
             ) {
-                launch {
-                    performVote()
-
-                    _showNextProgress.value = false
-                }
+                performVote()
             }
         }
     }
 
-    private suspend fun performVote() {
+    private fun performVote() = launch {
         val accountVote = accountVoteFlow.first()
 
         val result = withContext(Dispatchers.Default) {
@@ -138,6 +134,8 @@ class ConfirmReferendumVoteViewModel(
             router.backToReferendumDetails()
         }
             .onFailure(::showError)
+
+        _showNextProgress.value = false
     }
 
     private fun constructAccountVote(asset: Asset): AccountVote {
