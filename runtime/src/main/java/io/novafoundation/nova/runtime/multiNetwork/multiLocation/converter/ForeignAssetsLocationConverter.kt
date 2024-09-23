@@ -23,7 +23,7 @@ private typealias ForeignAssetsMapping = Map<ForeignAssetsMappingKey, Chain.Asse
 
 private const val FOREIGN_ASSETS_PALLET_NAME = "ForeignAssets"
 
-class ForeignAssetsLocationConverter(
+internal class ForeignAssetsLocationConverter(
     private val chain: Chain,
     private val runtime: Deferred<RuntimeSnapshot>
 ) : MultiLocationConverter {

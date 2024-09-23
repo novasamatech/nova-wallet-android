@@ -78,6 +78,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.selectedChainFlow
@@ -452,9 +453,9 @@ class ReferendumDetailsViewModel(
     private suspend fun mapReferendumCallToUi(referendumCall: ReferendumCall): ReferendumCallModel {
         return when (referendumCall) {
             is ReferendumCall.TreasuryRequest -> {
-                val token = tokenFlow.first()
+                val token = tokenUseCase.getToken(referendumCall.chainAsset.fullId)
 
-                ReferendumCallModel.GovernanceRequest.AmountOnly(
+                ReferendumCallModel.GovernanceRequest(
                     amount = mapAmountToAmountModel(referendumCall.amount, token)
                 )
             }

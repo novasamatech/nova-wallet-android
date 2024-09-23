@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.multiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
@@ -73,7 +74,21 @@ fun List<MultiLocation.Junction>.toInterior() = when (size) {
     else -> MultiLocation.Interior.Junctions(this)
 }
 
+fun MultiLocation.isHere(): Boolean {
+    return parents == BigInteger.ZERO && interior.isHere()
+}
+
 fun MultiLocation.Interior.isHere() = this is MultiLocation.Interior.Here
+
+fun MultiLocation.accountId(): AccountId? {
+    return interior.junctionList.tryFindNonNull {
+        when(it) {
+            is MultiLocation.Junction.AccountId32 -> it.accountId
+            is MultiLocation.Junction.AccountKey20 -> it.accountId
+            else -> null
+        }
+    }
+}
 
 fun MultiLocation.Interior.paraIdOrNull(): ParaId? {
     if (this !is MultiLocation.Interior.Junctions) return null

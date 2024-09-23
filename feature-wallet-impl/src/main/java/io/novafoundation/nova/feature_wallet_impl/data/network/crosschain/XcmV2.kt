@@ -91,6 +91,7 @@ class XcmMultiAsset(
 
     companion object;
 
+    @Deprecated("Deprecated in favour of MultiAssetId and VersionedMultiAssetId as those cover more use-cases")
     sealed class Id {
 
         class Concrete(val multiLocation: MultiLocation) : Id()

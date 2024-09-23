@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.isHere
 import java.math.BigInteger
 
-class NativeAssetLocationConverter(
+internal class NativeAssetLocationConverter(
     private val chain: Chain,
 ) : MultiLocationConverter {
 

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -108,7 +109,8 @@ class ReferendumFullDetailsViewModel(
             referendumCall.beneficiary,
             defaultIdentityProvider
         )
-        val amountModel = mapAmountToAmountModel(referendumCall.amount, getToken())
+        val token = tokenUseCase.getToken(referendumCall.asset.fullChainAssetId)
+        val amountModel = mapAmountToAmountModel(referendumCall.amount, token)
 
         return AddressAndAmountModel(addressModel, amountModel)
     }

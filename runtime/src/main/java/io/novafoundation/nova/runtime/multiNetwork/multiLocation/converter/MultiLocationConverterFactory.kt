@@ -8,13 +8,22 @@ import kotlinx.coroutines.async
 
 class MultiLocationConverterFactory(private val chainRegistry: ChainRegistry) {
 
-    fun default(chain: Chain, coroutineScope: CoroutineScope): MultiLocationConverter {
+    fun defaultAsync(chain: Chain, coroutineScope: CoroutineScope): MultiLocationConverter {
         val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chain.id) }
 
         return CompoundMultiLocationConverter(
             NativeAssetLocationConverter(chain),
-            LocalAssetsLocationConverter(chain, runtimeAsync),
+            LocalAssetsLocationConverter(chain, RuntimeSource.Async(runtimeAsync)),
             ForeignAssetsLocationConverter(chain, runtimeAsync)
+        )
+    }
+
+    suspend fun resolveLocalAssets(chain: Chain): MultiLocationConverter {
+        val runtime = chainRegistry.getRuntime(chain.id)
+
+        return CompoundMultiLocationConverter(
+            NativeAssetLocationConverter(chain),
+            LocalAssetsLocationConverter(chain, RuntimeSource.Sync(runtime)),
         )
     }
 }

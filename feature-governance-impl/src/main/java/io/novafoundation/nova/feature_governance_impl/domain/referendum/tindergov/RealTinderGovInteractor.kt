@@ -9,35 +9,35 @@ import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.toCallOrNull
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.user
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.VotingPowerState
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovBasketRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovVotingPowerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.ReferendumDetailsRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.VotingPowerState
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.availableToVote
 import io.novafoundation.nova.runtime.ext.summaryApiOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedOption
-import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.math.BigInteger
 
 class RealTinderGovInteractor(
     private val governanceSharedState: GovernanceSharedState,
@@ -117,7 +117,7 @@ class RealTinderGovInteractor(
 
         val referendumProposal = referendumPreview.onChainMetadata?.proposal
         val referendumProposalCall = referendumProposal?.toCallOrNull()
-        val referendumCall = referendumProposalCall?.let { preImageParser.parsePreimageCall(it.call, chain.id) }
+        val referendumCall = referendumProposalCall?.let { preImageParser.parsePreimageCall(it.call, chain) }
 
         return if (referendumCall is ReferendumCall.TreasuryRequest) {
             referendumCall.amount

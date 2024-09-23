@@ -66,7 +66,7 @@ class AssetConversionExchangeFactory(
 ) : AssetExchange.Factory {
 
     override suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange {
-        val converter = multiLocationConverterFactory.default(chain, coroutineScope)
+        val converter = multiLocationConverterFactory.defaultAsync(chain, coroutineScope)
 
         return AssetConversionExchange(
             chain = chain,

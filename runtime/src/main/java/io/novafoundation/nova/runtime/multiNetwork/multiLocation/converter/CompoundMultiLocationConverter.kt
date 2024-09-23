@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.tryFindNonNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 
-class CompoundMultiLocationConverter(
+internal class CompoundMultiLocationConverter(
     private vararg val delegates: MultiLocationConverter
 ) : MultiLocationConverter {
 
