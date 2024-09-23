@@ -13,7 +13,7 @@ import java.math.BigInteger
 internal class ChildParachainLocationConverter(
     private val relayChain: Chain,
     private val chainRegistry: ChainRegistry
-): ChainMultiLocationConverter {
+) : ChainMultiLocationConverter {
 
     private val parachainIdToChainIdByRelay = mapOf(
         Chain.Geneses.POLKADOT to mapOf(

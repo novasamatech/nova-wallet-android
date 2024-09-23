@@ -40,8 +40,8 @@ class ReferendumDetailsModule {
     @FeatureScope
     @IntoSet
     fun provideTreasurySpendParser(
-       chainLocationConverter: ChainMultiLocationConverterFactory,
-       assetLocationConverter: MultiLocationConverterFactory
+        chainLocationConverter: ChainMultiLocationConverterFactory,
+        assetLocationConverter: MultiLocationConverterFactory
     ): ReferendumCallAdapter = TreasurySpendAdapter(chainLocationConverter, assetLocationConverter)
 
     @Provides

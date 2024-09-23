@@ -6,4 +6,4 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.asset.Locatable
 class LocatableMultiAssetV4(
     override val location: MultiLocation,
     override val assetId: MultiAssetIdV4
-): LocatableMultiAsset
+) : LocatableMultiAsset

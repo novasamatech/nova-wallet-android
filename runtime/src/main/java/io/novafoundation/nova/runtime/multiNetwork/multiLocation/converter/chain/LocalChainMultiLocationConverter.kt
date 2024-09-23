@@ -6,9 +6,9 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.isHere
 
 internal class LocalChainMultiLocationConverter(
     val chain: Chain
-): ChainMultiLocationConverter {
+) : ChainMultiLocationConverter {
 
     override suspend fun toChain(multiLocation: MultiLocation): Chain? {
-       return chain.takeIf { multiLocation.isHere() }
+        return chain.takeIf { multiLocation.isHere() }
     }
 }

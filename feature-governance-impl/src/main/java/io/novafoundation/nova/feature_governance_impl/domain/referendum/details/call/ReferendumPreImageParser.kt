@@ -12,7 +12,7 @@ interface ReferendumPreImageParser {
 
     suspend fun parse(preImage: PreImage, chain: Chain): ReferendumCall?
 
-    suspend fun parsePreimageCall(call: GenericCall.Instance,  chain: Chain): ReferendumCall?
+    suspend fun parsePreimageCall(call: GenericCall.Instance, chain: Chain): ReferendumCall?
 }
 
 interface ReferendumCallAdapter {

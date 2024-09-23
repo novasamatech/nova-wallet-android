@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocati
 fun bindMultiAssetIdV3(decoded: Any?): MultiAssetIdV3 {
     val variant = decoded.castToDictEnum()
 
-    return when(variant.name) {
+    return when (variant.name) {
         "Concrete" -> MultiAssetIdV3.Concrete(bindMultiLocation(variant.value))
         else -> error("Asset ids besides Concrete are not supported")
     }

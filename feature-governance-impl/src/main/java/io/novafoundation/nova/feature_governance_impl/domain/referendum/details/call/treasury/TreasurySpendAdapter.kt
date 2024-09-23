@@ -18,7 +18,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 class TreasurySpendAdapter(
     private val chainLocationConverterFactory: ChainMultiLocationConverterFactory,
     private val assetLocationConverterFactory: MultiLocationConverterFactory
-): ReferendumCallAdapter {
+) : ReferendumCallAdapter {
 
     override suspend fun fromCall(
         call: GenericCall.Instance,

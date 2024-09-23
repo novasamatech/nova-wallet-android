@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.asset.v4.bindLo
 fun bindVersionedLocatableMultiAsset(decoded: Any?): VersionedLocatableMultiAsset {
     val asDictEnum = decoded.castToDictEnum()
 
-    return when(asDictEnum.name) {
+    return when (asDictEnum.name) {
         "V3" -> VersionedLocatableMultiAsset.V3(bindLocatableMultiAssetV3(asDictEnum.value))
         "V4" -> VersionedLocatableMultiAsset.V4(bindLocatableMultiAssetV4(asDictEnum.value))
         else -> error("Unsupported LocatableMultiAsset version: ${asDictEnum.name}")

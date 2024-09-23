@@ -82,7 +82,7 @@ fun MultiLocation.Interior.isHere() = this is MultiLocation.Interior.Here
 
 fun MultiLocation.accountId(): AccountId? {
     return interior.junctionList.tryFindNonNull {
-        when(it) {
+        when (it) {
             is MultiLocation.Junction.AccountId32 -> it.accountId
             is MultiLocation.Junction.AccountKey20 -> it.accountId
             else -> null
