@@ -122,6 +122,8 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 }
         }
 
+        viewModel.manageVotingPowerAvailable.observe(tinderGovCardsSettings::setVisible)
+
         viewModel.basketModelFlow.observe {
             tinderGovCardsBasketItems.text = it.items.toString()
             tinderGovCardsBasketItems.setTextColorRes(it.textColorRes)
