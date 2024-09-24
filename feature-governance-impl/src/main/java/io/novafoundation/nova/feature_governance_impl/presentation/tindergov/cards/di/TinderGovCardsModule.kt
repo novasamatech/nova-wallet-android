@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsDetailsLoaderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
 @Module(includes = [ViewModelModule::class])
 class TinderGovCardsModule {
@@ -24,11 +25,11 @@ class TinderGovCardsModule {
     @Provides
     fun provideTinderGovCardsDataHelper(
         interactor: TinderGovInteractor,
-        assetUseCase: AssetUseCase,
+        tokenUseCase: TokenUseCase,
     ): TinderGovCardsDetailsLoaderFactory {
         return TinderGovCardsDetailsLoaderFactory(
             interactor,
-            assetUseCase
+            tokenUseCase
         )
     }
 

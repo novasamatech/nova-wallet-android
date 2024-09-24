@@ -330,7 +330,7 @@ class TinderGovCardsViewModel(
     }
 
     private fun reloadDetailsForReferendum(referendum: ReferendumPreview) = launch {
-        tinderGovCardDetailsLoader.reloadSummary(referendum, this)
+        tinderGovCardDetailsLoader.reloadSummary(referendum)
         tinderGovCardDetailsLoader.reloadAmount(referendum)
     }
 

@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import java.math.BigInteger
 
 class RealTinderGovInteractor(
     private val governanceSharedState: GovernanceSharedState,
@@ -111,7 +110,7 @@ class RealTinderGovInteractor(
         return referendumDetailsRepository.loadSummary(chain, id, summaryApi.url)
     }
 
-    override suspend fun loadReferendumAmount(referendumPreview: ReferendumPreview): BigInteger? {
+    override suspend fun loadReferendumAmount(referendumPreview: ReferendumPreview): ReferendumCall.TreasuryRequest? {
         val selectedGovernanceOption = governanceSharedState.selectedOption()
         val chain = selectedGovernanceOption.assetWithChain.chain
 
@@ -119,11 +118,7 @@ class RealTinderGovInteractor(
         val referendumProposalCall = referendumProposal?.toCallOrNull()
         val referendumCall = referendumProposalCall?.let { preImageParser.parsePreimageCall(it.call, chain) }
 
-        return if (referendumCall is ReferendumCall.TreasuryRequest) {
-            referendumCall.amount
-        } else {
-            null
-        }
+        return referendumCall as? ReferendumCall.TreasuryRequest
     }
 
     override suspend fun setVotingPower(votingPower: VotingPower) {
