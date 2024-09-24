@@ -17,7 +17,6 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.onEachWithPrevious
-import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.safeSubList
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
@@ -88,7 +87,7 @@ class TinderGovCardsViewModel(
         cardsSummaryFlow,
         cardsAmountFlow,
         ::mapCards
-    )
+    ).shareInBackground()
 
     val retryReferendumInfoLoadingAction = actionAwaitableMixinFactory.confirmingOrDenyingAction<Unit>()
 
@@ -105,19 +104,21 @@ class TinderGovCardsViewModel(
 
     private val topReferendumWithDetails = combine(topCardIndex, cardsSummaryFlow, cardsAmountFlow) { topCardIndex, cardsSummary, cardsAmount ->
         val referendum = sortedReferendaFlow.value.getOrNull(topCardIndex) ?: return@combine null
-        val cardSummary = cardsSummary[referendum.id]
-        val cardAmount = cardsAmount[referendum.id]
+        val cardSummary = cardsSummary.getOrDefault(referendum.id, ExtendedLoadingState.Loading)
+        val cardAmount = cardsAmount.getOrDefault(referendum.id, ExtendedLoadingState.Loading)
 
         CardWithDetails(referendum, cardSummary, cardAmount)
-    }.filterNotNull()
+    }
         .distinctUntilChanged()
         .shareInBackground()
 
     private var isVotingInProgress = MutableStateFlow(false)
 
-    val isCardDraggingAvailable = combine(isVotingInProgress, topReferendumWithDetails) { isVotingInProgress, cardWithDetails ->
-        val summaryLoaded = cardWithDetails.summary?.isLoaded().orFalse()
-        val amountLoaded = cardWithDetails.summary?.isLoaded().orFalse()
+    val manageVotingPowerAvailable = topReferendumWithDetails.map { it != null }
+
+    val isCardDraggingAvailable = combine(isVotingInProgress, topReferendumWithDetails.filterNotNull()) { isVotingInProgress, cardWithDetails ->
+        val summaryLoaded = cardWithDetails.summary.isLoaded()
+        val amountLoaded = cardWithDetails.summary.isLoaded()
         !isVotingInProgress && summaryLoaded && amountLoaded
     }
 
@@ -131,7 +132,7 @@ class TinderGovCardsViewModel(
 
     val referendumCounterFlow = votingReferendaCounterFlow.map {
         if (it.hasReferendaToVote()) {
-            val currentItemIndex = it.itemsInBasket + 1
+            val currentItemIndex = it.remainingReferendaToVote
             resourceManager.getString(R.string.swipe_gov_cards_counter, currentItemIndex)
         } else {
             resourceManager.getString(R.string.swipe_gov_cards_no_referenda_to_vote)
@@ -199,7 +200,9 @@ class TinderGovCardsViewModel(
     fun editVotingPowerClicked() {
         launch {
             val topReferendum = topReferendumWithDetails.first()
-            tinderGovVoteRequester.openRequest(TinderGovVoteRequester.Request(topReferendum.referendum.id.value))
+            val topReferendumId = topReferendum?.referendum?.id?.value ?: return@launch
+            val request = TinderGovVoteRequester.Request(topReferendumId)
+            tinderGovVoteRequester.openRequest(request)
         }
     }
 
@@ -308,8 +311,9 @@ class TinderGovCardsViewModel(
 
     private fun setupReferendumRetryAction() {
         topReferendumWithDetails
+            .filterNotNull()
             .map {
-                val isLoadingError = it.summary?.isError().orFalse() || it.amount?.isError().orFalse()
+                val isLoadingError = it.summary.isError() || it.amount.isError()
                 it.referendum to isLoadingError
             }
             .distinctUntilChangedBy { (referendum, isLoadingError) -> referendum.id to isLoadingError }
@@ -330,7 +334,7 @@ class TinderGovCardsViewModel(
     }
 
     private fun reloadDetailsForReferendum(referendum: ReferendumPreview) = launch {
-        tinderGovCardDetailsLoader.reloadSummary(referendum, this)
+        tinderGovCardDetailsLoader.reloadSummary(referendum)
         tinderGovCardDetailsLoader.reloadAmount(referendum)
     }
 
@@ -418,8 +422,8 @@ private class ReferendaWithBasket(
 
 private class CardWithDetails(
     val referendum: ReferendumPreview,
-    val summary: ExtendedLoadingState<String?>?,
-    val amount: ExtendedLoadingState<AmountModel?>?
+    val summary: ExtendedLoadingState<String?>,
+    val amount: ExtendedLoadingState<AmountModel?>
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -434,6 +438,10 @@ private class ReferendaCounterModel(
     val itemsInBasket: Int,
     val referendaSize: Int
 ) {
+
+    val remainingReferendaToVote: Int
+        get() = referendaSize - itemsInBasket
+
     fun hasReferendaToVote(): Boolean {
         return referendaSize > itemsInBasket
     }

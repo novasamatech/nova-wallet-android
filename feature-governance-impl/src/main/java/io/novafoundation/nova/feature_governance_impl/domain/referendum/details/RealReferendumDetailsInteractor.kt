@@ -75,7 +75,7 @@ class RealReferendumDetailsInteractor(
     }
 
     override suspend fun detailsFor(preImage: PreImage, chain: Chain): ReferendumCall? {
-        return preImageParser.parse(preImage, chain.id)
+        return preImageParser.parse(preImage, chain)
     }
 
     override suspend fun previewFor(preImage: PreImage): PreimagePreview {

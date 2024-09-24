@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.Dispatchers
@@ -10,9 +10,9 @@ import kotlinx.coroutines.withContext
 
 interface ReferendumPreImageParser {
 
-    suspend fun parse(preImage: PreImage, chainId: ChainId): ReferendumCall?
+    suspend fun parse(preImage: PreImage, chain: Chain): ReferendumCall?
 
-    suspend fun parsePreimageCall(call: GenericCall.Instance, chainId: ChainId): ReferendumCall?
+    suspend fun parsePreimageCall(call: GenericCall.Instance, chain: Chain): ReferendumCall?
 }
 
 interface ReferendumCallAdapter {
@@ -22,7 +22,7 @@ interface ReferendumCallAdapter {
 
 interface ReferendumCallParseContext {
 
-    val chainId: ChainId
+    val chain: Chain
 
     /**
      * Can be used to resolve nested calls in compound calls like batch or proxy calls
@@ -35,12 +35,12 @@ class RealReferendumPreImageParser(
     private val knownAdapters: Collection<ReferendumCallAdapter>,
 ) : ReferendumPreImageParser {
 
-    override suspend fun parse(preImage: PreImage, chainId: ChainId): ReferendumCall? {
-        return parsePreimageCall(preImage.call, chainId)
+    override suspend fun parse(preImage: PreImage, chain: Chain): ReferendumCall? {
+        return parsePreimageCall(preImage.call, chain)
     }
 
-    override suspend fun parsePreimageCall(call: GenericCall.Instance, chainId: ChainId): ReferendumCall? {
-        val context = RealReferendumCallParseContext(chainId, knownAdapters)
+    override suspend fun parsePreimageCall(call: GenericCall.Instance, chain: Chain): ReferendumCall? {
+        val context = RealReferendumCallParseContext(chain, knownAdapters)
 
         return withContext(Dispatchers.IO) {
             context.parse(call)
@@ -48,7 +48,7 @@ class RealReferendumPreImageParser(
     }
 
     private inner class RealReferendumCallParseContext(
-        override val chainId: ChainId,
+        override val chain: Chain,
         private val knownAdapters: Collection<ReferendumCallAdapter>,
     ) : ReferendumCallParseContext {
 
