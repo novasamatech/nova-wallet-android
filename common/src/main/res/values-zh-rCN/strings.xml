@@ -493,6 +493,7 @@
     <string name="common_unlimited">无限</string>
     <string name="common_update">更新</string>
     <string name="common_use">使用</string>
+    <string name="common_use_max">使用最大值</string>
     <string name="common_validation_invalid_address_message">接收者应该是一个有效的%s地址</string>
     <string name="common_validation_invalid_address_title">无效的接收者</string>
     <string name="common_waiting">等待中</string>
@@ -974,6 +975,8 @@
     <string name="referenda_list_placeholder">公投信息将在这里显示，当它们开始时</string>
     <string name="referenda_search_placeholder">未找到输入的标题或 ID 的公投</string>
     <string name="referenda_search_toolbar_hint">按公投标题或 ID 搜索</string>
+    <string name="referenda_swipe_gov_banner_chip"> %d 个公投</string>
+    <string name="referenda_swipe_gov_banner_subtitle">滑动以通过 AI 概要投票。快速简单！</string>
     <string name="referenda_title">公投</string>
     <string name="referendim_details_not_found_title">未找到公投</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">弃权票只能通过 0.1x 决心投票。是否以 0.1x 决心投票？</string>
@@ -1540,6 +1543,31 @@
     <string name="swap_slippage_warning_too_small">因低滑点容忍度可能会被回退。</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%s的金额小于%s的最低余额</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">您尝试交换的金额太小</string>
+    <string name="swipe_gov_abstain_format">弃权： %s</string>
+    <string name="swipe_gov_aye_format">赞成： %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">你永远可以稍后为这个公投投票</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">从投票列表中移除公投 %s ？</string>
+    <string name="swipe_gov_basket_removed_items_message">某些公投不再可供投票或您的代币不足。可投票的：%s。</string>
+    <string name="swipe_gov_basket_removed_items_title">某些公投已从投票列表中排除</string>
+    <string name="swipe_gov_card_data_loading_error_message">无法加载公投数据</string>
+    <string name="swipe_gov_card_data_loading_error_title">没有数据</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">您已为所有可用的公投投票，或目前没有公投可供投票。请稍后再回来。</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">您已为所有可用的公投投票</string>
+    <string name="swipe_gov_card_requested_title">请求：</string>
+    <string name="swipe_gov_cards_basket_title">投票列表</string>
+    <string name="swipe_gov_cards_counter">剩余 %d </string>
+    <string name="swipe_gov_cards_full_list">确认投票</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">没有公投可投票</string>
+    <string name="swipe_gov_cards_placeholder_button">确认您的投票</string>
+    <string name="swipe_gov_cards_voting_list_empty">没有投票</string>
+    <string name="swipe_gov_convirm_votes_success_message">你已经成功为 %d 个公投投票</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">您的余额不足以使用当前的投票权 %s (%sx) 进行投票。请更改投票权或向您的钱包添加更多资金。</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">投票余额不足</string>
+    <string name="swipe_gov_nay_format">反对： %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">为 %d 个公投投票</string>
+    <string name="swipe_gov_vote_subtitle">投票将在 SwipeGov 的未来投票中设置</string>
+    <string name="swipe_gov_vote_title">投票权</string>
     <string name="tabbar_staking_title">质押</string>
     <string name="tabbar_wallet_title">钱包</string>
     <string name="today">今天</string>

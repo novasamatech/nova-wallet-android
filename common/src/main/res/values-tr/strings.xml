@@ -498,6 +498,7 @@
     <string name="common_unlimited">Sınırsız</string>
     <string name="common_update">Güncelle</string>
     <string name="common_use">Kullan</string>
+    <string name="common_use_max">Maksimumu Kullan</string>
     <string name="common_validation_invalid_address_message">Alıcı geçerli bir %s adresi olmalıdır</string>
     <string name="common_validation_invalid_address_title">Geçersiz alıcı</string>
     <string name="common_waiting">Bekleniyor</string>
@@ -981,6 +982,8 @@
     <string name="referenda_list_placeholder">Referandumlar başladığında bilgiler burada görünecek</string>
     <string name="referenda_search_placeholder">Girilen başlık veya ID ile hiç referandum bulunamadı</string>
     <string name="referenda_search_toolbar_hint">Referandum başlığı veya ID ile ara</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referandum</string>
+    <string name="referenda_swipe_gov_banner_subtitle">AI özetleriyle referandumlara oy vermek için kaydırın. Hızlı ve kolay!</string>
     <string name="referenda_title">Referandumlar</string>
     <string name="referendim_details_not_found_title">Referandum bulunamadı</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Çekimser oylar yalnızca 0.1x inançla yapılabilir. 0.1x inançla oy kullanmak ister misiniz?</string>
@@ -1550,6 +1553,31 @@
     <string name="swap_slippage_warning_too_small">Düşük kayma toleransı nedeniyle işlem geri alınabilir.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%s miktarı, %s\'nin minimum bakiyesinden az</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Çok küçük bir miktar takası yapmaya çalışıyorsunuz</string>
+    <string name="swipe_gov_abstain_format">Çekimser: %s</string>
+    <string name="swipe_gov_aye_format">Evet: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Bu referanduma her zaman daha sonra oy verebilirsiniz</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Referandum %s oy listesinden kaldırılsın mı?</string>
+    <string name="swipe_gov_basket_removed_items_message">Bazı referandumlara artık oy verilemiyor veya oy vermek için yeterli token bulunmayabilir. Oy verilebilir: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Bazı referandumlar oy listesinden çıkarıldı</string>
+    <string name="swipe_gov_card_data_loading_error_message">Referandum verileri yüklenemedi</string>
+    <string name="swipe_gov_card_data_loading_error_title">Veri alınamadı</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Mevcut tüm referandumlara zaten oy verdiniz veya şu anda oylayacak referandum yok. Daha sonra tekrar gelin.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Mevcut tüm referandumlara zaten oy verdiniz</string>
+    <string name="swipe_gov_card_requested_title">Talep Edilen:</string>
+    <string name="swipe_gov_cards_basket_title">Oy listesi</string>
+    <string name="swipe_gov_cards_counter">%d kaldı</string>
+    <string name="swipe_gov_cards_full_list">Oyları onayla</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Oylanacak referandum yok</string>
+    <string name="swipe_gov_cards_placeholder_button">Oylarınızı onaylayın</string>
+    <string name="swipe_gov_cards_voting_list_empty">Oy yok</string>
+    <string name="swipe_gov_convirm_votes_success_message">%d referandum için başarıyla oy verdiniz</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Mevcut oy gücü %s (%sx) ile oy vermek için yeterli bakiyeniz yok. Lütfen oy gücünü değiştirin veya cüzdanınıza daha fazla para ekleyin.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Oy vermek için yetersiz bakiye</string>
+    <string name="swipe_gov_nay_format">Hayır: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">%d referandum için oy verin</string>
+    <string name="swipe_gov_vote_subtitle">SwipeGov\'daki gelecekteki oylar için oy verilecektir</string>
+    <string name="swipe_gov_vote_title">Oy gücü</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Cüzdan</string>
     <string name="today">Bugün</string>

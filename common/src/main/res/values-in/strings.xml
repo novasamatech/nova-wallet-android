@@ -493,6 +493,7 @@
     <string name="common_unlimited">Tidak terbatas</string>
     <string name="common_update">Perbarui</string>
     <string name="common_use">Gunakan</string>
+    <string name="common_use_max">Gunakan maksimum</string>
     <string name="common_validation_invalid_address_message">Penerima harus merupakan alamat %s yang valid</string>
     <string name="common_validation_invalid_address_title">Penerima tidak valid</string>
     <string name="common_waiting">Menunggu</string>
@@ -974,6 +975,8 @@
     <string name="referenda_list_placeholder">Informasi Referenda akan muncul di sini ketika mereka dimulai</string>
     <string name="referenda_search_placeholder">Tidak ada referenda dengan judul atau ID yang dimasukkan ditemukan</string>
     <string name="referenda_search_toolbar_hint">Cari berdasarkan judul referendum atau ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referendum</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Gesek untuk memberikan suara pada referendum dengan ringkasan AI. Cepat &amp;  mudah!</string>
     <string name="referenda_title">Referenda</string>
     <string name="referendim_details_not_found_title">Referendum tidak ditemukan</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Suara Abstain hanya dapat dilakukan dengan keyakinan 0,1x. Pilih dengan keyakinan 0,1x?</string>
@@ -1540,6 +1543,31 @@
     <string name="swap_slippage_warning_too_small">Transaksi mungkin dibalikkan karena toleransi slippage yang rendah.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Jumlah %s kurang dari saldo minimum %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Anda mencoba untuk menukar jumlah yang terlalu kecil</string>
+    <string name="swipe_gov_abstain_format">Abstain: %s</string>
+    <string name="swipe_gov_aye_format">Aye: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Anda selalu bisa memberikan suara untuk referendum ini nanti</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Hapus referendum %s dari daftar suara?</string>
+    <string name="swipe_gov_basket_removed_items_message">Beberapa referendum tidak lagi tersedia untuk pemungutan suara atau Anda mungkin tidak memiliki cukup token yang tersedia untuk memberikan suara. Tersedia untuk memberikan suara: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Beberapa referendum dikeluarkan dari daftar suara</string>
+    <string name="swipe_gov_card_data_loading_error_message">Data referendum tidak dapat dimuat</string>
+    <string name="swipe_gov_card_data_loading_error_title">Tidak ada data yang ditemukan</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Anda telah memberikan suara untuk semua referendum yang tersedia atau tidak ada referendum untuk memberikan suara saat ini. Kembali lagi nanti.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Anda telah memberikan suara untuk semua referendum yang tersedia</string>
+    <string name="swipe_gov_card_requested_title">Diminta:</string>
+    <string name="swipe_gov_cards_basket_title">Daftar suara</string>
+    <string name="swipe_gov_cards_counter">%d tersisa</string>
+    <string name="swipe_gov_cards_full_list">Konfirmasi suara</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Tidak ada referendum untuk memberikan suara</string>
+    <string name="swipe_gov_cards_placeholder_button">Konfirmasi suara Anda</string>
+    <string name="swipe_gov_cards_voting_list_empty">Tidak ada suara</string>
+    <string name="swipe_gov_convirm_votes_success_message">Anda berhasil memberikan suara untuk %d referendum</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Anda tidak memiliki saldo yang cukup untuk memberikan suara dengan kekuatan suara saat ini %s (%sx). Silakan ubah kekuatan suara atau tambahkan lebih banyak dana ke dompet Anda.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Saldo tidak mencukupi untuk memberikan suara</string>
+    <string name="swipe_gov_nay_format">Nay: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Berikan suara untuk %d referendum</string>
+    <string name="swipe_gov_vote_subtitle">Pemungutan suara akan diatur untuk suara di masa depan di SwipeGov</string>
+    <string name="swipe_gov_vote_title">Kekuatan Suara</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Dompet</string>
     <string name="today">Hari ini</string>
