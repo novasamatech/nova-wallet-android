@@ -997,7 +997,7 @@
     <string name="referenda_search_placeholder">Не найдены референдумы\nс таким названием или ID</string>
     <string name="referenda_search_toolbar_hint">Поиск по заголовку или ID</string>
     <string name="referenda_swipe_gov_banner_chip">%d референдума</string>
-    <string name="referenda_swipe_gov_banner_subtitle">Свайпайте, чтобы проголосовать на референдумах с резюме от AI. Быстро и легко!</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Свайпайте, чтобы проголосовать за референдумы с резюме от AI. Быстро и легко!</string>
     <string name="referenda_title">Референдумы</string>
     <string name="referendim_details_not_found_title">Референдум не найден</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Голосование с воздержанием возможно только с убежденностью 0.1x. Проголосовать с убежденностью 0.1x?</string>
