@@ -493,6 +493,7 @@
     <string name="common_unlimited">무제한</string>
     <string name="common_update">업데이트</string>
     <string name="common_use">사용</string>
+    <string name="common_use_max">최대 사용</string>
     <string name="common_validation_invalid_address_message">수신자는 유효한 %s 주소여야 합니다</string>
     <string name="common_validation_invalid_address_title">잘못된 수신자</string>
     <string name="common_waiting">기다리는 중</string>
@@ -974,6 +975,8 @@
     <string name="referenda_list_placeholder">국민투표 정보는 시작되면 여기에 나타납니다</string>
     <string name="referenda_search_placeholder">입력한 제목 또는 ID로 국민투표를 찾을 수 없습니다</string>
     <string name="referenda_search_toolbar_hint">국민투표 제목 또는 ID로 검색</string>
+    <string name="referenda_swipe_gov_banner_chip">%d 개 국민투표</string>
+    <string name="referenda_swipe_gov_banner_subtitle">국민투표에 인공지능 요약으로 투표하세요. 빠르고 간편하게!</string>
     <string name="referenda_title">국민투표</string>
     <string name="referendim_details_not_found_title">국민투표를 찾을 수 없습니다</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">기권 투표는 0.1x 확신도로만 가능합니다. 0.1x 확신도로 투표하시겠습니까?</string>
@@ -1540,6 +1543,31 @@
     <string name="swap_slippage_warning_too_small">낮은 슬리피지 허용량으로 인해 거래가 되돌릴 수 있습니다.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%s의 금액이 %s의 최소 잔액보다 적습니다</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">너무 적은 금액을 스왑하려고 합니다</string>
+    <string name="swipe_gov_abstain_format">기권: %s</string>
+    <string name="swipe_gov_aye_format">찬성: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">나중에 이 국민투표에 다시 투표할 수 있습니다</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">투표 목록에서 국민투표 %s 제거?</string>
+    <string name="swipe_gov_basket_removed_items_message">일부 국민투표는 더 이상 투표할 수 없거나 투표에 충분한 토큰이 없을 수 있습니다. 투표 가능: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">투표 목록에서 국민투표 일부 제외</string>
+    <string name="swipe_gov_card_data_loading_error_message">국민투표 데이터를 불러올 수 없습니다</string>
+    <string name="swipe_gov_card_data_loading_error_title">데이터 없음</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">모든 가능한 국민투표에 이미 투표한 상태이거나 지금 투표할 국민투표가 없습니다. 나중에 다시 오세요.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">모든 가능한 국민투표에 이미 투표했습니다</string>
+    <string name="swipe_gov_card_requested_title">요청됨:</string>
+    <string name="swipe_gov_cards_basket_title">투표 목록</string>
+    <string name="swipe_gov_cards_counter">%d 남음</string>
+    <string name="swipe_gov_cards_full_list">투표 확인</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">투표할 국민투표 없음</string>
+    <string name="swipe_gov_cards_placeholder_button">투표 확인하기</string>
+    <string name="swipe_gov_cards_voting_list_empty">투표 없음</string>
+    <string name="swipe_gov_convirm_votes_success_message">%d 개 국민투표에 성공적으로 투표하셨습니다</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">현재 투표권 %s (%sx)으로 투표할 자금이 부족합니다. 투표권을 변경하거나 지갑에 더 많은 자금을 추가하세요.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">투표에 필요한 잔액 부족</string>
+    <string name="swipe_gov_nay_format">반대: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">%d 개 국민투표에 투표</string>
+    <string name="swipe_gov_vote_subtitle">앞으로 있을 투표는 SwipeGov에서 설정됩니다</string>
+    <string name="swipe_gov_vote_title">투표권</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">지갑</string>
     <string name="today">오늘</string>

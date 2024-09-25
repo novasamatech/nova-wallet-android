@@ -493,6 +493,7 @@
     <string name="common_unlimited">無制限</string>
     <string name="common_update">更新</string>
     <string name="common_use">使用</string>
+    <string name="common_use_max">最大を使用</string>
     <string name="common_validation_invalid_address_message">受信者は有効な %s アドレスである必要があります</string>
     <string name="common_validation_invalid_address_title">無効な受信者</string>
     <string name="common_waiting">待機中</string>
@@ -974,6 +975,8 @@
     <string name="referenda_list_placeholder">レファレンダム情報は開始されるとここに表示されます</string>
     <string name="referenda_search_placeholder">入力されたタイトルまたはIDのレファレンダムが見つかりませんでした</string>
     <string name="referenda_search_toolbar_hint">レファレンダムのタイトルまたはIDで検索</string>
+    <string name="referenda_swipe_gov_banner_chip">%d レファレンダ</string>
+    <string name="referenda_swipe_gov_banner_subtitle">スワイプしてAIサマリーでレファレンダに投票。迅速かつ簡単！</string>
     <string name="referenda_title">レファレンダム</string>
     <string name="referendim_details_not_found_title">レファレンダムが見つかりません</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">棄権票は0.1xの信念でのみ行うことができます。0.1xの信念で投票しますか？</string>
@@ -1540,6 +1543,31 @@
     <string name="swap_slippage_warning_too_small">低スリッページ許容のため、トランザクションがリバートされる可能性があります。</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%sの金額は%sの最低残高を下回っています</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">交換する金額が小さすぎます</string>
+    <string name="swipe_gov_abstain_format">棄権: %s</string>
+    <string name="swipe_gov_aye_format">賛成: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">後でこのレファレンダムに投票することができます</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">投票リストからレファレンダ %s を削除しますか？</string>
+    <string name="swipe_gov_basket_removed_items_message">一部のレファレンダはもはや投票に利用できないか、投票に必要なトークンが不足している可能性があります。利用可能な投票：%s。</string>
+    <string name="swipe_gov_basket_removed_items_title">投票リストから除外されたレファレンダの一部</string>
+    <string name="swipe_gov_card_data_loading_error_message">レファレンダのデータを読み込むことができませんでした</string>
+    <string name="swipe_gov_card_data_loading_error_title">データが取得できません</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">利用可能なレファレンダに既に投票したか、現在投票できるレファレンダがありません。後で戻ってきてください。</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">利用可能なレファレンダに既に投票しています</string>
+    <string name="swipe_gov_card_requested_title">リクエスト済み：</string>
+    <string name="swipe_gov_cards_basket_title">投票リスト</string>
+    <string name="swipe_gov_cards_counter">残り %d</string>
+    <string name="swipe_gov_cards_full_list">投票を確認</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">投票するレファレンダはありません</string>
+    <string name="swipe_gov_cards_placeholder_button">投票を確認する</string>
+    <string name="swipe_gov_cards_voting_list_empty">投票がありません</string>
+    <string name="swipe_gov_convirm_votes_success_message">%d レファレンダへの投票に成功しました</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">現在の投票力 %s (%sx) で投票するには残高が不足しています。投票力を変更するか、ウォレットに資金を追加してください。</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">投票に必要な残高が不足しています</string>
+    <string name="swipe_gov_nay_format">反対: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">%d レファレンダに投票</string>
+    <string name="swipe_gov_vote_subtitle">SwipeGovで将来の投票を設定します</string>
+    <string name="swipe_gov_vote_title">投票力</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">ウォレット</string>
     <string name="today">今日</string>

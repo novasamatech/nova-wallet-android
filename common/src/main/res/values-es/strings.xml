@@ -498,6 +498,7 @@
     <string name="common_unlimited">Ilimitado</string>
     <string name="common_update">Actualizar</string>
     <string name="common_use">Usar</string>
+    <string name="common_use_max">Usar máximo</string>
     <string name="common_validation_invalid_address_message">El destinatario debe ser una dirección %s válida</string>
     <string name="common_validation_invalid_address_title">Destinatario inválido</string>
     <string name="common_waiting">Esperando</string>
@@ -981,6 +982,8 @@
     <string name="referenda_list_placeholder">La información de los referendos aparecerá aquí cuando comiencen</string>
     <string name="referenda_search_placeholder">No se encontraron referendos con el título o ID entrado</string>
     <string name="referenda_search_toolbar_hint">Buscar por título de referendo o ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referendos</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Desliza para votar en referendos con resúmenes por IA. ¡Rápido y fácil!</string>
     <string name="referenda_title">Referendos</string>
     <string name="referendim_details_not_found_title">Referendo no encontrado</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Los votos de Abstención solo se pueden realizar con una convicción de 0.1x. ¿Votar con una convicción de 0.1x?</string>
@@ -1550,6 +1553,31 @@
     <string name="swap_slippage_warning_too_small">La transacción podría ser revertida debido a la baja tolerancia al deslizamiento.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">La cantidad de %s es menor que el balance mínimo de %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Estás intentando intercambiar una cantidad demasiado pequeña</string>
+    <string name="swipe_gov_abstain_format">Abstenerse: %s</string>
+    <string name="swipe_gov_aye_format">A favor: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Siempre puedes votar por este referendo más tarde</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">¿Eliminar el referendo %s de la lista de votos?</string>
+    <string name="swipe_gov_basket_removed_items_message">Algunos de los referendos ya no están disponibles para votar o puede que no tengas suficientes tokens disponibles para votar. Disponible para votar: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Algunos de los referendos fueron excluidos de la lista de votos</string>
+    <string name="swipe_gov_card_data_loading_error_message">No se pudieron cargar los datos del referendo</string>
+    <string name="swipe_gov_card_data_loading_error_title">No se recuperaron datos</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Ya has votado por todos los referendos disponibles o no hay referendos para votar en este momento. Vuelve más tarde.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Ya has votado por todos los referendos disponibles</string>
+    <string name="swipe_gov_card_requested_title">Solicitado:</string>
+    <string name="swipe_gov_cards_basket_title">Lista de votos</string>
+    <string name="swipe_gov_cards_counter">%d restantes</string>
+    <string name="swipe_gov_cards_full_list">Confirmar votos</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">No hay referendos para votar</string>
+    <string name="swipe_gov_cards_placeholder_button">Confirma tus votos</string>
+    <string name="swipe_gov_cards_voting_list_empty">Sin votos</string>
+    <string name="swipe_gov_convirm_votes_success_message">Has votado exitosamente por %d referendos</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">No tienes suficiente saldo para votar con el poder de voto actual %s (%sx). Por favor, cambia el poder de voto o añade más fondos a tu cartera.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Saldo insuficiente para votar</string>
+    <string name="swipe_gov_nay_format">En contra: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Votar por %d referendos</string>
+    <string name="swipe_gov_vote_subtitle">La votación se establecerá para futuros votos en SwipeGov</string>
+    <string name="swipe_gov_vote_title">Poder de voto</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Cartera</string>
     <string name="today">Hoy</string>

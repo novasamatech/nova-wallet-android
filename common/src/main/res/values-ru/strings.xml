@@ -508,6 +508,7 @@
     <string name="common_unlimited">Неограниченно</string>
     <string name="common_update">Обновить</string>
     <string name="common_use">Использовать</string>
+    <string name="common_use_max">Использовать максимум</string>
     <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
     <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
     <string name="common_waiting">Ожидание</string>
@@ -995,6 +996,8 @@
     <string name="referenda_list_placeholder">Информация о референдумах появится здесь, когда они начнутся</string>
     <string name="referenda_search_placeholder">Не найдены референдумы\nс таким названием или ID</string>
     <string name="referenda_search_toolbar_hint">Поиск по заголовку или ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d референдума</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Свайпайте, чтобы проголосовать за референдумы с резюме от AI. Быстро и легко!</string>
     <string name="referenda_title">Референдумы</string>
     <string name="referendim_details_not_found_title">Референдум не найден</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Голосование с воздержанием возможно только с убежденностью 0.1x. Проголосовать с убежденностью 0.1x?</string>
@@ -1570,6 +1573,31 @@
     <string name="swap_slippage_warning_too_small">Транзакция может быть отменена из-за низкой устойчивости к проскальзыванию.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Сумма %s меньше минимального баланса %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Вы пытаетесь обменять слишком маленькую сумму</string>
+    <string name="swipe_gov_abstain_format">Воздержаться: %s</string>
+    <string name="swipe_gov_aye_format">За: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Вы всегда можете проголосовать за этот референдум позже </string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Удалить референдум %s из списка голосований?</string>
+    <string name="swipe_gov_basket_removed_items_message">Некоторые референдумы больше недоступны для голосования или у вас может быть недостаточно токенов для голосования. Доступно для голосования: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Некоторые референдумы исключены из списка голосований</string>
+    <string name="swipe_gov_card_data_loading_error_message">Данные референдума не удалось загрузить</string>
+    <string name="swipe_gov_card_data_loading_error_title">Данные не получены</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Вы уже проголосовали во всех доступных референдумах или на данный момент нет референдумов для голосования. Вернитесь позже.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Вы уже проголосовали во всех доступных референдумах</string>
+    <string name="swipe_gov_card_requested_title">Запрошено:</string>
+    <string name="swipe_gov_cards_basket_title">Список голосований</string>
+    <string name="swipe_gov_cards_counter">Осталось %d</string>
+    <string name="swipe_gov_cards_full_list">Подтвердить голоса</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Нет референдумов для голосования</string>
+    <string name="swipe_gov_cards_placeholder_button">Подтвердите ваши голоса</string>
+    <string name="swipe_gov_cards_voting_list_empty">Нет голосов</string>
+    <string name="swipe_gov_convirm_votes_success_message">Вы успешно проголосовали за %d референдума</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">У вас недостаточно баланса, чтобы проголосовать с текущей мощностью голоса %s (%sx). Пожалуйста, измените мощность голоса или добавьте больше средств в ваш кошелек.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Недостаточно баланса для голосования</string>
+    <string name="swipe_gov_nay_format">Против: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Проголосовать за %d референдума</string>
+    <string name="swipe_gov_vote_subtitle">Голосование будет настроено для будущих голосов в SwipeGov</string>
+    <string name="swipe_gov_vote_title">Мощность голоса</string>
     <string name="tabbar_staking_title">Стейкинг</string>
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="today">Сегодня</string>

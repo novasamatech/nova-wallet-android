@@ -493,6 +493,7 @@
     <string name="common_unlimited">Không giới hạn</string>
     <string name="common_update">Cập nhật</string>
     <string name="common_use">Sử dụng</string>
+    <string name="common_use_max">Sử dụng tối đa</string>
     <string name="common_validation_invalid_address_message">Người nhận phải là địa chỉ %s hợp lệ</string>
     <string name="common_validation_invalid_address_title">Người nhận không hợp lệ</string>
     <string name="common_waiting">Đang chờ</string>
@@ -974,6 +975,8 @@
     <string name="referenda_list_placeholder">Thông tin về các cuộc trưng cầu dân ý sẽ xuất hiện ở đây khi chúng bắt đầu</string>
     <string name="referenda_search_placeholder">Không tìm thấy cuộc trưng cầu dân ý với tiêu đề hoặc ID đã nhập\n</string>
     <string name="referenda_search_toolbar_hint">Tìm kiếm theo tiêu đề hoặc ID cuộc trưng cầu dân ý</string>
+    <string name="referenda_swipe_gov_banner_chip">%d cuộc trưng cầu</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Vuốt để bình chọn cho cuộc trưng cầu với tóm tắt AI. Nhanh và dễ dàng!</string>
     <string name="referenda_title">Cuộc trưng cầu dân ý</string>
     <string name="referendim_details_not_found_title">Không tìm thấy cuộc trưng cầu dân ý</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Bỏ phiếu Abstain chỉ có thể thực hiện với độ xác tín 0.1x. Bỏ phiếu với độ xác tín 0.1x?</string>
@@ -1540,6 +1543,31 @@
     <string name="swap_slippage_warning_too_small">Giao dịch có thể bị hoàn lại do mức chấp nhận độ trượt giá thấp.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Số lượng %s ít hơn số dư tối thiểu %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Bạn đang cố gắng hoán đổi số tiền quá nhỏ</string>
+    <string name="swipe_gov_abstain_format">Kiềm chế: %s</string>
+    <string name="swipe_gov_aye_format">Đồng ý: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Bạn luôn có thể bỏ phiếu cho cuộc trưng cầu này sau</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Xóa cuộc trưng cầu %s khỏi danh sách bỏ phiếu?</string>
+    <string name="swipe_gov_basket_removed_items_message">Một số cuộc trưng cầu không còn khả dụng để bỏ phiếu hoặc bạn có thể không có đủ token để bỏ phiếu. Khả dụng để bỏ phiếu: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Một số cuộc trưng cầu bị loại khỏi danh sách bỏ phiếu</string>
+    <string name="swipe_gov_card_data_loading_error_message">Không thể tải dữ liệu cuộc trưng cầu</string>
+    <string name="swipe_gov_card_data_loading_error_title">Không có dữ liệu</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Bạn đã bỏ phiếu cho tất cả các cuộc trưng cầu khả dụng hoặc hiện không có cuộc trưng cầu nào để bỏ phiếu. Quay lại sau.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Bạn đã bỏ phiếu cho tất cả các cuộc trưng cầu khả dụng</string>
+    <string name="swipe_gov_card_requested_title">Yêu cầu:</string>
+    <string name="swipe_gov_cards_basket_title">Danh sách bỏ phiếu</string>
+    <string name="swipe_gov_cards_counter">%d còn lại</string>
+    <string name="swipe_gov_cards_full_list">Xác nhận phiếu</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Không có cuộc trưng cầu để bỏ phiếu</string>
+    <string name="swipe_gov_cards_placeholder_button">Xác nhận phiếu của bạn</string>
+    <string name="swipe_gov_cards_voting_list_empty">Không có phiếu</string>
+    <string name="swipe_gov_convirm_votes_success_message">Bạn đã thành công bỏ phiếu cho %d cuộc trưng cầu</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Bạn không có đủ số dư để bỏ phiếu với sức mạnh hiện tại %s (%sx). Vui lòng thay đổi sức mạnh bỏ phiếu hoặc thêm thêm tiền vào ví của bạn.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Số dư không đủ để bỏ phiếu</string>
+    <string name="swipe_gov_nay_format">Không đồng ý: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Bỏ phiếu cho %d cuộc trưng cầu</string>
+    <string name="swipe_gov_vote_subtitle">Việc bỏ phiếu sẽ được đặt cho các cuộc bỏ phiếu trong tương lai trong SwipeGov</string>
+    <string name="swipe_gov_vote_title">Sức mạnh bỏ phiếu</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Ví</string>
     <string name="today">Hôm nay</string>
