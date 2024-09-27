@@ -85,6 +85,7 @@ import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import okhttp3.OkHttpClient
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
@@ -256,4 +257,6 @@ interface AssetsFeatureDependencies {
     val holdsDao: HoldsDao
 
     val coinGeckoLinkParser: CoinGeckoLinkParser
+
+    val okHttpClient: OkHttpClient
 }

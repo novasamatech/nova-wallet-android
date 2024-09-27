@@ -80,6 +80,24 @@
         <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Experimental" />
+
+        <io.novafoundation.nova.common.view.settings.SettingsGroupView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <io.novafoundation.nova.common.view.settings.SettingsItemView
+                android:id="@+id/settingsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_buy_outline"
+                app:title="Nova Card" />
+
+        </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+        <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/settings_preferences" />
 
         <io.novafoundation.nova.common.view.settings.SettingsGroupView

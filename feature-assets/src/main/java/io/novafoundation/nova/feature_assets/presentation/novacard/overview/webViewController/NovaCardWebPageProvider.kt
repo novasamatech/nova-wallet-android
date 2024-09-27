@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController
 
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
+
 class NovaCardWebPageProvider(
     private val widgetId: String,
-    private val refundAddress: String
+    private val setupConfig: CardSetupConfig
 ) {
 
     private val containerId = "widget-container"
@@ -33,13 +35,14 @@ class NovaCardWebPageProvider(
                 widgetId: '$widgetId',
                 host: document.getElementById('widget-container'),
                 type: 'sell',
-                currency: 'DOT',
+                currency: '${setupConfig.spendToken.symbol.value}',
                 fiatCurrency: 'EUR',
                 paymentMethod: 'fiat_card_open',
+                theme: 'nova',
                 width: '100%',
                 height: window.innerHeight,
                 hideRefundAddress: true,
-                refundAddress: '$refundAddress',
+                refundAddress: '${setupConfig.refundAddress}',
                 fixPaymentMethod: true,
                 showSpendCardDetails: true,
                 onStatusChange: data => {

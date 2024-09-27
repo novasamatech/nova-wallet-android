@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import okhttp3.OkHttpClient
 
 @Module(includes = [ViewModelModule::class])
 class NovaCardModule {
@@ -29,6 +30,7 @@ class NovaCardModule {
         permissionsAskerFactory: PermissionsAskerFactory,
         appLinksProvider: AppLinksProvider,
         fileProvider: FileProvider,
+        okHttpClient: OkHttpClient,
         gson: Gson
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
@@ -37,7 +39,8 @@ class NovaCardModule {
             permissionsAskerFactory,
             appLinksProvider,
             gson,
-            BuildConfig.NOVA_CARD_WIDGET_ID
+            BuildConfig.NOVA_CARD_WIDGET_ID,
+            okHttpClient
         )
     }
 
