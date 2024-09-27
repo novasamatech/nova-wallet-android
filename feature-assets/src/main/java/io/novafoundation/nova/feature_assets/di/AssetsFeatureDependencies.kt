@@ -19,6 +19,8 @@ import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.HoldsDao
@@ -171,9 +173,13 @@ interface AssetsFeatureDependencies {
 
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
 
-    val assetsSourceRegistry: AssetSourceRegistry
-
     fun nftRepository(): NftRepository
+
+    fun systemCallExecutor(): SystemCallExecutor
+
+    fun permissionsAskerFactory(): PermissionsAskerFactory
+
+    val assetsSourceRegistry: AssetSourceRegistry
 
     val addressInputMixinFactory: AddressInputMixinFactory
 

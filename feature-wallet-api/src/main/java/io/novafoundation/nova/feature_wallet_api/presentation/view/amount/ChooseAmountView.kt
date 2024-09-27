@@ -65,7 +65,14 @@ class ChooseAmountView @JvmOverloads constructor(
         // TODO amount chooser max button
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        chooseAmountInput.isEnabled = enabled
+        super.setEnabled(enabled)
+    }
+
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ChooseAmountView) {
+        isEnabled = it.getBoolean(R.styleable.ChooseAmountView_android_enabled, true)
+
         val title = it.getString(R.styleable.ChooseAmountView_title) ?: context.getString(R.string.common_amount)
         setTitle(title)
     }

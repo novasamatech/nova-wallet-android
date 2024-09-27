@@ -53,6 +53,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment
+import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
@@ -394,6 +396,14 @@ class Navigator(
 
     override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
         navController?.navigate(R.id.action_open_swapSetupAmount, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
+    }
+
+    override fun openNovaCard() {
+        navController?.navigate(R.id.action_open_novaCard)
+    }
+
+    override fun openTopUpCard(payload: TopUpCardPayload) {
+        navController?.navigate(R.id.action_open_topUpCard, TopUpCardFragment.getBundle(payload))
     }
 
     override fun openNfts() {

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nova_card_graph"
+    app:startDestination="@id/novaCardFragment">
+
+    <fragment
+        android:id="@+id/novaCardFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardFragment"
+        android:label="novaCardFragment"
+        tools:layout="@layout/fragment_nova_card">
+
+        <action
+            android:id="@+id/action_open_topUpCard"
+            app:destination="@id/topUpCardFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/topUpCardFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment"
+        android:label="fragment_top_up"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_top_up_card" />
+
+</navigation>
