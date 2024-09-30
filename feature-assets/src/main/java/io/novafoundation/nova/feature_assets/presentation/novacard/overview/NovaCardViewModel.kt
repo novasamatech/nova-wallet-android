@@ -36,7 +36,7 @@ class NovaCardViewModel(
     }.shareInBackground()
 
     fun onTransactionStatusChanged(event: NovaCardEventHandler.TransactionStatus) {
-       showMessage("New status: $event")
+        showMessage("New status: $event")
     }
 
     fun openTopUp(amount: BigDecimal, address: String) = launch {

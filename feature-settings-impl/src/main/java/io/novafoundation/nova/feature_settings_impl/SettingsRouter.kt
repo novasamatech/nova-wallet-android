@@ -44,6 +44,4 @@ interface SettingsRouter : ReturnableRouter {
     fun finishCreateNetworkFlow()
 
     fun openEditNetwork(payload: AddNetworkPayload.Mode.Edit)
-
-    fun openCard()
 }

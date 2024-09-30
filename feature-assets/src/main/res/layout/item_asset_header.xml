@@ -51,6 +51,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balanceListTotalTitle" />
 
+    <androidx.legacy.widget.Space
+        android:id="@+id/balanceListNovaCardNegativeMargin"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/balanceListTotalBalance" />
+
+    <io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsNovaCardView
+        android:id="@+id/balanceListNovaCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="32dp"
+        app:layout_constraintTop_toTopOf="@+id/balanceListNovaCardNegativeMargin" />
+
     <io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
         android:id="@+id/balanceListNfts"
         android:layout_width="0dp"
@@ -58,20 +71,20 @@
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balanceListTotalBalance" />
+        app:layout_constraintTop_toBottomOf="@id/balanceListNovaCard" />
 
     <io.novafoundation.nova.common.view.PromoBannerView
+        android:id="@+id/balanceListCrowdloansPromoBanner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/balanceListCrowdloansPromoBanner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:promoBanner_background="@drawable/bg_crowdloan_banner"
-        app:promoBanner_image="@drawable/crowdloan_banner_image"
-        app:promoBanner_title="@string/assets_crowdloan_unlock_banner_title"
-        app:promoBanner_description="@string/assets_crowdloan_unlock_banner_description"
         android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/balanceListNfts" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balanceListNfts"
+        app:promoBanner_background="@drawable/bg_crowdloan_banner"
+        app:promoBanner_description="@string/assets_crowdloan_unlock_banner_description"
+        app:promoBanner_image="@drawable/crowdloan_banner_image"
+        app:promoBanner_title="@string/assets_crowdloan_unlock_banner_title" />
 
     <TextView
         android:id="@+id/balanceListAssetTitle"

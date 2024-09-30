@@ -11,10 +11,14 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.colorSpan
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
@@ -170,6 +174,8 @@ class BalanceListViewModel(
 
     val shouldShowCrowdloanBanner = assetsListInteractor.shouldShowCrowdloansBanner()
         .shareInBackground()
+
+    val novaCardText = flowOf { getNovaCardText() }
 
     init {
         selectedCurrency
@@ -348,5 +354,16 @@ class BalanceListViewModel(
 
     private fun hideCrowdloanBanner() = launch {
         assetsListInteractor.hideCrowdloanBanner()
+    }
+
+    fun novaCardClicked() {
+        router.openNovaCard()
+    }
+
+    private fun getNovaCardText(): CharSequence {
+        val highlightedText = resourceManager.getString(R.string.fragment_assets_nova_card_default_highlighted)
+            .toSpannable(colorSpan(resourceManager.getColor(R.color.text_primary)))
+
+        return SpannableFormatter.format(resourceManager.getString(R.string.fragment_assets_nova_card), highlightedText)
     }
 }
