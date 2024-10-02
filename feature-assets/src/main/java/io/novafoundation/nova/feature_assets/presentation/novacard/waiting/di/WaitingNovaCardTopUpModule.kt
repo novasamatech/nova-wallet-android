@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.WaitingNovaCardTopUpViewModel
 
@@ -20,9 +21,10 @@ class WaitingNovaCardTopUpModule {
     @ViewModelKey(WaitingNovaCardTopUpViewModel::class)
     fun provideViewModel(
         assetsRouter: AssetsRouter,
+        novaCardInteractor: NovaCardInteractor,
         resourceManager: ResourceManager
     ): ViewModel {
-        return WaitingNovaCardTopUpViewModel(assetsRouter, resourceManager)
+        return WaitingNovaCardTopUpViewModel(assetsRouter, resourceManager, novaCardInteractor)
     }
 
     @Provides
