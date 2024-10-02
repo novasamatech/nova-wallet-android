@@ -393,6 +393,16 @@ class Navigator(
         performNavigation(R.id.action_open_novaCard)
     }
 
+    override fun finishTopUpFlowAndAwaitCardCreation() {
+        performNavigation(R.id.action_finish_top_up_flow)
+    }
+
+    override fun closeCardWaitingForTopUp() {
+        if (navController?.currentDestination?.id == R.id.waitingForTopUpCardFragment) {
+            navController?.popBackStack()
+        }
+    }
+
     override fun openSwapFlow() {
         val payload = SwapFlowPayload.InitialSelecting
         navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))

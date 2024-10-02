@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
@@ -38,7 +39,8 @@ class TopUpCardModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         selectedAccountUseCase: SelectedAccountUseCase,
         addressInputMixinFactory: AddressInputMixinFactory,
-        amountChooserMixinFactory: AmountChooserMixin.Factory
+        amountChooserMixinFactory: AmountChooserMixin.Factory,
+        novaCardInteractor: NovaCardInteractor
     ): ViewModel {
         return TopUpCardViewModel(
             chainRegistry = chainRegistry,
@@ -52,6 +54,7 @@ class TopUpCardModule {
             selectedAccountUseCase = selectedAccountUseCase,
             addressInputMixinFactory = addressInputMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
+            novaCardInteractor = novaCardInteractor
         )
     }
 

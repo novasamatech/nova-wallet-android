@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="waiting_top_up_card_timer">Estimated %s</string>
+    <string name="waiting_top_up_card_title">Your card being issued</string>
+    <string name="waiting_top_up_card_description">It can take up to 2 min. Please do not close this window while Mercuryo will receive your funds. This window will be closed automatically.</string>
+
+    <string name="common_unexpected_error">Unexpected error</string>
+    <string name="fragment_waiting_top_up_time_out_error">For some reason we can’t reach the Mercuryo service. Try again later</string>
+
     <string name="fragment_assets_nova_card_default_highlighted">Pay anywhere</string>
     <string name="fragment_assets_nova_card">%s Nova Card</string>
 

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardEventHandler
@@ -20,7 +21,8 @@ import java.math.BigDecimal
 class NovaCardViewModel(
     private val chainRegistry: ChainRegistry,
     private val accountInteractor: AccountInteractor,
-    private val assetsRouter: AssetsRouter
+    private val assetsRouter: AssetsRouter,
+    private val novaCardInteractor: NovaCardInteractor
 ) : BaseViewModel() {
 
     private val metaAccount = flowOf { accountInteractor.selectedMetaAccount() }
@@ -40,12 +42,25 @@ class NovaCardViewModel(
     }
 
     fun openTopUp(amount: BigDecimal, address: String) = launch {
-        assetsRouter.openTopUpCard(
-            TopUpCardPayload(
-                amount = amount,
-                address = address,
-                asset = setupCardConfig.first().spendToken.toAssetPayload()
-            )
+        val payload = TopUpCardPayload(
+            amount = amount,
+            address = address,
+            asset = setupCardConfig.first().spendToken.toAssetPayload()
         )
+
+        assetsRouter.openTopUpCard(payload)
+    }
+
+    fun onCardCreated() {
+        // No need to open/close timer dialog if card is already active
+        if (novaCardInteractor.isNovaCardStateActive()) return
+
+        novaCardInteractor.setNovaCardState(true)
+
+        closeTimerBottomSheet()
+    }
+
+    private fun closeTimerBottomSheet() {
+        assetsRouter.closeCardWaitingForTopUp()
     }
 }

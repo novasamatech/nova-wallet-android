@@ -15,9 +15,11 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_assets.BuildConfig
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.WebViewCardCreationInterceptorFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
@@ -25,13 +27,22 @@ import okhttp3.OkHttpClient
 class NovaCardModule {
 
     @Provides
+    fun provideWebViewCardCreationInterceptorFactory(
+        gson: Gson,
+        okHttpClient: OkHttpClient
+    ): WebViewCardCreationInterceptorFactory = WebViewCardCreationInterceptorFactory(
+        gson = gson,
+        okHttpClient = okHttpClient
+    )
+
+    @Provides
     fun provideNovaCardWebViewControllerFactory(
         systemCallExecutor: SystemCallExecutor,
         permissionsAskerFactory: PermissionsAskerFactory,
         appLinksProvider: AppLinksProvider,
         fileProvider: FileProvider,
-        okHttpClient: OkHttpClient,
-        gson: Gson
+        gson: Gson,
+        webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
             systemCallExecutor,
@@ -40,7 +51,7 @@ class NovaCardModule {
             appLinksProvider,
             gson,
             BuildConfig.NOVA_CARD_WIDGET_ID,
-            okHttpClient
+            webViewCardCreationInterceptorFactory
         )
     }
 
@@ -50,12 +61,14 @@ class NovaCardModule {
     fun provideViewModel(
         chainRegistry: ChainRegistry,
         accountInteractor: AccountInteractor,
-        assetsRouter: AssetsRouter
+        assetsRouter: AssetsRouter,
+        novaCardInteractor: NovaCardInteractor
     ): ViewModel {
         return NovaCardViewModel(
             chainRegistry = chainRegistry,
             accountInteractor = accountInteractor,
-            assetsRouter = assetsRouter
+            assetsRouter = assetsRouter,
+            novaCardInteractor = novaCardInteractor
         )
     }
 
