@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.overview
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.webkit.CookieManager
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -11,11 +12,13 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardEventHandler
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
-import java.math.BigDecimal
-import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_nova_card.novaCardClearCookies
 import kotlinx.android.synthetic.main.fragment_nova_card.novaCardContainer
 import kotlinx.android.synthetic.main.fragment_nova_card.novaCardWebView
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import javax.inject.Inject
 
 class NovaCardFragment : BaseFragment<NovaCardViewModel>(), NovaCardEventHandler {
 
@@ -40,17 +43,22 @@ class NovaCardFragment : BaseFragment<NovaCardViewModel>(), NovaCardEventHandler
 
     override fun initViews() {
         novaCardContainer.applyStatusBarInsets()
+
+        novaCardClearCookies.setOnClickListener {
+            val cookieManager = CookieManager.getInstance()
+            cookieManager.removeAllCookies(null)
+            cookieManager.flush()
+        }
     }
 
     override fun subscribe(viewModel: NovaCardViewModel) {
         viewModel.launch {
-            val refundAddress = viewModel.getRefundAddress()
             val novaCardWebViewController = novaCardWebViewControllerFactory.create(
                 fragment = this@NovaCardFragment,
                 webView = novaCardWebView,
                 eventHandler = this@NovaCardFragment,
-                refundAddress = refundAddress,
-                coroutineScope = viewModel
+                setupConfig = viewModel.setupCardConfig.first(),
+                scope = viewModel
             )
 
             novaCardWebViewController.setup()
