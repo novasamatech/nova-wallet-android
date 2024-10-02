@@ -42,6 +42,8 @@ class NovaCardViewModel(
     }
 
     fun openTopUp(amount: BigDecimal, address: String) = launch {
+        novaCardInteractor.setTimeCardBeingIssued(System.currentTimeMillis())
+
         val payload = TopUpCardPayload(
             amount = amount,
             address = address,
@@ -56,11 +58,5 @@ class NovaCardViewModel(
         if (novaCardInteractor.isNovaCardStateActive()) return
 
         novaCardInteractor.setNovaCardState(true)
-
-        closeTimerBottomSheet()
-    }
-
-    private fun closeTimerBottomSheet() {
-        assetsRouter.closeCardWaitingForTopUp()
     }
 }

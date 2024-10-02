@@ -8,18 +8,29 @@ import io.novafoundation.nova.common.utils.formatting.duration.EstimatedDuration
 import io.novafoundation.nova.common.utils.formatting.duration.TimeDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ZeroDurationFormatter
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import kotlin.time.Duration.Companion.minutes
-
-const val TIMER_MINUTES = 5
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class WaitingNovaCardTopUpViewModel(
     private val assetsRouter: AssetsRouter,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val novaCardInteractor: NovaCardInteractor
 ) : BaseViewModel() {
 
+    init {
+        novaCardInteractor.observeNovaCardState()
+            .onEach { novaCardActive ->
+                if (novaCardActive) {
+                    assetsRouter.back()
+                }
+            }.launchIn(this)
+    }
+
     fun getTimerValue(): TimerValue {
-        return TimerValue(TIMER_MINUTES.minutes.inWholeMilliseconds, System.currentTimeMillis())
+        val timeToCardCreation = novaCardInteractor.getTimeToCardCreation()
+        return TimerValue(timeToCardCreation, System.currentTimeMillis())
     }
 
     fun getTimerFormatter(): EstimatedDurationFormatter {

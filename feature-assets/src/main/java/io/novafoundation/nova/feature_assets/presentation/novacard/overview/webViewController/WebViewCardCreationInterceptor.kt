@@ -43,7 +43,7 @@ class WebViewCardCreationInterceptor(
             if (request == null) return@onEachLatest
 
             for (i in 0..100) {
-                val cardWasSuccessfullyCreated = makeRequest(request)
+                val cardWasSuccessfullyCreated = checkForCardCreation(request)
 
                 if (cardWasSuccessfullyCreated) {
                     break
@@ -61,7 +61,6 @@ class WebViewCardCreationInterceptor(
     fun intercept(request: WebResourceRequest): Boolean {
         val url = request.url.toString()
 
-        // Intercept requests that might return a JSON response
         if (url.contains("https://api.mercuryo.io/v1.6/cards")) { // Specify your condition here
             performOkHttpRequest(request)
             return true
@@ -72,16 +71,10 @@ class WebViewCardCreationInterceptor(
 
     private fun performOkHttpRequest(request: WebResourceRequest) {
         try {
-            // Create OkHttp Request based on WebResourceRequest
             val okHttpRequestBuilder = Request.Builder().url(request.url.toString())
 
-            // Set method (GET, POST, etc.) and request body if needed
-            when (request.method) {
-                "GET" -> okHttpRequestBuilder.get()
-                else -> okHttpRequestBuilder.get()
-            }
+            okHttpRequestBuilder.get()
 
-            // Add headers from WebResourceRequest
             for ((key, value) in request.requestHeaders) {
                 okHttpRequestBuilder.addHeader(key, value)
             }
@@ -94,20 +87,28 @@ class WebViewCardCreationInterceptor(
 
             interceptedCardRequest.value = okHttpRequestBuilder
 
-            makeRequest(okHttpRequestBuilder)
+            checkForCardCreation(okHttpRequestBuilder)
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun checkForCardCreation(requestBuilder: Request.Builder): Boolean {
+        val cardSuccessfullyCreated = makeRequest(requestBuilder)
+
+        if (cardSuccessfullyCreated) {
+            onCardCreatedListener.onCardCreated()
+        }
+
+        return cardSuccessfullyCreated
     }
 
     /**
      * Notify onCardCreatedListener if data value contains mercurio cards
      */
     private fun makeRequest(requestBuilder: Request.Builder): Boolean {
-        // Execute the OkHttp request
         val okHttpResponse = okHttpClient.newCall(requestBuilder.build()).execute()
 
-        // Check if the response is successful
         if (okHttpResponse.isSuccessful) {
             val responseBody = okHttpResponse.body
 
@@ -116,10 +117,7 @@ class WebViewCardCreationInterceptor(
             val cards = cardsResponse.data
             val containsMercurioCard = cards.any { it.issuedByMercurio }
 
-            if (containsMercurioCard) {
-                onCardCreatedListener.onCardCreated()
-                return true
-            }
+            return containsMercurioCard
         }
 
         return false
