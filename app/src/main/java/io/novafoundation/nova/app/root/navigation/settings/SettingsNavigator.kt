@@ -72,8 +72,6 @@ class SettingsNavigator(
         )
     }
 
-    override fun openCard() = performNavigation(R.id.action_open_novaCard)
-
     override fun openPushNotificationSettings() {
         performNavigation(R.id.action_open_pushNotificationsSettings)
     }

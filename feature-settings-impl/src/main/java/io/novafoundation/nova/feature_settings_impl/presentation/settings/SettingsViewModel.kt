@@ -136,10 +136,6 @@ class SettingsViewModel(
         }
     }
 
-    fun novaCardClicked() {
-        router.openCard()
-    }
-
     fun currenciesClicked() {
         router.openCurrencies()
     }

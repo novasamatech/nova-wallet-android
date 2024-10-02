@@ -164,7 +164,6 @@ class NovaCardWebViewController(
                     // Return null or handle error cases (e.g., 404, 500)
                     null
                 }
-
             } catch (e: Exception) {
                 e.printStackTrace()
             }

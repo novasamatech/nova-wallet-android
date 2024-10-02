@@ -389,6 +389,10 @@ class Navigator(
         navController?.navigate(R.id.action_close_send_flow)
     }
 
+    override fun openNovaCard() {
+        performNavigation(R.id.action_open_novaCard)
+    }
+
     override fun openSwapFlow() {
         val payload = SwapFlowPayload.InitialSelecting
         navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
@@ -397,7 +401,6 @@ class Navigator(
     override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
         navController?.navigate(R.id.action_open_swapSetupAmount, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
     }
-
 
     override fun openTopUpCard(payload: TopUpCardPayload) {
         navController?.navigate(R.id.action_open_topUpCard, TopUpCardFragment.getBundle(payload))

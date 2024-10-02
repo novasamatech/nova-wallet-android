@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.fragment_settings.accountView
 import kotlinx.android.synthetic.main.fragment_settings.settingsAppVersion
 import kotlinx.android.synthetic.main.fragment_settings.settingsAvatar
 import kotlinx.android.synthetic.main.fragment_settings.settingsBiometricAuth
-import kotlinx.android.synthetic.main.fragment_settings.settingsCard
 import kotlinx.android.synthetic.main.fragment_settings.settingsCloudBackup
 import kotlinx.android.synthetic.main.fragment_settings.settingsContainer
 import kotlinx.android.synthetic.main.fragment_settings.settingsCurrency
@@ -58,8 +57,6 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsContainer.applyStatusBarInsets()
 
         accountView.setWholeClickListener { viewModel.accountActionsClicked() }
-
-        settingsCard.setOnClickListener { viewModel.novaCardClicked() }
 
         settingsWallets.setOnClickListener { viewModel.walletsClicked() }
         settingsNetworks.setOnClickListener { viewModel.networksClicked() }

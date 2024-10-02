@@ -78,4 +78,6 @@ interface AssetsRouter {
     fun openStaking()
 
     fun closeSendFlow()
+
+    fun openNovaCard()
 }

@@ -129,6 +129,10 @@ class BalanceListFragment :
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
 
         viewModel.shouldShowCrowdloanBanner.observe(headerAdapter::setCrowdloanBannerVisible)
+
+        viewModel.novaCardText.observe {
+            headerAdapter.setNovaCardText(it)
+        }
     }
 
     override fun assetClicked(asset: AssetModel) {
@@ -181,6 +185,10 @@ class BalanceListFragment :
 
     override fun crowdloanBannerCloseClicked() {
         viewModel.crowdloanBannerCloseClicked()
+    }
+
+    override fun novaCardClick() {
+        viewModel.novaCardClicked()
     }
 
     override fun swapClicked() {
