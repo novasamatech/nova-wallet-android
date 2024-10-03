@@ -37,12 +37,12 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import java.math.BigInteger
-import kotlinx.coroutines.CoroutineScope
 
 class RealExtrinsicService(
     private val rpcCalls: RpcCalls,
@@ -107,7 +107,8 @@ class RealExtrinsicService(
     ): FeeResponse {
         val extrinsic = extrinsicBuilderFactory.createForFee(getFeeSigner(chain, origin), chain)
             .also { it.formExtrinsic() }
-            .build(submissionOptions.batchMode)
+            .buildExtrinsic(submissionOptions.batchMode)
+            .extrinsicHex
 
         return rpcCalls.getExtrinsicFee(chain, extrinsic)
     }
@@ -121,7 +122,7 @@ class RealExtrinsicService(
         val signer = getFeeSigner(chain, origin)
         val extrinsicBuilder = extrinsicBuilderFactory.createForFee(signer, chain)
         extrinsicBuilder.formExtrinsic()
-        val extrinsic = extrinsicBuilder.build(submissionOptions.batchMode)
+        val extrinsic = extrinsicBuilder.buildExtrinsic(submissionOptions.batchMode).extrinsicHex
 
         return estimateFee(chain, extrinsic, signer, submissionOptions)
     }
@@ -227,7 +228,7 @@ class RealExtrinsicService(
 
             feePayment.modifyExtrinsic(extrinsicBuilder)
 
-            extrinsicBuilder.build(submissionOptions.batchMode)
+            extrinsicBuilder.buildExtrinsic(submissionOptions.batchMode).extrinsicHex
         }
 
         extrinsicsToSubmit
@@ -254,7 +255,7 @@ class RealExtrinsicService(
 
         feePayment.modifyExtrinsic(extrinsicBuilder)
 
-        val extrinsic = extrinsicBuilder.build(submissionOptions.batchMode)
+        val extrinsic = extrinsicBuilder.buildExtrinsic(submissionOptions.batchMode).extrinsicHex
 
         return SubmissionRaw(extrinsic, submissionOrigin)
     }

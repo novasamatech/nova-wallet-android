@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.1.4'
+        substrateSdkVersion = '2.2.0'
 
         gifVersion = '1.2.19'
 
