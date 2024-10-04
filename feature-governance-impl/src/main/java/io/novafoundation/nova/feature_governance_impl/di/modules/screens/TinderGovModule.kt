@@ -2,11 +2,14 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.TinderGovDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.summary.ReferendaSummaryInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.RealReferendumSummaryDataSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.ReferendumSummaryApi
@@ -20,9 +23,11 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.RealTinderGovBasketInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.RealTinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.summary.RealReferendaSummaryInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.summary.ReferendaSummarySharedComputation
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 
 @Module
 class TinderGovModule {
@@ -69,10 +74,7 @@ class TinderGovModule {
         governanceSharedState: GovernanceSharedState,
         referendaSharedComputation: ReferendaSharedComputation,
         accountRepository: AccountRepository,
-        referendumDetailsRepository: ReferendumDetailsRepository,
         preImageParser: ReferendumPreImageParser,
-        tinderGovBasketRepository: TinderGovBasketRepository,
-        walletRepository: WalletRepository,
         tinderGovVotingPowerRepository: TinderGovVotingPowerRepository,
         referendaFilteringProvider: ReferendaFilteringProvider,
         assetUseCase: AssetUseCase
@@ -80,12 +82,53 @@ class TinderGovModule {
         governanceSharedState,
         referendaSharedComputation,
         accountRepository,
-        referendumDetailsRepository,
         preImageParser,
-        tinderGovBasketRepository,
-        walletRepository,
         tinderGovVotingPowerRepository,
         referendaFilteringProvider,
         assetUseCase
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaSummarySharedComputation(
+        computationalCache: ComputationalCache,
+        referendumDetailsRepository: ReferendumDetailsRepository,
+        accountRepository: AccountRepository
+    ) = ReferendaSummarySharedComputation(
+        computationalCache,
+        referendumDetailsRepository,
+        accountRepository
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaSummaryInteractor(
+        governanceSharedState: GovernanceSharedState,
+        referendaSummarySharedComputation: ReferendaSummarySharedComputation
+    ): ReferendaSummaryInteractor = RealReferendaSummaryInteractor(
+        governanceSharedState,
+        referendaSummarySharedComputation
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideTinderGovBasketInteractor(
+        governanceSharedState: GovernanceSharedState,
+        referendaSharedComputation: ReferendaSharedComputation,
+        accountRepository: AccountRepository,
+        tinderGovBasketRepository: TinderGovBasketRepository,
+        tinderGovVotingPowerRepository: TinderGovVotingPowerRepository,
+        referendaFilteringProvider: ReferendaFilteringProvider,
+        assetUseCase: AssetUseCase,
+        tinderGovInteractor: TinderGovInteractor
+    ): TinderGovBasketInteractor = RealTinderGovBasketInteractor(
+        governanceSharedState = governanceSharedState,
+        referendaSharedComputation = referendaSharedComputation,
+        accountRepository = accountRepository,
+        tinderGovBasketRepository = tinderGovBasketRepository,
+        tinderGovVotingPowerRepository = tinderGovVotingPowerRepository,
+        referendaFilteringProvider = referendaFilteringProvider,
+        assetUseCase = assetUseCase,
+        tinderGovInteractor = tinderGovInteractor
     )
 }

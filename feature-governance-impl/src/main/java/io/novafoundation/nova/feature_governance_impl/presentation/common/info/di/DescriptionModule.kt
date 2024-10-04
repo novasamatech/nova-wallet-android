@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.common.description.di
+package io.novafoundation.nova.feature_governance_impl.presentation.common.info.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel

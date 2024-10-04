@@ -36,6 +36,7 @@
     <color name="link_text">#A3FFFFFF</color>
     <color name="staking_type_banner_text">#A3FFFFFF</color>
     <color name="staking_type_banner_text_inactive">#52FFFFFF</color>
+    <color name="tinder_gov_banner_secondary_text">#A3FFFFFF</color>
 
     <color name="crowdloan_banner_gradient_start">#BD387F</color>
     <color name="crowdloan_banner_gradient_end">#FF7A00</color>
