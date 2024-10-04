@@ -102,7 +102,6 @@ class CustomChainFactory(
             source = Chain.Asset.Source.MANUAL,
         )
 
-
         val explorer = getChainExplorer(payload.blockExplorer, chainId)
 
         val nodes = Chain.Nodes(

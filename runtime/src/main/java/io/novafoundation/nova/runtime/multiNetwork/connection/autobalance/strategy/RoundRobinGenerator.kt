@@ -5,7 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedU
 
 class RoundRobinGenerator(
     private val availableNodes: List<NodeWithSaturatedUrl>,
-): NodeSequenceGenerator {
+) : NodeSequenceGenerator {
 
     override fun generateNodeSequence(): Sequence<NodeWithSaturatedUrl> {
         return availableNodes.cycle()

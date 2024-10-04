@@ -81,7 +81,7 @@ class RealNetworkManagementChainInteractor(
     }
 
     private fun Chain.Nodes.strategyForToggledWssAutoBalance(): NodeSelectionStrategy {
-        return when(wssNodeSelectionStrategy) {
+        return when (wssNodeSelectionStrategy) {
             NodeSelectionStrategy.AutoBalance -> {
                 val firstNode = wssNodes().first()
                 NodeSelectionStrategy.SelectedNode(firstNode.unformattedUrl)

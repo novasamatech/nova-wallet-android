@@ -5,7 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedU
 
 class UniformGenerator(
     private val availabelNodes: List<NodeWithSaturatedUrl>,
-): NodeSequenceGenerator {
+) : NodeSequenceGenerator {
 
     override fun generateNodeSequence(): Sequence<NodeWithSaturatedUrl> {
         return availabelNodes.shuffled().cycle()
