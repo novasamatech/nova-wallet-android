@@ -91,7 +91,7 @@ fun CharSequence.formatAsSpannable(vararg args: Any): SpannedString {
 private fun typefaceSpanCompatV28(typeface: Typeface) =
     TypefaceSpan(typeface)
 
-class CustomTypefaceSpan(private val typeface: Typeface?) : MetricAffectingSpan() {
+private class CustomTypefaceSpan(private val typeface: Typeface?) : MetricAffectingSpan() {
     override fun updateDrawState(paint: TextPaint) {
         paint.typeface = typeface
     }
