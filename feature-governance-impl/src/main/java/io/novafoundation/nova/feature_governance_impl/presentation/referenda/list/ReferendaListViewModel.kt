@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.domain.mapLoading
@@ -15,6 +17,7 @@ import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.DelegatedState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.GovernanceLocksOverview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
@@ -26,6 +29,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFi
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
+import io.novafoundation.nova.feature_governance_impl.domain.summary.ReferendaSummaryInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.ReferendaListStateModel
@@ -59,7 +63,8 @@ class ReferendaListViewModel(
     private val updateSystem: UpdateSystem,
     private val governanceRouter: GovernanceRouter,
     private val referendumFormatter: ReferendumFormatter,
-    private val governanceDAppsInteractor: GovernanceDAppsInteractor
+    private val governanceDAppsInteractor: GovernanceDAppsInteractor,
+    private val referendaSummaryInteractor: ReferendaSummaryInteractor
 ) : BaseViewModel(), WithAssetSelector {
 
     override val assetSelectorMixin = assetSelectorFactory.create(
@@ -103,9 +108,14 @@ class ReferendaListViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
-    val tinderGovBanner = referendaListStateFlow.map { referenda ->
+    private val referendaSummariesFlow = referendaListStateFlow.mapLoading { referenda ->
+        val referendaIds = referenda.availableToVoteReferenda.map { it.id }
+        referendaSummaryInteractor.getReferendaSummaries(referendaIds, viewModelScope)
+    }.shareInBackground()
+
+    val tinderGovBanner = referendaSummariesFlow.map { summaries ->
         val chain = selectedAssetSharedState.chain()
-        mapTinderGovToUi(chain, referenda.dataOrNull)
+        mapTinderGovToUi(chain, summaries)
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -170,17 +180,16 @@ class ReferendaListViewModel(
         }
     }
 
-    private fun mapTinderGovToUi(chain: Chain, referendaListState: ReferendaListState?): TinderGovBannerModel? {
+    private fun mapTinderGovToUi(chain: Chain, referendaSummariesLoadingState: ExtendedLoadingState<Map<ReferendumId, String>>): TinderGovBannerModel? {
         if (!chain.supportTinderGov()) return null
-        if (referendaListState == null) return null
 
-        val availableToVote = referendaListState.availableToVoteReferenda
+        val referendumSummaries = referendaSummariesLoadingState.dataOrNull ?: return null
 
         return TinderGovBannerModel(
-            chipText = if (availableToVote.isEmpty()) {
+            if (referendumSummaries.isEmpty()) {
                 null
             } else {
-                resourceManager.getString(R.string.referenda_swipe_gov_banner_chip, availableToVote.size)
+                resourceManager.getString(R.string.referenda_swipe_gov_banner_chip, referendumSummaries.size)
             }
         )
     }

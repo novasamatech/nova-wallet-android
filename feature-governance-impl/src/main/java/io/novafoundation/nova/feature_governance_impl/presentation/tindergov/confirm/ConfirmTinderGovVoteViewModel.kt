@@ -13,7 +13,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.accountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationPayload
@@ -55,6 +56,7 @@ class ConfirmTinderGovVoteViewModel(
     private val resourceManager: ResourceManager,
     private val locksChangeFormatter: LocksChangeFormatter,
     private val tinderGovInteractor: TinderGovInteractor,
+    private val tinderGovBasketInteractor: TinderGovBasketInteractor,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
 ) : ConfirmVoteViewModel(
     router,
@@ -69,7 +71,7 @@ class ConfirmTinderGovVoteViewModel(
     validationExecutor
 ) {
 
-    private val basketFlow = tinderGovInteractor.observeTinderGovBasket()
+    private val basketFlow = tinderGovBasketInteractor.observeTinderGovBasket()
         .map { it.associateBy { it.referendumId } }
         .shareInBackground()
 
@@ -157,7 +159,7 @@ class ConfirmTinderGovVoteViewModel(
         awaitVotedReferendaStateUpdate(basket)
 
         showMessage(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, basket.size))
-        tinderGovInteractor.clearBasket()
+        tinderGovBasketInteractor.clearBasket()
         router.backToTinderGovCards()
     }
 

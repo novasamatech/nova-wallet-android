@@ -1,18 +1,16 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2
 
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Query
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.request.ReferendumSummariesRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.response.ReferendumSummaryResponse
+import retrofit2.http.Body
+import retrofit2.http.POST
 import retrofit2.http.Url
 
 interface ReferendumSummaryApi {
 
-    @GET
-    suspend fun getReferendumSummary(
+    @POST
+    suspend fun getReferendumSummaries(
         @Url url: String,
-        @Header("x-network") networkHeader: String?,
-        @Header("x-ai-summary-api-key") summaryApiKey: String,
-        @Query("postId") postId: Int,
-        @Query("proposalType") proposalType: String = "referendums_v2"
-    ): ReferendumSummaryResponse
+        @Body body: ReferendumSummariesRequest
+    ): List<ReferendumSummaryResponse>
 }
