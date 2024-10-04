@@ -151,7 +151,16 @@ class CustomChainFactory(
         )
 
         val prefilledNodes = prefilledChain?.nodes?.nodes.orEmpty()
-        val prefilledExceptInput = prefilledNodes.filter { it.unformattedUrl != inputNode.unformattedUrl }
+        val prefilledExceptInput = prefilledNodes.mapNotNull {
+            val differentFromInput = it.unformattedUrl != inputNode.unformattedUrl
+
+            if (differentFromInput) {
+                // Consider prefilled nodes as custom
+                it.copy(isCustom = true)
+            } else {
+                null
+            }
+        }
 
         return buildList {
             add(inputNode)
