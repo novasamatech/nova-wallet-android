@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.transformLatest
 
 class NodeAutobalancer(
@@ -35,7 +35,13 @@ class NodeAutobalancer(
 
             emit(nodeIterator.next())
 
-            val updates = changeConnectionEventFlow.map { nodeIterator.next() }
+            val updates = changeConnectionEventFlow.mapNotNull {
+                if (nodeIterator.hasNext()) {
+                    nodeIterator.next()
+                } else {
+                    null
+                }
+            }
             emitAll(updates)
         }
     }

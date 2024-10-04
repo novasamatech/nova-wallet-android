@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy
 
+import io.novafoundation.nova.common.utils.cycle
 import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 
 class SelectedNodeGenerator(
@@ -7,6 +8,6 @@ class SelectedNodeGenerator(
 ) : NodeSequenceGenerator {
 
     override fun generateNodeSequence(): Sequence<NodeWithSaturatedUrl> {
-        return sequenceOf(selectedNode)
+        return listOf(selectedNode).cycle()
     }
 }
