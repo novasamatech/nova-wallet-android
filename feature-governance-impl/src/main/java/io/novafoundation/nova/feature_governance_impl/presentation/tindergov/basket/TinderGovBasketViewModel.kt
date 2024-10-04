@@ -14,8 +14,8 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovBasketInteractor
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter

@@ -6,8 +6,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovBasketInteractor
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovBasketRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovVotingPowerRepository
@@ -22,6 +20,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+
+interface TinderGovBasketInteractor {
+
+    fun observeTinderGovBasket(): Flow<List<TinderGovBasketItem>>
+
+    suspend fun getTinderGovBasket(): List<TinderGovBasketItem>
+
+    suspend fun addItemToBasket(referendumId: ReferendumId, voteType: VoteType)
+
+    suspend fun removeReferendumFromBasket(item: TinderGovBasketItem)
+
+    suspend fun removeBasketItems(items: Collection<TinderGovBasketItem>)
+
+    suspend fun isBasketEmpty(): Boolean
+
+    suspend fun clearBasket()
+
+    suspend fun getBasketItemsToRemove(coroutineScope: CoroutineScope): List<TinderGovBasketItem>
+
+    suspend fun awaitAllItemsVoted(coroutineScope: CoroutineScope, basket: List<TinderGovBasketItem>)
+}
 
 class RealTinderGovBasketInteractor(
     private val governanceSharedState: GovernanceSharedState,

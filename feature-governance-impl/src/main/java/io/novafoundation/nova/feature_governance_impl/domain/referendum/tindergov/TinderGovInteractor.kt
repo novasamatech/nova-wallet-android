@@ -12,8 +12,6 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.toCallOrNull
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.user
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.VotingPowerState
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.TinderGovVotingPowerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
@@ -31,6 +29,32 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+
+sealed interface VotingPowerState {
+
+    object Empty : VotingPowerState
+
+    class InsufficientAmount(val votingPower: VotingPower) : VotingPowerState
+
+    class SufficientAmount(val votingPower: VotingPower) : VotingPowerState
+}
+
+interface TinderGovInteractor {
+
+    fun observeReferendaState(coroutineScope: CoroutineScope): Flow<ReferendaState>
+
+    fun observeReferendaAvailableToVote(coroutineScope: CoroutineScope): Flow<List<ReferendumPreview>>
+
+    suspend fun getReferendumAmount(referendumPreview: ReferendumPreview): ReferendumCall.TreasuryRequest?
+
+    suspend fun setVotingPower(votingPower: VotingPower)
+
+    suspend fun getVotingPower(metaId: Long, chainId: ChainId): VotingPower?
+
+    suspend fun getVotingPowerState(): VotingPowerState
+
+    suspend fun awaitAllItemsVoted(coroutineScope: CoroutineScope, basket: List<TinderGovBasketItem>)
+}
 
 class RealTinderGovInteractor(
     private val governanceSharedState: GovernanceSharedState,

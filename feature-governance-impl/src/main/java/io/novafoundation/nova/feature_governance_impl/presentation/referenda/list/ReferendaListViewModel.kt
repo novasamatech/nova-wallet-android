@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.domain.mapLoading
@@ -28,7 +29,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFi
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
-import io.novafoundation.nova.feature_governance_api.domain.referendum.summary.ReferendaSummaryInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.summary.ReferendaSummaryInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.ReferendaListStateModel
@@ -114,7 +115,7 @@ class ReferendaListViewModel(
 
     val tinderGovBanner = referendaSummariesFlow.map { summaries ->
         val chain = selectedAssetSharedState.chain()
-        mapTinderGovToUi(chain, summaries.dataOrNull)
+        mapTinderGovToUi(chain, summaries)
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -179,15 +180,16 @@ class ReferendaListViewModel(
         }
     }
 
-    private fun mapTinderGovToUi(chain: Chain, referendaSummaries: Map<ReferendumId, String>?): TinderGovBannerModel? {
+    private fun mapTinderGovToUi(chain: Chain, referendaSummariesLoadingState: ExtendedLoadingState<Map<ReferendumId, String>>): TinderGovBannerModel? {
         if (!chain.supportTinderGov()) return null
-        if (referendaSummaries == null) return null
+
+        val referendumSummaries = referendaSummariesLoadingState.dataOrNull ?: return null
 
         return TinderGovBannerModel(
-            if (referendaSummaries.isEmpty()) {
+            if (referendumSummaries.isEmpty()) {
                 null
             } else {
-                resourceManager.getString(R.string.referenda_swipe_gov_banner_chip, referendaSummaries.size)
+                resourceManager.getString(R.string.referenda_swipe_gov_banner_chip, referendumSummaries.size)
             }
         )
     }

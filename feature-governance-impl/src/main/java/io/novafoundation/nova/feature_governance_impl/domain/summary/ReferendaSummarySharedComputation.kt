@@ -19,9 +19,9 @@ class ReferendaSummarySharedComputation(
         scope: CoroutineScope
     ): Map<ReferendumId, String>? {
         val chainId = governanceOption.assetWithChain.chain.id
-        val referendaSet = referendaIds.toSet()
+        val referendaHashCode = referendaIds.toSet().hashCode()
         val selectedLanguage = accountRepository.selectedLanguage()
-        val key = "REFERENDA_SUMMARIES:$chainId:$referendaSet:${selectedLanguage.iso639Code}"
+        val key = "REFERENDA_SUMMARIES:$chainId:$referendaHashCode:${selectedLanguage.iso639Code}"
 
         return computationalCache.useCache(key, scope) {
             referendumDetailsRepository.loadSummaries(governanceOption.assetWithChain.chain, referendaIds, selectedLanguage)

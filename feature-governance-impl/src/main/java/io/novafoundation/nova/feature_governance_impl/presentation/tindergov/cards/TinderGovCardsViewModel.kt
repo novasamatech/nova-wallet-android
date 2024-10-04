@@ -21,10 +21,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
-import io.novafoundation.nova.feature_governance_api.domain.referendum.summary.ReferendaSummaryInteractor
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovBasketInteractor
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
-import io.novafoundation.nova.feature_governance_api.domain.tindergov.VotingPowerState
+import io.novafoundation.nova.feature_governance_impl.domain.summary.ReferendaSummaryInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.VotingPowerState
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoPayload
@@ -91,7 +91,7 @@ class TinderGovCardsViewModel(
     private val _resetCards = MutableLiveData<Event<Unit>>()
     val resetCardsEvent: LiveData<Event<Unit>> = _resetCards
 
-    private val topReferendumWithDetails = combine(topCardIndex, sortedReferendaFlow) { topCardIndex, referenda ->
+    private val topCardFlow = combine(topCardIndex, sortedReferendaFlow) { topCardIndex, referenda ->
         referenda.getOrNull(topCardIndex) ?: return@combine null
     }
         .distinctUntilChanged()
@@ -99,7 +99,7 @@ class TinderGovCardsViewModel(
 
     private var isVotingInProgress = MutableStateFlow(false)
 
-    val manageVotingPowerAvailable = topReferendumWithDetails.map { it != null }
+    val manageVotingPowerAvailable = topCardFlow.map { it != null }
 
     val isCardDraggingAvailable = isVotingInProgress.map { !it }
 
@@ -169,7 +169,7 @@ class TinderGovCardsViewModel(
 
     fun editVotingPowerClicked() {
         launch {
-            val topReferendum = topReferendumWithDetails.first()
+            val topReferendum = topCardFlow.first()
             val topReferendumId = topReferendum?.id?.value ?: return@launch
             val request = TinderGovVoteRequester.Request(topReferendumId)
             tinderGovVoteRequester.openRequest(request)
@@ -295,8 +295,7 @@ class TinderGovCardsViewModel(
             val summaries = referendaSummaryInteractor.getReferendaSummaries(referendaIds, viewModelScope)
             val amounts = referenda.associate { it.id to it.getAmountModel() }
 
-            val referendaCards = referenda.mapToCardWithDetails(summaries, amounts)
-                .filterNotNull()
+            val referendaCards = referenda.mapToCardsAndFilterBySummaries(summaries, amounts)
 
             ReferendaWithBasket(referendaCards, basket)
         }
@@ -304,12 +303,12 @@ class TinderGovCardsViewModel(
             .launchIn(this)
     }
 
-    private fun List<ReferendumPreview>.mapToCardWithDetails(
+    private fun List<ReferendumPreview>.mapToCardsAndFilterBySummaries(
         summaries: Map<ReferendumId, String>,
         amounts: Map<ReferendumId, AmountModel?>
-    ): List<CardWithDetails?> {
-        return map {
-            val summary = summaries[it.id] ?: return@map null
+    ): List<CardWithDetails> {
+        return mapNotNull {
+            val summary = summaries[it.id] ?: return@mapNotNull null
 
             CardWithDetails(it.id, summary, amounts[it.id])
         }
