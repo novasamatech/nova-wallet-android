@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.request.ReferendumSummariesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.request.ReferendumSummaryRequest
-import io.novafoundation.nova.runtime.ext.isSwapSupported
 import io.novafoundation.nova.runtime.ext.summaryApiOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

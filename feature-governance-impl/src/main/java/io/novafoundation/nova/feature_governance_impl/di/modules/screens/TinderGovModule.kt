@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_governance_api.domain.referendum.summary.ReferendaSummaryInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovBasketInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
-import io.novafoundation.nova.feature_governance_impl.BuildConfig
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.RealReferendumSummaryDataSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.summary.v2.ReferendumSummaryApi
