@@ -13,7 +13,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLoca
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.ext.autoBalanceEnabled
-import io.novafoundation.nova.runtime.ext.selectedNodeUrlOrNull
+import io.novafoundation.nova.runtime.ext.selectedUnformattedWssNodeUrlOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
@@ -157,19 +157,14 @@ fun mapNodeSelectionPreferencesToLocal(chain: Chain): NodeSelectionPreferencesLo
     return NodeSelectionPreferencesLocal(
         chainId = chain.id,
         autoBalanceEnabled = chain.autoBalanceEnabled,
-        selectedNodeUrl = chain.selectedNodeUrlOrNull
+        selectedNodeUrl = chain.selectedUnformattedWssNodeUrlOrNull
     )
 }
 
-fun mapNodeSelectionStrategyToLocal(domain: Chain): ChainLocal.NodeSelectionStrategyLocal {
-    val autobalanceStrategy = when (val strategy = domain.nodes.nodeSelectionStrategy) {
-        is Chain.Nodes.NodeSelectionStrategy.SelectedNode -> strategy.autoBalanceStrategy
-        is Chain.Nodes.NodeSelectionStrategy.AutoBalance -> strategy
-    }
-
-    return when (autobalanceStrategy) {
-        Chain.Nodes.NodeSelectionStrategy.AutoBalance.ROUND_ROBIN -> ChainLocal.NodeSelectionStrategyLocal.ROUND_ROBIN
-        Chain.Nodes.NodeSelectionStrategy.AutoBalance.UNIFORM -> ChainLocal.NodeSelectionStrategyLocal.UNIFORM
+fun mapNodeSelectionStrategyToLocal(domain: Chain): ChainLocal.AutoBalanceStrategyLocal {
+    return when (domain.nodes.autoBalanceStrategy) {
+        Chain.Nodes.AutoBalanceStrategy.ROUND_ROBIN -> ChainLocal.AutoBalanceStrategyLocal.ROUND_ROBIN
+        Chain.Nodes.AutoBalanceStrategy.UNIFORM -> ChainLocal.AutoBalanceStrategyLocal.UNIFORM
     }
 }
 

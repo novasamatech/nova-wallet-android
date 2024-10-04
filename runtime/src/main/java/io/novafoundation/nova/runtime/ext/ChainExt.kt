@@ -49,14 +49,11 @@ const val EVM_DEFAULT_TOKEN_DECIMALS = 18
 private const val EIP_155_PREFIX = "eip155"
 
 val Chain.autoBalanceEnabled: Boolean
-    get() = nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
+    get() = nodes.wssNodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
 
-val Chain.autoBalanceDisabled: Boolean
-    get() = !autoBalanceEnabled
-
-val Chain.selectedNodeUrlOrNull: String?
-    get() = if (nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.SelectedNode) {
-        nodes.nodeSelectionStrategy.nodeUrl
+val Chain.selectedUnformattedWssNodeUrlOrNull: String?
+    get() = if (nodes.wssNodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.SelectedNode) {
+        nodes.wssNodeSelectionStrategy.unformattedNodeUrl
     } else {
         null
     }
@@ -215,8 +212,12 @@ fun Chain.Nodes.wssNodes(): List<Chain.Node> {
     return nodes.filter { it.isWss }
 }
 
-fun Chain.Nodes.httpNodes(): Chain.Nodes {
-    return copy(nodes = nodes.filter { it.isHttps })
+fun Chain.Nodes.httpNodes(): List<Chain.Node> {
+    return nodes.filter { it.isHttps }
+}
+
+fun Chain.Nodes.hasHttpNodes(): Boolean {
+    return nodes.any { it.isHttps }
 }
 
 val Chain.Asset.disabled: Boolean

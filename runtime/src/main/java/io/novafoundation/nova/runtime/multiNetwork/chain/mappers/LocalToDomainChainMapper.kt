@@ -16,8 +16,8 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.AutoBalanceStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
-import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
@@ -31,6 +31,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ConnectionState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.AutoBalanceStrategy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 
@@ -163,17 +164,23 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
     }
 }.getOrNull()
 
-private fun mapNodeSelectionFromLocal(chainLocal: ChainLocal, nodeSelectionPreferencesLocal: NodeSelectionPreferencesLocal?): NodeSelectionStrategy {
-    val autoBalanceStrategy = when (chainLocal.nodeSelectionStrategy) {
-        NodeSelectionStrategyLocal.ROUND_ROBIN -> NodeSelectionStrategy.AutoBalance.ROUND_ROBIN
-        NodeSelectionStrategyLocal.UNIFORM -> NodeSelectionStrategy.AutoBalance.UNIFORM
-        NodeSelectionStrategyLocal.UNKNOWN -> NodeSelectionStrategy.AutoBalance.ROUND_ROBIN
+private fun mapAutoBalanceStrategyFromLocal(local: AutoBalanceStrategyLocal): AutoBalanceStrategy {
+    return when (local) {
+        AutoBalanceStrategyLocal.ROUND_ROBIN -> AutoBalanceStrategy.ROUND_ROBIN
+        AutoBalanceStrategyLocal.UNIFORM -> AutoBalanceStrategy.UNIFORM
+        AutoBalanceStrategyLocal.UNKNOWN -> AutoBalanceStrategy.ROUND_ROBIN
     }
+}
 
-    return if (nodeSelectionPreferencesLocal?.autoBalanceEnabled == true) {
-        autoBalanceStrategy
+private fun mapNodeSelectionFromLocal(nodeSelectionPreferencesLocal: NodeSelectionPreferencesLocal?): NodeSelectionStrategy {
+    if (nodeSelectionPreferencesLocal == null) return NodeSelectionStrategy.AutoBalance
+
+    val selectedUnformattedWssUrl = nodeSelectionPreferencesLocal.selectedUnformattedWssNodeUrl
+
+    return if (selectedUnformattedWssUrl != null && !nodeSelectionPreferencesLocal.autoBalanceEnabled) {
+        NodeSelectionStrategy.SelectedNode(selectedUnformattedWssUrl)
     } else {
-        NodeSelectionStrategy.SelectedNode(nodeSelectionPreferencesLocal?.selectedNodeUrl, autoBalanceStrategy)
+        NodeSelectionStrategy.AutoBalance
     }
 }
 
@@ -209,7 +216,8 @@ fun mapChainLocalToChain(
     }
 
     val nodesConfig = Chain.Nodes(
-        nodeSelectionStrategy = mapNodeSelectionFromLocal(chainLocal, nodeSelectionPreferences),
+        autoBalanceStrategy = mapAutoBalanceStrategyFromLocal(chainLocal.autoBalanceStrategy),
+        wssNodeSelectionStrategy = mapNodeSelectionFromLocal(nodeSelectionPreferences),
         nodes = nodes
     )
 

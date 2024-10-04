@@ -134,17 +134,24 @@ class ChainRegistry(
         chainDao.setConnectionState(chainId, connectionState)
     }
 
-    suspend fun setAutoBalanceEnabled(chainId: ChainId, enabled: Boolean) {
-        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, enabled, null))
+    suspend fun setWssNodeSelectionStrategy(chainId: String, strategy: Chain.Nodes.NodeSelectionStrategy) {
+        return when (strategy) {
+            Chain.Nodes.NodeSelectionStrategy.AutoBalance -> enableAutoBalance(chainId)
+            is Chain.Nodes.NodeSelectionStrategy.SelectedNode -> setSelectedNode(chainId, strategy.unformattedNodeUrl)
+        }
     }
 
-    suspend fun setDefaultNode(chainId: ChainId, nodeUrl: String) {
+    private suspend fun enableAutoBalance(chainId: ChainId) {
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, autoBalanceEnabled = false, null))
+    }
+
+    private suspend fun setSelectedNode(chainId: ChainId, unformattedNodeUrl: String) {
         val chain = getChain(chainId)
 
-        val chainSupportsNode = chain.nodes.nodes.any { it.unformattedUrl == nodeUrl }
-        require(chainSupportsNode) { "Node with url $nodeUrl is not found for chain $chainId" }
+        val chainSupportsNode = chain.nodes.nodes.any { it.unformattedUrl == unformattedNodeUrl }
+        require(chainSupportsNode) { "Node with url $unformattedNodeUrl is not found for chain $chainId" }
 
-        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, false, nodeUrl))
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, false, unformattedNodeUrl))
     }
 
     private suspend fun requireConnectionStateAtLeast(chainId: ChainId, state: ConnectionState) {

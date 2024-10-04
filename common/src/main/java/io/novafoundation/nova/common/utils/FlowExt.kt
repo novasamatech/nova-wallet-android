@@ -78,6 +78,10 @@ fun <T> Flow<T>.onEachLatest(action: suspend (T) -> Unit): Flow<T> = transformLa
  * Modifies flow so that it firstly emits [LoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
  */
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state.
+ * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
+ */
 fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
     return map<T, LoadingState<T>> { LoadingState.Loaded(it) }
         .onStart { emit(LoadingState.Loading()) }
@@ -101,6 +105,11 @@ fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, Corouti
     }
 }
 
+/**
+ * Modifies flow so that it firstly emits [ExtendedLoadingState.Loading] state.
+ * Then emits each element from upstream wrapped into [ExtendedLoadingState.Loaded] state.
+ * If exception occurs, emits [ExtendedLoadingState.Error] state.
+ */
 /**
  * Modifies flow so that it firstly emits [ExtendedLoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [ExtendedLoadingState.Loaded] state.
@@ -146,6 +155,11 @@ fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>>
  * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
  * Old suppliers are discarded as per [Flow.transformLatest] behavior
  */
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
+ * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
+ * Old suppliers are discarded as per [Flow.transformLatest] behavior
+ */
 fun <T, R> Flow<T>.withLoading(sourceSupplier: suspend (T) -> Flow<R>): Flow<LoadingState<R>> {
     return transformLatest { item ->
         emit(LoadingState.Loading<R>())
@@ -160,6 +174,14 @@ private enum class InnerState {
     INITIAL_START, SECONDARY_START, IN_PROGRESS
 }
 
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
+ * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
+ * Old suppliers are discarded as per [Flow.transformLatest] behavior
+ *
+ * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
+ * In particular, it does not emit loading state on second and subsequent re-subscriptions
+ */
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
  * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
@@ -196,6 +218,13 @@ suspend fun <T> Flow<ExtendedLoadingState<T>>.firstIfLoaded(): T? = first().data
  * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
  * In particular, it does not emit loading state on second and subsequent re-subscriptions
  */
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state.
+ * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
+ *
+ * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
+ * In particular, it does not emit loading state on second and subsequent re-subscriptions
+ */
 fun <T> Flow<T>.withLoadingShared(): Flow<ExtendedLoadingState<T>> {
     var state: InnerState = InnerState.INITIAL_START
 
@@ -213,6 +242,9 @@ fun <T> Flow<T>.withLoadingShared(): Flow<ExtendedLoadingState<T>> {
 /**
  * Similar to [Flow.takeWhile] but emits last element too
  */
+/**
+ * Similar to [Flow.takeWhile] but emits last element too
+ */
 fun <T> Flow<T>.takeWhileInclusive(predicate: suspend (T) -> Boolean) = transformWhile {
     emit(it)
 
@@ -223,6 +255,11 @@ inline fun <T, R> Flow<T?>.mapNullable(crossinline mapper: suspend (T) -> R): Fl
     return map { it?.let { mapper(it) } }
 }
 
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
+ * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
+ * Old suppliers are discarded as per [Flow.transformLatest] behavior
+ */
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
  * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
@@ -614,6 +651,21 @@ inline fun <T, R> Flow<IndexedValue<T>>.mapLatestIndexed(crossinline transform: 
     return mapLatest { IndexedValue(it.index, transform(it.value)) }
 }
 
+/**
+ * Emits first element from upstream and then emits last element emitted by upstream during specified time window
+ *
+ * ```
+ * flow {
+ *  for (num in 1..15) {
+ *      emit(num)
+ *      delay(25)
+ *  }
+ * }.throttleLast(100)
+ *  .onEach { println(it) }
+ *  .collect()  // Prints 1, 5, 9, 13, 15
+ *
+ * ```
+ */
 /**
  * Emits first element from upstream and then emits last element emitted by upstream during specified time window
  *

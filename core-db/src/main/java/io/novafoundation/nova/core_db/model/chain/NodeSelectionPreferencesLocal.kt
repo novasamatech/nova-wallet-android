@@ -26,8 +26,13 @@ data class NodeSelectionPreferencesLocal(
     val chainId: String,
     @ColumnInfo(defaultValue = DEFAULT_AUTO_BALANCE_DEFAULT_STR)
     val autoBalanceEnabled: Boolean,
+    @Deprecated("Use [selectedUnformattedWssNodeUrl]")
     val selectedNodeUrl: String?
 ) : Identifiable {
+
+    @Suppress("DEPRECATION")
+    val selectedUnformattedWssNodeUrl: String?
+        get() = selectedNodeUrl
 
     companion object {
 

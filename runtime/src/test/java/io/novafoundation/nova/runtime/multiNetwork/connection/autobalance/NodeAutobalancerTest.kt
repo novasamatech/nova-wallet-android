@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.RoundRobinStrategy
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.RoundRobinGenerator
 import io.novafoundation.nova.test_shared.CoroutineTest
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.whenever
@@ -44,7 +44,7 @@ class NodeAutobalancerTest : CoroutineTest() {
     fun setup() {
         autobalancer = NodeAutobalancer(strategyProvider, connectionSecrets)
         whenever(strategyProvider.strategyFlowFor(any(), nodeSelectionStrategy))
-            .thenReturn(flowOf(RoundRobinStrategy()))
+            .thenReturn(flowOf(RoundRobinGenerator()))
     }
 
     @Test

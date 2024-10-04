@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.ext.EVM_DEFAULT_TOKEN_DECIMALS
 import io.novafoundation.nova.runtime.ext.evmChainIdFrom
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy.AutoBalance
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.network.rpc.systemProperties
@@ -102,23 +102,22 @@ class CustomChainFactory(
             source = Chain.Asset.Source.MANUAL,
         )
 
-        val node = Chain.Node(
-            chainId = chainId,
-            unformattedUrl = payload.nodeUrl,
-            name = payload.nodeName,
-            orderId = 0,
-            isCustom = true,
-        )
 
         val explorer = getChainExplorer(payload.blockExplorer, chainId)
+
+        val nodes = Chain.Nodes(
+            autoBalanceStrategy = prefilledChain?.nodes?.autoBalanceStrategy ?: Chain.Nodes.AutoBalanceStrategy.ROUND_ROBIN,
+            wssNodeSelectionStrategy = NodeSelectionStrategy.AutoBalance,
+            nodes = createNodeList(chainId, prefilledChain, payload)
+        )
 
         return Chain(
             id = chainId,
             parentId = prefilledChain?.parentId,
             name = payload.chainName,
             assets = listOf(asset),
-            nodes = Chain.Nodes(prefilledChain?.nodes?.nodeSelectionStrategy ?: AutoBalance.ROUND_ROBIN, listOf(node)),
-            explorers = explorer?.let { listOf(it) } ?: prefilledChain?.explorers.orEmpty(),
+            nodes = nodes,
+            explorers = explorer?.let(::listOf) ?: prefilledChain?.explorers.orEmpty(),
             externalApis = prefilledChain?.externalApis.orEmpty(),
             icon = prefilledChain?.icon,
             addressPrefix = addressPrefix,
@@ -136,6 +135,28 @@ class CustomChainFactory(
             connectionState = Chain.ConnectionState.FULL_SYNC,
             additional = prefilledChain?.additional
         )
+    }
+
+    private fun createNodeList(
+        chainId: String,
+        prefilledChain: Chain?,
+        input: CustomNetworkPayload
+    ): List<Chain.Node> {
+        val inputNode = Chain.Node(
+            chainId = chainId,
+            unformattedUrl = input.nodeUrl,
+            name = input.nodeName,
+            orderId = 0,
+            isCustom = true,
+        )
+
+        val prefilledNodes = prefilledChain?.nodes?.nodes.orEmpty()
+        val prefilledExceptInput = prefilledNodes.filter { it.unformattedUrl != inputNode.unformattedUrl }
+
+        return buildList {
+            add(inputNode)
+            addAll(prefilledExceptInput)
+        }
     }
 
     fun getChainExplorer(blockExplorer: CustomNetworkPayload.BlockExplorer?, chainId: String): Chain.Explorer? {

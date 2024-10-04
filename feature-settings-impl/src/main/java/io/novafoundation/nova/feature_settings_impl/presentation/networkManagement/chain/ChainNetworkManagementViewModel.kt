@@ -83,7 +83,7 @@ class ChainNetworkManagementViewModel(
 
     fun selectNode(item: NetworkNodeRvItem) {
         launch {
-            networkManagementChainInteractor.selectNode(payload.chainId, item.url)
+            networkManagementChainInteractor.selectNode(payload.chainId, item.unformattedUrl)
         }
     }
 
@@ -96,12 +96,12 @@ class ChainNetworkManagementViewModel(
                     R.string.manage_node_actions_title,
                     subtitle = item.name,
                     listOf(
-                        editItem(R.string.manage_node_action_edit) { editNode(item.url) },
+                        editItem(R.string.manage_node_action_edit) { editNode(item.unformattedUrl) },
                         deleteItem(R.string.manage_node_action_delete) { deleteNode(item) }
                     )
                 )
             } else {
-                editNode(item.url)
+                editNode(item.unformattedUrl)
             }
         }
     }
@@ -151,7 +151,7 @@ class ChainNetworkManagementViewModel(
                 )
             )
 
-            networkManagementChainInteractor.deleteNode(chainId = payload.chainId, item.url)
+            networkManagementChainInteractor.deleteNode(chainId = payload.chainId, unformattedNodeUrl = item.unformattedUrl)
         }
     }
 
@@ -181,7 +181,7 @@ class ChainNetworkManagementViewModel(
         return NetworkNodeRvItem(
             id = nodeHealthState.node.unformattedUrl,
             name = nodeHealthState.node.name,
-            url = nodeHealthState.node.unformattedUrl,
+            unformattedUrl = nodeHealthState.node.unformattedUrl,
             isEditable = nodeHealthState.node.isCustom,
             isDeletable = networkState.nodeHealthStates.size > 1 && nodeHealthState.node.isCustom,
             isSelected = nodeHealthState.node.unformattedUrl == networkState.connectingNode?.unformattedUrl,
