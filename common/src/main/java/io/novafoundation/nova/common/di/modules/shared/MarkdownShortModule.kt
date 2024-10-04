@@ -10,7 +10,7 @@ import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.utils.markdown.RemoveHtmlTagsPlugin
-import io.novafoundation.nova.common.utils.markdown.StylePlugin
+import io.novafoundation.nova.common.utils.markdown.LinkStylePlugin
 
 private const val IMG_HTML_TAG = "img"
 private const val TABLE_HTML_TAG = "table"
@@ -24,7 +24,7 @@ class MarkdownShortModule {
         return Markwon.builder(context)
             .usePlugin(RemoveHtmlTagsPlugin(IMG_HTML_TAG, TABLE_HTML_TAG))
             .usePlugin(LinkifyPlugin.create(Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS))
-            .usePlugin(StylePlugin(context))
+            .usePlugin(LinkStylePlugin(context))
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(HtmlPlugin.create())
             .build()

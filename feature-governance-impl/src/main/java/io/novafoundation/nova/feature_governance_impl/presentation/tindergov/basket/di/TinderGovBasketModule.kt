@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovBasketInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -32,17 +33,19 @@ class TinderGovBasketModule {
         referendumFormatter: ReferendumFormatter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
-        assetUseCase: AssetUseCase
+        assetUseCase: AssetUseCase,
+        basketInteractor: TinderGovBasketInteractor
     ): ViewModel {
         return TinderGovBasketViewModel(
             governanceSharedState = governanceSharedState,
             router = router,
             interactor = interactor,
+            basketInteractor = basketInteractor,
             votersFormatter = votersFormatter,
             referendumFormatter = referendumFormatter,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             resourceManager = resourceManager,
-            assetUseCase
+            assetUseCase = assetUseCase
         )
     }
 

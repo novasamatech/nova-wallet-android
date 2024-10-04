@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovBasketInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationSystem
@@ -57,6 +58,7 @@ class ConfirmTinderGovVoteModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         locksChangeFormatter: LocksChangeFormatter,
         tinderGovInteractor: TinderGovInteractor,
+        tinderGovBasketInteractor: TinderGovBasketInteractor,
         partialRetriableMixinFactory: PartialRetriableMixin.Factory,
     ): ViewModel {
         return ConfirmTinderGovVoteViewModel(
@@ -75,6 +77,7 @@ class ConfirmTinderGovVoteModule {
             resourceManager = resourceManager,
             locksChangeFormatter = locksChangeFormatter,
             tinderGovInteractor = tinderGovInteractor,
+            tinderGovBasketInteractor = tinderGovBasketInteractor,
             partialRetriableMixinFactory = partialRetriableMixinFactory
         )
     }

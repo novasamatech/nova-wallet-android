@@ -6,6 +6,7 @@ import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.info.di.ReferendumInfoModule
 
 @Subcomponent(
     modules = [

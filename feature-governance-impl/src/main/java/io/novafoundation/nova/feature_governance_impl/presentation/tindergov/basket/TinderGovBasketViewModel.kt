@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
+import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovBasketInteractor
 import io.novafoundation.nova.feature_governance_api.domain.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -38,6 +39,7 @@ class TinderGovBasketViewModel(
     private val governanceSharedState: GovernanceSharedState,
     private val router: GovernanceRouter,
     private val interactor: TinderGovInteractor,
+    private val basketInteractor: TinderGovBasketInteractor,
     private val votersFormatter: VotersFormatter,
     private val referendumFormatter: ReferendumFormatter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -55,7 +57,7 @@ class TinderGovBasketViewModel(
         .map { it.associateBy { it.id } }
         .shareInBackground()
 
-    private val basketItemsFlow = interactor.observeTinderGovBasket()
+    private val basketItemsFlow = basketInteractor.observeTinderGovBasket()
         .shareInBackground()
 
     val editModeButtonText = inEditModeFlow.map {
@@ -107,7 +109,7 @@ class TinderGovBasketViewModel(
                     .firstOrNull { it.referendumId == item.id }
                     ?: return@launch
 
-                interactor.removeReferendumFromBasket(referendum)
+                basketInteractor.removeReferendumFromBasket(referendum)
 
                 closeScreenIfBasketIsEmpty()
             }
@@ -151,10 +153,10 @@ class TinderGovBasketViewModel(
 
     private fun validateReferendaAndRemove() {
         launch {
-            val removedReferenda = interactor.getBasketItemsToRemove(coroutineScope)
+            val removedReferenda = basketInteractor.getBasketItemsToRemove(coroutineScope)
 
             if (removedReferenda.isNotEmpty()) {
-                interactor.removeBasketItems(removedReferenda)
+                basketInteractor.removeBasketItems(removedReferenda)
 
                 itemsWasRemovedFromBasketAction.awaitAction(getFormattedAmountAvailableToVote())
 
@@ -169,7 +171,7 @@ class TinderGovBasketViewModel(
     }
 
     private suspend fun closeScreenIfBasketIsEmpty() {
-        if (interactor.isBasketEmpty()) {
+        if (basketInteractor.isBasketEmpty()) {
             router.back()
         }
     }

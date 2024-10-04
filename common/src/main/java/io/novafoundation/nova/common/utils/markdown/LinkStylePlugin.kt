@@ -5,7 +5,7 @@ import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.novafoundation.nova.common.R
 
-class StylePlugin(private val context: Context) : AbstractMarkwonPlugin() {
+class LinkStylePlugin(private val context: Context) : AbstractMarkwonPlugin() {
 
     override fun configureTheme(builder: MarkwonTheme.Builder) {
         builder.isLinkUnderlined(false)

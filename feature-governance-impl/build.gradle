@@ -19,7 +19,7 @@ android {
 
         buildConfigField "String", "DELEGATION_TUTORIAL_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/governance/add-delegate-information\""
 
-        buildConfigField "String", "SUMMARY_API_KEY", readStringSecret("POLKASSEMBLY_SUMMARY_API_KEY")
+        buildConfigField "String", "OPENGOV_API_URL", "\"https://opengov-backend-dev.novasama-tech.org\""
     }
 
     buildTypes {
@@ -28,6 +28,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/governance/v2/dapps.json\""
+
+            buildConfigField "String", "OPENGOV_API_URL", "\"https://opengov-backend.novasama-tech.org\""
         }
     }
 

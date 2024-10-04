@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.summary.ReferendaSummaryInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
@@ -36,7 +37,8 @@ class ReferendaListModule {
         updateSystem: UpdateSystem,
         governanceRouter: GovernanceRouter,
         referendumFormatter: ReferendumFormatter,
-        governanceDAppsInteractor: GovernanceDAppsInteractor
+        governanceDAppsInteractor: GovernanceDAppsInteractor,
+        summaryInteractor: ReferendaSummaryInteractor
     ): ViewModel {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -48,7 +50,8 @@ class ReferendaListModule {
             updateSystem = updateSystem,
             governanceRouter = governanceRouter,
             referendumFormatter = referendumFormatter,
-            governanceDAppsInteractor = governanceDAppsInteractor
+            governanceDAppsInteractor = governanceDAppsInteractor,
+            referendaSummaryInteractor = summaryInteractor
         )
     }
 
