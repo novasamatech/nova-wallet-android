@@ -7,20 +7,20 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface ReferendumDetailsRepository {
 
-    suspend fun loadSummary(chain: Chain, id: ReferendumId, selectedLanguage: Language): String
+    suspend fun loadSummary(chain: Chain, id: ReferendumId, selectedLanguage: Language): String?
 
-    suspend fun loadSummaries(chain: Chain, ids: List<ReferendumId>, selectedLanguage: Language): Map<ReferendumId, String>
+    suspend fun loadSummaries(chain: Chain, ids: List<ReferendumId>, selectedLanguage: Language): Map<ReferendumId, String>?
 }
 
 class RealReferendumDetailsRepository(
     private val referendumSummaryDataSource: ReferendumSummaryDataSource
 ) : ReferendumDetailsRepository {
 
-    override suspend fun loadSummary(chain: Chain, id: ReferendumId, selectedLanguage: Language): String {
+    override suspend fun loadSummary(chain: Chain, id: ReferendumId, selectedLanguage: Language): String? {
         return referendumSummaryDataSource.loadSummary(chain, id, selectedLanguage.iso639Code)
     }
 
-    override suspend fun loadSummaries(chain: Chain, ids: List<ReferendumId>, selectedLanguage: Language): Map<ReferendumId, String> {
+    override suspend fun loadSummaries(chain: Chain, ids: List<ReferendumId>, selectedLanguage: Language): Map<ReferendumId, String>? {
         return referendumSummaryDataSource.loadSummaries(chain, ids, selectedLanguage.iso639Code)
     }
 }

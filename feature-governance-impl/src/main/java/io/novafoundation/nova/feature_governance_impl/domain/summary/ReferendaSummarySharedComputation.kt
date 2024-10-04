@@ -17,7 +17,7 @@ class ReferendaSummarySharedComputation(
         governanceOption: SupportedGovernanceOption,
         referendaIds: List<ReferendumId>,
         scope: CoroutineScope
-    ): Map<ReferendumId, String> {
+    ): Map<ReferendumId, String>? {
         val chainId = governanceOption.assetWithChain.chain.id
         val referendaSet = referendaIds.toSet()
         val selectedLanguage = accountRepository.selectedLanguage()

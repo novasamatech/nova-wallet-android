@@ -12,6 +12,13 @@ class RealReferendaSummaryInteractor(
 ) : ReferendaSummaryInteractor {
 
     override suspend fun getReferendaSummaries(ids: List<ReferendumId>, coroutineScope: CoroutineScope): Map<ReferendumId, String> {
-        return referendaSummarySharedComputation.summaries(governanceSharedState.selectedOption(), ids, coroutineScope)
+        return runCatching {
+            referendaSummarySharedComputation.summaries(
+                governanceSharedState.selectedOption(),
+                ids,
+                coroutineScope
+            )
+        }.getOrNull()
+            .orEmpty()
     }
 }

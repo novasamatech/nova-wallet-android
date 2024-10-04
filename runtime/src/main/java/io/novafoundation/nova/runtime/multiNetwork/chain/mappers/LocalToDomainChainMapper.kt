@@ -24,7 +24,6 @@ import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SummaryReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.TransferParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
@@ -155,8 +154,7 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
         }
 
         ApiType.REFERENDUM_SUMMARY -> {
-            val parameters = externalApiLocal.parsedParameters<SummaryReferendaParameters>(gson)
-            ExternalApi.ReferendumSummary(externalApiLocal.url, parameters?.network)
+            ExternalApi.ReferendumSummary(externalApiLocal.url)
         }
 
         ApiType.UNKNOWN -> null

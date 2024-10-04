@@ -36,7 +36,7 @@ class TinderGovModule {
     @Provides
     @FeatureScope
     fun provideReferendumSummaryApi(apiCreator: NetworkApiCreator): ReferendumSummaryApi {
-        return apiCreator.create(ReferendumSummaryApi::class.java, customBaseUrl = BuildConfig.OPENGOV_API_URL)
+        return apiCreator.create(ReferendumSummaryApi::class.java)
     }
 
     @Provides
