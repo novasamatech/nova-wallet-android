@@ -4,7 +4,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Era
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import java.math.BigInteger
 
-class DAppParsedExtrinsic(
+data class DAppParsedExtrinsic(
     val address: String,
     val nonce: BigInteger,
     val specVersion: Int,
@@ -13,5 +13,6 @@ class DAppParsedExtrinsic(
     val era: Era,
     val blockHash: ByteArray,
     val tip: BigInteger,
+    val metadataHash: ByteArray?,
     val call: Extrinsic.EncodingInstance.CallRepresentation
 )
