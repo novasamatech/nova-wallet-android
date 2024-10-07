@@ -1,9 +1,8 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
-import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 interface SwapGraphEdge : QuotableEdge {
@@ -20,13 +19,7 @@ interface SwapGraphEdge : QuotableEdge {
     suspend fun debugLabel(): String
 }
 
-interface QuotableEdge : Edge<FullChainAssetId> {
 
-    suspend fun quote(
-        amount: Balance,
-        direction: SwapDirection
-    ): Balance
-}
 
 typealias SwapGraph = Graph<FullChainAssetId, SwapGraphEdge>
 typealias SwapPath = Path<SwapGraphEdge>

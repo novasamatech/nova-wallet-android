@@ -5,13 +5,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxConversionSource
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.omnipool.OmniPoolConversionSourceFactory
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.stableswap.StableConversionSourceFactory
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.impl.xyk.XYKConversionSourceFactory
-import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.RealHydraDxAssetConversionFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.RealHydraDxQuotingFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.OmniPoolQuotingSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.StableSwapQuotingSourceFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.XYKSwapQuotingSourceFactory
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -27,8 +27,8 @@ class HydraDxConversionModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         chainRegistry: ChainRegistry,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    ): HydraDxConversionSource.Factory {
-        return OmniPoolConversionSourceFactory(
+    ): HydraDxQuotingSource.Factory<*> {
+        return OmniPoolQuotingSourceFactory(
             remoteStorageSource = remoteStorageSource,
             chainRegistry = chainRegistry,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter
@@ -42,8 +42,8 @@ class HydraDxConversionModule {
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         gson: Gson,
         chainStateRepository: ChainStateRepository
-    ): HydraDxConversionSource.Factory {
-        return StableConversionSourceFactory(
+    ): HydraDxQuotingSource.Factory<*> {
+        return StableSwapQuotingSourceFactory(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             gson = gson,
@@ -56,8 +56,8 @@ class HydraDxConversionModule {
     fun provideXykSwapSourceFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter
-    ): HydraDxConversionSource.Factory {
-        return XYKConversionSourceFactory(
+    ): HydraDxQuotingSource.Factory<*> {
+        return XYKSwapQuotingSourceFactory(
             remoteStorageSource,
             hydraDxAssetIdConverter
         )
@@ -67,10 +67,10 @@ class HydraDxConversionModule {
     @FeatureScope
     fun provideHydraDxAssetConversionFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        conversionSourceFactories: Set<@JvmSuppressWildcards HydraDxConversionSource.Factory>,
+        conversionSourceFactories: Set<@JvmSuppressWildcards HydraDxQuotingSource.Factory<*>>,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    ): HydraDxAssetConversionFactory {
-        return RealHydraDxAssetConversionFactory(
+    ): HydraDxQuoting.Factory {
+        return RealHydraDxQuotingFactory(
             remoteStorageSource = remoteStorageSource,
             conversionSourceFactories = conversionSourceFactories,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter

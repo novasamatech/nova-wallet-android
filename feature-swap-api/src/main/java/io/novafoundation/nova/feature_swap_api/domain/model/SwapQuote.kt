@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
-import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
-import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -16,9 +15,8 @@ import java.math.BigDecimal
 data class SwapQuote(
     val amountIn: ChainAssetWithAmount,
     val amountOut: ChainAssetWithAmount,
-    val direction: SwapDirection,
     val priceImpact: Percent,
-    val path: Path<QuotedSwapEdge>
+    val quotedPath: QuotedPath<SwapGraphEdge>
 ) {
 
     val assetIn: Chain.Asset
@@ -40,21 +38,15 @@ data class SwapQuote(
     }
 }
 
-class QuotedSwapEdge(
-    val quotedAmount: Balance,
-    val quote: Balance,
-    val edge: SwapGraphEdge
-)
-
 
 val SwapQuote.editedBalance: Balance
-    get() = when (direction) {
+    get() = when (quotedPath.direction) {
         SwapDirection.SPECIFIED_IN -> planksIn
         SwapDirection.SPECIFIED_OUT -> planksOut
     }
 
 val SwapQuote.quotedBalance: Balance
-    get() = when (direction) {
+    get() = when (quotedPath.direction) {
         SwapDirection.SPECIFIED_IN -> planksOut
         SwapDirection.SPECIFIED_OUT -> planksIn
     }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMapAsync
+import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.structOf
@@ -15,23 +16,27 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.accountCurrencyMap
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.multiTransactionPayment
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrThrow
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetId
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSystemAsset
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -60,7 +65,8 @@ class HydraDxExchangeFactory(
     private val extrinsicService: ExtrinsicService,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
-    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
+    private val quotingFactory: HydraDxQuoting.Factory,
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetExchange.Factory {
 
@@ -74,19 +80,21 @@ class HydraDxExchangeFactory(
             hydraDxNovaReferral = hydraDxNovaReferral,
             swapSourceFactories = swapSourceFactories,
             assetSourceRegistry = assetSourceRegistry,
-            parentQuoter = parentQuoter
+            parentQuoter = parentQuoter,
+            delegate = quotingFactory.create(chain)
         )
     }
 }
 
 private class HydraDxExchange(
+    private val delegate: HydraDxQuoting,
     private val remoteStorageSource: StorageDataSource,
     private val chain: Chain,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val extrinsicService: ExtrinsicService,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
-    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory>,
+    private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val parentQuoter: AssetExchange.ParentQuoter,
 ) : AssetExchange {
@@ -97,16 +105,12 @@ private class HydraDxExchange(
 
     private val userReferralState: MutableSharedFlow<ReferralState> = singleReplaySharedFlow()
 
-    override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
-        val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)
+    override suspend fun sync() {
+        return swapSources.forEachAsync { it.sync() }
+    }
 
-        if (hydraDxAssetIdConverter.isSystemAsset(onChainId)) return true
-
-        val fallbackPrice = remoteStorageSource.query(chain.id) {
-            metadata.multiTransactionPayment.acceptedCurrencies.query(onChainId)
-        }
-
-        return fallbackPrice != null
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
+        return delegate.canPayFeeInNonUtilityToken(chainAsset)
     }
 
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
@@ -180,8 +184,14 @@ private class HydraDxExchange(
         SET, NOT_SET, NOT_AVAILABLE
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun createSources(): List<HydraDxSwapSource> {
-        return swapSourceFactories.map { it.create(chain) }
+        return swapSourceFactories.map {
+            val sourceDelegate = delegate.getSource(it.identifier)
+
+            // Cast should be safe as long as identifiers between delegates and wrappers match
+            (it as HydraDxSwapSource.Factory<HydraDxQuotingSource<*>>).create(sourceDelegate)
+        }
     }
 
     private inner class HydraDxSwapEdge(
@@ -224,7 +234,13 @@ private class HydraDxExchange(
         }
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            val nativeFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, BatchMode.FORCE_BATCH) {
+            val nativeFee = extrinsicService.estimateFee(
+                chain = chain,
+                origin = TransactionOrigin.SelectedWallet,
+                submissionOptions = ExtrinsicService.SubmissionOptions(
+                    batchMode = BatchMode.FORCE_BATCH
+                )
+            ) {
                 executeSwap()
             }
 
@@ -236,12 +252,19 @@ private class HydraDxExchange(
 
             return SubstrateFee(
                 amount = feeAmountInExpectedCurrency,
-                submissionOrigin = nativeFee.submissionOrigin
+                submissionOrigin = nativeFee.submissionOrigin,
+                asset = usedFeeAsset
             )
         }
 
         override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
-            return extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet, BatchMode.FORCE_BATCH) {
+            return extrinsicService.submitAndWatchExtrinsic(
+                chain = chain,
+                origin = TransactionOrigin.SelectedWallet,
+                submissionOptions = ExtrinsicService.SubmissionOptions(
+                    batchMode = BatchMode.FORCE_BATCH
+                )
+            ) {
                 executeSwap()
             }.awaitInBlock().map {
                 SwapExecutionCorrection()

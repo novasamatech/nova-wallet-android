@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConvers
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.assetConversion
+import io.novafoundation.nova.feature_account_api.data.conversion.assethub.assetConversionOrNull
+import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
@@ -14,11 +16,11 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationA
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -61,7 +63,7 @@ class AssetConversionExchangeFactory(
         parentQuoter: AssetExchange.ParentQuoter,
         coroutineScope: CoroutineScope
     ): AssetExchange {
-        val converter = multiLocationConverterFactory.default(chain, coroutineScope)
+        val converter = multiLocationConverterFactory.defaultAsync(chain, coroutineScope)
 
         return AssetConversionExchange(
             chain = chain,
@@ -83,7 +85,11 @@ private class AssetConversionExchange(
     private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange {
 
-    override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
+    override suspend fun sync() {
+        // nothing to sync
+    }
+
+    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
         // any asset is usable as a fee as soon as it has associated pool
         return true
     }
@@ -275,7 +281,11 @@ private class AssetConversionExchange(
             val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
             val toBuyNativeFee = runtimeCallsApi.quoteFeeConversion(nativeTokenFee.amount, customFeeAsset)
 
-            return SubstrateFee(toBuyNativeFee, nativeTokenFee.submissionOrigin)
+            return SubstrateFee(
+                amount = toBuyNativeFee,
+                submissionOrigin = nativeTokenFee.submissionOrigin,
+                asset = customFeeAsset
+            )
         }
 
         private suspend fun RuntimeCallsApi.quoteFeeConversion(commissionAmountOut: Balance, customFeeToken: Chain.Asset): Balance {

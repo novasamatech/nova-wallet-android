@@ -3,14 +3,13 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotableEdge
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 
-typealias HydraDxSwapSourceId = String
 typealias HydraDxStandaloneSwapBuilder = ExtrinsicBuilder.(args: AtomicSwapOperationArgs) -> Unit
 
 interface HydraDxSourceEdge : QuotableEdge {
@@ -27,6 +26,8 @@ interface HydraDxSourceEdge : QuotableEdge {
 
 interface HydraDxSwapSource : Identifiable {
 
+    suspend fun sync()
+
     suspend fun availableSwapDirections(): Collection<HydraDxSourceEdge>
 
     suspend fun runSubscriptions(
@@ -34,8 +35,8 @@ interface HydraDxSwapSource : Identifiable {
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<Unit>
 
-    interface Factory {
+    interface Factory<D : HydraDxQuotingSource<*>> : Identifiable {
 
-        fun create(chain: Chain): HydraDxSwapSource
+        fun create(delegate: D): HydraDxSwapSource
     }
 }

@@ -11,9 +11,10 @@ import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProvid
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.HydrationFeePaymentProvider
-import io.novafoundation.nova.feature_account_impl.data.fee.utils.HydraDxQuoteSharedComputation
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
-import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQuoteSharedComputation
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -42,15 +43,17 @@ class CustomFeeModule {
     @FeatureScope
     fun provideHydraDxQuoteSharedComputation(
         computationalCache: ComputationalCache,
-        assetConversionFactory: HydraDxAssetConversionFactory,
+        quotingFactory: HydraDxQuoting.Factory,
+        pathQuoterFactory: PathQuoter.Factory,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         blockNumberUpdater: BlockNumberUpdater
     ): HydraDxQuoteSharedComputation {
         return HydraDxQuoteSharedComputation(
-            computationalCache,
-            assetConversionFactory,
-            storageSharedRequestsBuilderFactory,
-            blockNumberUpdater
+            computationalCache = computationalCache,
+            quotingFactory = quotingFactory,
+            pathQuoterFactory = pathQuoterFactory,
+            storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
+            blockNumberUpdater = blockNumberUpdater
         )
     }
 

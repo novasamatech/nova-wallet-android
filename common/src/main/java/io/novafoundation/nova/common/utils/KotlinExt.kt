@@ -109,7 +109,7 @@ suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     }.awaitAll()
 }
 
-suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> List<R>): List<R> {
+suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> Collection<R>): List<R> {
     return coroutineScope {
         map { async { operation(it) } }
     }.awaitAll().flatten()

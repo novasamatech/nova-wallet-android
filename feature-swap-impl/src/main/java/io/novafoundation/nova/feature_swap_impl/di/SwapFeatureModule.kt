@@ -7,13 +7,14 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.OperationDao
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
@@ -45,17 +46,19 @@ class SwapFeatureModule {
     @FeatureScope
     @Provides
     fun provideSwapService(
-        assetConversionExchangeFactory: AssetConversionExchangeFactory,
+        assetConversionFactory: AssetConversionExchangeFactory,
         hydraDxExchangeFactory: HydraDxExchangeFactory,
         computationalCache: ComputationalCache,
         chainRegistry: ChainRegistry,
+        quoterFactory: PathQuoter.Factory,
         customFeeCapabilityFacade: CustomFeeCapabilityFacade
     ): SwapService {
         return RealSwapService(
-            assetConversionFactory = assetConversionExchangeFactory,
+            assetConversionFactory = assetConversionFactory,
             hydraDxExchangeFactory = hydraDxExchangeFactory,
             computationalCache = computationalCache,
             chainRegistry = chainRegistry,
+            quoterFactory = quoterFactory,
             customFeeCapabilityFacade = customFeeCapabilityFacade
         )
     }
