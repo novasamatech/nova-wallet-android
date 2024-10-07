@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di.modules
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -40,13 +41,15 @@ class NativeAssetsModule {
         assetCache: AssetCache,
         substrateRemoteSource: SubstrateRemoteSource,
         @Named(REMOTE_STORAGE_SOURCE) remoteSource: StorageDataSource,
-        lockDao: LockDao
+        lockDao: LockDao,
+        holdsDao: HoldsDao,
     ) = NativeAssetBalance(
         chainRegistry = chainRegistry,
         assetCache = assetCache,
         substrateRemoteSource = substrateRemoteSource,
         remoteStorage = remoteSource,
-        lockDao = lockDao
+        lockDao = lockDao,
+        holdsDao = holdsDao
     )
 
     @Provides
@@ -54,7 +57,7 @@ class NativeAssetsModule {
     fun provideTransfers(
         chainRegistry: ChainRegistry,
         assetSourceRegistry: AssetSourceRegistry,
-        extrinsicService: ExtrinsicService,
+        extrinsicServiceFactory: ExtrinsicService.Factory,
         phishingValidationFactory: PhishingValidationFactory,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
         @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
@@ -62,7 +65,7 @@ class NativeAssetsModule {
     ) = NativeAssetTransfers(
         chainRegistry,
         assetSourceRegistry,
-        extrinsicService,
+        extrinsicServiceFactory,
         phishingValidationFactory,
         enoughTotalToStayAboveEDValidationFactory,
         storageDataSource,

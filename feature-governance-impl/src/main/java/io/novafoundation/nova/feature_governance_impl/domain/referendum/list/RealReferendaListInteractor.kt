@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.getN
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.user
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.ext.fullId
@@ -44,7 +45,8 @@ class RealReferendaListInteractor(
     private val referendaCommonRepository: ReferendaCommonRepository,
     private val referendaSharedComputation: ReferendaSharedComputation,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
-    private val referendaSortingProvider: ReferendaSortingProvider
+    private val referendaSortingProvider: ReferendaSortingProvider,
+    private val referendaFilteringProvider: ReferendaFilteringProvider,
 ) : ReferendaListInteractor {
 
     override fun searchReferendaListStateFlow(
@@ -122,8 +124,11 @@ class RealReferendaListInteractor(
 
                     val filteredReferenda = referendaState.referenda.applyFilter(referendumFilter)
 
+                    val availableToVoteReferenda = referendaFilteringProvider.filterAvailableToVoteReferenda(referendaState.referenda, referendaState.voting)
+
                     ReferendaListState(
                         groupedReferenda = sortReferendaPreviews(filteredReferenda),
+                        availableToVoteReferenda = availableToVoteReferenda,
                         locksOverview = locksOverview,
                         delegated = determineDelegatedState(referendaState.voting, delegationSupported),
                     )

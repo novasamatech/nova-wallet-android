@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ class AssetSwapFlowViewModel(
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
+    private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val swapFlowExecutor: SwapFlowExecutor,
     private val payload: SwapFlowPayload
 ) : AssetFlowViewModel(
@@ -40,6 +42,12 @@ class AssetSwapFlowViewModel(
     externalBalancesInteractor,
     resourceManager,
 ) {
+
+    init {
+        launch {
+            swapAvailabilityInteractor.sync(viewModelScope)
+        }
+    }
 
     @StringRes
     fun getTitleRes(): Int {

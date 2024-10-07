@@ -3,7 +3,6 @@ package io.novafoundation.nova.runtime.extrinsic
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.CustomExtension.ASSETS_TX_PAYMENT
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signedExtra
 import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionId
 import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
 import java.math.BigInteger
@@ -16,7 +15,7 @@ object CustomSignedExtensions {
 
             override fun createPayload(): SignedExtensionValue {
                 return SignedExtensionValue(
-                    signedExtra = assetTxPaymentPayload(assetId = null)
+                    includedInExtrinsic = assetTxPaymentPayload(assetId = null)
                 )
             }
         },
@@ -27,7 +26,7 @@ object CustomSignedExtensions {
 
             override fun createPayload(): SignedExtensionValue {
                 return SignedExtensionValue(
-                    signedExtra = BigInteger.ZERO
+                    includedInExtrinsic = BigInteger.ZERO
                 )
             }
         };
@@ -37,7 +36,11 @@ object CustomSignedExtensions {
 
     fun ExtrinsicBuilder.assetTxPayment(assetId: Any?, tip: BigInteger = BigInteger.ZERO) {
         val extensionValue = assetTxPaymentPayload(assetId, tip)
-        signedExtra(ASSETS_TX_PAYMENT.extensionName, extensionValue)
+
+        signedExtension(
+            id = ASSETS_TX_PAYMENT.extensionName,
+            value = SignedExtensionValue(includedInExtrinsic = extensionValue)
+        )
     }
 
     fun extensionsWithValues(): Map<SignedExtensionId, SignedExtensionValue> {

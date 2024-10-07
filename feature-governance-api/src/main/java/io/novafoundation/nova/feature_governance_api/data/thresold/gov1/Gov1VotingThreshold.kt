@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VotingThreshold.Threshold
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.notPassing
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.simple
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.passing
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigInteger
@@ -34,9 +35,9 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
 
             val threshold = sqrtTotalIssuance.divideToDecimal(sqrtTurnout + sqrtTotalIssuance)
 
-            return Threshold(
+            return Threshold.simple(
                 value = threshold,
-                passing = aysFraction > threshold
+                currentlyPassing = aysFraction > threshold
             )
         }
     },
@@ -59,9 +60,9 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
 
             val threshold = sqrtTurnout.divideToDecimal(sqrtTurnout + sqrtTotalIssuance)
 
-            return Threshold(
+            return Threshold.simple(
                 value = threshold,
-                passing = aysFraction > threshold
+                currentlyPassing = aysFraction > threshold
             )
         }
     },
@@ -76,9 +77,9 @@ enum class Gov1VotingThreshold(val readableName: String) : VotingThreshold {
 
             val aysFraction = tally.ayeVotes().fraction
 
-            return Threshold(
+            return Threshold.simple(
                 value = threshold,
-                passing = aysFraction > threshold
+                currentlyPassing = aysFraction > threshold
             )
         }
     };

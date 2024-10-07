@@ -21,10 +21,13 @@ import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInExtrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInSignature
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -33,6 +36,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
+import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
@@ -54,6 +58,10 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.networkStateFlow
+import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
+import kotlinx.coroutines.flow.first
 import org.web3j.crypto.Sign
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
@@ -67,6 +75,9 @@ val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
 
 val SS58Encoder.DEFAULT_PREFIX: Short
     get() = 42.toShort()
+
+val SS58Encoder.GENERIC_ADDRESS_PREFIX: Short
+    get() = DEFAULT_PREFIX
 
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
@@ -93,6 +104,9 @@ fun Short.toByteArray(byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
 
 val Short.bigEndianBytes
     get() = toByteArray(ByteOrder.BIG_ENDIAN)
+
+val Short.littleEndianBytes
+    get() = toByteArray(ByteOrder.LITTLE_ENDIAN)
 
 fun ByteArray.toBigEndianShort(): Short = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).short
 fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
@@ -122,6 +136,14 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
     return stream.toByteArray()
 }
 
+fun SignerPayloadExtrinsic.encodedIncludedInExtrinsic(): ByteArray {
+    return ExtrasIncludedInExtrinsic.bytes(runtime, signedExtras.includedInExtrinsic)
+}
+
+fun SignerPayloadExtrinsic.encodedIncludedInSignature(): ByteArray {
+    return ExtrasIncludedInSignature.bytes(runtime, signedExtras.includedInSignature)
+}
+
 fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) =
     bytesOrNull(runtime, value)?.toHexString(withPrefix = true)
 
@@ -139,6 +161,10 @@ operator fun <S : Schema<S>> S.invoke(block: StructBuilderWithContext<S>? = null
 
 fun <S : Schema<S>> EncodableStruct<S>.hash(): String {
     return schema.toByteArray(this).blake2b256().toHexString(withPrefix = true)
+}
+
+fun ExtrinsicMetadata.hasSignedExtension(id: String): Boolean {
+    return signedExtensions.any { it.id == id }
 }
 
 fun String.extrinsicHash(): String {
@@ -240,6 +266,10 @@ fun RuntimeMetadata.electionProviderMultiPhaseOrNull() = moduleOrNull(Modules.EL
 fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
 fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
+
+fun RuntimeMetadata.delegatedStakingOrNull() = moduleOrNull(Modules.DELEGATED_STAKING)
+
+fun RuntimeMetadata.delegatedStaking() = module(Modules.DELEGATED_STAKING)
 
 fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
 
@@ -361,7 +391,12 @@ fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEnt
     ?: fallbacks.firstOrNull { storage?.get(it) != null }
         ?.let { storage?.get(it) } ?: throw NoSuchElementException()
 
+suspend fun SocketService.awaitConnected() {
+    networkStateFlow().first { it is SocketStateMachine.State.Connected }
+}
+
 object Modules {
+
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
     const val BALANCES = "Balances"
@@ -408,6 +443,8 @@ object Modules {
     const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
 
     const val NOMINATION_POOLS = "NominationPools"
+
+    const val DELEGATED_STAKING = "DelegatedStaking"
 
     const val ASSET_CONVERSION = "AssetConversion"
 

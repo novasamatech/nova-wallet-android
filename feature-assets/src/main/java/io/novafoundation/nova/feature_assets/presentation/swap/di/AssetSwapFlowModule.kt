@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 
 @Module(includes = [ViewModelModule::class])
@@ -57,7 +58,8 @@ class AssetSwapFlowModule {
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         payload: SwapFlowPayload,
-        executorFactory: SwapFlowExecutorFactory
+        executorFactory: SwapFlowExecutorFactory,
+        swapAvailabilityInteractor: SwapAvailabilityInteractor
     ): ViewModel {
         return AssetSwapFlowViewModel(
             interactor = interactor,
@@ -68,7 +70,8 @@ class AssetSwapFlowModule {
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             swapFlowExecutor = executorFactory.create(payload),
-            payload = payload
+            payload = payload,
+            swapAvailabilityInteractor = swapAvailabilityInteractor
         )
     }
 }

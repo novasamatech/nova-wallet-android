@@ -6,15 +6,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategy
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSequenceGenerator
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.generateNodeIterator
-import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrls
-import io.reactivex.Flowable
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
+import io.reactivex.Flowable
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -31,27 +29,21 @@ import org.web3j.protocol.http.HttpService
 import org.web3j.protocol.websocket.events.Notification
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
 
 class BalancingHttpWeb3jService(
     initialNodes: Chain.Nodes,
-    connectionSecrets: ConnectionSecrets,
     private val httpClient: OkHttpClient,
-    private val strategyProvider: AutoBalanceStrategyProvider,
+    private val strategyProvider: NodeSelectionStrategyProvider,
     private val objectMapper: ObjectMapper = ObjectMapperFactory.getObjectMapper(),
-    private val executorService: ExecutorService,
 ) : Web3jService, UpdatableNodes {
 
     private val nodeSwitcher = NodeSwitcher(
-        initialNodes = initialNodes.nodes,
-        initialStrategy = strategyProvider.strategyFor(initialNodes.nodeSelectionStrategy),
-        connectionSecrets = connectionSecrets
+        initialStrategy = strategyProvider.createHttp(initialNodes),
     )
 
     override fun updateNodes(nodes: Chain.Nodes) {
-        val autoBalanceStrategy = strategyProvider.strategyFor(nodes.nodeSelectionStrategy)
-
-        nodeSwitcher.updateNodes(nodes.nodes, autoBalanceStrategy)
+        val strategy = strategyProvider.createHttp(nodes)
+        nodeSwitcher.updateNodes(strategy)
     }
 
     override fun <T : Response<*>> send(request: Request<*, out Response<*>>, responseType: Class<T>): T {
@@ -245,16 +237,11 @@ class BalancingHttpWeb3jService(
 }
 
 private class NodeSwitcher(
-    initialNodes: List<Chain.Node>,
-    initialStrategy: AutoBalanceStrategy,
-    private val connectionSecrets: ConnectionSecrets,
+    initialStrategy: NodeSequenceGenerator,
 ) {
 
     @Volatile
-    private var availableNodes: List<Chain.Node> = initialNodes
-
-    @Volatile
-    private var balanceStrategy: AutoBalanceStrategy = initialStrategy
+    private var balanceStrategy: NodeSequenceGenerator = initialStrategy
 
     @Volatile
     private var nodeIterator: Iterator<NodeWithSaturatedUrl>? = null
@@ -263,18 +250,14 @@ private class NodeSwitcher(
     private var currentNodeUrl: String? = null
 
     init {
-        updateNodes(initialNodes, initialStrategy)
+        updateNodes(initialStrategy)
     }
 
     @Synchronized
-    fun updateNodes(nodes: List<Chain.Node>, strategy: AutoBalanceStrategy) {
-        val saturatedNodes = nodes.saturateNodeUrls(connectionSecrets)
-        if (saturatedNodes.isEmpty()) return
-
-        availableNodes = nodes
+    fun updateNodes(strategy: NodeSequenceGenerator) {
         balanceStrategy = strategy
 
-        nodeIterator = balanceStrategy.generateNodeIterator(saturatedNodes)
+        nodeIterator = balanceStrategy.generateNodeIterator()
         selectNextNode()
     }
 
@@ -289,7 +272,10 @@ private class NodeSwitcher(
     }
 
     private fun selectNextNode() {
-        currentNodeUrl = nodeIterator?.next()?.saturatedUrl
+        val iterator = nodeIterator ?: return
+        if (iterator.hasNext()) {
+            currentNodeUrl = iterator.next().saturatedUrl
+        }
     }
 }
 

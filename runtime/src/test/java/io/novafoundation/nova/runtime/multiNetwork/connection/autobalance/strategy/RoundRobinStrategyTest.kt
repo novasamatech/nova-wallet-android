@@ -7,7 +7,6 @@ import org.junit.Test
 
 class RoundRobinStrategyTest {
 
-    private val strategy = RoundRobinStrategy()
 
     private val nodes = listOf(
         createFakeNode("1"),
@@ -15,9 +14,11 @@ class RoundRobinStrategyTest {
         createFakeNode("3")
     )
 
+    private val strategy = RoundRobinGenerator(nodes)
+
     @Test
     fun `collections should have the same sequence`() {
-        val iterator = strategy.generateNodeSequence(nodes)
+        val iterator = strategy.generateNodeSequence()
             .iterator()
 
         nodes.forEach { assertEquals(it, iterator.next()) }
@@ -25,7 +26,7 @@ class RoundRobinStrategyTest {
 
     @Test
     fun `sequence should be looped`() {
-        val iterator = strategy.generateNodeSequence(nodes)
+        val iterator = strategy.generateNodeSequence()
             .iterator()
 
         repeat(nodes.size) { iterator.next() }
@@ -34,7 +35,7 @@ class RoundRobinStrategyTest {
     }
 
     private fun createFakeNode(id: String) = NodeWithSaturatedUrl(
-        node = Chain.Node(unformattedUrl = id, name = id, chainId = "test", orderId = 0),
+        node = Chain.Node(unformattedUrl = id, name = id, chainId = "test", orderId = 0, isCustom = false),
         saturatedUrl = id
     )
 }

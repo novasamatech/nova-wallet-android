@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoingOrNull
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.flattenCastingVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.hash
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.proposal
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
@@ -45,14 +47,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import java.math.BigInteger
-
-class ReferendaState(
-    val voting: Map<TrackId, Voting>,
-    val currentBlockNumber: BlockNumber,
-    val onChainReferenda: Map<ReferendumId, OnChainReferendum>,
-    val referenda: List<ReferendumPreview>,
-    val tracksById: Map<TrackId, TrackInfo>,
-)
 
 interface ReferendaCommonRepository {
 
@@ -176,6 +170,18 @@ class RealReferendaCommonRepository(
             keySelector = { it.id },
             valueTransform = {
                 referendaConstructor.constructReferendumVoting(
+                    tally = it.status.asOngoingOrNull()?.tally,
+                    currentBlockNumber = currentBlockNumber,
+                    electorate = electorate,
+                    offChainVotingDetails = ExtendedLoadingState.Loaded(null)
+                )
+            }
+        )
+
+        val thresholdById = onChainReferenda.associateBy(
+            keySelector = { it.id },
+            valueTransform = {
+                referendaConstructor.constructReferendumThreshold(
                     referendum = it,
                     tracksById = tracksById,
                     currentBlockNumber = currentBlockNumber,
@@ -189,7 +195,8 @@ class RealReferendaCommonRepository(
             onChainReferenda = onChainReferenda,
             tracksById = tracksById,
             currentBlockNumber = currentBlockNumber,
-            votingByReferenda = votingsById
+            votingByReferenda = votingsById,
+            thresholdByReferenda = thresholdById
         )
 
         val referenda = onChainReferenda.map { onChainReferendum ->
@@ -210,6 +217,7 @@ class RealReferendaCommonRepository(
                 },
                 status = statuses.getValue(onChainReferendum.id),
                 voting = votingsById[onChainReferendum.id],
+                threshold = thresholdById[onChainReferendum.id],
                 referendumVote = voting[onChainReferendum.id]
             )
         }

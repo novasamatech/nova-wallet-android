@@ -8,3 +8,5 @@ sealed class ReferendumProposal {
 
     class Call(val call: GenericCall.Instance) : ReferendumProposal()
 }
+
+fun ReferendumProposal.toCallOrNull() = this as? ReferendumProposal.Call

@@ -169,6 +169,7 @@ class GovV2OnChainReferendaRepository(
             "Ongoing" -> {
                 val status = asDictEnum.value.castToStruct()
                 val trackId = TrackId(bindNumber(status["track"]))
+                val track = tracksById.getValue(trackId)
 
                 OnChainReferendumStatus.Ongoing(
                     track = trackId,
@@ -179,7 +180,7 @@ class GovV2OnChainReferendaRepository(
                     deciding = bindDecidingStatus(status["deciding"]),
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = bindBoolean(status["inQueue"]),
-                    threshold = Gov2VotingThreshold(tracksById.getValue(trackId))
+                    threshold = Gov2VotingThreshold(track),
                 )
             }
 
@@ -240,6 +241,7 @@ class GovV2OnChainReferendaRepository(
                 name = bindString(trackInfoStruct["name"]),
                 preparePeriod = bindBlockNumber(trackInfoStruct["preparePeriod"]),
                 decisionPeriod = bindBlockNumber(trackInfoStruct["decisionPeriod"]),
+                confirmPeriod = bindBlockNumber(trackInfoStruct["confirmPeriod"]),
                 minApproval = bindCurve(trackInfoStruct.getTyped("minApproval")),
                 minSupport = bindCurve(trackInfoStruct.getTyped("minSupport"))
             )

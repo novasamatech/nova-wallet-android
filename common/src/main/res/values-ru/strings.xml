@@ -17,12 +17,10 @@
     <string name="account_add_already_exists_message">Аккаунт уже существует. Пожалуйста, попробуйте другой.</string>
     <string name="account_add_watch_only_description">Отследить любой кошелек по его адресу</string>
     <string name="account_add_watch_wallet">Добавить watch-only кошелёк</string>
-    <string name="account_backup_mnemonic_field_title">Мнемоническая фраза</string>
-    <string name="account_backup_mnemonic_title">Запишите фразу и храните её в надежном месте</string>
+    <string name="account_backup_mnemonic_title">Запишите вашу секретную фразу</string>
     <string name="account_backup_secret_caption">Пожалуйста, убедитесь, что ваша фраза записана корректно и разборчиво.</string>
     <string name="account_chain_address_format">%s адрес</string>
     <string name="account_confirm_mnemonic">Подтверждение</string>
-    <string name="account_confirm_mnemonic_subtitle">Выберите слова в правильном порядке</string>
     <string name="account_confirm_mnemonic_title">Давайте перепроверим</string>
     <string name="account_confirmation_details">Выберите слова в правильном порядке</string>
     <string name="account_create_account">Создать новый аккаунт</string>
@@ -30,6 +28,7 @@
     <string name="account_create_name_subtitle_v2_2_0">Имя будет использоваться только в приложении. Вы сможете изменить его позже</string>
     <string name="account_create_name_title_v2_2_0">Назовите кошелёк</string>
     <string name="account_create_title">Мнемоника</string>
+    <string name="account_create_wallet">Создать новый кошелёк</string>
     <string name="account_creation_info">Мнемоническая фраза используется для восстановления доступа к аккаунту. Запишите ее, мы не сможем восстановить доступ к аккаунту без нее!</string>
     <string name="account_custom_secret">Аккаунты с изменённым секретом</string>
     <string name="account_delete_confirm">Забыть</string>
@@ -46,10 +45,10 @@
     <string name="account_ethereum_derivation_path">Последовательность для вывода секрета Ethereum</string>
     <string name="account_export">Экспорт аккаунта</string>
     <string name="account_export_action">Экспортировать</string>
+    <string name="account_export_existing">Импортировать существующий</string>
     <string name="account_export_json_password_subtitle">Это необходимо для шифрования данных и сохранения файла JSON.</string>
-    <string name="account_export_json_password_title">Установите пароль</string>
+    <string name="account_export_json_password_title">Установите пароль для вашего JSON файла</string>
     <string name="account_export_json_title">Сохраните ваш секрет и храните его в надежном месте</string>
-    <string name="account_export_password_change">Сменить пароль</string>
     <string name="account_export_seed_title">Запишите секрет и храните его в надежном месте</string>
     <string name="account_import_invalid_keystore">Неверный формат данных восстановления. Пожалуйста, удостоверьтесь, что данные соответствуют json формату.</string>
     <string name="account_import_invalid_seed">Seed неверный. Пожалуйста, убедитесь, что введенные данные содержат 64 hex символа.</string>
@@ -67,16 +66,31 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Ваш путь деривации содержит неподдерживаемые символы или имеет некорректную структуру</string>
     <string name="account_invalid_derivation_path_title">Некорректный путь деривации</string>
     <string name="account_json_file">JSON файл</string>
+    <string name="account_ledger_generic_import_start_step_1">Удостоверьтесь, что %s на Ваше устройство Ledger, используя приложение Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot приложение установлено</string>
+    <string name="account_ledger_generic_import_start_step_2">%s на своем устройстве Ledger</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Откройте Polkadot приложение</string>
     <string name="account_ledger_import_fill_description">Убедитесь, что приложение сети установлено на вашем Ledger устройстве через приложение Ledger Live. Откройте приложение сети на вашем Ledger устройстве.</string>
     <string name="account_ledger_import_fill_disabled_hint">Добавьте аккаунт</string>
     <string name="account_ledger_import_fill_title">Добавьте аккаунты в Ваш кошелёк</string>
     <string name="account_ledger_import_start_guide">Инструкция по подключению Ledger</string>
-    <string name="account_ledger_import_start_step_1">Удостоверьтесь, что <font color="#FFFFFF">приложение Сети установлено</font> на Ваше устройство Ledger, используя приложение Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Откройте приложение Сети</font> на Вашем Ledger устройстве</string>
-    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth и Гео-локации</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Выберите аккаунт</font> для добавления в кошелёк</string>
+    <string name="account_ledger_import_start_step_1">Удостоверьтесь, что %s на Ваше устройство Ledger, используя приложение Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">приложение Сети установлено</string>
+    <string name="account_ledger_import_start_step_2">%s на Вашем Ledger устройстве</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Откройте приложение Сети</string>
+    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">доступ к Bluetooth и Гео-локации</string>
+    <string name="account_ledger_import_start_step_4">%s для добавления в кошелёк</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Выберите аккаунт</string>
     <string name="account_ledger_import_start_title">Подключите Ledger Nano X</string>
+    <string name="account_ledger_legacy_warning_message">Чтобы подписать операции и перенести свои учетные записи в новое приложение Generic Ledger, установите и откройте приложение Migration. Приложения Ledger (Legacy) и Migration Ledger не будут поддерживаться в будущем.</string>
+    <string name="account_ledger_legacy_warning_title">Выпущено новое приложение Ledger</string>
+    <string name="account_ledger_migration_app">Polkadot Migration</string>
+    <string name="account_ledger_migration_deprecation_message">Migration приложение в ближайшее время будет недоступно. Используйте его для переноса своих учетных записей в новое приложение Ledger, чтобы не потерять свои средства.</string>
+    <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot приложение)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Пожалуйста, включите Bluetooth в настройках телефона. Разблокируйте Ledger устройство и откройте %s приложение.</string>
     <string name="account_ledger_select_device_title">Выберите устройство Ledger</string>
     <string name="account_mnmonic_length_variants">фраза длиной 12, 15, 18, 21 или 24 слова</string>
@@ -89,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Вот ваши аккаунты</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Неверный QR-код, пожалуйста, убедитесь, что вы сканируете QR-код из %s</string>
     <string name="account_parity_signer_import_start_select_top">Убедитесь, что выбрали самый верхний</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Откройте приложение Parity Signer</font> на смартфоне.</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</font>, который вы хотите добавить в Nova Wallet.</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
+    <string name="account_parity_signer_import_start_step_1">%s на вашем смартфоне</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Откройте приложение Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s, который вы хотите добавить в Nova Wallet.</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">QR-код для сканирования</string>
     <string name="account_parity_signer_import_start_title">Добавить кошелёк из %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s не поддерживает подписание произвольных сообщений — только транзакции</string>
     <string name="account_parity_signer_not_supported_title">Подписание не поддерживается</string>
@@ -105,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Подписать с %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Обратите внимание, имя пути деривации должно быть пустым</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Откройте приложение Polkadot Vault</font> на своем смартфоне</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Наборы ключей».</font> Выберите свой набор ключей, сеть, а затем учетную запись, которую вы хотите добавить в Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">%s на смартфоне</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Откройте приложение Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Выберите свой набор ключей, сеть, а затем учетную запись, которую вы хотите добавить в Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Перейдите на вкладку «Key Sets».</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault предоставит вам %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-код для сканирования</string>
     <string name="account_private_key">Приватный ключ</string>
     <string name="account_proxieds">Делегировано вам (проксированные)</string>
     <string name="account_proxy_type_any">Любые действия</string>
@@ -136,12 +156,15 @@
     <string name="account_watch_key_missing_title">Упс! Ключ отсутствует</string>
     <string name="account_watch_only">watch-only</string>
     <string name="account_welcome_hardware_wallet_subtitle">Использовать Polkadot Vault, Ledger или Parity Signer</string>
-    <string name="account_welcome_hardware_wallet_title">Подключить аппаратный кошелёк</string>
+    <string name="account_welcome_hardware_wallet_title">Аппаратный кошелёк</string>
     <string name="accounts_add_chain_account">Добавить %s аккаунт</string>
     <string name="accounts_add_wallet">Добавить кошелёк</string>
     <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
     <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
+    <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="add_custom_node">Добавить пользовательскую ноду</string>
     <string name="add_delegation_missing_account_message">Вы должны добавить %s аккаунт в кошелек, чтобы иметь возможность делегировать</string>
+    <string name="add_network_title">Введите данные сети</string>
     <string name="add_proxy_confirmation_delegate_to">Делегировать аккаунту</string>
     <string name="add_proxy_confirmation_delegating_account">Аккаунт делегирования</string>
     <string name="add_proxy_confirmation_delegating_wallet">Кошелек делегирования</string>
@@ -149,6 +172,7 @@
     <string name="add_proxy_deposit_description_message">Депозит остается зарезервированным на вашем счете до тех пор, пока прокси не будет удален.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Вы достигли лимита добавленных прокси (%s) в %s . Удалите прокси, чтобы добавить новые.</string>
     <string name="add_proxy_maximum_reached_error_title">Достигнуто максимальное количество прокси</string>
+    <string name="added_networks_empty_placeholder">Добавленные пользовательские сети\nпоявятся здесь</string>
     <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Введенный адрес контракта присутствует в Nova как токен %s. Вы уверены, что хотите изменить его?</string>
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
@@ -164,7 +188,6 @@
     <string name="assets_add_token">Добавить токен</string>
     <string name="assets_add_token_enter_info_address_label">Адрес контракта</string>
     <string name="assets_add_token_enter_info_decimals_label">Число десятичных знаков</string>
-    <string name="assets_add_token_enter_info_price_label">Ссылка Coingecko для курса валют (необязательно)</string>
     <string name="assets_add_token_enter_info_symbol_label">Символ</string>
     <string name="assets_add_token_enter_info_title">Введите данные ERC-20 токена</string>
     <string name="assets_add_token_select_chain_title">Выберите сеть для добавления ERC-20 токена</string>
@@ -188,10 +211,36 @@
     <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или получите токены\nна свой аккаунт.</string>
     <string name="assets_swap_flow_pay_title">Токен для оплаты</string>
     <string name="assets_swap_flow_receive_title">Токен для получения</string>
+    <string name="backup_diff_subtitle">Прежде чем приступить к изменениям, %s для модифицированных и удаленных кошельков!</string>
+    <string name="backup_diff_subtitle_highlighted">убедитесь, что вы сохранили секретные фразы</string>
+    <string name="backup_diff_title">Применить Изменения Бэкапа?</string>
+    <string name="backup_mnemonic_attention_title">Приготовьтесь сохранить ваш кошелёк!</string>
+    <string name="backup_secrets_warning_condition_1">Эта секретная фраза дает вам полный и постоянный доступ ко всем подключенным кошелькам и средствам в них. \n %s</string>
+    <string name="backup_secrets_warning_condition_1_highlight">НЕ ПЕРЕДАВАЙТЕ ЕЁ НИКОМУ.</string>
+    <string name="backup_secrets_warning_condition_2">Не вводите свою секретную фразу ни в какие формы или на веб-сайтах. \n %s</string>
+    <string name="backup_secrets_warning_condition_2_highlight">ВАШИ СРЕДСТВА БУДУТ ПОТЕРЯНЫ НАВСЕГДА.</string>
+    <string name="backup_secrets_warning_condition_3">Служба поддержки или администраторы никогда и ни при каких обстоятельствах не будут запрашивать вашу секретную фразу. \n %s</string>
+    <string name="backup_secrets_warning_condition_3_highlight">ОСТЕРЕГАЙТЕСЬ МОШЕННИКОВ.</string>
+    <string name="backup_secrets_warning_disabled_button">Ознакомьтесь и Примите, чтобы продолжить</string>
+    <string name="backup_settings_delete_backup">Удалить бэкап</string>
+    <string name="backup_settings_manual_subtitle">Вы можете вручную создать бэкап своей секретной фразы, чтобы получить доступ к средствам вашего кошелька, если потеряете доступ к этому устройству</string>
+    <string name="backup_settings_manual_switcher_title">Создать бэкап вручную</string>
+    <string name="backup_settings_manual_title">Вручную</string>
+    <string name="backup_settings_no_wallets_error_message">Вы не добавили ни одного кошелька с секретной фразой.</string>
+    <string name="backup_settings_no_wallets_error_title">Нет кошельков для бэкапа</string>
+    <string name="backup_settings_subtitle">Вы можете включить бэкап на Google Диске для хранения зашифрованных копий ваших кошельков, защищенных установленным паролем.</string>
+    <string name="backup_settings_switcher_text">Сохранить на Google Диск</string>
+    <string name="backup_settings_title">Google Диск</string>
+    <string name="backup_settings_toolbar_title">Бэкап</string>
+    <string name="backup_title">Бэкап</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
     <string name="buy_provider_open_confirmation_title">Продолжить в браузере?</string>
+    <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>
+    <string name="chain_network_management_enabling">Включить подключение</string>
+    <string name="change_cloud_backup_password_subtitle">Введите пароль, который будет использоваться для восстановления ваших кошельков из облачного бэкапа. Этот пароль нельзя будет восстановить в будущем, поэтому обязательно запомните его!</string>
+    <string name="change_cloud_backup_password_title">Изменить пароль бэкапа</string>
     <string name="choose_amount_asset">Токен</string>
     <string name="choose_amount_available_balance">Свободный баланс</string>
     <string name="choose_amount_error_balance">К сожалению, запрос проверки баланса не выполнен. Пожалуйста, попробуйте позже.</string>
@@ -200,19 +249,54 @@
     <string name="choose_amount_fee">Комиссия</string>
     <string name="choose_amount_network_error">Сеть недоступна</string>
     <string name="choose_amount_to">Кому</string>
-    
-    
-    
-    
-    
-    
-    
+    <string name="cloud_backup_delete_action_subtitle">%s и не забывайте всегда держать их в письменном виде, чтобы иметь возможность восстановить в любое время. Сделать это можно в Настройках Бэкапа.</string>
+    <string name="cloud_backup_delete_action_subtitle_highlighted">Пожалуйста, запишите секретные фразы от всех ваших кошельков перед тем как продолжить</string>
+    <string name="cloud_backup_delete_action_title">Бэкап будет удалён из Google Диска</string>
+    <string name="cloud_backup_delete_backup_confirmation_message">Текущий бэкап ваших кошельков будет удален навсегда!</string>
+    <string name="cloud_backup_delete_backup_confirmation_title">Вы уверены, что хотите удалить Облачный Бэкап?</string>
+    <string name="cloud_backup_delete_button">Удалить Бэкап</string>
+    <string name="cloud_backup_destructive_changes_action_subtitle">На данный момент ваш бэкап не синхронизирован. Пожалуйста, ознакомьтесь с этими изменениями.</string>
+    <string name="cloud_backup_destructive_changes_action_title">Обнаружены изменения в Облачном Бэкапе</string>
+    <string name="cloud_backup_destructive_changes_button">Обзор Изменений</string>
+    <string name="cloud_backup_destructive_changes_confirmation_subtitle">Если вы не записали вручную свою секретную фразу для кошельков, которые будут удалены, то эти кошельки и все их активы будут навсегда и безвозвратно потеряны.</string>
+    <string name="cloud_backup_destructive_changes_confirmation_title">Вы уверены, что хотите применить эти изменения?</string>
+    <string name="cloud_backup_destructive_changes_not_applied_button">Обзор проблемы</string>
+    <string name="cloud_backup_destructive_changes_not_applied_subtitle">На данный момент ваш бэкап не синхронизирован. Пожалуйста, ознакомьтесь с проблемой.</string>
+    <string name="cloud_backup_destructive_changes_not_applied_title">Не удалось применить изменения кошелька в Облачном Бэкапе</string>
+    <string name="cloud_backup_error_google_service_auth_failed_message">Пожалуйста, убедитесь, что вы вошли в свою учетную запись Google с правильными учетными данными и предоставили Nova Wallet доступ к Google Диску</string>
+    <string name="cloud_backup_error_google_service_auth_failed_title">Ошибка аутентификации на Google Диске</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_message">У вас недостаточно свободного места на Google Диске.</string>
+    <string name="cloud_backup_error_google_service_not_enough_space_title">Недостаточно места</string>
+    <string name="cloud_backup_error_google_service_not_found_message">К сожалению, Google Диск не работает без сервисов Google Play, которые отсутствуют на вашем устройстве. Попробуйте получить доступ к сервисам Google Play</string>
+    <string name="cloud_backup_error_google_service_not_found_title">Службы Google Play не найдены</string>
+    <string name="cloud_backup_error_google_service_other_message">Не удается создать бэкап ваших кошельков на Google Диске. Пожалуйста, убедитесь, что вы разрешили Nova Wallet использовать ваш Google Диск и у вас достаточно свободного места для хранения, а затем повторите попытку.</string>
+    <string name="cloud_backup_error_google_service_other_title">Ошибка Google Диска</string>
+    <string name="cloud_backup_error_invalid_password_message">Пожалуйста, проверьте корректность пароля и попробуйте снова.</string>
+    <string name="cloud_backup_error_invalid_password_title">Неверный пароль</string>
+    <string name="cloud_backup_error_not_found_message">К сожалению, мы не нашли бэкап для восстановления кошельков</string>
+    <string name="cloud_backup_error_not_found_title">Бэкапы не найдены</string>
+    <string name="cloud_backup_removing_warning_subtitle">Убедитесь, что вы сохранили секретную фразу для кошелька, прежде чем продолжить.</string>
+    <string name="cloud_backup_removing_warning_title">Кошелек будет удален из Облачного Бэкапа.</string>
+    <string name="cloud_backup_settings_backup_errors_button">Обзор Ошибки Бэкапа</string>
+    <string name="cloud_backup_settings_corrupted_backup_button">Обзор Изменений Бэкапа</string>
+    <string name="cloud_backup_settings_deprecated_password_button">Ввести Пароль</string>
+    <string name="cloud_backup_settings_disabled_state_subtitle">Включите, чтобы создать бэкап кошельков в Google Диске</string>
+    <string name="cloud_backup_settings_last_sync" formatted="false">Последняя синхронизация: %s в %s</string>
+    <string name="cloud_backup_settings_not_auth_button">Войдите в Google Диск</string>
+    <string name="cloud_backup_settings_other_errors_button">Обзор Проблемы с Google Диском</string>
+    <string name="cloud_backup_state_disabled_title">Бэкап Отключён</string>
+    <string name="cloud_backup_state_synced_title">Бэкап Синхронизирован</string>
+    <string name="cloud_backup_state_syncing_title">Синхронизация Бэкапа...</string>
+    <string name="cloud_backup_state_unsynced_title">Бэкап Не Синхронизирован</string>
+    <string name="cloud_backup_will_be_changed_subtitle">Новые кошельки автоматически добавляются в Облачный Бэкап. Вы можете отключить Облачный Бэкап в настройках.</string>
+    <string name="cloud_backup_will_be_changed_title">Изменения кошелька будут применены в Облачном Бэкапе</string>
     <string name="common_accept_terms">Примите условия...</string>
     <string name="common_account">Аккаунт</string>
     <string name="common_account_address">Адрес аккаунта</string>
     <string name="common_active">Активно</string>
     <string name="common_add">Добавить</string>
     <string name="common_add_delegation">Добавить делегацию</string>
+    <string name="common_add_network">Добавить сеть</string>
     <string name="common_address">Адрес</string>
     <string name="common_advanced">Продвинутый</string>
     <string name="common_all">Все</string>
@@ -223,7 +307,7 @@
     <string name="common_applied">Применено</string>
     <string name="common_apply">Применить</string>
     <string name="common_ask_again">Запросить еще раз</string>
-    <string name="common_attention">Внимание!</string>
+    <string name="common_attention">Подготовьтесь к сохранению кошелька!</string>
     <string name="common_available_format">Доступно: %s</string>
     <string name="common_average">Средний</string>
     <string name="common_balance">Баланс</string>
@@ -236,16 +320,23 @@
     <string name="common_cannot_pay_network_fee_message" formatted="false">Вы можете использовать не больше %s, поскольку вам нужно заплатить\n%s за комиссию за сети.</string>
     <string name="common_chain">Сеть</string>
     <string name="common_change">Изменить</string>
+    <string name="common_change_password">Изменить пароль</string>
+    <string name="common_check_box_auto_continue">Автоматически продолжать в будущем</string>
     <string name="common_choose_network">Выберите сеть</string>
     <string name="common_clear">Очистить</string>
     <string name="common_close">Закрыть</string>
     <string name="common_close_confirmation_message">Вы уверены, что хотите закрыть этот экран?\nИзменения не будут применены.</string>
+    <string name="common_cloud_backup">Облачный бэкап</string>
     <string name="common_completed">Завершённые</string>
     <string name="common_completed_with_count">Завершённые (%s)</string>
     <string name="common_confirm">Подтвердить</string>
     <string name="common_confirm_title">Подтверждение</string>
     <string name="common_confirmation_title">Уверены ли вы?</string>
     <string name="common_confirmed">Подтверждено</string>
+    <string name="common_connected_ms">%d мс</string>
+    <string name="common_connecting">подключение...</string>
+    <string name="common_connection_error_message">Пожалуйста, проверьте подключение к интернету и повторите попытку</string>
+    <string name="common_connection_error_title">Сбой подключения</string>
     <string name="common_continue">Продолжить</string>
     <string name="common_copied">Скопировано в буфер обмена</string>
     <string name="common_copy_address">Копировать адрес</string>
@@ -253,6 +344,7 @@
     <string name="common_crypto_type">Тип ключевой пары</string>
     <string name="common_date">Дата</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s и %s</string>
+    <string name="common_delete">Удалить</string>
     <string name="common_details">Подробности</string>
     <string name="common_disabled">Отключен</string>
     <string name="common_disconnect">Отключить</string>
@@ -264,9 +356,12 @@
     <string name="common_enable">Включить</string>
     <string name="common_enter_address">Введите адрес…</string>
     <string name="common_enter_amount">Введите сумму...</string>
+    <string name="common_enter_details">Введите данные</string>
+    <string name="common_enter_password">Введите пароль</string>
     <string name="common_error_general_title">Ошибка</string>
     <string name="common_error_not_enough_tokens">Недостаточно токенов</string>
     <string name="common_event">Событие</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">EVM Адрес</string>
     <string name="common_existential_warning_message_v2_2_0">Ваша учетная запись будет удалена из сети после операции, так как ваш баланс опустится ниже минимального</string>
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
@@ -277,6 +372,7 @@
     <string name="common_filter_sort_header">Сортировать по:</string>
     <string name="common_filters">Фильтры</string>
     <string name="common_find_out_more">Узнать больше</string>
+    <string name="common_forgot_password">Забыли пароль?</string>
     <plurals name="common_frequency_days">
         <item quantity="one">каждый %s день</item>
         <item quantity="few">каждые %s дня</item>
@@ -286,6 +382,7 @@
     <string name="common_frequency_days_daily">ежедневно</string>
     <string name="common_frequency_days_everyday">ежедневно</string>
     <string name="common_get_token_format">Получить %s</string>
+    <string name="common_got_it">Понятно</string>
     <string name="common_governance">Демократия</string>
     <string name="common_hexadecimal_string">Шестнадцатеричная строка</string>
     <plurals name="common_hours_format">
@@ -297,7 +394,6 @@
     <string name="common_how_it_works">Как это работает</string>
     <string name="common_i_understand">Понятно</string>
     <string name="common_info">Информация</string>
-    <string name="common_input_error_set_password">Установите пароль...</string>
     <string name="common_invalid_qr">QR-код недействителен</string>
     <string name="common_learn_more">Узнать больше</string>
     <string name="common_learn_more_v2_2_0">Узнать больше</string>
@@ -312,9 +408,12 @@
         <item quantity="other">%d минута</item>
     </plurals>
     <string name="common_missing_account_title">%s аккаунт отсутствует</string>
+    <string name="common_modify">Изменить</string>
     <string name="common_module">Модуль</string>
     <string name="common_network">Сеть</string>
+    <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">Сеть %s не поддерживается</string>
+    <string name="common_network_polkadot">Polkadot</string>
     <string name="common_networks">Сети</string>
     <plurals name="common_networks_plural">
         <item quantity="one">Сеть</item>
@@ -332,6 +431,7 @@
     <string name="common_not_available">Не доступно</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
+    <string name="common_not_now">Не сейчас</string>
     <string name="common_off">Выкл</string>
     <string name="common_ok">OK</string>
     <string name="common_ok_back">Хорошо, назад</string>
@@ -339,6 +439,7 @@
     <string name="common_ongoing">На голосовании</string>
     <string name="common_optional">Необязательные</string>
     <string name="common_options_title">Выберите опцию</string>
+    <string name="common_passphrase">Секретная фраза</string>
     <string name="common_paste">Вставить</string>
     <string name="common_per_year">/ год</string>
     <string name="common_per_year_format">%s / год</string>
@@ -372,6 +473,7 @@
     <string name="common_secret_derivation_path">Последовательность для вывода</string>
     <string name="common_settings">Настройки</string>
     <string name="common_share">Поделиться</string>
+    <string name="common_sign_in">Войти</string>
     <string name="common_sign_request">Запрос на подпись</string>
     <string name="common_signature_invalid">Неверная подпись</string>
     <string name="common_skip">Пропустить</string>
@@ -381,8 +483,11 @@
     <string name="common_something_went_wrong_title">Что-то пошло не так</string>
     <string name="common_sort_by">Сортировка по</string>
     <string name="common_status">Статус</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Substrate адрес</string>
+    <string name="common_tap_to_reveal_title">Нажмите, чтобы открыть</string>
     <string name="common_terms_and_conditions_formatting">Условиями использования</string>
+    <string name="common_testnet">Тестнет</string>
     <string name="common_time_left">Оставшееся время</string>
     <string name="common_title">Заголовок</string>
     <string name="common_to_settings">Открыть Настройки</string>
@@ -403,6 +508,7 @@
     <string name="common_unlimited">Неограниченно</string>
     <string name="common_update">Обновить</string>
     <string name="common_use">Использовать</string>
+    <string name="common_use_max">Использовать максимум</string>
     <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
     <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
     <string name="common_waiting">Ожидание</string>
@@ -410,13 +516,16 @@
     <string name="common_warning">Предупреждение</string>
     <string name="common_yes">Да</string>
     <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
+    <string name="confirm_cloud_backup_password_subtitle">Введите пароль, созданный в процессе бэкапа</string>
+    <string name="confirm_cloud_backup_password_title">Введите текущий пароль для бэкапа</string>
+    <string name="confirm_mnemonic_disabled_button_state">Выберите слова...</string>
+    <string name="confirm_mnemonic_not_matching_error_message">Неверная секретная фраза, пожалуйста, проверьте еще раз порядок слов</string>
     <string name="confirm_referendum_vote_referendum">Референдум</string>
     <string name="confirm_referendum_vote_title">Голосование</string>
     <string name="confirm_referendum_vote_track">Трек</string>
     <string name="connection_add_already_exists_error">Узел уже был добавлен ранее. Пожалуйста, попробуйте другой узел.</string>
     <string name="connection_add_invalid_error">Не удается установить соединение с узлом. Пожалуйста, попробуйте другой узел.</string>
     <string name="connection_add_unsupported_error">К сожалению, сеть не поддерживается. Пожалуйста, попробуйте одну из следующих: %s.</string>
-    <string name="connection_delete_confirm">Удалить</string>
     <string name="connection_delete_description">Подтвердите удаление %s.</string>
     <string name="connection_delete_title">Удалить сеть?</string>
     <string name="connection_error_message_v2_2_0">Пожалуйста, проверьте ваше подключение или повторите позднее</string>
@@ -425,6 +534,22 @@
     <string name="connection_management_title">Сети</string>
     <string name="connections_add_connection">Добавить соединение</string>
     <string name="contacts_scan">Сканировать QR-код</string>
+    <string name="corrupted_backup_error_subtitle">Обнаружена проблема с бэкапом. Вы можете удалить текущий бэкап и создать новый. %s, перед тем как продолжить.</string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Убедитесь, что вы сохранили секретные фразы для всех кошельков</string>
+    <string name="corrupted_backup_error_title">Найден пустой или поврежденный бэкап</string>
+    <string name="create_cloud_backup_password_alert_subtitle">В будущем без пароля к бэкапу невозможно будет восстановить ваши кошельки из Облачного Бэкапа.\n%s</string>
+    <string name="create_cloud_backup_password_alert_subtitle_highlighted">Этот пароль не может быть восстановлен.</string>
+    <string name="create_cloud_backup_password_alert_title">Запомните пароль Бэкапа</string>
+    <string name="create_cloud_backup_password_input_confirm_hint">Подтвердите пароль</string>
+    <string name="create_cloud_backup_password_input_hint">Пароль бэкапа</string>
+    <string name="create_cloud_backup_password_requirement_letters">Буквы</string>
+    <string name="create_cloud_backup_password_requirement_min_chars">Мин. 8 символов</string>
+    <string name="create_cloud_backup_password_requirement_numbers">Числа</string>
+    <string name="create_cloud_backup_password_requirement_passwords_match">Пароли совпадают</string>
+    <string name="create_cloud_backup_password_subtitle">Пожалуйста, введите пароль для доступа к бэкапу. Пароль восстановлению не подлежит, обязательно запомните его!</string>
+    <string name="create_cloud_backup_password_title">Создание пароля для бэкапа</string>
+    <string name="create_network_invalid_chain_id_message">Введенный Chain ID не совпадает с сетью в RPC URL.</string>
+    <string name="create_network_invalid_chain_id_title">Неверный Chain ID</string>
     <string name="crodloan_private_crowdloan_message">Приватные краудлоуны пока не поддерживаются</string>
     <string name="crodloan_private_crowdloan_title">Приватный краудлоун</string>
     <string name="crowdloan_about">О краудлоунах</string>
@@ -481,6 +606,24 @@
     <string name="crowdloan_unlock_hint">Ваши %s токены будут возвращены обратно после срока лизинга парачейна.</string>
     <string name="crowdloan_your_contributions">Ваш вклад</string>
     <string name="crownloans_raised_format" formatted="false">Собрано: %s из %s</string>
+    <string name="custom_network_already_exist_failure_message">Введенный RPC URL присутствует в Nova как %s пользовательская сеть. Вы уверены, что хотите изменить его?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">URL block explorer (необязательно)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">Chain ID</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">Символ валюты</string>
+    <string name="custom_network_name_title">Имя сети</string>
+    <string name="custom_node_add_button_state">Добавить ноду</string>
+    <string name="custom_node_add_title">Добавить пользовательскую ноду для</string>
+    <string name="custom_node_disabled_button_state">Введите данные</string>
+    <string name="custom_node_edit_button_state">Сохранить</string>
+    <string name="custom_node_edit_title">Редактировать пользовательскую ноду для</string>
+    <string name="custom_node_name_hint">Имя</string>
+    <string name="custom_node_name_title">Имя ноды</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">URL ноды</string>
+    <string name="custom_rpc_node_url_title">RPC URL</string>
     <string name="dapp_authorized_description">DApps, к которым вы разрешили доступ, видят ваш адрес, когда вы их используете</string>
     <string name="dapp_authorized_remove_description">”%s” DApp будет удален из Авторизованных</string>
     <string name="dapp_authorized_remove_title">Удалить из Авторизованных?</string>
@@ -509,7 +652,9 @@
     <string name="dapp_sign_error_unsupported_chain">Неподдерживаемый блокчейн с генезис хэшем %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Убедитесь, что операция правильная</string>
     <string name="dapp_sign_extrinsic_failed">Не удалось подписать запрошенную операцию</string>
-    
+    <string name="dapp_url_warning_open_anyway">Все равно открыть</string>
+    <string name="dapp_url_warning_subtitle">Вредоносные DApps могут вывести все ваши средства. Всегда проводите собственное исследование перед использованием DApp, предоставлением разрешения или отправкой средств.\n\nЕсли кто-то настаивает на посещении этого DApp, это, вероятно, мошенничество. Если у вас есть сомнения, пожалуйста, свяжитесь с поддержкой Nova Wallet: %s.</string>
+    <string name="dapp_url_warning_title">Внимание! DApp неизвестен</string>
     <string name="deep_linking_chain_id_is_not_found">Сеть не найдена</string>
     <string name="deep_linking_domain_is_not_matched">Домен из ссылки %s не в списке разрешённых</string>
     <string name="deep_linking_governance_type_is_not_specified">Не указан тип управления</string>
@@ -518,7 +663,9 @@
     <string name="deep_linking_invalid_derivation_path">Неверный формат пути деривации</string>
     <string name="deep_linking_invalid_mnemonic">Неверный формат мнемоники</string>
     <string name="deep_linking_url_is_invalid">Неверный формат ссылки</string>
+    <string name="default_network_already_exist_failure_message">Введенный RPC URL присутствует в Nova как %s сеть.</string>
     <string name="default_notification_channel_name">Основной канал уведомлений</string>
+    <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Поиск по адресу или имени</string>
     <string name="delegate_search_placeholder_empty">Недопустимый формат адреса. Убедитесь, что адрес принадлежит правильной сети</string>
     <string name="delegate_search_result_count">результаты поиска: %d</string>
@@ -563,16 +710,28 @@
     <string name="delegation_your_delegation">Ваша делегация</string>
     <string name="delegation_your_delegations">Ваши делегации</string>
     <string name="delegations_filter">Показывать</string>
+    <string name="deleting_backup_progress">Удаление бэкапа...</string>
+    <string name="deprecated_cloud_backup_password_subtitle">Пароль для бэкапа был обновлен ранее. Чтобы продолжить использование Облачного Бэкапа, %s</string>
+    <string name="deprecated_cloud_backup_password_subtitle_highlight">введите новый пароль от бэкапа.</string>
+    <string name="deprecated_cloud_backup_password_title">Пароль от бэкапа изменился</string>
+    <string name="disabled_chain_error_message">Вы не можете подписывать транзакции отключенных сетей. Включите %s в настройках и попробуйте снова</string>
+    <string name="disabled_chain_error_title">%s отключена</string>
     <string name="duplicate_proxy_type_message">Вы уже делегируете полномочия этому аккаунту: %s</string>
     <string name="duplicate_proxy_type_title">Делегация уже существует</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH совместимый)</string>
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (альтернативный)</string>
     <string name="ed25519_selection_title">Edwards</string>
+    <string name="enter_backup_password_hint">Пароль бэкапа</string>
     <string name="error_not_enough_to_pay_fee_title">Недостаточно токенов для оплаты комиссии</string>
     <string name="ethereum_contract">Контракт</string>
     <string name="ethereum_contract_call">Вызов контракта</string>
     <string name="ethereum_function">Функция</string>
+    <string name="existing_cloud_backup_found_button">Восстановить кошельки</string>
+    <string name="existing_cloud_backup_found_subtitle">%s Все ваши кошельки будут надежно сохранены на Google Диске.</string>
+    <string name="existing_cloud_backup_found_subtitle_highlight">Хотите восстановить свои кошельки?</string>
+    <string name="existing_cloud_backup_found_title">Обнаружен существующий Бэкап</string>
+    <string name="export_json_download_btn">Скачать JSON для восстановления</string>
     <string name="export_json_password_confirm">Подтверждение пароля</string>
     <string name="export_json_password_match_error">Пароли не совпадают</string>
     <string name="export_json_password_new">Новый пароль</string>
@@ -612,11 +771,23 @@
     <string name="import_mnemonic_invalid_title">Ваша мнемоника недействительна</string>
     <string name="import_seed_invalid_message">Пожалуйста, убедитесь, что введенные данные содержат 64 hex символа.</string>
     <string name="import_seed_invalid_title">Сид неверный</string>
+    <string name="import_wallet_cloud_backup_not_found_subtitle">К сожалению, Бэкап с вашими кошельками не найден.</string>
+    <string name="import_wallet_cloud_backup_not_found_title">Бэкап не найден</string>
+    <string name="import_wallet_options_cloud_backup_subtitle">Восстановление кошельков из Google Диска</string>
+    <string name="import_wallet_options_mnemonic_subtitle">Используйте свою фразу длинной 12, 15, 18, 21 или 24 слова</string>
+    <string name="import_wallet_options_title">Выберите как вы бы хотели импортировать кошелёк</string>
+    <string name="import_wallet_options_watch_only_title">Watch-only</string>
+    <string name="integrate_networks_banner_description">Интегрируйте все функции сети, которую вы создаете, в Nova Wallet, чтобы сделать ее доступной для всех.</string>
+    <string name="integrate_networks_banner_link">Интегрировать вашу сеть</string>
+    <string name="integrate_networks_banner_title">Создаете для Polkadot?</string>
     <string name="invalid_proxy_address_message">Адрес прокси должен быть действительным адресом %s</string>
     <string name="invalid_proxy_address_title">Неверный адрес прокси</string>
+    <string name="invalid_token_symbol_message">Введенный символ валюты (%1$s) не совпадает с сетью (%2$s). Вы хотите использовать правильный символ валюты?</string>
+    <string name="invalid_token_symbol_title">Неверный символ валюты</string>
     <string name="invoice_scan_error_no_info">Не удается декодировать QR</string>
     <string name="invoice_scan_qr_code_title">QR код</string>
     <string name="invoice_scan_upload">Из галереи</string>
+    <string name="json_export_btn">Экспортировать JSON-файл</string>
     <string name="language_title">Язык</string>
     <string name="ledger_chain_not_supported">Ledger не поддерживает %s</string>
     <string name="ledger_error_app_cancelled_message">Операция была отменена устройством. Удостоверьтесь, что Ledger разблокирован.</string>
@@ -640,9 +811,35 @@
     <string name="ledger_verify_address_subtitle">Нажмите обе кнопки на Вашем %s для подтверждения адреса</string>
     <string name="ledger_wallet_details_description">Этот кошелёк добавлен из Ledger устройства. Nova Wallet поможет создать любую операцию, и вам будет необходимо подписать ее с помощью Ledger устройства</string>
     <string name="ledher_import_select_address_title">Выберите аккаунт для добавления в кошелёк</string>
+    <string name="loading_network_info">Загрузка информации о сети...</string>
+    <string name="loocking_backup_progress">В процессе поиска вашего бэкапа...</string>
     <string name="make_payout_transaction_sent">Транзакция на выплату отправлена</string>
     <string name="manage_assets_add_token">Добавить</string>
-    
+    <string name="manage_cloud_backup">Управление бэкапом</string>
+    <string name="manage_network_action_delete">Удалить сеть</string>
+    <string name="manage_network_action_edit">Редактировать сеть</string>
+    <string name="manage_network_actions_title">Управление добавленной сетью</string>
+    <string name="manage_network_delete_message">Вы не сможете видеть свои балансы токенов в этой сети на экране активов</string>
+    <string name="manage_network_delete_title">Удалить сеть?</string>
+    <string name="manage_node_action_delete">Удалить ноду</string>
+    <string name="manage_node_action_edit">Редактировать ноду</string>
+    <string name="manage_node_actions_title">Управление добавленной нодой</string>
+    <string name="manage_node_delete_message">Нода \\"%s\\" будет удалена</string>
+    <string name="manage_node_delete_title">Удалить ноду?</string>
+    <string name="manual_backup_secrets_custom_key_title">Добавленный ключ</string>
+    <string name="manual_backup_secrets_default_key_title">Ключ по умолчанию</string>
+    <string name="manual_backup_secrets_subtitle">Не делитесь этой информацией с кем-либо. Если вы это сделаете, вы навсегда и безвозвратно потеряете все свои активы.</string>
+    <string name="manual_backup_select_account_custom_key_title">Аккаунты с кастомным секретом</string>
+    <string name="manual_backup_select_account_default_key_account">Аккаунты по умолчанию</string>
+    <string name="manual_backup_select_account_default_key_account_subtitle_more_chains" formatted="false">%s, +%d других</string>
+    <string name="manual_backup_select_account_default_key_title">Аккаунты с общим секретом</string>
+    <string name="manual_backup_select_account_header">Выберите ключ для бэкапа</string>
+    <string name="manual_backup_select_wallet_header">Выберите кошелёк для бэкапа</string>
+    <string name="manual_backup_warning_subtitle">Пожалуйста, внимательно прочитайте следующее перед просмотром своего бэкапа</string>
+    <string name="manual_backup_warning_title">Не сообщайте свою секретную фразу!</string>
+    <string name="mnemonic_card_reveal_subtitle">Убедитесь, что никто не видит ваш экран,\nи не делайте скриншотов</string>
+    <string name="mnemonic_card_title">Пожалуйста %s ни с кем</string>
+    <string name="mnemonic_card_title_highlight">не делитесь</string>
     <string name="mnemonic_error_try_another_one">Пожалуйста, попробуйте другую.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">Ваша мнемоника недействительна, пожалуйста, проверьте еще раз порядок слов</string>
     <string name="multiple_wallets_selection_max_message">Вы не можете выбрать более %d кошельков.</string>
@@ -652,9 +849,14 @@
         <item quantity="many">Выберите хотя бы %d кошельков</item>
         <item quantity="other">Выберите хотя бы %d кошельков</item>
     </plurals>
+    <string name="network_already_exist_failure_title">Эта нода уже существует</string>
     <string name="network_fee">Комиссия сети</string>
     <string name="network_info_address">Адрес ноды</string>
     <string name="network_info_title">Информация ноды</string>
+    <string name="network_management_added_page_title">Добавлено</string>
+    <string name="network_management_custom_nodes">пользовательские ноды</string>
+    <string name="network_management_default_nodes">ноды по умолчанию</string>
+    <string name="network_management_default_page_title">По умолчанию</string>
     <string name="network_status_connecting">Подключение…</string>
     <string name="nft_collection">Коллекция</string>
     <string name="nft_created_by">Создатель</string>
@@ -665,6 +867,12 @@
     <string name="nft_owned_by">Владелец</string>
     <string name="nft_price_not_listed">Без цены</string>
     <string name="nft_your_nfts">Ваши NFT</string>
+    <string name="node_already_exist_failure_message">Введенный вами URL уже существует как \"%s\" нода.</string>
+    <string name="node_already_exist_failure_title">Этот Узел уже существует</string>
+    <string name="node_not_alive_message">Введенный вами URL Узла либо не отвечает, либо имеет неверный формат. Формат URL должен начинаться с \"wss://\".</string>
+    <string name="node_not_alive_title">Ошибка ноды</string>
+    <string name="node_not_supported_by_network_message">Введенный вами URL не соответствует ноде для %1$s.\nПожалуйста, введите URL валидной ноды %1$s.</string>
+    <string name="node_not_supported_by_network_title">Неверная сеть</string>
     <string name="nomination_pool_claim_rewards">Забрать награды</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Ваши токены будут добавлены обратно в стейкинг</string>
     <string name="nomination_pools_direct">Прямой</string>
@@ -709,6 +917,12 @@
     <string name="pool_full_failure_title">Пул заполнен</string>
     <string name="pool_inactive_failure_message">Вы не можете присоединиться к не открытому пулу. Пожалуйста, свяжитесь с владельцем пула.</string>
     <string name="pool_inactive_failure_title">Пул не открыт</string>
+    <string name="pool_staking_conflict_message">Вы больше не можете использовать одновременно стейкинг напрямую и в пуле с одного аккаунта. Для управления стейкингом в пуле вам сначала нужно вывести ваши токены из стейкинга напрямую.</string>
+    <string name="pool_staking_conflict_title">Действия в пуле недоступны</string>
+    <string name="pre_configured_networks_add_custom_button">Добавить сеть вручную</string>
+    <string name="pre_configured_networks_progress_text">Загрузка списка сетей...</string>
+    <string name="pre_configured_networks_search_hint">Поиск по имени сети</string>
+    <string name="pre_configured_networks_title">Добавить сеть</string>
     <string name="profile_accounts_title">Аккаунты</string>
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
@@ -763,7 +977,6 @@
     <string name="push_token_sent_no_account_name_title">💸 Отправлено</string>
     <string name="push_token_sent_title">💸 Отправлено %s</string>
     <string name="push_wallets_title">Выберите до 3 кошельков для которых вы будете получать уведомления о событиях кошелька</string>
-    <string name="push_welcome_cancel_button">Не сейчас</string>
     <string name="push_welcome_enable_button">Включить push-уведомления</string>
     <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы всегда быть в куре событий</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
@@ -783,8 +996,13 @@
     <string name="referenda_list_placeholder">Информация о референдумах появится здесь, когда они начнутся</string>
     <string name="referenda_search_placeholder">Не найдены референдумы\nс таким названием или ID</string>
     <string name="referenda_search_toolbar_hint">Поиск по заголовку или ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d референдума</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Свайпайте, чтобы проголосовать за референдумы с резюме от AI. Быстро и легко!</string>
     <string name="referenda_title">Референдумы</string>
     <string name="referendim_details_not_found_title">Референдум не найден</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Голосование с воздержанием возможно только с убежденностью 0.1x. Проголосовать с убежденностью 0.1x?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Обновление убежденности</string>
+    <string name="referendum_abstain_voters_title">Голоса \\"воздержался\\"</string>
     <string name="referendum_aye_format">За: %s</string>
     <string name="referendum_dapp_list_title">Используйте Nova DApp браузер</string>
     <string name="referendum_description_fallback">Только автор референдума может редактировать это описание и заголовок. Если у вас есть доступ к аккаунту автора, посетите Polkassembly и заполните информацию о вашем референдуме</string>
@@ -894,6 +1112,13 @@
         <item quantity="other"></item>
     </plurals>
     <string name="remove_votes_suggestion_title">Удалить историю ваших голосов?</string>
+    <string name="restore_cloud_backup_delete_backup_description" formatted="false">%s Он принадлежит исключительно вам, хранится в надежном месте и недоступен для других. Без пароля для бекапа восстановление кошельков из Google Диска невозможно. В случае потери удалите текущий бэкап, чтобы создать новый с новым паролем. %s</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_1">К сожалению, ваш пароль не может быть восстановлен.</string>
+    <string name="restore_cloud_backup_delete_backup_description_highlighted_2">Альтернативно, вы можете использовать Секретную фразу для восставновления кошелька.</string>
+    <string name="restore_cloud_backup_delete_backup_title">Потеряли пароль?</string>
+    <string name="restore_cloud_backup_password_title">Пароль для бэкапа был изменён ранее. Чтобы продолжить использование бэкапа, пожалуйста введите новый пароль.</string>
+    <string name="restore_cloud_backup_subtitle">Пожалуйста, введите пароль, установленный во время бэкапа</string>
+    <string name="restore_cloud_backup_title">Введите пароль от бэкапа</string>
     <string name="runtime_update_failure_description">Не удалось обновить информацию о среде выполнения блокчейна. Некоторые функции могут не работать.</string>
     <string name="runtime_update_failure_title">Ошибка обновления среды выполнения</string>
     <string name="search_contacts">Контакты</string>
@@ -936,6 +1161,9 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Руководство пользователя</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Убежденность будет установлена на 0.1x при Воздержании</string>
+    <string name="setup_staking_conflict_message">Невозможно стейкать напрямую и в пуле одновременно</string>
+    <string name="setup_staking_conflict_title">Уже застейкано</string>
     <string name="setup_staking_type_advanced_options_condition">Расширенное управление стейкингом</string>
     <string name="setup_staking_type_already_used_title">Тип стейкинга не может быть изменен</string>
     <string name="setup_staking_type_direct_already_used_message">У вас уже есть стейкинг напрямую</string>
@@ -951,7 +1179,6 @@
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Неподдерживаемый тип стейкинга</string>
     <string name="sr25519_selection_subtitle">sr25519 (рекомендованный)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_action_add_proxy">Делегировать полномочия (прокси)</string>
     <string name="staking_action_your_proxies">Ваши делегации</string>
@@ -1251,6 +1478,14 @@
     <string name="staking_your_stake">Ваш стейк</string>
     <string name="staking_your_validators">Ваши валидаторы</string>
     <string name="staking_your_validators_changing_title">Ваши валидаторы поменяются в следующую эру</string>
+    <string name="start_create_wallet_backup_ready_explanation">Теперь давайте создадим резервную копию вашего кошелька. Это гарантирует, что ваши средства будут в безопасности. Бэкапы позволяют восстановить ваш кошелёк в любое время.</string>
+    <string name="start_create_wallet_cloud_backup_btn">Продолжить с Google</string>
+    <string name="start_create_wallet_enter_wallet_name">Введите имя кошелька</string>
+    <string name="start_create_wallet_input_hint">Мой новый кошелёк</string>
+    <string name="start_create_wallet_manual_backup_btn">Продолжить с бэкапом вручную</string>
+    <string name="start_create_wallet_name_your_wallet">Назовите свой кошелёк</string>
+    <string name="start_create_wallet_set_wallet_name_explanation">Оно будет видно только вам и может быть изменено позже.</string>
+    <string name="start_create_wallet_your_wallet_is_ready">Ваш кошелёк готов</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Вы заблокировали токены на своем балансе используя %s. Чтобы продолжить, вам следует ввести меньше %s или больше %s. Чтобы поставить еще одну сумму, вам следует разблокировать токены из %s.</string>
     <string name="start_staking_cant_stake_amount">Вы не можете застейкать указанную сумму</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Выбрано: %d (макс. %d)</string>
@@ -1286,6 +1521,9 @@
     <string name="start_staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов. Повторите попытку позже</string>
     <string name="start_staking_max_nominators_reached_title">%s в настоящее время недоступен</string>
     <string name="start_staking_selection_validators_subtitle" formatted="false">Валидаторы: %d (макс. %d)</string>
+    <string name="state_changed">Изменён</string>
+    <string name="state_new">Добавлен</string>
+    <string name="state_removed">Удалён</string>
     <string name="swap_custom_fee_selector_description">Токен для оплаты комиссии сети</string>
     <string name="swap_custom_fee_selector_footer">Комиссия сети добавится к введенной сумме</string>
     <string name="swap_error_pair_not_supported">Эта пара не поддерживается</string>
@@ -1335,9 +1573,35 @@
     <string name="swap_slippage_warning_too_small">Транзакция может быть отменена из-за низкой устойчивости к проскальзыванию.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Сумма %s меньше минимального баланса %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Вы пытаетесь обменять слишком маленькую сумму</string>
+    <string name="swipe_gov_abstain_format">Воздержаться: %s</string>
+    <string name="swipe_gov_aye_format">За: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Вы всегда можете проголосовать за этот референдум позже </string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Удалить референдум %s из списка голосований?</string>
+    <string name="swipe_gov_basket_removed_items_message">Некоторые референдумы больше недоступны для голосования или у вас может быть недостаточно токенов для голосования. Доступно для голосования: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Некоторые референдумы исключены из списка голосований</string>
+    <string name="swipe_gov_card_data_loading_error_message">Данные референдума не удалось загрузить</string>
+    <string name="swipe_gov_card_data_loading_error_title">Данные не получены</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Вы уже проголосовали во всех доступных референдумах или на данный момент нет референдумов для голосования. Вернитесь позже.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Вы уже проголосовали во всех доступных референдумах</string>
+    <string name="swipe_gov_card_requested_title">Запрошено:</string>
+    <string name="swipe_gov_cards_basket_title">Список голосований</string>
+    <string name="swipe_gov_cards_counter">Осталось %d</string>
+    <string name="swipe_gov_cards_full_list">Подтвердить голоса</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Нет референдумов для голосования</string>
+    <string name="swipe_gov_cards_placeholder_button">Подтвердите ваши голоса</string>
+    <string name="swipe_gov_cards_voting_list_empty">Нет голосов</string>
+    <string name="swipe_gov_convirm_votes_success_message">Вы успешно проголосовали за %d референдума</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">У вас недостаточно баланса, чтобы проголосовать с текущей мощностью голоса %s (%sx). Пожалуйста, измените мощность голоса или добавьте больше средств в ваш кошелек.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Недостаточно баланса для голосования</string>
+    <string name="swipe_gov_nay_format">Против: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Проголосовать за %d референдума</string>
+    <string name="swipe_gov_vote_subtitle">Голосование будет настроено для будущих голосов в SwipeGov</string>
+    <string name="swipe_gov_vote_title">Мощность голоса</string>
     <string name="tabbar_staking_title">Стейкинг</string>
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="today">Сегодня</string>
+    <string name="token_price_info_provider_label">Ссылка Coingecko для курса валют (необязательно)</string>
     <string name="transaction_details_copy_hash">Копировать хеш</string>
     <string name="transaction_details_extrinsic_fee">Комиссия</string>
     <string name="transaction_details_from">От</string>
@@ -1431,6 +1695,9 @@
     <string name="wallet_filters_title">Фильтры</string>
     <string name="wallet_filters_transfers">Переводы</string>
     <string name="wallet_manage_assets_title">Управление ассетами</string>
+    <string name="wallet_management_add_account_title">Как добавить кошелёк?</string>
+    <string name="wallet_management_create_account_btn">Как добавить кошелёк?</string>
+    <string name="wallet_management_import_account_btn">Как добавить кошелёк?</string>
     <string name="wallet_nickname_create_caption_v2_2_0">Примеры имён: Мой аккаунт, Валидатор, Dotsama краудлоуны, и т.д.</string>
     <string name="wallet_receive_description">Поделитесь этим QR-кодом с отправителем</string>
     <string name="wallet_receive_description_v2_2_0">Покажите QR код отправителю для сканирования</string>

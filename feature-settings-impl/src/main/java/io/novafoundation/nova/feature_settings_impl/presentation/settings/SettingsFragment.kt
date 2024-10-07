@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settingsCurrency
 import kotlinx.android.synthetic.main.fragment_settings.settingsEmail
 import kotlinx.android.synthetic.main.fragment_settings.settingsGithub
 import kotlinx.android.synthetic.main.fragment_settings.settingsLanguage
+import kotlinx.android.synthetic.main.fragment_settings.settingsNetworks
 import kotlinx.android.synthetic.main.fragment_settings.settingsPin
 import kotlinx.android.synthetic.main.fragment_settings.settingsPinCodeVerification
 import kotlinx.android.synthetic.main.fragment_settings.settingsPrivacy
@@ -58,7 +59,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         accountView.setWholeClickListener { viewModel.accountActionsClicked() }
 
         settingsWallets.setOnClickListener { viewModel.walletsClicked() }
-
+        settingsNetworks.setOnClickListener { viewModel.networksClicked() }
         settingsPushNotifications.setOnClickListener { viewModel.pushNotificationsClicked() }
         settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
         settingsLanguage.setOnClickListener { viewModel.languagesClicked() }

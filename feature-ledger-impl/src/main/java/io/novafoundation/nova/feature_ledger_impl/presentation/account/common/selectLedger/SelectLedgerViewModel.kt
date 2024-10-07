@@ -5,13 +5,12 @@ import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
@@ -23,6 +22,7 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SideEffect
@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.SelectLedgerState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.WaitingForPermissionsState
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleScanFailed
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -49,11 +48,11 @@ abstract class SelectLedgerViewModel(
     private val locationManager: LocationManager,
     private val router: ReturnableRouter,
     private val resourceManager: ResourceManager,
-    private val payload: SelectLedgerPayload,
-    private val chainRegistry: ChainRegistry,
-) : BaseViewModel(), PermissionsAsker by permissionsAsker, LedgerMessageCommands {
-
-    protected val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
+    private val messageFormatter: LedgerMessageFormatter,
+) : BaseViewModel(),
+    PermissionsAsker by permissionsAsker,
+    LedgerMessageCommands,
+    Browserable.Presentation by Browserable() {
 
     private val stateMachine = StateMachine(WaitingForPermissionsState(), coroutineScope = this)
 
@@ -61,7 +60,7 @@ abstract class SelectLedgerViewModel(
         .shareInBackground()
 
     val hints = flowOf {
-        resourceManager.getString(R.string.account_ledger_select_device_description, chain().name)
+        resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
     }.shareInBackground()
 
     override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()
@@ -85,7 +84,7 @@ abstract class SelectLedgerViewModel(
     open suspend fun handleLedgerError(reason: Throwable, device: LedgerDevice) {
         handleLedgerError(
             reason = reason,
-            chain = chain,
+            messageFormatter = messageFormatter,
             resourceManager = resourceManager,
             retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
         )

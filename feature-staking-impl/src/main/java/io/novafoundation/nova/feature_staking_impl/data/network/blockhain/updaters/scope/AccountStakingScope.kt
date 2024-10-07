@@ -5,7 +5,6 @@ import io.novafoundation.nova.core.updater.UpdateScope
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.runtime.state.assetWithChain
 import kotlinx.coroutines.flow.Flow

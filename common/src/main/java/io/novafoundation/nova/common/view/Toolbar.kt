@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
@@ -18,6 +19,8 @@ import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setImageTintRes
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
 import kotlinx.android.synthetic.main.view_toolbar.view.backImg
 import kotlinx.android.synthetic.main.view_toolbar.view.rightActionContainer
@@ -129,6 +132,11 @@ class Toolbar @JvmOverloads constructor(
     fun hideRightAction() {
         rightImg.makeGone()
         rightText.makeGone()
+    }
+
+    fun setRightActionTint(@ColorRes colorRes: Int) {
+        rightImg.setImageTintRes(colorRes)
+        rightText.setTextColorRes(colorRes)
     }
 
     fun setRightIconRes(@DrawableRes iconRes: Int) {

@@ -21,8 +21,8 @@ import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeBackButton
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeCreateWalletButton
-import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
 import kotlinx.android.synthetic.main.fragment_welcome.welcomeRestoreWalletButton
+import kotlinx.android.synthetic.main.fragment_welcome.welcomeTerms
 
 class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
 

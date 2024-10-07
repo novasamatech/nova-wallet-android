@@ -3,9 +3,8 @@ package io.novafoundation.nova.runtime.ethereum
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
@@ -23,9 +22,8 @@ import java.util.concurrent.ScheduledExecutorService
 
 class Web3ApiFactory(
     private val requestExecutorService: ScheduledExecutorService = Async.defaultExecutorService(),
-    private val connectionSecrets: ConnectionSecrets,
     private val httpClient: OkHttpClient,
-    private val strategyProvider: AutoBalanceStrategyProvider,
+    private val strategyProvider: NodeSelectionStrategyProvider,
 ) {
 
     fun createWss(socketService: SocketService): Web3Api {
@@ -37,13 +35,21 @@ class Web3ApiFactory(
         )
     }
 
+    fun createHttps(chainNode: Chain.Node): Pair<Web3Api, UpdatableNodes> {
+        val nodes = Chain.Nodes(
+            autoBalanceStrategy = Chain.Nodes.AutoBalanceStrategy.ROUND_ROBIN,
+            wssNodeSelectionStrategy = Chain.Nodes.NodeSelectionStrategy.AutoBalance,
+            nodes = listOf(chainNode)
+        )
+
+        return createHttps(nodes)
+    }
+
     fun createHttps(chainNodes: Chain.Nodes): Pair<Web3Api, UpdatableNodes> {
         val service = BalancingHttpWeb3jService(
             initialNodes = chainNodes,
-            connectionSecrets = connectionSecrets,
             httpClient = httpClient,
             strategyProvider = strategyProvider,
-            executorService = requestExecutorService
         )
 
         val api = RealWeb3Api(

@@ -7,19 +7,21 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.KnownMaxUnlockingOverwrites
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.RealKnownMaxUnlockingOverwrites
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.FixedKnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PredefinedPoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.RealPoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolDelegatedStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolUnbondRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolDelegatedStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
@@ -31,6 +33,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedCo
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.delegatedStake.DelegatedStakeMigrationUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.delegatedStake.RealDelegatedStakeMigrationUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.hints.NominationPoolHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.hints.RealNominationPoolHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
@@ -54,6 +58,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -112,9 +117,10 @@ class NominationPoolModule {
     @FeatureScope
     fun provideNominationPoolMembersRepository(
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+        @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource,
         multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     ): NominationPoolMembersRepository {
-        return RealNominationPoolMembersRepository(localStorageSource, multiChainRuntimeCallsApi)
+        return RealNominationPoolMembersRepository(localStorageSource, remoteDataSource, multiChainRuntimeCallsApi)
     }
 
     @Provides
@@ -274,4 +280,23 @@ class NominationPoolModule {
         nominationPoolStateRepository = nominationPoolStateRepository,
         poolStateRepository = poolStateRepository
     )
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolDelegatedStakeRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): NominationPoolDelegatedStakeRepository {
+        return RealNominationPoolDelegatedStakeRepository(localStorageSource, chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideDelegatedStakeMigrationUseCase(
+        delegatedStakeRepository: NominationPoolDelegatedStakeRepository,
+        stakingSharedState: StakingSharedState,
+        accountRepository: AccountRepository
+    ): DelegatedStakeMigrationUseCase {
+        return RealDelegatedStakeMigrationUseCase(delegatedStakeRepository, stakingSharedState, accountRepository)
+    }
 }

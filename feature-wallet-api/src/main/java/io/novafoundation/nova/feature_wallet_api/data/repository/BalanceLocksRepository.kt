@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BalanceLocksRepository {
 
-    suspend fun observeBalanceLocks(chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>>
+    suspend fun observeBalanceLocks(metaId: Long, chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>>
 
     suspend fun getBiggestLock(chain: Chain, chainAsset: Chain.Asset): BalanceLock?
 

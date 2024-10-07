@@ -15,4 +15,6 @@ sealed class NominationPoolsRedeemValidationFailure {
 
     class ToStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
         NominationPoolsRedeemValidationFailure(), InsufficientBalanceToStayAboveEDError
+
+    object StakingTypesConflict : NominationPoolsRedeemValidationFailure()
 }

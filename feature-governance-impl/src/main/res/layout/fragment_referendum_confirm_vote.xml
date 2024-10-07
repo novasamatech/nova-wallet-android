@@ -64,21 +64,21 @@
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="16dp">
 
-                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.AmountChangesView
                         android:id="@+id/confirmReferendumVoteTransferableAmountChanges"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:amountChanges_icon="@drawable/ic_transferable"
                         app:amountChanges_title="@string/wallet_balance_transferable" />
 
-                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.AmountChangesView
                         android:id="@+id/confirmReferendumVoteLockedAmountChanges"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:amountChanges_icon="@drawable/ic_lock"
                         app:amountChanges_title="@string/referendum_vote_governance_lock" />
 
-                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+                    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.AmountChangesView
                         android:id="@+id/confirmReferendumVoteLockedPeriodChanges"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

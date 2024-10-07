@@ -32,6 +32,18 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Aye" />
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/votersViewVotesCountShimmer"
+        android:layout_width="68dp"
+        android:layout_height="8dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_shimmering"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/votersViewVotesInfo"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/votersViewVotesCount"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"

@@ -27,9 +27,11 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.unlabeledReserves
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -78,8 +80,10 @@ class BalanceDetailViewModel(
         .share()
 
     private val balanceLocksFlow = balanceLocksInteractor.balanceLocksFlow(assetPayload.chainId, assetPayload.chainAssetId)
-        .inBackground()
-        .share()
+        .shareInBackground()
+
+    private val balanceHoldsFlow = balanceLocksInteractor.balanceHoldsFlow(assetPayload.chainId, assetPayload.chainAssetId)
+        .shareInBackground()
 
     private val selectedAccountFlow = accountUseCase.selectedMetaAccountFlow()
         .share()
@@ -94,8 +98,8 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    private val lockedBalanceModel = combine(balanceLocksFlow, externalBalancesFlow, assetFlow) { locks, externalBalances, asset ->
-        mapBalanceLocksToUi(locks, externalBalances, asset)
+    private val lockedBalanceModel = combine(balanceLocksFlow, balanceHoldsFlow, externalBalancesFlow, assetFlow) { locks, holds, externalBalances, asset ->
+        mapBalanceLocksToUi(locks, holds, externalBalances, asset)
     }
         .inBackground()
         .share()
@@ -140,6 +144,8 @@ class BalanceDetailViewModel(
 
     fun sync() {
         launch {
+            swapAvailabilityInteractor.sync(viewModelScope)
+
             val currency = currencyInteractor.getSelectedCurrency()
             val deferredAssetSync = async { walletInteractor.syncAssetsRates(currency) }
             val deferredTransactionsSync = async { transactionHistoryMixin.syncFirstOperationsPage() }
@@ -204,6 +210,7 @@ class BalanceDetailViewModel(
 
     private fun mapBalanceLocksToUi(
         balanceLocks: List<BalanceLock>,
+        holds: List<BalanceHold>,
         externalBalances: List<ExternalBalance>,
         asset: Asset
     ): BalanceLocksModel {
@@ -214,9 +221,18 @@ class BalanceDetailViewModel(
             )
         }
 
+        val mappedHolds = holds.map {
+            BalanceLocksModel.Lock(
+                mapBalanceIdToUi(resourceManager, it.identifier),
+                mapAmountToAmountModel(it.amountInPlanks, asset)
+            )
+        }
+
+        val unlabeledReserves = asset.unlabeledReserves(holds)
+
         val reservedBalance = BalanceLocksModel.Lock(
             resourceManager.getString(R.string.wallet_balance_reserved),
-            mapAmountToAmountModel(asset.reserved, asset)
+            mapAmountToAmountModel(unlabeledReserves, asset)
         )
 
         val external = externalBalances.map { externalBalance ->
@@ -228,6 +244,7 @@ class BalanceDetailViewModel(
 
         val locks = buildList {
             addAll(mappedLocks)
+            addAll(mappedHolds)
             add(reservedBalance)
             addAll(external)
         }

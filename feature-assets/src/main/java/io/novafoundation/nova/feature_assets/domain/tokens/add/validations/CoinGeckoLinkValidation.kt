@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.isTrueOrError
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
-import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 
 class CoinGeckoLinkValidationFactory(

@@ -17,6 +17,7 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.math.RoundingMode
 import java.util.Calendar
 import java.util.Collections
 import java.util.Date
@@ -98,6 +99,10 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
     return destination
 }
 
+fun <T> List<T>.safeSubList(fromIndex: Int, toIndex: Int): List<T> {
+    return subList(fromIndex.coerceIn(0, size), toIndex.coerceIn(0, size))
+}
+
 suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     return coroutineScope {
         map { async { operation(it) } }
@@ -110,6 +115,10 @@ suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> List<R>): 
     }.awaitAll().flatten()
 }
 
+
+suspend fun <T, R> Iterable<T>.forEachAsync(operation: suspend (T) -> R) {
+    mapAsync(operation)
+}
 
 fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     if (prefix.size > size) return false
@@ -185,6 +194,35 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
 fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
+
+fun BigDecimal.lessEpsilon(): BigDecimal = when {
+    this.isZero -> this
+    else -> this.subtract(BigInteger.ONE.toBigDecimal(scale = MathContext.DECIMAL64.precision))
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal): BigDecimal? = try {
+    this.divide(value)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal, mathContext: MathContext): BigDecimal? = try {
+    this.divide(value, mathContext)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal, roundingMode: RoundingMode): BigDecimal? = try {
+    this.divide(value, roundingMode)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.coerceInOrNull(from: BigDecimal, to: BigDecimal): BigDecimal? = if (this >= from && this <= to) {
+    this
+} else {
+    null
+}
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
@@ -367,6 +405,8 @@ inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filt
 
 fun String?.nullIfEmpty(): String? = if (isNullOrEmpty()) null else this
 
+fun String?.nullIfBlank(): String? = if (isNullOrBlank()) null else this
+
 fun String.ensureSuffix(suffix: String) = if (endsWith(suffix)) this else this + suffix
 
 private val NAMED_PATTERN_REGEX = "\\{([a-zA-z]+)\\}".toRegex()
@@ -455,9 +495,9 @@ inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fo
 
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
-fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
+fun <T> Collection<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
 
-fun <T> List<T>.indexOfOrNull(value: T) = indexOf(value).takeIf { it >= 0 }
+fun <T> Collection<T>.indexOfOrNull(value: T) = indexOf(value).takeIf { it >= 0 }
 
 @Suppress("IfThenToElvis")
 fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {

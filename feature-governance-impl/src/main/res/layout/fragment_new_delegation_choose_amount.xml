@@ -53,7 +53,7 @@
                     android:orientation="horizontal" />
             </HorizontalScrollView>
 
-            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.VotePowerView
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.VotePowerView
                 android:id="@+id/newDelegationChooseAmountVotePower"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp" />
 
-            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.AmountChangesView
                 android:id="@+id/newDelegationChooseAmountLockedAmountChanges"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
                 app:amountChanges_icon="@drawable/ic_lock"
                 app:amountChanges_title="@string/referendum_vote_governance_lock" />
 
-            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.AmountChangesView
+            <io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.AmountChangesView
                 android:id="@+id/newDelegationChooseAmountLockedPeriodChanges"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

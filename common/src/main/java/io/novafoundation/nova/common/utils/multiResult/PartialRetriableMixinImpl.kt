@@ -27,9 +27,9 @@ private class PartialRetriableMixinImpl(
     coroutineScope: CoroutineScope
 ) : PartialRetriableMixin.Presentation, CoroutineScope by coroutineScope {
 
-    override fun <T> handleMultiResult(
+    override suspend fun <T> handleMultiResult(
         multiResult: RetriableMultiResult<T>,
-        onSuccess: (List<T>) -> Unit,
+        onSuccess: suspend (List<T>) -> Unit,
         progressConsumer: ProgressConsumer?,
         onRetryCancelled: () -> Unit
     ) {
@@ -44,7 +44,7 @@ private class PartialRetriableMixinImpl(
 
     private fun <T> submissionFailed(
         failure: RetriableMultiResult.RetriableFailure<T>,
-        onSuccess: (List<T>) -> Unit,
+        onSuccess: suspend (List<T>) -> Unit,
         progressConsumer: ProgressConsumer?,
         onRetryCancelled: () -> Unit,
     ) {
@@ -62,7 +62,7 @@ private class PartialRetriableMixinImpl(
 
     private fun <T> retrySubmission(
         failure: RetriableMultiResult.RetriableFailure<T>,
-        onSuccess: (List<T>) -> Unit,
+        onSuccess: suspend (List<T>) -> Unit,
         progressConsumer: ProgressConsumer?,
         onRetryCancelled: () -> Unit
     ) {

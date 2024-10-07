@@ -17,31 +17,17 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
-import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
-import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class BalanceListModule {
-
-    @Provides
-    @ScreenScope
-    fun provideBalanceLocksInteractor(
-        chainRegistry: ChainRegistry,
-        balanceLocksRepository: BalanceLocksRepository
-    ): BalanceLocksInteractor {
-        return BalanceLocksInteractorImpl(
-            chainRegistry,
-            balanceLocksRepository
-        )
-    }
 
     @Provides
     @ScreenScope
@@ -55,11 +41,13 @@ class BalanceListModule {
     @ScreenScope
     fun provideBalanceBreakdownInteractor(
         accountRepository: AccountRepository,
-        balanceLocksRepository: BalanceLocksRepository
+        balanceLocksRepository: BalanceLocksRepository,
+        balanceHoldsRepository: BalanceHoldsRepository
     ): BalanceBreakdownInteractor {
         return BalanceBreakdownInteractor(
             accountRepository,
-            balanceLocksRepository
+            balanceLocksRepository,
+            balanceHoldsRepository
         )
     }
 

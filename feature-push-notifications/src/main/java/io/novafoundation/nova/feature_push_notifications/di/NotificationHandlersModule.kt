@@ -6,8 +6,8 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.AssetDetailsDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope

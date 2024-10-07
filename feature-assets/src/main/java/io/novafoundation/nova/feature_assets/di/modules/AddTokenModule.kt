@@ -5,7 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
-import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.domain.tokens.add.RealAddTokensInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository

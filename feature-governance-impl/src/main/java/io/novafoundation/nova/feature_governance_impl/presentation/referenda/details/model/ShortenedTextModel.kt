@@ -50,5 +50,6 @@ fun ShortenedTextModel?.applyTo(textView: TextView, readMoreView: ReadMoreView, 
         textView.text = shortenedText
     }
 
+    textView.setVisible(true)
     readMoreView.setVisible(hasMore)
 }

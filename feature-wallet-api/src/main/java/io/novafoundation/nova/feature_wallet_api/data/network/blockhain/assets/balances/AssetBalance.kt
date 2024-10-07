@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import java.math.BigInteger
 
 sealed class BalanceSyncUpdate {
@@ -29,6 +30,14 @@ interface AssetBalance {
         accountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*>
+
+    suspend fun startSyncingBalanceHolds(
+        metaAccount: MetaAccount,
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        subscriptionBuilder: SharedRequestsBuilder
+    ): Flow<*> = emptyFlow<Nothing>()
 
     suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
 

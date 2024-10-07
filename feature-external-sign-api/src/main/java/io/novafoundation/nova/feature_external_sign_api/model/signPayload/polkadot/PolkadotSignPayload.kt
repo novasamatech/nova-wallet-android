@@ -19,6 +19,8 @@ sealed class PolkadotSignPayload : Parcelable {
         val specVersion: String,
         val tip: String,
         val transactionVersion: String,
+        val metadataHash: String?,
+        val withSignedTransaction: Boolean?,
         val signedExtensions: List<String>,
         val version: Int
     ) : PolkadotSignPayload()
@@ -32,3 +34,5 @@ sealed class PolkadotSignPayload : Parcelable {
 }
 
 fun PolkadotSignPayload.maybeSignExtrinsic(): PolkadotSignPayload.Json? = this as? PolkadotSignPayload.Json
+
+fun PolkadotSignPayload.genesisHash(): String? = (this as? PolkadotSignPayload.Json)?.genesisHash

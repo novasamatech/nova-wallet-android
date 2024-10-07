@@ -5,15 +5,17 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.delegatedStake.DelegatedStakeMigrationUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.hints.NominationPoolHintsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.RealNominationPoolsUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFactory
@@ -52,13 +54,15 @@ class NominationPoolsCommonUnbondModule {
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         poolAccountDerivation: PoolAccountDerivation,
         poolMemberUseCase: NominationPoolMemberUseCase,
+        migrationUseCase: DelegatedStakeMigrationUseCase
     ): NominationPoolsUnbondInteractor {
         return RealNominationPoolsUnbondInteractor(
             extrinsicService = extrinsicService,
             stakingSharedState = stakingSharedState,
             nominationPoolSharedComputation = nominationPoolSharedComputation,
             poolAccountDerivation = poolAccountDerivation,
-            poolMemberUseCase = poolMemberUseCase
+            poolMemberUseCase = poolMemberUseCase,
+            migrationUseCase = migrationUseCase
         )
     }
 
@@ -66,8 +70,15 @@ class NominationPoolsCommonUnbondModule {
     @ScreenScope
     fun provideValidationSystem(
         validationFactory: NominationPoolsUnbondValidationFactory,
-        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
-    ): NominationPoolsUnbondValidationSystem = ValidationSystem.nominationPoolsUnbond(validationFactory, enoughTotalToStayAboveEDValidationFactory)
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+        stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory
+    ): NominationPoolsUnbondValidationSystem {
+        return ValidationSystem.nominationPoolsUnbond(
+            unbondValidationFactory = validationFactory,
+            enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory,
+            stakingTypesConflictValidationFactory = stakingTypesConflictValidationFactory
+        )
+    }
 
     @Provides
     @ScreenScope

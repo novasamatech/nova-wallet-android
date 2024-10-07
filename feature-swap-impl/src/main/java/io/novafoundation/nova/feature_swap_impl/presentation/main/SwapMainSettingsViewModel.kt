@@ -34,7 +34,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkF
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -59,7 +59,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.Swa
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.main.view.FeeAssetSelectorBottomSheet
+import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
@@ -78,6 +78,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -180,7 +181,9 @@ class SwapMainSettingsViewModel(
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
         tokenFlow = feeAssetFlow.map { it?.token },
         configuration = GenericFeeLoaderMixin.Configuration(
-            initialStatusValue = FeeStatus.NoFee
+            initialState = Configuration.InitialState(
+                feeStatus = FeeStatus.NoFee,
+            )
         )
     )
 
@@ -301,6 +304,10 @@ class SwapMainSettingsViewModel(
         feeMixin.setupFees()
 
         setCustomFeeAssetIfNotEnoughNative()
+
+        launch {
+            swapInteractor.sync(viewModelScope)
+        }
     }
 
     fun selectPayToken() {

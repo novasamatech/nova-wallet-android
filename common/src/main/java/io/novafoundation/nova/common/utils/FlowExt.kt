@@ -52,6 +52,10 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
+inline fun <T> Flow<List<T>>.filterList(crossinline handler: suspend (T) -> Boolean) = map { list ->
+    list.filter { item -> handler(item) }
+}
+
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
 }
@@ -178,6 +182,8 @@ fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Fl
 
 suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
 
+suspend fun <T> Flow<ExtendedLoadingState<T>>.firstIfLoaded(): T? = first().dataOrNull
+
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
@@ -263,6 +269,16 @@ fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {
     }
 }
 
+fun <T> Flow<T>.onEachWithPrevious(action: suspend (T?, T) -> Unit): Flow<T> = flow {
+    var current: T? = null
+
+    collect {
+        action(current, it)
+        emit(it)
+        current = it
+    }
+}
+
 private fun <K> MutableMap<K, CoroutineScope>.removeAndCancel(key: K) {
     remove(key)?.also(CoroutineScope::cancel)
 }
@@ -292,6 +308,7 @@ fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend
 private class SendingCollector<T>(
     private val channel: SendChannel<T>
 ) : FlowCollector<T> {
+
     override suspend fun emit(value: T): Unit = channel.send(value)
 }
 
@@ -543,6 +560,20 @@ fun <A, B, C, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, transform
         flowB.onEach { bResult = it },
         flowC.onEach { cResult = it },
     ).map { transform(aResult, bResult, cResult) }
+}
+
+fun <A, B, C, D, R> unite(flowA: Flow<A>, flowB: Flow<B>, flowC: Flow<C>, flowD: Flow<D>, transform: (A?, B?, C?, D?) -> R): Flow<R> {
+    var aResult: A? = null
+    var bResult: B? = null
+    var cResult: C? = null
+    var dResult: D? = null
+
+    return merge(
+        flowA.onEach { aResult = it },
+        flowB.onEach { bResult = it },
+        flowC.onEach { cResult = it },
+        flowD.onEach { dResult = it }
+    ).map { transform(aResult, bResult, cResult, dResult) }
 }
 
 fun <T> firstNonEmpty(

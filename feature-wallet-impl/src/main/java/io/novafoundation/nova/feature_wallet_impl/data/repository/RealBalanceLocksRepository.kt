@@ -14,14 +14,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 class RealBalanceLocksRepository(
+    // TODO refactoring - repository should not depend on other repository. MetaId should be passed to repository arguments
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val lockDao: LockDao
 ) : BalanceLocksRepository {
 
-    override suspend fun observeBalanceLocks(chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>> {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        return lockDao.observeBalanceLocks(metaAccount.id, chain.id, chainAsset.id)
+    override suspend fun observeBalanceLocks(metaId: Long, chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>> {
+        return lockDao.observeBalanceLocks(metaId, chain.id, chainAsset.id)
             .mapList { lock -> mapBalanceLockFromLocal(chainAsset, lock) }
     }
 

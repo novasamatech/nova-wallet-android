@@ -25,7 +25,7 @@ android {
             keyAlias readRawSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
             keyPassword readRawSecretOrNull('CI_KEYSTORE_KEY_PASS')
         }
-        debug {
+        debugFixedKey {
             storeFile file('develop_key.jks')
             storePassword readRawSecretOrNull('CI_KEYSTORE_PASS')
             keyAlias readRawSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
@@ -46,10 +46,17 @@ android {
     }
     buildTypes {
         debug {
+            signingConfig signingConfigs.debugFixedKey
+
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
 
             buildConfigField "String", "BuildType", "\"debug\""
+        }
+        debugLocal {
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
+            signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false
@@ -185,6 +192,7 @@ dependencies {
     implementation project(':feature-onboarding-impl')
 
     implementation project(':feature-ledger-api')
+    implementation project(':feature-ledger-core')
     implementation project(':feature-ledger-impl')
 
     implementation project(':feature-account-api')
@@ -235,6 +243,7 @@ dependencies {
     implementation project(':feature-settings-api')
     implementation project(':feature-settings-impl')
 
+    implementation project(":feature-swap-core")
     implementation project(':feature-swap-api')
     implementation project(':feature-swap-impl')
 
@@ -246,6 +255,10 @@ dependencies {
 
     implementation project(':feature-cloud-backup-api')
     implementation project(':feature-cloud-backup-impl')
+
+    implementation project(':bindings:metadata_shortener')
+
+    implementation project(':test-shared')
 
     implementation kotlinDep
 

@@ -6,9 +6,12 @@ import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
 fun createTestChain(
@@ -28,8 +31,17 @@ fun createTestChain(
             assetOf(assetId = it, symbol = it.toString())
         }
     }
+    val explorers = emptyList<ChainExplorerLocal>()
+    val externalApis = emptyList<ChainExternalApiLocal>()
 
-    return JoinedChainInfo(chain, nodes, assets, explorers = emptyList(), externalApis = emptyList())
+    return JoinedChainInfo(
+        chain,
+        NodeSelectionPreferencesLocal(chain.id, autoBalanceEnabled = true, selectedNodeUrl = null),
+        nodes,
+        assets,
+        explorers,
+        externalApis
+    )
 }
 
 fun chainOf(
@@ -44,10 +56,17 @@ fun chainOf(
     prefix = 0,
     isTestNet = false,
     isEthereumBased = false,
-    externalApi = null,
     hasCrowdloans = false,
     additional = "",
-    governance = "governance"
+    governance = "governance",
+    connectionState = ChainLocal.ConnectionStateLocal.FULL_SYNC,
+    pushSupport = true,
+    supportProxy = false,
+    swap = "",
+    hasSubstrateRuntime = true,
+    nodeSelectionStrategy = ChainLocal.AutoBalanceStrategyLocal.ROUND_ROBIN,
+    source = ChainLocal.Source.CUSTOM,
+    customFee = ""
 )
 
 fun ChainLocal.nodeOf(
@@ -56,7 +75,8 @@ fun ChainLocal.nodeOf(
     name = "Test",
     url = link,
     chainId = id,
-    orderId = 0
+    orderId = 0,
+    source = ChainNodeLocal.Source.CUSTOM,
 )
 
 fun ChainLocal.assetOf(
@@ -84,7 +104,8 @@ suspend fun ChainDao.addChains(chains: List<JoinedChainInfo>) {
         assetsDiff = addedDiff(chains.flatMap(JoinedChainInfo::assets)),
         nodesDiff = addedDiff(chains.flatMap(JoinedChainInfo::nodes)),
         explorersDiff = addedDiff(chains.flatMap(JoinedChainInfo::explorers)),
-        externalApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::externalApis))
+        externalApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::externalApis)),
+        nodeSelectionPreferencesDiff = emptyDiff()
     )
 }
 
@@ -96,7 +117,8 @@ suspend fun ChainDao.removeChain(joinedChainInfo: JoinedChainInfo) {
         assetsDiff = removedDiff(joinedChainInfo.assets),
         nodesDiff = removedDiff(joinedChainInfo.nodes),
         explorersDiff = removedDiff(joinedChainInfo.explorers),
-        externalApisDiff = removedDiff(joinedChainInfo.externalApis)
+        externalApisDiff = removedDiff(joinedChainInfo.externalApis),
+        nodeSelectionPreferencesDiff = emptyDiff()
     )
 }
 
@@ -106,7 +128,8 @@ suspend fun ChainDao.updateChain(joinedChainInfo: JoinedChainInfo) {
         assetsDiff = updatedDiff(joinedChainInfo.assets),
         nodesDiff = updatedDiff(joinedChainInfo.nodes),
         explorersDiff = updatedDiff(joinedChainInfo.explorers),
-        externalApisDiff = updatedDiff(joinedChainInfo.externalApis)
+        externalApisDiff = updatedDiff(joinedChainInfo.externalApis),
+        nodeSelectionPreferencesDiff = emptyDiff()
     )
 }
 
@@ -148,7 +171,10 @@ fun testMetaAccount(name: String = "Test") = MetaAccountLocal(
     substrateAccountId = byteArrayOf(),
     ethereumAddress = null,
     position = 0,
-    type = MetaAccountLocal.Type.WATCH_ONLY
+    type = MetaAccountLocal.Type.WATCH_ONLY,
+    globallyUniqueId = "",
+    parentMetaId = 1,
+    status = MetaAccountLocal.Status.ACTIVE
 )
 
 fun testChainAccount(

@@ -47,6 +47,8 @@ sealed class AccountVote {
     ) : AccountVote()
 
     object Unsupported : AccountVote()
+
+    companion object
 }
 
 data class PriorLock(
@@ -232,4 +234,22 @@ fun Conviction.amountMultiplier(): BigDecimal {
 
 fun Voting.Delegating.getConvictionVote(chainAsset: Chain.Asset): GenericVoter.ConvictionVote {
     return GenericVoter.ConvictionVote(chainAsset.amountFromPlanks(amount), conviction)
+}
+
+fun AccountVote.Companion.constructAccountVote(amount: BigInteger, conviction: Conviction, voteType: VoteType): AccountVote {
+    return if (voteType == VoteType.ABSTAIN) {
+        AccountVote.SplitAbstain(
+            aye = BigInteger.ZERO,
+            nay = BigInteger.ZERO,
+            abstain = amount
+        )
+    } else {
+        AccountVote.Standard(
+            vote = Vote(
+                aye = voteType == VoteType.AYE,
+                conviction = conviction
+            ),
+            balance = amount
+        )
+    }
 }

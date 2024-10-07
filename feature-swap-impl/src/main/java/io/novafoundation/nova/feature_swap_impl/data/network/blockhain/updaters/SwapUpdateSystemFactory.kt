@@ -13,7 +13,7 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.ConstantSingleChainUpdateSystem
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.SupportedAssetOption
@@ -49,7 +49,7 @@ class SwapUpdateSystemFactory(
     }
 
     private fun blockNumberUpdater(sharedStateAdapter: SwapSharedStateAdapter): Updater<*> {
-        return BlockNumberUpdater(chainRegistry, sharedStateAdapter, storageCache)
+        return SharedAssetBlockNumberUpdater(chainRegistry, sharedStateAdapter, storageCache)
     }
 }
 

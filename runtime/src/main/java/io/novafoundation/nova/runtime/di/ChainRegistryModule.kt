@@ -5,6 +5,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -21,9 +23,13 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
-import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.NodeSelectionStrategyProvider
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.AsyncChainSyncDispatcher
+import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeCacheMigrator
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
+import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeMetadataFetcher
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
@@ -76,9 +82,22 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideRuntimeMetadataFetcher(): RuntimeMetadataFetcher {
+        return RuntimeMetadataFetcher()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideRuntimeCacheMigrator(): RuntimeCacheMigrator {
+        return RuntimeCacheMigrator()
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideRuntimeFilesCache(
         fileProvider: FileProvider,
-    ) = RuntimeFilesCache(fileProvider)
+        preferences: Preferences
+    ) = RuntimeFilesCache(fileProvider, preferences)
 
     @Provides
     @ApplicationScope
@@ -92,7 +111,16 @@ class ChainRegistryModule {
         typesFetcher: TypesFetcher,
         runtimeFilesCache: RuntimeFilesCache,
         chainDao: ChainDao,
-    ) = RuntimeSyncService(typesFetcher, runtimeFilesCache, chainDao)
+        runtimeCacheMigrator: RuntimeCacheMigrator,
+        runtimeMetadataFetcher: RuntimeMetadataFetcher
+    ) = RuntimeSyncService(
+        typesFetcher = typesFetcher,
+        runtimeFilesCache = runtimeFilesCache,
+        chainDao = chainDao,
+        runtimeMetadataFetcher = runtimeMetadataFetcher,
+        cacheMigrator = runtimeCacheMigrator,
+        chainSyncDispatcher = AsyncChainSyncDispatcher()
+    )
 
     @Provides
     @ApplicationScope
@@ -106,19 +134,21 @@ class ChainRegistryModule {
     fun provideRuntimeProviderPool(
         runtimeFactory: RuntimeFactory,
         runtimeSyncService: RuntimeSyncService,
+        runtimeFilesCache: RuntimeFilesCache,
         baseTypeSynchronizer: BaseTypeSynchronizer,
-    ) = RuntimeProviderPool(runtimeFactory, runtimeSyncService, baseTypeSynchronizer)
+    ) = RuntimeProviderPool(runtimeFactory, runtimeSyncService, runtimeFilesCache, baseTypeSynchronizer)
 
     @Provides
     @ApplicationScope
-    fun provideAutoBalanceProvider() = AutoBalanceStrategyProvider()
+    fun provideAutoBalanceProvider(
+        connectionSecrets: ConnectionSecrets
+    ) = NodeSelectionStrategyProvider(connectionSecrets)
 
     @Provides
     @ApplicationScope
     fun provideNodeAutoBalancer(
-        autoBalanceStrategyProvider: AutoBalanceStrategyProvider,
-        connectionSecrets: ConnectionSecrets
-    ) = NodeAutobalancer(autoBalanceStrategyProvider, connectionSecrets)
+        nodeSelectionStrategyProvider: NodeSelectionStrategyProvider,
+    ) = NodeAutobalancer(nodeSelectionStrategyProvider)
 
     @Provides
     @ApplicationScope
@@ -126,16 +156,28 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideNodeConnectionFactory(
+        socketProvider: Provider<SocketService>,
+        bulkRetriever: BulkRetriever,
+        connectionSecrets: ConnectionSecrets,
+        web3ApiFactory: Web3ApiFactory
+    ) = NodeHealthStateTesterFactory(
+        socketProvider,
+        connectionSecrets,
+        bulkRetriever,
+        web3ApiFactory
+    )
+
+    @Provides
+    @ApplicationScope
     fun provideChainConnectionFactory(
         socketProvider: Provider<SocketService>,
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         nodeAutobalancer: NodeAutobalancer,
-        connectionSecrets: ConnectionSecrets,
     ) = ChainConnectionFactory(
         externalRequirementsFlow,
         nodeAutobalancer,
         socketProvider,
-        connectionSecrets
     )
 
     @Provides
@@ -152,8 +194,7 @@ class ChainRegistryModule {
     @Provides
     @ApplicationScope
     fun provideWeb3ApiFactory(
-        connectionSecrets: ConnectionSecrets,
-        strategyProvider: AutoBalanceStrategyProvider,
+        strategyProvider: NodeSelectionStrategyProvider,
     ): Web3ApiFactory {
         val builder = HttpService.getOkHttpClientBuilder()
         builder.interceptors().clear() // getOkHttpClientBuilder() adds logging interceptor which doesn't log into LogCat
@@ -164,7 +205,7 @@ class ChainRegistryModule {
 
         val okHttpClient = builder.build()
 
-        return Web3ApiFactory(connectionSecrets = connectionSecrets, strategyProvider = strategyProvider, httpClient = okHttpClient)
+        return Web3ApiFactory(strategyProvider = strategyProvider, httpClient = okHttpClient)
     }
 
     @Provides

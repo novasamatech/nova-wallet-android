@@ -207,7 +207,7 @@ internal class GoogleDriveBackupStorage(
             .build()
     }
 
-    private fun driveScope(): String = DriveScopes.DRIVE
+    private fun driveScope(): String = DriveScopes.DRIVE_FILE
 
     private fun backupFileName(): String {
         return if (debug) {

@@ -23,6 +23,14 @@ on:
         required: false
         type: string
         default: "false"
+      upload-name:
+        required: false
+        type: string
+        default: "apk"
+      build-debug-tests:
+        required: false
+        type: boolean
+        default: false
     secrets:
       ACALA_PROD_AUTH_TOKEN:
         required: true
@@ -50,6 +58,8 @@ on:
         required: true
       DEBUG_GOOGLE_OAUTH_ID:
         required: true
+      RELEASE_GOOGLE_OAUTH_ID:
+          required: true
       # Special secrets for signing:
       CI_MARKET_KEYSTORE_PASS:
         required: false
@@ -93,6 +103,7 @@ env:
   DWELLIR_API_KEY: ${{ secrets.DWELLIR_API_KEY }}
   WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
   DEBUG_GOOGLE_OAUTH_ID:  ${{ secrets.DEBUG_GOOGLE_OAUTH_ID }}
+  RELEASE_GOOGLE_OAUTH_ID:  ${{ secrets.RELEASE_GOOGLE_OAUTH_ID }}
 
   CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
   CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}
@@ -111,14 +122,16 @@ env:
   CI_DEVELOP_GOOGLE_SERVICES_FILE: ${{ secrets.CI_DEVELOP_GOOGLE_SERVICES }}
   CI_PRODUCTION_GOOGLE_SERVICES_FILE: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
 
+  POLKASSEMBLY_SUMMARY_API_KEY: ${{ secrets.POLKASSEMBLY_SUMMARY_API_KEY }}
+
 concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{inputs.upload-name}}
   cancel-in-progress: true
 
 jobs:
   build-app:
     name: Build app and test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Checkout particualr branch
@@ -144,7 +157,7 @@ jobs:
         uses: ./.github/workflows/install/
 
       - name: 🧪 Run tests
-        if: ${{ inputs.run-tests }} == "true"
+        if: ${{ inputs.run-tests }}
         run: ./gradlew runTest
 
       - name: 🔐 Getting github sign key
@@ -167,13 +180,17 @@ jobs:
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
         run: ./gradlew ${{ inputs.gradlew-command }}
 
+      - name: 🏗 Build debug tests
+        if: ${{ inputs.build-debug-tests }}
+        run: ./gradlew assembleDebugAndroidTest
+
       - name: 🧹 Delete key after building
         if: ${{ !startsWith(inputs.keystore-file-name, 'false') }}
         run: rm ./app/${{ inputs.keystore-file-name }}
 
       - name: ➡️ Upload build artifacts
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: apk
+          name: ${{ inputs.upload-name }}
           path: app/build/outputs/apk/

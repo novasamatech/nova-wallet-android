@@ -27,6 +27,11 @@ fun bindMultiLocation(instance: Any?): MultiLocation {
     )
 }
 
+fun bindVersionedMultiLocation(instance: Any?): MultiLocation {
+    val asDictEnum = instance.castToDictEnum()
+    return bindMultiLocation(asDictEnum.value)
+}
+
 private fun bindInterior(instance: Any?): MultiLocation.Interior {
     val asDictEnum = instance.castToDictEnum()
 

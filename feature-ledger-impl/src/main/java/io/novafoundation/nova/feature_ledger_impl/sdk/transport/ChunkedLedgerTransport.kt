@@ -17,9 +17,11 @@ import kotlin.math.min
 
 private const val DATA_TAG_ID: Byte = 0x05
 
+private const val CHANNEL_LENGTH = 2
 private const val PACKET_INDEX_LENGTH = 2
 private const val MESSAGE_SIZE_LENGTH = 2
-private const val HEADER_MIN_SIZE = 1 + PACKET_INDEX_LENGTH
+private const val HEADER_MIN_SIZE_NO_CHANNEL = 1 + PACKET_INDEX_LENGTH
+private const val HEADER_MIN_SIZE_CHANNEL = CHANNEL_LENGTH + HEADER_MIN_SIZE_NO_CHANNEL
 
 private class ReceivedChunk(val content: ByteArray, val total: Int?)
 
@@ -33,8 +35,9 @@ class ChunkedLedgerTransport : LedgerTransport {
         device.connection.resetReceiveChannel()
 
         val mtu = device.connection.mtu()
+        val channel = device.connection.channel
 
-        val chunks = buildRequestChunks(data, mtu)
+        val chunks = buildRequestChunks(data, mtu, channel)
         device.connection.send(chunks)
 
         readChunkedResponse(device.connection)
@@ -46,7 +49,11 @@ class ChunkedLedgerTransport : LedgerTransport {
         }
     }
 
-    private fun buildRequestChunks(data: ByteArray, mtu: Int): List<ByteArray> {
+    private fun buildRequestChunks(
+        data: ByteArray,
+        mtu: Int,
+        channel: Short?
+    ): List<ByteArray> {
         val chunks = mutableListOf<ByteArray>()
         val totalLength = data.size
         var offset = 0
@@ -56,6 +63,10 @@ class ChunkedLedgerTransport : LedgerTransport {
             val isFirst = currentIndex == 0
 
             val chunk = buildByteArray { stream ->
+                channel?.let {
+                    stream.write(channel.toShort().bigEndianBytes)
+                }
+
                 stream.write(byteArrayOf(DATA_TAG_ID))
                 stream.write(currentIndex.toShort().bigEndianBytes)
 
@@ -84,15 +95,18 @@ class ChunkedLedgerTransport : LedgerTransport {
     private suspend fun readChunkedResponse(connection: LedgerConnection): ByteArray {
         var result = ByteArray(0)
 
+        val hasChannel = connection.channel != null
+
         val headerRaw = connection.receiveChannel.receive()
-        val headerChunk = parseReceivedChunk(headerRaw)
+        val headerChunk = parseReceivedChunk(headerRaw, hasChannel, readMax = null)
         val total = headerChunk.total
         result += headerChunk.content
         require(total != null, Reason.NO_HEADER_FOUND)
 
         while (result.size < total!!) {
             val raw = connection.receiveChannel.receive()
-            val chunk = parseReceivedChunk(raw)
+            val readMax = total - result.size
+            val chunk = parseReceivedChunk(raw, hasChannel, readMax)
 
             require(chunk.total == null, Reason.INCOMPLETE_RESPONSE)
 
@@ -102,12 +116,20 @@ class ChunkedLedgerTransport : LedgerTransport {
         return result
     }
 
-    private fun parseReceivedChunk(raw: ByteArray): ReceivedChunk {
-        require(raw.size >= HEADER_MIN_SIZE, Reason.NO_HEADER_FOUND)
+    private fun parseReceivedChunk(
+        raw: ByteArray,
+        hasChannel: Boolean,
+        readMax: Int?
+    ): ReceivedChunk {
+        require(raw.size >= headerSize(hasChannel), Reason.NO_HEADER_FOUND)
 
         var remainedData = raw
 
-        val tag = raw.first()
+        if (hasChannel) {
+            remainedData = remainedData.dropBytes(CHANNEL_LENGTH)
+        }
+
+        val tag = remainedData.first()
         require(tag == DATA_TAG_ID, Reason.UNSUPPORTED_RESPONSE)
         remainedData = remainedData.dropBytes(1)
 
@@ -116,12 +138,18 @@ class ChunkedLedgerTransport : LedgerTransport {
 
         return if (packetIndex == 0.toUShort()) {
             require(remainedData.size >= MESSAGE_SIZE_LENGTH, Reason.NO_MESSAGE_SIZE_FOUND)
-            val messageSize = remainedData.copyBytes(from = 0, size = MESSAGE_SIZE_LENGTH).toBigEndianU16()
+            val messageSize = remainedData.copyBytes(from = 0, size = MESSAGE_SIZE_LENGTH).toBigEndianU16().toInt()
             remainedData = remainedData.dropBytes(MESSAGE_SIZE_LENGTH)
 
-            ReceivedChunk(remainedData, total = messageSize.toInt())
+            val content = remainedData.take(messageSize).toByteArray()
+
+            ReceivedChunk(content, total = messageSize)
         } else {
-            ReceivedChunk(remainedData, total = null)
+            val content = remainedData.take(readMax!!).toByteArray()
+
+            ReceivedChunk(content, total = null)
         }
     }
+
+    private fun headerSize(hasChannel: Boolean) = if (hasChannel) HEADER_MIN_SIZE_CHANNEL else HEADER_MIN_SIZE_NO_CHANNEL
 }

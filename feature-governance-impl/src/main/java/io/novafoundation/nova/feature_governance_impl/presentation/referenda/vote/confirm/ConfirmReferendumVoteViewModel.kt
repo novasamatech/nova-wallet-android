@@ -2,27 +2,25 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vo
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.constructAccountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.estimateLocksAfterVoting
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationPayload
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.handleVoteReferendumValidationFailure
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.VoteReferendaValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.VoteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
@@ -30,16 +28,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
-import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -54,7 +49,6 @@ class ConfirmReferendumVoteViewModel(
     private val walletUiUseCase: WalletUiUseCase,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val addressIconGenerator: AddressIconGenerator,
-    private val localIdentityProvider: IdentityProvider,
     private val interactor: VoteReferendumInteractor,
     private val assetUseCase: AssetUseCase,
     private val payload: ConfirmVoteReferendumPayload,
@@ -63,111 +57,76 @@ class ConfirmReferendumVoteViewModel(
     private val resourceManager: ResourceManager,
     private val referendumFormatter: ReferendumFormatter,
     private val locksChangeFormatter: LocksChangeFormatter,
-) : BaseViewModel(),
-    Validatable by validationExecutor,
-    WithFeeLoaderMixin,
-    ExternalActions by externalActions {
+) : ConfirmVoteViewModel(
+    router,
+    feeLoaderMixinFactory,
+    externalActions,
+    governanceSharedState,
+    hintsMixinFactory,
+    walletUiUseCase,
+    selectedAccountUseCase,
+    addressIconGenerator,
+    assetUseCase,
+    validationExecutor
+) {
 
-    private val assetFlow = assetUseCase.currentAssetFlow()
-        .shareInBackground()
-
-    override val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
-
-    val hintsMixin = hintsMixinFactory.create(scope = this)
-
-    val walletModel: Flow<WalletModel> = walletUiUseCase.selectedWalletUiFlow()
-        .shareInBackground()
-
-    val amountModelFlow = assetFlow.map {
-        mapAmountToAmountModel(payload.vote.amount, it)
+    override val titleFlow: Flow<String> = flowOf {
+        val formattedNumber = referendumFormatter.formatId(payload.referendumId)
+        resourceManager.getString(R.string.referendum_vote_setup_title, formattedNumber)
     }.shareInBackground()
 
-    val currentAddressModelFlow = selectedAccountUseCase.selectedMetaAccountFlow().map { metaAccount ->
-        val chain = governanceSharedState.chain()
-
-        addressIconGenerator.createAccountAddressModel(chain, metaAccount)
+    override val amountModelFlow: Flow<AmountModel> = assetFlow.map {
+        mapAmountToAmountModel(payload.vote.amount, it)
     }.shareInBackground()
 
     private val accountVoteFlow = assetFlow.map(::constructAccountVote)
         .shareInBackground()
 
-    private val _showNextProgress = MutableStateFlow(false)
-
-    val showNextProgress: Flow<Boolean> = _showNextProgress
-
     private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, viewModelScope)
 
-    val accountVoteUi = accountVoteFlow.map {
+    override val accountVoteUi = accountVoteFlow.map {
         val referendumVote = ReferendumVote.UserDirect(it)
         val (chain, chainAsset) = governanceSharedState.chainAndAsset()
 
         referendumFormatter.formatUserVote(referendumVote, chain, chainAsset)
     }.shareInBackground()
 
-    val title = flowOf {
-        val formattedNumber = referendumFormatter.formatId(payload.referendumId)
-        resourceManager.getString(R.string.referendum_vote_setup_title, formattedNumber)
-    }.shareInBackground()
-
     private val locksChangeFlow = voteAssistantFlow.map { voteAssistant ->
         val asset = assetFlow.first()
-        val amountPlanks = asset.token.planksFromAmount(payload.vote.amount)
+        val accountVote = constructAccountVote(asset)
 
-        voteAssistant.estimateLocksAfterVoting(amountPlanks, payload.vote.conviction, asset)
+        voteAssistant.estimateLocksAfterVoting(payload.referendumId, accountVote, asset)
     }
-
-    val locksChangeUiFlow = locksChangeFlow.map {
-        locksChangeFormatter.mapLocksChangeToUi(it, assetFlow.first())
-    }
-        .shareInBackground()
-
-    private val decimalFee = mapFeeFromParcel(payload.fee)
 
     init {
         setFee()
     }
 
-    fun accountClicked() = launch {
-        val addressModel = currentAddressModelFlow.first()
-        val type = ExternalActions.Type.Address(addressModel.address)
-
-        externalActions.showExternalActions(type, governanceSharedState.chain())
+    override val locksChangeUiFlow = locksChangeFlow.map {
+        locksChangeFormatter.mapLocksChangeToUi(it, assetFlow.first())
     }
+        .shareInBackground()
 
-    fun confirmClicked() = launch {
-        val voteAssistant = voteAssistantFlow.first()
-
-        val validationPayload = VoteReferendumValidationPayload(
-            onChainReferendum = voteAssistant.onChainReferendum,
-            asset = assetFlow.first(),
-            trackVoting = voteAssistant.trackVoting,
-            voteAmount = payload.vote.amount,
-            fee = decimalFee
-        )
-
-        validationExecutor.requireValid(
-            validationSystem = validationSystem,
-            payload = validationPayload,
-            validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
-            progressConsumer = _showNextProgress.progressConsumer(),
-        ) {
-            performVote()
+    override fun confirmClicked() {
+        launch {
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = getValidationPayload(),
+                validationFailureTransformerCustom = { status, actions ->
+                    handleVoteReferendumValidationFailure(status.reason, actions, resourceManager)
+                },
+                progressConsumer = _showNextProgress.progressConsumer(),
+            ) {
+                performVote()
+            }
         }
-    }
-
-    fun backClicked() {
-        router.back()
-    }
-
-    private fun setFee() = launch {
-        originFeeMixin.setFee(decimalFee.genericFee)
     }
 
     private fun performVote() = launch {
         val accountVote = accountVoteFlow.first()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.vote(accountVote, payload.referendumId)
+            interactor.voteReferendum(payload.referendumId, accountVote)
         }
 
         result.onSuccess {
@@ -179,15 +138,27 @@ class ConfirmReferendumVoteViewModel(
         _showNextProgress.value = false
     }
 
-    private fun constructAccountVote(asset: Asset): AccountVote.Standard {
+    private fun constructAccountVote(asset: Asset): AccountVote {
         val planks = asset.token.planksFromAmount(payload.vote.amount)
 
-        return AccountVote.Standard(
-            vote = Vote(
-                aye = payload.vote.aye,
-                conviction = payload.vote.conviction
-            ),
-            balance = planks
+        return AccountVote.constructAccountVote(planks, payload.vote.conviction, payload.vote.voteType)
+    }
+
+    private fun setFee() = launch {
+        originFeeMixin.setFee(mapFeeFromParcel(payload.fee).genericFee)
+    }
+
+    private suspend fun getValidationPayload(): VoteReferendaValidationPayload {
+        val voteAssistant = voteAssistantFlow.first()
+
+        return VoteReferendaValidationPayload(
+            onChainReferenda = voteAssistant.onChainReferenda,
+            asset = assetFlow.first(),
+            trackVoting = voteAssistant.trackVoting,
+            maxAmount = payload.vote.amount,
+            conviction = payload.vote.conviction,
+            voteType = payload.vote.voteType,
+            fee = originFeeMixin.awaitDecimalFee()
         )
     }
 }

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository

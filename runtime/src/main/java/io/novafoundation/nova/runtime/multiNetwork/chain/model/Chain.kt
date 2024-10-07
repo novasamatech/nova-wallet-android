@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.model
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
+import java.io.Serializable
 import java.math.BigInteger
 
 typealias ChainId = String
@@ -23,21 +24,23 @@ data class Chain(
     val nodes: Nodes,
     val explorers: List<Explorer>,
     val externalApis: List<ExternalApi>,
-    val icon: String,
+    val icon: String?,
     val addressPrefix: Int,
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    val source: Source,
     val hasSubstrateRuntime: Boolean,
     val pushSupport: Boolean,
     val hasCrowdloans: Boolean,
     val supportProxy: Boolean,
     val governance: List<Governance>,
     val swap: List<Swap>,
+    val customFee: List<CustomFee>,
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
-) : Identifiable {
+) : Identifiable, Serializable {
 
     companion object // extensions
 
@@ -51,7 +54,9 @@ data class Chain(
         val relaychainAsNative: Boolean?,
         val stakingMaxElectingVoters: Int?,
         val feeViaRuntimeCall: Boolean?,
-        val identityChain: ChainId?
+        val supportLedgerGenericApp: Boolean?,
+        val identityChain: ChainId?,
+        val disabledCheckMetadataHash: Boolean?
     )
 
     data class Types(
@@ -72,7 +77,7 @@ data class Chain(
         val source: Source,
         val name: String,
         val enabled: Boolean,
-    ) : Identifiable {
+    ) : Identifiable, Serializable {
 
         enum class Source {
             DEFAULT, ERC20, MANUAL
@@ -117,12 +122,20 @@ data class Chain(
     }
 
     data class Nodes(
-        val nodeSelectionStrategy: NodeSelectionStrategy,
+        val autoBalanceStrategy: AutoBalanceStrategy,
+        val wssNodeSelectionStrategy: NodeSelectionStrategy,
         val nodes: List<Node>,
     ) {
 
-        enum class NodeSelectionStrategy {
+        enum class AutoBalanceStrategy {
             ROUND_ROBIN, UNIFORM
+        }
+
+        sealed class NodeSelectionStrategy {
+
+            object AutoBalance : NodeSelectionStrategy()
+
+            class SelectedNode(val unformattedNodeUrl: String) : NodeSelectionStrategy()
         }
     }
 
@@ -131,6 +144,7 @@ data class Chain(
         val unformattedUrl: String,
         val name: String,
         val orderId: Int,
+        val isCustom: Boolean
     ) : Identifiable {
 
         enum class ConnectionType {
@@ -138,7 +152,7 @@ data class Chain(
         }
 
         val connectionType = when {
-            unformattedUrl.startsWith("wss://") -> ConnectionType.WSS
+            unformattedUrl.startsWith("wss://") || unformattedUrl.startsWith("ws://") -> ConnectionType.WSS
             unformattedUrl.startsWith("https://") -> ConnectionType.HTTPS
             else -> ConnectionType.UNKNOWN
         }
@@ -183,6 +197,8 @@ data class Chain(
         }
 
         data class GovernanceDelegations(override val url: String) : ExternalApi()
+
+        data class ReferendumSummary(override val url: String) : ExternalApi()
     }
 
     enum class Governance {
@@ -191,6 +207,10 @@ data class Chain(
 
     enum class Swap {
         ASSET_CONVERSION, HYDRA_DX
+    }
+
+    enum class CustomFee {
+        ASSET_HUB, HYDRA_DX
     }
 
     enum class ConnectionState {
@@ -209,6 +229,10 @@ data class Chain(
          * Chain is completely disabled - it does not initialize websockets not allocates any other resources
          */
         DISABLED
+    }
+
+    enum class Source {
+        DEFAULT, CUSTOM
     }
 
     override val identifier: String = id

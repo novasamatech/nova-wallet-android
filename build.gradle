@@ -1,16 +1,16 @@
 buildscript {
     ext {
         // App version
-        versionName = '7.12.3'
-        versionCode = 135
+        versionName = '8.6.0'
+        versionCode = 154
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
 
         // SDK and tools
-        compileSdkVersion = 33
+        compileSdkVersion = 34
         minSdkVersion = 24
-        targetSdkVersion = 33
+        targetSdkVersion = 34
 
         kotlinVersion = '1.7.21'
 
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.0.2'
+        substrateSdkVersion = '2.2.0'
 
         gifVersion = '1.2.19'
 
@@ -91,6 +91,8 @@ buildscript {
         playServicesAuthVersion = "20.0.0"
         googleApiClientVersion = "1.32.1"
         googleDriveVersion = "v3-rev20210919-1.32.1"
+
+        cardStackVersion = "2.3.4"
 
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
@@ -140,7 +142,7 @@ buildscript {
         // lifecycle scopes
         lifeCycleKtxDep = "androidx.lifecycle:lifecycle-runtime-ktx:$architectureComponentVersion"
 
-        permissionsDep = "com.github.florent37:runtime-permission-kotlin:$permissionsVersion"
+        permissionsDep = "com.github.florent37:RuntimePermission:$permissionsVersion"
 
         roomDep = "androidx.room:room-runtime:$roomVersion"
         roomKtxDep = "androidx.room:room-ktx:$roomVersion"
@@ -213,13 +215,15 @@ buildscript {
         firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+        cardStackView = "com.github.yuyakaido:cardstackview:$cardStackVersion"
     }
 
     repositories {
         google()
+        mavenCentral()
         jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
-        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
@@ -234,10 +238,10 @@ buildscript {
 allprojects {
     repositories {
         google()
+        mavenCentral()
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url "https://nexus.iroha.tech/repository/maven-soramitsu/" }
-        mavenCentral()
         mavenLocal()
         flatDir { dirs "$rootDir/common/libs" }
     }

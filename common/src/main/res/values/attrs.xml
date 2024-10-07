@@ -198,6 +198,9 @@
         <attr name="styleIconTint" format="color" />
 
         <attr name="android:text" />
+
+        <attr name="AlertView_description" format="string" />
+        <attr name="AlertView_action" format="string" />
     </declare-styleable>
 
     <declare-styleable name="IconButton">
@@ -244,6 +247,7 @@
         <attr name="android:src" format="reference" />
         <attr name="bannerBackground" format="reference|color" />
         <attr name="android:scaleType" />
+        <attr name="closeIcon" format="reference" />
         <attr name="showClose" />
     </declare-styleable>
 
@@ -321,6 +325,7 @@
     <declare-styleable name="SettingsSwitcherView">
         <attr name="title" />
         <attr name="icon" />
+        <attr name="switcherTextColor" />
     </declare-styleable>
 
     <declare-styleable name="WarningCheckBox">
@@ -334,6 +339,12 @@
         <attr name="subtitle" />
         <attr name="cornerRadius" />
         <attr name="tapToViewBackground" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SegmentedTabLayout">
+        <attr name="tabIndicatorFullHeight" format="boolean" />
+        <attr name="tabIndicatorMargin" format="dimension" />
+        <attr name="backgroundCornerRadius" format="dimension" />
     </declare-styleable>
 
 </resources>

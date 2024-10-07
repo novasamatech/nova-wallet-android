@@ -101,7 +101,7 @@ val AssetTransferPayload.originFeeListInUsedAsset: List<GenericDecimalFee<Generi
     }
 
 val AssetTransferPayload.isSendingCommissionAsset
-    get() = transfer.originChainAsset == transfer.originChain.commissionAsset
+    get() = transfer.originChainAsset == commissionChainAsset
 
 val AssetTransferPayload.isReceivingCommissionAsset
     get() = transfer.destinationChainAsset == transfer.destinationChain.commissionAsset

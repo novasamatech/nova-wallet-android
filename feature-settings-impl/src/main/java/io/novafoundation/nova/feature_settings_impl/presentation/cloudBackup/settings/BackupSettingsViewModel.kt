@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flatMap
-import io.novafoundation.nova.common.utils.progress.ProgressDialogMixin
+import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.progress.startProgress
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
@@ -32,15 +32,15 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CannotApplyNonDestructiveDiff
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.CloudBackupNotFound
-import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeleteBackupAction
-import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitDeleteBackupConfirmation
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.FetchBackupError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.InvalidBackupPasswordError
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.errors.PasswordNotSaved
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupChangesAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCorruptedBackupFoundAction
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeleteBackupAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchDeprecatedPasswordAction
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitBackupDestructiveChangesConfirmation
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.confirmation.awaitDeleteBackupConfirmation
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.handlers.showCloudBackupUnknownError
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCloudBackupSyncFailed
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapDeleteBackupFailureToUi
@@ -50,8 +50,8 @@ import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.model.CloudBackupChangedAccount
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.CloudBackupDiffBottomSheet
-import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.CloudBackupDiffGroupRVItem
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.AccountDiffRVItem
+import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.CloudBackupDiffGroupRVItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -70,13 +70,15 @@ class BackupSettingsViewModel(
     private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     private val walletUiUseCase: WalletUiUseCase,
-    val progressDialogMixin: ProgressDialogMixin,
+    private val progressDialogMixinFactory: ProgressDialogMixinFactory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     listSelectorMixinFactory: ListSelectorMixin.Factory,
     customDialogProvider: CustomDialogDisplayer.Presentation
 ) : BaseViewModel(),
     ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create(),
     CustomDialogDisplayer.Presentation by customDialogProvider {
+
+    val progressDialogMixin = progressDialogMixinFactory.create()
 
     val negativeConfirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
@@ -221,8 +223,8 @@ class BackupSettingsViewModel(
         return when (this) {
             is PasswordNotSaved -> BackupSyncOutcome.EmptyPassword
             is InvalidBackupPasswordError -> BackupSyncOutcome.UnknownPassword
-            // not found backup is ok when we enable backup and when we start initial sync since we will create a new backup
             is CannotApplyNonDestructiveDiff -> BackupSyncOutcome.DestructiveDiff(cloudBackupDiff, cloudBackup)
+            // not found backup is ok when we enable backup and when we start initial sync since we will create a new backup
             is FetchBackupError.BackupNotFound -> BackupSyncOutcome.Ok
             is FetchBackupError.CorruptedBackup -> BackupSyncOutcome.CorruptedBackup
             is FetchBackupError.Other -> BackupSyncOutcome.UnknownError

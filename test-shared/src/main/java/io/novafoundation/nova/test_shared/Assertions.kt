@@ -22,3 +22,11 @@ fun <K, V> assertMapEquals(expected: Map<K, V>, actual: Map<K, V>) {
         throw AssertionError("Maps are not equal. Expected: $expected, actual: $actual")
     }
 }
+
+fun <V> assertAllItemsEquals(items: List<V>) {
+    items.forEach {
+        if (it != items[0]) {
+            throw AssertionError("Items in list are not equal:\n$it\n${items[0]}")
+        }
+    }
+}

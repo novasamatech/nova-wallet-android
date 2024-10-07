@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_wallet_api.di
 
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -74,5 +74,5 @@ interface WalletFeatureApi {
 
     val arbitraryTokenUseCase: ArbitraryTokenUseCase
 
-    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
+    val holdsRepository: BalanceHoldsRepository
 }

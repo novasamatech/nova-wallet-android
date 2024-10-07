@@ -12,6 +12,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
+import kotlinx.coroutines.CoroutineScope
 
 interface AssetTransfer {
     val sender: MetaAccount
@@ -71,13 +72,16 @@ fun AssetTransfer.senderAccountId(): AccountId {
     return sender.requireAccountIdIn(originChain)
 }
 
+val AssetTransfer.commissionAsset
+    get() = commissionAssetToken.configuration
+
 interface AssetTransfers {
 
-    val validationSystem: AssetTransfersValidationSystem
+    fun getValidationSystem(coroutineScope: CoroutineScope): AssetTransfersValidationSystem
 
-    suspend fun calculateFee(transfer: AssetTransfer): Fee
+    suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee
 
-    suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<ExtrinsicSubmission>
+    suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission>
 
     suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         return true

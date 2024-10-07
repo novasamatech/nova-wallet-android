@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter
 
 import io.novafoundation.nova.common.utils.PalletName
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.ext.statemineOrNull
@@ -13,9 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.junctionList
-import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
-import kotlinx.coroutines.Deferred
 import java.math.BigInteger
 
 private typealias LocalAssetsAssetId = BigInteger
@@ -24,7 +21,7 @@ private typealias LocalAssetsMapping = Map<LocalAssetsMappingKey, Chain.Asset>
 
 class LocalAssetsLocationConverter(
     private val chain: Chain,
-    private val runtime: Deferred<RuntimeSnapshot>
+    private val runtimeSource: RuntimeSource
 ) : MultiLocationConverter {
 
     private val assetIdToAssetMapping by lazy { constructAssetIdToAssetMapping() }
@@ -35,7 +32,7 @@ class LocalAssetsLocationConverter(
         val assetsType = chainAsset.statemineOrNull() ?: return null
         // LocalAssets converter only supports number ids to use as GeneralIndex
         val index = assetsType.id.asNumberOrNull() ?: return null
-        val pallet = runtime().metadata.moduleOrNull(assetsType.palletNameOrDefault()) ?: return null
+        val pallet = runtimeSource.getRuntime().metadata.moduleOrNull(assetsType.palletNameOrDefault()) ?: return null
 
         return MultiLocation(
             parents = BigInteger.ZERO, // For Local Assets chain serves as a reserve
@@ -56,7 +53,7 @@ class LocalAssetsLocationConverter(
         val (maybePalletInstance, maybeGeneralIndex) = junctions
         if (maybePalletInstance !is Junction.PalletInstance || maybeGeneralIndex !is Junction.GeneralIndex) return null
 
-        val pallet = runtime().metadata.moduleOrNull(maybePalletInstance.index.toInt()) ?: return null
+        val pallet = runtimeSource.getRuntime().metadata.moduleOrNull(maybePalletInstance.index.toInt()) ?: return null
         val assetId = maybeGeneralIndex.index
 
         return assetIdToAssetMapping[pallet.name to assetId]

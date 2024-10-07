@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -14,6 +16,7 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -21,9 +24,10 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.reviewAddress
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
@@ -36,14 +40,21 @@ import kotlinx.coroutines.withContext
 
 abstract class SelectAddressLedgerViewModel(
     private val router: LedgerRouter,
-    private val interactor: SelectAddressLedgerInteractor,
+    protected val interactor: SelectAddressLedgerInteractor,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
-) : BaseViewModel(), LedgerMessageCommands {
+    private val messageFormatter: LedgerMessageFormatter
+) : BaseViewModel(),
+    LedgerMessageCommands,
+    Browserable.Presentation by Browserable() {
+
+    abstract val ledgerVariant: LedgerVariant
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
+
+    protected open val needToVerifyAccount = true
 
     private val chain by lazyAsync { chainRegistry.getChain(payload.chainId) }
 
@@ -87,39 +98,45 @@ abstract class SelectAddressLedgerViewModel(
     }
 
     fun accountClicked(accountUi: AccountUi) {
-        verifyAccount(accountUi.id)
+        verifyAccount(accountUi.id.toInt())
     }
 
-    private fun verifyAccount(id: Long) {
+    protected fun verifyAccount(id: Int) {
         verifyAddressJob?.cancel()
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id.toInt() }
 
-            ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
-                title = resourceManager.getString(R.string.ledger_review_approve_title),
-                subtitle = resourceManager.getString(R.string.ledger_verify_address_subtitle, device.first().name),
-                onCancel = ::verifyAddressCancelled,
-                footer = Footer.Value(
-                    value = account.account.address,
-                )
-            ).event()
-
-            val result = withContext(Dispatchers.Default) {
-                interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index)
-            }
-
-            result.onFailure {
-                handleLedgerError(it) { verifyAccount(id) }
-            }.onSuccess {
-                ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
-
+            if (needToVerifyAccount) {
+                verifyAccountInternal(account)
+            } else {
                 onAccountVerified(account)
             }
         }
     }
 
+    private suspend fun verifyAccountInternal(account: LedgerAccountWithBalance) {
+        ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
+            resourceManager = resourceManager,
+            address = account.account.address,
+            deviceName = device.first().name,
+            onCancel = ::verifyAddressCancelled,
+        ).event()
+
+        val result = withContext(Dispatchers.Default) {
+            interactor.verifyLedgerAccount(chain(), payload.deviceId, account.index, ledgerVariant)
+        }
+
+        result.onFailure {
+            handleLedgerError(it) { verifyAccount(account.index) }
+        }.onSuccess {
+            ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+
+            onAccountVerified(account)
+        }
+    }
+
     private fun handleLedgerError(error: Throwable, retry: () -> Unit) {
-        handleLedgerError(error, chain, resourceManager, retry)
+        handleLedgerError(error, messageFormatter, resourceManager, retry)
     }
 
     private fun verifyAddressCancelled() {
@@ -135,10 +152,11 @@ abstract class SelectAddressLedgerViewModel(
             loadingAccount.withFlagSet {
                 val nextAccountIndex = loadedAccounts.value.size
 
-                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex)
+                interactor.loadLedgerAccount(chain(), payload.deviceId, nextAccountIndex, ledgerVariant)
                     .onSuccess {
                         loadedAccounts.value = loadedAccounts.value.added(it)
                     }.onFailure {
+                        Log.d("Ledger", "Error", it)
                         handleLedgerError(it) { loadNewAccount() }
                     }
             }
@@ -157,7 +175,7 @@ abstract class SelectAddressLedgerViewModel(
                 isSelected = false,
                 isClickable = true,
                 picture = addressModel.image,
-                chainIconUrl = null,
+                chainIcon = null,
                 updateIndicator = false,
                 subtitleIconRes = null,
                 isEditable = false

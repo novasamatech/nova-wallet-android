@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.updateExternalBalance
 import io.novafoundation.nova.core_db.model.ExternalBalanceLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
@@ -16,6 +16,8 @@ import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.Po
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.bondedPools
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.delegatedStakingOrNull
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.delegators
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.poolMembers
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.subPoolsStorage
@@ -31,8 +33,10 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -89,13 +93,15 @@ class PooledBalanceUpdater(
             val poolMemberFlow = metadata.nominationPools.poolMembers
                 .observe(accountId)
 
+            val inAccountPoolStakeFlow = observeInAccountPoolStake(accountId)
+
             val poolWithBalance = poolMemberFlow
                 .map { it?.poolId }
                 .distinctUntilChanged()
                 .flatMapLatest(::subscribeToPoolWithBalance)
 
-            combine(poolMemberFlow, poolWithBalance) { poolMember, totalPoolBalances ->
-                insertExternalBalance(poolMember, totalPoolBalances, metaAccount)
+            combine(poolMemberFlow, poolWithBalance, inAccountPoolStakeFlow) { poolMember, totalPoolBalances, inAccountPoolStake ->
+                insertExternalBalance(poolMember, totalPoolBalances, metaAccount, inAccountPoolStake)
             }
         }.noSideAffects()
     }
@@ -117,13 +123,29 @@ class PooledBalanceUpdater(
         }
     }
 
+    context(StorageQueryContext)
+    @Suppress("IfThenToElvis")
+    private fun observeInAccountPoolStake(accountId: AccountId): Flow<Balance> {
+        val delegatedStakingPallet = metadata.delegatedStakingOrNull
+
+        return if (delegatedStakingPallet != null) {
+            delegatedStakingPallet.delegators.observe(accountId).map {
+                it?.amount.orZero()
+            }
+        } else {
+            flowOf(Balance.ZERO)
+        }
+    }
+
     private suspend fun insertExternalBalance(
         poolMember: PoolMember?,
         totalPoolBalances: TotalPoolBalances?,
         metaAccount: MetaAccount,
+        inAccountPoolStake: Balance,
     ) {
         val totalStake = if (poolMember != null && totalPoolBalances != null) {
-            totalPoolBalances.totalStakeOf(poolMember)
+            // Only use stake part that is not in account as external balance entry
+            totalPoolBalances.totalStakeOf(poolMember) - inAccountPoolStake
         } else {
             Balance.ZERO
         }

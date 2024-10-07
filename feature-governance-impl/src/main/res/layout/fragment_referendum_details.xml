@@ -104,6 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:orientation="vertical"
+                android:visibility="gone"
                 tools:background="@color/block_background">
 
                 <TextView
@@ -145,7 +146,8 @@
                 android:id="@+id/referendumDetailsYourVote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="12dp"
+                android:visibility="gone" />
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingStatusView
                 android:id="@+id/referendumDetailsVotingStatus"
@@ -166,6 +168,7 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingTop="16dp"
+                android:visibility="gone"
                 tools:background="@color/block_background">
 
                 <TextView
@@ -192,6 +195,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_primary_list_item"
+                android:visibility="gone"
                 tools:background="@color/block_background">
 
                 <TextView
@@ -229,6 +233,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="gone" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

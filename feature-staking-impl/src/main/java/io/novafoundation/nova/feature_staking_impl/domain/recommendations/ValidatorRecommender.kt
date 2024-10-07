@@ -10,11 +10,13 @@ import kotlinx.coroutines.withContext
 
 class ValidatorRecommender(
     val availableValidators: List<Validator>,
-    private val novaValidatorIds: List<String>,
+    private val novaValidatorIds: Set<String>,
+    private val excludedValidators: Set<String>,
 ) {
 
     suspend fun recommendations(settings: RecommendationSettings) = withContext(Dispatchers.Default) {
         val all = availableValidators.applyFiltersAdaptingToEmptyResult(settings.allFilters)
+            .filterExcludedIfNeeded(settings)
             .sortedWith(settings.sorting)
 
         val postprocessed = settings.postProcessors.fold(all) { acc, postProcessor ->
@@ -49,5 +51,11 @@ class ValidatorRecommender(
         }
 
         return filtered
+    }
+
+    private fun List<Validator>.filterExcludedIfNeeded(settings: RecommendationSettings): List<Validator> {
+        if (!settings.filterExcluded) return this
+
+        return filter { it.accountIdHex !in excludedValidators }
     }
 }

@@ -19,12 +19,19 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
+import io.novafoundation.nova.runtime.extrinsic.metadata.RealMetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.RealExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainChainMapperFacade
+import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
+import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
+import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -32,10 +39,16 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RemoteEven
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
+import io.novafoundation.nova.runtime.repository.ChainNodeRepository
+import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.runtime.repository.RealBlockLimitsRepository
+import io.novafoundation.nova.runtime.repository.RealChainNodeRepository
+import io.novafoundation.nova.runtime.repository.RealChainRepository
 import io.novafoundation.nova.runtime.repository.RealParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.RealPreConfiguredChainsRepository
 import io.novafoundation.nova.runtime.repository.RealTotalIssuanceRepository
 import io.novafoundation.nova.runtime.repository.RemoteTimestampRepository
 import io.novafoundation.nova.runtime.repository.TimestampRepository
@@ -46,7 +59,9 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.LocalStorageSource
 import io.novafoundation.nova.runtime.storage.source.RemoteStorageSource
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import javax.inject.Named
+import javax.inject.Provider
 
 const val LOCAL_STORAGE_SOURCE = "LOCAL_STORAGE_SOURCE"
 const val REMOTE_STORAGE_SOURCE = "REMOTE_STORAGE_SOURCE"
@@ -59,15 +74,15 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideExtrinsicBuilderFactory(
-        chainDao: ChainDao,
         rpcCalls: RpcCalls,
         chainRegistry: ChainRegistry,
         mortalityConstructor: MortalityConstructor,
+        metadataShortenerService: MetadataShortenerService
     ) = ExtrinsicBuilderFactory(
-        chainDao,
         rpcCalls,
         chainRegistry,
-        mortalityConstructor
+        mortalityConstructor,
+        metadataShortenerService
     )
 
     @Provides
@@ -211,7 +226,72 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
+    fun provideChainMultiLocationConverterFactory(chainRegistry: ChainRegistry): ChainMultiLocationConverterFactory {
+        return ChainMultiLocationConverterFactory(chainRegistry)
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideExtrinsicWalk(
         chainRegistry: ChainRegistry,
     ): ExtrinsicWalk = RealExtrinsicWalk(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideMetadataShortenerService(
+        chainRegistry: ChainRegistry,
+        rpcCalls: RpcCalls,
+    ): MetadataShortenerService {
+        return RealMetadataShortenerService(chainRegistry, rpcCalls)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideChainNodeRepository(
+        chainDao: ChainDao,
+    ): ChainNodeRepository = RealChainNodeRepository(chainDao)
+
+    @Provides
+    @ApplicationScope
+    fun provideNodeConnectionFactory(
+        socketServiceProvider: Provider<SocketService>,
+        connectionSecrets: ConnectionSecrets
+    ): NodeConnectionFactory {
+        return NodeConnectionFactory(
+            socketServiceProvider,
+            connectionSecrets
+        )
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideRemoteToDomainChainMapperFacade(gson: Gson): RemoteToDomainChainMapperFacade {
+        return RemoteToDomainChainMapperFacade(gson)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun providePreConfiguredChainsRepository(
+        chainFetcher: ChainFetcher,
+        chainMapperFacade: RemoteToDomainChainMapperFacade
+    ): PreConfiguredChainsRepository {
+        return RealPreConfiguredChainsRepository(
+            chainFetcher,
+            chainMapperFacade
+        )
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideChainRepository(
+        chainRegistry: ChainRegistry,
+        chainDao: ChainDao,
+        gson: Gson
+    ): ChainRepository {
+        return RealChainRepository(
+            chainRegistry,
+            chainDao,
+            gson
+        )
+    }
 }

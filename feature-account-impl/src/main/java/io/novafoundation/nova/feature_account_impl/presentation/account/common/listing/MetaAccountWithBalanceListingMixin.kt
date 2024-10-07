@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTo
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -74,7 +75,7 @@ private class MetaAccountWithBalanceListingMixin(
                 isEditable = metaAccount.isEditable(),
                 isClickable = true,
                 picture = walletUiUseCase.walletIcon(metaAccount),
-                chainIconUrl = proxyChain?.icon,
+                chainIcon = proxyChain?.iconOrFallback(),
                 updateIndicator = hasUpdates && showUpdatedMetaAccountsBadge,
                 subtitleIconRes = null
             )
@@ -87,6 +88,7 @@ private class MetaAccountWithBalanceListingMixin(
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.WATCH_ONLY,
             LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER_LEGACY,
             LightMetaAccount.Type.LEDGER,
             LightMetaAccount.Type.POLKADOT_VAULT -> formattedTotalBalance()
 
@@ -112,6 +114,7 @@ private class MetaAccountWithBalanceListingMixin(
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.WATCH_ONLY,
             LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER_LEGACY,
             LightMetaAccount.Type.LEDGER,
             LightMetaAccount.Type.POLKADOT_VAULT -> true
 

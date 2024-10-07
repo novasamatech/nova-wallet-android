@@ -35,6 +35,9 @@ android {
         buildConfigField "String", "POLKADOT_VAULT_TROUBLESHOOTING", "\"https://docs.novawallet.io/nova-wallet-wiki/welcome-to-nova-wallet/hardware-wallets/polkadot-vault/troubleshooting\""
         buildConfigField "String", "NOVA_WALLET_WIKI_BASE", "\"https://docs.novawallet.io/nova-wallet-wiki/welcome-to-nova-wallet/about-nova-wallet\""
         buildConfigField "String", "NOVA_WALLET_WIKI_PROXY", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/delegated-authorities-proxies\""
+        buildConfigField "String", "NOVA_WALLET_WIKI_INTEGRATE_NETWORK", "\"https://docs.novawallet.io/nova-wallet-wiki/misc/developer-documentation/integrate-network\""
+
+        buildConfigField "String", "LEDGER_MIGRATION_ARTICLE", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/hardware-wallets/ledger-nano-x/ledger-app-migration\""
 
         buildConfigField "String", "LEDGER_BLEUTOOTH_GUIDE", "\"https://support.ledger.com/hc/en-us/articles/360019138694-Set-up-Bluetooth-connection\""
 

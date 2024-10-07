@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.list
 
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 
@@ -15,7 +16,8 @@ data class ReferendumPreview(
     val onChainMetadata: OnChainMetadata?,
     val track: ReferendumTrack?,
     val voting: ReferendumVoting?,
-    val referendumVote: ReferendumVote?
+    val threshold: ReferendumThreshold?,
+    val referendumVote: ReferendumVote?,
 ) {
 
     data class OffChainMetadata(val title: String)

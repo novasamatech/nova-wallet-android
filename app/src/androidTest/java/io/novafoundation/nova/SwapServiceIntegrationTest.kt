@@ -4,14 +4,14 @@ import android.util.Log
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
+import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi

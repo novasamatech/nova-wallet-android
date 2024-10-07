@@ -10,8 +10,9 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.Companion.EMPTY_CHAIN_ICON
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
-import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.AutoBalanceStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -27,6 +28,8 @@ private const val HYDRA_DX_SWAPS = "hydradx-swaps"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
 private const val FULL_SYNC_BY_DEFAULT = "fullSyncByDefault"
 private const val PUSH_SUPPORT = "pushSupport"
+private const val CUSTOM_FEE_ASSET_HUB = "assethub-fees"
+private const val CUSTOM_FEE_HYDRA_DX = "hydration-fees"
 
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 private const val CHAIN_THEME_COLOR = "themeColor"
@@ -35,11 +38,14 @@ private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
 private const val RELAYCHAIN_AS_NATIVE = "relaychainAsNative"
 private const val MAX_ELECTING_VOTES = "stakingMaxElectingVoters"
 private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
+private const val SUPPORT_GENERIC_LEDGER_APP = "supportsGenericLedgerApp"
 private const val IDENTITY_CHAIN = "identityChain"
+private const val DISABLED_CHECK_METADATA_HASH = "disabledCheckMetadataHash"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
     oldChain: ChainLocal?,
+    source: ChainLocal.Source,
     gson: Gson
 ): ChainLocal {
     val types = chainRemote.types?.let {
@@ -58,7 +64,9 @@ fun mapRemoteChainToLocal(
             relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
             stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
             feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean,
-            identityChain = it[IDENTITY_CHAIN] as? ChainId
+            supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
+            identityChain = it[IDENTITY_CHAIN] as? ChainId,
+            disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean
         )
     }
 
@@ -70,7 +78,7 @@ fun mapRemoteChainToLocal(
             parentId = parentId,
             name = name,
             types = types,
-            icon = icon,
+            icon = icon ?: EMPTY_CHAIN_ICON,
             prefix = addressPrefix,
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
@@ -80,20 +88,22 @@ fun mapRemoteChainToLocal(
             pushSupport = PUSH_SUPPORT in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             swap = mapSwapRemoteOptionsToLocal(optionsOrEmpty),
+            customFee = mapCustomFeeRemoteOptionsToLocal(optionsOrEmpty),
             connectionState = determineConnectionState(chainRemote, oldChain),
             additional = gson.toJson(additional),
-            nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy)
+            nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy),
+            source = source
         )
     }
 
     return chainLocal
 }
 
-private fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal {
+private fun mapNodeSelectionStrategyToLocal(remote: String?): AutoBalanceStrategyLocal {
     return when (remote) {
-        null, "roundRobin" -> NodeSelectionStrategyLocal.ROUND_ROBIN
-        "uniform" -> NodeSelectionStrategyLocal.UNIFORM
-        else -> NodeSelectionStrategyLocal.UNKNOWN
+        null, "roundRobin" -> AutoBalanceStrategyLocal.ROUND_ROBIN
+        "uniform" -> AutoBalanceStrategyLocal.UNIFORM
+        else -> AutoBalanceStrategyLocal.UNKNOWN
     }
 }
 
@@ -113,10 +123,6 @@ private fun ConnectionStateLocal.isNotDefault(): Boolean {
     return this != ConnectionStateLocal.LIGHT_SYNC
 }
 
-private fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
-
-private fun mapSwapListToLocal(swap: List<Chain.Swap>) = swap.joinToString(separator = ",", transform = Chain.Swap::name)
-
 private fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): String {
     val domainGovernanceTypes = remoteOptions.governanceTypesFromOptions()
 
@@ -127,6 +133,12 @@ private fun mapSwapRemoteOptionsToLocal(remoteOptions: Set<String>): String {
     val domainGovernanceTypes = remoteOptions.swapTypesFromOptions()
 
     return mapSwapListToLocal(domainGovernanceTypes)
+}
+
+private fun mapCustomFeeRemoteOptionsToLocal(remoteOptions: Set<String>): String {
+    val domainGovernanceTypes = remoteOptions.customFeeTypeFromOptions()
+
+    return mapCustomFeeToLocal(domainGovernanceTypes)
 }
 
 fun mapRemoteAssetToLocal(
@@ -158,7 +170,8 @@ fun mapRemoteNodesToLocal(chainRemote: ChainRemote): List<ChainNodeLocal> {
             url = chainNodeRemote.url,
             name = chainNodeRemote.name,
             chainId = chainRemote.chainId,
-            orderId = index
+            orderId = index,
+            source = ChainNodeLocal.Source.DEFAULT
         )
     }
 }
@@ -197,6 +210,7 @@ private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "crowdloans" -> ApiType.CROWDLOANS
     "governance" -> ApiType.GOVERNANCE_REFERENDA
     "governance-delegations" -> ApiType.GOVERNANCE_DELEGATIONS
+    "referendum-summary" -> ApiType.REFERENDUM_SUMMARY
     else -> ApiType.UNKNOWN
 }
 
@@ -257,6 +271,16 @@ private fun Set<String>.swapTypesFromOptions(): List<Chain.Swap> {
         when (option) {
             SWAP_HUB -> Chain.Swap.ASSET_CONVERSION
             HYDRA_DX_SWAPS -> Chain.Swap.HYDRA_DX
+            else -> null
+        }
+    }
+}
+
+private fun Set<String>.customFeeTypeFromOptions(): List<Chain.CustomFee> {
+    return mapNotNull { option ->
+        when (option) {
+            CUSTOM_FEE_ASSET_HUB -> Chain.CustomFee.ASSET_HUB
+            CUSTOM_FEE_HYDRA_DX -> Chain.CustomFee.HYDRA_DX
             else -> null
         }
     }

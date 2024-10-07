@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.share
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
@@ -17,9 +18,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -31,7 +34,6 @@ class ChainConnectionFactory(
     private val externalRequirementFlow: Flow<ChainConnection.ExternalRequirement>,
     private val nodeAutobalancer: NodeAutobalancer,
     private val socketServiceProvider: Provider<SocketService>,
-    private val connectionSecrets: ConnectionSecrets,
 ) {
 
     suspend fun create(chain: Chain): ChainConnection {
@@ -39,8 +41,7 @@ class ChainConnectionFactory(
             socketService = socketServiceProvider.get(),
             externalRequirementFlow = externalRequirementFlow,
             nodeAutobalancer = nodeAutobalancer,
-            connectionSecrets = connectionSecrets,
-            chain = chain
+            initialChain = chain
         )
 
         connection.setup()
@@ -65,9 +66,8 @@ private val RATE_LIMIT_ERROR_CODES = listOf(
 class ChainConnection internal constructor(
     val socketService: SocketService,
     private val externalRequirementFlow: Flow<ExternalRequirement>,
-    nodeAutobalancer: NodeAutobalancer,
-    private val chain: Chain,
-    private val connectionSecrets: ConnectionSecrets,
+    private val nodeAutobalancer: NodeAutobalancer,
+    initialChain: Chain,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default),
     WebSocketResponseInterceptor {
 
@@ -85,14 +85,17 @@ class ChainConnection internal constructor(
         responseRequiresNodeChangeFlow
     ).shareIn(scope = this, started = SharingStarted.Eagerly)
 
-    private val availableNodes = MutableStateFlow(chain.nodes)
+    private val chain = MutableStateFlow(initialChain)
 
-    private val currentUrl = nodeAutobalancer.connectionUrlFlow(
-        chainId = chain.id,
+    private val availableNodes = chain.map { it.nodes }
+        .distinctUntilChanged()
+        .share(SharingStarted.Eagerly)
+
+    val currentUrl = nodeAutobalancer.connectionUrlFlow(
+        chainId = initialChain.id,
         changeConnectionEventFlow = nodeChangeSignal,
         availableNodesFlow = availableNodes,
-    )
-        .shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
+    ).share(SharingStarted.Eagerly)
 
     suspend fun setup() {
         socketService.setInterceptor(this)
@@ -110,19 +113,20 @@ class ChainConnection internal constructor(
     }
 
     private suspend fun observeCurrentNode() {
+        // Important - this should be awaited first before setting up externalRequirementFlow subscription
+        // Otherwise there might be a race between both of them
         val firstNodeUrl = currentUrl.first()?.saturatedUrl ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
 
-        currentUrl
-            .mapNotNull { it?.saturatedUrl }
+        currentUrl.mapNotNull { it?.saturatedUrl }
             .filter { nodeUrl -> actualUrl() != nodeUrl }
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
-            .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
+            .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.value.name} to $nodeUrl") }
             .launchIn(this)
     }
 
-    fun considerUpdateNodes(nodes: Chain.Nodes) {
-        availableNodes.value = nodes
+    fun updateChain(chain: Chain) {
+        this.chain.value = chain
     }
 
     fun finish() {
@@ -148,6 +152,7 @@ class ChainConnection internal constructor(
     }
 
     private fun State.needsAutobalance() = this is State.WaitingForReconnect && attempt > 1
+
     override fun onRpcResponseReceived(rpcResponse: RpcResponse): ResponseDelivery {
         val error = rpcResponse.error
 

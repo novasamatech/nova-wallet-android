@@ -11,7 +11,6 @@ import io.novafoundation.nova.core_db.dao.updateExternalBalance
 import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.core_db.model.ExternalBalanceLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBalanceScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBalanceScope.ScopeValue
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory

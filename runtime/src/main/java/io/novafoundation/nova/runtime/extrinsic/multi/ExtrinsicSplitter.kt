@@ -108,6 +108,7 @@ internal class RealExtrinsicSplitter(
             accountId = signer.signerAccountId(chain)
         )
             .call(call)
-            .build()
+            .buildExtrinsic()
+            .extrinsicHex
     }
 }

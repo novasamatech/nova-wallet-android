@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
-import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
@@ -94,12 +93,6 @@ class AssetsFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         chainRegistry: ChainRegistry,
     ) = HistoryFiltersProviderFactory(computationalCache, assetSourceRegistry, chainRegistry)
-
-    @Provides
-    @FeatureScope
-    fun provideCoinGeckoLinkParser(): CoinGeckoLinkParser {
-        return CoinGeckoLinkParser()
-    }
 
     @Provides
     @FeatureScope

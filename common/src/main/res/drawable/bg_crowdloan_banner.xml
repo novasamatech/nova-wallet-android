@@ -4,7 +4,7 @@
     <corners android:radius="@dimen/border_radius" />
 
     <gradient
-        android:startColor="@color/crowdloan_banner_gradient_start"
+        android:angle="0"
         android:endColor="@color/crowdloan_banner_gradient_end"
-        android:angle="0" />
+        android:startColor="@color/crowdloan_banner_gradient_start" />
 </shape>

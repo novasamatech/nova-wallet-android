@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_push_notifications.di
 import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkHandler
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.AssetDetailsDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.storage.Preferences

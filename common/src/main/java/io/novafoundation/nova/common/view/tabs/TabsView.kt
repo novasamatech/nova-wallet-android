@@ -7,7 +7,6 @@ import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
 import androidx.annotation.StringRes
 import androidx.core.view.children
-import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.updatePadding
@@ -84,14 +83,4 @@ class TabsView @JvmOverloads constructor(
 
 fun TabsView.addTab(@StringRes titleRes: Int) {
     addTab(context.getString(titleRes))
-}
-
-fun TabsView.setupWithRouter(router: TabsRouter, lifecycle: Lifecycle) {
-    onTabSelected { index ->
-        router.openTabAt(index)
-    }
-
-    router.listenCurrentTab(lifecycle) { index ->
-        setCheckedTab(index, triggerListener = false)
-    }
 }

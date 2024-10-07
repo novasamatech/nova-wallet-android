@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -27,13 +26,11 @@ import java.math.BigInteger
 class StatemineAssetTransfers(
     chainRegistry: ChainRegistry,
     assetSourceRegistry: AssetSourceRegistry,
-    extrinsicService: ExtrinsicService,
+    extrinsicServiceFactory: ExtrinsicService.Factory,
     phishingValidationFactory: PhishingValidationFactory,
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val remoteStorage: StorageDataSource
-) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
-
-    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
+) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
     override suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>> {
         val type = chainAsset.requireStatemine()

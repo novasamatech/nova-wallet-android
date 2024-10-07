@@ -11,14 +11,12 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
@@ -42,7 +40,6 @@ class ConfirmReferendumVoteModule {
         walletUiUseCase: WalletUiUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
         addressIconGenerator: AddressIconGenerator,
-        @LocalIdentity localIdentityProvider: IdentityProvider,
         interactor: VoteReferendumInteractor,
         assetUseCase: AssetUseCase,
         payload: ConfirmVoteReferendumPayload,
@@ -62,7 +59,6 @@ class ConfirmReferendumVoteModule {
             walletUiUseCase = walletUiUseCase,
             selectedAccountUseCase = selectedAccountUseCase,
             addressIconGenerator = addressIconGenerator,
-            localIdentityProvider = localIdentityProvider,
             interactor = interactor,
             assetUseCase = assetUseCase,
             payload = payload,

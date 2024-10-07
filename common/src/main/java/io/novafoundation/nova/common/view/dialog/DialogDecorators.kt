@@ -39,15 +39,16 @@ fun infoDialog(
 
 fun warningDialog(
     context: Context,
-    onConfirm: DialogClickHandler,
-    @StringRes confirmTextRes: Int = R.string.common_continue,
-    @StringRes cancelTextRes: Int = R.string.common_cancel,
-    onCancel: DialogClickHandler? = null,
+    onPositiveClick: DialogClickHandler,
+    @StringRes positiveTextRes: Int = R.string.common_continue,
+    @StringRes negativeTextRes: Int = R.string.common_cancel,
+    onNegativeClick: DialogClickHandler? = null,
+    @StyleRes styleRes: Int = R.style.AccentNegativeAlertDialogTheme_Reversed,
     decorator: DialogDecorator? = null
 ) {
-    dialog(context.themed(R.style.AccentNegativeAlertDialogTheme_Reversed)) {
-        setPositiveButton(confirmTextRes) { _, _ -> onConfirm() }
-        setNegativeButton(cancelTextRes) { _, _ -> onCancel?.invoke() }
+    dialog(context.themed(styleRes)) {
+        setPositiveButton(positiveTextRes) { _, _ -> onPositiveClick() }
+        setNegativeButton(negativeTextRes) { _, _ -> onNegativeClick?.invoke() }
 
         decorator?.invoke(this)
     }

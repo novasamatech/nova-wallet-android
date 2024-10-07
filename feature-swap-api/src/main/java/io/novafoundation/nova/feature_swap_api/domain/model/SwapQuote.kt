@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_swap_core.domain.model.QuotePath
+import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks

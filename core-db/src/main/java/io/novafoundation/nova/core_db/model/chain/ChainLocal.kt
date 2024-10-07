@@ -29,19 +29,38 @@ data class ChainLocal(
     @ColumnInfo(defaultValue = "0")
     val supportProxy: Boolean,
     val swap: String,
+    val customFee: String,
     val governance: String,
     val additional: String?,
     val connectionState: ConnectionStateLocal,
+    @Deprecated("Use autoBalanceStrategy")
     @ColumnInfo(defaultValue = NODE_SELECTION_STRATEGY_DEFAULT)
-    val nodeSelectionStrategy: NodeSelectionStrategyLocal,
+    val nodeSelectionStrategy: AutoBalanceStrategyLocal,
+    @ColumnInfo(defaultValue = DEFAULT_NETWORK_SOURCE_STR)
+    val source: Source
 ) : Identifiable {
 
-    enum class NodeSelectionStrategyLocal {
+    @Suppress("DEPRECATION")
+    val autoBalanceStrategy: AutoBalanceStrategyLocal
+        get() = nodeSelectionStrategy
+
+    companion object {
+
+        const val EMPTY_CHAIN_ICON = ""
+
+        const val DEFAULT_NETWORK_SOURCE_STR = "DEFAULT"
+    }
+
+    enum class AutoBalanceStrategyLocal {
         ROUND_ROBIN, UNIFORM, UNKNOWN
     }
 
     enum class ConnectionStateLocal {
         FULL_SYNC, LIGHT_SYNC, DISABLED
+    }
+
+    enum class Source {
+        DEFAULT, CUSTOM
     }
 
     object Default {

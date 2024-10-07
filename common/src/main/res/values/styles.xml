@@ -437,6 +437,62 @@
 
     <!-- Buttons -->
 
+    <style name="Widget.Nova.MaterialButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="elevation">0dp</item>
+        <item name="android:elevation">0dp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline</item>
+        <item name="rippleColor">@color/cell_background_pressed</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Primary" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_primary</item>
+        <item name="android:textColor">@color/button_text</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Secondary" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_secondary</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Secondary.Transparent" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_secondary_transparent</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Positive" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_positive</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Negative" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">@color/selector_button_background_negative</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Primary.IconOnly" parent="Widget.Nova.MaterialButton.Primary">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Secondary.IconOnly" parent="Widget.Nova.MaterialButton.Secondary">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Positive.IconOnly" parent="Widget.Nova.MaterialButton.Positive">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Negative.IconOnly" parent="Widget.Nova.MaterialButton.Negative">
+        <item name="iconPadding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
     <!-- Input -->
 
     <style name="Widget.Nova.Input.EditText" parent="@android:style/Widget.EditText">
@@ -582,4 +638,18 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
+    <style name="SegmentedTab">
+        <item name="backgroundCornerRadius">12dp</item>
+        <item name="tabIndicator">@drawable/segmented_tab_indicator</item>
+        <item name="tabIndicatorColor">@color/segmented_tab_active</item>
+        <item name="tabIndicatorHeight">40dp</item>
+        <item name="tabIndicatorMargin">4dp</item>
+        <item name="tabSelectedTextColor">@color/text_primary</item>
+        <item name="tabTextAppearance">@style/SegmentedTab.Tab</item>
+        <item name="tabTextColor">@color/text_secondary</item>
+    </style>
+
+    <style name="SegmentedTab.Tab" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+        <item name="textAllCaps">false</item>
+    </style>
 </resources>

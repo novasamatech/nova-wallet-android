@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
 import io.novafoundation.nova.runtime.network.updaters.ConstantSingleChainUpdateSystem
 import io.novafoundation.nova.runtime.network.updaters.InactiveIssuanceUpdater
@@ -26,7 +26,7 @@ class GovernanceUpdatersModule {
     fun provideUpdateSystem(
         totalIssuanceUpdater: TotalIssuanceUpdater,
         inactiveIssuanceUpdater: InactiveIssuanceUpdater,
-        blockNumberUpdater: BlockNumberUpdater,
+        blockNumberUpdater: SharedAssetBlockNumberUpdater,
         blockTimeUpdater: BlockTimeUpdater,
         chainRegistry: ChainRegistry,
         singleAssetSharedState: GovernanceSharedState,
@@ -53,7 +53,7 @@ class GovernanceUpdatersModule {
         chainRegistry: ChainRegistry,
         crowdloanSharedState: GovernanceSharedState,
         storageCache: StorageCache,
-    ) = BlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
+    ) = SharedAssetBlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
 
     @Provides
     @FeatureScope

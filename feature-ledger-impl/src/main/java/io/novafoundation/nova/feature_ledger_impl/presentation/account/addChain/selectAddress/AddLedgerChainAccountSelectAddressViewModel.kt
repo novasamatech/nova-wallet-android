@@ -2,10 +2,12 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.AddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -22,14 +24,18 @@ class AddLedgerChainAccountSelectAddressViewModel(
     resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
     selectLedgerAddressPayload: SelectLedgerAddressPayload,
+    messageFormatter: LedgerMessageFormatter
 ) : SelectAddressLedgerViewModel(
     router = router,
     interactor = selectAddressLedgerInteractor,
     addressIconGenerator = addressIconGenerator,
     resourceManager = resourceManager,
     payload = selectLedgerAddressPayload,
-    chainRegistry = chainRegistry
+    chainRegistry = chainRegistry,
+    messageFormatter = messageFormatter
 ) {
+
+    override val ledgerVariant: LedgerVariant = LedgerVariant.LEGACY
 
     override fun onAccountVerified(account: LedgerAccountWithBalance) {
         launch {

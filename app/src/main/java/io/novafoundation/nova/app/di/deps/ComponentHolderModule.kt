@@ -35,6 +35,8 @@ import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureH
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
+import io.novafoundation.nova.feature_ledger_core.LedgerCoreHolder
+import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureHolder
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
@@ -49,6 +51,8 @@ import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_core.di.SwapCoreApi
+import io.novafoundation.nova.feature_swap_core.di.SwapCoreHolder
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureHolder
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureHolder
@@ -101,6 +105,12 @@ interface ComponentHolderModule {
     @ClassKey(LedgerFeatureApi::class)
     @IntoMap
     fun provideLedgerFeature(accountFeatureHolder: LedgerFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(LedgerCoreApi::class)
+    @IntoMap
+    fun provideLedgerCore(accountFeatureHolder: LedgerCoreHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds
@@ -239,4 +249,10 @@ interface ComponentHolderModule {
     @ClassKey(CloudBackupFeatureApi::class)
     @IntoMap
     fun provideCloudBackupFeatureHolder(holder: CloudBackupFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(SwapCoreApi::class)
+    @IntoMap
+    fun provideSwapCoreFeatureHolder(holder: SwapCoreHolder): FeatureApiHolder
 }

@@ -7,16 +7,15 @@ import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain.From
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -79,7 +78,7 @@ class WalletDetailsInteractor(
     }
 
     suspend fun getAllChains(): List<Chain> {
-        return chainRegistry.currentChains.first()
+        return chainRegistry.enabledChains()
     }
 }
 

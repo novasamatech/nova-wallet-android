@@ -14,9 +14,9 @@ fun BaseFragment<*>.setupPermissionAsker(
 
         warningDialog(
             context = requireContext(),
-            onConfirm = { it.onSuccess(PermissionDeniedAction.RETRY) },
-            onCancel = { it.onSuccess(PermissionDeniedAction.BACK) },
-            confirmTextRes = if (level == CAN_ASK_AGAIN) R.string.common_ask_again else R.string.common_to_settings
+            onPositiveClick = { it.onSuccess(PermissionDeniedAction.RETRY) },
+            onNegativeClick = { it.onSuccess(PermissionDeniedAction.BACK) },
+            positiveTextRes = if (level == CAN_ASK_AGAIN) R.string.common_ask_again else R.string.common_to_settings
         ) {
             if (level == CAN_ASK_AGAIN) {
                 setTitle(R.string.common_permission_permissions_needed_title)

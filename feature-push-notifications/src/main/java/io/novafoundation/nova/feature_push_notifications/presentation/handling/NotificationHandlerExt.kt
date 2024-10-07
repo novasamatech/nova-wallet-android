@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkData
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.ReferendumDeepLinkData
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.AssetDetailsDeepLinkData
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkData
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount

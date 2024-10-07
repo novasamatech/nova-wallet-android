@@ -10,12 +10,15 @@ import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetFinalizedHeadRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetHeaderRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetStorageSize
+import io.novafoundation.nova.common.data.network.runtime.calls.GetSystemPropertiesRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.NextAccountIndexRequest
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
+import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.extrinsicHash
+import io.novafoundation.nova.common.utils.fromHex
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.feeViaRuntimeCall
@@ -27,13 +30,16 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.scale.dataType.DataType
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 import io.novasama.substrate_sdk_android.wsrpc.request.DeliveryType
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.author.SubmitAndWatchExtrinsicRequest
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.author.SubmitExtrinsicRequest
-import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersionFull
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersionRequest
 import io.novasama.substrate_sdk_android.wsrpc.subscriptionFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -103,10 +109,8 @@ class RpcCalls(
         return doubleResult.toInt().toBigInteger()
     }
 
-    suspend fun getRuntimeVersion(chainId: ChainId): RuntimeVersion {
-        val request = StateRuntimeVersionRequest()
-
-        return socketFor(chainId).executeAsync(request, mapper = pojo<RuntimeVersion>().nonNull())
+    suspend fun getRuntimeVersion(chainId: ChainId): RuntimeVersionFull {
+        return socketFor(chainId).executeAsync(RuntimeVersionRequest(), mapper = pojo<RuntimeVersionFull>().nonNull())
     }
 
     /**
@@ -141,7 +145,7 @@ class RpcCalls(
      *  @param blockNumber - if null, then the  best block hash is returned
      */
     suspend fun getBlockHash(chainId: ChainId, blockNumber: BlockNumber? = null): String {
-        return socketFor(chainId).executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
+        return socketFor(chainId).getBlockHash(blockNumber)
     }
 
     suspend fun getStorageSize(chainId: ChainId, storageKey: String): BigInteger {
@@ -158,4 +162,25 @@ class RpcCalls(
             weight = bindWeight(asStruct["weight"])
         )
     }
+}
+
+suspend fun SocketService.getBlockHash(blockNumber: BlockNumber? = null): String {
+    return executeAsync(GetBlockHashRequest(blockNumber), mapper = pojo<String>().nonNull())
+}
+
+suspend fun SocketService.systemProperties(): SystemProperties {
+    return executeAsync(GetSystemPropertiesRequest(), mapper = pojo<SystemProperties>().nonNull())
+}
+
+suspend fun SocketService.stateCall(request: StateCallRequest): String? {
+    return executeAsync(request, mapper = pojo<String>()).result
+}
+
+suspend fun <T> SocketService.stateCall(request: StateCallRequest, returnType: DataType<T>): T {
+    val rawResult = stateCall(request)
+    requireNotNull(rawResult) {
+        "Unexpected state call null response"
+    }
+
+    return returnType.fromHex(rawResult)
 }

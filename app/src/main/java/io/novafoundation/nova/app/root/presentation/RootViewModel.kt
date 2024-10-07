@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInt
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -50,8 +49,10 @@ class RootViewModel(
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher
-) : BaseViewModel(), NetworkStateUi by networkStateMixin, ActionBottomSheetLauncher by actionBottomSheetLauncher {
+    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+) : BaseViewModel(),
+    NetworkStateUi by networkStateMixin,
+    ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     private var willBeClearedForLanguageChange = false
 
@@ -77,7 +78,7 @@ class RootViewModel(
 
         updatePhishingAddresses()
 
-        obserBusEvents()
+        observeBusEvents()
 
         walletConnectService.onPairErrorLiveData.observeForever {
             showError(it.peekContent())
@@ -90,7 +91,7 @@ class RootViewModel(
         externalServiceInitializer.initialize()
     }
 
-    private fun obserBusEvents() {
+    private fun observeBusEvents() {
         compoundRequestBusHandler.observe()
     }
 
@@ -186,10 +187,6 @@ class RootViewModel(
 
     fun applySafeModeIfEnabled() {
         safeModeService.applySafeModeIfEnabled()
-    }
-
-    override fun onCleared() {
-        rootScope.cancel()
     }
 
     fun handleDeepLink(data: Uri) {
