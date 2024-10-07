@@ -3,9 +3,11 @@ package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strat
 import io.novafoundation.nova.common.utils.cycle
 import io.novafoundation.nova.runtime.multiNetwork.connection.NodeWithSaturatedUrl
 
-class UniformStrategy : NodeSelectionSequenceStrategy {
+class SelectedNodeGenerator(
+    private val selectedNode: NodeWithSaturatedUrl,
+) : NodeSequenceGenerator {
 
-    override fun generateNodeSequence(defaultNodes: List<NodeWithSaturatedUrl>): Sequence<NodeWithSaturatedUrl> {
-        return defaultNodes.shuffled().cycle()
+    override fun generateNodeSequence(): Sequence<NodeWithSaturatedUrl> {
+        return listOf(selectedNode).cycle()
     }
 }
