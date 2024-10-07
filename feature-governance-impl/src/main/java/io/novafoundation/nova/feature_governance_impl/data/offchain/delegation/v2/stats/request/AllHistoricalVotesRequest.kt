@@ -20,9 +20,7 @@ class AllHistoricalVotesRequest(address: String) {
               vote
               parent {
                 referendumId
-                delegate {
-                  accountId
-                }
+                delegateId
                 standardVote
               }
             }
