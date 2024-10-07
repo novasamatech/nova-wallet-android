@@ -70,7 +70,7 @@ class MetadataShortenerTest : BaseIntegrationTest() {
         extrinsicBuilder.nativeTransfer(accountId = signer.accountId, amount = BigInteger.ONE)
         extrinsicBuilder.systemRemark(remark = byteArrayOf(1, 2, 3))
 
-        extrinsicBuilder.build()
+        extrinsicBuilder.buildExtrinsic()
     }
 
     @Test
