@@ -40,24 +40,20 @@ fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
     return vertices.isNotEmpty()
 }
 
-fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
-    val result = mutableMapOf<N, List<N>>()
-
-    forEach { connectedComponent ->
-        connectedComponent.forEach { node ->
-            // in the connected component every node is connected to every other except itself
-            result[node] = connectedComponent - node
-        }
-    }
-
-    return result
-}
 
 fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: Int): List<Path<E>> {
-    data class QueueElement(val currentPath: Path<E>, val nodeList: List<N>, val score: Int) : Comparable<QueueElement> {
+    data class QueueElement(val currentPath: Path<E>, val score: Int) : Comparable<QueueElement> {
 
         override fun compareTo(other: QueueElement): Int {
             return score - other.score
+        }
+
+        fun lastNode(): N {
+            return if (currentPath.isNotEmpty()) currentPath.last().to else from
+        }
+
+        operator fun contains(node: N): Boolean {
+            return currentPath.any { it.from == node || it.to == node }
         }
     }
 
@@ -67,11 +63,11 @@ fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit:
     adjacencyList.keys.forEach { count[it] = 0 }
 
     val heap = PriorityQueue<QueueElement>()
-    heap.add(QueueElement(currentPath = emptyList(), nodeList = listOf(from), score = 0))
+    heap.add(QueueElement(currentPath = emptyList(),  score = 0))
 
     while (heap.isNotEmpty() && paths.size < limit) {
         val minimumQueueElement = heap.poll()!!
-        val lastNode = minimumQueueElement.nodeList.last()
+        val lastNode = minimumQueueElement.lastNode()
 
         val newCount = count.getValue(lastNode) + 1
         count[lastNode] = newCount
@@ -83,11 +79,10 @@ fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit:
 
         if (newCount <= limit) {
             adjacencyList.getValue(lastNode).forEach { edge ->
-                if (edge.to in minimumQueueElement.nodeList) return@forEach
+                if (edge.to in minimumQueueElement) return@forEach
 
                 val newElement = QueueElement(
                     currentPath = minimumQueueElement.currentPath + edge,
-                    nodeList = minimumQueueElement.nodeList + edge.to,
                     score = minimumQueueElement.score + 1
                 )
 
@@ -134,6 +129,19 @@ private fun <N, E : Edge<N>> reachabilityDfs(
 //
 //        val reachableNodes = reachabilityDfs(vertex, adjacencyList, visited)
 //        result.add(reachableNodes)
+//    }
+//
+//    return result
+//}
+
+//fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
+//    val result = mutableMapOf<N, List<N>>()
+//
+//    forEach { connectedComponent ->
+//        connectedComponent.forEach { node ->
+//            // in the connected component every node is connected to every other except itself
+//            result[node] = connectedComponent - node
+//        }
 //    }
 //
 //    return result
