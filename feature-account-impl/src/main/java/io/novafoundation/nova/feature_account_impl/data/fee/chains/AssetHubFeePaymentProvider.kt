@@ -26,7 +26,7 @@ class AssetHubFeePaymentProvider(
                     paymentAsset = feePaymentCurrency.asset,
                     multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
                     remoteStorageSource = remoteStorageSource,
-                    multiLocationConverter = multiLocationConverterFactory.default(chain, coroutineScope!!)
+                    multiLocationConverter = multiLocationConverterFactory.defaultAsync(chain, coroutineScope!!)
                 )
             }
 

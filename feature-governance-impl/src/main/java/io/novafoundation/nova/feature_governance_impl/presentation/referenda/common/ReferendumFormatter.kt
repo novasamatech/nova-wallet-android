@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
@@ -40,4 +41,8 @@ interface ReferendumFormatter {
         token: Token,
         chain: Chain
     ): ReferendumModel
+
+    fun formatReferendumName(referendum: ReferendumPreview): String
+
+    fun formatReferendumName(referendum: ReferendumDetails): String
 }

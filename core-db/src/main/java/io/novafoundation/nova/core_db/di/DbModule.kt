@@ -30,6 +30,7 @@ import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
+import io.novafoundation.nova.core_db.dao.TinderGovDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 
@@ -204,5 +205,11 @@ class DbModule {
     @ApplicationScope
     fun provideHoldsDao(appDatabase: AppDatabase): HoldsDao {
         return appDatabase.holdsDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideTinderGovDao(appDatabase: AppDatabase): TinderGovDao {
+        return appDatabase.tinderGovDao()
     }
 }

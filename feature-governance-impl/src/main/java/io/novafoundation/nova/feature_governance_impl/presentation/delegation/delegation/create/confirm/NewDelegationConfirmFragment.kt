@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.setVoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateLabelState
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackListBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_new_delegation_confirm.newDelegationConfirmAmount

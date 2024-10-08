@@ -19,9 +19,10 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
-import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
+import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -94,6 +95,8 @@ interface RuntimeApi {
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val multiLocationConverterFactory: MultiLocationConverterFactory
+
+    val chainMultiLocationConverterFactory: ChainMultiLocationConverterFactory
 
     val extrinsicWalk: ExtrinsicWalk
 

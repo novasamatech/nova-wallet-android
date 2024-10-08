@@ -37,7 +37,7 @@ class AssetConversionSwapExtractor(
         if (!call.isSwap()) return null
 
         val scope = CoroutineScope(coroutineContext)
-        val multiLocationConverter = multiLocationConverterFactory.default(chain, scope)
+        val multiLocationConverter = multiLocationConverterFactory.defaultAsync(chain, scope)
 
         val path = bindList(callArgs["path"], ::bindMultiLocation)
         val assetIn = multiLocationConverter.toChainAsset(path.first()) ?: return null

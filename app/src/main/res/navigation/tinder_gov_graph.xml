@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tinder_gov_graph"
+    app:startDestination="@id/tinderGovCards">
+
+    <fragment
+        android:id="@+id/tinderGovCards"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsFragment"
+        android:label="TinderGovCardsFragment"
+        tools:layout="@layout/fragment_tinder_gov_cards">
+
+        <action
+            android:id="@+id/action_tinderGovCards_to_setupTinderGovVoteFragment"
+            app:destination="@id/setupTinderGovVoteFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_tinderGovCards_to_tinderGovBasket"
+            app:destination="@id/setupTinderGovBasketFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_tinderGovCards_to_referendumInfo"
+            app:destination="@id/referendumInfoFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/setupTinderGovVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.SetupTinderGovVoteFragment"
+        android:label="SetupTinderGovVoteFragment"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_setup_vote" />
+
+    <fragment
+        android:id="@+id/setupTinderGovBasketFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.TinderGovBasketFragment"
+        android:label="TinderGovBasketFragment"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_tinder_gov_basket">
+
+        <action
+            android:id="@+id/action_setupTinderGovBasket_to_confirmTinderGovVote"
+            app:destination="@id/confirmTinderGovVoteFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_setupTinderGovBasket_to_referendumInfo"
+            app:destination="@id/referendumInfoFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmTinderGovVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm.ConfirmTinderGovVoteFragment"
+        android:label="ConfirmTinderGovVoteFragment"
+        app:useAdd="true">
+
+        <action
+            android:id="@+id/action_confirmTinderGovVote_to_tinderGovCards"
+            app:destination="@id/tinderGovCards"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@id/tinderGovCards"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/referendumInfoFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoFragment"
+        android:label="ConfirmTinderGovVoteFragment"
+        app:useAdd="true" />
+
+</navigation>

@@ -153,6 +153,10 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
             ExternalApi.GovernanceDelegations(externalApiLocal.url)
         }
 
+        ApiType.REFERENDUM_SUMMARY -> {
+            ExternalApi.ReferendumSummary(externalApiLocal.url)
+        }
+
         ApiType.UNKNOWN -> null
     }
 }.getOrNull()

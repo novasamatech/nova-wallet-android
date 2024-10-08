@@ -99,6 +99,10 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
     return destination
 }
 
+fun <T> List<T>.safeSubList(fromIndex: Int, toIndex: Int): List<T> {
+    return subList(fromIndex.coerceIn(0, size), toIndex.coerceIn(0, size))
+}
+
 suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     return coroutineScope {
         map { async { operation(it) } }

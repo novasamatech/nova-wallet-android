@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.setChips
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountAmount
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountAmountChipsContainer

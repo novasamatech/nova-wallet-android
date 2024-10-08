@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRep
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallAdapter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParseContext
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class TreasuryApproveProposalAdapter(
@@ -19,8 +20,12 @@ class TreasuryApproveProposalAdapter(
 
         val id = bindNumber(call.arguments["proposal_id"])
 
-        val proposal = treasuryRepository.getTreasuryProposal(context.chainId, TreasuryProposal.Id(id)) ?: return null
+        val proposal = treasuryRepository.getTreasuryProposal(context.chain.id, TreasuryProposal.Id(id)) ?: return null
 
-        return ReferendumCall.TreasuryRequest(amount = proposal.amount, beneficiary = proposal.beneficiary)
+        return ReferendumCall.TreasuryRequest(
+            amount = proposal.amount,
+            chainAsset = context.chain.utilityAsset,
+            beneficiary = proposal.beneficiary
+        )
     }
 }

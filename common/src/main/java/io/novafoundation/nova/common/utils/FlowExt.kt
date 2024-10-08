@@ -274,6 +274,16 @@ fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {
     }
 }
 
+fun <T> Flow<T>.onEachWithPrevious(action: suspend (T?, T) -> Unit): Flow<T> = flow {
+    var current: T? = null
+
+    collect {
+        action(current, it)
+        emit(it)
+        current = it
+    }
+}
+
 private fun <K> MutableMap<K, CoroutineScope>.removeAndCancel(key: K) {
     remove(key)?.also(CoroutineScope::cancel)
 }

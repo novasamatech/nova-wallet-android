@@ -122,6 +122,8 @@ env:
   CI_DEVELOP_GOOGLE_SERVICES_FILE: ${{ secrets.CI_DEVELOP_GOOGLE_SERVICES }}
   CI_PRODUCTION_GOOGLE_SERVICES_FILE: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
 
+  POLKASSEMBLY_SUMMARY_API_KEY: ${{ secrets.POLKASSEMBLY_SUMMARY_API_KEY }}
+
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}-${{inputs.upload-name}}
   cancel-in-progress: true

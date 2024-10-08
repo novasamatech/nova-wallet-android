@@ -31,6 +31,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -221,6 +222,12 @@ class RuntimeModule {
     @ApplicationScope
     fun provideMultiLocationConverterFactory(chainRegistry: ChainRegistry): MultiLocationConverterFactory {
         return MultiLocationConverterFactory(chainRegistry)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideChainMultiLocationConverterFactory(chainRegistry: ChainRegistry): ChainMultiLocationConverterFactory {
+        return ChainMultiLocationConverterFactory(chainRegistry)
     }
 
     @Provides
