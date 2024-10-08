@@ -14,13 +14,15 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "NOVA_CARD_WIDGET_ID", "\"4ce98182-ed76-4933-ba1b-b85e4a51d75a\""
+        buildConfigField "String", "NOVA_CARD_WIDGET_ID", "\"0a51d3d5-05ca-4b93-9593-ebb8911d0fb2\""
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "NOVA_CARD_WIDGET_ID", "\"4ce98182-ed76-4933-ba1b-b85e4a51d75a\""
         }
     }
 

@@ -1,16 +1,17 @@
 package io.novafoundation.nova.feature_assets.data.repository
 
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface NovaCardStateRepository {
 
-    fun isNovaCardStateActive(): Boolean
+    fun getNovaCardCreationState(): NovaCardState
 
-    fun setNovaCardState(active: Boolean)
+    fun setNovaCardCreationState(state: NovaCardState)
 
-    fun observeNovaCardState(): Flow<Boolean>
+    fun observeNovaCardCreationState(): Flow<NovaCardState>
 
     fun setTimeCardBeingIssued(time: Long)
 
@@ -24,17 +25,18 @@ class RealNovaCardStateRepository(
     private val preferences: Preferences
 ) : NovaCardStateRepository {
 
-    override fun isNovaCardStateActive(): Boolean {
-        return preferences.getBoolean(PREFS_NOVA_CARD_STATE, false)
+    override fun getNovaCardCreationState(): NovaCardState {
+        val novaCardState = preferences.getString(PREFS_NOVA_CARD_STATE, NovaCardState.NONE.toString())
+        return NovaCardState.valueOf(novaCardState)
     }
 
-    override fun setNovaCardState(active: Boolean) {
-        preferences.putBoolean(PREFS_NOVA_CARD_STATE, active)
+    override fun setNovaCardCreationState(state: NovaCardState) {
+        preferences.putString(PREFS_NOVA_CARD_STATE, state.toString())
     }
 
-    override fun observeNovaCardState(): Flow<Boolean> {
+    override fun observeNovaCardCreationState(): Flow<NovaCardState> {
         return preferences.keyFlow(PREFS_NOVA_CARD_STATE)
-            .map { preferences.getBoolean(PREFS_NOVA_CARD_STATE, false) }
+            .map { getNovaCardCreationState() }
     }
 
     override fun setTimeCardBeingIssued(time: Long) {

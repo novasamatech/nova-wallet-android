@@ -4,13 +4,21 @@ import io.novafoundation.nova.feature_assets.data.repository.NovaCardStateReposi
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration.Companion.minutes
 
+enum class NovaCardState {
+    NONE,
+    CREATION,
+    CREATED
+}
+
 interface NovaCardInteractor {
 
-    fun isNovaCardStateActive(): Boolean
+    fun isNovaCardCreated(): Boolean
 
-    fun setNovaCardState(active: Boolean)
+    fun getNovaCardState(): NovaCardState
 
-    fun observeNovaCardState(): Flow<Boolean>
+    fun setNovaCardState(state: NovaCardState)
+
+    fun observeNovaCardState(): Flow<NovaCardState>
 
     fun setTimeCardBeingIssued(time: Long)
 
@@ -23,16 +31,20 @@ class RealNovaCardInteractor(
     private val novaCardStateRepository: NovaCardStateRepository
 ) : NovaCardInteractor {
 
-    override fun isNovaCardStateActive(): Boolean {
-        return novaCardStateRepository.isNovaCardStateActive()
+    override fun isNovaCardCreated(): Boolean {
+        return novaCardStateRepository.getNovaCardCreationState() == NovaCardState.CREATED
     }
 
-    override fun setNovaCardState(active: Boolean) {
-        return novaCardStateRepository.setNovaCardState(active)
+    override fun getNovaCardState(): NovaCardState {
+        return novaCardStateRepository.getNovaCardCreationState()
     }
 
-    override fun observeNovaCardState(): Flow<Boolean> {
-        return novaCardStateRepository.observeNovaCardState()
+    override fun setNovaCardState(state: NovaCardState) {
+        return novaCardStateRepository.setNovaCardCreationState(state)
+    }
+
+    override fun observeNovaCardState(): Flow<NovaCardState> {
+        return novaCardStateRepository.observeNovaCardCreationState()
     }
 
     override fun setTimeCardBeingIssued(time: Long) {

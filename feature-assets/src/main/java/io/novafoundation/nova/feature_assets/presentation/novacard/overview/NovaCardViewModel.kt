@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardState
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
@@ -37,13 +38,21 @@ class NovaCardViewModel(
         )
     }.shareInBackground()
 
+    init {
+        launch {
+            val novaCardState = novaCardInteractor.getNovaCardState()
+
+            if (novaCardState == NovaCardState.CREATION) {
+                assetsRouter.openAwaitingCardCreation()
+            }
+        }
+    }
+
     fun onTransactionStatusChanged(event: NovaCardEventHandler.TransactionStatus) {
-        showMessage("New status: $event")
+        
     }
 
     fun openTopUp(amount: BigDecimal, address: String) = launch {
-        novaCardInteractor.setTimeCardBeingIssued(System.currentTimeMillis())
-
         val payload = TopUpCardPayload(
             amount = amount,
             address = address,
@@ -54,9 +63,9 @@ class NovaCardViewModel(
     }
 
     fun onCardCreated() {
-        // No need to open/close timer dialog if card is already active
-        if (novaCardInteractor.isNovaCardStateActive()) return
+        // No need to open/close timer dialog if card is already created
+        if (novaCardInteractor.isNovaCardCreated()) return
 
-        novaCardInteractor.setNovaCardState(true)
+        novaCardInteractor.setNovaCardState(NovaCardState.CREATED)
     }
 }

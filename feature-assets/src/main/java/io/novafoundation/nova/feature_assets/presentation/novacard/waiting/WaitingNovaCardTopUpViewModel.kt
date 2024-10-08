@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.formatting.duration.EstimatedDuration
 import io.novafoundation.nova.common.utils.formatting.duration.TimeDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ZeroDurationFormatter
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardState
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import kotlinx.coroutines.flow.launchIn
@@ -21,8 +22,8 @@ class WaitingNovaCardTopUpViewModel(
 
     init {
         novaCardInteractor.observeNovaCardState()
-            .onEach { novaCardActive ->
-                if (novaCardActive) {
+            .onEach { novaCardState ->
+                if (novaCardState == NovaCardState.CREATED) {
                     assetsRouter.back()
                 }
             }.launchIn(this)
