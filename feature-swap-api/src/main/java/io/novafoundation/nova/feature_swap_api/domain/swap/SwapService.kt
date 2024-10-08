@@ -35,7 +35,7 @@ interface SwapService {
 
     suspend fun swap(args: SwapExecuteArgs): Result<SwapExecutionCorrection>
 
-    suspend fun slippageConfig(chainId: ChainId): SlippageConfig?
+    suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig
 
-    fun runSubscriptions(chainIn: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger>
+    fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 }

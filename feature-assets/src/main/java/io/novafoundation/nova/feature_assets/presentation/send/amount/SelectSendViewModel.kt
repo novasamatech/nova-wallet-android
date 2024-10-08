@@ -55,7 +55,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGenericChangeableFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -543,7 +542,7 @@ class SelectSendViewModel(
 
     private fun availableOutDirections(): Flow<List<CrossChainDirection>> {
         return originChainAsset.flatMapLatest {
-            crossChainTransfersUseCase.outcomingCrossChainDirections(it)
+            crossChainTransfersUseCase.outcomingCrossChainDirectionsFlow(it)
                 .filterList { it.chain.isEnabled }
                 .mapList { incomingDirection ->
                     CrossChainDirection(

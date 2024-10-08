@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
+import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.BestPathQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
@@ -61,8 +62,10 @@ private class RealPathQuoter<E : QuotableEdge>(
             paths
         }
 
-        val quotedPaths = paths.mapNotNull { path -> quotePath(path, amount, swapDirection) }
-        if (paths.isEmpty()) {
+        val quotedPaths = paths.mapAsync { path -> quotePath(path, amount, swapDirection) }
+            .filterNotNull()
+
+        if (quotedPaths.isEmpty()) {
             throw SwapQuoteException.NotEnoughLiquidity
         }
 
@@ -106,12 +109,19 @@ private class RealPathQuoter<E : QuotableEdge>(
             val initial = mutableListOf<QuotedEdge<E>>() to amount
 
             path.foldRight(initial) { segment, (quotedPath, currentAmount) ->
+                Log.d("Swaps", "Started quoting ${segment::class.simpleName}")
+
                 val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_OUT)
+
+                Log.d("Swaps", "Finished quoting ${segment::class.simpleName}")
+
                 quotedPath.add(0, QuotedEdge(currentAmount, segmentQuote, segment))
 
                 quotedPath to segmentQuote
             }.first
-        }.getOrNull()
+        }
+            .onFailure { Log.w("Swaps", "Failed to quote path", it) }
+            .getOrNull()
     }
 
     private suspend fun quotePathSell(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>>? {
@@ -119,12 +129,19 @@ private class RealPathQuoter<E : QuotableEdge>(
             val initial = mutableListOf<QuotedEdge<E>>() to amount
 
             path.fold(initial) { (quotedPath, currentAmount), segment ->
+                Log.d("Swaps", "Started quoting ${segment::class.simpleName}")
+
                 val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_IN)
+
+                Log.d("Swaps", "Finished quoting ${segment::class.simpleName}")
+
                 quotedPath.add(QuotedEdge(currentAmount, segmentQuote, segment))
 
                 quotedPath to segmentQuote
             }.first
-        }.getOrNull()
+        }
+            .onFailure { Log.w("Swaps", "Failed to quote path", it) }
+            .getOrNull()
     }
 }
 

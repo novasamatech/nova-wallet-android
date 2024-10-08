@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
 import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
@@ -627,20 +628,16 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupSubscriptionQuoting() {
-        swapSettings.mapNotNull { it.assetIn?.chainId }
-            .distinctUntilChanged()
-            .flatMapLatest { chainId ->
-                val chain = chainRegistry.getChain(chainId)
+        flowOfAll {
+            swapInteractor.runSubscriptions(selectedAccountUseCase.getSelectedMetaAccount())
+                .catch { Log.e(this@SwapMainSettingsViewModel.LOG_TAG, "Failure during subscriptions run", it) }
+        }.onEach {
+            Log.d("Swap", "ReQuote triggered from subscription")
 
-                swapInteractor.runSubscriptions(chain, selectedAccountUseCase.getSelectedMetaAccount())
-                    .catch { Log.e(this@SwapMainSettingsViewModel.LOG_TAG, "Failure during subscriptions run", it) }
-            }.onEach {
-                Log.d("Swap", "ReQuote triggered from subscription")
+            val currentSwapSettings = swapSettings.first()
 
-                val currentSwapSettings = swapSettings.first()
-
-                performQuote(currentSwapSettings, shouldShowLoading = false)
-            }.launchIn(viewModelScope)
+            performQuote(currentSwapSettings, shouldShowLoading = false)
+        }.launchIn(viewModelScope)
     }
 
     private suspend fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean) {

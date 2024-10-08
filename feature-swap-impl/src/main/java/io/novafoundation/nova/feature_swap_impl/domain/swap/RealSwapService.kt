@@ -47,6 +47,8 @@ import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.compound.CompoundAssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
@@ -69,7 +71,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
-import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
@@ -80,6 +81,7 @@ private const val QUOTER_CACHE = "RealSwapService.QUOTER"
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
     private val hydraDxExchangeFactory: HydraDxExchangeFactory,
+    private val crossChainTransferFactory: CrossChainTransferAssetExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
     private val quoterFactory: PathQuoter.Factory,
@@ -90,15 +92,15 @@ internal class RealSwapService(
     override suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean = withContext(Dispatchers.Default) {
         val computationScope = CoroutineScope(coroutineContext)
 
-        val exchange = exchanges(computationScope).getValue(asset.chainId)
+        val exchange = exchangeRegistry(computationScope).getExchange(asset.chainId)
         customFeeCapabilityFacade.canPayFeeInNonUtilityToken(asset, exchange)
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
         Log.d("Swaps", "Syncing swap service")
 
-        exchanges(coroutineScope)
-            .values
+        exchangeRegistry(coroutineScope)
+            .allExchanges()
             .forEachAsync { it.sync() }
     }
 
@@ -112,11 +114,13 @@ internal class RealSwapService(
         asset: Chain.Asset,
         computationScope: CoroutineScope
     ): Flow<Set<FullChainAssetId>> {
-        return directionsGraph(computationScope).map { it.findAllPossibleDestinations(asset.fullId) }
+        return directionsGraph(computationScope).map {
+            it.findAllPossibleDestinations(asset.fullId)
+        }
     }
 
     override suspend fun hasAvailableSwapDirections(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Boolean> {
-        return directionsGraph(computationScope).map { it.hasOutcomingDirections(asset.fullId)  }
+        return directionsGraph(computationScope).map { it.hasOutcomingDirections(asset.fullId) }
     }
 
     override suspend fun quote(
@@ -212,18 +216,17 @@ internal class RealSwapService(
         )
     }
 
-    override suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
-        val computationScope = CoroutineScope(coroutineContext)
-        val exchanges = exchanges(computationScope)
-        return exchanges[chainId]?.slippageConfig()
+    override suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig {
+        return SlippageConfig.default()
     }
 
-    override fun runSubscriptions(chainIn: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
+    override fun runSubscriptions( metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return withFlowScope { scope ->
-            Log.d("Swaps", "Starting new subscriptions")
+            val exchangeRegistry = exchangeRegistry(scope)
 
-            val exchanges = exchanges(scope)
-            exchanges.getValue(chainIn.id).runSubscriptions(chainIn, metaAccount)
+            exchangeRegistry.allExchanges()
+                .map { it.runSubscriptions(metaAccount) }
+                .mergeIfMultiple()
         }.throttleLast(500.milliseconds)
     }
 
@@ -265,14 +268,14 @@ internal class RealSwapService(
 
     private suspend fun directionsGraph(computationScope: CoroutineScope): Flow<SwapGraph> {
         return computationalCache.useSharedFlow(ALL_DIRECTIONS_CACHE, computationScope) {
-            val exchanges = exchanges(computationScope)
+            val exchangeRegistry = exchangeRegistry(computationScope)
 
-            val directionsByExchange = exchanges.map { (chainId, exchange) ->
+            val directionsByExchange = exchangeRegistry.allExchanges().map { exchange ->
                 flowOf { exchange.availableDirectSwapConnections() }
                     .catch {
                         emit(emptyList())
 
-                        Log.e("RealSwapService", "Failed to fetch directions for exchange ${exchange::class} in chain $chainId", it)
+                        Log.e("RealSwapService", "Failed to fetch directions for exchange ${exchange::class}", it)
                     }
             }
 
@@ -283,20 +286,29 @@ internal class RealSwapService(
         }
     }
 
-    private suspend fun exchanges(computationScope: CoroutineScope): Map<ChainId, AssetExchange> {
+    private suspend fun exchangeRegistry(computationScope: CoroutineScope): ExchangeRegistry {
         return computationalCache.useCache(EXCHANGES_CACHE, computationScope) {
-            createExchanges(computationScope)
+            createExchangeRegistry(this)
         }
     }
 
-    private suspend fun createExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
+    private suspend fun createExchangeRegistry(coroutineScope: CoroutineScope): ExchangeRegistry {
+        return ExchangeRegistry(
+            singleChainExchanges = createIndividualChainExchanges(coroutineScope),
+            multiChainExchanges = listOf(
+                crossChainTransferFactory.create(InnerParentQuoter(coroutineScope), coroutineScope)
+            )
+        )
+    }
+
+    private suspend fun createIndividualChainExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
         return chainRegistry.chainsById.first().mapValues { (_, chain) ->
-            createExchange(coroutineScope, chain)
+            createSingleExchange(coroutineScope, chain)
         }
             .filterNotNull()
     }
 
-    private suspend fun createExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
+    private suspend fun createSingleExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
         val factory = when {
             chain.swap.assetConversionSupported() -> assetConversionFactory
             chain.swap.hydraDxSupported() -> hydraDxExchangeFactory
@@ -377,6 +389,32 @@ internal class RealSwapService(
                 val outAmount = quotedSwapEdge.quote.formatPlanks(assetOut)
 
                 append(outAmount)
+            }
+        }
+    }
+
+    private class ExchangeRegistry(
+        private val singleChainExchanges: Map<ChainId, AssetExchange>,
+        private val multiChainExchanges: List<AssetExchange>,
+    ) {
+
+        fun getExchange(chainId: ChainId): AssetExchange {
+            val relevantExchanges = buildList {
+                singleChainExchanges[chainId]?.let { add(it) }
+                addAll(multiChainExchanges)
+            }
+
+            return when(relevantExchanges.size) {
+                0 -> error("No exchanges found")
+                1 -> relevantExchanges.single()
+                else -> CompoundAssetExchange(relevantExchanges)
+            }
+        }
+
+        fun allExchanges(): List<AssetExchange> {
+            return buildList {
+                addAll(singleChainExchanges.values)
+                addAll(multiChainExchanges)
             }
         }
     }

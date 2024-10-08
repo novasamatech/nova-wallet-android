@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils.graph
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.MultiMapList
 import java.util.PriorityQueue
 
@@ -8,6 +9,12 @@ interface Edge<N> {
     val from: N
 
     val to: N
+}
+
+interface WeightedEdge<N> : Edge<N> {
+
+    // Smaller the better
+    val weight: Int
 }
 
 class Graph<N, E : Edge<N>>(
@@ -41,7 +48,9 @@ fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
 }
 
 
-fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: Int): List<Path<E>> {
+fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
+    from: N, to: N, limit: Int
+): List<Path<E>> {
     data class QueueElement(val currentPath: Path<E>, val score: Int) : Comparable<QueueElement> {
 
         override fun compareTo(other: QueueElement): Int {
@@ -63,7 +72,7 @@ fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit:
     adjacencyList.keys.forEach { count[it] = 0 }
 
     val heap = PriorityQueue<QueueElement>()
-    heap.add(QueueElement(currentPath = emptyList(),  score = 0))
+    heap.add(QueueElement(currentPath = emptyList(), score = 0))
 
     while (heap.isNotEmpty() && paths.size < limit) {
         val minimumQueueElement = heap.poll()!!
@@ -81,10 +90,17 @@ fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit:
             adjacencyList.getValue(lastNode).forEach { edge ->
                 if (edge.to in minimumQueueElement) return@forEach
 
-                val newElement = QueueElement(
-                    currentPath = minimumQueueElement.currentPath + edge,
-                    score = minimumQueueElement.score + 1
-                )
+                val newElement: QueueElement
+
+                try {
+                    newElement = QueueElement(
+                        currentPath = minimumQueueElement.currentPath + edge,
+                        score = minimumQueueElement.score + edge.weight
+                    )
+                } catch (e: AbstractMethodError) {
+                    Log.e("Swaps", "Asbract method in ${edge::class.java}")
+                    throw e
+                }
 
                 heap.add(newElement)
             }

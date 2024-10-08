@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.xyk
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.localId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.subscribeToTransferableBalance
@@ -173,6 +174,9 @@ private class RealXYKSwapQuotingSource(
         override val from: FullChainAssetId = fromAsset.second
 
         override val to: FullChainAssetId = toAsset.second
+
+        override val weight: Int
+            get() = Weights.Hydra.XYK
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = xykPools.first()

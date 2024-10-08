@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
-import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
@@ -68,7 +67,7 @@ class HydraDxExchangeFactory(
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val quotingFactory: HydraDxQuoting.Factory,
     private val assetSourceRegistry: AssetSourceRegistry,
-) : AssetExchange.Factory {
+) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(chain: Chain, parentQuoter: AssetExchange.ParentQuoter, coroutineScope: CoroutineScope): AssetExchange {
         return HydraDxExchange(
@@ -119,11 +118,7 @@ private class HydraDxExchange(
         }
     }
 
-    override suspend fun slippageConfig(): SlippageConfig {
-        return SlippageConfig.default()
-    }
-
-    override fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
+    override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return withFlowScope { scope ->
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
             val userAccountId = metaAccount.requireAccountIdIn(chain)

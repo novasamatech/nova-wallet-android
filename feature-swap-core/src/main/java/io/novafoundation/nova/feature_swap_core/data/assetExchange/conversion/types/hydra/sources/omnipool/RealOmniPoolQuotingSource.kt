@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.OmniPool
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.OmniPoolFees
@@ -203,12 +204,16 @@ private class RealOmniPoolQuotingSource(
 
         override val to: FullChainAssetId = toAsset.second.fullId
 
+        override val weight: Int
+            get() = Weights.Hydra.OMNIPOOL
+
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val omniPool = omniPoolFlow.first()
 
             return omniPool.quote(fromAsset.first, toAsset.first, amount, direction)
                 ?: throw SwapQuoteException.NotEnoughLiquidity
         }
+
     }
 }
 

@@ -14,7 +14,7 @@ class SwapSlippageRangeValidation(
 ) : SwapValidation {
 
     override suspend fun validate(value: SwapValidationPayload): ValidationStatus<SwapValidationFailure> {
-        val slippageConfig = swapService.slippageConfig(value.detailedAssetIn.chain.id)!!
+        val slippageConfig = swapService.defaultSlippageConfig(value.detailedAssetIn.chain.id)!!
 
         if (value.slippage.value !in slippageConfig.minAvailableSlippage.value..slippageConfig.maxAvailableSlippage.value) {
             return InvalidSlippage(slippageConfig.minAvailableSlippage, slippageConfig.maxAvailableSlippage).validationError()

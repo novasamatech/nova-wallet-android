@@ -15,10 +15,10 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
-import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
@@ -56,7 +56,7 @@ class AssetConversionExchangeFactory(
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
     private val extrinsicService: ExtrinsicService,
     private val chainStateRepository: ChainStateRepository,
-) : AssetExchange.Factory {
+) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(
         chain: Chain,
@@ -102,11 +102,7 @@ private class AssetConversionExchange(
         }
     }
 
-    override suspend fun slippageConfig(): SlippageConfig {
-        return SlippageConfig.default()
-    }
-
-    override fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
+    override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return chainStateRepository.currentBlockNumberFlow(chain.id)
             .drop(1) // skip immediate value from the cache to not perform double-quote on chain change
             .map { ReQuoteTrigger }
@@ -191,6 +187,9 @@ private class AssetConversionExchange(
                 amount = amount
             ) ?: throw SwapQuoteException.NotEnoughLiquidity
         }
+
+        override val weight: Int
+            get() = Weights.AssetConversion.SWAP
     }
 
     inner class AssetConversionOperation(

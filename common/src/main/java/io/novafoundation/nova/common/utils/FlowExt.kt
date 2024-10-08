@@ -259,6 +259,10 @@ fun <T : Identifiable> Flow<List<T>>.diffed(): Flow<CollectionDiffer.Diff<T>> {
     }
 }
 
+suspend inline fun Flow<Boolean>.awaitTrue() {
+    first { it }
+}
+
 fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {
     var current: T? = null
 

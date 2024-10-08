@@ -16,11 +16,13 @@ import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateF
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.di.exchanges.AssetConversionExchangeModule
+import io.novafoundation.nova.feature_swap_impl.di.exchanges.CrossChainTransferExchangeModule
 import io.novafoundation.nova.feature_swap_impl.di.exchanges.HydraDxExchangeModule
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.RealSwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
@@ -40,7 +42,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdat
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module(includes = [HydraDxExchangeModule::class, AssetConversionExchangeModule::class])
+@Module(includes = [HydraDxExchangeModule::class, AssetConversionExchangeModule::class, CrossChainTransferExchangeModule::class])
 class SwapFeatureModule {
 
     @FeatureScope
@@ -48,14 +50,16 @@ class SwapFeatureModule {
     fun provideSwapService(
         assetConversionFactory: AssetConversionExchangeFactory,
         hydraDxExchangeFactory: HydraDxExchangeFactory,
+        crossChainTransferAssetExchangeFactory: CrossChainTransferAssetExchangeFactory,
         computationalCache: ComputationalCache,
         chainRegistry: ChainRegistry,
         quoterFactory: PathQuoter.Factory,
-        customFeeCapabilityFacade: CustomFeeCapabilityFacade
+        customFeeCapabilityFacade: CustomFeeCapabilityFacade,
     ): SwapService {
         return RealSwapService(
             assetConversionFactory = assetConversionFactory,
             hydraDxExchangeFactory = hydraDxExchangeFactory,
+            crossChainTransferFactory = crossChainTransferAssetExchangeFactory,
             computationalCache = computationalCache,
             chainRegistry = chainRegistry,
             quoterFactory = quoterFactory,

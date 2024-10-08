@@ -8,16 +8,23 @@ class GraphBuilder<N, E : Edge<N>> {
 
     fun addEdge(to: E) {
         val fromEdges = adjacencyList.getOrPut(to.from) { mutableListOf() }
+        initializeVertex(to.to)
         fromEdges.add(to)
     }
 
     fun addEdges(from: N, to: List<E>) {
         val fromEdges = adjacencyList.getOrPut(from) { mutableListOf() }
+        to.onEach { initializeVertex(it.to) }
+
         fromEdges.addAll(to)
     }
 
     fun build(): Graph<N, E> {
         return Graph(adjacencyList)
+    }
+
+    private fun initializeVertex(v: N) {
+        adjacencyList.computeIfAbsent(v) { mutableListOf() }
     }
 }
 

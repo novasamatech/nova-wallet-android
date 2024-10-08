@@ -114,11 +114,11 @@ class SwapInteractor(
     }
 
     suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
-        return swapService.slippageConfig(chainId)
+        return swapService.defaultSlippageConfig(chainId)
     }
 
-    fun runSubscriptions(chainIn: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
-        return swapService.runSubscriptions(chainIn, metaAccount)
+    fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
+        return swapService.runSubscriptions(metaAccount)
     }
 
     private fun buyAvailable(chainAssetFlow: Flow<Chain.Asset?>): Flow<Boolean> {

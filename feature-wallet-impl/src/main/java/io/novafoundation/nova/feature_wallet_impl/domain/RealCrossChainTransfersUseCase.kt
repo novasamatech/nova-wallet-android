@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.combineToPair
+import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -16,6 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.assets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -34,6 +36,10 @@ internal class RealCrossChainTransfersUseCase(
     private val accountRepository: AccountRepository,
     private val computationalCache: ComputationalCache,
 ) : CrossChainTransfersUseCase {
+
+    override suspend fun syncCrossChainConfig() {
+        crossChainTransfersRepository.syncConfiguration()
+    }
 
     override fun incomingCrossChainDirections(destination: Flow<Chain.Asset?>): Flow<List<IncomingDirection>> {
         return withFlowScope { scope ->
@@ -59,7 +65,7 @@ internal class RealCrossChainTransfersUseCase(
         }.catch { emit(emptyList()) }
     }
 
-    override fun outcomingCrossChainDirections(origin: Chain.Asset): Flow<List<OutcomingDirection>> {
+    override fun outcomingCrossChainDirectionsFlow(origin: Chain.Asset): Flow<List<OutcomingDirection>> {
         return withFlowScope { scope ->
             scope.launch { crossChainTransfersRepository.syncConfiguration() }
 
@@ -74,5 +80,10 @@ internal class RealCrossChainTransfersUseCase(
                 }
             }
         }.catch { emit(emptyList()) }
+    }
+
+    override suspend fun allDirections(): List<Edge<FullChainAssetId>> {
+        val config = crossChainTransfersRepository.getConfiguration()
+        return config.availableInDestinations()
     }
 }

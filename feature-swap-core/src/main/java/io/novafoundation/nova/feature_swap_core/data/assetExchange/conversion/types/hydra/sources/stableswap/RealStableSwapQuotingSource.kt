@@ -10,19 +10,20 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalIdOptional
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.flatten
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.omniPoolAccountId
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StablePool
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StablePoolAsset
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StableSwapPoolInfo
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.quote
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StablePool
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StablePoolAsset
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.quote
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -284,6 +285,9 @@ private class RealStableSwapQuotingSource(
         override val from: FullChainAssetId = fromAsset.second
 
         override val to: FullChainAssetId = toAsset.second
+
+        override val weight: Int
+            get() = Weights.Hydra.STABLESWAP
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = stablePools.first()

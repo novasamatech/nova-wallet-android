@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_wallet_api.domain.implementations
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.utils.graph.Edge
+import io.novafoundation.nova.common.utils.graph.SimpleEdge
 import io.novafoundation.nova.common.utils.isAscending
 import io.novafoundation.nova.feature_wallet_api.domain.model.AssetLocationPath
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfiguration
@@ -76,6 +78,21 @@ fun CrossChainTransfersConfiguration.availableInDestinations(destination: Chain.
                 .any { it.type != XcmTransferType.UNKNOWN && it.destination.fullDestinationAssetId == requiredDestinationId }
 
             FullChainAssetId(originChainId, originAssetTransfers.assetId).takeIf { hasDestination }
+        }
+    }
+}
+
+fun CrossChainTransfersConfiguration.availableInDestinations(): List<Edge<FullChainAssetId>> {
+    return chains.flatMap { (originChainId, chainTransfers) ->
+        chainTransfers.flatMap { originAssetTransfers ->
+            originAssetTransfers.xcmTransfers.mapNotNull {
+                if (it.type == XcmTransferType.UNKNOWN ) return@mapNotNull null
+
+                val from = FullChainAssetId(originChainId, originAssetTransfers.assetId)
+                val to = FullChainAssetId(it.destination.chainId, it.destination.assetId)
+
+                SimpleEdge(from, to)
+            }
         }
     }
 }

@@ -30,12 +30,6 @@ data class SwapQuote(
 
     val planksOut: Balance
         get() = amountOut.amount
-
-    init {
-        require(assetIn.chainId == assetOut.chainId) {
-            "Cross-chain swaps are not yet implemented"
-        }
-    }
 }
 
 
