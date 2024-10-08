@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
+import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
 import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.mapAsync
@@ -94,6 +95,8 @@ internal class RealSwapService(
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
+        Log.d("Swaps", "Syncing swap service")
+
         exchanges(coroutineScope)
             .values
             .forEachAsync { it.sync() }
@@ -110,6 +113,10 @@ internal class RealSwapService(
         computationScope: CoroutineScope
     ): Flow<Set<FullChainAssetId>> {
         return directionsGraph(computationScope).map { it.findAllPossibleDestinations(asset.fullId) }
+    }
+
+    override suspend fun hasAvailableSwapDirections(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Boolean> {
+        return directionsGraph(computationScope).map { it.hasOutcomingDirections(asset.fullId)  }
     }
 
     override suspend fun quote(
@@ -213,6 +220,8 @@ internal class RealSwapService(
 
     override fun runSubscriptions(chainIn: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return withFlowScope { scope ->
+            Log.d("Swaps", "Starting new subscriptions")
+
             val exchanges = exchanges(scope)
             exchanges.getValue(chainIn.id).runSubscriptions(chainIn, metaAccount)
         }.throttleLast(500.milliseconds)

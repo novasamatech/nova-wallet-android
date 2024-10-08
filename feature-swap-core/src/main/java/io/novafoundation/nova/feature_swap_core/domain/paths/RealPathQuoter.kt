@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_core.domain.paths
 
+import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
@@ -16,6 +17,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import java.math.BigInteger
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 private const val PATHS_LIMIT = 4
 private const val QUOTES_CACHE = "RealSwapService.QuotesCache"
@@ -38,6 +41,7 @@ private class RealPathQuoter<E : QuotableEdge>(
     private val computationalScope: CoroutineScope
 ): PathQuoter<E> {
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun findBestPath(
         chainAssetIn: Chain.Asset,
         chainAssetOut: Chain.Asset,
@@ -48,7 +52,13 @@ private class RealPathQuoter<E : QuotableEdge>(
         val to = chainAssetOut.fullId
 
         val paths = pathsFromCacheOrCompute(from, to, computationalScope) {
-            graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT)
+            val (paths, duration) = measureTimedValue {
+                graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT)
+            }
+
+            Log.d("Swaps", "${chainAssetIn.symbol} -> ${chainAssetOut.symbol}: finding ${paths.size} paths took $duration")
+
+            paths
         }
 
         val quotedPaths = paths.mapNotNull { path -> quotePath(path, amount, swapDirection) }

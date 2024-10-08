@@ -35,6 +35,11 @@ fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDestinations(origin: N): Set<N> 
     return reachabilityDfs(origin, adjacencyList).toSet()
 }
 
+fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
+    val vertices = adjacencyList[origin] ?: return false
+    return vertices.isNotEmpty()
+}
+
 fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
     val result = mutableMapOf<N, List<N>>()
 
