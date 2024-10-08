@@ -75,12 +75,17 @@ private class RealPathQuoter<E : QuotableEdge>(
         scope: CoroutineScope,
         computation: suspend () -> List<Path<E>>
     ): List<Path<E>> {
-        val mapKey = from to to
-        val cacheKey = "$QUOTES_CACHE:$mapKey"
+        val cacheKey = "$QUOTES_CACHE:${pathsCacheKey(from, to)}"
 
         return computationalCache.useCache(cacheKey, scope) {
             computation()
         }
+    }
+    private fun pathsCacheKey(from: FullChainAssetId, to: FullChainAssetId): String {
+        val fromKey = "${from.chainId}:${from.assetId}"
+        val toKey = "${to.chainId}:${to.assetId}"
+
+        return "${fromKey}:${toKey}"
     }
 
     private suspend fun quotePath(

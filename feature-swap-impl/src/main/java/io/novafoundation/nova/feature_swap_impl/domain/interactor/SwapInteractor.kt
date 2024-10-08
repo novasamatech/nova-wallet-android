@@ -47,7 +47,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.coroutineContext
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -83,8 +82,8 @@ class SwapInteractor(
         }
     }
 
-    suspend fun quote(quoteArgs: SwapQuoteArgs): Result<SwapQuote> {
-        return swapService.quote(quoteArgs, CoroutineScope(coroutineContext))
+    suspend fun quote(quoteArgs: SwapQuoteArgs, computationalScope: CoroutineScope): Result<SwapQuote> {
+        return swapService.quote(quoteArgs, computationalScope)
     }
 
     suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs): Result<SwapExecutionCorrection> = withContext(Dispatchers.IO) {

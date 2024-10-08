@@ -352,7 +352,7 @@ class SwapConfirmationViewModel(
     private fun runQuoting(newSwapQuoteArgs: SwapQuoteArgs) {
         launch {
             val confirmationState = confirmationStateFlow.value ?: return@launch
-            val swapQuote = swapInteractor.quote(newSwapQuoteArgs)
+            val swapQuote = swapInteractor.quote(newSwapQuoteArgs, viewModelScope)
                 .onFailure { }
                 .getOrNull() ?: return@launch
 
