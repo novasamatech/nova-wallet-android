@@ -188,7 +188,7 @@ class GovV2OnChainReferendaRepository(
             "Rejected" -> OnChainReferendumStatus.Rejected(bindCompletedReferendumSince(asDictEnum.value))
             "Cancelled" -> OnChainReferendumStatus.Cancelled(bindCompletedReferendumSince(asDictEnum.value))
             "TimedOut" -> OnChainReferendumStatus.TimedOut(bindCompletedReferendumSince(asDictEnum.value))
-            "Killed" -> OnChainReferendumStatus.Killed(bindCompletedReferendumSince(asDictEnum.value))
+            "Killed" -> OnChainReferendumStatus.Killed(bindNumber(asDictEnum.value))
             else -> throw IllegalArgumentException("Unsupported referendum status")
         }
 
@@ -197,7 +197,7 @@ class GovV2OnChainReferendaRepository(
             status = referendumStatus
         )
     }
-        .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum", it) }
+        .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum $id", it) }
         .getOrNull()
 
     private fun bindDecidingStatus(decoded: Any?): DecidingStatus? {
