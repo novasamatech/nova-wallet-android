@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
 import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
@@ -70,9 +71,10 @@ class SettingsFeatureModule {
     fun provideNetworkManagementChainInteractor(
         chainRegistry: ChainRegistry,
         nodeHealthStateTesterFactory: NodeHealthStateTesterFactory,
-        chainRepository: ChainRepository
+        chainRepository: ChainRepository,
+        accountInteractor: AccountInteractor
     ): NetworkManagementChainInteractor {
-        return RealNetworkManagementChainInteractor(chainRegistry, nodeHealthStateTesterFactory, chainRepository)
+        return RealNetworkManagementChainInteractor(chainRegistry, nodeHealthStateTesterFactory, chainRepository, accountInteractor)
     }
 
     @Provides
