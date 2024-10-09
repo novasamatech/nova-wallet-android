@@ -16,6 +16,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -77,7 +78,7 @@ interface SwapFeatureDependencies {
 
     val amountMixinFactory: AmountChooserMixin.Factory
 
-    val extrinsicService: ExtrinsicService
+    val extrinsicServiceFactory: ExtrinsicService.Factory
 
     val resourceHintsMixinFactory: ResourcesHintsMixinFactory
 
@@ -131,4 +132,6 @@ interface SwapFeatureDependencies {
     val customFeeCapabilityFacade: CustomFeeCapabilityFacade
 
     val quoterFactory: PathQuoter.Factory
+
+    val hydrationFeeInjector: HydrationFeeInjector
 }

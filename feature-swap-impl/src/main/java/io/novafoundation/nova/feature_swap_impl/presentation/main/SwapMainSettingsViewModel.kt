@@ -540,7 +540,8 @@ class SwapMainSettingsViewModel(
             }
             .mapLatest { quoteState ->
                 val swapArgs = quoteState.value.toExecuteArgs(
-                    slippage = swapSettings.first().slippage
+                    slippage = swapSettings.first().slippage,
+                    firstSegmentFees = quoteState.firstSegmentFeeAsset
                 )
 
                 loadFeeSuspending(

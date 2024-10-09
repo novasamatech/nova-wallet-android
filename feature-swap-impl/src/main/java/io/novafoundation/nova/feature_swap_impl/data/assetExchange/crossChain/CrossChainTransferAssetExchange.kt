@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 
-import io.novafoundation.nova.common.utils.awaitTrue
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
@@ -22,7 +22,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import java.math.BigInteger
 
@@ -48,16 +47,11 @@ class CrossChainTransferAssetExchange(
     private val chainRegistry: ChainRegistry
 ) : AssetExchange {
 
-    private val synced = MutableStateFlow(false)
-
     override suspend fun sync() {
         crossChainTransfersUseCase.syncCrossChainConfig()
-        synced.value = true
     }
 
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
-        synced.awaitTrue()
-
         return crossChainTransfersUseCase.allDirections().map(::CrossChainTransferEdge)
     }
 
@@ -85,11 +79,10 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun debugLabel(): String {
-            return "Cross-chain Transfer"
+            return "Transfer"
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
-            // TODO include delivery & execution fees
             return amount
         }
     }
@@ -100,18 +93,23 @@ class CrossChainTransferAssetExchange(
     ) : AtomicSwapOperation {
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            val chain = chainRegistry.getChain(edge.from.chainId)
-
             // TODO
             return SubstrateFee(
                 amount = BigInteger.ZERO,
                 submissionOrigin = SubmissionOrigin.singleOrigin(emptySubstrateAccountId()),
-                asset = chain.utilityAsset
+                asset = paymentAsset()
             )
         }
 
         override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
             return Result.failure(UnsupportedOperationException("TODO"))
+        }
+
+        private suspend fun paymentAsset(): Chain.Asset {
+            return when(val currency = transactionArgs.feePaymentCurrency) {
+                is FeePaymentCurrency.Asset -> currency.asset
+                FeePaymentCurrency.Native -> chainRegistry.getChain(edge.from.chainId).utilityAsset
+            }
         }
     }
 }

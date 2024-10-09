@@ -8,8 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
-import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
@@ -26,11 +25,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.emptyAccountId
-import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.utilityAsset
-import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.assetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
@@ -54,7 +49,7 @@ class AssetConversionExchangeFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val remoteStorageSource: StorageDataSource,
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
-    private val extrinsicService: ExtrinsicService,
+    private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val chainStateRepository: ChainStateRepository,
 ) : AssetExchange.SingleChainFactory {
 
@@ -70,8 +65,9 @@ class AssetConversionExchangeFactory(
             multiLocationConverter = converter,
             remoteStorageSource = remoteStorageSource,
             multiChainRuntimeCallsApi = runtimeCallsApi,
-            extrinsicService = extrinsicService,
-            chainStateRepository = chainStateRepository
+            coroutineScope = coroutineScope,
+            chainStateRepository = chainStateRepository,
+            extrinsicServiceFactory = extrinsicServiceFactory
         )
     }
 }
@@ -81,9 +77,12 @@ private class AssetConversionExchange(
     private val multiLocationConverter: MultiLocationConverter,
     private val remoteStorageSource: StorageDataSource,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
-    private val extrinsicService: ExtrinsicService,
+    private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val chainStateRepository: ChainStateRepository,
+    coroutineScope: CoroutineScope
 ) : AssetExchange {
+
+    private val extrinsicService = extrinsicServiceFactory.createDefault(coroutineScope)
 
     override suspend fun sync() {
         // nothing to sync
@@ -199,31 +198,31 @@ private class AssetConversionExchange(
     ) : AtomicSwapOperation {
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            val nativeAssetFee = extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+            return extrinsicService.estimateFee(
+                chain = chain,
+                origin = TransactionOrigin.SelectedWallet,
+                submissionOptions = ExtrinsicService.SubmissionOptions(
+                    feePaymentCurrency = transactionArgs.feePaymentCurrency
+                )
+            ) {
                 executeSwap(sendTo = chain.emptyAccountId())
             }
-
-            return convertNativeFeeToPayingTokenFee(nativeAssetFee)
         }
 
         override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
             // TODO use `previousStepCorrection` to correct used call arguments
             // TODO implement watching for extrinsic events
-            return extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { submissionOrigin ->
+            return extrinsicService.submitAndWatchExtrinsic(
+                chain = chain,
+                origin = TransactionOrigin.SelectedWallet,
+                submissionOptions = ExtrinsicService.SubmissionOptions(
+                    feePaymentCurrency = transactionArgs.feePaymentCurrency
+                )
+            ) { submissionOrigin ->
                 // Send swapped funds to the requested origin since it the account doing the swap
                 executeSwap(sendTo = submissionOrigin.requestedOrigin)
             }.awaitInBlock().map {
                 SwapExecutionCorrection()
-            }
-        }
-
-        private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee): AtomicSwapOperationFee {
-            val customFeeAsset = transactionArgs.customFeeAsset
-
-            return if (customFeeAsset != null && !customFeeAsset.isCommissionAsset()) {
-                calculateCustomTokenFee(nativeTokenFee, customFeeAsset)
-            } else {
-                nativeTokenFee
             }
         }
 
@@ -258,48 +257,6 @@ private class AssetConversionExchange(
                     )
                 )
             }
-
-            setFeeAsset(transactionArgs.customFeeAsset)
-        }
-
-        private suspend fun ExtrinsicBuilder.setFeeAsset(feeAsset: Chain.Asset?) {
-            if (feeAsset == null || feeAsset.isCommissionAsset()) return
-
-            val assetId = multiLocationConverter.encodableMultiLocationOf(feeAsset)
-
-            assetTxPayment(assetId)
-        }
-
-        // TODO we purposefully do not use `nativeTokenFee.amountByRequestedAccount`
-        // since we have disabled fee payment in custom tokens for accounts where the difference matters (e.g. proxy)
-        // We should adapt it if we decide to remove the restriction
-        private suspend fun calculateCustomTokenFee(
-            nativeTokenFee: Fee,
-            customFeeAsset: Chain.Asset
-        ): AtomicSwapOperationFee {
-            val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
-            val toBuyNativeFee = runtimeCallsApi.quoteFeeConversion(nativeTokenFee.amount, customFeeAsset)
-
-            return SubstrateFee(
-                amount = toBuyNativeFee,
-                submissionOrigin = nativeTokenFee.submissionOrigin,
-                asset = customFeeAsset
-            )
-        }
-
-        private suspend fun RuntimeCallsApi.quoteFeeConversion(commissionAmountOut: Balance, customFeeToken: Chain.Asset): Balance {
-            val quotedAmount = quote(
-                swapDirection = SwapDirection.SPECIFIED_OUT,
-                assetIn = customFeeToken,
-                assetOut = chain.utilityAsset,
-                amount = commissionAmountOut
-            )
-
-            return requireNotNull(quotedAmount)
-        }
-
-        private fun Chain.Asset.isCommissionAsset(): Boolean {
-            return fullId == chain.commissionAsset.fullId
         }
 
         private suspend fun MultiLocationConverter.encodableMultiLocationOf(chainAsset: Chain.Asset): Any? {

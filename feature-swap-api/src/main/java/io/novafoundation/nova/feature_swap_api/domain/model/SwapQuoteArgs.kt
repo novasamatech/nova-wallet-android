@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
 data class SwapQuoteArgs(
@@ -20,6 +21,7 @@ class SwapExecuteArgs(
     val slippage: Percent,
     val executionPath: Path<SegmentExecuteArgs>,
     val direction: SwapDirection,
+    val firstSegmentFees: Chain.Asset
 )
 
 class SegmentExecuteArgs(
@@ -41,11 +43,12 @@ sealed class SwapLimit {
     ) : SwapLimit()
 }
 
-fun SwapQuote.toExecuteArgs(slippage: Percent): SwapExecuteArgs {
+fun SwapQuote.toExecuteArgs(slippage: Percent, firstSegmentFees: Chain.Asset): SwapExecuteArgs {
     return SwapExecuteArgs(
         slippage = slippage,
         direction = quotedPath.direction,
-        executionPath = quotedPath.path.map { quotedSwapEdge -> SegmentExecuteArgs(quotedSwapEdge) }
+        executionPath = quotedPath.path.map { quotedSwapEdge -> SegmentExecuteArgs(quotedSwapEdge) },
+        firstSegmentFees = firstSegmentFees
     )
 }
 

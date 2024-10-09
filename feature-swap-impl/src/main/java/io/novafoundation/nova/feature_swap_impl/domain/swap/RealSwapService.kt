@@ -18,10 +18,11 @@ import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.requireInnerNotNull
-import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
@@ -65,6 +66,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -141,7 +143,7 @@ internal class RealSwapService(
 
         val fees = atomicOperations.mapAsync { it.estimateFee() }
 
-        return SwapFee(fees)
+        return SwapFee(fees).also(::logFee)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<SwapExecutionCorrection> {
@@ -161,19 +163,21 @@ internal class RealSwapService(
         // TODO this will result in lower total slippage if some segments are appendable
         val perSegmentSlippage = slippage / executionPath.size
 
-        executionPath.forEach { segmentExecuteArgs ->
+        executionPath.forEachIndexed { index, segmentExecuteArgs ->
             val quotedEdge = segmentExecuteArgs.quotedSwapEdge
 
             val operationArgs = AtomicSwapOperationArgs(
                 swapLimit = SwapLimit(direction, quotedEdge.quotedAmount, perSegmentSlippage, quotedEdge.quote),
-                // TODO custom fee assets
-                customFeeAsset = null,
+                feePaymentCurrency = segmentExecuteArgs.quotedSwapEdge.edge.identifySegmentCurrency(
+                    isFirstSegment = index == 0,
+                    firstSegmentFees = firstSegmentFees
+                )
             )
 
             // Initial case - begin first operation
             if (currentSwapTx == null) {
                 currentSwapTx = quotedEdge.edge.beginOperation(operationArgs)
-                return@forEach
+                return@forEachIndexed
             }
 
             // Try to append segment to current swap tx
@@ -190,6 +194,18 @@ internal class RealSwapService(
         finishedSwapTxs.add(currentSwapTx!!)
 
         return finishedSwapTxs
+    }
+
+    private suspend fun SwapGraphEdge.identifySegmentCurrency(
+        isFirstSegment: Boolean,
+        firstSegmentFees: Chain.Asset
+    ): FeePaymentCurrency {
+        return if (isFirstSegment) {
+            firstSegmentFees.toFeePaymentCurrency()
+        } else {
+            // When executing intermediate segments, always pay in sending asset
+            chainRegistry.asset(from).toFeePaymentCurrency()
+        }
     }
 
 
@@ -227,7 +243,7 @@ internal class RealSwapService(
             exchangeRegistry.allExchanges()
                 .map { it.runSubscriptions(metaAccount) }
                 .mergeIfMultiple()
-        }.throttleLast(500.milliseconds)
+        }.debounce(500.milliseconds)
     }
 
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {
@@ -330,12 +346,13 @@ internal class RealSwapService(
         chainAssetOut: Chain.Asset,
         amount: Balance,
         swapDirection: SwapDirection,
-        computationSharingScope: CoroutineScope
+        computationSharingScope: CoroutineScope,
+        logQuotes: Boolean = true
     ): QuotedTrade {
         val quoter = getPathQuoter(computationSharingScope)
 
         val bestPathQuote = quoter.findBestPath(chainAssetIn, chainAssetOut, amount, swapDirection)
-        if (debug) {
+        if (debug && logQuotes) {
             logQuotes(bestPathQuote.candidates)
         }
 
@@ -359,9 +376,18 @@ internal class RealSwapService(
                 chainAssetOut = quoteArgs.chainAssetOut,
                 amount = quoteArgs.amount,
                 swapDirection = quoteArgs.swapDirection,
-                computationSharingScope = computationScope
+                computationSharingScope = computationScope,
+                logQuotes = false
             ).finalQuote()
         }
+    }
+
+    private fun logFee(fee: SwapFee) {
+        val route = fee.atomicOperationFees.joinToString() {
+            it.amount.formatPlanks(it.asset)
+        }
+
+        Log.d("Swaps", "Fee: $route")
     }
 
     private suspend fun logQuotes(quotedTrades: List<QuotedTrade>) {

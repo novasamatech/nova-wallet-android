@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
@@ -54,22 +55,24 @@ class HydraDxExchangeModule {
     fun provideHydraDxExchangeFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-        extrinsicService: ExtrinsicService,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         hydraDxNovaReferral: HydraDxNovaReferral,
         swapSourceFactories: Set<@JvmSuppressWildcards HydraDxSwapSource.Factory<*>>,
+        extrinsicServiceFactory: ExtrinsicService.Factory,
         quotingFactory: HydraDxQuoting.Factory,
         assetSourceRegistry: AssetSourceRegistry,
+        hydrationFeeInjector: HydrationFeeInjector
     ): HydraDxExchangeFactory {
         return HydraDxExchangeFactory(
             remoteStorageSource = remoteStorageSource,
             sharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
-            extrinsicService = extrinsicService,
+            extrinsicServiceFactory = extrinsicServiceFactory,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             hydraDxNovaReferral = hydraDxNovaReferral,
             swapSourceFactories = swapSourceFactories,
             assetSourceRegistry = assetSourceRegistry,
-            quotingFactory = quotingFactory
+            quotingFactory = quotingFactory,
+            hydrationFeeInjector = hydrationFeeInjector
         )
     }
 }

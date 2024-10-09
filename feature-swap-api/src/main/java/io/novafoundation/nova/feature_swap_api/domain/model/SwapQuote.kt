@@ -62,6 +62,9 @@ class SwapFee(
     val atomicOperationFees: List<AtomicSwapOperationFee>
 ) : GenericFee {
 
+    val firstSegmentFee: Fee
+        get() = atomicOperationFees.first()
+
     // TODO handle multi-segment fee display
     override val networkFee: Fee
         get() = atomicOperationFees.first()

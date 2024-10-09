@@ -246,8 +246,11 @@ class SwapConfirmationViewModel(
 
     private fun executeSwap() = launch {
         val quote = confirmationStateFlow.value?.swapQuote ?: return@launch
-        // TODO fees in sending asset
-        val executeArgs = quote.toExecuteArgs(slippage = initialSwapState.first().slippage)
+        val swapState = initialSwapState.first()
+        val executeArgs = quote.toExecuteArgs(
+            slippage = swapState.slippage,
+            firstSegmentFees = swapState.fee.firstSegmentFee.asset
+        )
 
         swapInteractor.executeSwap(executeArgs)
             .onSuccess { navigateToNextScreen(quote.assetIn) }
@@ -356,7 +359,10 @@ class SwapConfirmationViewModel(
                 .onFailure { }
                 .getOrNull() ?: return@launch
 
-            val executeArgs = swapQuote.toExecuteArgs(slippageFlow.first())
+            val executeArgs = swapQuote.toExecuteArgs(
+                slippage = slippageFlow.first(),
+                firstSegmentFees = initialSwapState.first().fee.firstSegmentFee.asset
+            )
 
             feeMixin.loadFeeV2Generic(
                 coroutineScope = viewModelScope,

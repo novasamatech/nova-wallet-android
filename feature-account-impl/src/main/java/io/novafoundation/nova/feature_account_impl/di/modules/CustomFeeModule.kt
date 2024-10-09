@@ -6,12 +6,14 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.HydrationFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQuoteSharedComputation
+import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.RealHydrationFeeInjector
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
@@ -73,15 +75,23 @@ class CustomFeeModule {
 
     @Provides
     @FeatureScope
+    fun provideHydraFeesInjector(
+        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    ): HydrationFeeInjector = RealHydrationFeeInjector(
+        hydraDxAssetIdConverter,
+    )
+
+    @Provides
+    @FeatureScope
     fun provideHydrationFeePaymentProvider(
         chainRegistry: ChainRegistry,
-        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
+        hydrationFeeInjector: HydrationFeeInjector,
         accountRepository: AccountRepository
     ) = HydrationFeePaymentProvider(
         chainRegistry,
-        hydraDxAssetIdConverter,
         hydraDxQuoteSharedComputation,
+        hydrationFeeInjector,
         accountRepository
     )
 

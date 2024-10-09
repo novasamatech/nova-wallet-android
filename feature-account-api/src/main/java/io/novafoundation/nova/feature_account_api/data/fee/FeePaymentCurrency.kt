@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.data.fee
 
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -17,7 +18,17 @@ sealed interface FeePaymentCurrency {
      *
      * The actual asset used to pay fees will be available in [Fee.asset]
      */
-    data class Asset(val asset: Chain.Asset) : FeePaymentCurrency
+    class Asset(val asset: Chain.Asset) : FeePaymentCurrency {
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is Asset) return false
+            return asset.fullId == other.asset.fullId
+        }
+
+        override fun hashCode(): Int {
+            return asset.hashCode()
+        }
+    }
 
     companion object
 }

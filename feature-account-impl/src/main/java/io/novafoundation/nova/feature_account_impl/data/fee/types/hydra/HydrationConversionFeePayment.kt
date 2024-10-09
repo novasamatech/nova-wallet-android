@@ -1,14 +1,14 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types.hydra
 
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector.ResetMode
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector.SetFeesMode
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector.SetMode
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
-import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quote
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -20,19 +20,18 @@ import kotlinx.coroutines.CoroutineScope
 internal class HydrationConversionFeePayment(
     private val paymentAsset: Chain.Asset,
     private val chainRegistry: ChainRegistry,
-    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val hydrationFeeInjector: HydrationFeeInjector,
     private val hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
     private val accountRepository: AccountRepository,
     private val coroutineScope: CoroutineScope
 ) : FeePayment {
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
-        val baseCall = extrinsicBuilder.getCall()
-        extrinsicBuilder.resetCalls()
-
-        extrinsicBuilder.setFeeCurrency(hydraDxAssetIdConverter.toOnChainIdOrThrow(paymentAsset))
-        extrinsicBuilder.call(baseCall)
-        extrinsicBuilder.setFeeCurrency(hydraDxAssetIdConverter.systemAssetId)
+        val setFeesMode = SetFeesMode(
+            setMode = SetMode.Always,
+            resetMode = ResetMode.ToNative
+        )
+        hydrationFeeInjector.setFees(extrinsicBuilder, paymentAsset, setFeesMode)
     }
 
     override suspend fun convertNativeFee(nativeFee: Fee): Fee {
@@ -63,15 +62,5 @@ internal class HydrationConversionFeePayment(
 
         val assetConversion = hydraDxQuoteSharedComputation.getSwapQuoting(chain, accountId, coroutineScope)
         return assetConversion.canPayFeeInNonUtilityToken(paymentAsset)
-    }
-
-    private fun ExtrinsicBuilder.setFeeCurrency(onChainId: HydraDxAssetId) {
-        call(
-            moduleName = Modules.MULTI_TRANSACTION_PAYMENT,
-            callName = "set_currency",
-            arguments = mapOf(
-                "currency" to onChainId
-            )
-        )
     }
 }

@@ -109,12 +109,7 @@ private class RealPathQuoter<E : QuotableEdge>(
             val initial = mutableListOf<QuotedEdge<E>>() to amount
 
             path.foldRight(initial) { segment, (quotedPath, currentAmount) ->
-                Log.d("Swaps", "Started quoting ${segment::class.simpleName}")
-
                 val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_OUT)
-
-                Log.d("Swaps", "Finished quoting ${segment::class.simpleName}")
-
                 quotedPath.add(0, QuotedEdge(currentAmount, segmentQuote, segment))
 
                 quotedPath to segmentQuote
@@ -129,12 +124,7 @@ private class RealPathQuoter<E : QuotableEdge>(
             val initial = mutableListOf<QuotedEdge<E>>() to amount
 
             path.fold(initial) { (quotedPath, currentAmount), segment ->
-                Log.d("Swaps", "Started quoting ${segment::class.simpleName}")
-
                 val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_IN)
-
-                Log.d("Swaps", "Finished quoting ${segment::class.simpleName}")
-
                 quotedPath.add(QuotedEdge(currentAmount, segmentQuote, segment))
 
                 quotedPath to segmentQuote
