@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setAddress
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
@@ -48,6 +49,7 @@ class TopUpCardViewModel(
     private val payload: TopUpCardPayload,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
+    private val novaCardInteractor: NovaCardInteractor,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -150,7 +152,12 @@ class TopUpCardViewModel(
     private fun transferTokensAndFinishFlow(payload: AssetTransferPayload) = launch {
         sendInteractor.performTransfer(payload.transfer, payload.originFee, null, viewModelScope)
 
-        router.back()
+        if (novaCardInteractor.isNovaCardStateActive()) {
+            router.back()
+        } else {
+            // If nova card is not active it means user create card first time and we need to show waiting dialog
+            router.finishTopUpFlowAndAwaitCardCreation()
+        }
     }
 
     private fun setupFees() {

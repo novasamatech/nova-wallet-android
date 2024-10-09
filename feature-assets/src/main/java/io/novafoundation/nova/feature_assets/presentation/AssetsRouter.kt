@@ -80,4 +80,6 @@ interface AssetsRouter {
     fun closeSendFlow()
 
     fun openNovaCard()
+
+    fun finishTopUpFlowAndAwaitCardCreation()
 }

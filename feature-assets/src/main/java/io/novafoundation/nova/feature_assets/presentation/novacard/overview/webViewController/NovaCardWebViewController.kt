@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.overview.web
 
 import android.Manifest
 import android.net.Uri
-import android.util.Log
-import android.webkit.CookieManager
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
@@ -15,17 +13,11 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.readText
 import io.novafoundation.nova.common.utils.systemCall.FilePickerSystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import kotlin.time.Duration.Companion.milliseconds
 
 class NovaCardWebViewControllerFactory(
     private val systemCallExecutor: SystemCallExecutor,
@@ -34,13 +26,14 @@ class NovaCardWebViewControllerFactory(
     private val appLinksProvider: AppLinksProvider,
     private val gson: Gson,
     private val widgetId: String,
-    private val okHttpClient: OkHttpClient,
+    private val webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory
 ) {
 
     fun create(
         fragment: Fragment,
         webView: WebView,
         eventHandler: NovaCardEventHandler,
+        cardCreatedListener: OnCardCreatedListener,
         setupConfig: CardSetupConfig,
         scope: CoroutineScope,
     ): NovaCardWebViewController {
@@ -56,7 +49,7 @@ class NovaCardWebViewControllerFactory(
             pageProvider = pageProvider,
             novaCardJsCallback = jsCallback,
             coroutineScope = scope,
-            okHttpClient = okHttpClient
+            cardCreationInterceptor = webViewCardCreationInterceptorFactory.create(cardCreatedListener)
         )
     }
 }
@@ -71,7 +64,7 @@ class NovaCardWebViewController(
     private val pageProvider: NovaCardWebPageProvider,
     private val novaCardJsCallback: NovaCardJsCallback,
     private val coroutineScope: CoroutineScope,
-    private val okHttpClient: OkHttpClient,
+    private val cardCreationInterceptor: WebViewCardCreationInterceptor
 ) {
 
     private val permissionsAsker = permissionsAskerFactory.create(fragment)
@@ -79,28 +72,9 @@ class NovaCardWebViewController(
     private val webViewClient = object : WebViewClient() {
 
         private var jsScriptWasCalled = false
-        private var interceptedCardRequest: Request.Builder? = null
 
         init {
-            coroutineScope.launch(Dispatchers.IO) {
-                repeat(100) {
-                    if (interceptedCardRequest != null) {
-                        val okHttpResponse = okHttpClient.newCall(interceptedCardRequest!!.build()).execute()
-
-                        if (okHttpResponse.isSuccessful) {
-                            val responseBody = okHttpResponse.body
-
-                            val data = responseBody!!.byteStream().readText()
-
-                            Log.d("NovaCard", "Polled $data")
-                        } else {
-                            Log.d("NovaCard", "Polling failed")
-                        }
-                    }
-
-                    delay(1000.milliseconds)
-                }
-            }
+            cardCreationInterceptor.runPolling(coroutineScope)
         }
 
         override fun onPageFinished(view: WebView, url: String) {
@@ -113,62 +87,9 @@ class NovaCardWebViewController(
         }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            val url = request.url.toString()
-
-            // Intercept requests that might return a JSON response
-            if (url.contains("https://api.mercuryo.io/v1.6/cards")) { // Specify your condition here
-                return performOkHttpRequest(request)
-            }
+            cardCreationInterceptor.intercept(request)
 
             return super.shouldInterceptRequest(view, request)
-        }
-
-        private fun performOkHttpRequest(request: WebResourceRequest): WebResourceResponse? {
-            try {
-                // Create OkHttp Request based on WebResourceRequest
-                val okHttpRequestBuilder = Request.Builder().url(request.url.toString())
-
-                // Set method (GET, POST, etc.) and request body if needed
-                when (request.method) {
-                    "GET" -> okHttpRequestBuilder.get()
-                    else -> okHttpRequestBuilder.get()
-                }
-
-                // Add headers from WebResourceRequest
-                for ((key, value) in request.requestHeaders) {
-                    okHttpRequestBuilder.addHeader(key, value)
-                }
-
-                val cookieManager = CookieManager.getInstance()
-                val cookies = cookieManager.getCookie(request.url.toString())
-                if (cookies != null) {
-                    okHttpRequestBuilder.addHeader("Cookie", cookies)
-                }
-
-                interceptedCardRequest = okHttpRequestBuilder
-
-                // Execute the OkHttp request
-                val okHttpResponse = okHttpClient.newCall(okHttpRequestBuilder.build()).execute()
-
-                // Check if the response is successful
-                return if (okHttpResponse.isSuccessful) {
-                    val responseBody = okHttpResponse.body
-
-                    val data = responseBody!!.byteStream().readText()
-
-                    Log.d("NovaCard", "Intercepted $data")
-
-                    // Return WebResourceResponse with the intercepted data
-                    null
-                } else {
-                    // Return null or handle error cases (e.g., 404, 500)
-                    null
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            return null // Fall back to default WebView behavior if something goes wrong
         }
     }
 

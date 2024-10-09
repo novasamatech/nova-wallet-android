@@ -26,6 +26,24 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment"
         android:label="fragment_top_up"
         app:useAdd="true"
-        tools:layout="@layout/fragment_top_up_card" />
+        tools:layout="@layout/fragment_top_up_card">
+
+        <action
+            android:id="@+id/action_finish_top_up_flow"
+            app:destination="@id/waitingForTopUpCardFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/novaCardFragment" />
+
+    </fragment>
+
+    <dialog
+        android:id="@+id/waitingForTopUpCardFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.novacard.waiting.WaitingNovaCardTopUpFragment"
+        android:label="fragment_waiting_top_up"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_waiting_nova_card_top_up" />
 
 </navigation>
