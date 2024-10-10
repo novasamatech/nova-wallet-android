@@ -99,8 +99,6 @@ class TinderGovCardsViewModel(
 
     private var isVotingInProgress = MutableStateFlow(false)
 
-    val manageVotingPowerAvailable = topCardFlow.map { it != null }
-
     val isCardDraggingAvailable = isVotingInProgress.map { !it }
 
     val basketModelFlow = basketFlow
