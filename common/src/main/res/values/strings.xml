@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="settings_email">Email</string>-->
+    <string name="settings_email">Get support via Email</string>
+
     <string name="swipe_gov_card_placeholder_basket_full_text">You have already voted for all available referenda</string>
     <string name="swipe_gov_cards_placeholder_button">Confirm your votes</string>
     <string name="swipe_gov_cards_basket_title">Vote list</string>
@@ -2036,7 +2039,6 @@
     <string name="search_recipient_welcome_v2_2_0">Search results will be displayed here</string>
     <string name="search_result_header">Search results</string>
     <string name="settings_community">Community</string>
-    <string name="settings_email">Email</string>
     <string name="settings_general">General</string>
     <string name="settings_preferences">Preferences</string>
     <string name="settings_security">Security</string>
