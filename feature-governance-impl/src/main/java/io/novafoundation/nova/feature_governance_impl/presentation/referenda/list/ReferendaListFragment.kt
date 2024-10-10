@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -50,6 +51,8 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
 
     override fun subscribe(viewModel: ReferendaListViewModel) {
         subscribeOnAssetClick(viewModel.assetSelectorMixin, imageLoader)
+        observeValidations(viewModel)
+
         subscribeOnAssetChange(viewModel.assetSelectorMixin) {
             referendaHeaderAdapter.setAsset(it)
         }

@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.summary.ReferendaSu
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
@@ -38,7 +40,10 @@ class ReferendaListModule {
         governanceRouter: GovernanceRouter,
         referendumFormatter: ReferendumFormatter,
         governanceDAppsInteractor: GovernanceDAppsInteractor,
-        summaryInteractor: ReferendaSummaryInteractor
+        summaryInteractor: ReferendaSummaryInteractor,
+        tinderGovInteractor: TinderGovInteractor,
+        selectedMetaAccountUseCase: SelectedAccountUseCase,
+        validationExecutor: ValidationExecutor,
     ): ViewModel {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -51,7 +56,10 @@ class ReferendaListModule {
             governanceRouter = governanceRouter,
             referendumFormatter = referendumFormatter,
             governanceDAppsInteractor = governanceDAppsInteractor,
-            referendaSummaryInteractor = summaryInteractor
+            referendaSummaryInteractor = summaryInteractor,
+            tinderGovInteractor = tinderGovInteractor,
+            selectedMetaAccountUseCase = selectedMetaAccountUseCase,
+            validationExecutor = validationExecutor
         )
     }
 

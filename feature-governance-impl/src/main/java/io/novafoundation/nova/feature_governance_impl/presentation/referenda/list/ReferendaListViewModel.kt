@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combineToPair
@@ -14,6 +15,8 @@ import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withItemScope
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -34,10 +37,13 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.ReferendaListStateModel
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.StartSwipeGovValidationPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.TinderGovBannerModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.toReferendumDetailsPrefilledData
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.validation.handleStartSwipeGovValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
@@ -64,8 +70,12 @@ class ReferendaListViewModel(
     private val governanceRouter: GovernanceRouter,
     private val referendumFormatter: ReferendumFormatter,
     private val governanceDAppsInteractor: GovernanceDAppsInteractor,
-    private val referendaSummaryInteractor: ReferendaSummaryInteractor
-) : BaseViewModel(), WithAssetSelector {
+    private val referendaSummaryInteractor: ReferendaSummaryInteractor,
+    private val tinderGovInteractor: TinderGovInteractor,
+    private val selectedMetaAccountUseCase: SelectedAccountUseCase,
+    private val validationExecutor: ValidationExecutor,
+) : BaseViewModel(), WithAssetSelector,
+    Validatable by validationExecutor {
 
     override val assetSelectorMixin = assetSelectorFactory.create(
         scope = this,
@@ -148,8 +158,24 @@ class ReferendaListViewModel(
         governanceRouter.openReferendum(payload)
     }
 
-    fun openTinderGovCards() {
-        governanceRouter.openTinderGovCards()
+    fun openTinderGovCards() = launch {
+        val payload = StartSwipeGovValidationPayload(
+            chain = selectedAssetSharedState.chain(),
+            metaAccount = selectedMetaAccountUseCase.getSelectedMetaAccount()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = tinderGovInteractor.startSwipeGovValidationSystem(),
+            payload = payload,
+            validationFailureTransformerCustom = { validationFailure, _ ->
+                handleStartSwipeGovValidationFailure(
+                    resourceManager,
+                    validationFailure
+                )
+            }
+        ) {
+            governanceRouter.openTinderGovCards()
+        }
     }
 
     private fun mapLocksOverviewToUi(locksOverview: GovernanceLocksOverview?, asset: Asset): GovernanceLocksModel? {
