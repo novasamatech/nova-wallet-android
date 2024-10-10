@@ -65,4 +65,6 @@ interface AccountInteractor {
     suspend fun hasSecretsAccounts(): Boolean
 
     suspend fun hasCustomChainAccounts(metaId: Long): Boolean
+
+    suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
 }

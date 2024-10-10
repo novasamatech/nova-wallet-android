@@ -133,4 +133,6 @@ interface AccountRepository {
     suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
 
     suspend fun hasSecretsAccounts(): Boolean
+
+    suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
 }

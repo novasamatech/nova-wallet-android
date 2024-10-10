@@ -184,12 +184,7 @@ class AccountInteractorImpl(
     override suspend fun removeDeactivatedMetaAccounts() {
         accountRepository.removeDeactivatedMetaAccounts()
 
-        if (!accountRepository.isAccountSelected()) {
-            val metaAccounts = getActiveMetaAccounts()
-            if (metaAccounts.isNotEmpty()) {
-                accountRepository.selectMetaAccount(metaAccounts.first().id)
-            }
-        }
+        switchMetaAccountIfAccountNotSelected()
     }
 
     override suspend fun switchToNotDeactivatedAccountIfNeeded() {
@@ -209,5 +204,20 @@ class AccountInteractorImpl(
     override suspend fun hasCustomChainAccounts(metaId: Long): Boolean {
         val metaAccount = getMetaAccount(metaId)
         return metaAccount.chainAccounts.isNotEmpty()
+    }
+
+    override suspend fun deleteProxiedMetaAccountsByChain(chainId: String) {
+        accountRepository.deleteProxiedMetaAccountsByChain(chainId)
+
+        switchMetaAccountIfAccountNotSelected()
+    }
+
+    private suspend fun switchMetaAccountIfAccountNotSelected() {
+        if (!accountRepository.isAccountSelected()) {
+            val metaAccounts = getActiveMetaAccounts()
+            if (metaAccounts.isNotEmpty()) {
+                accountRepository.selectMetaAccount(metaAccounts.first().id)
+            }
+        }
     }
 }
