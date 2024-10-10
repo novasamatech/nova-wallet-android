@@ -126,11 +126,6 @@ fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     else -> merge()
 }
 
-fun <K, V> List<Flow<Map<K, V>>>.accumulateMaps(): Flow<Map<K, V>> {
-    return mergeIfMultiple()
-        .runningFold(emptyMap()) { acc, directions -> acc + directions }
-}
-
 inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) -> Flow<T>): Flow<T> {
     return flowOfAll {
         val flowScope = CoroutineScope(coroutineContext)
@@ -262,6 +257,10 @@ fun <T : Identifiable> Flow<List<T>>.diffed(): Flow<CollectionDiffer.Diff<T>> {
     return zipWithPrevious().map { (previous, new) ->
         CollectionDiffer.findDiff(newItems = new, oldItems = previous.orEmpty(), forceUseNewItems = false)
     }
+}
+
+suspend inline fun Flow<Boolean>.awaitTrue() {
+    first { it }
 }
 
 fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {

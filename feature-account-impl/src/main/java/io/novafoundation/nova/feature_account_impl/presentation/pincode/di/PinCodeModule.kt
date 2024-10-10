@@ -14,8 +14,10 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.io.MainThreadExecutor
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
+import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricService
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -23,8 +25,6 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeViewModel
-import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
-import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 
 @Module(
     includes = [

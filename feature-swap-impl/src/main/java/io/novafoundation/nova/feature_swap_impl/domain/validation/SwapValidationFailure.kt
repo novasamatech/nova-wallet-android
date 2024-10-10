@@ -57,41 +57,17 @@ sealed class SwapValidationFailure {
             val swapFee: SwapFee
         ) : SwapValidationFailure()
 
-        class NoNeedsToBuyMainAssetED(
+        class CannotPayFee(
             val assetIn: Chain.Asset,
             val feeAsset: Chain.Asset,
             val maxSwapAmount: Balance,
             val fee: Fee
         ) : SwapValidationFailure()
-
-        class NeedsToBuyMainAssetED(
-            val feeAsset: Chain.Asset,
-            val assetIn: Chain.Asset,
-            val nativeAsset: Chain.Asset,
-            val toBuyAmountToKeepEDInCommissionAsset: Balance,
-            val toSellAmountToKeepEDUsingAssetIn: Balance,
-            val maxSwapAmount: Balance,
-            val fee: Fee
-        ) : SwapValidationFailure()
     }
 
-    sealed class TooSmallRemainingBalance : SwapValidationFailure() {
-
-        class NoNeedsToBuyMainAssetED(
-            val assetIn: Chain.Asset,
-            val remainingBalance: Balance,
-            val assetInExistentialDeposit: Balance
-        ) : SwapValidationFailure()
-
-        class NeedsToBuyMainAssetED(
-            val feeAsset: Chain.Asset,
-            val assetIn: Chain.Asset,
-            val nativeAsset: Chain.Asset,
-            val assetInExistentialDeposit: Balance,
-            val toBuyAmountToKeepEDInCommissionAsset: Balance,
-            val toSellAmountToKeepEDUsingAssetIn: Balance,
-            val remainingBalance: Balance,
-            val fee: Fee
-        ) : SwapValidationFailure()
-    }
+    class TooSmallRemainingBalance(
+        val assetIn: Chain.Asset,
+        val remainingBalance: Balance,
+        val assetInExistentialDeposit: Balance
+    ): SwapValidationFailure()
 }

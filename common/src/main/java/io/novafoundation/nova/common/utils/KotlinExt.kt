@@ -109,6 +109,13 @@ suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     }.awaitAll()
 }
 
+suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> Collection<R>): List<R> {
+    return coroutineScope {
+        map { async { operation(it) } }
+    }.awaitAll().flatten()
+}
+
+
 suspend fun <T, R> Iterable<T>.forEachAsync(operation: suspend (T) -> R) {
     mapAsync(operation)
 }
@@ -255,6 +262,10 @@ fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all {
 fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
+
+fun <T> Result<T?>.requireInnerNotNull(): Result<T> {
+    return mapCatching { requireNotNull(it) }
+}
 
 /**
  * Given a list finds a partition point in O(log2(N)) given that there is only a single partition point present.

@@ -17,7 +17,7 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
-import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
@@ -33,7 +33,6 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsFlip
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsGetAssetIn
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMinBalanceAlert
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsPayInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsToolbar
@@ -120,7 +119,15 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             }
         }
 
-        viewModel.minimumBalanceBuyAlert.observe(swapMainSettingsMinBalanceAlert::setModel)
+        viewModel.canChangeFeeToken.observe { canChangeFeeToken ->
+            if (canChangeFeeToken) {
+                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(R.drawable.ic_pencil_edit, R.color.icon_secondary)
+                swapMainSettingsDetailsNetworkFee.setOnValueClickListener { viewModel.editFeeTokenClicked() }
+            } else {
+                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(null)
+                swapMainSettingsDetailsNetworkFee.setOnValueClickListener(null)
+            }
+        }
 
         viewModel.changeFeeTokenEvent.awaitableActionLiveData.observeEvent {
             FeeAssetSelectorBottomSheet(

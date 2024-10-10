@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.commissionAssetToSpendOnBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -38,13 +37,6 @@ val SwapValidationPayload.isFeePayingByAssetIn: Boolean
 val SwapValidationPayload.swapAmountInFeeToken: Balance
     get() = if (isFeePayingByAssetIn) {
         detailedAssetIn.amountInPlanks
-    } else {
-        BigInteger.ZERO
-    }
-
-val SwapValidationPayload.toBuyAmountToKeepMainEDInFeeAsset: Balance
-    get() = if (isFeePayingByAssetIn) {
-        decimalFee.genericFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
     } else {
         BigInteger.ZERO
     }
