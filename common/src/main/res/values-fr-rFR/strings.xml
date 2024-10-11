@@ -1131,7 +1131,7 @@
     <string name="settings_biometric_not_ready_message">Veuillez vous assurer que la biométrie est activée dans les paramètres</string>
     <string name="settings_biometric_not_ready_title">La biométrie est désactivée dans les paramètres</string>
     <string name="settings_community">Communauté</string>
-    <string name="settings_email">E-mail</string>
+    <string name="settings_email">Obtenez de l\'aide par Email</string>
     <string name="settings_general">Général</string>
     <string name="settings_pin_code_verification_confirmation_message">Chaque opération de signature sur les portefeuilles avec paire de clés (créée dans Nova Wallet ou importée) doit nécessiter une vérification PIN avant de construire la signature</string>
     <string name="settings_pin_code_verification_confirmation_title">Demander une authentification pour signer les opérations</string>
@@ -1143,7 +1143,7 @@
     <string name="settings_security">Sécurité</string>
     <string name="settings_support">Assistance et commentaires</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki et centre d\'aide</string>
     <string name="settings_youtube">YouTube</string>
     <string name="setup_referendum_vote_conviction_info">La conviction sera fixée à 0,1x lorsque vous vous abstenez</string>
     <string name="setup_staking_conflict_message">Vous ne pouvez pas staker avec le Stake direct et les Pools de Nomination en même temps</string>

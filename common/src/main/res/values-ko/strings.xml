@@ -81,7 +81,7 @@
     <string name="account_ledger_import_start_step_3">%s에 대한 Nova Wallet 접근을 허용하십시오</string>
     <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 및 위치</string>
     <string name="account_ledger_import_start_step_4">지갑에 추가하려면 %s</string>
-    <string name="account_ledger_import_start_step_4_highlighted">계정을 선택</string>
+    <string name="account_ledger_import_start_step_4_highlighted"><font>계정을 선택</font></string>
     <string name="account_ledger_import_start_title">Ledger Nano X 연결</string>
     <string name="account_ledger_legacy_warning_message">작업을 서명하고 계정을 새로운 Generic Ledger 앱으로 마이그레이션하려면 Migration 앱을 설치하고 여십시오. 레거시 구형 및 Migration Ledger 앱은 더 이상 지원되지 않을 것입니다.</string>
     <string name="account_ledger_legacy_warning_title">새로운 Ledger 앱이 출시되었습니다</string>
@@ -1123,7 +1123,7 @@
     <string name="settings_biometric_not_ready_message">설정에서 생체 인식이 활성화되었는지 확인하세요</string>
     <string name="settings_biometric_not_ready_title">설정에서 생체 인식이 비활성화되었습니다</string>
     <string name="settings_community">커뮤니티</string>
-    <string name="settings_email">이메일</string>
+    <string name="settings_email">이메일을 통해 지원 받기</string>
     <string name="settings_general">일반</string>
     <string name="settings_pin_code_verification_confirmation_message">키 페어가 있는 지갑(Nova Wallet에서 생성 또는 가져옴)에 대한 각 서명 작업은 서명을 생성하기 전에 PIN 확인이 필요합니다</string>
     <string name="settings_pin_code_verification_confirmation_title">작업 서명을 위해 인증 요청</string>
@@ -1135,7 +1135,7 @@
     <string name="settings_security">보안</string>
     <string name="settings_support">지원 및 피드백</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">위키</string>
+    <string name="settings_wiki">위키 및 도움말 센터</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info"><font>기권</font> 시 확신도가 0.1x로 설정됩니다</string>
     <string name="setup_staking_conflict_message">직접 Staking과 Nomination Pools를 동시에 사용할 수 없습니다</string>

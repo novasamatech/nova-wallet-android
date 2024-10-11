@@ -1123,7 +1123,7 @@
     <string name="settings_biometric_not_ready_message">Pastikan biometrik diaktifkan dalam Pengaturan</string>
     <string name="settings_biometric_not_ready_title">Biometrik dinonaktifkan dalam Pengaturan</string>
     <string name="settings_community">Komunitas</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Dapatkan dukungan melalui Email</string>
     <string name="settings_general">Umum</string>
     <string name="settings_pin_code_verification_confirmation_message">Setiap operasi tanda tangan pada dompet dengan pasangan kunci (dibuat di dompet nova atau diimpor) harus memerlukan verifikasi PIN sebelum membuat tanda tangan</string>
     <string name="settings_pin_code_verification_confirmation_title">Minta autentikasi untuk penandatanganan operasi</string>
@@ -1135,7 +1135,7 @@
     <string name="settings_security">Keamanan</string>
     <string name="settings_support">Dukungan &amp; Masukan</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki &amp; Pusat Bantuan</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">Keyakinan akan diatur ke 0,1x ketika Abstain</string>
     <string name="setup_staking_conflict_message">Anda tidak dapat melakukan staking dengan Staking Langsung dan Pool Nominasi pada saat yang sama</string>

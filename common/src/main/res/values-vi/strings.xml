@@ -1123,7 +1123,7 @@
     <string name="settings_biometric_not_ready_message">Vui lòng, đảm bảo sinh trắc học đã được bật trong Cài đặt</string>
     <string name="settings_biometric_not_ready_title">Sinh trắc học đã bị vô hiệu hóa trong Cài đặt</string>
     <string name="settings_community">Cộng đồng</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Nhận hỗ trợ qua Email</string>
     <string name="settings_general">Chung</string>
     <string name="settings_pin_code_verification_confirmation_message">Mỗi hoạt động ký trên ví với cặp khóa (tạo trong ví nova hoặc nhập) cần yêu cầu xác minh PIN trước khi tạo chữ ký</string>
     <string name="settings_pin_code_verification_confirmation_title">Yêu cầu xác thực cho các hoạt động ký</string>
@@ -1135,7 +1135,7 @@
     <string name="settings_security">Bảo mật</string>
     <string name="settings_support">Hỗ trợ &amp;  Phản hồi</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki &amp; Trung tâm trợ giúp</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">Độ xác tín sẽ được đặt là 0.1x khi <font>bỏ phiếu Abstain</font></string>
     <string name="setup_staking_conflict_message">Bạn không thể Stake với Direct Staking và Nomination Pools cùng một lúc</string>
