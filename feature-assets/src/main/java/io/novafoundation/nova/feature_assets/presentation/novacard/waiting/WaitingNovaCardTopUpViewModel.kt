@@ -45,9 +45,11 @@ class WaitingNovaCardTopUpViewModel(
     }
 
     fun timerFinished() {
+        novaCardInteractor.setNovaCardState(NovaCardState.NONE)
+
         showError(
-            resourceManager.getString(R.string.common_unexpected_error),
-            resourceManager.getString(R.string.fragment_waiting_top_up_time_out_error)
+            resourceManager.getString(R.string.fragment_waiting_top_up_time_out_error_title),
+            resourceManager.getString(R.string.fragment_waiting_top_up_time_out_error_message)
         )
 
         assetsRouter.back()
