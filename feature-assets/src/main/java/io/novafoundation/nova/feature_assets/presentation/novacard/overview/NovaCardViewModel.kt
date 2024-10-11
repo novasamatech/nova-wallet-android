@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.overview
 
+import android.util.Log
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -12,8 +14,10 @@ import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webV
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.ext.ChainIds
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -28,7 +32,7 @@ class NovaCardViewModel(
 
     private val metaAccount = flowOf { accountInteractor.selectedMetaAccount() }
 
-    private val topUpChain = flowOf { chainRegistry.getChain(ChainGeneses.POLKADOT) }
+    private val topUpChain = flowOf { getTopUpChain() }
         .shareInBackground()
 
     val setupCardConfig = combine(metaAccount, topUpChain) { metaAccount, topUpChain ->
@@ -49,7 +53,7 @@ class NovaCardViewModel(
     }
 
     fun onTransactionStatusChanged(event: NovaCardEventHandler.TransactionStatus) {
-        
+        Log.d("NovaCardView", "onTransactionStatusChanged: $event")
     }
 
     fun openTopUp(amount: BigDecimal, address: String) = launch {
@@ -67,5 +71,13 @@ class NovaCardViewModel(
         if (novaCardInteractor.isNovaCardCreated()) return
 
         novaCardInteractor.setNovaCardState(NovaCardState.CREATED)
+    }
+
+    private suspend fun getTopUpChain(): Chain {
+        return if (BuildConfig.DEBUG) {
+            chainRegistry.getChain(ChainIds.ETHEREUM_SEPOLIA)
+        } else {
+            chainRegistry.getChain(ChainGeneses.POLKADOT)
+        }
     }
 }
