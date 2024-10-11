@@ -22,10 +22,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGr
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetList
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetSearch
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetsPlaceholder
+
 import javax.inject.Inject
 
 class AssetSearchFragment :

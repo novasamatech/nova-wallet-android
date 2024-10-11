@@ -8,8 +8,6 @@ import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
-import kotlinx.android.synthetic.main.item_start_staking_landing_condition.view.itemStakingConditionIcon
-import kotlinx.android.synthetic.main.item_start_staking_landing_condition.view.itemStakingConditionText
 
 class StartStakingLandingAdapter : BaseListAdapter<StakingConditionRVItem, StakingConditionViewHolder>(StakingConditionDiffCallback()) {
 

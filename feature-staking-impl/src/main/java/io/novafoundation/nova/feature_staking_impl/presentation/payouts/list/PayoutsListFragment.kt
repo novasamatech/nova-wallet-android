@@ -16,12 +16,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.model.PendingPayoutsStatisticsModel
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutListPlaceholder
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsList
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListAll
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListContainer
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListProgress
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListToolbar
 
 class PayoutsListFragment : BaseFragment<PayoutsListViewModel>(), PayoutAdapter.ItemHandler {
 

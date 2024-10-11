@@ -14,15 +14,6 @@ import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
-import kotlinx.android.synthetic.main.item_account.view.itemAccountArrow
-import kotlinx.android.synthetic.main.item_account.view.itemAccountCheckBox
-import kotlinx.android.synthetic.main.item_account.view.itemAccountRadioButton
-import kotlinx.android.synthetic.main.item_account.view.itemAccountContainer
-import kotlinx.android.synthetic.main.item_account.view.itemAccountDelete
-import kotlinx.android.synthetic.main.item_account.view.itemAccountIcon
-import kotlinx.android.synthetic.main.item_account.view.itemAccountSubtitle
-import kotlinx.android.synthetic.main.item_account.view.itemAccountTitle
-import kotlinx.android.synthetic.main.item_account.view.itemChainIcon
 
 class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes private val chainBorderColor: Int) : GroupedListHolder(view) {
 

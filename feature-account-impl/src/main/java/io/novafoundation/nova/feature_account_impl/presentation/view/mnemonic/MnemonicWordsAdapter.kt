@@ -7,8 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.item_mnemonic_word.view.numberTv
-import kotlinx.android.synthetic.main.item_mnemonic_word.view.wordTv
 
 class MnemonicWordsAdapter : ListAdapter<MnemonicWordModel, MnemonicWordViewHolder>(DiffCallback) {
 

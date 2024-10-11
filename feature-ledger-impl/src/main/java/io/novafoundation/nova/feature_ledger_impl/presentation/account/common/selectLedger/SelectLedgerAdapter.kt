@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
-import kotlinx.android.synthetic.main.item_ledger.view.itemLedger
 
 class SelectLedgerAdapter(
     private val handler: Handler

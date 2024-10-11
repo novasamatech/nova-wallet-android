@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.se
 import android.view.View
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
-import kotlinx.android.synthetic.main.item_manual_backup_subtitle.view.manualBackupSecretsSubtitle
 
 data class ManualBackupSubtitleRvItem(
     val text: String

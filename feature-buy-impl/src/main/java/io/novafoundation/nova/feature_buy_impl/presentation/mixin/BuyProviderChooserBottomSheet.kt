@@ -11,8 +11,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ReferentialEqualityDiffCallBack
 import io.novafoundation.nova.feature_buy_api.domain.BuyProvider
 import io.novafoundation.nova.feature_buy_impl.R
-import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderImage
-import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderText
 
 class BuyProviderChooserBottomSheet(
     context: Context,

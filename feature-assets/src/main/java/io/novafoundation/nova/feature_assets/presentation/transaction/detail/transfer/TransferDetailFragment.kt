@@ -17,16 +17,6 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import io.novafoundation.nova.feature_assets.presentation.model.toAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showLoadingAmount
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmount
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFee
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFrom
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailHash
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailNetwork
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailRepeat
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailStatus
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailTo
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailToolbar
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailTransferDirection
 
 private const val KEY_TRANSACTION = "KEY_DRAFT"
 

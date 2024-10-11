@@ -12,11 +12,6 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_your_pool.view.yourPoolContentGroup
-import kotlinx.android.synthetic.main.view_your_pool.view.yourPoolIcon
-import kotlinx.android.synthetic.main.view_your_pool.view.yourPoolLoadingGroup
-import kotlinx.android.synthetic.main.view_your_pool.view.yourPoolName
-import kotlinx.android.synthetic.main.view_your_pool.view.yourPoolTitle
 
 class YourPoolView @JvmOverloads constructor(
     context: Context,

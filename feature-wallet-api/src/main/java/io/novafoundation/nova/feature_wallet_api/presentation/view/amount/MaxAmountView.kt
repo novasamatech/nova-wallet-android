@@ -10,8 +10,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxAvailableView
-import kotlinx.android.synthetic.main.view_max_amount.view.viewMaxAmountAction
-import kotlinx.android.synthetic.main.view_max_amount.view.viewMaxAmountValue
 
 class MaxAmountView @JvmOverloads constructor(
     context: Context,

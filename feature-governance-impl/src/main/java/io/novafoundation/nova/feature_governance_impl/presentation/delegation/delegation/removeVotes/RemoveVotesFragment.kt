@@ -15,10 +15,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackListBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteConfirm
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteToolbar
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteTracks
 
 class RemoveVotesFragment : BaseFragment<RemoveVotesViewModel>() {
 

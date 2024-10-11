@@ -18,14 +18,7 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftCounter
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreview1
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreview2
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreview3
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreviewHolder1
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreviewHolder2
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftPreviewHolder3
-import kotlinx.android.synthetic.main.view_go_to_nfts.view.goToNftsShimmer
+
 import javax.inject.Inject
 
 class GoToNftsView @JvmOverloads constructor(

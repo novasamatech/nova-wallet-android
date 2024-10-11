@@ -13,14 +13,6 @@ import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAbout
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAssetSelector
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanMainDescription
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedContainer
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedFiat
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedShimmering
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedValue
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributionsCount
 
 class CrowdloanHeaderAdapter(
     private val imageLoader: ImageLoader,

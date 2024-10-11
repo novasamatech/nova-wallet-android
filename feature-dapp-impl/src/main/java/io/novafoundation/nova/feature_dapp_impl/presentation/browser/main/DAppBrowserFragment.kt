@@ -31,15 +31,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
+
 import javax.inject.Inject
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {

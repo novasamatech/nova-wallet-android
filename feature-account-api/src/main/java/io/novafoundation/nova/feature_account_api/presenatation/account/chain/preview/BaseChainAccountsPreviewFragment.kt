@@ -13,10 +13,7 @@ import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountAccounts
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountContinue
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountDescription
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountToolbar
+
 import javax.inject.Inject
 
 abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewViewModel> : BaseFragment<V>(), ChainAccountsAdapter.Handler {

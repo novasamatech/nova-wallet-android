@@ -21,16 +21,6 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAccount
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssets
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationButton
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationNetworkFee
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationPriceDifference
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationRate
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationSlippage
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationToolbar
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationWallet
 
 class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
 

@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.item_governance_total_locks_header.view.governanceTotalLocksAmount
 
 class TotalGovernanceLocksHeaderAdapter : RecyclerView.Adapter<TotalGovernanceLocksHeaderAdapter.HeaderHolder>() {
 

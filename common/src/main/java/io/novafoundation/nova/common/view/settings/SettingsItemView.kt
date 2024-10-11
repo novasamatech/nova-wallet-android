@@ -9,9 +9,6 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_settings_item.view.settingsItemIcon
-import kotlinx.android.synthetic.main.view_settings_item.view.settingsItemTitle
-import kotlinx.android.synthetic.main.view_settings_item.view.settingsItemValue
 
 class SettingsItemView @JvmOverloads constructor(
     context: Context,

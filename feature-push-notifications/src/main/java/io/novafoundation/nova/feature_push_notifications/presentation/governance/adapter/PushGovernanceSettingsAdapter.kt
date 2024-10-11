@@ -12,10 +12,6 @@ import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIconToTarget
 import io.novafoundation.nova.feature_push_notifications.R
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemNewReferenda
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemReferendumUpdate
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemState
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemTracks
 
 class PushGovernanceSettingsAdapter(
     private val imageLoader: ImageLoader,

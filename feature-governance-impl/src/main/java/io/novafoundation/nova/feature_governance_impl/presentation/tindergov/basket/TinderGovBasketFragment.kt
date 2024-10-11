@@ -16,9 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.adpter.TinderGovBasketAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.adpter.TinderGovBasketRvItem
-import kotlinx.android.synthetic.main.fragment_tinder_gov_basket.tinderGovBasketButton
-import kotlinx.android.synthetic.main.fragment_tinder_gov_basket.tinderGovBasketList
-import kotlinx.android.synthetic.main.fragment_tinder_gov_basket.tinderGovBasketToolbar
 
 class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), TinderGovBasketAdapter.Handler {
 

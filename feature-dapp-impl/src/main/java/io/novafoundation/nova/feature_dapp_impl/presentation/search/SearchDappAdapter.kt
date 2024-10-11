@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
-import kotlinx.android.synthetic.main.item_dapp_search_category.view.searchCategory
 
 class SearchDappAdapter(
     private val handler: Handler

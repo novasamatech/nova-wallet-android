@@ -11,9 +11,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ReferentialEq
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
-import kotlinx.android.synthetic.main.item_track_delegation.view.itemTrackDelegationTrack
-import kotlinx.android.synthetic.main.item_track_delegation.view.itemTrackDelegationVotesCount
-import kotlinx.android.synthetic.main.item_track_delegation.view.itemTrackDelegationVotesCountDetails
 
 class TrackDelegationListBottomSheet(
     context: Context,

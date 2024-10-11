@@ -7,8 +7,6 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_instruction_step.view.instructionStepIndicator
-import kotlinx.android.synthetic.main.view_instruction_step.view.instructionStepText
 
 class InstructionStepView @JvmOverloads constructor(
     context: Context,

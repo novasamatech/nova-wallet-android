@@ -6,9 +6,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.section.SectionView
 import io.novafoundation.nova.feature_wallet_api.R
-import kotlinx.android.synthetic.main.section_price.view.sectionPriceFiat
-import kotlinx.android.synthetic.main.section_price.view.sectionPriceToken
-import kotlinx.android.synthetic.main.section_price.view.sectionTitle
 
 class PriceSectionView @JvmOverloads constructor(
     context: Context,

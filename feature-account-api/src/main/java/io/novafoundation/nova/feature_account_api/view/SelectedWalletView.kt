@@ -11,9 +11,6 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
-import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletAccountIcon
-import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletAccountUpdateIndicator
-import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletTypeIcon
 
 class SelectedWalletView @JvmOverloads constructor(
     context: Context,

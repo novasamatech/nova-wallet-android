@@ -7,8 +7,6 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.ensureSuffix
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_list_chooser.view.viewListChooserLabel
-import kotlinx.android.synthetic.main.view_list_chooser.view.viewListChooserValue
 
 class ListChooserView @JvmOverloads constructor(
     context: Context,

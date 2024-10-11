@@ -16,9 +16,6 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_accounts.accountListToolbar
-import kotlinx.android.synthetic.main.fragment_accounts.accountsList
-import kotlinx.android.synthetic.main.fragment_accounts.addAccount
 
 class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), AccountHolder.AccountItemHandler {
 

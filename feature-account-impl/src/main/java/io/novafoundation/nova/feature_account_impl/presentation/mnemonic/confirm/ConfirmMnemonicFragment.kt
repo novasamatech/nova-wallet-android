@@ -12,11 +12,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.BackupMnemonicAdapter
-import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicDestination
-import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicSource
-import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.confirmMnemonicToolbar
-import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.conformMnemonicContinue
-import kotlinx.android.synthetic.main.fragment_confirm_mnemonic.conformMnemonicSkip
 
 class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel>() {
 

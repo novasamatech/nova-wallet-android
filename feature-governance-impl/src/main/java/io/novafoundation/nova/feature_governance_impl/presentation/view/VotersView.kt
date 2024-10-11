@@ -11,10 +11,6 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteType
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteTypeColor
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVotesCount
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVotesCountShimmer
 
 class VotersView @JvmOverloads constructor(
     context: Context,

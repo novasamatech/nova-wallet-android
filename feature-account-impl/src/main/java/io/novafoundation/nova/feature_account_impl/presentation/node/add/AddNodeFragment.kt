@@ -3,17 +3,18 @@ package io.novafoundation.nova.feature_account_impl.presentation.node.add
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentNodeAddBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_node_add.addBtn
-import kotlinx.android.synthetic.main.fragment_node_add.nodeHostField
-import kotlinx.android.synthetic.main.fragment_node_add.nodeNameField
-import kotlinx.android.synthetic.main.fragment_node_add.novaToolbar
 
-class AddNodeFragment : BaseFragment<AddNodeViewModel>() {
+
+class AddNodeFragment : BaseFragment<AddNodeViewModel, FragmentNodeAddBinding>() {
+
+    override val binder: FragmentNodeAddBinding by viewBinding(FragmentNodeAddBinding::bind)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,15 +23,15 @@ class AddNodeFragment : BaseFragment<AddNodeViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_node_add, container, false)
 
     override fun initViews() {
-        novaToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.novaToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        nodeNameField.content.bindTo(viewModel.nodeNameInputLiveData)
+        binder.nodeNameField.content.bindTo(viewModel.nodeNameInputLiveData)
 
-        nodeHostField.content.bindTo(viewModel.nodeHostInputLiveData)
+        binder.nodeHostField.content.bindTo(viewModel.nodeHostInputLiveData)
 
-        addBtn.setOnClickListener { viewModel.addNodeClicked() }
+        binder.addBtn.setOnClickListener { viewModel.addNodeClicked() }
 
-        addBtn.prepareForProgress(viewLifecycleOwner)
+        binder.addBtn.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -44,6 +45,6 @@ class AddNodeFragment : BaseFragment<AddNodeViewModel>() {
     }
 
     override fun subscribe(viewModel: AddNodeViewModel) {
-        viewModel.addButtonState.observe(addBtn::setState)
+        viewModel.addButtonState.observe(binder.addBtn::setState)
     }
 }

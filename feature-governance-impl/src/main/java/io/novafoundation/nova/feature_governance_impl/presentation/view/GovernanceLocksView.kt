@@ -8,10 +8,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockAmount
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockedIcon
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockedTitle
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceUnlockBadge
 
 class GovernanceLocksView @JvmOverloads constructor(
     context: Context,

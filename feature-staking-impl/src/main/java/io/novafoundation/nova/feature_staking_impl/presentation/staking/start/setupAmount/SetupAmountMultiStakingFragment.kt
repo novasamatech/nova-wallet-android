@@ -18,11 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.model.StakingPropertiesModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountAmount
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountContinue
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountRewards
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountSelection
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountToolbar
 
 class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingViewModel>() {
 

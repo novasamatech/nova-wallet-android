@@ -12,10 +12,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationOrDe
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_pincode.pinCodeNumbers
-import kotlinx.android.synthetic.main.fragment_pincode.pinCodeTitle
-import kotlinx.android.synthetic.main.fragment_pincode.pincodeProgress
-import kotlinx.android.synthetic.main.fragment_pincode.toolbar
 
 class PincodeFragment : BaseFragment<PinCodeViewModel>() {
 

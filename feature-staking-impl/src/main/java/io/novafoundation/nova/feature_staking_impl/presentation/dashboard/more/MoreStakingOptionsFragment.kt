@@ -19,8 +19,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.list.StakingDAppsDecoration
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.list.StakingDappsAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.StakingDAppModel
-import kotlinx.android.synthetic.main.fragment_more_staking_options.moreStakingOptionsContent
-import kotlinx.android.synthetic.main.fragment_more_staking_options.moreStakingOptionsToolbar
 
 class MoreStakingOptionsFragment :
     BaseFragment<MoreStakingOptionsViewModel>(),

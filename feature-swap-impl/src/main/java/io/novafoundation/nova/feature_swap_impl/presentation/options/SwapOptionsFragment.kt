@@ -16,11 +16,6 @@ import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
-import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsAlert
-import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsApplyButton
-import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsSlippageInput
-import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsSlippageTitle
-import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsToolbar
 
 class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
 

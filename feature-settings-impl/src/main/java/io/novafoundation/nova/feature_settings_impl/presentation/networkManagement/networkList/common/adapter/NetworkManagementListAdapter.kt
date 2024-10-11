@@ -15,12 +15,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkImage
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkLabel
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkStatus
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkStatusShimmer
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkSubtitle
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkTitle
 
 class NetworkManagementListAdapter(
     private val imageLoader: ImageLoader,

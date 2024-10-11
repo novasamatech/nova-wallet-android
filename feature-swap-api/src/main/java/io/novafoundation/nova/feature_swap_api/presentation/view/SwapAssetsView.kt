@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.feature_swap_api.R
-import kotlinx.android.synthetic.main.view_swap_assets.view.viewSwapAssetsIn
-import kotlinx.android.synthetic.main.view_swap_assets.view.viewSwapAssetsOut
 
 class SwapAssetsView @JvmOverloads constructor(
     context: Context,

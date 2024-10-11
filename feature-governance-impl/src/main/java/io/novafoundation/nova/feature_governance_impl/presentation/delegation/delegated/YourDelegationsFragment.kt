@@ -17,9 +17,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter.DelegateListAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_your_delegations.yourDelegationsAddDelegationButton
-import kotlinx.android.synthetic.main.fragment_your_delegations.yourDelegationsList
-import kotlinx.android.synthetic.main.fragment_your_delegations.yourDelegationsToolbar
 
 class YourDelegationsFragment :
     BaseFragment<YourDelegationsViewModel>(),

@@ -8,9 +8,6 @@ import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_external_sign_api.R
-import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionAllow
-import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionReject
-import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmInnerContent
 
 abstract class ConfirmDAppActionBottomSheet(
     context: Context,

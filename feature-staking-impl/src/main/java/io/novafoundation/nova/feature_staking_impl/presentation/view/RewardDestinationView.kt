@@ -10,11 +10,6 @@ import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountFiat
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountGain
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountToken
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetCheck
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetName
 
 private const val CHECKABLE_DEFAULT = true
 

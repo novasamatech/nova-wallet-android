@@ -15,12 +15,6 @@ import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeApplyButton
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeChain
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeNameInput
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeTitle
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeToolbar
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeUrlInput
 
 class CustomNodeFragment : BaseFragment<CustomNodeViewModel>() {
 

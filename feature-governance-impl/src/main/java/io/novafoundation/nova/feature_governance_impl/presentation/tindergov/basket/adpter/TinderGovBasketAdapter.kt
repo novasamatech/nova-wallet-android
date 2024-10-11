@@ -9,11 +9,6 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketDelete
-import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketId
-import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketInfo
-import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketSubtitle
-import kotlinx.android.synthetic.main.item_tinder_gov_basket.view.itemTinderGovBasketTitle
 
 class TinderGovBasketAdapter(
     private val handler: Handler

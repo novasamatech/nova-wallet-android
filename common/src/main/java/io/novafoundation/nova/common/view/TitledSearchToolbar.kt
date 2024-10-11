@@ -6,8 +6,6 @@ import android.view.View
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
-import kotlinx.android.synthetic.main.view_titled_search_toolbar.view.titledSearchToolbar
-import kotlinx.android.synthetic.main.view_titled_search_toolbar.view.titledSearchToolbarField
 
 class TitledSearchToolbar @JvmOverloads constructor(
     context: Context,

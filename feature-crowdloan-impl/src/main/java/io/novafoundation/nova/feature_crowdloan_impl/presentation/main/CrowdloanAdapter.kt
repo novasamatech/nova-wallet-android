@@ -20,16 +20,6 @@ import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanArrow
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanIcon
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaDescription
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaName
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaRaised
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaRaisedPercentage
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanParaRaisedProgress
-import kotlinx.android.synthetic.main.item_crowdloan.view.itemCrowdloanTimeRemaining
-import kotlinx.android.synthetic.main.item_crowdloan_group.view.itemCrowdloanGroupCounter
-import kotlinx.android.synthetic.main.item_crowdloan_group.view.itemCrowdloanGroupStatus
 
 class CrowdloanAdapter(
     private val imageLoader: ImageLoader,

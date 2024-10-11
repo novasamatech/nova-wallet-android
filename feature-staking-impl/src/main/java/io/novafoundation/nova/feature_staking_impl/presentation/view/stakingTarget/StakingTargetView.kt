@@ -18,13 +18,6 @@ import io.novafoundation.nova.common.utils.makeVisibleViews
 import io.novafoundation.nova.common.utils.withRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetIcon
-import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetIconShimmer
-import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetQuantity
-import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetSubtitle
-import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetSubtitleShimmering
-import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetTitle
-import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetTitleShimmering
 
 class StakingTargetView @JvmOverloads constructor(
     context: Context,

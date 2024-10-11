@@ -25,11 +25,6 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputClear
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputContainer
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputError
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputField
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputFieldContainer
 
 class TipsInputField @JvmOverloads constructor(
     context: Context,

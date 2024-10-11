@@ -4,7 +4,6 @@ import android.view.View
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.ManualBackupItemHandler
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
-import kotlinx.android.synthetic.main.item_manual_backup_json.view.manualBackupSecretsJsonButton
 
 class ManualBackupJsonRvItem : ManualBackupSecretsRvItem {
 

@@ -13,8 +13,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSh
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
-import kotlinx.android.synthetic.main.item_encryption_type.view.encryptionTv
-import kotlinx.android.synthetic.main.item_encryption_type.view.rightIcon
 
 class EncryptionTypeChooserBottomSheetDialog(
     context: Context,

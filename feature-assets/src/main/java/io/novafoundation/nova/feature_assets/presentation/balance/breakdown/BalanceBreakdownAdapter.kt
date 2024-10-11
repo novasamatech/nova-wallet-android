@@ -10,11 +10,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownAmount
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.item_balance_breakdown_amount.view.balanceBreakdownItemDetail
-import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotal
-import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotalIcon
-import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotalName
-import kotlinx.android.synthetic.main.item_balance_breakdown_total.view.itemBreakdownTotalPercentage
 
 class BalanceBreakdownAdapter : GroupedListAdapter<BalanceBreakdownTotal, BalanceBreakdownAmount>(DiffCallback) {
 

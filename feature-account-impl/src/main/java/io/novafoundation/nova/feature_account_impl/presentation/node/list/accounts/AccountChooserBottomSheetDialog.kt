@@ -11,8 +11,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSh
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.accounts.model.AccountByNetworkModel
-import kotlinx.android.synthetic.main.item_account_by_network.view.accountIcon
-import kotlinx.android.synthetic.main.item_account_by_network.view.accountTitle
 
 class AccountChooserBottomSheetDialog(
     context: Context,

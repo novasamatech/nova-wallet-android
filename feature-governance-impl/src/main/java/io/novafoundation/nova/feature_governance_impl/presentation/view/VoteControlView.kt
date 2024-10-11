@@ -6,9 +6,6 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_vote_control.view.setupReferendumVoteAbstain
-import kotlinx.android.synthetic.main.view_vote_control.view.setupReferendumVoteAye
-import kotlinx.android.synthetic.main.view_vote_control.view.setupReferendumVoteNay
 
 class VoteControlView @JvmOverloads constructor(
     context: Context,

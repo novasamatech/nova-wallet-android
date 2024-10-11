@@ -17,11 +17,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_dapp_api.R
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
-import kotlinx.android.synthetic.main.view_dapp.view.itemDAppIcon
-import kotlinx.android.synthetic.main.view_dapp.view.itemDAppSubtitle
-import kotlinx.android.synthetic.main.view_dapp.view.itemDAppSubtitleIcon
-import kotlinx.android.synthetic.main.view_dapp.view.itemDAppTitle
-import kotlinx.android.synthetic.main.view_dapp.view.itemDappAction
 
 class DAppView @JvmOverloads constructor(
     context: Context,

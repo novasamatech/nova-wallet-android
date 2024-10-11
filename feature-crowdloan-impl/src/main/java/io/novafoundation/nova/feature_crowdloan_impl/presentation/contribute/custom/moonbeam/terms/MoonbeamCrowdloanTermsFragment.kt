@@ -19,12 +19,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsCheckbox
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsConfirm
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsContainer
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsFee
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsLink
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsToolbar
+
 import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"

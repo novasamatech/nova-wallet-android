@@ -12,9 +12,6 @@ import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
-import kotlinx.android.synthetic.main.item_unavailable_track.view.itemUnavailableTrack
-import kotlinx.android.synthetic.main.item_unavailable_tracks_group.view.itemUnavailableTrackGroupButton
-import kotlinx.android.synthetic.main.item_unavailable_tracks_group.view.itemUnavailableTrackGroupTitle
 
 class UnavailableTracksAdapter(
     private val handler: Handler

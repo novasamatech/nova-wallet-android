@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
-import kotlinx.android.synthetic.main.view_wallet_connect_item.view.walletConnectItemValue
 
 class WalletConnectItemView @JvmOverloads constructor(
     context: Context,

@@ -10,8 +10,6 @@ import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationModel
-import kotlinx.android.synthetic.main.view_reward_destination_viewer.view.viewRewardDestinationDestination
-import kotlinx.android.synthetic.main.view_reward_destination_viewer.view.viewRewardDestinationPayoutAccount
 
 class RewardDestinationViewer @JvmOverloads constructor(
     context: Context,

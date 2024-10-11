@@ -9,11 +9,6 @@ import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
-import kotlinx.android.synthetic.main.view_voting_threshold.view.negativePercentage
-import kotlinx.android.synthetic.main.view_voting_threshold.view.positivePercentage
-import kotlinx.android.synthetic.main.view_voting_threshold.view.thresholdInfo
-import kotlinx.android.synthetic.main.view_voting_threshold.view.thresholdPercentage
-import kotlinx.android.synthetic.main.view_voting_threshold.view.votesView
 
 class VotingThresholdView @JvmOverloads constructor(
     context: Context,

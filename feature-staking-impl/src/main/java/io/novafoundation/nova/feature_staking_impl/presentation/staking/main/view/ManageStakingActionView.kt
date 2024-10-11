@@ -10,9 +10,6 @@ import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.item_staking_manage_action.view.itemManageStakingActionBadge
-import kotlinx.android.synthetic.main.item_staking_manage_action.view.itemManageStakingActionImage
-import kotlinx.android.synthetic.main.item_staking_manage_action.view.itemManageStakingActionText
 
 class ManageStakingActionView @kotlin.jvm.JvmOverloads constructor(
     context: Context,

@@ -12,10 +12,6 @@ import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
-import kotlinx.android.synthetic.main.view_choose_amount_input.view.chooseAmountInputFiat
-import kotlinx.android.synthetic.main.view_choose_amount_input.view.chooseAmountInputField
-import kotlinx.android.synthetic.main.view_choose_amount_input.view.chooseAmountInputImage
-import kotlinx.android.synthetic.main.view_choose_amount_input.view.chooseAmountInputToken
 
 class ChooseAmountInputView @JvmOverloads constructor(
     context: Context,

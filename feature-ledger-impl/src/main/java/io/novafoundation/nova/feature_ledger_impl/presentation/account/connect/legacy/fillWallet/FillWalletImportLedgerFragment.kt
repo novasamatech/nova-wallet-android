@@ -14,9 +14,7 @@ import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.model.FillableChainAccountModel
-import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerAccounts
-import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerContinue
-import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerToolbar
+
 import javax.inject.Inject
 
 class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewModel>(), FillWalletImportLedgerAdapter.Handler {

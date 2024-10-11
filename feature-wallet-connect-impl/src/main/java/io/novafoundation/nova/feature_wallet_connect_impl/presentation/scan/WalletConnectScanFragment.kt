@@ -13,8 +13,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
-import kotlinx.android.synthetic.main.fragment_wc_scan.walletConnectScan
-import kotlinx.android.synthetic.main.fragment_wc_scan.walletConnectScanToolbar
 
 class WalletConnectScanFragment : ScanQrFragment<WalletConnectScanViewModel>() {
 

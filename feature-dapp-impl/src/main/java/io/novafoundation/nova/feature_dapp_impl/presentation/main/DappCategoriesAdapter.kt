@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_dapp_category.view.itemDappCategory
 
 class DappCategoriesAdapter(
     private val handler: Handler,

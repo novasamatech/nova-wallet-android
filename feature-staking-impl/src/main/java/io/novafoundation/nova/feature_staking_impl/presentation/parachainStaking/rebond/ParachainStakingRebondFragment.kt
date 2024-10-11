@@ -20,13 +20,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondAmount
-import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondCollator
-import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondConfirm
-import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondContainer
-import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondHints
-import kotlinx.android.synthetic.main.fragment_parachain_staking_rebond.parachainStakingRebondToolbar
 
 class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewModel>() {
 

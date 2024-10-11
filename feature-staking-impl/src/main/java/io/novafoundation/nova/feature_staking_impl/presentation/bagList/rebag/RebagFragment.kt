@@ -14,12 +14,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_rebag.rebagConfirm
-import kotlinx.android.synthetic.main.fragment_rebag.rebagCurrentBag
-import kotlinx.android.synthetic.main.fragment_rebag.rebagExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_rebag.rebagHints
-import kotlinx.android.synthetic.main.fragment_rebag.rebagNewBag
-import kotlinx.android.synthetic.main.fragment_rebag.rebagToolbar
 
 class RebagFragment : BaseFragment<RebagViewModel>() {
 

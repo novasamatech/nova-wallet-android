@@ -16,8 +16,7 @@ import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_unbonding.view.itemUnbondAmount
-import kotlinx.android.synthetic.main.item_unbonding.view.itemUnbondStatus
+
 import kotlin.time.ExperimentalTime
 
 class UnbondingsAdapter : ListAdapter<UnbondingModel, UnbondingsHolder>(UnbondingModelDiffCallback()) {

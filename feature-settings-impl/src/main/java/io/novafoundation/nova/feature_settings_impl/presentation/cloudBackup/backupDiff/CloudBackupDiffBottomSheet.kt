@@ -8,10 +8,6 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.CloudBackupDiffAdapter
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffApply
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffCancel
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffList
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffSubtitle
 
 class CloudBackupDiffBottomSheet(
     context: Context,

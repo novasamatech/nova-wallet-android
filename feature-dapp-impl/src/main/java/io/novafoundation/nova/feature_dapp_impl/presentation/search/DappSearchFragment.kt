@@ -18,9 +18,6 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappList
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearch
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearhContainer
 
 class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler {
 

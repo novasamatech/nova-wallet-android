@@ -8,7 +8,6 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_link.view.viewLinkText
 
 class LinkView @JvmOverloads constructor(
     context: Context,

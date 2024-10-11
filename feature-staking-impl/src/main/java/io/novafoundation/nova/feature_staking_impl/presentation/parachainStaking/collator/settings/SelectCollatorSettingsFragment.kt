@@ -15,9 +15,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.model.CollatorRecommendationConfigParcelModel
-import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator_settings.selectCollatorSettingsApply
-import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator_settings.selectCollatorSettingsSort
-import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator_settings.selectCollatorSettingsToolbar
 
 private val SORT_MAPPING = mapOf(
     CollatorSorting.REWARDS to R.id.selectCollatorSettingsSortRewards,

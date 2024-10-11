@@ -13,12 +13,6 @@ import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.enterBackupPasswordSubtitle
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.enterBackupPasswordTitle
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupContinueBtn
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupForgotPassword
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupInput
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupToolbar
 
 abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordViewModel> : BaseFragment<T>() {
 

@@ -24,15 +24,6 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorAlert
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorAccountInfo
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorDetailsContainer
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorDetailsToolbar
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentity
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingEstimatedReward
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingMinimumStake
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingStakers
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingStatus
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingTotalStake
 
 class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 

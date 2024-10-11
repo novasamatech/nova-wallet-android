@@ -8,11 +8,6 @@ import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_currency_api.presentation.model.CurrencyModel
 import io.novafoundation.nova.feature_currency_impl.R
-import kotlinx.android.synthetic.main.item_currency.view.itemCurrencyAbbreviation
-import kotlinx.android.synthetic.main.item_currency.view.itemCurrencyCheck
-import kotlinx.android.synthetic.main.item_currency.view.itemCurrencyName
-import kotlinx.android.synthetic.main.item_currency.view.itemCurrencySign
-import kotlinx.android.synthetic.main.item_currency_type.view.itemCurrencyType
 
 class CurrencyAdapter(
     private val handler: Handler

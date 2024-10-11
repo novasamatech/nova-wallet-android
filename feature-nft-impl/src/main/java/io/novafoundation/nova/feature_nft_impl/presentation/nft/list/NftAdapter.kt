@@ -21,14 +21,6 @@ import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_impl.R
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_nft.view.itemNftContent
-import kotlinx.android.synthetic.main.item_nft.view.itemNftIssuance
-import kotlinx.android.synthetic.main.item_nft.view.itemNftMedia
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPriceFiat
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPricePlaceholder
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPriceToken
-import kotlinx.android.synthetic.main.item_nft.view.itemNftShimmer
-import kotlinx.android.synthetic.main.item_nft.view.itemNftTitle
 
 class NftAdapter(
     private val imageLoader: ImageLoader,

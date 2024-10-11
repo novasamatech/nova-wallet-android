@@ -16,12 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondAmount
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondContinue
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondFee
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondHints
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondToolbar
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondTransferable
 
 class CustomRebondFragment : BaseFragment<CustomRebondViewModel>() {
 

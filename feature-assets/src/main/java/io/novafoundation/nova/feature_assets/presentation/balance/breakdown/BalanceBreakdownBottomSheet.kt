@@ -4,8 +4,6 @@ import android.content.Context
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.TotalBalanceBreakdownModel
-import kotlinx.android.synthetic.main.fragment_balance_breakdown.balanceBreakdownList
-import kotlinx.android.synthetic.main.fragment_balance_breakdown.balanceBreakdownTotal
 
 class BalanceBreakdownBottomSheet(context: Context) : BaseBottomSheet(context) {
 

@@ -18,15 +18,7 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeAmount
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeBonus
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeConfirm
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeContainer
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeFee
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeLeasingPeriod
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeOriginAcount
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeReward
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.confirmContributeToolbar
+
 import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 

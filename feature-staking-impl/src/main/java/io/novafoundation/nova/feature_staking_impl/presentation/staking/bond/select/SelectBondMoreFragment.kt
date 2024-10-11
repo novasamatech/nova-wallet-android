@@ -15,12 +15,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreAmount
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreContainer
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreContinue
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreFee
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreHints
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 

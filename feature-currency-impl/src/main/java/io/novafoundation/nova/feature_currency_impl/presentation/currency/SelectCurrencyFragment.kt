@@ -9,8 +9,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.R
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureComponent
-import kotlinx.android.synthetic.main.fragment_select_currency.currencyList
-import kotlinx.android.synthetic.main.fragment_select_currency.currencyToolbar
 
 class SelectCurrencyFragment : BaseFragment<SelectCurrencyViewModel>(), CurrencyAdapter.Handler {
 

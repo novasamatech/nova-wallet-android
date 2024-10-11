@@ -6,20 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentWalletListBinding
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_wallet_list.walletListBarAction
-import kotlinx.android.synthetic.main.fragment_wallet_list.walletListContent
-import kotlinx.android.synthetic.main.fragment_wallet_list.walletListTitle
 
 abstract class WalletListFragment<T : WalletListViewModel> :
-    BaseBottomSheetFragment<T>(),
+    BaseBottomSheetFragment<T, FragmentWalletListBinding>(),
     AccountHolder.AccountItemHandler {
+
+    override val binder by viewBinding(FragmentWalletListBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -28,14 +29,8 @@ abstract class WalletListFragment<T : WalletListViewModel> :
         AccountsAdapter(this, imageLoader, initialMode = viewModel.mode, chainBorderColor = R.color.bottom_sheet_background)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ) = layoutInflater.inflate(R.layout.fragment_wallet_list, container, false)
-
     override fun initViews() {
-        walletListContent.adapter = adapter
+        binder.walletListContent.adapter = adapter
     }
 
     override fun subscribe(viewModel: T) {
@@ -51,14 +46,14 @@ abstract class WalletListFragment<T : WalletListViewModel> :
     }
 
     fun setTitleRes(@StringRes titleRes: Int) {
-        walletListTitle.setText(titleRes)
+        binder.walletListTitle.setText(titleRes)
     }
 
     fun setActionIcon(@DrawableRes drawableRes: Int) {
-        walletListBarAction.setImageResource(drawableRes)
+        binder.walletListBarAction.setImageResource(drawableRes)
     }
 
     fun setActionClickListener(listener: View.OnClickListener?) {
-        walletListBarAction.setOnClickListener(listener)
+        binder.walletListBarAction.setOnClickListener(listener)
     }
 }

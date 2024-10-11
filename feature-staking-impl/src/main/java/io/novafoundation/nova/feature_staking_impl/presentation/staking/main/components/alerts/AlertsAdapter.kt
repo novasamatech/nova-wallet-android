@@ -10,9 +10,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_alert.view.alertItemGoToFlowIcon
-import kotlinx.android.synthetic.main.item_alert.view.alertItemMessage
-import kotlinx.android.synthetic.main.item_alert.view.alertItemTitle
 
 class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(AlertDiffCallback()) {
 

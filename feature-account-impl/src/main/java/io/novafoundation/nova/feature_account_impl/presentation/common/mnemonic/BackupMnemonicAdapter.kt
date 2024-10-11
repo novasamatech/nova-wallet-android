@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.MnemonicWord
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_backup_mnemonic_word.view.itemConfirmMnemonicIndex
+
 import kotlinx.android.synthetic.main.item_backup_mnemonic_word.view.itemConfirmMnemonicWord
 
 class BackupMnemonicAdapter(

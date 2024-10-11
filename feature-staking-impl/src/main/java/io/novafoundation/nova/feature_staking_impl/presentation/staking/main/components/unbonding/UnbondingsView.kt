@@ -9,9 +9,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_unbondings.view.unbondingCancel
-import kotlinx.android.synthetic.main.view_unbondings.view.unbondingRedeem
-import kotlinx.android.synthetic.main.view_unbondings.view.unbondingsList
 
 class UnbondingsView @JvmOverloads constructor(
     context: Context,

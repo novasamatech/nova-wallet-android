@@ -16,11 +16,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.observeRewardDestinationChooser
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationChooser
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationContainer
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationContinue
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationFee
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationToolbar
 
 class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationViewModel>() {
 

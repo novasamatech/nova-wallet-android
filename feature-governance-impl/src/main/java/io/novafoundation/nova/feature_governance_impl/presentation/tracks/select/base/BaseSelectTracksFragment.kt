@@ -16,9 +16,6 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter.SelectTracksAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter.SelectTracksPresetsAdapter
-import kotlinx.android.synthetic.main.fragment_select_tracks.selectTracksList
-import kotlinx.android.synthetic.main.fragment_select_tracks.selectTracksProgress
-import kotlinx.android.synthetic.main.fragment_select_tracks.selectTracksToolbar
 
 abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
     BaseFragment<V>(),

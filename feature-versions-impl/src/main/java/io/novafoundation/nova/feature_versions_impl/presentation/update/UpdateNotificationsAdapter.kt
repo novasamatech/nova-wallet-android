@@ -12,14 +12,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_versions_impl.R
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationDate
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationDescription
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationLatest
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationSeverity
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationVersion
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationAlertSubtitle
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationAlertTitle
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationBanner
 
 class UpdateNotificationsAdapter(private val seeAllClickedListener: SeeAllClickedListener) : ListAdapter<Any, ViewHolder>(
     DiffCallback

@@ -17,10 +17,6 @@ import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureComponent
 import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsAdapter
 import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsBannerAdapter
 import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsSeeAllAdapter
-import kotlinx.android.synthetic.main.fragment_update_notifications.updateNotificationsProgress
-import kotlinx.android.synthetic.main.fragment_update_notifications.updatesApply
-import kotlinx.android.synthetic.main.fragment_update_notifications.updatesList
-import kotlinx.android.synthetic.main.fragment_update_notifications.updatesToolbar
 
 class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), UpdateNotificationsSeeAllAdapter.SeeAllClickedListener {
 

@@ -17,9 +17,6 @@ import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFea
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.adapter.PushGovernanceRVItem
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.adapter.PushGovernanceSettingsAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceList
-import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceProgress
-import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceToolbar
 
 class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewModel>(), PushGovernanceSettingsAdapter.ItemHandler {
 

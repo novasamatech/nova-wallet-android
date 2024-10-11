@@ -16,13 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondAmount
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondContainer
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondContinue
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondFee
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondHints
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondToolbar
-import kotlinx.android.synthetic.main.fragment_select_unbond.unbondTransferable
 
 class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel>() {
 

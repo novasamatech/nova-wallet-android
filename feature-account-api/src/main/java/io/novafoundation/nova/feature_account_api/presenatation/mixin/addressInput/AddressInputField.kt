@@ -20,16 +20,6 @@ import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.ExternalAccount
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputAddress
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputClear
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputField
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputIdenticon
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputMyself
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputPaste
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputScan
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputW3NAddress
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputW3NContainer
-import kotlinx.android.synthetic.main.view_address_input.view.addressInputW3NProgress
 
 class AddressInputField @JvmOverloads constructor(
     context: Context,

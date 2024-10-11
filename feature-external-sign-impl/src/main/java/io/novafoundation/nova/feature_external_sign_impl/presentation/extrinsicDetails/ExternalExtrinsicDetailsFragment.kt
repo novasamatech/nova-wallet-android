@@ -10,8 +10,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
 import io.novafoundation.nova.feature_external_sign_impl.R
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureComponent
-import kotlinx.android.synthetic.main.fragment_dapp_extrinsic_details.extrinsicDetailsContent
-import kotlinx.android.synthetic.main.fragment_dapp_extrinsic_details.signExtrinsicToolbar
 
 class ExternalExtrinsicDetailsFragment : BaseBottomSheetFragment<ExternalExtrinsicDetailsViewModel>() {
 

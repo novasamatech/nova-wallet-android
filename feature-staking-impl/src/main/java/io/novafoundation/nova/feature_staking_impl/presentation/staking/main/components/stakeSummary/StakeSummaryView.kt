@@ -15,14 +15,6 @@ import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryContentGroup
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryFiatStake
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryFiatStakeShimmer
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryShimmerGroup
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatus
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryStatusShimmer
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryTokenStake
-import kotlinx.android.synthetic.main.view_stake_summary.view.stakeSummaryTokenStakeShimmer
 
 class StakeSummaryView @JvmOverloads constructor(
     context: Context,

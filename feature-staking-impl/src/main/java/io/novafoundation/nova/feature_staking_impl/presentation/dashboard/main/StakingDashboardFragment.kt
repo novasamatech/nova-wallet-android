@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHasStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHeaderAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.MoreStakingOptionsAdapter
-import kotlinx.android.synthetic.main.fragment_staking_dashboard.stakingDashboardContent
 
 class StakingDashboardFragment :
     BaseFragment<StakingDashboardViewModel>(),

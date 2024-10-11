@@ -19,17 +19,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainAvailableBalance
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainIcon
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainName
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainNameContainer
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarnings
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsContainer
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsShimmerShape
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffix
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffixContainer
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffixShimmerShape
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeStakingType
 
 class StakingDashboardNoStakeView @JvmOverloads constructor(
     context: Context,

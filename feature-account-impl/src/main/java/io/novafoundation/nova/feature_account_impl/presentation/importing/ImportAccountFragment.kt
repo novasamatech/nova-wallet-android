@@ -15,10 +15,7 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.FileRequester
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.ImportSource
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.RequestCode
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountContinue
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountSourceContainer
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountTitle
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountToolbar
+
 import javax.inject.Inject
 
 class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {

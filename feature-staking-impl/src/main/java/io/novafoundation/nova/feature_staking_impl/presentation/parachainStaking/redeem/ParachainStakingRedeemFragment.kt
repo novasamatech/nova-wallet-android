@@ -16,11 +16,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemAmount
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemConfirm
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemContainer
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemToolbar
 
 class ParachainStakingRedeemFragment : BaseFragment<ParachainStakingRedeemViewModel>() {
 

@@ -12,10 +12,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getEnum
-import kotlinx.android.synthetic.main.view_banner.view.bannerBackground
-import kotlinx.android.synthetic.main.view_banner.view.bannerClose
-import kotlinx.android.synthetic.main.view_banner.view.bannerContent
-import kotlinx.android.synthetic.main.view_banner.view.bannerImage
 
 class BannerView @JvmOverloads constructor(
     context: Context,

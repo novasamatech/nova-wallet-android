@@ -15,8 +15,6 @@ import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel.StatusContent
-import kotlinx.android.synthetic.main.item_governance_lock.view.leftToUnlock
-import kotlinx.android.synthetic.main.item_governance_lock.view.unlockableTokensAmount
 
 class UnlockableTokensAdapter : ListAdapter<GovernanceLockModel, UnlockableTokenHolder>(GovernanceLockCallback) {
 

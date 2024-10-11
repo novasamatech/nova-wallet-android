@@ -19,8 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Balance
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
-import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
+
 import javax.inject.Inject
 
 class BalanceListFragment :

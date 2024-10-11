@@ -17,13 +17,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeView
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeViewState
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralBonus
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralLearnMore
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralNovaBonusApply
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralNovaBonusTitle
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralPrivacySwitch
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralPrivacyText
-import kotlinx.android.synthetic.main.view_referral_flow.view.referralReferralCodeInput
+
 import javax.inject.Inject
 
 class ReferralContributeView @JvmOverloads constructor(

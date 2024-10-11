@@ -20,16 +20,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
-import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupCounter
-import kotlinx.android.synthetic.main.item_referenda_group.view.itemReferendaGroupStatus
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumName
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumNumber
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumStatus
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumThreshold
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumTimeEstimate
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumTrack
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVote
-import kotlinx.android.synthetic.main.item_referendum.view.itermReferendumDivider
 
 class ReferendaListAdapter(
     private val handler: Handler,

@@ -6,10 +6,6 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_promo_banner.view.promoBannerClose
-import kotlinx.android.synthetic.main.view_promo_banner.view.promoBannerDescription
-import kotlinx.android.synthetic.main.view_promo_banner.view.promoBannerImage
-import kotlinx.android.synthetic.main.view_promo_banner.view.promoBannerTitle
 
 class PromoBannerView @JvmOverloads constructor(
     context: Context,

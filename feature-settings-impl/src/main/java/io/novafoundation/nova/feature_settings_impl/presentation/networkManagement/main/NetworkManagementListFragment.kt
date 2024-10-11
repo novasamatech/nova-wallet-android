@@ -13,9 +13,6 @@ import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_network_management.networkManagementTabLayout
-import kotlinx.android.synthetic.main.fragment_network_management.networkManagementToolbar
-import kotlinx.android.synthetic.main.fragment_network_management.networkManagementViewPager
 
 class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewModel>() {
 

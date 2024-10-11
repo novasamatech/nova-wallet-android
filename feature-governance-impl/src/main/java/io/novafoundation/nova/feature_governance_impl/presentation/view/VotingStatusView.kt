@@ -16,13 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
-import kotlinx.android.synthetic.main.view_voting_status.view.abstainVotersDetails
-import kotlinx.android.synthetic.main.view_voting_status.view.negativeVotersDetails
-import kotlinx.android.synthetic.main.view_voting_status.view.positiveVotersDetails
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatus
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatusStartVote
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatusThreshold
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatusTimeEstimation
 
 class VotingStatusView @JvmOverloads constructor(
     context: Context,

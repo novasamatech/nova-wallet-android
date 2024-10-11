@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter.SelectTracksAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.delegationTracks.adapter.SelectTracksHeaderAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter.SelectTracksPresetsAdapter
-import kotlinx.android.synthetic.main.fragment_select_tracks.selectTracksApply
 
 abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewModel> :
     BaseSelectTracksFragment<V>(),

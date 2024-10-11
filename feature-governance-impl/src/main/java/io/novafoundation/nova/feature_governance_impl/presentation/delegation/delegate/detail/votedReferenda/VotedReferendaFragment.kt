@@ -14,9 +14,6 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.BaseReferendaListFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
-import kotlinx.android.synthetic.main.fragment_voted_referenda.votedReferendaCount
-import kotlinx.android.synthetic.main.fragment_voted_referenda.votedReferendaList
-import kotlinx.android.synthetic.main.fragment_voted_referenda.votedReferendaToolbar
 
 class VotedReferendaFragment : BaseReferendaListFragment<VotedReferendaViewModel>(), ReferendaListAdapter.Handler {
 

@@ -18,9 +18,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderButton
-import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderImage
-import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderText
 
 class PlaceholderView @JvmOverloads constructor(
     context: Context,

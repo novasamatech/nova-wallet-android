@@ -8,11 +8,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.item_chain_account.view.chainAccountAccountAddress
-import kotlinx.android.synthetic.main.item_chain_account.view.chainAccountAccountIcon
-import kotlinx.android.synthetic.main.item_chain_account.view.chainAccountChainIcon
-import kotlinx.android.synthetic.main.item_chain_account.view.chainAccountChainName
-import kotlinx.android.synthetic.main.item_chain_account.view.labeledTextAction
 
 class ItemChainAccount @JvmOverloads constructor(
     context: Context,

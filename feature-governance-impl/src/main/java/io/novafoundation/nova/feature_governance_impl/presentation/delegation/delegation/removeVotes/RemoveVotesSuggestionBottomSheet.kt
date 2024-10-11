@@ -4,9 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.bottom_remove_votes_suggestion.removeVotesSuggestionApply
-import kotlinx.android.synthetic.main.bottom_remove_votes_suggestion.removeVotesSuggestionDescription
-import kotlinx.android.synthetic.main.bottom_remove_votes_suggestion.removeVotesSuggestionSkip
 
 class RemoveVotesSuggestionBottomSheet(
     context: Context,

@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
-import kotlinx.android.synthetic.main.item_day_header.view.itemDayHeader
 
 class TransactionHistoryAdapter(
     private val handler: Handler,

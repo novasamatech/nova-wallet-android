@@ -16,8 +16,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.ManualBackupSecretsAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupJsonRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
-import kotlinx.android.synthetic.main.fragment_manual_backup_secrets.manualBackupSecretsList
-import kotlinx.android.synthetic.main.fragment_manual_backup_secrets.manualBackupSecretsToolbar
 
 class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel>(), ManualBackupItemHandler {
 

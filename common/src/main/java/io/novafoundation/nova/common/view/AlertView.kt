@@ -16,12 +16,6 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_alert.view.alertActionArrow
-import kotlinx.android.synthetic.main.view_alert.view.alertActionContent
-import kotlinx.android.synthetic.main.view_alert.view.alertActionGroup
-import kotlinx.android.synthetic.main.view_alert.view.alertIcon
-import kotlinx.android.synthetic.main.view_alert.view.alertMessage
-import kotlinx.android.synthetic.main.view_alert.view.alertSubMessage
 
 typealias SimpleAlertModel = String
 

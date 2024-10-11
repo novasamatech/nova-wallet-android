@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.view.ChainChipView
 import io.novafoundation.nova.feature_wallet_connect_impl.R
-import kotlinx.android.synthetic.main.item_bottom_sheet_wc_networks_label.view.itemWcNetworksLabel
 
 class WCNetworksAdapter : GroupedListAdapter<WCNetworkListModel.Label, WCNetworkListModel.Chain>(WCNetworksDiffCallback()) {
 

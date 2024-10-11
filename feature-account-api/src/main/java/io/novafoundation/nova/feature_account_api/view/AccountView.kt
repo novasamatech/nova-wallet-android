@@ -15,10 +15,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.view_account.view.addressAction
-import kotlinx.android.synthetic.main.view_account.view.addressPrimaryIcon
-import kotlinx.android.synthetic.main.view_account.view.addressSubtitle
-import kotlinx.android.synthetic.main.view_account.view.addressTitle
 
 private const val SHOW_BACKGROUND_DEFAULT = true
 

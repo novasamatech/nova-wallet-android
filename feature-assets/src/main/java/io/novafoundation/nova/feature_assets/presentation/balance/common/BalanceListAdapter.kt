@@ -14,14 +14,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenI
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import kotlinx.android.synthetic.main.item_asset.view.itemAssetBalance
-import kotlinx.android.synthetic.main.item_asset.view.itemAssetImage
-import kotlinx.android.synthetic.main.item_asset.view.itemAssetPriceAmount
-import kotlinx.android.synthetic.main.item_asset.view.itemAssetRate
-import kotlinx.android.synthetic.main.item_asset.view.itemAssetRateChange
-import kotlinx.android.synthetic.main.item_asset.view.itemAssetToken
-import kotlinx.android.synthetic.main.item_asset_group.view.itemAssetGroupBalance
-import kotlinx.android.synthetic.main.item_asset_group.view.itemAssetGroupChain
 
 val priceRateExtractor = { assetModel: AssetModel -> assetModel.token.rate }
 val recentChangeExtractor = { assetModel: AssetModel -> assetModel.token.recentRateChange }

@@ -17,11 +17,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextAction
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextIcon
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextLabel
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextPrimaryIcon
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextText
 
 class LabeledTextView @JvmOverloads constructor(
     context: Context,

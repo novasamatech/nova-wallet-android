@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
 
 class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(), ReferendaListHeaderAdapter.Handler {
 

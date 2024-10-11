@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
-import kotlinx.android.synthetic.main.item_chip_action.view.itemChipAction
 
 class ChipActionsModel(
     val action: String

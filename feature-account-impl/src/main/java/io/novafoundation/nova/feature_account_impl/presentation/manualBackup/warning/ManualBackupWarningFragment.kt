@@ -16,11 +16,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningButtonContinue
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition1
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition2
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition3
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningToolbar
 
 class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>() {
 

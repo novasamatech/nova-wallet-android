@@ -11,10 +11,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.view.PrimaryButton
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedImage
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedOk
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedSubtitle
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedTitle
 
 open class ActionNotAllowedBottomSheet(
     context: Context,

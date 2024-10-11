@@ -11,10 +11,7 @@ import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.model.PendingPayoutModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementDescriptionLeft
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementDescriptionRight
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementTitleLeft
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementTitleRight
+
 import kotlin.time.ExperimentalTime
 
 class PayoutAdapter(

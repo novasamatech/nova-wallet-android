@@ -13,9 +13,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_primary_amount.view.primaryAmountFiat
-import kotlinx.android.synthetic.main.view_primary_amount.view.primaryAmountProgress
-import kotlinx.android.synthetic.main.view_primary_amount.view.primaryAmountToken
 
 class PrimaryAmountView @JvmOverloads constructor(
     context: Context,

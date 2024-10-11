@@ -11,13 +11,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetCheck
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetActionIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetName
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class SelectCollatorView @JvmOverloads constructor(
     context: Context,

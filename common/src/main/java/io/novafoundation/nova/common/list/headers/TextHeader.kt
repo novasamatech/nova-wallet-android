@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
-import kotlinx.android.synthetic.main.item_text_header.view.textHeader
 
 class TextHeader(val content: String) {
 

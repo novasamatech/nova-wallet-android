@@ -15,14 +15,6 @@ import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.SelectHardwareWalletBottomSheet
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionCloud
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionHardware
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionJson
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionPassphraseBig
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionPassphraseSmall
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionRawSeed
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionWatchOnly
-import kotlinx.android.synthetic.main.fragment_import_wallet_options.importOptionsToolbar
 
 class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel>() {
 

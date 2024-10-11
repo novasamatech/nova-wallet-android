@@ -18,9 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyRvItem
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_staking_proxy_list.stakingProxyList
-import kotlinx.android.synthetic.main.fragment_staking_proxy_list.stakingProxyListAddProxyButton
-import kotlinx.android.synthetic.main.fragment_staking_proxy_list.stakingProxyListToolbar
 
 class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel>(), StakingProxyListAdapter.Handler {
 

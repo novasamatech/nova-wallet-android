@@ -12,15 +12,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteAmount
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteConfirm
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteHints
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteInformation
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteLockedAmountChanges
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteLockedPeriodChanges
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteResult
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteToolbar
-import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteTransferableAmountChanges
 
 abstract class ConfirmVoteFragment<T : ConfirmVoteViewModel> : BaseFragment<T>() {
 

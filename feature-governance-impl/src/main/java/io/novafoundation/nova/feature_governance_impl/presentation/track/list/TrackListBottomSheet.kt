@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
-import kotlinx.android.synthetic.main.item_track.view.itemTrack
 
 class TrackListBottomSheet(
     context: Context,

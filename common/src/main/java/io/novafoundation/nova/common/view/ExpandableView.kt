@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import kotlinx.android.synthetic.main.view_banner.view.bannerImage
 
 enum class ExpandableViewState {
     COLLAPSE,

@@ -18,22 +18,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateListModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.setTextOrHide
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateCardView
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateConvictionAmount
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDelegatedVotes
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDelegations
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDescription
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateIcon
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateRecentVotes
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateRecentVotesLabel
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateStatsGroup
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateTitle
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateType
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateVotedBlock
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateVotes
-import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateVotesDetails
-import kotlinx.android.synthetic.main.item_delegate.view.itemVotedTrack
-import kotlinx.android.synthetic.main.item_delegate.view.itemVotedTracksCount
 
 class DelegateListAdapter(
     private val imageLoader: ImageLoader,

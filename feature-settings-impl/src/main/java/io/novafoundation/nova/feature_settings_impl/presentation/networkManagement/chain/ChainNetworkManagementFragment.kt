@@ -22,8 +22,6 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.NodesItemDividerDecoration
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodeRvItem
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_chain_network_management.chainNetworkManagementContent
-import kotlinx.android.synthetic.main.fragment_chain_network_management.chainNetworkManagementToolbar
 
 private val NODES_GROUP_TEXT_STYLE = R.style.TextAppearance_NovaFoundation_SemiBold_Caps2
 private val NODES_GROUP_COLOR_RES = R.color.text_secondary

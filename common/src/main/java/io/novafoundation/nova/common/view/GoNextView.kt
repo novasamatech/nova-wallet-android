@@ -16,12 +16,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
-import kotlinx.android.synthetic.main.view_go_next.view.goNextActionImage
-import kotlinx.android.synthetic.main.view_go_next.view.goNextBadgeText
-import kotlinx.android.synthetic.main.view_go_next.view.goNextDivider
-import kotlinx.android.synthetic.main.view_go_next.view.goNextIcon
-import kotlinx.android.synthetic.main.view_go_next.view.goNextProgress
-import kotlinx.android.synthetic.main.view_go_next.view.goNextTitle
 
 class GoNextView @JvmOverloads constructor(
     context: Context,

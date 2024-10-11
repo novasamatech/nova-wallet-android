@@ -12,9 +12,6 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.accounts.AccountChooserBottomSheetDialog
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
-import kotlinx.android.synthetic.main.fragment_nodes.addConnectionTv
-import kotlinx.android.synthetic.main.fragment_nodes.connectionsList
-import kotlinx.android.synthetic.main.fragment_nodes.novaToolbar
 
 class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandler {
 

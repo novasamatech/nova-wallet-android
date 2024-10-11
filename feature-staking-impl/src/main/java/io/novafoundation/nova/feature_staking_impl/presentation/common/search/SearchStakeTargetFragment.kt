@@ -16,15 +16,6 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorAccounts
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorListHeader
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorProgress
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorRewards
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsContainer
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsInput
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsList
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsPlaceholder
-import kotlinx.android.synthetic.main.fragment_search_custom_validators.searchCustomValidatorsToolbar
 
 typealias DoneAction = () -> Unit
 

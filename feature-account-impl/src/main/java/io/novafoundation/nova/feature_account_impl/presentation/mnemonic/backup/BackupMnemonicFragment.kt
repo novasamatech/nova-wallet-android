@@ -16,12 +16,6 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicContinue
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicPassphrase
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicCondition1
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicCondition2
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicCondition3
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicToolbar
 
 class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
 

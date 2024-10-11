@@ -20,14 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.setupUnbondingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.setupUserRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.setupYourPoolComponent
-import kotlinx.android.synthetic.main.fragment_staking.stakingAlertsInfo
-import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
-import kotlinx.android.synthetic.main.fragment_staking.stakingStakeManage
-import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
-import kotlinx.android.synthetic.main.fragment_staking.stakingStakeUnbondings
-import kotlinx.android.synthetic.main.fragment_staking.stakingToolbar
-import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
-import kotlinx.android.synthetic.main.fragment_staking.stakingYourPool
+
 import javax.inject.Inject
 
 class StakingFragment : BaseFragment<StakingViewModel>() {

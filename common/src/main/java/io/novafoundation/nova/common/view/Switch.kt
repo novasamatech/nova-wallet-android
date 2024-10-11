@@ -9,9 +9,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_switch.view.viewSwitchField
-import kotlinx.android.synthetic.main.view_switch.view.viewSwitchSubtitle
-import kotlinx.android.synthetic.main.view_switch.view.viewSwitchTitle
 
 private const val DIVIDER_VISIBLE_DEFAULT = false
 

@@ -9,10 +9,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsBuy
-import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsReceive
-import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsSend
-import kotlinx.android.synthetic.main.view_asset_actions.view.assetActionsSwap
 
 class AssetActionsView @JvmOverloads constructor(
     context: Context,

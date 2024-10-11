@@ -15,15 +15,6 @@ import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_ledger_impl.R
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageActions
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageAlert
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageCancel
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageConfirm
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageContainer
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageFooterMessage
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageGraphics
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageSubtitle
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageTitle
 
 sealed class LedgerMessageCommand {
 

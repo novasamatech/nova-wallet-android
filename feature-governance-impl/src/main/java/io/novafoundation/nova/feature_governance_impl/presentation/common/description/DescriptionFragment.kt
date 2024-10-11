@@ -10,9 +10,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import kotlinx.android.synthetic.main.fragment_description.descriptionFullDescription
-import kotlinx.android.synthetic.main.fragment_description.descriptionTitle
-import kotlinx.android.synthetic.main.fragment_description.descriptionToolbar
 
 class DescriptionFragment : BaseFragment<DescriptionViewModel>() {
 

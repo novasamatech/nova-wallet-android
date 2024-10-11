@@ -9,13 +9,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeHeaderModel
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
-import kotlinx.android.synthetic.main.item_node.view.nodeCheck
-import kotlinx.android.synthetic.main.item_node.view.nodeDelete
-import kotlinx.android.synthetic.main.item_node.view.nodeHost
-import kotlinx.android.synthetic.main.item_node.view.nodeIcon
-import kotlinx.android.synthetic.main.item_node.view.nodeInfo
-import kotlinx.android.synthetic.main.item_node.view.nodeTitle
-import kotlinx.android.synthetic.main.item_node_group.view.nodeGroupTitle
 
 class NodesAdapter(
     private val nodeItemHandler: NodeItemHandler

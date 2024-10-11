@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.setImageResource
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_ledger_impl.R
-import kotlinx.android.synthetic.main.view_ledger_action.view.viewLedgerGraphicsIcon
 
 class LedgerActionView @JvmOverloads constructor(
     context: Context,

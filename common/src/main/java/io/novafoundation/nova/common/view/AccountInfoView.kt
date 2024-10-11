@@ -12,10 +12,6 @@ import io.novafoundation.nova.common.utils.getColorOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTint
-import kotlinx.android.synthetic.main.view_account_info.view.accountAction
-import kotlinx.android.synthetic.main.view_account_info.view.accountAddressText
-import kotlinx.android.synthetic.main.view_account_info.view.accountIcon
-import kotlinx.android.synthetic.main.view_account_info.view.accountTitle
 
 class AccountInfoView @JvmOverloads constructor(
     context: Context,

@@ -4,7 +4,6 @@ import android.content.Context
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
-import kotlinx.android.synthetic.main.bottom_sheet_unavailable_tracks.unavailableTracksList
 
 class UnavailableTracksPayload(
     val alreadyVoted: List<TrackModel>,

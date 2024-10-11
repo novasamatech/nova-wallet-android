@@ -9,10 +9,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.runtime.ext.availableExplorersFor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.android.synthetic.main.bottom_sheet_external_actions.externalActionsChain
-import kotlinx.android.synthetic.main.bottom_sheet_external_actions.externalActionsContainer
-import kotlinx.android.synthetic.main.bottom_sheet_external_actions.externalActionsIcon
-import kotlinx.android.synthetic.main.bottom_sheet_external_actions.externalActionsValue
 
 typealias ExternalViewCallback = (Chain.Explorer, ExternalActions.Type) -> Unit
 typealias CopyCallback = (String) -> Unit

@@ -10,10 +10,6 @@ import io.novafoundation.nova.common.utils.observe
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.JsonImportSource
-import kotlinx.android.synthetic.main.import_source_json.view.importJsonContent
-import kotlinx.android.synthetic.main.import_source_json.view.importJsonNoNetworkInfo
-import kotlinx.android.synthetic.main.import_source_json.view.importJsonPasswordInput
-import kotlinx.android.synthetic.main.import_source_json.view.importJsonUsernameInput
 
 class JsonImportView @JvmOverloads constructor(
     context: Context,

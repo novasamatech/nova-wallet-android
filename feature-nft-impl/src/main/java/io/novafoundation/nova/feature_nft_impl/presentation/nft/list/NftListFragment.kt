@@ -12,11 +12,7 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
-import kotlinx.android.synthetic.main.fragment_nft_list.nftListBack
-import kotlinx.android.synthetic.main.fragment_nft_list.nftListCounter
-import kotlinx.android.synthetic.main.fragment_nft_list.nftListNfts
-import kotlinx.android.synthetic.main.fragment_nft_list.nftListRefresh
-import kotlinx.android.synthetic.main.fragment_nft_list.nftListToolbar
+
 import javax.inject.Inject
 
 class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {

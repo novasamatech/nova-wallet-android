@@ -8,10 +8,6 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoterModel
-import kotlinx.android.synthetic.main.item_delegator.view.itemDelegatorAddress
-import kotlinx.android.synthetic.main.item_delegator.view.itemDelegatorImage
-import kotlinx.android.synthetic.main.item_delegator.view.itemDelegatorVotesCount
-import kotlinx.android.synthetic.main.item_delegator.view.itemDelegatorVotesCountDetails
 
 class DelegatorsAdapter(
     private val handler: Handler,

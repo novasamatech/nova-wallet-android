@@ -18,11 +18,7 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensContainer
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensList
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensPlaceholder
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensSearch
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensToolbar
+
 import javax.inject.Inject
 
 class ManageTokensFragment :

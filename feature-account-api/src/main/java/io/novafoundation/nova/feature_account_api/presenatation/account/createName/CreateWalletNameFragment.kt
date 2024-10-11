@@ -10,9 +10,6 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameContinue
-import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameInput
-import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameToolbar
 
 abstract class CreateWalletNameFragment<V : CreateWalletNameViewModel> : BaseFragment<V>() {
 

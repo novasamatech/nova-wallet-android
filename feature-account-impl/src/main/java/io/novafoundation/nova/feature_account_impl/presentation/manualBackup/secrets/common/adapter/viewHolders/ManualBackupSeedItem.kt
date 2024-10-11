@@ -5,9 +5,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
-import kotlinx.android.synthetic.main.item_manual_backup_seed.view.manualBackupSecretsSeedContainer
-import kotlinx.android.synthetic.main.item_manual_backup_seed.view.manualBackupSecretsSeedLabel
-import kotlinx.android.synthetic.main.item_manual_backup_seed.view.manualBackupSecretsSeedText
 
 data class ManualBackupSeedRvItem(
     val label: String,

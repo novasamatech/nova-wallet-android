@@ -9,8 +9,6 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig.Connect.Instruction
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.view_instruction_image.view.viewInstructionImage
-import kotlinx.android.synthetic.main.view_instruction_image.view.viewInstructionImageLabel
 
 class InstructionImageView @JvmOverloads constructor(
     context: Context,

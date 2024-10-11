@@ -12,11 +12,8 @@ import io.novafoundation.nova.feature_vote.R
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureComponent
 import io.novafoundation.nova.feature_vote.presentation.VoteRouter
-import kotlinx.android.synthetic.main.fragment_vote.voteAvatar
-import kotlinx.android.synthetic.main.fragment_vote.voteContainer
-import kotlinx.android.synthetic.main.fragment_vote.voteTabs
+
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_vote.voteViewPager
 
 class VoteFragment : BaseFragment<VoteViewModel>() {
 

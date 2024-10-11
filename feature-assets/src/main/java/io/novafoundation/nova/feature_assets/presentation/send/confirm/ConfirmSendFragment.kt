@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.send.confirm
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -14,27 +15,16 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_account_api.view.showChainOrHide
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentConfirmSendBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendAmount
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendContainer
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendCrossChainFee
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendFromNetwork
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendHints
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendOriginFee
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendRecipient
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendSender
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendToNetwork
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendToolbar
-import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendWallet
 
 private const val KEY_DRAFT = "KEY_DRAFT"
 
-class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel>() {
+class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel, FragmentConfirmSendBinding>() {
 
     companion object {
 
@@ -43,25 +33,21 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_confirm_send, container, false)
+    override val binder by viewBinding(FragmentConfirmSendBinding::bind)
 
     override fun initViews() {
-        confirmSendContainer.applyStatusBarInsets()
+        binder.confirmSendContainer.applyStatusBarInsets()
 
-        confirmSendSender.setOnClickListener { viewModel.senderAddressClicked() }
-        confirmSendRecipient.setOnClickListener { viewModel.recipientAddressClicked() }
+        binder.confirmSendSender.setOnClickListener { viewModel.senderAddressClicked() }
+        binder.confirmSendRecipient.setOnClickListener { viewModel.recipientAddressClicked() }
 
-        confirmSendToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.confirmSendToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        confirmSendConfirm.setOnClickListener { viewModel.submitClicked() }
-        confirmSendConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.confirmSendConfirm.setOnClickListener { viewModel.submitClicked() }
+        binder.confirmSendConfirm.prepareForProgress(viewLifecycleOwner)
 
-        confirmSendCrossChainFee.setTitle(R.string.wallet_send_cross_chain_fee)
-        confirmSendCrossChainFee.setFeeStatus(FeeStatus.NoFee) // hide by default
+        binder.confirmSendCrossChainFee.setTitle(R.string.wallet_send_cross_chain_fee)
+        binder.confirmSendCrossChainFee.setFeeStatus(FeeStatus.NoFee) // hide by default
     }
 
     override fun inject() {
@@ -79,24 +65,24 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel>() {
     override fun subscribe(viewModel: ConfirmSendViewModel) {
         setupExternalActions(viewModel)
         observeValidations(viewModel)
-        setupFeeLoading(viewModel.originFeeMixin, confirmSendOriginFee)
-        setupFeeLoading(viewModel.crossChainFeeMixin, confirmSendCrossChainFee)
-        observeHints(viewModel.hintsMixin, confirmSendHints)
+        setupFeeLoading(viewModel.originFeeMixin, binder.confirmSendOriginFee)
+        setupFeeLoading(viewModel.crossChainFeeMixin, binder.confirmSendCrossChainFee)
+        observeHints(viewModel.hintsMixin, binder.confirmSendHints)
 
-        viewModel.recipientModel.observe(confirmSendRecipient::showAddress)
-        viewModel.senderModel.observe(confirmSendSender::showAddress)
+        viewModel.recipientModel.observe(binder.confirmSendRecipient::showAddress)
+        viewModel.senderModel.observe(binder.confirmSendSender::showAddress)
 
-        viewModel.sendButtonStateLiveData.observe(confirmSendConfirm::setState)
+        viewModel.sendButtonStateLiveData.observe(binder.confirmSendConfirm::setState)
 
-        viewModel.wallet.observe(confirmSendWallet::showWallet)
+        viewModel.wallet.observe(binder.confirmSendWallet::showWallet)
 
         viewModel.transferDirectionModel.observe {
-            confirmSendFromNetwork.showChain(it.origin)
-            confirmSendFromNetwork.setTitle(it.originChainLabel)
+            binder.confirmSendFromNetwork.showChain(it.origin)
+            binder.confirmSendFromNetwork.setTitle(it.originChainLabel)
 
-            confirmSendToNetwork.showChainOrHide(it.destination)
+            binder.confirmSendToNetwork.showChainOrHide(it.destination)
         }
 
-        viewModel.amountModel.observe(confirmSendAmount::setAmount)
+        viewModel.amountModel.observe(binder.confirmSendAmount::setAmount)
     }
 }

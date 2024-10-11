@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.view.bindFromMap
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.domain.assets.filters.NonZeroBalanceFilter
-import kotlinx.android.synthetic.main.fragment_asset_filters.assetsFilterSwitchZeroBalances
 
 class AssetFiltersBottomSheetFragment : BaseBottomSheetFragment<AssetFiltersViewModel>() {
 

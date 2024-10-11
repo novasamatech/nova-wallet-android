@@ -14,10 +14,6 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_confirm_set_controller.confirmSetControllerConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_set_controller.confirmSetControllerController
-import kotlinx.android.synthetic.main.fragment_confirm_set_controller.confirmSetControllerExtrinsicInformation
-import kotlinx.android.synthetic.main.fragment_confirm_set_controller.confirmSetControllerToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 

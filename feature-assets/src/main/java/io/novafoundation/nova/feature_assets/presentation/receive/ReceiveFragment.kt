@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -12,19 +13,19 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentReceiveBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
-import kotlinx.android.synthetic.main.fragment_receive.receiveFrom
-import kotlinx.android.synthetic.main.fragment_receive.receiveQrCode
-import kotlinx.android.synthetic.main.fragment_receive.receiveShare
-import kotlinx.android.synthetic.main.fragment_receive.receiveToolbar
+
 import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
-class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
+class ReceiveFragment : BaseFragment<ReceiveViewModel, FragmentReceiveBinding>() {
+
+    override val binder by viewBinding(FragmentReceiveBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -36,23 +37,17 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_receive, container, false)
-
     override fun initViews() {
-        receiveFrom.setWholeClickListener { viewModel.recipientClicked() }
+        binder.receiveFrom.setWholeClickListener { viewModel.recipientClicked() }
 
-        receiveToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.receiveToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        receiveShare.setOnClickListener { viewModel.shareButtonClicked() }
+        binder.receiveShare.setOnClickListener { viewModel.shareButtonClicked() }
 
-        receiveFrom.primaryIcon.setVisible(true)
+        binder.receiveFrom.primaryIcon.setVisible(true)
 
-        receiveQrCode.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
-        receiveQrCode.clipToOutline = true // for round corners
+        binder.receiveQrCode.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
+        binder.receiveQrCode.clipToOutline = true // for round corners
     }
 
     override fun inject() {
@@ -68,16 +63,16 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
     override fun subscribe(viewModel: ReceiveViewModel) {
         setupExternalActions(viewModel)
 
-        viewModel.qrBitmapFlow.observe(receiveQrCode::setImageBitmap)
+        viewModel.qrBitmapFlow.observe(binder.receiveQrCode::setImageBitmap)
 
         viewModel.receiver.observe {
-            receiveFrom.setTextIcon(it.addressModel.image)
-            receiveFrom.primaryIcon.loadTokenIcon(it.chainAssetIcon, imageLoader)
-            receiveFrom.setMessage(it.addressModel.address)
-            receiveFrom.setLabel(it.chain.name)
+            binder.receiveFrom.setTextIcon(it.addressModel.image)
+            binder.receiveFrom.primaryIcon.loadTokenIcon(it.chainAssetIcon, imageLoader)
+            binder.receiveFrom.setMessage(it.addressModel.address)
+            binder.receiveFrom.setLabel(it.chain.name)
         }
 
-        viewModel.toolbarTitle.observe(receiveToolbar::setTitle)
+        viewModel.toolbarTitle.observe(binder.receiveToolbar::setTitle)
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)
     }

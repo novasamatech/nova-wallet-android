@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_nova_connect.view.viewNovaConnectTargetIcon
 
 class NovaConnectView @JvmOverloads constructor(
     context: Context,

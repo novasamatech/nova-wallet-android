@@ -21,16 +21,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.sh
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRate
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRateChange
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenIcon
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
-import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
+
 import javax.inject.Inject
 
 private const val KEY_TOKEN = "KEY_TOKEN"

@@ -15,10 +15,6 @@ import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorAction
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorBalance
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorIcon
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorTokenName
 
 class AssetSelectorView @JvmOverloads constructor(
     context: Context,

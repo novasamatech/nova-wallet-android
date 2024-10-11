@@ -19,10 +19,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CrowdloanMainFlowFeatures
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.injectionLayoutParams
-import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeDescription
-import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeScrollableContent
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeAmount
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeInjectionParent
+
 import kotlinx.coroutines.CoroutineScope
 
 abstract class MainFlowMoonbeamCustomization(

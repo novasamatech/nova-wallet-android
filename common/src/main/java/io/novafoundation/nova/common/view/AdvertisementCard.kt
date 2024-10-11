@@ -15,15 +15,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardBackground
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardButton
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardClose
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardImage
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardLearnMoreArrow
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardLearnMoreContent
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardLearnMoreGroup
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardSubTitle
-import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardTitle
 
 class AdvertisementCard @JvmOverloads constructor(
     context: Context,

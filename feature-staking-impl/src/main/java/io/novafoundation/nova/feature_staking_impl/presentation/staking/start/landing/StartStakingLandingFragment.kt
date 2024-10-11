@@ -21,10 +21,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
-import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingAvailableBalance
-import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingButton
-import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingList
-import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingToolbar
 
 class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>(), StartStakingLandingFooterAdapter.ClickHandler {
 

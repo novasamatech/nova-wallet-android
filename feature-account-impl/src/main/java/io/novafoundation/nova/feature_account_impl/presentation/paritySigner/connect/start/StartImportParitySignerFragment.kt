@@ -17,11 +17,6 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.view.InstructionImageView
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerConnectOverview
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerInstructionContainer
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerScanQrCode
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerTitle
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerToolbar
 
 class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerViewModel>() {
 

@@ -7,8 +7,6 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.view.PrimaryButton
 import io.novafoundation.nova.feature_wallet_api.R
-import kotlinx.android.synthetic.main.view_confirm_transaction.view.confirmTransactionAction
-import kotlinx.android.synthetic.main.view_confirm_transaction.view.confirmTransactionFee
 
 class ConfirmTransactionView @JvmOverloads constructor(
     context: Context,

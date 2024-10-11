@@ -11,10 +11,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainI
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyGroupRvItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyRvItem
-import kotlinx.android.synthetic.main.item_proxy.view.itemStakingProxyAccountTitle
-import kotlinx.android.synthetic.main.item_proxy.view.itemStakingProxyChainIcon
-import kotlinx.android.synthetic.main.item_proxy.view.itemStakingProxyIcon
-import kotlinx.android.synthetic.main.item_proxy_group.view.itemProxyGroup
 
 class StakingProxyListAdapter(
     private val handler: Handler,

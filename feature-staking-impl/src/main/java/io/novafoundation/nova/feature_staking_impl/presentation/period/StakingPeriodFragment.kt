@@ -17,12 +17,6 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_period_staking.customPeriodSettings
-import kotlinx.android.synthetic.main.fragment_period_staking.customStakingPeriodAlwaysToday
-import kotlinx.android.synthetic.main.fragment_period_staking.customStakingPeriodEnd
-import kotlinx.android.synthetic.main.fragment_period_staking.customStakingPeriodStart
-import kotlinx.android.synthetic.main.fragment_period_staking.stakingPeriodGroup
-import kotlinx.android.synthetic.main.fragment_period_staking.stakingPeriodToolbar
 
 private const val DATE_PICKER_TAG = "datePicker"
 

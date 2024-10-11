@@ -10,9 +10,6 @@ import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
 import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectConnectedCount
-import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectConnectionsIcon
-import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectIconContainer
 
 class WalletConnectCounterView @JvmOverloads constructor(
     context: Context,

@@ -13,9 +13,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetSubtitle
-import kotlinx.android.synthetic.main.item_list_selector.view.itemSelectorIcon
-import kotlinx.android.synthetic.main.item_list_selector.view.itemSelectorTitle
 
 class DynamicSelectorBottomSheet(
     context: Context,

@@ -14,10 +14,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSh
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
-import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorBalance
-import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorCheckmark
-import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorIcon
-import kotlinx.android.synthetic.main.item_asset_selector.view.itemAssetSelectorTokenName
 
 class AssetSelectorBottomSheet(
     private val imageLoader: ImageLoader,

@@ -22,12 +22,6 @@ import io.novafoundation.nova.common.utils.updateTopMargin
 import io.novafoundation.nova.common.view.bottomSheet.LockBottomSheetBehavior
 import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.synthetic.main.view_transfer_history.view.placeholder
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryFilter
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryList
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryProgress
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryPuller
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryTitle
 
 typealias ScrollingListener = (position: Int) -> Unit
 typealias SlidingStateListener = (Int) -> Unit

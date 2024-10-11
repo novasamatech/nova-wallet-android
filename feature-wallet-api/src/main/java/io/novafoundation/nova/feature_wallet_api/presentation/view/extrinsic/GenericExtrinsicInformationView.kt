@@ -11,9 +11,6 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-import kotlinx.android.synthetic.main.view_generic_extrinsic_information.view.viewGenericExtrinsicInformationAccount
-import kotlinx.android.synthetic.main.view_generic_extrinsic_information.view.viewGenericExtrinsicInformationFee
-import kotlinx.android.synthetic.main.view_generic_extrinsic_information.view.viewGenericExtrinsicInformationWallet
 
 class GenericExtrinsicInformationView @JvmOverloads constructor(
     context: Context,

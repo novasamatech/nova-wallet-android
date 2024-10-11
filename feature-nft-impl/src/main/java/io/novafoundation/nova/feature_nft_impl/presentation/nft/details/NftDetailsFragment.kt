@@ -24,18 +24,7 @@ import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.model.NftPriceModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsChain
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCollection
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCreator
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsDescription
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsIssuance
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsMedia
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsOnwer
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsPrice
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsProgress
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsTable
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsTitle
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsToolbar
+
 import javax.inject.Inject
 
 class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {

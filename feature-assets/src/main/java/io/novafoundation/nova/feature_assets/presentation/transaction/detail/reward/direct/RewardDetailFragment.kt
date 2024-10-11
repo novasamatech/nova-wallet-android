@@ -15,14 +15,6 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import io.novafoundation.nova.feature_assets.presentation.model.toAmountModel
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailAmount
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEra
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEvent
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailNetwork
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailStatus
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailToolbar
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailType
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailValidator
 
 class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
     companion object {

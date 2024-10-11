@@ -16,10 +16,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_scan.view.viewScanScanner
-import kotlinx.android.synthetic.main.view_scan.view.viewScanSubtitle
-import kotlinx.android.synthetic.main.view_scan.view.viewScanTitle
-import kotlinx.android.synthetic.main.view_scan.view.viewScanViewFinder
 
 class ScanView @JvmOverloads constructor(
     context: Context,

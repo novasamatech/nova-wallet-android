@@ -12,11 +12,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.item_backup_account.view.itemManualBackupAccountContainer
-import kotlinx.android.synthetic.main.item_backup_account.view.itemManualBackupAccountIcon
-import kotlinx.android.synthetic.main.item_backup_account.view.itemManualBackupAccountSubtitle
-import kotlinx.android.synthetic.main.item_backup_account.view.itemManualBackupAccountTitle
-import kotlinx.android.synthetic.main.item_backup_account_header.view.itemManualBackupGroupTitle
 
 class ManualBackupAccountsAdapter(
     private val imageLoader: ImageLoader,

@@ -14,8 +14,6 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.setupQrCodeExpiration
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
-import kotlinx.android.synthetic.main.fragment_sign_parity_signer_scan.signParitySignerScanScanner
-import kotlinx.android.synthetic.main.fragment_sign_parity_signer_scan.signParitySignerScanToolbar
 
 class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewModel>() {
 

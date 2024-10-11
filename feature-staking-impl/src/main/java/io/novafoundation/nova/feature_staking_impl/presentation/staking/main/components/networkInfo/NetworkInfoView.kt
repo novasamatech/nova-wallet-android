@@ -9,8 +9,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkCollapsibleView
-import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkInfoTitle
 
 private const val ANIMATION_DURATION = 220L
 

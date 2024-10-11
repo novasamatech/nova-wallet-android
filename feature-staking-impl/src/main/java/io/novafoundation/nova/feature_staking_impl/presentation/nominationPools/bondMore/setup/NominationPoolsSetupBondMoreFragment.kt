@@ -15,12 +15,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nominationPoolsBondMoreAmount
-import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nominationPoolsBondMoreContainer
-import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nominationPoolsBondMoreContinue
-import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nominationPoolsBondMoreFee
-import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nominationPoolsBondMoreHints
-import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nominationPoolsBondMoreToolbar
 
 class NominationPoolsSetupBondMoreFragment : BaseFragment<NominationPoolsSetupBondMoreViewModel>() {
 

@@ -12,7 +12,7 @@ buildscript {
         minSdkVersion = 24
         targetSdkVersion = 34
 
-        kotlinVersion = '1.7.21'
+        kotlinVersion = '1.9.22'
 
         ktlintPinterestVersion = '0.47.0'
 
@@ -21,13 +21,13 @@ buildscript {
         cardViewVersion = '1.0.0'
         constraintVersion = '1.1.3'
 
-        coroutinesVersion = '1.6.3'
+        coroutinesVersion = '1.8.1'
 
         biometricVersion = '1.0.1'
 
         progressButtonsVersion = '2.1.0'
 
-        daggerVersion = '2.44.2'
+        daggerVersion = '2.52'
         javaxInjectVersion = '1'
 
         architectureComponentVersion = '2.2.0'
@@ -79,7 +79,7 @@ buildscript {
 
         bleVersion = '2.5.1'
 
-        roomVersion = '2.4.3'
+        roomVersion = '2.6.1'
 
         markwonVersion = '4.6.2'
 
@@ -93,6 +93,8 @@ buildscript {
         googleDriveVersion = "v3-rev20210919-1.32.1"
 
         cardStackVersion = "2.3.4"
+
+        viewBindingDelegateVersion = "1.5.9"
 
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
@@ -217,6 +219,8 @@ buildscript {
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
         cardStackView = "com.github.yuyakaido:cardstackview:$cardStackVersion"
+
+        viewBindingDelegate = "com.github.kirich1409:viewbindingpropertydelegate-noreflection:$viewBindingDelegateVersion"
     }
 
     repositories {

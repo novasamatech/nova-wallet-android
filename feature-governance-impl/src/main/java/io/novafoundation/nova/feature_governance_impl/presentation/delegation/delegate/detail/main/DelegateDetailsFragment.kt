@@ -28,23 +28,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackDelegationListBottomSheet
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAccount
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAddDelegation
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsContent
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDelegatedVotes
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDelegations
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDescription
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDescriptionReadMore
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsIcon
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsIdentity
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsMetadataGroup
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsProgress
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsTitle
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsToolbar
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsType
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedOverall
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedRecently
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsYourDelegation
+
 import javax.inject.Inject
 
 class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {

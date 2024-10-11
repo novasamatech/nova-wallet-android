@@ -12,15 +12,6 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsAnnouncements
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsEnable
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsGovernance
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsNoSelectedWallets
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsReceivedTokens
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsSentTokens
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsStakingRewards
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsToolbar
-import kotlinx.android.synthetic.main.fragment_push_settings.pushSettingsWallets
 
 class PushSettingsFragment : BaseFragment<PushSettingsViewModel>() {
 

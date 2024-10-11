@@ -16,15 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoContainer
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoDescription
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoNumber
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoProgress
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoProposer
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoTime
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoTitle
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoToolbar
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoTrack
 
 class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
 

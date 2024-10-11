@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.ViewSpace
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.updatePadding
-import kotlinx.android.synthetic.main.item_text.view.itemText
 
 class TextAdapter(
     private var text: String? = null,

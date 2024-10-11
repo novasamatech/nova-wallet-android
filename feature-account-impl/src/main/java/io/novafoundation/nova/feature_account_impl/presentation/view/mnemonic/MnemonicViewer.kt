@@ -6,7 +6,6 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.view_mnemonic.view.mnemonicViewerList
 
 class MnemonicViewer @JvmOverloads constructor(
     context: Context,

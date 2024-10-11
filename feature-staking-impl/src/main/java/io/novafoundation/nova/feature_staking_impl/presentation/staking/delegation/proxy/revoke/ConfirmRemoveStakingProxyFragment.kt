@@ -17,13 +17,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_confirm_revoke_staking_proxy.confirmRemoveStakingProxyButton
-import kotlinx.android.synthetic.main.fragment_confirm_revoke_staking_proxy.confirmRemoveStakingProxyDelegationAccount
-import kotlinx.android.synthetic.main.fragment_confirm_revoke_staking_proxy.confirmRemoveStakingProxyNetwork
-import kotlinx.android.synthetic.main.fragment_confirm_revoke_staking_proxy.confirmRemoveStakingProxyNetworkFee
-import kotlinx.android.synthetic.main.fragment_confirm_revoke_staking_proxy.confirmRemoveStakingProxyProxiedAccount
-import kotlinx.android.synthetic.main.fragment_confirm_revoke_staking_proxy.confirmRemoveStakingProxyToolbar
-import kotlinx.android.synthetic.main.fragment_confirm_revoke_staking_proxy.confirmRemoveStakingProxyWallet
 
 class ConfirmRemoveStakingProxyFragment : BaseFragment<ConfirmRemoveStakingProxyViewModel>() {
     companion object {

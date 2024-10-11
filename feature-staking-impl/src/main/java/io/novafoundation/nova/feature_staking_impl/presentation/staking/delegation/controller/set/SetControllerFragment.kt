@@ -15,13 +15,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_set_controller_account.confirmSetControllerContainer
-import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerAdvertisement
-import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerContinue
-import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerController
-import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerStash
-import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerSwitchToStashWarning
-import kotlinx.android.synthetic.main.fragment_set_controller_account.setControllerToolbar
 
 class SetControllerFragment : BaseFragment<SetControllerViewModel>() {
 

@@ -14,12 +14,6 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.model.AuthorizedDAppModel
-import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedDAppsList
-import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedDAppsToolbar
-import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedDAppsWallet
-import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedPlaceholder
-import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedPlaceholderSpacerBottom
-import kotlinx.android.synthetic.main.fragment_authorized_dapps.authorizedPlaceholderSpacerTop
 
 class AuthorizedDAppsFragment : BaseFragment<AuthorizedDAppsViewModel>(), AuthorizedDAppAdapter.Handler {
 

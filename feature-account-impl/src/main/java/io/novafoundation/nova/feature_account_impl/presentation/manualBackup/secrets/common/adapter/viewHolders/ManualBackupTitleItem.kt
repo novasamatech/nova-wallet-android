@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.list.decoration.ExtraSpaceViewHolder
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
-import kotlinx.android.synthetic.main.item_manual_backup_title.view.manualBackupSecretsTitle
 
 data class ManualBackupTitleRvItem(
     val title: String

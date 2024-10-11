@@ -10,8 +10,6 @@ import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.model.DelegationTrackModel
-import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrack
-import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrackCheckbox
 
 class SelectTracksAdapter(
     private val handler: Handler

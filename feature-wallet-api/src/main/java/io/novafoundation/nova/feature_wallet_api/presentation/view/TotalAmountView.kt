@@ -8,9 +8,6 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_total_amount.view.totalAmountFiat
-import kotlinx.android.synthetic.main.view_total_amount.view.totalAmountTitle
-import kotlinx.android.synthetic.main.view_total_amount.view.totalAmountToken
 
 class TotalAmountView @JvmOverloads constructor(
     context: Context,

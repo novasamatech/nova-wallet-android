@@ -20,11 +20,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.Poo
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.PoolRvItem
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolCount
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolList
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolProgressBar
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolRecommendedAction
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolToolbar
 
 class SelectPoolFragment : BaseFragment<SelectPoolViewModel>(), PoolAdapter.ItemHandler {
 

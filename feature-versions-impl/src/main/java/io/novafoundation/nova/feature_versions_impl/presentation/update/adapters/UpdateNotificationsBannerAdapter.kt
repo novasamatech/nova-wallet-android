@@ -7,9 +7,6 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_versions_impl.R
 import io.novafoundation.nova.feature_versions_impl.presentation.update.models.UpdateNotificationBannerModel
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationAlertSubtitle
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationAlertTitle
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationBanner
 
 class UpdateNotificationsBannerAdapter : RecyclerView.Adapter<UpdateNotificationBannerHolder>() {
 

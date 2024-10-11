@@ -12,8 +12,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.item_account_chooser.view.itemAccountChooserAddress
-import kotlinx.android.synthetic.main.item_account_chooser.view.itemAccountChooserCheck
 
 class AccountChooserBottomSheetDialog(
     context: Context,

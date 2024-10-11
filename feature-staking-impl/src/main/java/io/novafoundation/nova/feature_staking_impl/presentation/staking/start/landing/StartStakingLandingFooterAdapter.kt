@@ -17,8 +17,6 @@ import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterMoreInfo
-import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterTermsOfUse
 
 class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : SingleItemAdapter<StartStakingLandingFooterViewHolder>() {
 

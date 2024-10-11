@@ -17,11 +17,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.android.synthetic.main.item_chain_chooser.view.itemChainChooserAmountFiat
-import kotlinx.android.synthetic.main.item_chain_chooser.view.itemChainChooserAmountToken
-import kotlinx.android.synthetic.main.item_chain_chooser.view.itemChainChooserChain
-import kotlinx.android.synthetic.main.item_chain_chooser.view.itemChainChooserCheck
-import kotlinx.android.synthetic.main.item_chain_chooser_group.view.itemChainChooserGroup
 
 class SelectCrossChainDestinationBottomSheet(
     context: Context,

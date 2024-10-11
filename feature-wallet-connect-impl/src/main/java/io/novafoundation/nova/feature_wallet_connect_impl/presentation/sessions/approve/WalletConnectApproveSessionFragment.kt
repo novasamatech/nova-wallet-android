@@ -17,16 +17,7 @@ import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeature
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.view.WCNetworksBottomSheet
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionAccountsAlert
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionAllow
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionChainsAlert
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionDApp
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionIcon
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionNetworks
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionReject
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionTitle
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionToolbar
-import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionWallet
+
 import javax.inject.Inject
 
 class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSessionViewModel>() {

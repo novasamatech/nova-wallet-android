@@ -36,14 +36,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_table_cell.view.barrier
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellContent
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellImage
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellTitle
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueDivider
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueProgress
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueSecondary
 
 open class TableCellView @JvmOverloads constructor(
     context: Context,

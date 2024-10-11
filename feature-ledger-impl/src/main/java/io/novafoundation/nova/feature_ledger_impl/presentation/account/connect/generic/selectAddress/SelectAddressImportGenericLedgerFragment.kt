@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerFragment
-import kotlinx.android.synthetic.main.fragment_import_ledger_select_address.ledgerSelectAddressChain
 
 class SelectAddressImportGenericLedgerFragment : SelectAddressLedgerFragment<SelectAddressImportGenericLedgerViewModel>() {
 

@@ -14,11 +14,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondAmount
-import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondExtrinsicInformation
-import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondHints
-import kotlinx.android.synthetic.main.fragment_confirm_unbond.confirmUnbondToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 

@@ -14,9 +14,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.model.ChainTokenInstanceModel
-import kotlinx.android.synthetic.main.item_manage_chain_token.view.itemManageChainTokenChainIcon
-import kotlinx.android.synthetic.main.item_manage_chain_token.view.itemManageChainTokenChainName
-import kotlinx.android.synthetic.main.item_manage_chain_token.view.itemManageChainTokenEnabled
 
 class ManageChainTokensAdapter(
     private val imageLoader: ImageLoader,

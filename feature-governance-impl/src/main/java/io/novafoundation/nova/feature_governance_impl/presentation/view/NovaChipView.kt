@@ -27,9 +27,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_chip.view.chipDrawablePadding
-import kotlinx.android.synthetic.main.view_chip.view.chipIcon
-import kotlinx.android.synthetic.main.view_chip.view.chipText
+
 import kotlin.math.roundToInt
 
 private val SIZE_DEFAULT = NovaChipView.Size.NORMAL

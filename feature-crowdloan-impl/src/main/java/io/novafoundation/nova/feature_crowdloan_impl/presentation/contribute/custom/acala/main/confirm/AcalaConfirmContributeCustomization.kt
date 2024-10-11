@@ -12,8 +12,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.AcalaCustomizationPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.base.AcalaMainFlowCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.injectionLayoutParams
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeAmountBottomMargin
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeInjectionParent
+
 import kotlinx.coroutines.CoroutineScope
 
 class AcalaConfirmContributeCustomization(

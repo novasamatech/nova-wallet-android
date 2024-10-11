@@ -17,11 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VoterItemDecoration
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VotersAdapter
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersCount
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersList
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersPlaceholder
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersProgress
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersToolbar
+
 import javax.inject.Inject
 
 class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), VotersAdapter.Handler {

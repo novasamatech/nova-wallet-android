@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_delegations_search_result_count.view.itemDelegationSearchCount
 
 class DelegateSearchCountResultAdapter : RecyclerView.Adapter<DelegationSearchCountViewHolder>() {
 

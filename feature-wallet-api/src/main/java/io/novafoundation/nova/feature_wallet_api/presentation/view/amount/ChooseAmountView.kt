@@ -13,10 +13,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxAvailableView
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
-import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountBalance
-import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountBalanceLabel
-import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountInput
-import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountTitle
 
 class ChooseAmountView @JvmOverloads constructor(
     context: Context,

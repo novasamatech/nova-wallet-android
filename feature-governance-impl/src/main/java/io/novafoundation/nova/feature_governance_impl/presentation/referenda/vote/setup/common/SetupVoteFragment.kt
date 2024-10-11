@@ -16,17 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.setChips
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteAlertView
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteAmount
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteAmountChipsContainer
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteAmountChipsScroll
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteContainer
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteLockedAmountChanges
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteLockedPeriodChanges
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteTitle
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteToolbar
-import kotlinx.android.synthetic.main.fragment_setup_vote.setupReferendumVoteVotePower
-import kotlinx.android.synthetic.main.fragment_setup_vote.view.setupVoteControlFrame
 
 abstract class SetupVoteFragment<T : SetupVoteViewModel> : BaseFragment<T>() {
 

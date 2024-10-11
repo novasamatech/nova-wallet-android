@@ -19,8 +19,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.blur.SweetBlur
 import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.utils.updatePadding
-import kotlinx.android.synthetic.main.fragment_main.bottomNavHost
-import kotlinx.android.synthetic.main.fragment_main.bottomNavigationView
+
 import javax.inject.Inject
 
 class MainFragment : BaseFragment<MainViewModel>() {

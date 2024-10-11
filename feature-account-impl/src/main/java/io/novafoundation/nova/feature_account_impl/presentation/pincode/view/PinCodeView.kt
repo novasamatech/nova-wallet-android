@@ -9,18 +9,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatButton
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.pincode_view.view.btn0
-import kotlinx.android.synthetic.main.pincode_view.view.btn1
-import kotlinx.android.synthetic.main.pincode_view.view.btn2
-import kotlinx.android.synthetic.main.pincode_view.view.btn3
-import kotlinx.android.synthetic.main.pincode_view.view.btn4
-import kotlinx.android.synthetic.main.pincode_view.view.btn5
-import kotlinx.android.synthetic.main.pincode_view.view.btn6
-import kotlinx.android.synthetic.main.pincode_view.view.btn7
-import kotlinx.android.synthetic.main.pincode_view.view.btn8
-import kotlinx.android.synthetic.main.pincode_view.view.btn9
-import kotlinx.android.synthetic.main.pincode_view.view.btnDelete
-import kotlinx.android.synthetic.main.pincode_view.view.biometricBtn
 
 class PinCodeView @JvmOverloads constructor(
     context: Context,

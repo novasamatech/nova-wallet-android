@@ -8,9 +8,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setShimmerVisible
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoGain
-import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoGainShimmer
-import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoTitle
 
 class StakingInfoView @JvmOverloads constructor(
     context: Context,

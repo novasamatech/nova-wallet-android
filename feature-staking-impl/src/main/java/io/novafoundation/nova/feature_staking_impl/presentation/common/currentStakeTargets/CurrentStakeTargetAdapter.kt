@@ -15,17 +15,6 @@ import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetStatusModel
-import kotlinx.android.synthetic.main.item_current_validator.view.currentValidatorSlashedIcon
-import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorApy
-import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorIcon
-import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorInfo
-import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorName
-import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorNominated
-import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorNominatedAmount
-import kotlinx.android.synthetic.main.item_current_validator.view.itemCurrentValidatorOversubscribed
-import kotlinx.android.synthetic.main.item_current_validator_group.view.itemCurrentValidatorContainer
-import kotlinx.android.synthetic.main.item_current_validator_group.view.itemCurrentValidatorGroupDescription
-import kotlinx.android.synthetic.main.item_current_validator_group.view.itemCurrentValidatorGroupStatus
 
 class CurrentStakeTargetAdapter(
     private val handler: Handler,

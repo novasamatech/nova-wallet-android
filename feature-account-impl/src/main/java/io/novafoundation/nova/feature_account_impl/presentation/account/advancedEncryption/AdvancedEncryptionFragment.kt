@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -19,20 +20,14 @@ import io.novafoundation.nova.common.view.LabeledTextView
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentAdvancedEncryptionBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.EncryptionTypeChooserBottomSheetDialog
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionApply
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionContainer
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionEthereumCryptoType
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionEthereumDerivationPath
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionSubstrateCryptoType
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionSubstrateDerivationPath
-import kotlinx.android.synthetic.main.fragment_advanced_encryption.advancedEncryptionToolbar
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel>() {
+class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel, FragmentAdvancedEncryptionBinding>() {
 
     companion object {
 
@@ -45,22 +40,20 @@ class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel>() {
         }
     }
 
+    override val binder by viewBinding(FragmentAdvancedEncryptionBinding::bind)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_advanced_encryption, container, false)
-    }
-
     override fun initViews() {
-        advancedEncryptionToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
-        advancedEncryptionContainer.applyStatusBarInsets()
+        binder.advancedEncryptionToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        binder.advancedEncryptionContainer.applyStatusBarInsets()
 
-        advancedEncryptionApply.setOnClickListener {
+        binder.advancedEncryptionApply.setOnClickListener {
             viewModel.applyClicked()
         }
 
-        advancedEncryptionSubstrateCryptoType.setOnClickListener {
+        binder.advancedEncryptionSubstrateCryptoType.setOnClickListener {
             viewModel.substrateEncryptionClicked()
         }
     }
@@ -75,17 +68,17 @@ class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel>() {
     override fun subscribe(viewModel: AdvancedEncryptionViewModel) {
         observeValidations(viewModel)
 
-        advancedEncryptionApply.setVisible(viewModel.applyVisible)
+        binder.advancedEncryptionApply.setVisible(viewModel.applyVisible)
 
-        viewModel.substrateCryptoTypeInput.bindTo(advancedEncryptionSubstrateCryptoType)
+        viewModel.substrateCryptoTypeInput.bindTo(binder.advancedEncryptionSubstrateCryptoType)
         viewModel.substrateDerivationPathInput.bindTo(
-            advancedEncryptionSubstrateDerivationPath,
+            binder.advancedEncryptionSubstrateDerivationPath,
             viewModel::substrateDerivationPathChanged
         )
 
-        viewModel.ethereumCryptoTypeInput.bindTo(advancedEncryptionEthereumCryptoType)
+        viewModel.ethereumCryptoTypeInput.bindTo(binder.advancedEncryptionEthereumCryptoType)
         viewModel.ethereumDerivationPathInput.bindTo(
-            advancedEncryptionEthereumDerivationPath,
+            binder.advancedEncryptionEthereumDerivationPath,
             viewModel::ethereumDerivationPathChanged
         )
 

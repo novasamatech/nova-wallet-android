@@ -10,9 +10,6 @@ import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.makeVisibleViews
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_estimated_rewards.view.viewEstimatedRewardsEarnings
-import kotlinx.android.synthetic.main.view_estimated_rewards.view.viewEstimatedRewardsEarningsShimmer
-import kotlinx.android.synthetic.main.view_estimated_rewards.view.viewEstimatedRewardsEarningsSuffix
 
 class EstimatedRewardsView @JvmOverloads constructor(
     context: Context,

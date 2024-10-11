@@ -15,10 +15,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenModel
-import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainEnabled
-import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainIcon
-import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainNetworks
-import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainSymbol
 
 private val subtitleExtractor = { model: MultiChainTokenModel -> model.header.networks }
 

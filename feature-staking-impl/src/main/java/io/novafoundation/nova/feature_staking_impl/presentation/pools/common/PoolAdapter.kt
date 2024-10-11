@@ -11,12 +11,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.item_pool.view.itemPoolCheckBox
-import kotlinx.android.synthetic.main.item_pool.view.itemPoolIcon
-import kotlinx.android.synthetic.main.item_pool.view.itemPoolInfo
-import kotlinx.android.synthetic.main.item_pool.view.itemPoolMembersCount
-import kotlinx.android.synthetic.main.item_pool.view.itemPoolSubtitle
-import kotlinx.android.synthetic.main.item_pool.view.itemPoolTitle
 
 class PoolAdapter(
     private val imageLoader: ImageLoader,

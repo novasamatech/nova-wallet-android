@@ -13,8 +13,6 @@ import androidx.core.view.children
 import com.google.android.flexbox.FlexboxLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.setTextColorRes
-import kotlinx.android.synthetic.main.view_seekbar.view.seekbarInner
-import kotlinx.android.synthetic.main.view_seekbar.view.seekbarTickLabelsContainer
 
 class Seekbar @JvmOverloads constructor(
     context: Context,

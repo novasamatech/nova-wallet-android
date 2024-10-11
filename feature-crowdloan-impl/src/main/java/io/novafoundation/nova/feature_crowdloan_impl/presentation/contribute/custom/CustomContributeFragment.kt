@@ -14,10 +14,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
-import kotlinx.android.synthetic.main.fragment_custom_contribute.customContributeApply
-import kotlinx.android.synthetic.main.fragment_custom_contribute.customContributeContainer
-import kotlinx.android.synthetic.main.fragment_custom_contribute.customContributeToolbar
-import kotlinx.android.synthetic.main.fragment_custom_contribute.customFlowContainer
+
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject

@@ -19,10 +19,7 @@ import io.novafoundation.nova.common.utils.getParcelableCompat
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewContainer
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewHiddenContent
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewSbutitle
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewTitle
+
 import kotlin.math.roundToInt
 
 private const val SUPER_STATE = "super_state"

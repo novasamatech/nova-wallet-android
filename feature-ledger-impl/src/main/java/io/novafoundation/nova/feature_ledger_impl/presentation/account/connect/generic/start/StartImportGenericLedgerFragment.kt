@@ -12,13 +12,6 @@ import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
-import kotlinx.android.synthetic.main.fragment_generic_import_ledger_start.startImportGenericLedgerContinue
-import kotlinx.android.synthetic.main.fragment_generic_import_ledger_start.startImportGenericLedgerGuideLink
-import kotlinx.android.synthetic.main.fragment_generic_import_ledger_start.startImportGenericLedgerStep1
-import kotlinx.android.synthetic.main.fragment_generic_import_ledger_start.startImportGenericLedgerStep2
-import kotlinx.android.synthetic.main.fragment_generic_import_ledger_start.startImportGenericLedgerStep3
-import kotlinx.android.synthetic.main.fragment_generic_import_ledger_start.startImportGenericLedgerStep4
-import kotlinx.android.synthetic.main.fragment_generic_import_ledger_start.startImportGenericLedgerToolbar
 
 class StartImportGenericLedgerFragment : BaseFragment<StartImportGenericLedgerViewModel>() {
 

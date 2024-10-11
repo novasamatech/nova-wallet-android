@@ -12,11 +12,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_versions_impl.R
 import io.novafoundation.nova.feature_versions_impl.presentation.update.models.UpdateNotificationModel
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationDate
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationDescription
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationLatest
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationSeverity
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationVersion
 
 class UpdateNotificationsAdapter : ListAdapter<UpdateNotificationModel, UpdateNotificationHolder>(
     UpdateNotificationsDiffCallback

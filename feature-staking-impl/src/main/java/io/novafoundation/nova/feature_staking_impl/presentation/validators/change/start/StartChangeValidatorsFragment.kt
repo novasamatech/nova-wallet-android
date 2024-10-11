@@ -12,10 +12,6 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsContainer
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsCustom
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsRecommended
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsToolbar
 
 class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewModel>() {
 

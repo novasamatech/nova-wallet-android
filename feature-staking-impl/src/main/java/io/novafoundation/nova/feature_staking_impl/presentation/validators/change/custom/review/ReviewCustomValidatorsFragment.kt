@@ -18,10 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.Stake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.VIEW
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsAccounts
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsList
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsNext
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsToolbar
 
 class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 

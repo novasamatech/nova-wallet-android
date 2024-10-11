@@ -22,10 +22,6 @@ import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkManagementListAdapter
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks.adapter.AddCustomNetworkAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_pre_configured_network_list.preConfiguredNetworkList
-import kotlinx.android.synthetic.main.fragment_pre_configured_network_list.preConfiguredNetworkProgress
-import kotlinx.android.synthetic.main.fragment_pre_configured_network_list.preConfiguredNetworksSearch
-import kotlinx.android.synthetic.main.fragment_pre_configured_network_list.preConfiguredNetworksToolbar
 
 class PreConfiguredNetworksFragment :
     BaseFragment<PreConfiguredNetworksViewModel>(),

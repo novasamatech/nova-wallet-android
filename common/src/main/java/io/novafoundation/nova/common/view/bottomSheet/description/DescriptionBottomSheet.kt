@@ -5,8 +5,6 @@ import android.os.Bundle
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import kotlinx.android.synthetic.main.bottom_sheet_description.sheetDescriptionDetails
-import kotlinx.android.synthetic.main.bottom_sheet_description.sheetDescriptionTitle
 
 class DescriptionBottomSheet(
     context: Context,

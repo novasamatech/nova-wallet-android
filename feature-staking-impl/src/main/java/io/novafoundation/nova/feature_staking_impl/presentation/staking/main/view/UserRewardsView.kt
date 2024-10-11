@@ -13,19 +13,6 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState.ClaimableRewards
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsBanner
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsContentGroup
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmount
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmountShimmer
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingAmount
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingClaim
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingContainer
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingFiat
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingGroup
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsShimmerGroup
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsStakingPeriod
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsTokenAmount
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsTokenAmountShimmer
 
 class UserRewardsView @JvmOverloads constructor(
     context: Context,

@@ -10,9 +10,6 @@ import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.ChipLabelView
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountChipHolder
 import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.item_cloud_backup_account_diff.view.itemCloudBackupAccountDiffIcon
-import kotlinx.android.synthetic.main.item_cloud_backup_account_diff.view.itemCloudBackupAccountDiffName
-import kotlinx.android.synthetic.main.item_cloud_backup_account_diff.view.itemCloudBackupAccountDiffState
 
 class CloudBackupDiffAdapter : GroupedListAdapter<CloudBackupDiffGroupRVItem, AccountDiffRVItem>(BackupAccountDiffCallback()) {
 

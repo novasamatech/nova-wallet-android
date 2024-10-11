@@ -14,12 +14,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setImageTintRes
-import kotlinx.android.synthetic.main.item_operation_list_item.view.itemOperationHeader
-import kotlinx.android.synthetic.main.item_operation_list_item.view.itemOperationIcon
-import kotlinx.android.synthetic.main.item_operation_list_item.view.itemOperationSubHeader
-import kotlinx.android.synthetic.main.item_operation_list_item.view.itemOperationValuePrimary
-import kotlinx.android.synthetic.main.item_operation_list_item.view.itemOperationValueSecondary
-import kotlinx.android.synthetic.main.item_operation_list_item.view.itemOperationValueStatus
 
 class OperationListItem @kotlin.jvm.JvmOverloads constructor(
     context: Context,

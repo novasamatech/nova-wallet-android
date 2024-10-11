@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIconToTarget
 import io.novafoundation.nova.feature_push_notifications.R
-import kotlinx.android.synthetic.main.item_push_staking_settings.view.pushStakingItem
 
 class PushStakingSettingsAdapter(
     private val imageLoader: ImageLoader,

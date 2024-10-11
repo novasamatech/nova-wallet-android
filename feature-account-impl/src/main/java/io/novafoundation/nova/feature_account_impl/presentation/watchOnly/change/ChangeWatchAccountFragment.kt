@@ -13,10 +13,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddA
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_change_watch_wallet.changeWatchAccountChainAddress
-import kotlinx.android.synthetic.main.fragment_change_watch_wallet.changeWatchAccountChainAddressHint
-import kotlinx.android.synthetic.main.fragment_change_watch_wallet.changeWatchAccountContinue
-import kotlinx.android.synthetic.main.fragment_change_watch_wallet.changeWatchAccountToolbar
 
 class ChangeWatchAccountFragment : BaseFragment<ChangeWatchAccountViewModel>() {
 

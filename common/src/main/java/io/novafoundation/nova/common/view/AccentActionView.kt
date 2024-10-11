@@ -8,8 +8,6 @@ import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
-import kotlinx.android.synthetic.main.view_accent_action.view.accentActionIcon
-import kotlinx.android.synthetic.main.view_accent_action.view.accentActionText
 
 class AccentActionView @JvmOverloads constructor(
     context: Context,

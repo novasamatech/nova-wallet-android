@@ -17,14 +17,6 @@ import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
-import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionArrow
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionIcon
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionSubtitle
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionTitle
-import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
-import kotlinx.android.synthetic.main.item_sheet_switcher.view.itemSheetSwitcher
 
 typealias ViewGetter<V> = FixedListBottomSheet.() -> V
 

@@ -8,8 +8,6 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_dapp_impl.R
-import kotlinx.android.synthetic.main.view_address_bar.view.addressBarIcon
-import kotlinx.android.synthetic.main.view_address_bar.view.addressBarUrl
 
 class AddressBarView @JvmOverloads constructor(
     context: Context,

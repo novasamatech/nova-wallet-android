@@ -16,10 +16,6 @@ import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.CloudBackupDiffBottomSheet
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsManualBtn
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsSwitcher
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsToolbar
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupStateView
 
 class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel>() {
 

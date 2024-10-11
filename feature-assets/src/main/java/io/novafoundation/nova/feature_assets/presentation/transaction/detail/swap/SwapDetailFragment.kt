@@ -17,16 +17,6 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showLoadingAmount
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailAccount
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailAmount
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailAssets
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailFee
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailHash
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailRate
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailStatus
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailToolbar
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailWallet
-import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailsRepeatOperation
 
 private const val KEY_PAYLOAD = "SwapDetailFragment.Payload"
 

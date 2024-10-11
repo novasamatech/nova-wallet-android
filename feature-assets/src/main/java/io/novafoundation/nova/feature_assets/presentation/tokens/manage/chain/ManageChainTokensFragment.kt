@@ -12,10 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenI
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenChains
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenIcon
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenSubtitle
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenSymbol
+
 import javax.inject.Inject
 
 class ManageChainTokensFragment :

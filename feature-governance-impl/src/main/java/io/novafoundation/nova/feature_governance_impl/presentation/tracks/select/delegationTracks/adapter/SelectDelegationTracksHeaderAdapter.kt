@@ -7,10 +7,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksDescriptionGroup
-import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksUnavailableTracks
-import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksUnavailableTracksText
-import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.selectDelegationTracksTitle
 
 class SelectTracksHeaderAdapter(
     private val handler: Handler

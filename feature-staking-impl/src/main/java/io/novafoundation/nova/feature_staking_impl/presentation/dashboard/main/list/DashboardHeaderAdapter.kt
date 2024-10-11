@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_dashboard_header.view.stakingDashboardHeaderAvatar
 
 class DashboardHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<DashboardHeaderHolder>() {
 

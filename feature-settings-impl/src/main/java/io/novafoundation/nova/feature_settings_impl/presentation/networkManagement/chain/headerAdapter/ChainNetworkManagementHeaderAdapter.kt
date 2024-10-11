@@ -9,10 +9,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementAutoBalance
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementEnable
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementIcon
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementTitle
 
 class ChainNetworkManagementHeaderAdapter(
     private val imageLoader: ImageLoader,

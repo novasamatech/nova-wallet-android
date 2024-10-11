@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.doIfPositionValid
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_editable_staking_type.view.editableStakingType
 
 class SetupStakingTypeAdapter(
     private val handler: ItemAssetHandler

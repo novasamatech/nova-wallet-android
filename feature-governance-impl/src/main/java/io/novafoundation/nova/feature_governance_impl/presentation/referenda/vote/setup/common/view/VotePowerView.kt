@@ -9,8 +9,6 @@ import androidx.core.view.setPadding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_vote_power.view.votePowerSelector
-import kotlinx.android.synthetic.main.view_vote_power.view.votePowerVotes
 
 class VotePowerView @JvmOverloads constructor(
     context: Context,

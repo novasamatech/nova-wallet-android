@@ -17,13 +17,6 @@ import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkConnectionRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodeRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodesAddCustomRvItem
-import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeConnectionState
-import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeConnectionStatusShimmering
-import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeEditButton
-import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeManageButton
-import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeName
-import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeRadioButton
-import kotlinx.android.synthetic.main.item_chan_network_management_node.view.chainNodeSocketAddress
 
 class ChainNetworkManagementNodesAdapter(
     private val itemHandler: ItemHandler

@@ -13,9 +13,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
-import kotlinx.android.synthetic.main.button_large.view.buttonLargeIcon
-import kotlinx.android.synthetic.main.button_large.view.buttonLargeSubtitle
-import kotlinx.android.synthetic.main.button_large.view.buttonLargeTitle
 
 class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     context: Context,

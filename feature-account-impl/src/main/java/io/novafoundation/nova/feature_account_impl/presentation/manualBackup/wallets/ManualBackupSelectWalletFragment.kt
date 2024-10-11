@@ -16,8 +16,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_manual_backup_select_wallet.manualBackupWalletsList
-import kotlinx.android.synthetic.main.fragment_manual_backup_select_wallet.manualBackupWalletsToolbar
 
 class ManualBackupSelectWalletFragment : BaseFragment<ManualBackupSelectWalletViewModel>(), AccountHolder.AccountItemHandler {
 

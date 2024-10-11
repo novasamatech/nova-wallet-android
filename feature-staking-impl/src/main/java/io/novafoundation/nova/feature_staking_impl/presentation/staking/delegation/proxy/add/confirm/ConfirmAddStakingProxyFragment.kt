@@ -18,14 +18,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyButton
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyDelegationAccount
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyDeposit
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyNetwork
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyNetworkFee
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyProxiedAccount
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyToolbar
-import kotlinx.android.synthetic.main.fragment_confirm_add_staking_proxy.confirmAddStakingProxyWallet
 
 class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewModel>() {
     companion object {

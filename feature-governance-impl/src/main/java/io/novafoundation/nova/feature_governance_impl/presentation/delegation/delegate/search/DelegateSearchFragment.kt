@@ -20,12 +20,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter.DelegateListAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_delegate_search.delegateSearchField
-import kotlinx.android.synthetic.main.fragment_delegate_search.delegateSearchList
-import kotlinx.android.synthetic.main.fragment_delegate_search.delegateSearchNavigation
-import kotlinx.android.synthetic.main.fragment_delegate_search.delegateSearchPlaceholder
-import kotlinx.android.synthetic.main.fragment_delegate_search.delegateSearchProgressBar
-import kotlinx.android.synthetic.main.fragment_delegate_search.delegateSearchToolbar
 
 class DelegateSearchFragment :
     BaseFragment<DelegateSearchViewModel>(),

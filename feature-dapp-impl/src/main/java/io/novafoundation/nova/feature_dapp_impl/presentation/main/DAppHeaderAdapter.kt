@@ -7,9 +7,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_dapp_impl.R
-import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainManage
-import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSearch
-import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSelectedWallet
 
 class DAppHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 

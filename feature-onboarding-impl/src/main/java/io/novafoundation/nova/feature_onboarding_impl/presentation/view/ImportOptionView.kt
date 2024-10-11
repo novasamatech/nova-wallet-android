@@ -9,9 +9,6 @@ import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_onboarding_impl.R
-import kotlinx.android.synthetic.main.view_import_option.view.importOptionDescription
-import kotlinx.android.synthetic.main.view_import_option.view.importOptionImage
-import kotlinx.android.synthetic.main.view_import_option.view.importOptionName
 
 class ImportOptionView @JvmOverloads constructor(
     context: Context,

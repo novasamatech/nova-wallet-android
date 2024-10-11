@@ -11,11 +11,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetModel
-import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsContainer
-import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsList
-import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsOversubscribedMessage
-import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsProgress
-import kotlinx.android.synthetic.main.fragment_current_validators.currentValidatorsToolbar
 
 abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> : BaseFragment<V>(), CurrentStakeTargetAdapter.Handler {
 

@@ -26,18 +26,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBack
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketButton
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketChevron
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketItems
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsBasketState
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsControlView
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsEmptyStateButton
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsEmptyStateDescription
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSettings
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStack
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsStatusBarInsetsContainer
-import kotlinx.android.synthetic.main.fragment_tinder_gov_cards.tinderGovCardsSubtitle
 
 class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGovCardsAdapter.Handler, TinderGovCardStackListener {
 

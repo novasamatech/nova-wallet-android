@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_governance_tracks_header.view.selectGovernanceTracksChain
 
 class SelectGovernanceTracksHeaderAdapter : RecyclerView.Adapter<SelectGovernanceTracksHeaderViewHolder>() {
 

@@ -13,12 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import jp.shts.android.storiesprogressview.StoriesProgressView
-import kotlinx.android.synthetic.main.fragment_story.stakingStoryLearnMore
-import kotlinx.android.synthetic.main.fragment_story.stories
-import kotlinx.android.synthetic.main.fragment_story.storyBody
-import kotlinx.android.synthetic.main.fragment_story.storyCloseIcon
-import kotlinx.android.synthetic.main.fragment_story.storyContainer
-import kotlinx.android.synthetic.main.fragment_story.storyTitle
 
 class StoryFragment : BaseFragment<StoryViewModel>(), StoriesProgressView.StoriesListener {
 

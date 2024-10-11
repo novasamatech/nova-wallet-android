@@ -19,17 +19,7 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeAmount
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeBonus
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeBonusReward
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeContainer
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeContinue
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeFee
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeLearnMore
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeLeasingPeriod
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeReward
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeToolbar
-import kotlinx.android.synthetic.main.fragment_contribute.crowdloanContributeUnlockHint
+
 import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 

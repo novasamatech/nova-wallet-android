@@ -17,13 +17,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.nameOrAddress
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModelIcon
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterAddress
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterAddressContainer
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterChevron
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterImage
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterType
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVotesCount
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVotesCountDetails
 
 class VotersAdapter(
     private val handler: Handler,

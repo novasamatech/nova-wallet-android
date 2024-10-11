@@ -6,8 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.SingleItemAdapter
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.item_integrate_networks_banner.view.integrateNetworkBannerClose
-import kotlinx.android.synthetic.main.item_integrate_networks_banner.view.integrateNetworkBannerLink
 
 class NetworksBannerAdapter(
     private val itemHandler: ItemHandler

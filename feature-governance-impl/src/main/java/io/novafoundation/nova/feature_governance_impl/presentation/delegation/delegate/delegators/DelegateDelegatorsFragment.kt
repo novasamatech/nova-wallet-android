@@ -16,10 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoterModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.list.DelegatorsAdapter
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsCount
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsList
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsProgress
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsToolbar
 
 class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), DelegatorsAdapter.Handler {
 

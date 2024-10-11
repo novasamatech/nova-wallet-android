@@ -12,8 +12,6 @@ import io.novafoundation.nova.common.view.TapToViewContainer
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.BackupMnemonicAdapter
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.MnemonicWord
-import kotlinx.android.synthetic.main.view_mnemonic_card_view.view.mnemonicCardPhrase
-import kotlinx.android.synthetic.main.view_mnemonic_card_view.view.mnemonicCardTitle
 
 class MnemonicCardView @JvmOverloads constructor(
     context: Context,

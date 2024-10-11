@@ -14,10 +14,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_nomination_pools_redeem.nominationPoolsRedeemAmount
-import kotlinx.android.synthetic.main.fragment_nomination_pools_redeem.nominationPoolsRedeemConfirm
-import kotlinx.android.synthetic.main.fragment_nomination_pools_redeem.nominationPoolsRedeemExtrinsicInformation
-import kotlinx.android.synthetic.main.fragment_nomination_pools_redeem.nominationPoolsRedeemToolbar
 
 class NominationPoolsRedeemFragment : BaseFragment<NominationPoolsRedeemViewModel>() {
 

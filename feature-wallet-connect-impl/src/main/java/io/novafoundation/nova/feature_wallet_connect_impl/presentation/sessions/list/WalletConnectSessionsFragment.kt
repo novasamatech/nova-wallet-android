@@ -13,10 +13,7 @@ import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeature
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.model.SessionListModel
-import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsConnectionsList
-import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsConnectionsPlaceholder
-import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsNewConnection
-import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsToolbar
+
 import javax.inject.Inject
 
 class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewModel>(), WalletConnectSessionsAdapter.Handler {

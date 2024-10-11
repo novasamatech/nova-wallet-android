@@ -17,14 +17,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletContainer
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletContinue
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletEvmAddress
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletName
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletPresets
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletScrollArea
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletSubstrateAddress
-import kotlinx.android.synthetic.main.fragment_create_watch_wallet.createWatchWalletToolbar
 
 class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel>() {
 

@@ -10,14 +10,6 @@ import io.novafoundation.nova.common.utils.setShimmerVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.parallaxCard.ParallaxCardView
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceBuy
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceLocked
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceLockedContainer
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceReceive
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceSend
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceShimmer
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceSwap
-import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceTotal
 
 class AssetsTotalBalanceView @JvmOverloads constructor(
     context: Context,

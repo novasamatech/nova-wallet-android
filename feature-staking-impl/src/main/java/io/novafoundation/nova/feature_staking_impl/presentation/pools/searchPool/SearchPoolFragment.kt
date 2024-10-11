@@ -24,11 +24,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.Poo
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.PoolRvItem
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_search_pool.searchPoolCount
-import kotlinx.android.synthetic.main.fragment_search_pool.searchPoolList
-import kotlinx.android.synthetic.main.fragment_search_pool.searchPoolListHeader
-import kotlinx.android.synthetic.main.fragment_search_pool.searchPoolPlaceholder
-import kotlinx.android.synthetic.main.fragment_search_pool.searchPoolToolbar
 
 class SearchPoolFragment : BaseFragment<SearchPoolViewModel>(), PoolAdapter.ItemHandler {
 

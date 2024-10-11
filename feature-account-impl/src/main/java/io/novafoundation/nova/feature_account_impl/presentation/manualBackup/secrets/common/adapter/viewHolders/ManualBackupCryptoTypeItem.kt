@@ -4,9 +4,6 @@ import android.view.View
 import androidx.core.view.isGone
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
-import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsCryptoType
-import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsDerivationPath
-import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsDerivationPathLabel
 
 data class ManualBackupCryptoTypeRvItem(
     val network: String,

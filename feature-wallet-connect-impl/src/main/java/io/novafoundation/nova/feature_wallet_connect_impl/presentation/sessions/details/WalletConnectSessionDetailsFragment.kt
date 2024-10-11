@@ -17,14 +17,7 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDA
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsDApp
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsDisconnect
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsIcon
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsNetworks
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsStatus
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsTitle
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsToolbar
-import kotlinx.android.synthetic.main.fragment_wc_session_details.wcSessionDetailsWallet
+
 import javax.inject.Inject
 
 class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDetailsViewModel>() {

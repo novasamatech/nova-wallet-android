@@ -11,10 +11,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_external_sign_api.R
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
-import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappDApp
-import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappIcon
-import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappTitle
-import kotlinx.android.synthetic.main.bottom_sheet_confirm_authorize.confirmAuthorizeDappWallet
+
 import kotlinx.coroutines.launch
 
 class AuthorizeDappBottomSheet(

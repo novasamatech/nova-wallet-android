@@ -12,8 +12,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourMultiVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
-import kotlinx.android.synthetic.main.view_your_vote_preview.view.itemReferendumYourVoteDetails
-import kotlinx.android.synthetic.main.view_your_vote_preview.view.itemReferendumYourVoteType
+
 import kotlin.math.max
 
 private const val MAX_SUPPORTED_VOTE_TYPES = 3

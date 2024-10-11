@@ -12,8 +12,6 @@ import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setImageResourceOrHide
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_warning_checkbox.view.warningCheckBoxCheckBox
-import kotlinx.android.synthetic.main.view_warning_checkbox.view.warningCheckBoxIcon
 
 class WarningCheckBox @JvmOverloads constructor(
     context: Context,

@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdap
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_dapp_main.dappRecyclerView
 
 class MainDAppFragment :
     BaseFragment<MainDAppViewModel>(),

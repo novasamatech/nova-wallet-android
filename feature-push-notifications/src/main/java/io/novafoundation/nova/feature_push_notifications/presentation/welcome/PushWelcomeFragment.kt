@@ -14,10 +14,6 @@ import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeCancelButton
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeEnableButton
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeTermsAndConditions
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeToolbar
 
 class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel>() {
 

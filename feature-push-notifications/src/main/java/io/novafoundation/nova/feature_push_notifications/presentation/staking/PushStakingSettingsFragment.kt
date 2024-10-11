@@ -16,9 +16,6 @@ import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFea
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.adapter.PushStakingRVItem
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.adapter.PushStakingSettingsAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingList
-import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingProgress
-import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingToolbar
 
 class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel>(), PushStakingSettingsAdapter.ItemHandler {
 

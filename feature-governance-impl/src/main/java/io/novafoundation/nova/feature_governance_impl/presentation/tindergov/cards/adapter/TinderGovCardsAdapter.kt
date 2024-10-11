@@ -11,12 +11,6 @@ import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter.Handler
-import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardAmountContainer
-import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardRequestedAmount
-import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardRequestedFiat
-import kotlinx.android.synthetic.main.item_tinder_gov_card.view.itemTinderGovCardSummary
-import kotlinx.android.synthetic.main.item_tinder_gov_card.view.tinderGovCardContainer
-import kotlinx.android.synthetic.main.item_tinder_gov_card.view.tinderGovCardReadMore
 
 class TinderGovCardsAdapter(
     private val lifecycleOwner: LifecycleOwner,

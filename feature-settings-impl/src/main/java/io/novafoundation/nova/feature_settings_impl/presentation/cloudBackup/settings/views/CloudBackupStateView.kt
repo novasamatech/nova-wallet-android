@@ -17,13 +17,6 @@ import io.novafoundation.nova.common.utils.withRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.shape.ovalDrawable
 import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.view_cloud_backup_state.view.backupStateDivider
-import kotlinx.android.synthetic.main.view_cloud_backup_state.view.backupStateImg
-import kotlinx.android.synthetic.main.view_cloud_backup_state.view.backupStateMore
-import kotlinx.android.synthetic.main.view_cloud_backup_state.view.backupStateProblemBtn
-import kotlinx.android.synthetic.main.view_cloud_backup_state.view.backupStateProgress
-import kotlinx.android.synthetic.main.view_cloud_backup_state.view.backupStateSubtitle
-import kotlinx.android.synthetic.main.view_cloud_backup_state.view.backupStateTitle
 
 class CloudBackupStateView @JvmOverloads constructor(
     context: Context,

@@ -12,8 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
-import kotlinx.android.synthetic.main.fragment_confirm_nominations.confirmNominationsList
-import kotlinx.android.synthetic.main.fragment_confirm_nominations.confirmNominationsToolbar
 
 class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
 

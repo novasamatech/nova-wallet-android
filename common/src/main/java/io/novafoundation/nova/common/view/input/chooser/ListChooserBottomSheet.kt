@@ -12,8 +12,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin.Model
-import kotlinx.android.synthetic.main.item_list_chooser.view.itemListChooserCheck
-import kotlinx.android.synthetic.main.item_list_chooser.view.itemListChooserLabel
 
 class ListChooserBottomSheet<T>(
     context: Context,

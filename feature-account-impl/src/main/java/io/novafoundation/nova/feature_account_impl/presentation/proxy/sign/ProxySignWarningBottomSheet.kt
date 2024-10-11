@@ -5,10 +5,6 @@ import android.os.Bundle
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningCancel
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningContinue
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningDontShowAgain
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningMessage
 
 class ProxySignWarningBottomSheet(
     context: Context,

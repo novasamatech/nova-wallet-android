@@ -24,15 +24,8 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.model.ExtrinsicContentModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.model.ExtrinsicContentModel.BlockEntry
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicContentContainer
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmount
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailIcon
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailNetwork
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailSender
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailStatus
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailToolbar
+
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmountFiat
 
 private const val KEY_EXTRINSIC = "KEY_EXTRINSIC"
 

@@ -16,15 +16,6 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletCloudBackupButton
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletConfirmName
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletExplanation
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletManualBackupButton
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInput
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletNameInputLayout
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletSyncWithCloudEnabled
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletTitle
-import kotlinx.android.synthetic.main.fragment_start_create_wallet.startCreateWalletToolbar
 
 class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
 

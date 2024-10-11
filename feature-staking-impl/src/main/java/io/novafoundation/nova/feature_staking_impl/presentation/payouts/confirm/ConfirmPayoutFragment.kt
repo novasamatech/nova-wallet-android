@@ -16,11 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_confirm_payout.confirmPayoutAmount
-import kotlinx.android.synthetic.main.fragment_confirm_payout.confirmPayoutConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_payout.confirmPayoutContainer
-import kotlinx.android.synthetic.main.fragment_confirm_payout.confirmPayoutExtrinsicInformation
-import kotlinx.android.synthetic.main.fragment_confirm_payout.confirmPayoutToolbar
 
 class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel>() {
 

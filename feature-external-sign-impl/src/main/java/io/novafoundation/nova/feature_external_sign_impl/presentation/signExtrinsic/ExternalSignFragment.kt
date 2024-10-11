@@ -27,16 +27,7 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDA
 import io.novafoundation.nova.feature_external_sign_impl.R
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionAllow
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionReject
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicAccount
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicDappUrl
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicDetails
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicFee
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicIcon
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicNetwork
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicToolbar
-import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicWallet
+
 import javax.inject.Inject
 
 private const val PAYLOAD_KEY = "DAppSignExtrinsicFragment.Payload"

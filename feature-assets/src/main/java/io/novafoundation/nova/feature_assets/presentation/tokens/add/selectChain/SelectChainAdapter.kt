@@ -11,8 +11,6 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.synthetic.main.item_select_chain.view.itemSelectChainIcon
-import kotlinx.android.synthetic.main.item_select_chain.view.itemSelectChainName
 
 class SelectChainAdapter(
     private val imageLoader: ImageLoader,

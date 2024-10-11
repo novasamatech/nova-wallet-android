@@ -14,11 +14,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
-import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationContainer
-import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationExtrinsicInformation
-import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationRewardDestination
-import kotlinx.android.synthetic.main.fragment_confirm_reward_destination.confirmRewardDestinationToolbar
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 

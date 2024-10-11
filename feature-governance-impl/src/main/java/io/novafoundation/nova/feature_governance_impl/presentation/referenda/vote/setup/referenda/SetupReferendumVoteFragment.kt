@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVoteFragment
-import kotlinx.android.synthetic.main.layout_setup_vote_control_aye_nay_abstain.setupReferendumVoteControlView
 
 class SetupReferendumVoteFragment : SetupVoteFragment<SetupReferendumVoteViewModel>() {
 

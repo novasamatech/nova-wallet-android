@@ -7,11 +7,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import io.novafoundation.nova.feature_account_api.view.AccountView
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserLearnMore
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayout
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayoutTarget
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayoutTitle
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserRestake
 
 class RewardDestinationChooserView @JvmOverloads constructor(
     context: Context,

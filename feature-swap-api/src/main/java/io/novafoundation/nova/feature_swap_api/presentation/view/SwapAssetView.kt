@@ -17,11 +17,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_swap_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetAmount
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetFiat
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetImage
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetNetwork
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetNetworkImage
 
 class SwapAssetView @JvmOverloads constructor(
     context: Context,

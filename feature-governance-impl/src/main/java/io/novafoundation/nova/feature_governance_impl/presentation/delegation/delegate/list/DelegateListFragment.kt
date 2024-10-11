@@ -17,8 +17,7 @@ import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter.DelegateListAdapter
-import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListList
-import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListToolbar
+
 import javax.inject.Inject
 
 class DelegateListFragment :

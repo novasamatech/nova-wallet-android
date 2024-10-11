@@ -13,14 +13,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerContinue
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerDepractionWarning
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerGuideLink
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerStep1
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerStep2
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerStep3
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerStep4
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerToolbar
 
 class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel>() {
 

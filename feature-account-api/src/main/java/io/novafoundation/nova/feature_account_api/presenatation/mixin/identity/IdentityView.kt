@@ -7,11 +7,6 @@ import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.view_identity.view.viewIdentityElementName
-import kotlinx.android.synthetic.main.view_identity.view.viewIdentityEmail
-import kotlinx.android.synthetic.main.view_identity.view.viewIdentityLegalName
-import kotlinx.android.synthetic.main.view_identity.view.viewIdentityTwitter
-import kotlinx.android.synthetic.main.view_identity.view.viewIdentityWeb
 
 class IdentityView @JvmOverloads constructor(
     context: Context,

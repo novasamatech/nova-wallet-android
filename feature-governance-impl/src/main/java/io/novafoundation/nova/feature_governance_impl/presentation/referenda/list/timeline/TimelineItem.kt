@@ -8,8 +8,6 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
-import kotlinx.android.synthetic.main.item_timeline_default_item.view.itemTimelineSubtitle
-import kotlinx.android.synthetic.main.item_timeline_default_item.view.itemTimelineTitle
 
 class TimelineItem @JvmOverloads constructor(
     context: Context,

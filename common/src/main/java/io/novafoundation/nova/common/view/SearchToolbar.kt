@@ -6,8 +6,6 @@ import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_search_toolbar.view.searchToolbarCancel
-import kotlinx.android.synthetic.main.view_search_toolbar.view.searchToolbarSearch
 
 class SearchToolbar @JvmOverloads constructor(
     context: Context,

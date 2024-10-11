@@ -22,15 +22,6 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostCollator
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostConfirm
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostContainer
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostFrequency
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostMode
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostTerms
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostThreshold
-import kotlinx.android.synthetic.main.fragment_yield_boost_confirm.confirmYieldBoostToolbar
 
 class YieldBoostConfirmFragment : BaseFragment<YieldBoostConfirmViewModel>() {
 

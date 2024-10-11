@@ -22,12 +22,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.SelectionStyle
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.bindSelectedCollator
-import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCheck
-import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCollator
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetName
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
     context: Context,

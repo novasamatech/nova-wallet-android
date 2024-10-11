@@ -8,10 +8,6 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.MnemonicImportSource
-import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemnonicUsernameHint
-import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicContent
-import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicContentContainer
-import kotlinx.android.synthetic.main.import_source_mnemonic.view.importMnemonicUsernameInput
 
 class MnemonicImportView @JvmOverloads constructor(
     context: Context,

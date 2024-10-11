@@ -14,11 +14,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
-import kotlinx.android.synthetic.main.fragment_my_contributions.myContributionsContainer
-import kotlinx.android.synthetic.main.fragment_my_contributions.myContributionsList
-import kotlinx.android.synthetic.main.fragment_my_contributions.myContributionsPlaceholder
-import kotlinx.android.synthetic.main.fragment_my_contributions.myContributionsProgress
-import kotlinx.android.synthetic.main.fragment_my_contributions.myContributionsToolbar
+
 import javax.inject.Inject
 
 class UserContributionsFragment : BaseFragment<UserContributionsViewModel>() {

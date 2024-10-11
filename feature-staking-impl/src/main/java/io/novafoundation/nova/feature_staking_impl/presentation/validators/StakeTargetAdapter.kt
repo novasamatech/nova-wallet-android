@@ -15,15 +15,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetCheck
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetActionIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetName
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringPrimary
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringSecondary
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class StakeTargetAdapter<V>(
     private val itemHandler: ItemHandler<V>,

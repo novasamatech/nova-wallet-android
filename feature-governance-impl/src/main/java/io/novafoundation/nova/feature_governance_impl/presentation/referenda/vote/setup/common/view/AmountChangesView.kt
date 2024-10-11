@@ -16,12 +16,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.AmountChangeModel
-import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesDifference
-import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesFrom
-import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesFromGroup
-import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesIcon
-import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesTitle
-import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesTo
 
 class AmountChangesView @JvmOverloads constructor(
     context: Context,

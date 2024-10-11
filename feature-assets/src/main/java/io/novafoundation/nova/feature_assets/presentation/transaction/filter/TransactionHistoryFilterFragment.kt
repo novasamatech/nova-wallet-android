@@ -15,12 +15,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionFilterApplyBtn
-import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterOtherTransactions
-import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterRewards
-import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterSwaps
-import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterSwitchTransfers
-import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterToolbar
 
 class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterViewModel>() {
 

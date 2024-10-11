@@ -15,14 +15,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.setTextOrHide
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
-import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksDelegations
-import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksHeader
-import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksLocked
-import kotlinx.android.synthetic.main.item_referenda_header.view.referendaAssetHeader
-import kotlinx.android.synthetic.main.item_referenda_header.view.referendaHeaderFilter
-import kotlinx.android.synthetic.main.item_referenda_header.view.referendaHeaderSearch
-import kotlinx.android.synthetic.main.item_referenda_header.view.referendaTinderGovChip
-import kotlinx.android.synthetic.main.item_referenda_header.view.referendaTindergovBanner
 
 class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 

@@ -13,10 +13,6 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import kotlinx.android.synthetic.main.fragment_governance_locks_overview.governanceLockedTokens
-import kotlinx.android.synthetic.main.fragment_governance_locks_overview.governanceLockedTokensToolbar
-import kotlinx.android.synthetic.main.fragment_governance_locks_overview.governanceTokensProgress
-import kotlinx.android.synthetic.main.fragment_governance_locks_overview.governanceUnlockTokensButton
 
 class GovernanceLocksOverviewFragment : BaseFragment<GovernanceLocksOverviewViewModel>() {
 

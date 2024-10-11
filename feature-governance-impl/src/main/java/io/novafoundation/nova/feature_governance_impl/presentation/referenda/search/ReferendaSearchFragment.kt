@@ -19,8 +19,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.BaseReferendaListFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
-import kotlinx.android.synthetic.main.fragment_referenda_search.searchReferendaToolbar
-import kotlinx.android.synthetic.main.fragment_referenda_search.searchedReferendaList
 
 class ReferendaSearchFragment : BaseReferendaListFragment<ReferendaSearchViewModel>() {
 
