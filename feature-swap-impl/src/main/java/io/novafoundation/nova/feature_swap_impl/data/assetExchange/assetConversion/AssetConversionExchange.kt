@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -55,7 +56,7 @@ class AssetConversionExchangeFactory(
 
     override suspend fun create(
         chain: Chain,
-        parentQuoter: AssetExchange.ParentQuoter,
+        parentQuoter: AssetExchange.SwapHost,
         coroutineScope: CoroutineScope
     ): AssetExchange {
         val converter = multiLocationConverterFactory.defaultAsync(chain, coroutineScope)
@@ -99,6 +100,10 @@ private class AssetConversionExchange(
 
             constructAllAvailableDirections(allPools)
         }
+    }
+
+    override fun feePaymentOverrides(): List<FeePaymentProviderOverride> {
+        return emptyList()
     }
 
     override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
@@ -198,7 +203,7 @@ private class AssetConversionExchange(
     ) : AtomicSwapOperation {
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            return extrinsicService.estimateFee(
+            val submissionFee = extrinsicService.estimateFee(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
@@ -207,6 +212,8 @@ private class AssetConversionExchange(
             ) {
                 executeSwap(sendTo = chain.emptyAccountId())
             }
+
+            return AtomicSwapOperationFee(submissionFee)
         }
 
         override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {

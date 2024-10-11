@@ -5,20 +5,33 @@ import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.paidByOriginOrNull
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableOutDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.IncomingDirection
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.OutcomingDirection
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.assets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -28,6 +41,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 private const val INCOMING_DIRECTIONS = "RealCrossChainTransfersUseCase.INCOMING_DIRECTIONS"
+private const val CONFIGURATION_CACHE = "RealCrossChainTransfersUseCase.CONFIGURATION"
 
 internal class RealCrossChainTransfersUseCase(
     private val crossChainTransfersRepository: CrossChainTransfersRepository,
@@ -35,6 +49,9 @@ internal class RealCrossChainTransfersUseCase(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val computationalCache: ComputationalCache,
+    private val crossChainWeigher: CrossChainWeigher,
+    private val crossChainTransactor: CrossChainTransactor,
+    private val parachainInfoRepository: ParachainInfoRepository,
 ) : CrossChainTransfersUseCase {
 
     override suspend fun syncCrossChainConfig() {
@@ -46,7 +63,7 @@ internal class RealCrossChainTransfersUseCase(
             computationalCache.useSharedFlow(INCOMING_DIRECTIONS, scope) {
                 scope.launch { crossChainTransfersRepository.syncConfiguration() }
 
-                combineToPair(destination, crossChainTransfersRepository.configurationFlow()).flatMapLatest { (destinationAsset, crossChainConfig) ->
+                combineToPair(destination, cachedConfigurationFlow(scope)).flatMapLatest { (destinationAsset, crossChainConfig) ->
                     if (destinationAsset == null) return@flatMapLatest flowOf(emptyList())
 
                     val selectedMetaAccountId = accountRepository.getSelectedMetaAccount().id
@@ -85,5 +102,41 @@ internal class RealCrossChainTransfersUseCase(
     override suspend fun allDirections(): List<Edge<FullChainAssetId>> {
         val config = crossChainTransfersRepository.getConfiguration()
         return config.availableInDestinations()
+    }
+
+    override suspend fun ExtrinsicService.estimateFee(
+        transfer: AssetTransferBase,
+        computationalScope: CoroutineScope
+    ): CrossChainTransferFee {
+        val configuration = cachedConfigurationFlow(computationalScope).first()
+        val transferConfiguration = configuration.transferConfiguration(
+            originChain = transfer.originChain,
+            originAsset = transfer.originChainAsset,
+            destinationChain = transfer.destinationChain,
+            destinationParaId = parachainInfoRepository.paraId(transfer.destinationChain.id)
+        )!!
+
+        val originFee = with(crossChainTransactor) {
+            estimateOriginFee(transferConfiguration, transfer)
+        }
+
+        val crossChainFee = crossChainWeigher.estimateFee(transfer.amountPlanks, transferConfiguration)
+
+        return CrossChainTransferFee(
+            fromOriginInFeeCurrency = originFee,
+            fromOriginInNativeCurrency = crossChainFee.paidByOriginOrNull()?.let {
+                SubstrateFee(it, originFee.submissionOrigin, transfer.originChain.commissionAsset)
+            },
+            fromHoldingRegister = SubstrateFeeBase(
+                amount = crossChainFee.paidFromHoldingRegister,
+                asset = transfer.originChainAsset,
+            ),
+        )
+    }
+
+    private fun cachedConfigurationFlow(computationScope: CoroutineScope): Flow<CrossChainTransfersConfiguration> {
+        return computationalCache.useSharedFlow(CONFIGURATION_CACHE, computationScope) {
+            crossChainTransfersRepository.configurationFlow()
+        }
     }
 }

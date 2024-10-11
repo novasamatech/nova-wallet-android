@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
@@ -19,6 +20,10 @@ class CompoundAssetExchange(
 
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
        return delegates.flatMap { it.availableDirectSwapConnections() }
+    }
+
+    override fun feePaymentOverrides(): List<FeePaymentProviderOverride> {
+        return delegates.flatMap { it.feePaymentOverrides() }
     }
 
     override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {

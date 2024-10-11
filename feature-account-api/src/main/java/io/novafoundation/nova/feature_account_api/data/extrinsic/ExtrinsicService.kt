@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
@@ -63,7 +62,7 @@ interface ExtrinsicService {
         /**
          * Specify to use it instead of default [FeePaymentProviderRegistry] to perform fee computations
          */
-        val customFeePaymentProvider: FeePaymentProvider? = null,
+        val customFeePaymentRegistry: FeePaymentProviderRegistry? = null,
     )
 
     suspend fun submitExtrinsic(

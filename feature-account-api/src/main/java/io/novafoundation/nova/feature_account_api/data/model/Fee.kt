@@ -6,16 +6,26 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-interface Fee {
+// TODO rename FeeBase -> Fee and use SubmissionFee everywhere Fee is currently used
+typealias Fee = SubmissionFee
+
+interface SubmissionFee : FeeBase {
 
     companion object
-
-    val amount: BigInteger
 
     /**
      * Information about origin that is supposed to send the transaction fee was calculated against
      */
     val submissionOrigin: SubmissionOrigin
+}
+
+/**
+ * Fee that doesn't have a particular origin
+ * For example, fees paid during cross chain transfers do not have a specific account that pays them
+ */
+interface FeeBase {
+
+    val amount: BigInteger
 
     val asset: Chain.Asset
 }
@@ -34,6 +44,11 @@ class SubstrateFee(
     override val submissionOrigin: SubmissionOrigin,
     override val asset: Chain.Asset
 ) : Fee
+
+class SubstrateFeeBase(
+    override val amount: BigInteger,
+    override val asset: Chain.Asset
+): FeeBase
 
 val Fee.requestedAccountPaysFees: Boolean
     get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)

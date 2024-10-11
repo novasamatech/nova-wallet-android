@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 
 class RealExtrinsicServiceFactory(
@@ -36,15 +34,6 @@ class RealExtrinsicServiceFactory(
     }
 
     private fun getRegistry(config: ExtrinsicService.FeePaymentConfig): FeePaymentProviderRegistry {
-        return config.customFeePaymentProvider?.let(::FixedFeePaymentProviderRegistry) ?: feePaymentProviderRegistry
-    }
-
-    private class FixedFeePaymentProviderRegistry(
-        private val provider: FeePaymentProvider
-    ) : FeePaymentProviderRegistry {
-
-        override suspend fun providerFor(chain: Chain): FeePaymentProvider {
-            return provider
-        }
+        return config.customFeePaymentRegistry ?: feePaymentProviderRegistry
     }
 }

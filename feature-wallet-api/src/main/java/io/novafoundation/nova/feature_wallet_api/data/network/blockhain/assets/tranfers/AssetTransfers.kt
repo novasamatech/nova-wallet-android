@@ -1,28 +1,74 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
-import kotlinx.coroutines.CoroutineScope
 
-interface AssetTransfer {
-    val sender: MetaAccount
+interface AssetTransferBase {
+
     val recipient: String
+
     val originChain: Chain
+
     val originChainAsset: Chain.Asset
+
     val destinationChain: Chain
+
     val destinationChainAsset: Chain.Asset
+
+    val feePaymentCurrency: FeePaymentCurrency
+
+    val amountPlanks: Balance
+}
+
+// TODO this is too specialized for this module
+interface AssetTransfer : AssetTransferBase {
+
+    val sender: MetaAccount
+
     val commissionAssetToken: Token
+
     val amount: BigDecimal
+
+    override val amountPlanks: Balance
+        get() = originChainAsset.planksFromAmount(amount)
+
+    override val feePaymentCurrency: FeePaymentCurrency
+        get() = commissionAssetToken.configuration.toFeePaymentCurrency()
+}
+
+fun AssetTransferBase(
+    recipient: String,
+    originChain: Chain,
+    originChainAsset: Chain.Asset,
+    destinationChain: Chain,
+    destinationChainAsset: Chain.Asset,
+    feePaymentCurrency: FeePaymentCurrency,
+    amountPlanks: Balance
+): AssetTransferBase {
+    return object : AssetTransferBase {
+        override val recipient: String = recipient
+        override val originChain: Chain = originChain
+        override val originChainAsset: Chain.Asset = originChainAsset
+        override val destinationChain: Chain = destinationChain
+        override val destinationChainAsset: Chain.Asset = destinationChainAsset
+        override val feePaymentCurrency: FeePaymentCurrency = feePaymentCurrency
+        override val amountPlanks: Balance = amountPlanks
+    }
 }
 
 class BaseAssetTransfer(

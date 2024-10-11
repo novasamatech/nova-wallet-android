@@ -22,10 +22,10 @@ import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
@@ -88,6 +88,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -285,14 +286,12 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideCrossChainTransactor(
         weigher: CrossChainWeigher,
-        extrinsicService: ExtrinsicService,
         assetSourceRegistry: AssetSourceRegistry,
         phishingValidationFactory: PhishingValidationFactory,
         palletXcmRepository: PalletXcmRepository,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
     ): CrossChainTransactor = RealCrossChainTransactor(
         weigher = weigher,
-        extrinsicService = extrinsicService,
         assetSourceRegistry = assetSourceRegistry,
         phishingValidationFactory = phishingValidationFactory,
         palletXcmRepository = palletXcmRepository,
@@ -365,13 +364,19 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
         computationalCache: ComputationalCache,
+        crossChainWeigher: CrossChainWeigher,
+        crossChainTransactor: CrossChainTransactor,
+        parachainInfoRepository: ParachainInfoRepository,
     ): CrossChainTransfersUseCase {
         return RealCrossChainTransfersUseCase(
             crossChainTransfersRepository = crossChainTransfersRepository,
             walletRepository = walletRepository,
             chainRegistry = chainRegistry,
             accountRepository = accountRepository,
-            computationalCache = computationalCache
+            computationalCache = computationalCache,
+            crossChainWeigher = crossChainWeigher,
+            crossChainTransactor = crossChainTransactor,
+            parachainInfoRepository = parachainInfoRepository
         )
     }
 

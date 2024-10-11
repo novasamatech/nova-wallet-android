@@ -20,7 +20,10 @@ import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.requireInnerNotNull
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -46,6 +49,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegment
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.compound.CompoundAssetExchange
@@ -77,6 +81,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
 private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
+private const val EXTRINSIC_SERVICE_CACHE = "RealSwapService.ExtrinsicService"
 private const val QUOTER_CACHE = "RealSwapService.QUOTER"
 
 
@@ -88,6 +93,8 @@ internal class RealSwapService(
     private val chainRegistry: ChainRegistry,
     private val quoterFactory: PathQuoter.Factory,
     private val customFeeCapabilityFacade: CustomFeeCapabilityFacade,
+    private val extrinsicServiceFactory: ExtrinsicService.Factory,
+    private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : SwapService {
 
@@ -170,8 +177,8 @@ internal class RealSwapService(
                 swapLimit = SwapLimit(direction, quotedEdge.quotedAmount, perSegmentSlippage, quotedEdge.quote),
                 feePaymentCurrency = segmentExecuteArgs.quotedSwapEdge.edge.identifySegmentCurrency(
                     isFirstSegment = index == 0,
-                    firstSegmentFees = firstSegmentFees
-                )
+                    firstSegmentFees = firstSegmentFees,
+                ),
             )
 
             // Initial case - begin first operation
@@ -236,7 +243,7 @@ internal class RealSwapService(
         return SlippageConfig.default()
     }
 
-    override fun runSubscriptions( metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
+    override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return withFlowScope { scope ->
             val exchangeRegistry = exchangeRegistry(scope)
 
@@ -308,11 +315,29 @@ internal class RealSwapService(
         }
     }
 
+    private suspend fun extrinsicService(computationScope: CoroutineScope): ExtrinsicService {
+        return computationalCache.useCache(EXTRINSIC_SERVICE_CACHE, computationScope) {
+            createExtrinsicService(this)
+        }
+    }
+
     private suspend fun createExchangeRegistry(coroutineScope: CoroutineScope): ExchangeRegistry {
         return ExchangeRegistry(
             singleChainExchanges = createIndividualChainExchanges(coroutineScope),
             multiChainExchanges = listOf(
-                crossChainTransferFactory.create(InnerParentQuoter(coroutineScope), coroutineScope)
+                crossChainTransferFactory.create(InnerSwapHost(coroutineScope), coroutineScope)
+            )
+        )
+    }
+
+    private suspend fun createExtrinsicService(coroutineScope: CoroutineScope): ExtrinsicService {
+        val exchangeRegistry = exchangeRegistry(coroutineScope)
+        val feePaymentRegistry = exchangeRegistry.getFeePaymentRegistry()
+
+        return extrinsicServiceFactory.create(
+            ExtrinsicService.FeePaymentConfig(
+                coroutineScope = coroutineScope,
+                customFeePaymentRegistry = feePaymentRegistry
             )
         )
     }
@@ -331,7 +356,7 @@ internal class RealSwapService(
             else -> null
         }
 
-        return factory?.create(chain, InnerParentQuoter(computationScope), computationScope)
+        return factory?.create(chain, InnerSwapHost(computationScope), computationScope)
     }
 
     // Assumes each flow will have only single element
@@ -366,9 +391,9 @@ internal class RealSwapService(
         }
     }
 
-    private inner class InnerParentQuoter(
+    private inner class InnerSwapHost(
         private val computationScope: CoroutineScope
-    ) : AssetExchange.ParentQuoter {
+    ) : AssetExchange.SwapHost {
 
         override suspend fun quote(quoteArgs: ParentQuoterArgs): Balance {
             return quoteTrade(
@@ -380,14 +405,25 @@ internal class RealSwapService(
                 logQuotes = false
             ).finalQuote()
         }
+
+        override suspend fun extrinsicService(): ExtrinsicService {
+            return extrinsicService(computationScope)
+        }
     }
 
     private fun logFee(fee: SwapFee) {
-        val route = fee.atomicOperationFees.joinToString() {
-            it.amount.formatPlanks(it.asset)
+        val route = fee.atomicOperationFees.joinToString(separator = "\n") {
+            val allFees = buildList {
+                add(it.submissionFee)
+                addAll(it.additionalFees)
+            }
+
+            allFees.joinToString { it.amount.formatPlanks(it.asset) }
         }
 
-        Log.d("Swaps", "Fee: $route")
+        Log.d("Swaps", "---- Fees -----")
+        Log.d("Swaps", route)
+        Log.d("Swaps", "---- End Fees -----")
     }
 
     private suspend fun logQuotes(quotedTrades: List<QuotedTrade>) {
@@ -419,10 +455,12 @@ internal class RealSwapService(
         }
     }
 
-    private class ExchangeRegistry(
+    private inner class ExchangeRegistry(
         private val singleChainExchanges: Map<ChainId, AssetExchange>,
         private val multiChainExchanges: List<AssetExchange>,
     ) {
+
+        private val feePaymentRegistry = SwapFeePaymentRegistry()
 
         fun getExchange(chainId: ChainId): AssetExchange {
             val relevantExchanges = buildList {
@@ -430,17 +468,43 @@ internal class RealSwapService(
                 addAll(multiChainExchanges)
             }
 
-            return when(relevantExchanges.size) {
+            return when (relevantExchanges.size) {
                 0 -> error("No exchanges found")
                 1 -> relevantExchanges.single()
                 else -> CompoundAssetExchange(relevantExchanges)
             }
         }
 
+        fun getFeePaymentRegistry(): FeePaymentProviderRegistry {
+            return feePaymentRegistry
+        }
+
         fun allExchanges(): List<AssetExchange> {
             return buildList {
                 addAll(singleChainExchanges.values)
                 addAll(multiChainExchanges)
+            }
+        }
+
+        private inner class SwapFeePaymentRegistry : FeePaymentProviderRegistry {
+
+            private val paymentRegistryOverrides = createFeePaymentOverrides()
+
+            override suspend fun providerFor(chain: Chain): FeePaymentProvider {
+                return paymentRegistryOverrides.find { it.chain.id == chain.id }?.provider
+                    ?: defaultFeePaymentProviderRegistry.providerFor(chain)
+            }
+
+            private fun createFeePaymentOverrides(): List<FeePaymentProviderOverride> {
+                return buildList {
+                    singleChainExchanges.values.onEach { singleChainExchange ->
+                        addAll(singleChainExchange.feePaymentOverrides())
+                    }
+
+                    multiChainExchanges.onEach { multiChainExchange ->
+                        addAll(multiChainExchange.feePaymentOverrides())
+                    }
+                }
             }
         }
     }

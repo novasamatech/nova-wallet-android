@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
@@ -76,20 +77,18 @@ class HydraDxExchangeFactory(
     private val hydrationFeeInjector: HydrationFeeInjector
 ) : AssetExchange.SingleChainFactory {
 
-    override suspend fun create(chain: Chain, parentQuoter: AssetExchange.ParentQuoter, coroutineScope: CoroutineScope): AssetExchange {
+    override suspend fun create(chain: Chain, parentQuoter: AssetExchange.SwapHost, coroutineScope: CoroutineScope): AssetExchange {
         return HydraDxExchange(
             remoteStorageSource = remoteStorageSource,
             chain = chain,
             storageSharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
-            extrinsicServiceFactory = extrinsicServiceFactory,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             hydraDxNovaReferral = hydraDxNovaReferral,
             swapSourceFactories = swapSourceFactories,
             assetSourceRegistry = assetSourceRegistry,
-            parentQuoter = parentQuoter,
+            swapHost = parentQuoter,
             hydrationFeeInjector = hydrationFeeInjector,
             delegate = quotingFactory.create(chain),
-            coroutineScope = coroutineScope
         )
     }
 }
@@ -99,22 +98,13 @@ private class HydraDxExchange(
     private val remoteStorageSource: StorageDataSource,
     private val chain: Chain,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-    private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val parentQuoter: AssetExchange.ParentQuoter,
+    private val swapHost: AssetExchange.SwapHost,
     private val hydrationFeeInjector: HydrationFeeInjector,
-    coroutineScope: CoroutineScope,
 ) : AssetExchange {
-
-    private val extrinsicService = extrinsicServiceFactory.create(
-        ExtrinsicService.FeePaymentConfig(
-            coroutineScope = coroutineScope,
-            customFeePaymentProvider = ReusableQuoteFeePaymentProvider()
-        )
-    )
 
     private val swapSources: List<HydraDxSwapSource> = createSources()
 
@@ -134,6 +124,15 @@ private class HydraDxExchange(
         return swapSources.flatMapAsync { source ->
             source.availableSwapDirections().map(::HydraDxSwapEdge)
         }
+    }
+
+    override fun feePaymentOverrides(): List<FeePaymentProviderOverride> {
+        return listOf(
+            FeePaymentProviderOverride(
+                provider = ReusableQuoteFeePaymentProvider(),
+                chain = chain
+            )
+        )
     }
 
     override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
@@ -242,7 +241,7 @@ private class HydraDxExchange(
         }
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            return extrinsicService.estimateFee(
+            val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
@@ -252,10 +251,12 @@ private class HydraDxExchange(
             ) {
                 executeSwap()
             }
+
+            return AtomicSwapOperationFee(submissionFee)
         }
 
         override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
-            return extrinsicService.submitAndWatchExtrinsic(
+            return swapHost.extrinsicService().submitAndWatchExtrinsic(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
@@ -416,7 +417,7 @@ private class HydraDxExchange(
                 swapDirection = SwapDirection.SPECIFIED_OUT
             )
 
-            val quotedFee = parentQuoter.quote(args)
+            val quotedFee = swapHost.quote(args)
 
             // TODO
             // There is a issue in Router implementation in Hydra that doesn't allow asset balance to go below ED. We add it to fee for simplicity instead

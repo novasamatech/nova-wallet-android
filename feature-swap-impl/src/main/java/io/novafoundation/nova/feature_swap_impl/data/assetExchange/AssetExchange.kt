@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapability
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
@@ -16,7 +18,7 @@ interface AssetExchange : CustomFeeCapability {
 
         suspend fun create(
             chain: Chain,
-            parentQuoter: ParentQuoter,
+            parentQuoter: SwapHost,
             coroutineScope: CoroutineScope
         ): AssetExchange?
     }
@@ -24,21 +26,30 @@ interface AssetExchange : CustomFeeCapability {
     interface MultiChainFactory {
 
         suspend fun create(
-            parentQuoter: ParentQuoter,
+            swapHost: SwapHost,
             coroutineScope: CoroutineScope
         ): AssetExchange?
     }
-    interface ParentQuoter {
+    interface SwapHost {
 
         suspend fun quote(quoteArgs: ParentQuoterArgs): Balance
+
+        suspend fun extrinsicService(): ExtrinsicService
     }
 
     suspend fun sync()
 
     suspend fun availableDirectSwapConnections(): List<SwapGraphEdge>
 
+    fun feePaymentOverrides(): List<FeePaymentProviderOverride>
+
     fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 }
+
+data class FeePaymentProviderOverride(
+    val provider: FeePaymentProvider,
+    val chain: Chain
+)
 
 data class ParentQuoterArgs(
     val chainAssetIn: Chain.Asset,

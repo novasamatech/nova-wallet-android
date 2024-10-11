@@ -48,6 +48,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
@@ -161,4 +162,6 @@ interface WalletFeatureDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val customFeeCapabilityFacade: CustomFeeCapabilityFacade
+
+    val parachainInfoRepository: ParachainInfoRepository
 }

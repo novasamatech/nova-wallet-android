@@ -63,11 +63,11 @@ class SwapFee(
 ) : GenericFee {
 
     val firstSegmentFee: Fee
-        get() = atomicOperationFees.first()
+        get() = atomicOperationFees.first().submissionFee
 
     // TODO handle multi-segment fee display
     override val networkFee: Fee
-        get() = atomicOperationFees.first()
+        get() = firstSegmentFee
 }
 
 val SwapFee.totalDeductedPlanks: Balance
