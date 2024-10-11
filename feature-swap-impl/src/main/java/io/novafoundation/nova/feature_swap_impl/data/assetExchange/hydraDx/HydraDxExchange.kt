@@ -116,10 +116,6 @@ private class HydraDxExchange(
         return swapSources.forEachAsync { it.sync() }
     }
 
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-        return delegate.canPayFeeInNonUtilityToken(chainAsset)
-    }
-
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
         return swapSources.flatMapAsync { source ->
             source.availableSwapDirections().map(::HydraDxSwapEdge)

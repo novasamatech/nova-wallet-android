@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
 class CompoundAssetExchange(
@@ -29,9 +28,5 @@ class CompoundAssetExchange(
     override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return delegates.map { it.runSubscriptions(metaAccount) }
             .mergeIfMultiple()
-    }
-
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-       return delegates.all { it.canPayFeeInNonUtilityToken(chainAsset) }
     }
 }

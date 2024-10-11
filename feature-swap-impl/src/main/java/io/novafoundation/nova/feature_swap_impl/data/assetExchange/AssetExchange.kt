@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapability
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -12,7 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
-interface AssetExchange : CustomFeeCapability {
+interface AssetExchange {
 
     interface SingleChainFactory {
 

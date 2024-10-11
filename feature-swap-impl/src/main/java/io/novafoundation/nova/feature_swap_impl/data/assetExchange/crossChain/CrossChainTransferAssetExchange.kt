@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
@@ -70,10 +69,6 @@ class CrossChainTransferAssetExchange(
 
     override fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return emptyFlow()
-    }
-
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-        return false
     }
 
     inner class CrossChainTransferEdge(

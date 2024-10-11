@@ -89,11 +89,6 @@ private class AssetConversionExchange(
         // nothing to sync
     }
 
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-        // any asset is usable as a fee as soon as it has associated pool
-        return true
-    }
-
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
         return remoteStorageSource.query(chain.id) {
             val allPools = metadata.assetConversionOrNull?.pools?.keys().orEmpty()

@@ -100,9 +100,13 @@ internal class RealSwapService(
 
     override suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean = withContext(Dispatchers.Default) {
         val computationScope = CoroutineScope(coroutineContext)
+        val exchangeRegistry = exchangeRegistry(computationScope)
+        val paymentRegistry = exchangeRegistry.getFeePaymentRegistry()
 
-        val exchange = exchangeRegistry(computationScope).getExchange(asset.chainId)
-        customFeeCapabilityFacade.canPayFeeInNonUtilityToken(asset, exchange)
+        val chain = chainRegistry.getChain(asset.chainId)
+        val feePayment = paymentRegistry.providerFor(chain).feePaymentFor(asset.toFeePaymentCurrency(), computationScope)
+
+        customFeeCapabilityFacade.canPayFeeInNonUtilityToken(asset, feePayment)
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
