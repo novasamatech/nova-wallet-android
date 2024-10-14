@@ -198,7 +198,7 @@
     <string name="assets_balance_details_locks_staking">Staking</string>
     <string name="assets_balance_details_locks_vesting">Acquisition</string>
     <string name="assets_buy_tokens_placeholder_button">Acheter des tokens</string>
-    <string name="assets_crowdloan_unlock_banner_description">Vous avez récupéré vos DOT des crowdloans ? Commencez à <font>staker</font> vos DOT aujourd\'hui pour obtenir les récompenses maximales !</string>
+    <string name="assets_crowdloan_unlock_banner_description">Vous avez récupéré vos DOT des crowdloans ? Commencez à staker vos DOT aujourd\'hui pour obtenir les récompenses maximales !</string>
     <string name="assets_crowdloan_unlock_banner_title">Boostez vos DOT 🚀</string>
     <string name="assets_filter_title">Filtrer les actifs</string>
     <string name="assets_manage_tokens_all_networks">Tous les réseaux</string>
@@ -525,10 +525,10 @@
     <string name="connections_add_connection">Ajouter une connexion</string>
     <string name="contacts_scan">Scannez le code QR</string>
     <string name="corrupted_backup_error_subtitle">Un problème a été identifié avec votre sauvegarde. Vous avez la possibilité de supprimer la sauvegarde actuelle et d\'en créer une nouvelle. %s avant de continuer.</string>
-    <string name="corrupted_backup_error_subtitle_highlighted"><font>Assurez-vous d\'avoir sauvegardé les phrases secrètes pour tous les portefeuilles</font></string>
+    <string name="corrupted_backup_error_subtitle_highlighted">Assurez-vous d\'avoir sauvegardé les phrases secrètes pour tous les portefeuilles</string>
     <string name="corrupted_backup_error_title">Sauvegarde trouvée mais vide ou corrompue</string>
     <string name="create_cloud_backup_password_alert_subtitle">À l\'avenir, sans le mot de passe de sauvegarde, il est impossible de restaurer vos portefeuilles à partir de la Sauvegarde Cloud.\n%s</string>
-    <string name="create_cloud_backup_password_alert_subtitle_highlighted"><font>Ce mot de passe ne peut pas être récupéré.</font></string>
+    <string name="create_cloud_backup_password_alert_subtitle_highlighted">Ce mot de passe ne peut pas être récupéré.</string>
     <string name="create_cloud_backup_password_alert_title">Souvenez-vous du mot de passe de sauvegarde</string>
     <string name="create_cloud_backup_password_input_confirm_hint">Confirmer le mot de passe</string>
     <string name="create_cloud_backup_password_input_hint">Mot de passe de sauvegarde</string>
@@ -1417,7 +1417,7 @@
     <string name="staking_turing_restake_title">Je veux staker</string>
     <string name="staking_turing_yield_boost">Yield Boost</string>
     <string name="staking_type_title">Type de staking</string>
-    <string name="staking_unable_to_stake_more_message">Vous retirez tous vos tokens et ne pouvez pas en <font>stake</font> davantage.</string>
+    <string name="staking_unable_to_stake_more_message">Vous retirez tous vos tokens et ne pouvez pas en stake davantage.</string>
     <string name="staking_unable_to_stake_more_title">Impossible de stake plus</string>
     <string name="staking_unbond_crossed_existential" formatted="false">Lors d\'un retrait partiel, vous devez laisser au moins %s en jeu. Voulez-vous effectuer un retrait complet en libérant également %s restants?</string>
     <string name="staking_unbond_crossed_existential_title">Montant trop faible reste en stake</string>
@@ -1466,8 +1466,8 @@
     <string name="start_create_wallet_name_your_wallet">Donnez un nom à votre portefeuille</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Cela ne sera visible que par vous et vous pourrez le modifier plus tard.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Votre portefeuille est prêt</string>
-    <string name="start_staking_available_balance_gap_message" formatted="false">Vous avez des tokens verrouillés sur votre solde en raison de %s. Pour continuer, vous devez entrer moins de %s ou plus de %s. Pour <font>stake</font> un autre montant, vous devez supprimer vos verrous %s.</string>
-    <string name="start_staking_cant_stake_amount">Vous ne pouvez pas <font>stake</font> le montant spécifié</string>
+    <string name="start_staking_available_balance_gap_message" formatted="false">Vous avez des tokens verrouillés sur votre solde en raison de %s. Pour continuer, vous devez entrer moins de %s ou plus de %s. Pour stake un autre montant, vous devez supprimer vos verrous %s.</string>
+    <string name="start_staking_cant_stake_amount">Vous ne pouvez pas stake le montant spécifié</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Sélectionné : %d (max %d)</string>
     <string name="start_staking_fragment_available_balance">Solde disponible : %1$s (%2$s)</string>
     <string name="start_staking_fragment_governance_participation_no_conditions">%s avec vos tokens staked</string>
@@ -1563,7 +1563,7 @@
     <string name="swipe_gov_card_data_loading_error_title">Aucune donnée récupérée</string>
     <string name="swipe_gov_card_placeholder_basket_empty_text">Vous avez déjà voté pour tous les référendums disponibles ou il n\'y a pas de référendums pour voter en ce moment. Revenez plus tard.</string>
     <string name="swipe_gov_card_placeholder_basket_full_text">Vous avez déjà voté pour tous les référendums disponibles</string>
-    <string name="swipe_gov_card_requested_title"><font>Demandé :</font></string>
+    <string name="swipe_gov_card_requested_title">Demandé :</string>
     <string name="swipe_gov_cards_basket_title">Liste de vote</string>
     <string name="swipe_gov_cards_counter">%d restant</string>
     <string name="swipe_gov_cards_full_list">Confirmer les votes</string>

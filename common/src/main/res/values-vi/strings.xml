@@ -1137,7 +1137,7 @@
     <string name="settings_twitter">Twitter</string>
     <string name="settings_wiki">Wiki &amp; Trung tâm trợ giúp</string>
     <string name="settings_youtube">Youtube</string>
-    <string name="setup_referendum_vote_conviction_info">Độ xác tín sẽ được đặt là 0.1x khi <font>bỏ phiếu Abstain</font></string>
+    <string name="setup_referendum_vote_conviction_info">Độ xác tín sẽ được đặt là 0.1x khi bỏ phiếu Abstain</string>
     <string name="setup_staking_conflict_message">Bạn không thể Stake với Direct Staking và Nomination Pools cùng một lúc</string>
     <string name="setup_staking_conflict_title">Đã staking</string>
     <string name="setup_staking_type_advanced_options_condition">Quản lý Stake nâng cao</string>
