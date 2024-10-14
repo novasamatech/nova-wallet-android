@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceListBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
@@ -23,9 +25,11 @@ import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import javax.inject.Inject
 
 class BalanceListFragment :
-    BaseFragment<BalanceListViewModel>(),
+    BaseFragment<BalanceListViewModel, FragmentBalanceListBinding>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler {
+
+    override val binder by viewBinding(FragmentBalanceListBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -44,16 +48,8 @@ class BalanceListFragment :
         ConcatAdapter(headerAdapter, assetsAdapter)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_balance_list, container, false)
-    }
-
     override fun initViews() {
-        balanceListAssets.applyInsetter {
+        binder.balanceListAssets.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -61,15 +57,15 @@ class BalanceListFragment :
 
         hideKeyboard()
 
-        balanceListAssets.setHasFixedSize(true)
-        balanceListAssets.adapter = adapter
+        binder.balanceListAssets.setHasFixedSize(true)
+        binder.balanceListAssets.adapter = adapter
 
-        AssetGroupingDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        AssetGroupingDecoration.applyDefaultTo(binder.balanceListAssets, assetsAdapter)
 
         // modification animations only harm here
-        balanceListAssets.itemAnimator = null
+        binder.balanceListAssets.itemAnimator = null
 
-        walletContainer.setOnRefreshListener {
+        binder.walletContainer.setOnRefreshListener {
             viewModel.fullSync()
         }
     }
@@ -87,7 +83,7 @@ class BalanceListFragment :
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
-                balanceListAssets?.invalidateItemDecorations()
+                binder.balanceListAssets?.invalidateItemDecorations()
             }
         }
 
@@ -98,7 +94,7 @@ class BalanceListFragment :
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
 
         viewModel.hideRefreshEvent.observeEvent {
-            walletContainer.isRefreshing = false
+            binder.walletContainer.isRefreshing = false
         }
 
         viewModel.balanceBreakdownFlow.observe {

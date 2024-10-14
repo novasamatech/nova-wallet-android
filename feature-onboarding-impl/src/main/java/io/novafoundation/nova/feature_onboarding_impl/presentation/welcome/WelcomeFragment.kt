@@ -6,6 +6,7 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -18,9 +19,10 @@ import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
+import io.novafoundation.nova.feature_onboarding_impl.databinding.FragmentWelcomeBinding
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
 
-class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
+class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>() {
 
     companion object {
         private const val KEY_DISPLAY_BACK = "display_back"
@@ -41,9 +43,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_welcome, container, false)
-    }
+    override val binder by viewBinding(FragmentWelcomeBinding::bind)
 
     override fun initViews() {
         configureTermsAndPrivacy(
@@ -51,19 +51,19 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
             getString(R.string.onboarding_terms_and_conditions_2),
             getString(R.string.onboarding_privacy_policy)
         )
-        welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
-        welcomeTerms.highlightColor = Color.TRANSPARENT
+        binder.welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
+        binder.welcomeTerms.highlightColor = Color.TRANSPARENT
 
-        welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
-        welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
+        binder.welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
+        binder.welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
 
-        welcomeBackButton.setOnClickListener { viewModel.backClicked() }
+        binder.welcomeBackButton.setOnClickListener { viewModel.backClicked() }
     }
 
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
         val clickableColor = requireContext().getColor(R.color.text_primary)
 
-        welcomeTerms.text = SpannableFormatter.format(
+        binder.welcomeTerms.text = SpannableFormatter.format(
             sourceText,
             terms.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::termsClicked)),
             privacy.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::privacyClicked)),
@@ -84,6 +84,6 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     override fun subscribe(viewModel: WelcomeViewModel) {
         observeBrowserEvents(viewModel)
 
-        viewModel.shouldShowBackLiveData.observe(welcomeBackButton::setVisible)
+        viewModel.shouldShowBackLiveData.observe(binder.welcomeBackButton::setVisible)
     }
 }

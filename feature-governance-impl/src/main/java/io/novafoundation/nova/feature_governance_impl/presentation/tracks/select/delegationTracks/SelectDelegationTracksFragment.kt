@@ -20,8 +20,8 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
 
     override fun initViews() {
         super.initViews()
-        selectTracksApply.isVisible = true
-        selectTracksApply.setOnClickListener { viewModel.nextClicked() }
+        binder.selectTracksApply.isVisible = true
+        binder.selectTracksApply.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun subscribe(viewModel: V) {
@@ -34,7 +34,7 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
             headerAdapter.showUnavailableTracks(it)
         }
 
-        viewModel.buttonState.observeWhenVisible(selectTracksApply::setState)
+        viewModel.buttonState.observeWhenVisible(binder.selectTracksApply::setState)
 
         viewModel.showRemoveVotesSuggestion.observeEvent {
             val bottomSheet = RemoveVotesSuggestionBottomSheet(

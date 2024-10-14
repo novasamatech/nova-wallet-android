@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.setupQrCodeExpiration
 
-class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>() {
+class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel, FragmentSignParitySignerShowBinding>() {
 
     companion object {
 
@@ -28,25 +28,23 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_sign_parity_signer_show, container, false)
-    }
+    override val binder by viewBinding(FragmentSignParitySignerShowBinding::bind)
 
     override fun initViews() {
         setupExternalActions(viewModel)
 
         onBackPressed { viewModel.backClicked() }
 
-        signParitySignerShowToolbar.applyStatusBarInsets()
-        signParitySignerShowToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.signParitySignerShowToolbar.applyStatusBarInsets()
+        binder.signParitySignerShowToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        signParitySignerShowQr.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
-        signParitySignerShowQr.clipToOutline = true // for round corners
+        binder.signParitySignerShowQr.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
+        binder.signParitySignerShowQr.clipToOutline = true // for round corners
 
-        signParitySignerShowAddress.setWholeClickListener { viewModel.addressClicked() }
+        binder.signParitySignerShowAddress.setWholeClickListener { viewModel.addressClicked() }
 
-        signParitySignerShowHaveError.setOnClickListener { viewModel.troublesClicked() }
-        signParitySignerShowContinue.setOnClickListener { viewModel.continueClicked() }
+        binder.signParitySignerShowHaveError.setOnClickListener { viewModel.troublesClicked() }
+        binder.signParitySignerShowContinue.setOnClickListener { viewModel.continueClicked() }
     }
 
     override fun inject() {
@@ -60,20 +58,20 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
         setupQrCodeExpiration(
             validityPeriodFlow = viewModel.validityPeriod,
             qrCodeExpiredPresentable = viewModel.qrCodeExpiredPresentable,
-            timerView = signParitySignerShowTimer,
+            timerView = binder.signParitySignerShowTimer,
             onTimerFinished = viewModel::timerFinished
         )
 
-        viewModel.qrCodeSequence.observe(signParitySignerShowQr::setSequence)
+        viewModel.qrCodeSequence.observe(binder.signParitySignerShowQr::setSequence)
 
         viewModel.addressModel.observe {
-            signParitySignerShowAddress.setLabel(it.nameOrAddress)
-            signParitySignerShowAddress.setMessage(it.address)
-            signParitySignerShowAddress.setPrimaryIcon(it.image)
+            binder.signParitySignerShowAddress.setLabel(it.nameOrAddress)
+            binder.signParitySignerShowAddress.setMessage(it.address)
+            binder.signParitySignerShowAddress.setPrimaryIcon(it.image)
         }
 
-        signParitySignerShowToolbar.setTitle(viewModel.title)
-        signParitySignerSignLabel.text = viewModel.signLabel
-        signParitySignerShowHaveError.text = viewModel.errorButtonLabel
+        binder.signParitySignerShowToolbar.setTitle(viewModel.title)
+        binder.signParitySignerSignLabel.text = viewModel.signLabel
+        binder.signParitySignerShowHaveError.text = viewModel.errorButtonLabel
     }
 }

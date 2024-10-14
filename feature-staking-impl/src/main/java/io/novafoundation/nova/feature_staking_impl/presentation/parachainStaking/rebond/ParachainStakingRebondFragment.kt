@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -17,11 +18,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingRebondBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewModel>() {
+class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewModel, FragmentParachainStakingRebondBinding>() {
 
     companion object {
 
@@ -30,25 +32,19 @@ class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewMo
         fun getBundle(payload: ParachainStakingRebondPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_parachain_staking_rebond, container, false)
-    }
+    override val binder by viewBinding(FragmentParachainStakingRebondBinding::bind)
 
     override fun initViews() {
-        parachainStakingRebondContainer.applyStatusBarInsets()
+        binder.parachainStakingRebondContainer.applyStatusBarInsets()
 
-        parachainStakingRebondToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.parachainStakingRebondToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        parachainStakingRebondExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
+        binder.parachainStakingRebondExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
-        parachainStakingRebondCollator.setOnClickListener { viewModel.collatorClicked() }
+        binder.parachainStakingRebondCollator.setOnClickListener { viewModel.collatorClicked() }
 
-        parachainStakingRebondConfirm.prepareForProgress(viewLifecycleOwner)
-        parachainStakingRebondConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.parachainStakingRebondConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.parachainStakingRebondConfirm.setOnClickListener { viewModel.confirmClicked() }
     }
 
     override fun inject() {
@@ -65,16 +61,16 @@ class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewMo
         observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, parachainStakingRebondExtrinsicInfo.fee)
-        observeHints(viewModel.hintsMixin, parachainStakingRebondHints)
+        setupFeeLoading(viewModel, binder.parachainStakingRebondExtrinsicInfo.fee)
+        observeHints(viewModel.hintsMixin, binder.parachainStakingRebondHints)
 
-        viewModel.showNextProgress.observe(parachainStakingRebondConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.parachainStakingRebondConfirm::setProgressState)
 
-        viewModel.currentAccountModelFlow.observe(parachainStakingRebondExtrinsicInfo::setAccount)
-        viewModel.walletFlow.observe(parachainStakingRebondExtrinsicInfo::setWallet)
+        viewModel.currentAccountModelFlow.observe(binder.parachainStakingRebondExtrinsicInfo::setAccount)
+        viewModel.walletFlow.observe(binder.parachainStakingRebondExtrinsicInfo::setWallet)
 
-        viewModel.collatorAddressModel.observe(parachainStakingRebondCollator::showAddress)
+        viewModel.collatorAddressModel.observe(binder.parachainStakingRebondCollator::showAddress)
 
-        viewModel.rebondAmount.observe(parachainStakingRebondAmount::showLoadingState)
+        viewModel.rebondAmount.observe(binder.parachainStakingRebondAmount::showLoadingState)
     }
 }

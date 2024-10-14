@@ -17,7 +17,9 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import javax.inject.Inject
 
-class ManualBackupSelectWalletFragment : BaseFragment<ManualBackupSelectWalletViewModel>(), AccountHolder.AccountItemHandler {
+class ManualBackupSelectWalletFragment : BaseFragment<ManualBackupSelectWalletViewModel, FragmentManualBackupSelectWalletBinding>(), AccountHolder.AccountItemHandler {
+
+    override val binder by viewBinding(FragmentManualBackupSelectWalletBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -43,19 +45,11 @@ class ManualBackupSelectWalletFragment : BaseFragment<ManualBackupSelectWalletVi
         )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_manual_backup_select_wallet, container, false)
-    }
-
     override fun initViews() {
-        manualBackupWalletsToolbar.applyStatusBarInsets()
-        manualBackupWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.manualBackupWalletsToolbar.applyStatusBarInsets()
+        binder.manualBackupWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        manualBackupWalletsList.adapter = adapter
+        binder.manualBackupWalletsList.adapter = adapter
     }
 
     override fun inject() {

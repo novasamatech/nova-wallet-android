@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -12,26 +13,21 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentRebagBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class RebagFragment : BaseFragment<RebagViewModel>() {
+class RebagFragment : BaseFragment<RebagViewModel, FragmentRebagBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_rebag, container, false)
-    }
+    override val binder by viewBinding(FragmentRebagBinding::bind)
 
     override fun initViews() {
-        rebagToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.rebagToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        rebagConfirm.prepareForProgress(viewLifecycleOwner)
-        rebagConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.rebagConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.rebagConfirm.setOnClickListener { viewModel.confirmClicked() }
 
-        rebagExtrinsicInfo.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.rebagExtrinsicInfo.setOnAccountClickedListener { viewModel.accountClicked() }
     }
 
     override fun inject() {
@@ -47,17 +43,17 @@ class RebagFragment : BaseFragment<RebagViewModel>() {
     override fun subscribe(viewModel: RebagViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        observeHints(viewModel.hintsMixin, rebagHints)
+        observeHints(viewModel.hintsMixin, binder.rebagHints)
 
-        setupFeeLoading(viewModel, rebagExtrinsicInfo.fee)
-        viewModel.originAddressModelFlow.observe(rebagExtrinsicInfo::setAccount)
-        viewModel.walletModel.observe(rebagExtrinsicInfo::setWallet)
+        setupFeeLoading(viewModel, binder.rebagExtrinsicInfo.fee)
+        viewModel.originAddressModelFlow.observe(binder.rebagExtrinsicInfo::setAccount)
+        viewModel.walletModel.observe(binder.rebagExtrinsicInfo::setWallet)
 
         viewModel.rebagMovementModel.observe {
-            rebagCurrentBag.showValue(it.currentBag)
-            rebagNewBag.showValue(it.newBag)
+            binder.rebagCurrentBag.showValue(it.currentBag)
+            binder.rebagNewBag.showValue(it.newBag)
         }
 
-        viewModel.showNextProgress.observe(rebagConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.rebagConfirm::setProgressState)
     }
 }

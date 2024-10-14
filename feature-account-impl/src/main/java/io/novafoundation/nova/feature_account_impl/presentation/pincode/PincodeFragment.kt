@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
-class PincodeFragment : BaseFragment<PinCodeViewModel>() {
+class PincodeFragment : BaseFragment<PinCodeViewModel, FragmentPinCodeBinding>() {
 
     companion object {
         const val KEY_PINCODE_ACTION = "pincode_action"
@@ -25,13 +25,11 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
         }
     }
 
+    override val binder by viewBinding(FragmentPinCodeBinding::bind)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         hideKeyboard()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_pincode, container, false)
     }
 
     override fun inject() {
@@ -44,9 +42,9 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
     }
 
     override fun initViews() {
-        toolbar.setHomeButtonListener { viewModel.backPressed() }
+        binder.toolbar.setHomeButtonListener { viewModel.backPressed() }
 
-        with(pinCodeNumbers) {
+        with(binder.pinCodeNumbers) {
             pinCodeEnteredListener = { viewModel.pinCodeEntered(it) }
             fingerprintClickListener = { viewModel.startBiometryAuth() }
         }
@@ -59,33 +57,33 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
             }
         }
 
-        pinCodeNumbers.bindProgressView(pincodeProgress)
+        binder.pinCodeNumbers.bindProgressView(binder.pincodeProgress)
     }
 
     override fun subscribe(viewModel: PinCodeViewModel) {
         setupConfirmationOrDenyDialog(R.style.AccentAlertDialogTheme, viewModel.confirmationAwaitableAction)
 
         viewModel.pinCodeAction.toolbarConfiguration.titleRes?.let {
-            toolbar.setTitle(getString(it))
+            binder.toolbar.setTitle(getString(it))
         }
 
         viewModel.showFingerPrintEvent.observeEvent {
-            pinCodeNumbers.changeBimometricButtonVisibility(it)
+            binder.pinCodeNumbers.changeBimometricButtonVisibility(it)
         }
 
         viewModel.biometricEvents.observe {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
 
-        viewModel.homeButtonVisibilityLiveData.observe(toolbar::setHomeButtonVisibility)
+        viewModel.homeButtonVisibilityLiveData.observe(binder.toolbar::setHomeButtonVisibility)
 
         viewModel.matchingPincodeErrorEvent.observeEvent {
-            pinCodeNumbers.pinCodeMatchingError()
+            binder.pinCodeNumbers.pinCodeMatchingError()
         }
 
         viewModel.resetInputEvent.observeEvent {
-            pinCodeNumbers.resetInput()
-            pinCodeTitle.text = it
+            binder.pinCodeNumbers.resetInput()
+            binder.pinCodeTitle.text = it
         }
 
         viewModel.startAuth()

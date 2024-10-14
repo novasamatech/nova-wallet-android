@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupJsonRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
 
-class ManualBackupAdvancedSecretsFragment : BaseFragment<ManualBackupAdvancedSecretsViewModel>(), ManualBackupItemHandler {
+class ManualBackupAdvancedSecretsFragment : BaseFragment<ManualBackupAdvancedSecretsViewModel, FragmentManualBackupAdvancedSecretsBinding>(), ManualBackupItemHandler {
 
     companion object {
 
@@ -28,22 +28,16 @@ class ManualBackupAdvancedSecretsFragment : BaseFragment<ManualBackupAdvancedSec
         }
     }
 
+    override val binder by viewBinding(FragmentManualBackupAdvancedSecretsBinding::bind)
+
     private val adapter = ManualBackupSecretsAdapter(this)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_manual_backup_advanced_secrets, container, false)
-    }
-
     override fun initViews() {
-        manualBackupAdvancedSecretsToolbar.applyStatusBarInsets()
-        manualBackupAdvancedSecretsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.manualBackupAdvancedSecretsToolbar.applyStatusBarInsets()
+        binder.manualBackupAdvancedSecretsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        manualBackupAdvancedSecretsList.adapter = adapter
-        manualBackupAdvancedSecretsList.addItemDecoration(ExtraSpaceItemDecoration())
+        binder.manualBackupAdvancedSecretsList.adapter = adapter
+        binder.manualBackupAdvancedSecretsList.addItemDecoration(ExtraSpaceItemDecoration())
     }
 
     override fun inject() {

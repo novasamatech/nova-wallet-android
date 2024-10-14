@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -11,34 +12,29 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
+import io.novafoundation.nova.feature_nft_impl.databinding.FragmentNftListBinding
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 
 import javax.inject.Inject
 
-class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
+class NftListFragment : BaseFragment<NftListViewModel, FragmentNftListBinding>(), NftAdapter.Handler {
+
+    override val binder by viewBinding(FragmentNftListBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { NftAdapter(imageLoader, this) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_nft_list, container, false)
-    }
-
     override fun initViews() {
-        nftListToolbar.applyStatusBarInsets()
-        nftListBack.setOnClickListener { viewModel.backClicked() }
+        binder.nftListToolbar.applyStatusBarInsets()
+        binder.nftListBack.setOnClickListener { viewModel.backClicked() }
 
-        nftListNfts.setHasFixedSize(true)
-        nftListNfts.adapter = adapter
-        nftListNfts.itemAnimator = null
+        binder.nftListNfts.setHasFixedSize(true)
+        binder.nftListNfts.adapter = adapter
+        binder.nftListNfts.itemAnimator = null
 
-        nftListRefresh.setOnRefreshListener { viewModel.syncNfts() }
+        binder.nftListRefresh.setOnRefreshListener { viewModel.syncNfts() }
     }
 
     override fun inject() {
@@ -50,14 +46,14 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
 
     override fun subscribe(viewModel: NftListViewModel) {
         viewModel.nftListItemsFlow.observe {
-            adapter.submitListPreservingViewPoint(it, nftListNfts)
+            adapter.submitListPreservingViewPoint(it, binder.nftListNfts)
         }
 
         viewModel.hideRefreshEvent.observeEvent {
-            nftListRefresh.isRefreshing = false
+            binder.nftListRefresh.isRefreshing = false
         }
 
-        viewModel.nftCountFlow.observe(nftListCounter::setText)
+        viewModel.nftCountFlow.observe(binder.nftListCounter::setText)
     }
 
     override fun itemClicked(item: NftListItem) {

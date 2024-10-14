@@ -13,31 +13,27 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.accounts.AccountChooserBottomSheetDialog
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
 
-class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandler {
+class NodesFragment : BaseFragment<NodesViewModel, FragmentNodesBinding>(), NodesAdapter.NodeItemHandler {
+
+    override val binder by viewBinding(FragmentNodesBinding::bind)
 
     private lateinit var adapter: NodesAdapter
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_nodes, container, false)
 
     override fun initViews() {
         adapter = NodesAdapter(this)
 
-        connectionsList.setHasFixedSize(true)
-        connectionsList.adapter = adapter
+        binder.connectionsList.setHasFixedSize(true)
+        binder.connectionsList.adapter = adapter
 
-        novaToolbar.setHomeButtonListener {
+        binder.novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 
-        novaToolbar.setRightActionClickListener {
+        binder.novaToolbar.setRightActionClickListener {
             viewModel.editClicked()
         }
 
-        addConnectionTv.setOnClickListener {
+        binder.addConnectionTv.setOnClickListener {
             viewModel.addNodeClicked()
         }
     }
@@ -67,7 +63,7 @@ class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandl
 
         viewModel.editMode.observe(adapter::switchToEdit)
 
-        viewModel.toolbarAction.observe(novaToolbar::setTextRight)
+        viewModel.toolbarAction.observe(binder.novaToolbar::setTextRight)
 
         viewModel.deleteNodeEvent.observeEvent(::showDeleteNodeDialog)
     }

@@ -11,23 +11,19 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageModel
 
-class LanguagesFragment : BaseFragment<LanguagesViewModel>(), LanguagesAdapter.LanguagesItemHandler {
+class LanguagesFragment : BaseFragment<LanguagesViewModel, FragmentLanguagesBinding>(), LanguagesAdapter.LanguagesItemHandler {
+
+    override val binder by viewBinding(FragmentLanguagesBinding::bind)
 
     private lateinit var adapter: LanguagesAdapter
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_languages, container, false)
 
     override fun initViews() {
         adapter = LanguagesAdapter(this)
 
-        languagesList.setHasFixedSize(true)
-        languagesList.adapter = adapter
+        binder.languagesList.setHasFixedSize(true)
+        binder.languagesList.adapter = adapter
 
-        novaToolbar.setHomeButtonListener {
+        binder.novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
     }

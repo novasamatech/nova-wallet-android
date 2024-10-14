@@ -11,7 +11,7 @@ class SelectAddressImportGenericLedgerFragment : SelectAddressLedgerFragment<Sel
     override fun initViews() {
         super.initViews()
 
-        ledgerSelectAddressChain.makeGone()
+        binder.ledgerSelectAddressChain.makeGone()
     }
 
     override fun inject() {

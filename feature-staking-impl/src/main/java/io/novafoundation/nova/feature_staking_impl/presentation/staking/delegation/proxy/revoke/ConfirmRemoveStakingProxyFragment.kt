@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -15,10 +16,11 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentConfirmRevokeStakingProxyBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class ConfirmRemoveStakingProxyFragment : BaseFragment<ConfirmRemoveStakingProxyViewModel>() {
+class ConfirmRemoveStakingProxyFragment : BaseFragment<ConfirmRemoveStakingProxyViewModel, FragmentConfirmRevokeStakingProxyBinding>() {
     companion object {
 
         private const val PAYLOAD_KEY = "PAYLOAD_KEY"
@@ -28,24 +30,18 @@ class ConfirmRemoveStakingProxyFragment : BaseFragment<ConfirmRemoveStakingProxy
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_confirm_revoke_staking_proxy, container, false)
-    }
+    override val binder by viewBinding(FragmentConfirmRevokeStakingProxyBinding::bind)
 
     override fun initViews() {
-        confirmRemoveStakingProxyToolbar.applyStatusBarInsets()
+        binder.confirmRemoveStakingProxyToolbar.applyStatusBarInsets()
 
-        confirmRemoveStakingProxyToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.confirmRemoveStakingProxyToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        confirmRemoveStakingProxyButton.setOnClickListener { viewModel.confirmClicked() }
-        confirmRemoveStakingProxyButton.prepareForProgress(viewLifecycleOwner)
+        binder.confirmRemoveStakingProxyButton.setOnClickListener { viewModel.confirmClicked() }
+        binder.confirmRemoveStakingProxyButton.prepareForProgress(viewLifecycleOwner)
 
-        confirmRemoveStakingProxyProxiedAccount.setOnClickListener { viewModel.proxiedAccountClicked() }
-        confirmRemoveStakingProxyDelegationAccount.setOnClickListener { viewModel.proxyAccountClicked() }
+        binder.confirmRemoveStakingProxyProxiedAccount.setOnClickListener { viewModel.proxiedAccountClicked() }
+        binder.confirmRemoveStakingProxyDelegationAccount.setOnClickListener { viewModel.proxyAccountClicked() }
     }
 
     override fun inject() {
@@ -63,13 +59,13 @@ class ConfirmRemoveStakingProxyFragment : BaseFragment<ConfirmRemoveStakingProxy
     override fun subscribe(viewModel: ConfirmRemoveStakingProxyViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel.feeMixin, confirmRemoveStakingProxyNetworkFee)
+        setupFeeLoading(viewModel.feeMixin, binder.confirmRemoveStakingProxyNetworkFee)
 
-        viewModel.chainModel.observe { confirmRemoveStakingProxyNetwork.showChain(it) }
-        viewModel.walletUiFlow.observe { confirmRemoveStakingProxyWallet.showWallet(it) }
-        viewModel.proxiedAccountModel.observe { confirmRemoveStakingProxyProxiedAccount.showAddress(it) }
-        viewModel.proxyAccountModel.observe { confirmRemoveStakingProxyDelegationAccount.showAddress(it) }
+        viewModel.chainModel.observe { binder.confirmRemoveStakingProxyNetwork.showChain(it) }
+        viewModel.walletUiFlow.observe { binder.confirmRemoveStakingProxyWallet.showWallet(it) }
+        viewModel.proxiedAccountModel.observe { binder.confirmRemoveStakingProxyProxiedAccount.showAddress(it) }
+        viewModel.proxyAccountModel.observe { binder.confirmRemoveStakingProxyDelegationAccount.showAddress(it) }
 
-        viewModel.validationProgressFlow.observe(confirmRemoveStakingProxyButton::setProgressState)
+        viewModel.validationProgressFlow.observe(binder.confirmRemoveStakingProxyButton::setProgressState)
     }
 }

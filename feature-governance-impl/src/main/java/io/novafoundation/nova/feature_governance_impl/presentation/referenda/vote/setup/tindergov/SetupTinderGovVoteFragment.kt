@@ -6,20 +6,25 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.LayoutSetupVoteControlAyeNayAbstainBinding
+import io.novafoundation.nova.feature_governance_impl.databinding.LayoutSetupVoteControlContinueBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVoteFragment
 
 class SetupTinderGovVoteFragment : SetupVoteFragment<SetupTinderGovVoteViewModel>() {
 
+    private lateinit var controlViewBinder: LayoutSetupVoteControlContinueBinding
+
     override fun getControlView(inflater: LayoutInflater, parent: View): View {
-        return inflater.inflate(R.layout.layout_setup_vote_control_continue, parent as ViewGroup, false)
+        controlViewBinder = LayoutSetupVoteControlContinueBinding.inflate(inflater, parent as ViewGroup, false)
+        return controlViewBinder.root
     }
 
     override fun initViews() {
         super.initViews()
-        setupReferendumVoteSubtitle.text = getString(R.string.swipe_gov_vote_subtitle)
+        binder.setupReferendumVoteSubtitle.text = getString(R.string.swipe_gov_vote_subtitle)
 
-        setupTinderGovVoteContinue.setOnClickListener { viewModel.continueClicked() }
+        controlViewBinder.setupTinderGovVoteContinue.setOnClickListener { viewModel.continueClicked() }
         onBackPressed { viewModel.backClicked() }
     }
 

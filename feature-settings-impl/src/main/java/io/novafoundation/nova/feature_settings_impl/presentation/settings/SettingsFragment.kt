@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
@@ -16,52 +17,47 @@ import io.novafoundation.nova.common.utils.sendEmailIntent
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.FragmentSettingsBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 
-class SettingsFragment : BaseFragment<SettingsViewModel>() {
+class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
-    }
+    override val binder by viewBinding(FragmentSettingsBinding::bind)
 
     override fun initViews() {
-        settingsContainer.applyStatusBarInsets()
+        binder.settingsContainer.applyStatusBarInsets()
 
-        accountView.setWholeClickListener { viewModel.accountActionsClicked() }
+        binder.accountView.setWholeClickListener { viewModel.accountActionsClicked() }
 
-        settingsWallets.setOnClickListener { viewModel.walletsClicked() }
-        settingsNetworks.setOnClickListener { viewModel.networksClicked() }
-        settingsPushNotifications.setOnClickListener { viewModel.pushNotificationsClicked() }
-        settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
-        settingsLanguage.setOnClickListener { viewModel.languagesClicked() }
+        binder.settingsWallets.setOnClickListener { viewModel.walletsClicked() }
+        binder.settingsNetworks.setOnClickListener { viewModel.networksClicked() }
+        binder.settingsPushNotifications.setOnClickListener { viewModel.pushNotificationsClicked() }
+        binder.settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
+        binder.settingsLanguage.setOnClickListener { viewModel.languagesClicked() }
 
-        settingsTelegram.setOnClickListener { viewModel.telegramClicked() }
-        settingsTwitter.setOnClickListener { viewModel.twitterClicked() }
-        settingsYoutube.setOnClickListener { viewModel.openYoutube() }
+        binder.settingsTelegram.setOnClickListener { viewModel.telegramClicked() }
+        binder.settingsTwitter.setOnClickListener { viewModel.twitterClicked() }
+        binder.settingsYoutube.setOnClickListener { viewModel.openYoutube() }
 
-        settingsWebsite.setOnClickListener { viewModel.websiteClicked() }
-        settingsGithub.setOnClickListener { viewModel.githubClicked() }
-        settingsTerms.setOnClickListener { viewModel.termsClicked() }
-        settingsPrivacy.setOnClickListener { viewModel.privacyClicked() }
+        binder.settingsWebsite.setOnClickListener { viewModel.websiteClicked() }
+        binder.settingsGithub.setOnClickListener { viewModel.githubClicked() }
+        binder.settingsTerms.setOnClickListener { viewModel.termsClicked() }
+        binder.settingsPrivacy.setOnClickListener { viewModel.privacyClicked() }
 
-        settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
-        settingsWiki.setOnClickListener { viewModel.wikiClicked() }
-        settingsEmail.setOnClickListener { viewModel.emailClicked() }
+        binder.settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
+        binder.settingsWiki.setOnClickListener { viewModel.wikiClicked() }
+        binder.settingsEmail.setOnClickListener { viewModel.emailClicked() }
 
-        settingsBiometricAuth.setOnClickListener { viewModel.changeBiometricAuth() }
-        settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
-        settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
-        settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
+        binder.settingsBiometricAuth.setOnClickListener { viewModel.changeBiometricAuth() }
+        binder.settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
+        binder.settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
+        binder.settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
 
-        settingsCloudBackup.setOnClickListener { viewModel.cloudBackupClicked() }
+        binder.settingsCloudBackup.setOnClickListener { viewModel.cloudBackupClicked() }
 
-        settingsWalletConnect.setOnClickListener { viewModel.walletConnectClicked() }
+        binder.settingsWalletConnect.setOnClickListener { viewModel.walletConnectClicked() }
 
-        settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
+        binder.settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
     }
 
     override fun inject() {
@@ -79,22 +75,22 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         observeBrowserEvents(viewModel)
 
         viewModel.selectedWalletModel.observe {
-            settingsAvatar.setModel(it)
+            binder.settingsAvatar.setModel(it)
 
-            accountView.setAccountIcon(it.walletIcon)
-            accountView.setTitle(it.name)
+            binder.accountView.setAccountIcon(it.walletIcon)
+            binder.accountView.setTitle(it.name)
         }
 
         viewModel.pushNotificationsState.observe {
-            settingsPushNotifications.setValue(it)
+            binder.settingsPushNotifications.setValue(it)
         }
 
         viewModel.selectedCurrencyFlow.observe {
-            settingsCurrency.setValue(it.code)
+            binder.settingsCurrency.setValue(it.code)
         }
 
         viewModel.selectedLanguageFlow.observe {
-            settingsLanguage.setValue(it.displayName)
+            binder.settingsLanguage.setValue(it.displayName)
         }
 
         viewModel.showBiometricNotReadyDialogEvent.observeEvent {
@@ -102,7 +98,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         }
 
         viewModel.biometricAuthStatus.observe {
-            settingsBiometricAuth.setChecked(it)
+            binder.settingsBiometricAuth.setChecked(it)
         }
 
         viewModel.biometricEventMessages.observe {
@@ -110,18 +106,18 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         }
 
         viewModel.pinCodeVerificationStatus.observe {
-            settingsPinCodeVerification.setChecked(it)
+            binder.settingsPinCodeVerification.setChecked(it)
         }
 
         viewModel.safeModeStatus.observe {
-            settingsSafeMode.setChecked(it)
+            binder.settingsSafeMode.setChecked(it)
         }
 
-        viewModel.appVersionFlow.observe(settingsAppVersion::setText)
+        viewModel.appVersionFlow.observe(binder.settingsAppVersion::setText)
 
         viewModel.openEmailEvent.observeEvent { requireContext().sendEmailIntent(it) }
 
-        viewModel.walletConnectSessionsUi.observe(settingsWalletConnect::setValue)
+        viewModel.walletConnectSessionsUi.observe(binder.settingsWalletConnect::setValue)
     }
 
     override fun onResume() {

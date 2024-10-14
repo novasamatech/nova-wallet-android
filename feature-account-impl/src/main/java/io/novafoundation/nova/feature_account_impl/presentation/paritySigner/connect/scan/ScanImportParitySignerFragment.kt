@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 
-class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerViewModel>() {
+class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerViewModel, FragmentImportParitySignerScanBinding>() {
 
     companion object {
 
@@ -26,9 +26,7 @@ class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerView
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_parity_signer_scan, container, false)
-    }
+    override val binder by viewBinding(FragmentImportParitySignerScanBinding::bind)
 
     override fun inject() {
         FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
@@ -40,12 +38,12 @@ class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerView
     override fun initViews() {
         super.initViews()
 
-        scanImportParitySignerScanToolbar.applyStatusBarInsets()
-        scanImportParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.scanImportParitySignerScanToolbar.applyStatusBarInsets()
+        binder.scanImportParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        scanImportParitySignerScan.setTitle(viewModel.title)
+        binder.scanImportParitySignerScan.setTitle(viewModel.title)
     }
 
     override val scanView: ScanView
-        get() = scanImportParitySignerScan
+        get() = binder.scanImportParitySignerScan
 }

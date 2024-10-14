@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -12,26 +13,21 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentNominationPoolsBondMoreBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class NominationPoolsSetupBondMoreFragment : BaseFragment<NominationPoolsSetupBondMoreViewModel>() {
+class NominationPoolsSetupBondMoreFragment : BaseFragment<NominationPoolsSetupBondMoreViewModel, FragmentNominationPoolsBondMoreBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_nomination_pools_bond_more, container, false)
-    }
+    override val binder by viewBinding(FragmentNominationPoolsBondMoreBinding::bind)
 
     override fun initViews() {
-        nominationPoolsBondMoreContainer.applyStatusBarInsets()
+        binder.nominationPoolsBondMoreContainer.applyStatusBarInsets()
 
-        nominationPoolsBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
-        nominationPoolsBondMoreContinue.prepareForProgress(viewLifecycleOwner)
-        nominationPoolsBondMoreContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.nominationPoolsBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.nominationPoolsBondMoreContinue.prepareForProgress(viewLifecycleOwner)
+        binder.nominationPoolsBondMoreContinue.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {
@@ -46,10 +42,10 @@ class NominationPoolsSetupBondMoreFragment : BaseFragment<NominationPoolsSetupBo
 
     override fun subscribe(viewModel: NominationPoolsSetupBondMoreViewModel) {
         observeValidations(viewModel)
-        setupAmountChooser(viewModel.amountChooserMixin, nominationPoolsBondMoreAmount)
-        setupFeeLoading(viewModel.originFeeMixin, nominationPoolsBondMoreFee)
-        observeHints(viewModel.hintsMixin, nominationPoolsBondMoreHints)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.nominationPoolsBondMoreAmount)
+        setupFeeLoading(viewModel.originFeeMixin, binder.nominationPoolsBondMoreFee)
+        observeHints(viewModel.hintsMixin, binder.nominationPoolsBondMoreHints)
 
-        viewModel.buttonState.observe(nominationPoolsBondMoreContinue::setState)
+        viewModel.buttonState.observe(binder.nominationPoolsBondMoreContinue::setState)
     }
 }

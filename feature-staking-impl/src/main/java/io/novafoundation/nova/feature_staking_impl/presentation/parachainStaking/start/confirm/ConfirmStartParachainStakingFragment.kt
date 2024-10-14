@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -17,11 +18,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingStartConfirmBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainStakingViewModel>() {
+class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainStakingViewModel, FragmentParachainStakingStartConfirmBinding>() {
 
     companion object {
 
@@ -30,26 +32,20 @@ class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainS
         fun getBundle(payload: ConfirmStartParachainStakingPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_parachain_staking_start_confirm, container, false)
-    }
+    override val binder by viewBinding(FragmentParachainStakingStartConfirmBinding::bind)
 
     override fun initViews() {
-        confirmStartParachainStakingContainer.applyStatusBarInsets()
+        binder.confirmStartParachainStakingContainer.applyStatusBarInsets()
 
-        confirmStartParachainStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.confirmStartParachainStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        confirmStartParachainStakingExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
+        binder.confirmStartParachainStakingExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
-        confirmStartParachainStakingConfirm.prepareForProgress(viewLifecycleOwner)
-        confirmStartParachainStakingConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.confirmStartParachainStakingConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.confirmStartParachainStakingConfirm.setOnClickListener { viewModel.confirmClicked() }
 
-        confirmStartParachainStakingCollator.setOnClickListener { viewModel.collatorClicked() }
+        binder.confirmStartParachainStakingCollator.setOnClickListener { viewModel.collatorClicked() }
     }
 
     override fun inject() {
@@ -66,22 +62,21 @@ class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainS
         observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, confirmStartParachainStakingExtrinsicInfo.fee)
-        observeHints(viewModel.hintsMixin, confirmStartParachainStakingHints)
+        setupFeeLoading(viewModel, binder.confirmStartParachainStakingExtrinsicInfo.fee)
+        observeHints(viewModel.hintsMixin, binder.confirmStartParachainStakingHints)
 
-        viewModel.title.observe(confirmStartParachainStakingToolbar::setTitle)
-        viewModel.showNextProgress.observe(confirmStartParachainStakingConfirm::setProgressState)
+        viewModel.title.observe(binder.confirmStartParachainStakingToolbar::setTitle)
+        viewModel.showNextProgress.observe(binder.confirmStartParachainStakingConfirm::setProgressState)
 
         viewModel.amountModel.observe { amountModel ->
-
-            confirmStartParachainStakingAmount.setAmount(amountModel)
-            confirmStartParachainStakingAmount.makeVisible()
+            binder.confirmStartParachainStakingAmount.setAmount(amountModel)
+            binder.confirmStartParachainStakingAmount.makeVisible()
         }
 
-        viewModel.currentAccountModelFlow.observe(confirmStartParachainStakingExtrinsicInfo::setAccount)
-        viewModel.walletFlow.observe(confirmStartParachainStakingExtrinsicInfo::setWallet)
+        viewModel.currentAccountModelFlow.observe(binder.confirmStartParachainStakingExtrinsicInfo::setAccount)
+        viewModel.walletFlow.observe(binder.confirmStartParachainStakingExtrinsicInfo::setWallet)
 
-        viewModel.collatorAddressModel.observe(confirmStartParachainStakingCollator::showAddress)
-        viewModel.amountModel.observe(confirmStartParachainStakingAmount::setAmount)
+        viewModel.collatorAddressModel.observe(binder.confirmStartParachainStakingCollator::showAddress)
+        viewModel.amountModel.observe(binder.confirmStartParachainStakingAmount::setAmount)
     }
 }

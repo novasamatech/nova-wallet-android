@@ -14,7 +14,9 @@ import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottom
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_impl.R
 
-abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordViewModel> : BaseFragment<T>() {
+abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordViewModel> : BaseFragment<T, FragmentRestoreCloudBackupBinding>() {
+
+    override val binder by viewBinding(FragmentRestoreCloudBackupBinding::bind)
 
     abstract val titleRes: Int
     abstract val subtitleRes: Int

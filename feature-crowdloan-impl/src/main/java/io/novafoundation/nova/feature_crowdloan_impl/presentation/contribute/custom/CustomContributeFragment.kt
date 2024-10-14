@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_crowdloan_impl.databinding.FragmentCustomContributeBinding
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.model.CustomContributePayload
@@ -21,7 +23,7 @@ import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
-class CustomContributeFragment : BaseFragment<CustomContributeViewModel>() {
+class CustomContributeFragment : BaseFragment<CustomContributeViewModel, FragmentCustomContributeBinding>() {
 
     @Inject
     protected lateinit var contributionManager: CustomContributeManager
@@ -33,12 +35,10 @@ class CustomContributeFragment : BaseFragment<CustomContributeViewModel>() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_custom_contribute, container, false)
-    }
+    override val binder by viewBinding(FragmentCustomContributeBinding::bind)
 
     override fun initViews() {
-        customContributeContainer.applyInsetter {
+        binder.customContributeContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -46,10 +46,10 @@ class CustomContributeFragment : BaseFragment<CustomContributeViewModel>() {
             consume(true)
         }
 
-        customContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.customContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        customContributeApply.prepareForProgress(viewLifecycleOwner)
-        customContributeApply.setOnClickListener { viewModel.applyClicked() }
+        binder.customContributeApply.prepareForProgress(viewLifecycleOwner)
+        binder.customContributeApply.setOnClickListener { viewModel.applyClicked() }
     }
 
     override fun inject() {
@@ -68,25 +68,26 @@ class CustomContributeFragment : BaseFragment<CustomContributeViewModel>() {
         lifecycleScope.launchWhenResumed {
             viewModel.applyButtonState.combine(viewModel.applyingInProgress) { state, inProgress ->
                 when {
-                    inProgress -> customContributeApply.setState(ButtonState.PROGRESS)
+                    inProgress -> binder.customContributeApply.setState(ButtonState.PROGRESS)
                     state is ApplyActionState.Unavailable -> {
-                        customContributeApply.setState(ButtonState.DISABLED)
-                        customContributeApply.text = state.reason
+                        binder.customContributeApply.setState(ButtonState.DISABLED)
+                        binder.customContributeApply.text = state.reason
                     }
+
                     state is ApplyActionState.Available -> {
-                        customContributeApply.setState(ButtonState.NORMAL)
-                        customContributeApply.setText(R.string.common_apply)
+                        binder.customContributeApply.setState(ButtonState.NORMAL)
+                        binder.customContributeApply.setText(R.string.common_apply)
                     }
                 }
             }.collect()
         }
 
         viewModel.viewStateFlow.observe { viewState ->
-            customFlowContainer.removeAllViews()
+            binder.customFlowContainer.removeAllViews()
 
             val newView = contributionManager.relevantExtraBonusFlow(viewModel.customFlowType).createView(requireContext())
 
-            customFlowContainer.addView(newView)
+            binder.customFlowContainer.addView(newView)
 
             newView.bind(viewState, lifecycleScope)
         }

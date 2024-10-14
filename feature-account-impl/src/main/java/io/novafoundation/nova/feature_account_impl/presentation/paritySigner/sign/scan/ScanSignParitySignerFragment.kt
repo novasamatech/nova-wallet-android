@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.setupQrCodeExpiration
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 
-class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewModel>() {
+class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewModel, FragmentSignParitySignerScanBinding>() {
 
     companion object {
 
@@ -28,18 +28,16 @@ class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewMode
         }
     }
 
-    override val scanView: ScanView
-        get() = signParitySignerScanScanner
+    override val binder by viewBinding(FragmentSignParitySignerScanBinding::bind)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_sign_parity_signer_scan, container, false)
-    }
+    override val scanView: ScanView
+        get() = binder.signParitySignerScanScanner
 
     override fun initViews() {
         super.initViews()
 
-        signParitySignerScanToolbar.applyStatusBarInsets()
-        signParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.signParitySignerScanToolbar.applyStatusBarInsets()
+        binder.signParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {
@@ -52,7 +50,7 @@ class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewMode
     override fun subscribe(viewModel: ScanSignParitySignerViewModel) {
         super.subscribe(viewModel)
 
-        signParitySignerScanToolbar.setTitle(viewModel.title)
+        binder.signParitySignerScanToolbar.setTitle(viewModel.title)
         scanView.setTitle(viewModel.scanLabel)
 
         setupQrCodeExpiration(

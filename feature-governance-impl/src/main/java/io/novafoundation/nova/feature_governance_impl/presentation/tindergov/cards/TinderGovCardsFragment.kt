@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.isVisible
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
@@ -23,31 +24,26 @@ import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.shape.toColorStateList
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentTinderGovCardsBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter
 
-class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGovCardsAdapter.Handler, TinderGovCardStackListener {
+class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel, FragmentTinderGovCardsBinding>(), TinderGovCardsAdapter.Handler, TinderGovCardStackListener {
+
+    override val binder by viewBinding(FragmentTinderGovCardsBinding::bind)
 
     private val adapter = TinderGovCardsAdapter(lifecycleOwner = this, handler = this)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_tinder_gov_cards, container, false)
-    }
-
     override fun initViews() {
-        tinderGovCardsStatusBarInsetsContainer.applyStatusBarInsets()
-        tinderGovCardsBack.setOnClickListener { viewModel.back() }
-        tinderGovCardsSettings.setOnClickListener { viewModel.editVotingPowerClicked() }
+        binder.tinderGovCardsStatusBarInsetsContainer.applyStatusBarInsets()
+        binder.tinderGovCardsBack.setOnClickListener { viewModel.back() }
+        binder.tinderGovCardsSettings.setOnClickListener { viewModel.editVotingPowerClicked() }
 
-        tinderGovCardsStack.adapter = adapter
-        tinderGovCardsStack.itemAnimator = null
+        binder.tinderGovCardsStack.adapter = adapter
+        binder.tinderGovCardsStack.itemAnimator = null
 
-        tinderGovCardsStack.layoutManager = CardStackLayoutManager(requireContext(), this)
+        binder.tinderGovCardsStack.layoutManager = CardStackLayoutManager(requireContext(), this)
             .apply {
                 setStackFrom(StackFrom.Bottom)
                 setDirections(listOf(Direction.Left, Direction.Right, Direction.Top))
@@ -57,12 +53,12 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 setOverlayInterpolator(CardsOverlayInterpolator(delay = 0.15f, maxResult = 0.64f))
             }
 
-        tinderGovCardsControlView.setAyeClickListener { swipeCardToDirection(Direction.Right) }
-        tinderGovCardsControlView.setAbstainClickListener { swipeCardToDirection(Direction.Top) }
-        tinderGovCardsControlView.setNayClickListener { swipeCardToDirection(Direction.Left) }
+        binder.tinderGovCardsControlView.setAyeClickListener { swipeCardToDirection(Direction.Right) }
+        binder.tinderGovCardsControlView.setAbstainClickListener { swipeCardToDirection(Direction.Top) }
+        binder.tinderGovCardsControlView.setNayClickListener { swipeCardToDirection(Direction.Left) }
 
-        tinderGovCardsBasketButton.setOnClickListener { viewModel.onBasketClicked() }
-        tinderGovCardsEmptyStateButton.setOnClickListener { viewModel.onBasketClicked() }
+        binder.tinderGovCardsBasketButton.setOnClickListener { viewModel.onBasketClicked() }
+        binder.tinderGovCardsEmptyStateButton.setOnClickListener { viewModel.onBasketClicked() }
     }
 
     override fun inject() {
@@ -77,17 +73,17 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
 
     override fun subscribe(viewModel: TinderGovCardsViewModel) {
         viewModel.referendumCounterFlow.observe {
-            tinderGovCardsSubtitle.text = it
+            binder.tinderGovCardsSubtitle.text = it
         }
 
         viewModel.cardsFlow.observe { adapter.submitList(it) }
 
         viewModel.placeholderTextFlow.observe {
-            tinderGovCardsEmptyStateDescription.text = it
+            binder.tinderGovCardsEmptyStateDescription.text = it
         }
 
         viewModel.showConfirmButtonFlow.observe {
-            tinderGovCardsEmptyStateButton.isVisible = it
+            binder.tinderGovCardsEmptyStateButton.isVisible = it
         }
 
         viewModel.skipCardEvent.observeEvent {
@@ -95,15 +91,15 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         }
 
         viewModel.rewindCardEvent.observeEvent {
-            tinderGovCardsStack.rewind()
+            binder.tinderGovCardsStack.rewind()
         }
 
         viewModel.resetCardsEvent.observeEvent {
-            tinderGovCardsStack.cardLayoutManager().topPosition = 0
+            binder.tinderGovCardsStack.cardLayoutManager().topPosition = 0
         }
 
         viewModel.isCardDraggingAvailable.observe { draggingAvailable ->
-            tinderGovCardsStack.cardLayoutManager()
+            binder.tinderGovCardsStack.cardLayoutManager()
                 .apply {
                     setCanScrollHorizontal(draggingAvailable)
                     setCanScrollVertical(draggingAvailable)
@@ -111,14 +107,14 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         }
 
         viewModel.basketModelFlow.observe {
-            tinderGovCardsBasketItems.text = it.items.toString()
-            tinderGovCardsBasketItems.setTextColorRes(it.textColorRes)
-            tinderGovCardsBasketItems.backgroundTintList = requireContext().getColor(it.backgroundColorRes).toColorStateList()
+            binder.tinderGovCardsBasketItems.text = it.items.toString()
+            binder.tinderGovCardsBasketItems.setTextColorRes(it.textColorRes)
+            binder.tinderGovCardsBasketItems.backgroundTintList = requireContext().getColor(it.backgroundColorRes).toColorStateList()
 
-            tinderGovCardsBasketState.setText(it.textRes)
-            tinderGovCardsBasketState.setTextColorRes(it.textColorRes)
+            binder.tinderGovCardsBasketState.setText(it.textRes)
+            binder.tinderGovCardsBasketState.setTextColorRes(it.textColorRes)
 
-            tinderGovCardsBasketChevron.setImageTintRes(it.imageTintRes)
+            binder.tinderGovCardsBasketChevron.setImageTintRes(it.imageTintRes)
         }
 
         viewModel.insufficientBalanceChangeAction.awaitableActionLiveData.observeEvent {
@@ -150,17 +146,17 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         }
 
         viewModel.hasReferendaToVote.observe {
-            tinderGovCardsSettings.isVisible = it
-            tinderGovCardsControlView.setVisible(it, falseState = View.INVISIBLE)
+            binder.tinderGovCardsSettings.isVisible = it
+            binder.tinderGovCardsControlView.setVisible(it, falseState = View.INVISIBLE)
 
             // To avoid click if referenda cards is empty
-            tinderGovCardsStack.isEnabled = it
+            binder.tinderGovCardsStack.isEnabled = it
         }
     }
 
     private fun getScaleIntervalForPadding(desiredPadding: Int): Float {
         val screenWidth = resources.displayMetrics.widthPixels
-        val cardsPadding = tinderGovCardsStack.paddingStart + tinderGovCardsStack.paddingEnd
+        val cardsPadding = binder.tinderGovCardsStack.paddingStart + binder.tinderGovCardsStack.paddingEnd
         val cardWidth = screenWidth - cardsPadding
         val nextCardWidth = cardWidth - desiredPadding * 2
         return nextCardWidth.toFloat() / cardWidth.toFloat()
@@ -175,7 +171,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
     }
 
     override fun onCardSwiped(direction: Direction) {
-        val topPosition = tinderGovCardsStack.cardLayoutManager().topPosition
+        val topPosition = binder.tinderGovCardsStack.cardLayoutManager().topPosition
         val swipedPosition = topPosition - 1
         when (direction) {
             Direction.Left -> viewModel.nayClicked(swipedPosition)
@@ -186,7 +182,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
     }
 
     private fun swipeCardToDirection(direction: Direction, forced: Boolean = false) {
-        val layoutManager = tinderGovCardsStack.cardLayoutManager()
+        val layoutManager = binder.tinderGovCardsStack.cardLayoutManager()
         if (forced || layoutManager.canScrollVertically() && layoutManager.canScrollHorizontally()) {
             val setting = SwipeAnimationSetting.Builder()
                 .setDirection(direction)
@@ -194,7 +190,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 .setInterpolator(AccelerateInterpolator())
                 .build()
             layoutManager.setSwipeAnimationSetting(setting)
-            tinderGovCardsStack.swipe()
+            binder.tinderGovCardsStack.swipe()
         }
     }
 

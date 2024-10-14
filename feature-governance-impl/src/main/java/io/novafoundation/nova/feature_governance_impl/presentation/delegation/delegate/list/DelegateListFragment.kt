@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,16 +16,19 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.input.chooser.setupListChooserMixinBottomSheet
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentDelegateListBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter.DelegateListAdapter
 
 import javax.inject.Inject
 
 class DelegateListFragment :
-    BaseFragment<DelegateListViewModel>(),
+    BaseFragment<DelegateListViewModel, FragmentDelegateListBinding>(),
     DelegateListAdapter.Handler,
     DelegateBannerAdapter.Handler,
     DelegateSortAndFilterAdapter.Handler {
+
+    override val binder by viewBinding(FragmentDelegateListBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -35,22 +39,14 @@ class DelegateListFragment :
     private val delegateListAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateListAdapter(imageLoader, this) }
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(bannerAdapter, sortAndFilterAdapter, placeholderAdapter, delegateListAdapter) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_delegate_list, container, false)
-    }
-
     override fun initViews() {
-        delegateListList.itemAnimator = null
-        delegateListList.setHasFixedSize(true)
-        delegateListList.adapter = adapter
+        binder.delegateListList.itemAnimator = null
+        binder.delegateListList.setHasFixedSize(true)
+        binder.delegateListList.adapter = adapter
 
-        delegateListToolbar.applyStatusBarInsets()
-        delegateListToolbar.setHomeButtonListener { viewModel.backClicked() }
-        delegateListToolbar.setRightActionClickListener { viewModel.openSearch() }
+        binder.delegateListToolbar.applyStatusBarInsets()
+        binder.delegateListToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.delegateListToolbar.setRightActionClickListener { viewModel.openSearch() }
     }
 
     override fun inject() {
@@ -84,7 +80,7 @@ class DelegateListFragment :
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
                     placeholderAdapter.show(false)
-                    delegateListAdapter.submitListPreservingViewPoint(it.data, delegateListList)
+                    delegateListAdapter.submitListPreservingViewPoint(it.data, binder.delegateListList)
                 }
                 ExtendedLoadingState.Loading -> {
                     placeholderAdapter.show(true)

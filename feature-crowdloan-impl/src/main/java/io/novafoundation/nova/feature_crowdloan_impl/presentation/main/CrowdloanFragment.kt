@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
@@ -15,13 +16,16 @@ import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_crowdloan_impl.databinding.FragmentCrowdloansBinding
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
 
 import javax.inject.Inject
 
-class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.Handler, CrowdloanHeaderAdapter.Handler {
+class CrowdloanFragment : BaseFragment<CrowdloanViewModel, FragmentCrowdloansBinding>(), CrowdloanAdapter.Handler, CrowdloanHeaderAdapter.Handler {
+
+    override val binder by viewBinding(FragmentCrowdloansBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -36,17 +40,9 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
         CrowdloanAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_crowdloans, container, false)
-    }
-
     override fun initViews() {
-        crowdloanList.itemAnimator = null
-        crowdloanList.adapter = ConcatAdapter(headerAdapter, shimmeringAdapter, placeholderAdapter, adapter)
+        binder.crowdloanList.itemAnimator = null
+        binder.crowdloanList.adapter = ConcatAdapter(headerAdapter, shimmeringAdapter, placeholderAdapter, adapter)
     }
 
     override fun inject() {

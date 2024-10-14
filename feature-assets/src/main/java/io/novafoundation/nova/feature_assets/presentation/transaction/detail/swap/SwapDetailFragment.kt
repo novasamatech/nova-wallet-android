@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.sw
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.s
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentSwapDetailsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -20,13 +22,15 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showLoadingAm
 
 private const val KEY_PAYLOAD = "SwapDetailFragment.Payload"
 
-class SwapDetailFragment : BaseFragment<SwapDetailViewModel>() {
+class SwapDetailFragment : BaseFragment<SwapDetailViewModel, FragmentSwapDetailsBinding>() {
 
     companion object {
         fun getBundle(operation: OperationParcelizeModel.Swap) = Bundle().apply {
             putParcelable(KEY_PAYLOAD, operation)
         }
     }
+
+    override val binder by viewBinding(FragmentSwapDetailsBinding::bind)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,25 +39,25 @@ class SwapDetailFragment : BaseFragment<SwapDetailViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_swap_details, container, false)
 
     override fun initViews() {
-        swapDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.swapDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        swapDetailHash.setOnClickListener {
+        binder.swapDetailHash.setOnClickListener {
             viewModel.transactionHashClicked()
         }
 
-        swapDetailAccount.setOnClickListener {
+        binder.swapDetailAccount.setOnClickListener {
             viewModel.originAddressClicked()
         }
 
-        swapDetailRate.setOnClickListener {
+        binder.swapDetailRate.setOnClickListener {
             viewModel.rateClicked()
         }
 
-        swapDetailFee.setOnClickListener {
+        binder.swapDetailFee.setOnClickListener {
             viewModel.feeClicked()
         }
 
-        swapDetailsRepeatOperation.setOnClickListener {
+        binder.swapDetailsRepeatOperation.setOnClickListener {
             viewModel.repeatOperationClicked()
         }
     }
@@ -75,23 +79,23 @@ class SwapDetailFragment : BaseFragment<SwapDetailViewModel>() {
         observeDescription(viewModel)
 
         with(viewModel.operation) {
-            swapDetailStatus.showOperationStatus(statusAppearance)
-            swapDetailToolbar.setTitle(timeMillis.formatDateTime())
+            binder.swapDetailStatus.showOperationStatus(statusAppearance)
+            binder.swapDetailToolbar.setTitle(timeMillis.formatDateTime())
 
-            swapDetailAmount.setTokenAmountTextColor(statusAppearance.amountTint)
+            binder.swapDetailAmount.setTokenAmountTextColor(statusAppearance.amountTint)
 
-            swapDetailHash.showValueOrHide(transactionHash)
+            binder.swapDetailHash.showValueOrHide(transactionHash)
         }
 
-        viewModel.amountModel.observe(swapDetailAmount::setAmount)
+        viewModel.amountModel.observe(binder.swapDetailAmount::setAmount)
 
-        viewModel.assetInModel.observe(swapDetailAssets::setAssetIn)
-        viewModel.assetOutModel.observe(swapDetailAssets::setAssetOut)
+        viewModel.assetInModel.observe(binder.swapDetailAssets::setAssetIn)
+        viewModel.assetOutModel.observe(binder.swapDetailAssets::setAssetOut)
 
-        viewModel.rate.observe(swapDetailRate::showValue)
-        viewModel.feeModel.observe(swapDetailFee::showLoadingAmount)
+        viewModel.rate.observe(binder.swapDetailRate::showValue)
+        viewModel.feeModel.observe(binder.swapDetailFee::showLoadingAmount)
 
-        viewModel.walletUi.observe(swapDetailWallet::showWallet)
-        viewModel.originAddressModelFlow.observe(swapDetailAccount::showAddress)
+        viewModel.walletUi.observe(binder.swapDetailWallet::showWallet)
+        viewModel.originAddressModelFlow.observe(binder.swapDetailAccount::showAddress)
     }
 }

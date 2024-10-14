@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.blockBackPressing
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureAp
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import io.novafoundation.nova.feature_external_sign_impl.R
+import io.novafoundation.nova.feature_external_sign_impl.databinding.FragmentConfirmSignExtrinsicBinding
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
@@ -32,37 +34,31 @@ import javax.inject.Inject
 
 private const val PAYLOAD_KEY = "DAppSignExtrinsicFragment.Payload"
 
-class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
+class ExternalSignFragment : BaseFragment<ExternaSignViewModel, FragmentConfirmSignExtrinsicBinding>() {
 
     companion object {
 
         fun getBundle(payload: ExternalSignPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
+    override val binder by viewBinding(FragmentConfirmSignExtrinsicBinding::bind)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_confirm_sign_extrinsic, container, false)
-    }
-
     override fun initViews() {
-        confirmSignExtinsicToolbar.applyStatusBarInsets()
+        binder.confirmSignExtinsicToolbar.applyStatusBarInsets()
 
         blockBackPressing()
 
-        confirmDAppActionAllow.prepareForProgress(viewLifecycleOwner)
+        binder.confirmDAppActionAllow.prepareForProgress(viewLifecycleOwner)
 
-        confirmDAppActionAllow.setOnClickListener { viewModel.acceptClicked() }
-        confirmDAppActionAllow.setText(R.string.common_confirm)
-        confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
+        binder.confirmDAppActionAllow.setOnClickListener { viewModel.acceptClicked() }
+        binder.confirmDAppActionAllow.setText(R.string.common_confirm)
+        binder.confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
 
-        confirmSignExtinsicDetails.setOnClickListener { viewModel.detailsClicked() }
-        confirmSignExtinsicDetails.background = with(requireContext()) {
+        binder.confirmSignExtinsicDetails.setOnClickListener { viewModel.detailsClicked() }
+        binder.confirmSignExtinsicDetails.background = with(requireContext()) {
             addRipple(getBlockDrawable())
         }
     }
@@ -76,11 +72,11 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: ExternaSignViewModel) {
-        setupFeeLoading(viewModel, confirmSignExtinsicFee)
+        setupFeeLoading(viewModel, binder.confirmSignExtinsicFee)
         observeValidations(viewModel)
 
         viewModel.maybeChainUi.observe { chainUi ->
-            confirmSignExtinsicNetwork.postToSelf {
+            binder.confirmSignExtinsicNetwork.postToSelf {
                 if (chainUi != null) {
                     showChain(chainUi)
                 } else {
@@ -90,21 +86,21 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
         }
 
         viewModel.requestedAccountModel.observe {
-            confirmSignExtinsicAccount.postToSelf { showAddress(it) }
+            binder.confirmSignExtinsicAccount.postToSelf { showAddress(it) }
         }
 
         viewModel.walletUi.observe {
-            confirmSignExtinsicWallet.postToSelf { showWallet(it) }
+            binder.confirmSignExtinsicWallet.postToSelf { showWallet(it) }
         }
 
-        confirmSignExtinsicIcon.showDAppIcon(viewModel.dAppInfo?.icon, imageLoader)
-        confirmSignExtinsicDappUrl.showValueOrHide(viewModel.dAppInfo?.url)
+        binder.confirmSignExtinsicIcon.showDAppIcon(viewModel.dAppInfo?.icon, imageLoader)
+        binder.confirmSignExtinsicDappUrl.showValueOrHide(viewModel.dAppInfo?.url)
 
         viewModel.performingOperationInProgress.observe { operationInProgress ->
             val actionsAllowed = !operationInProgress
 
-            confirmDAppActionReject.isEnabled = actionsAllowed
-            confirmDAppActionAllow.setProgressState(show = operationInProgress)
+            binder.confirmDAppActionReject.isEnabled = actionsAllowed
+            binder.confirmDAppActionAllow.setProgressState(show = operationInProgress)
         }
 
         viewModel.confirmUnrecoverableError.awaitableActionLiveData.observeEvent {

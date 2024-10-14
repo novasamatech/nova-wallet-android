@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -13,11 +14,12 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentConfirmPayoutBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel>() {
+class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel, FragmentConfirmPayoutBinding>() {
 
     companion object {
         private const val KEY_PAYOUTS = "payouts"
@@ -29,23 +31,17 @@ class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_confirm_payout, container, false)
-    }
+    override val binder by viewBinding(FragmentConfirmPayoutBinding::bind)
 
     override fun initViews() {
-        confirmPayoutContainer.applyStatusBarInsets()
+        binder.confirmPayoutContainer.applyStatusBarInsets()
 
-        confirmPayoutConfirm.setOnClickListener { viewModel.submitClicked() }
-        confirmPayoutConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.confirmPayoutConfirm.setOnClickListener { viewModel.submitClicked() }
+        binder.confirmPayoutConfirm.prepareForProgress(viewLifecycleOwner)
 
-        confirmPayoutToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.confirmPayoutToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        confirmPayoutExtrinsicInformation.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.confirmPayoutExtrinsicInformation.setOnAccountClickedListener { viewModel.accountClicked() }
     }
 
     override fun inject() {
@@ -65,13 +61,13 @@ class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel>() {
         setupExternalActions(viewModel)
         observeValidations(viewModel)
         observeRetries(viewModel)
-        setupFeeLoading(viewModel, confirmPayoutExtrinsicInformation.fee)
+        setupFeeLoading(viewModel, binder.confirmPayoutExtrinsicInformation.fee)
 
-        viewModel.initiatorAddressModel.observe(confirmPayoutExtrinsicInformation::setAccount)
-        viewModel.walletUiFlow.observe(confirmPayoutExtrinsicInformation::setWallet)
+        viewModel.initiatorAddressModel.observe(binder.confirmPayoutExtrinsicInformation::setAccount)
+        viewModel.walletUiFlow.observe(binder.confirmPayoutExtrinsicInformation::setWallet)
 
-        viewModel.totalRewardFlow.observe(confirmPayoutAmount::setAmount)
+        viewModel.totalRewardFlow.observe(binder.confirmPayoutAmount::setAmount)
 
-        viewModel.showNextProgress.observe(confirmPayoutConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.confirmPayoutConfirm::setProgressState)
     }
 }

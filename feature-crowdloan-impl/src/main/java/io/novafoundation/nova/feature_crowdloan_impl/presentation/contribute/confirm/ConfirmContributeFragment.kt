@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -16,6 +17,7 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_crowdloan_impl.databinding.FragmentContributeConfirmBinding
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 
@@ -24,9 +26,10 @@ import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
-class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
+class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel, FragmentContributeConfirmBinding>() {
 
-    @Inject protected lateinit var imageLoader: ImageLoader
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
 
     companion object {
 
@@ -35,16 +38,10 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_contribute_confirm, container, false)
-    }
+    override val binder by viewBinding(FragmentContributeConfirmBinding::bind)
 
     override fun initViews() {
-        confirmContributeContainer.applyInsetter {
+        binder.confirmContributeContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -52,11 +49,11 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
             consume(true)
         }
 
-        confirmContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
-        confirmContributeConfirm.prepareForProgress(viewLifecycleOwner)
-        confirmContributeConfirm.setOnClickListener { viewModel.nextClicked() }
+        binder.confirmContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.confirmContributeConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.confirmContributeConfirm.setOnClickListener { viewModel.nextClicked() }
 
-        confirmContributeOriginAcount.setWholeClickListener { viewModel.originAccountClicked() }
+        binder.confirmContributeOriginAcount.setWholeClickListener { viewModel.originAccountClicked() }
     }
 
     override fun inject() {
@@ -76,23 +73,23 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
 
-        viewModel.showNextProgress.observe(confirmContributeConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.confirmContributeConfirm::setProgressState)
 
         viewModel.assetModelFlow.observe {
-            confirmContributeAmount.setAssetBalance(it.assetBalance)
-            confirmContributeAmount.setAssetName(it.tokenSymbol)
-            confirmContributeAmount.loadAssetImage(it.imageUrl)
+            binder.confirmContributeAmount.setAssetBalance(it.assetBalance)
+            binder.confirmContributeAmount.setAssetName(it.tokenSymbol)
+            binder.confirmContributeAmount.loadAssetImage(it.imageUrl)
         }
 
-        confirmContributeAmount.amountInput.setText(viewModel.selectedAmount)
+        binder.confirmContributeAmount.amountInput.setText(viewModel.selectedAmount)
 
         viewModel.enteredFiatAmountFlow.observe {
-            it.let(confirmContributeAmount::setFiatAmount)
+            it.let(binder.confirmContributeAmount::setFiatAmount)
         }
 
-        viewModel.feeFlow.observe(confirmContributeFee::setFeeStatus)
+        viewModel.feeFlow.observe(binder.confirmContributeFee::setFeeStatus)
 
-        with(confirmContributeReward) {
+        with(binder.confirmContributeReward) {
             val reward = viewModel.estimatedReward
 
             setVisible(reward != null)
@@ -101,22 +98,22 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel>() {
         }
 
         viewModel.crowdloanInfoFlow.observe {
-            confirmContributeLeasingPeriod.showValue(it.leasePeriod, it.leasedUntil)
+            binder.confirmContributeLeasingPeriod.showValue(it.leasePeriod, it.leasedUntil)
         }
 
         viewModel.selectedAddressModelFlow.observe {
-            confirmContributeOriginAcount.setMessage(it.nameOrAddress)
-            confirmContributeOriginAcount.setTextIcon(it.image)
+            binder.confirmContributeOriginAcount.setMessage(it.nameOrAddress)
+            binder.confirmContributeOriginAcount.setTextIcon(it.image)
         }
 
         viewModel.bonusFlow.observe {
-            confirmContributeBonus.setVisible(it != null)
+            binder.confirmContributeBonus.setVisible(it != null)
 
-            it?.let(confirmContributeBonus::showValue)
+            it?.let(binder.confirmContributeBonus::showValue)
         }
 
         viewModel.customizationConfiguration.filterNotNull().observe { (customization, customViewState) ->
-            customization.injectViews(confirmContributeContainer, customViewState, viewLifecycleOwner.lifecycleScope)
+            customization.injectViews(binder.confirmContributeContainer, customViewState, viewLifecycleOwner.lifecycleScope)
         }
     }
 }

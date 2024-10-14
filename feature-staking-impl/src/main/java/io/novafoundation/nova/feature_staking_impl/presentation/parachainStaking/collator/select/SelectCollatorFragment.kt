@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -13,12 +14,15 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingSelectCollatorBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.CollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 
-class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel>(), StakeTargetAdapter.ItemHandler<Collator> {
+class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel, FragmentParachainStakingSelectCollatorBinding>(), StakeTargetAdapter.ItemHandler<Collator> {
+
+    override val binder by viewBinding(FragmentParachainStakingSelectCollatorBinding::bind)
 
     val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)
@@ -26,35 +30,27 @@ class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel>(), StakeTar
 
     private var filterAction: ImageView? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_parachain_staking_select_collator, container, false)
-    }
-
     override fun initViews() {
-        selectCollatorContainer.applyStatusBarInsets()
+        binder.selectCollatorContainer.applyStatusBarInsets()
 
-        selectCollatorList.adapter = adapter
-        selectCollatorList.setHasFixedSize(true)
-        selectCollatorList.itemAnimator = null
+        binder.selectCollatorList.adapter = adapter
+        binder.selectCollatorList.setHasFixedSize(true)
+        binder.selectCollatorList.itemAnimator = null
 
-        selectCollatorToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.selectCollatorToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        filterAction = selectCollatorToolbar.addCustomAction(R.drawable.ic_filter) {
+        filterAction = binder.selectCollatorToolbar.addCustomAction(R.drawable.ic_filter) {
             viewModel.settingsClicked()
         }
 
-        selectCollatorToolbar.addCustomAction(R.drawable.ic_search) {
+        binder.selectCollatorToolbar.addCustomAction(R.drawable.ic_search) {
             viewModel.searchClicked()
         }
 
-        selectCollatorList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
+        binder.selectCollatorList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
 
-        selectCollatorClearFilters.setOnClickListener { viewModel.clearFiltersClicked() }
+        binder.selectCollatorClearFilters.setOnClickListener { viewModel.clearFiltersClicked() }
     }
 
     override fun onDestroyView() {
@@ -77,19 +73,19 @@ class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel>(), StakeTar
         viewModel.collatorModelsFlow.observe {
             adapter.submitList(it)
 
-            selectCollatorContentGroup.makeVisible()
-            selectCollatorProgress.makeGone()
+            binder.selectCollatorContentGroup.makeVisible()
+            binder.selectCollatorProgress.makeGone()
         }
 
-        viewModel.collatorsTitle.observe(selectCollatorCount::setText)
+        viewModel.collatorsTitle.observe(binder.selectCollatorCount::setText)
 
-        viewModel.scoringHeader.observe(selectCollatorSorting::setText)
+        viewModel.scoringHeader.observe(binder.selectCollatorSorting::setText)
 
         viewModel.recommendationSettingsIcon.observe { icon ->
             filterAction?.setImageResource(icon)
         }
 
-        viewModel.clearFiltersEnabled.observe(selectCollatorClearFilters::setEnabled)
+        viewModel.clearFiltersEnabled.observe(binder.selectCollatorClearFilters::setEnabled)
     }
 
     override fun stakeTargetInfoClicked(stakeTargetModel: CollatorModel) {

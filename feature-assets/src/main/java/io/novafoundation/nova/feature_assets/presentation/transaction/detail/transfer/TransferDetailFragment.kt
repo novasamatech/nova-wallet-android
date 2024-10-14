@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.tr
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
@@ -11,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_account_api.view.showOptionalAddress
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentTransferDetailsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -20,13 +22,15 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showLoadingAm
 
 private const val KEY_TRANSACTION = "KEY_DRAFT"
 
-class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
+class TransferDetailFragment : BaseFragment<TransactionDetailViewModel, FragmentTransferDetailsBinding>() {
 
     companion object {
         fun getBundle(operation: OperationParcelizeModel.Transfer) = Bundle().apply {
             putParcelable(KEY_TRANSACTION, operation)
         }
     }
+
+    override val binder by viewBinding(FragmentTransferDetailsBinding::bind)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,21 +39,21 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_transfer_details, container, false)
 
     override fun initViews() {
-        transactionDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.transactionDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        transactionDetailHash.setOnClickListener {
+        binder.transactionDetailHash.setOnClickListener {
             viewModel.transactionHashClicked()
         }
 
-        transactionDetailFrom.setOnClickListener {
+        binder.transactionDetailFrom.setOnClickListener {
             viewModel.fromAddressClicked()
         }
 
-        transactionDetailTo.setOnClickListener {
+        binder.transactionDetailTo.setOnClickListener {
             viewModel.toAddressClicked()
         }
 
-        transactionDetailRepeat.setOnClickListener {
+        binder.transactionDetailRepeat.setOnClickListener {
             viewModel.repeatTransaction()
         }
     }
@@ -70,22 +74,22 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            transactionDetailStatus.showOperationStatus(statusAppearance)
-            transactionDetailTransferDirection.setImageResource(transferDirectionIcon)
+            binder.transactionDetailStatus.showOperationStatus(statusAppearance)
+            binder.transactionDetailTransferDirection.setImageResource(transferDirectionIcon)
 
-            transactionDetailToolbar.setTitle(time.formatDateTime())
+            binder.transactionDetailToolbar.setTitle(time.formatDateTime())
 
-            viewModel.fee.observe(transactionDetailFee::showLoadingAmount)
+            viewModel.fee.observe(binder.transactionDetailFee::showLoadingAmount)
 
-            transactionDetailAmount.setAmount(amount.toAmountModel())
-            transactionDetailAmount.setTokenAmountTextColor(statusAppearance.amountTint)
+            binder.transactionDetailAmount.setAmount(amount.toAmountModel())
+            binder.transactionDetailAmount.setTokenAmountTextColor(statusAppearance.amountTint)
 
-            transactionDetailHash.showValueOrHide(hash)
+            binder.transactionDetailHash.showValueOrHide(hash)
         }
 
-        viewModel.senderAddressModelLiveData.observe(transactionDetailFrom::showOptionalAddress)
-        viewModel.recipientAddressModelFlow.observe(transactionDetailTo::showOptionalAddress)
+        viewModel.senderAddressModelLiveData.observe(binder.transactionDetailFrom::showOptionalAddress)
+        viewModel.recipientAddressModelFlow.observe(binder.transactionDetailTo::showOptionalAddress)
 
-        viewModel.chainUi.observe(transactionDetailNetwork::showChain)
+        viewModel.chainUi.observe(binder.transactionDetailNetwork::showChain)
     }
 }

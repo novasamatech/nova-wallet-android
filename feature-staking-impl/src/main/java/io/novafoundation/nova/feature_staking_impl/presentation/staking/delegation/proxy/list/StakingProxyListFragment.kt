@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,32 +16,27 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddr
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStakingProxyListBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyRvItem
 import javax.inject.Inject
 
-class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel>(), StakingProxyListAdapter.Handler {
+class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel, FragmentStakingProxyListBinding>(), StakingProxyListAdapter.Handler {
+
+    override val binder by viewBinding(FragmentStakingProxyListBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { StakingProxyListAdapter(this, imageLoader) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_staking_proxy_list, container, false)
-    }
-
     override fun initViews() {
-        stakingProxyListToolbar.applyStatusBarInsets()
-        stakingProxyListToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.stakingProxyListToolbar.applyStatusBarInsets()
+        binder.stakingProxyListToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        stakingProxyListAddProxyButton.setOnClickListener { viewModel.addProxyClicked() }
+        binder.stakingProxyListAddProxyButton.setOnClickListener { viewModel.addProxyClicked() }
 
-        stakingProxyList.adapter = adapter
+        binder.stakingProxyList.adapter = adapter
     }
 
     override fun inject() {

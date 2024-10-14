@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,6 +16,7 @@ import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.FragmentChainNetworkManagementBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.headerAdapter.ChainNetworkManagementHeaderAdapter
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.ChainNetworkManagementNodesAdapter
@@ -28,7 +30,7 @@ private val NODES_GROUP_COLOR_RES = R.color.text_secondary
 private val NODES_GROUP_TEXT_PADDING_DP = ViewSpace(16, 24, 16, 0)
 
 class ChainNetworkManagementFragment :
-    BaseFragment<ChainNetworkManagementViewModel>(),
+    BaseFragment<ChainNetworkManagementViewModel, FragmentChainNetworkManagementBinding>(),
     ChainNetworkManagementHeaderAdapter.ItemHandler,
     ChainNetworkManagementNodesAdapter.ItemHandler {
 
@@ -42,6 +44,8 @@ class ChainNetworkManagementFragment :
             }
         }
     }
+
+    override val binder by viewBinding(FragmentChainNetworkManagementBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -76,23 +80,15 @@ class ChainNetworkManagementFragment :
         )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_chain_network_management, container, false)
-    }
-
     override fun initViews() {
-        chainNetworkManagementToolbar.applyStatusBarInsets()
-        chainNetworkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
-        chainNetworkManagementToolbar.setRightActionClickListener { viewModel.networkActionsClicked() }
+        binder.chainNetworkManagementToolbar.applyStatusBarInsets()
+        binder.chainNetworkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.chainNetworkManagementToolbar.setRightActionClickListener { viewModel.networkActionsClicked() }
 
-        chainNetworkManagementContent.adapter = adapter
-        chainNetworkManagementContent.itemAnimator = null
-        chainNetworkManagementContent.addItemDecoration(NodesItemBackgroundDecoration(requireContext()))
-        chainNetworkManagementContent.addItemDecoration(NodesItemDividerDecoration(requireContext()))
+        binder.chainNetworkManagementContent.adapter = adapter
+        binder.chainNetworkManagementContent.itemAnimator = null
+        binder.chainNetworkManagementContent.addItemDecoration(NodesItemBackgroundDecoration(requireContext()))
+        binder.chainNetworkManagementContent.addItemDecoration(NodesItemDividerDecoration(requireContext()))
     }
 
     override fun inject() {
@@ -110,8 +106,8 @@ class ChainNetworkManagementFragment :
 
         viewModel.isNetworkEditable.observe {
             if (it) {
-                chainNetworkManagementToolbar.setRightActionTint(R.color.icon_primary)
-                chainNetworkManagementToolbar.setRightIconRes(R.drawable.ic_more_horizontal)
+                binder.chainNetworkManagementToolbar.setRightActionTint(R.color.icon_primary)
+                binder.chainNetworkManagementToolbar.setRightIconRes(R.drawable.ic_more_horizontal)
             }
         }
 

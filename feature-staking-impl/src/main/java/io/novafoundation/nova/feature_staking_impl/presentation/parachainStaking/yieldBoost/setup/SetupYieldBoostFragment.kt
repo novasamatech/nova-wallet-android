@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -14,43 +15,38 @@ import io.novafoundation.nova.common.utils.scrollOnFocusTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentYieldBoostSetupBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.view.showRewardEstimation
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
+class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel, FragmentYieldBoostSetupBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_yield_boost_setup, container, false)
-    }
+    override val binder by viewBinding(FragmentYieldBoostSetupBinding::bind)
 
     override fun initViews() {
-        setupYieldBoostToolbar.applyStatusBarInsets()
+        binder.setupYieldBoostToolbar.applyStatusBarInsets()
 
-        setupYieldBoostToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.setupYieldBoostToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        setupYieldBoostContinue.prepareForProgress(viewLifecycleOwner)
-        setupYieldBoostContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.setupYieldBoostContinue.prepareForProgress(viewLifecycleOwner)
+        binder.setupYieldBoostContinue.setOnClickListener { viewModel.nextClicked() }
 
-        setupYieldBoostCollator.setOnClickListener { viewModel.selectCollatorClicked() }
+        binder.setupYieldBoostCollator.setOnClickListener { viewModel.selectCollatorClicked() }
 
-        setupYieldBoostOn.setOnClickListener { viewModel.yieldBoostStateChanged(yieldBoostOn = true) }
-        setupYieldBoostOff.setOnClickListener { viewModel.yieldBoostStateChanged(yieldBoostOn = false) }
+        binder.setupYieldBoostOn.setOnClickListener { viewModel.yieldBoostStateChanged(yieldBoostOn = true) }
+        binder.setupYieldBoostOff.setOnClickListener { viewModel.yieldBoostStateChanged(yieldBoostOn = false) }
 
-        setupYieldBoostContainer.applyInsetter {
+        binder.setupYieldBoostContainer.applyInsetter {
             type(ime = true) {
                 padding()
             }
         }
 
-        setupYieldBoostScrollArea.scrollOnFocusTo(setupYieldBoostThreshold)
+        binder.setupYieldBoostScrollArea.scrollOnFocusTo(binder.setupYieldBoostThreshold)
 
         setYieldViewsVisible(false)
     }
@@ -67,11 +63,11 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
 
     override fun subscribe(viewModel: SetupYieldBoostViewModel) {
         observeValidations(viewModel)
-        setupAmountChooser(viewModel.boostThresholdChooserMixin, setupYieldBoostThreshold)
-        setupFeeLoading(viewModel, setupYieldBoostFee)
+        setupAmountChooser(viewModel.boostThresholdChooserMixin, binder.setupYieldBoostThreshold)
+        setupFeeLoading(viewModel, binder.setupYieldBoostFee)
 
         viewModel.selectedCollatorModel.observe {
-            setupYieldBoostCollator.setSelectedCollator(it)
+            binder.setupYieldBoostCollator.setSelectedCollator(it)
         }
 
         viewModel.chooseCollatorAction.awaitableActionLiveData.observeEvent { action ->
@@ -87,25 +83,25 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
         viewModel.configurationUi.observe { state ->
             setYieldViewsVisible(state is YieldBoostStateModel.On)
 
-            setupYieldBoostOn.setChecked(state is YieldBoostStateModel.On)
-            setupYieldBoostOff.setChecked(state is YieldBoostStateModel.Off)
+            binder.setupYieldBoostOn.setChecked(state is YieldBoostStateModel.On)
+            binder.setupYieldBoostOff.setChecked(state is YieldBoostStateModel.Off)
 
             if (state is YieldBoostStateModel.On) {
-                setupYieldBoostFrequency.text = state.frequencyTitle
+                binder.setupYieldBoostFrequency.text = state.frequencyTitle
             }
         }
 
-        viewModel.buttonState.observe(setupYieldBoostContinue::setState)
+        viewModel.buttonState.observe(binder.setupYieldBoostContinue::setState)
 
-        viewModel.rewardsWithYieldBoost.observe(setupYieldBoostOn::showRewardEstimation)
-        viewModel.rewardsWithoutYieldBoost.observe(setupYieldBoostOff::showRewardEstimation)
+        viewModel.rewardsWithYieldBoost.observe(binder.setupYieldBoostOn::showRewardEstimation)
+        viewModel.rewardsWithoutYieldBoost.observe(binder.setupYieldBoostOff::showRewardEstimation)
     }
 
     private fun setYieldViewsVisible(visible: Boolean) {
         listOf(
-            setupYieldBoostFrequency,
-            setupYieldBoostThreshold,
-            setupYieldBoostOakLogo
+            binder.setupYieldBoostFrequency,
+            binder.setupYieldBoostThreshold,
+            binder.setupYieldBoostOakLogo
         ).onEach { it.isVisible = visible }
     }
 }

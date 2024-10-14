@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -12,27 +13,22 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentNominationPoolsSetupUnbondBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
-class NominationPoolsSetupUnbondFragment : BaseFragment<NominationPoolsSetupUnbondViewModel>() {
+class NominationPoolsSetupUnbondFragment : BaseFragment<NominationPoolsSetupUnbondViewModel, FragmentNominationPoolsSetupUnbondBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_nomination_pools_setup_unbond, container, false)
-    }
+    override val binder by viewBinding(FragmentNominationPoolsSetupUnbondBinding::bind)
 
     override fun initViews() {
-        nominationPoolsUnbondContainer.applyStatusBarInsets()
+        binder.nominationPoolsUnbondContainer.applyStatusBarInsets()
 
-        nominationPoolsUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }
-        nominationPoolsUnbondContinue.prepareForProgress(viewLifecycleOwner)
-        nominationPoolsUnbondContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.nominationPoolsUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.nominationPoolsUnbondContinue.prepareForProgress(viewLifecycleOwner)
+        binder.nominationPoolsUnbondContinue.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {
@@ -47,12 +43,12 @@ class NominationPoolsSetupUnbondFragment : BaseFragment<NominationPoolsSetupUnbo
 
     override fun subscribe(viewModel: NominationPoolsSetupUnbondViewModel) {
         observeValidations(viewModel)
-        setupAmountChooser(viewModel.amountChooserMixin, nominationPoolsUnbondAmount)
-        setupFeeLoading(viewModel.originFeeMixin, nominationPoolsUnbondFee)
-        observeHints(viewModel.hintsMixin, nominationPoolsUnbondHints)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.nominationPoolsUnbondAmount)
+        setupFeeLoading(viewModel.originFeeMixin, binder.nominationPoolsUnbondFee)
+        observeHints(viewModel.hintsMixin, binder.nominationPoolsUnbondHints)
 
-        viewModel.transferableBalance.observe(nominationPoolsUnbondTransferable::showAmount)
+        viewModel.transferableBalance.observe(binder.nominationPoolsUnbondTransferable::showAmount)
 
-        viewModel.buttonState.observe(nominationPoolsUnbondContinue::setState)
+        viewModel.buttonState.observe(binder.nominationPoolsUnbondContinue::setState)
     }
 }

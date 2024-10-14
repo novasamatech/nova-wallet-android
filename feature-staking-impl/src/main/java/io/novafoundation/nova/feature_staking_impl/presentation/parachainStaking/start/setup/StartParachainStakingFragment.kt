@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -14,6 +15,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingStartBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.ChooseCollatorResponse
@@ -22,7 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
-class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewModel>() {
+class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewModel, FragmentParachainStakingStartBinding>() {
 
     companion object {
 
@@ -31,24 +33,18 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         fun getBundle(payload: StartParachainStakingPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_parachain_staking_start, container, false)
-    }
+    override val binder by viewBinding(FragmentParachainStakingStartBinding::bind)
 
     override fun initViews() {
-        startParachainStakingContainer.applyStatusBarInsets()
+        binder.startParachainStakingContainer.applyStatusBarInsets()
 
-        startParachainStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.startParachainStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        startParachainStakingNext.prepareForProgress(viewLifecycleOwner)
-        startParachainStakingNext.setOnClickListener { viewModel.nextClicked() }
+        binder.startParachainStakingNext.prepareForProgress(viewLifecycleOwner)
+        binder.startParachainStakingNext.setOnClickListener { viewModel.nextClicked() }
 
-        startParachainStakingCollator.setOnClickListener { viewModel.selectCollatorClicked() }
+        binder.startParachainStakingCollator.setOnClickListener { viewModel.selectCollatorClicked() }
     }
 
     override fun inject() {
@@ -64,20 +60,20 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
     override fun subscribe(viewModel: StartParachainStakingViewModel) {
         observeRetries(viewModel)
         observeValidations(viewModel)
-        setupAmountChooser(viewModel.amountChooserMixin, startParachainStakingAmountField)
-        setupParachainStakingRewardsComponent(viewModel.rewardsComponent, startParachainStakingRewards)
-        setupFeeLoading(viewModel, startParachainStakingFee)
-        observeHints(viewModel.hintsMixin, startParachainStakingHints)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.startParachainStakingAmountField)
+        setupParachainStakingRewardsComponent(viewModel.rewardsComponent, binder.startParachainStakingRewards)
+        setupFeeLoading(viewModel, binder.startParachainStakingFee)
+        observeHints(viewModel.hintsMixin, binder.startParachainStakingHints)
 
-        viewModel.title.observe(startParachainStakingToolbar::setTitle)
+        viewModel.title.observe(binder.startParachainStakingToolbar::setTitle)
 
         viewModel.selectedCollatorModel.observe {
-            startParachainStakingCollator.setSelectedCollator(it)
+            binder.startParachainStakingCollator.setSelectedCollator(it)
         }
 
-        viewModel.buttonState.observe(startParachainStakingNext::setState)
+        viewModel.buttonState.observe(binder.startParachainStakingNext::setState)
 
-        viewModel.minimumStake.observe(startParachainStakingMinStake::showAmount)
+        viewModel.minimumStake.observe(binder.startParachainStakingMinStake::showAmount)
 
         viewModel.chooseCollatorAction.awaitableActionLiveData.observeEvent { action ->
             ChooseStakedStakeTargetsBottomSheet(

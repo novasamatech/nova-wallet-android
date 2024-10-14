@@ -24,7 +24,7 @@ abstract class FixedListBottomSheet(
     context: Context,
     onCancel: (() -> Unit)? = null,
     private val viewConfiguration: ViewConfiguration = ViewConfiguration.default()
-) : BaseBottomSheet(context, onCancel = onCancel) {
+) : BaseBottomSheet<>(context, onCancel = onCancel) {
 
     class ViewConfiguration(
         @LayoutRes val layout: Int,

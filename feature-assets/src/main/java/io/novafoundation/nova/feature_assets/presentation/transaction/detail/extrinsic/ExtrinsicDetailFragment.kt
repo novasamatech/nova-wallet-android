@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenI
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentExtrinsicDetailsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -29,13 +31,15 @@ import javax.inject.Inject
 
 private const val KEY_EXTRINSIC = "KEY_EXTRINSIC"
 
-class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
+class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel, FragmentExtrinsicDetailsBinding>() {
 
     companion object {
         fun getBundle(operation: OperationParcelizeModel.Extrinsic) = Bundle().apply {
             putParcelable(KEY_EXTRINSIC, operation)
         }
     }
+
+    override val binder by viewBinding(FragmentExtrinsicDetailsBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -47,9 +51,9 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_extrinsic_details, container, false)
 
     override fun initViews() {
-        extrinsicDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.extrinsicDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        extrinsicDetailSender.setOnClickListener {
+        binder.extrinsicDetailSender.setOnClickListener {
             viewModel.fromAddressClicked()
         }
     }
@@ -70,23 +74,23 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            extrinsicDetailStatus.showOperationStatus(statusAppearance)
-            extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
+            binder.extrinsicDetailStatus.showOperationStatus(statusAppearance)
+            binder.extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
 
-            extrinsicDetailToolbar.setTitle(time.formatDateTime())
+            binder.extrinsicDetailToolbar.setTitle(time.formatDateTime())
 
-            extrinsicDetailAmount.text = fee
-            extrinsicDetailAmountFiat.setTextOrHide(this.fiatFee)
+            binder.extrinsicDetailAmount.text = fee
+            binder.extrinsicDetailAmountFiat.setTextOrHide(this.fiatFee)
         }
 
         viewModel.content.observe(::showExtrinsicContent)
 
-        viewModel.senderAddressModelFlow.observe(extrinsicDetailSender::showAddress)
+        viewModel.senderAddressModelFlow.observe(binder.extrinsicDetailSender::showAddress)
 
-        viewModel.chainUi.observe(extrinsicDetailNetwork::showChain)
+        viewModel.chainUi.observe(binder.extrinsicDetailNetwork::showChain)
 
         viewModel.operationIcon.observe {
-            extrinsicDetailIcon.loadTokenIcon(it, imageLoader)
+            binder.extrinsicDetailIcon.loadTokenIcon(it, imageLoader)
         }
     }
 
@@ -109,7 +113,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
 
         block.apply(builder)
 
-        extrinsicContentContainer.addView(block)
+        binder.extrinsicContentContainer.addView(block)
     }
 
     private fun TableView.blockEntry(entry: BlockEntry) {

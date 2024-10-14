@@ -8,6 +8,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -17,13 +18,16 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentDelegateSearchBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter.DelegateListAdapter
 import javax.inject.Inject
 
 class DelegateSearchFragment :
-    BaseFragment<DelegateSearchViewModel>(),
+    BaseFragment<DelegateSearchViewModel, FragmentDelegateSearchBinding>(),
     DelegateListAdapter.Handler {
+
+    override val binder by viewBinding(FragmentDelegateSearchBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -32,21 +36,13 @@ class DelegateSearchFragment :
     private val delegateListAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateListAdapter(imageLoader, this) }
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(delegateSearchCountResultAdapter, delegateListAdapter) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_delegate_search, container, false)
-    }
-
     override fun initViews() {
-        delegateSearchList.itemAnimator = null
-        delegateSearchList.setHasFixedSize(true)
-        delegateSearchList.adapter = adapter
+        binder.delegateSearchList.itemAnimator = null
+        binder.delegateSearchList.setHasFixedSize(true)
+        binder.delegateSearchList.adapter = adapter
 
-        delegateSearchNavigation.applyStatusBarInsets()
-        delegateSearchToolbar.setHomeButtonListener {
+        binder.delegateSearchNavigation.applyStatusBarInsets()
+        binder.delegateSearchToolbar.setHomeButtonListener {
             viewModel.backClicked()
             hideKeyboard()
         }
@@ -63,13 +59,13 @@ class DelegateSearchFragment :
     }
 
     override fun subscribe(viewModel: DelegateSearchViewModel) {
-        delegateSearchField.content.bindTo(viewModel.query, lifecycleScope)
+        binder.delegateSearchField.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchPlaceholderModel.observeWhenVisible {
-            delegateSearchPlaceholder.isGone = it == null
+            binder.delegateSearchPlaceholder.isGone = it == null
             if (it != null) {
-                delegateSearchPlaceholder.setImage(it.drawableRes)
-                delegateSearchPlaceholder.setText(it.textRes)
+                binder.delegateSearchPlaceholder.setImage(it.drawableRes)
+                binder.delegateSearchPlaceholder.setText(it.textRes)
             }
         }
 
@@ -78,8 +74,8 @@ class DelegateSearchFragment :
         }
 
         viewModel.delegateModels.observeWhenVisible {
-            delegateSearchList.isGone = it is ExtendedLoadingState.Loading
-            delegateSearchProgressBar.isVisible = it is ExtendedLoadingState.Loading
+            binder.delegateSearchList.isGone = it is ExtendedLoadingState.Loading
+            binder.delegateSearchProgressBar.isVisible = it is ExtendedLoadingState.Loading
 
             if (it is ExtendedLoadingState.Loaded) {
                 delegateListAdapter.submitList(it.data)

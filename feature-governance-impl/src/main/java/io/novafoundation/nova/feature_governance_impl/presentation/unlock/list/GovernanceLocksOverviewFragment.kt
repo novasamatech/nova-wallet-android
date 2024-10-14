@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -12,9 +13,12 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentGovernanceLocksOverviewBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 
-class GovernanceLocksOverviewFragment : BaseFragment<GovernanceLocksOverviewViewModel>() {
+class GovernanceLocksOverviewFragment : BaseFragment<GovernanceLocksOverviewViewModel, FragmentGovernanceLocksOverviewBinding>() {
+
+    override val binder by viewBinding(FragmentGovernanceLocksOverviewBinding::bind)
 
     private val headerAdapter = TotalGovernanceLocksHeaderAdapter()
 
@@ -24,19 +28,11 @@ class GovernanceLocksOverviewFragment : BaseFragment<GovernanceLocksOverviewView
         ConcatAdapter(headerAdapter, listAdapter)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_governance_locks_overview, container, false)
-    }
-
     override fun initViews() {
-        governanceLockedTokensToolbar.setHomeButtonListener { viewModel.backClicked() }
-        governanceUnlockTokensButton.setOnClickListener { viewModel.unlockClicked() }
+        binder.governanceLockedTokensToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.governanceUnlockTokensButton.setOnClickListener { viewModel.unlockClicked() }
 
-        governanceLockedTokens.adapter = adapter
+        binder.governanceLockedTokens.adapter = adapter
     }
 
     override fun inject() {
@@ -57,19 +53,19 @@ class GovernanceLocksOverviewFragment : BaseFragment<GovernanceLocksOverviewView
         viewModel.lockModels.observe {
             if (it is LoadingState.Loaded) {
                 listAdapter.submitList(it.data)
-                governanceLockedTokens.makeVisible()
-                governanceTokensProgress.makeGone()
+                binder.governanceLockedTokens.makeVisible()
+                binder.governanceTokensProgress.makeGone()
             } else {
-                governanceLockedTokens.makeGone()
-                governanceTokensProgress.makeVisible()
+                binder.governanceLockedTokens.makeGone()
+                binder.governanceTokensProgress.makeVisible()
             }
         }
 
         viewModel.isUnlockAvailable.observe {
             if (it is LoadingState.Loaded) {
-                governanceUnlockTokensButton.isEnabled = it.data
+                binder.governanceUnlockTokensButton.isEnabled = it.data
             } else {
-                governanceUnlockTokensButton.isEnabled = false
+                binder.governanceUnlockTokensButton.isEnabled = false
             }
         }
     }

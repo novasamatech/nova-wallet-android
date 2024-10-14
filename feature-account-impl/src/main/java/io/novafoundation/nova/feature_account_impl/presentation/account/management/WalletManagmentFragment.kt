@@ -17,18 +17,14 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 import javax.inject.Inject
 
-class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), AccountHolder.AccountItemHandler {
+class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel, FragmentAccoutBinding>(), AccountHolder.AccountItemHandler {
+
+    override val binder by viewBinding(FragmentAccoutBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
 
     private lateinit var adapter: AccountsAdapter
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ) = layoutInflater.inflate(R.layout.fragment_accounts, container, false)
 
     override fun initViews() {
         adapter = AccountsAdapter(
@@ -38,13 +34,13 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), Accoun
             chainBorderColor = R.color.secondary_screen_background
         )
 
-        accountsList.setHasFixedSize(true)
-        accountsList.adapter = adapter
+        binder.accountsList.setHasFixedSize(true)
+        binder.accountsList.adapter = adapter
 
-        accountListToolbar.setRightActionClickListener { viewModel.editClicked() }
-        accountListToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.accountListToolbar.setRightActionClickListener { viewModel.editClicked() }
+        binder.accountListToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        addAccount.setOnClickListener { viewModel.addAccountClicked() }
+        binder.addAccount.setOnClickListener { viewModel.addAccountClicked() }
     }
 
     override fun inject() {
@@ -63,7 +59,7 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), Accoun
         viewModel.walletsListingMixin.metaAccountsFlow.observe(adapter::submitList)
         viewModel.mode.observe(adapter::setMode)
 
-        viewModel.toolbarAction.observe(accountListToolbar::setTextRight)
+        viewModel.toolbarAction.observe(binder.accountListToolbar::setTextRight)
 
         viewModel.confirmAccountDeletion.awaitableActionLiveData.observeEvent {
             warningDialog(

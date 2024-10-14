@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.onLoaded
@@ -13,6 +14,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStakingDashboardBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardLoadingAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
@@ -22,11 +24,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.l
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.MoreStakingOptionsAdapter
 
 class StakingDashboardFragment :
-    BaseFragment<StakingDashboardViewModel>(),
+    BaseFragment<StakingDashboardViewModel, FragmentStakingDashboardBinding>(),
     DashboardHasStakeAdapter.Handler,
     DashboardNoStakeAdapter.Handler,
     DashboardHeaderAdapter.Handler,
     MoreStakingOptionsAdapter.Handler {
+
+    override val binder by viewBinding(FragmentStakingDashboardBinding::bind)
 
     private val headerAdapter = DashboardHeaderAdapter(this)
     private val hasStakeLoadingAdapter = DashboardLoadingAdapter(initialNumberOfItems = 1, layout = R.layout.item_dashboard_has_stake_loading)
@@ -35,14 +39,6 @@ class StakingDashboardFragment :
     private val noStakeLoadingAdapter = DashboardLoadingAdapter(initialNumberOfItems = 3, layout = R.layout.item_dashboard_loading)
     private val noStakeAdapter = DashboardNoStakeAdapter(this)
     private val moreStakingOptionsAdapter = MoreStakingOptionsAdapter(this)
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_staking_dashboard, container, false)
-    }
 
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(
@@ -55,10 +51,10 @@ class StakingDashboardFragment :
     }
 
     override fun initViews() {
-        stakingDashboardContent.applyStatusBarInsets()
-        stakingDashboardContent.setHasFixedSize(true)
+        binder.stakingDashboardContent.applyStatusBarInsets()
+        binder.stakingDashboardContent.setHasFixedSize(true)
 
-        stakingDashboardContent.adapter = ConcatAdapter(
+        binder.stakingDashboardContent.adapter = ConcatAdapter(
             headerAdapter,
             hasStakeLoadingAdapter,
             hasStakeAdapter,
@@ -68,14 +64,14 @@ class StakingDashboardFragment :
             moreStakingOptionsAdapter
         )
 
-        stakingDashboardContent.itemAnimator = null
+        binder.stakingDashboardContent.itemAnimator = null
     }
 
     override fun subscribe(viewModel: StakingDashboardViewModel) {
         viewModel.stakingDashboardUiFlow.observe { dashboardLoading ->
             dashboardLoading.onLoaded {
-                hasStakeAdapter.submitListPreservingViewPoint(it.hasStakeItems, stakingDashboardContent)
-                noStakeAdapter.submitListPreservingViewPoint(it.noStakeItems, stakingDashboardContent)
+                hasStakeAdapter.submitListPreservingViewPoint(it.hasStakeItems, binder.stakingDashboardContent)
+                noStakeAdapter.submitListPreservingViewPoint(it.noStakeItems, binder.stakingDashboardContent)
 
                 hasStakeLoadingAdapter.setLoaded(true)
                 noStakeLoadingAdapter.setLoaded(true)
@@ -88,7 +84,7 @@ class StakingDashboardFragment :
         viewModel.walletUi.observe(headerAdapter::setSelectedWallet)
 
         viewModel.scrollToTopEvent.observeEvent {
-            stakingDashboardContent.scrollToPosition(0)
+            binder.stakingDashboardContent.scrollToPosition(0)
         }
     }
 

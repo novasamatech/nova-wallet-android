@@ -26,6 +26,6 @@ class TextHeader(val content: String) {
 class TextHeaderHolder(parentView: ViewGroup) : GroupedListHolder(parentView.inflateChild(R.layout.item_text_header)) {
 
     fun bind(item: TextHeader) {
-        containerView.textHeader.text = item.content
+        containerView.EtextHeader.text = item.content
     }
 }

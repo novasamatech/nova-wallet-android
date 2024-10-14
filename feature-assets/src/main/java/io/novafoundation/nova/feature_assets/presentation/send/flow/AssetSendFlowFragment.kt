@@ -12,7 +12,7 @@ class AssetSendFlowFragment : AssetFlowFragment<AssetSendFlowViewModel>() {
         super.initViews()
         setTitle(R.string.wallet_asset_send)
 
-        assetFlowPlaceholder.setButtonClickListener {
+        binder.assetFlowPlaceholder.setButtonClickListener {
             viewModel.openBuyFlow()
         }
     }

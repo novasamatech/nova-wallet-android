@@ -4,21 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.bindFromMap
+import io.novafoundation.nova.feature_assets.databinding.FragmentAssetFiltersBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.domain.assets.filters.NonZeroBalanceFilter
 
-class AssetFiltersBottomSheetFragment : BaseBottomSheetFragment<AssetFiltersViewModel>() {
+class AssetFiltersBottomSheetFragment : BaseBottomSheetFragment<AssetFiltersViewModel, FragmentAssetFiltersBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_asset_filters, container, false)
+    override val binder by viewBinding(FragmentAssetFiltersBinding::bind)
 
     override fun initViews() {}
 
@@ -33,6 +31,6 @@ class AssetFiltersBottomSheetFragment : BaseBottomSheetFragment<AssetFiltersView
     }
 
     override fun subscribe(viewModel: AssetFiltersViewModel) {
-        assetsFilterSwitchZeroBalances.bindFromMap(NonZeroBalanceFilter, viewModel.filtersEnabledMap, viewLifecycleOwner.lifecycleScope)
+        binder.assetsFilterSwitchZeroBalances.bindFromMap(NonZeroBalanceFilter, viewModel.filtersEnabledMap, viewLifecycleOwner.lifecycleScope)
     }
 }

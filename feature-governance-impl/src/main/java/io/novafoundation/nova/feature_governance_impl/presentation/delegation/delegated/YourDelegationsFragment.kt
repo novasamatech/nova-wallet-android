@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -14,13 +15,16 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentYourDelegationsBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter.DelegateListAdapter
 import javax.inject.Inject
 
 class YourDelegationsFragment :
-    BaseFragment<YourDelegationsViewModel>(),
+    BaseFragment<YourDelegationsViewModel, FragmentYourDelegationsBinding>(),
     DelegateListAdapter.Handler {
+
+    override val binder by viewBinding(FragmentYourDelegationsBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -29,21 +33,13 @@ class YourDelegationsFragment :
     private val delegateListAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateListAdapter(imageLoader, this) }
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(placeholderAdapter, delegateListAdapter) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_your_delegations, container, false)
-    }
-
     override fun initViews() {
-        yourDelegationsList.itemAnimator = null
-        yourDelegationsList.adapter = adapter
+        binder.yourDelegationsList.itemAnimator = null
+        binder.yourDelegationsList.adapter = adapter
 
-        yourDelegationsToolbar.applyStatusBarInsets()
-        yourDelegationsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        yourDelegationsAddDelegationButton.setOnClickListener { viewModel.addDelegationClicked() }
+        binder.yourDelegationsToolbar.applyStatusBarInsets()
+        binder.yourDelegationsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.yourDelegationsAddDelegationButton.setOnClickListener { viewModel.addDelegationClicked() }
     }
 
     override fun inject() {
@@ -62,7 +58,7 @@ class YourDelegationsFragment :
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
                     placeholderAdapter.show(false)
-                    delegateListAdapter.submitListPreservingViewPoint(it.data, yourDelegationsList)
+                    delegateListAdapter.submitListPreservingViewPoint(it.data, binder.yourDelegationsList)
                 }
                 ExtendedLoadingState.Loading -> {
                     placeholderAdapter.show(true)

@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.track.unavailable
 
 import android.content.Context
+import android.view.LayoutInflater
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.BottomSheetUnavailableTracksBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 
 class UnavailableTracksPayload(
@@ -14,13 +16,14 @@ class UnavailableTracksBottomSheet(
     context: Context,
     private val payload: UnavailableTracksPayload,
     private val removeVotesClicked: () -> Unit
-) : BaseBottomSheet(context), UnavailableTracksAdapter.Handler {
+) : BaseBottomSheet<BottomSheetUnavailableTracksBinding>(context), UnavailableTracksAdapter.Handler {
+
+    override val binder: BottomSheetUnavailableTracksBinding = BottomSheetUnavailableTracksBinding.inflate(LayoutInflater.from(context))
 
     private val adapter = UnavailableTracksAdapter(this)
 
     init {
-        setContentView(R.layout.bottom_sheet_unavailable_tracks)
-        unavailableTracksList.adapter = adapter
+        binder.unavailableTracksList.adapter = adapter
 
         adapter.submitList(buildList())
     }

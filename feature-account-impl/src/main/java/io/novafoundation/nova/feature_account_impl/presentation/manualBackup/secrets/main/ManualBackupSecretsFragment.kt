@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupJsonRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
 
-class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel>(), ManualBackupItemHandler {
+class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel, FragmentManualBackupSecretsBinding>(), ManualBackupItemHandler {
 
     companion object {
 
@@ -28,23 +28,17 @@ class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel>()
         }
     }
 
+    override val binder by viewBinding(FragmentManualBackupSecretsBinding::bind)
+
     private val adapter = ManualBackupSecretsAdapter(this)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_manual_backup_secrets, container, false)
-    }
-
     override fun initViews() {
-        manualBackupSecretsToolbar.applyStatusBarInsets()
-        manualBackupSecretsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        manualBackupSecretsToolbar.setRightActionClickListener { viewModel.advancedSecretsClicked() }
+        binder.manualBackupSecretsToolbar.applyStatusBarInsets()
+        binder.manualBackupSecretsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.manualBackupSecretsToolbar.setRightActionClickListener { viewModel.advancedSecretsClicked() }
 
-        manualBackupSecretsList.adapter = adapter
-        manualBackupSecretsList.addItemDecoration(ExtraSpaceItemDecoration())
+        binder.manualBackupSecretsList.adapter = adapter
+        binder.manualBackupSecretsList.addItemDecoration(ExtraSpaceItemDecoration())
     }
 
     override fun inject() {
@@ -59,15 +53,15 @@ class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel>()
 
     override fun subscribe(viewModel: ManualBackupSecretsViewModel) {
         viewModel.walletModel.observe {
-            manualBackupSecretsToolbar.setTitleIcon(it.icon)
-            manualBackupSecretsToolbar.setTitle(it.name)
+            binder.manualBackupSecretsToolbar.setTitleIcon(it.icon)
+            binder.manualBackupSecretsToolbar.setTitle(it.name)
         }
 
         viewModel.advancedSecretsBtnAvailable.observe { available ->
             if (available) {
-                manualBackupSecretsToolbar.setRightIconRes(R.drawable.ic_options)
+                binder.manualBackupSecretsToolbar.setRightIconRes(R.drawable.ic_options)
             } else {
-                manualBackupSecretsToolbar.hideRightAction()
+                binder.manualBackupSecretsToolbar.hideRightAction()
             }
         }
 

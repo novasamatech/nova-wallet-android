@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
@@ -21,13 +22,14 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
+import io.novafoundation.nova.feature_nft_impl.databinding.FragmentNftDetailsBinding
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.model.NftPriceModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
 
 import javax.inject.Inject
 
-class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
+class NftDetailsFragment : BaseFragment<NftDetailsViewModel, FragmentNftDetailsBinding>() {
 
     companion object {
 
@@ -36,31 +38,32 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
         fun getBundle(nftId: String) = bundleOf(PAYLOAD to nftId)
     }
 
+    override val binder by viewBinding(FragmentNftDetailsBinding::bind)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
     private val contentViews by lazy(LazyThreadSafetyMode.NONE) {
-        listOf(nftDetailsMedia, nftDetailsTitle, nftDetailsDescription, nftDetailsIssuance, nftDetailsPrice, nftDetailsTable)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_nft_details, container, false)
+        listOf(
+            binder.nftDetailsMedia,
+            binder.nftDetailsTitle,
+            binder.nftDetailsDescription,
+            binder.nftDetailsIssuance,
+            binder.nftDetailsPrice,
+            binder.nftDetailsTable
+        )
     }
 
     override fun initViews() {
-        nftDetailsToolbar.applyStatusBarInsets()
-        nftDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.nftDetailsToolbar.applyStatusBarInsets()
+        binder.nftDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        nftDetailsOnwer.setOnClickListener { viewModel.ownerClicked() }
-        nftDetailsCreator.setOnClickListener { viewModel.creatorClicked() }
+        binder.nftDetailsOnwer.setOnClickListener { viewModel.ownerClicked() }
+        binder.nftDetailsCreator.setOnClickListener { viewModel.creatorClicked() }
 
-        nftDetailsCollection.valuePrimary.ellipsize = TextUtils.TruncateAt.END
+        binder.nftDetailsCollection.valuePrimary.ellipsize = TextUtils.TruncateAt.END
 
-        nftDetailsProgress.makeVisible()
+        binder.nftDetailsProgress.makeVisible()
         contentViews.forEach(View::makeGone)
     }
 
@@ -75,37 +78,37 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
         setupExternalActions(viewModel)
 
         viewModel.nftDetailsUi.observe {
-            nftDetailsProgress.makeGone()
+            binder.nftDetailsProgress.makeGone()
             contentViews.forEach(View::makeVisible)
 
-            nftDetailsMedia.load(it.media, imageLoader) {
+            binder.nftDetailsMedia.load(it.media, imageLoader) {
                 placeholder(R.drawable.nft_media_progress)
                 error(R.drawable.nft_media_progress)
             }
-            nftDetailsTitle.text = it.name
-            nftDetailsDescription.setTextOrHide(it.description)
-            nftDetailsIssuance.text = it.issuance
+            binder.nftDetailsTitle.text = it.name
+            binder.nftDetailsDescription.setTextOrHide(it.description)
+            binder.nftDetailsIssuance.text = it.issuance
 
-            nftDetailsPrice.setPriceOrHide(it.price)
+            binder.nftDetailsPrice.setPriceOrHide(it.price)
 
             if (it.collection != null) {
-                nftDetailsCollection.makeVisible()
-                nftDetailsCollection.loadImage(it.collection.media)
-                nftDetailsCollection.showValue(it.collection.name)
+                binder.nftDetailsCollection.makeVisible()
+                binder.nftDetailsCollection.loadImage(it.collection.media)
+                binder.nftDetailsCollection.showValue(it.collection.name)
             } else {
-                nftDetailsCollection.makeGone()
+                binder.nftDetailsCollection.makeGone()
             }
 
-            nftDetailsOnwer.showAddress(it.owner)
+            binder.nftDetailsOnwer.showAddress(it.owner)
 
             if (it.creator != null) {
-                nftDetailsCreator.makeVisible()
-                nftDetailsCreator.showAddress(it.creator)
+                binder.nftDetailsCreator.makeVisible()
+                binder.nftDetailsCreator.showAddress(it.creator)
             } else {
-                nftDetailsCreator.makeGone()
+                binder.nftDetailsCreator.makeGone()
             }
 
-            nftDetailsChain.showChain(it.network)
+            binder.nftDetailsChain.showChain(it.network)
         }
 
         viewModel.exitingErrorLiveData.observeEvent {

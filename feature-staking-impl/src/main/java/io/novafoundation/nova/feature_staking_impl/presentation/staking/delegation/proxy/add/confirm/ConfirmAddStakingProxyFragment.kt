@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -16,10 +17,12 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentConfirmAddStakingProxyBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
-class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewModel>() {
+class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewModel, FragmentConfirmAddStakingProxyBinding>() {
+
     companion object {
 
         private const val PAYLOAD_KEY = "PAYLOAD_KEY"
@@ -29,25 +32,19 @@ class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewMo
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_confirm_add_staking_proxy, container, false)
-    }
+    override val binder by viewBinding(FragmentConfirmAddStakingProxyBinding::bind)
 
     override fun initViews() {
-        confirmAddStakingProxyToolbar.applyStatusBarInsets()
+        binder.confirmAddStakingProxyToolbar.applyStatusBarInsets()
 
-        confirmAddStakingProxyToolbar.setHomeButtonListener { viewModel.back() }
+        binder.confirmAddStakingProxyToolbar.setHomeButtonListener { viewModel.back() }
 
-        confirmAddStakingProxyButton.setOnClickListener { viewModel.confirmClicked() }
-        confirmAddStakingProxyButton.prepareForProgress(viewLifecycleOwner)
+        binder.confirmAddStakingProxyButton.setOnClickListener { viewModel.confirmClicked() }
+        binder.confirmAddStakingProxyButton.prepareForProgress(viewLifecycleOwner)
 
-        confirmAddStakingProxyProxiedAccount.setOnClickListener { viewModel.proxiedAccountClicked() }
-        confirmAddStakingProxyDeposit.setOnClickListener { viewModel.depositClicked() }
-        confirmAddStakingProxyDelegationAccount.setOnClickListener { viewModel.proxyAccountClicked() }
+        binder.confirmAddStakingProxyProxiedAccount.setOnClickListener { viewModel.proxiedAccountClicked() }
+        binder.confirmAddStakingProxyDeposit.setOnClickListener { viewModel.depositClicked() }
+        binder.confirmAddStakingProxyDelegationAccount.setOnClickListener { viewModel.proxyAccountClicked() }
     }
 
     override fun inject() {
@@ -67,13 +64,13 @@ class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewMo
         setupExternalActions(viewModel)
         observeDescription(viewModel)
 
-        viewModel.chainModel.observe { confirmAddStakingProxyNetwork.showChain(it) }
-        viewModel.walletUiFlow.observe { confirmAddStakingProxyWallet.showWallet(it) }
-        viewModel.proxiedAccountModel.observe { confirmAddStakingProxyProxiedAccount.showAddress(it) }
-        viewModel.proxyDeposit.observe { confirmAddStakingProxyDeposit.showAmount(it) }
-        viewModel.feeModelFlow.observe { confirmAddStakingProxyNetworkFee.showAmount(it) }
-        viewModel.proxyAccountModel.observe { confirmAddStakingProxyDelegationAccount.showAddress(it) }
+        viewModel.chainModel.observe { binder.confirmAddStakingProxyNetwork.showChain(it) }
+        viewModel.walletUiFlow.observe { binder.confirmAddStakingProxyWallet.showWallet(it) }
+        viewModel.proxiedAccountModel.observe { binder.confirmAddStakingProxyProxiedAccount.showAddress(it) }
+        viewModel.proxyDeposit.observe { binder.confirmAddStakingProxyDeposit.showAmount(it) }
+        viewModel.feeModelFlow.observe { binder.confirmAddStakingProxyNetworkFee.showAmount(it) }
+        viewModel.proxyAccountModel.observe { binder.confirmAddStakingProxyDelegationAccount.showAddress(it) }
 
-        viewModel.validationProgressFlow.observe(confirmAddStakingProxyButton::setProgressState)
+        viewModel.validationProgressFlow.observe(binder.confirmAddStakingProxyButton::setProgressState)
     }
 }

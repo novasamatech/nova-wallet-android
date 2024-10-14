@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -12,46 +13,45 @@ import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentImportLedgerStartBinding
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 
-class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel>() {
+class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel, FragmentImportLedgerStartBinding>() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_ledger_start, container, false)
-    }
+    override val binder by viewBinding(FragmentImportLedgerStartBinding::bind)
 
     override fun initViews() {
-        startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
-        startImportLedgerToolbar.applyStatusBarInsets()
+        binder.startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.startImportLedgerToolbar.applyStatusBarInsets()
 
-        startImportLedgerContinue.setOnClickListener { viewModel.continueClicked() }
+        binder.startImportLedgerContinue.setOnClickListener { viewModel.continueClicked() }
 
-        startImportLedgerDepractionWarning.setOnClickListener { viewModel.deprecationWarningClicked() }
+        binder.startImportLedgerDepractionWarning.setOnClickListener { viewModel.deprecationWarningClicked() }
 
-        startImportLedgerGuideLink.setOnClickListener { viewModel.guideClicked() }
+        binder.startImportLedgerGuideLink.setOnClickListener { viewModel.guideClicked() }
 
-        startImportLedgerStep1.setStepText(
+        binder.startImportLedgerStep1.setStepText(
             requireContext().highlightedText(
                 R.string.account_ledger_import_start_step_1,
                 R.string.account_ledger_import_start_step_1_highlighted
             )
         )
 
-        startImportLedgerStep2.setStepText(
+        binder.startImportLedgerStep2.setStepText(
             requireContext().highlightedText(
                 R.string.account_ledger_import_start_step_2,
                 R.string.account_ledger_import_start_step_2_highlighted
             )
         )
 
-        startImportLedgerStep3.setStepText(
+        binder.startImportLedgerStep3.setStepText(
             requireContext().highlightedText(
                 R.string.account_ledger_import_start_step_3,
                 R.string.account_ledger_import_start_step_3_highlighted
             )
         )
 
-        startImportLedgerStep4.setStepText(
+        binder.startImportLedgerStep4.setStepText(
             requireContext().highlightedText(
                 R.string.account_ledger_import_start_step_4,
                 R.string.account_ledger_import_start_step_4_highlighted
@@ -69,6 +69,6 @@ class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel>() {
     override fun subscribe(viewModel: StartImportLedgerViewModel) {
         observeBrowserEvents(viewModel)
 
-        viewModel.shouldShowWarning.observe(startImportLedgerDepractionWarning::setVisible)
+        viewModel.shouldShowWarning.observe(binder.startImportLedgerDepractionWarning::setVisible)
     }
 }

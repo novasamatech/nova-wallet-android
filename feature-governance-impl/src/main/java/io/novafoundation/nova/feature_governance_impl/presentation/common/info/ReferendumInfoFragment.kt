@@ -7,17 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.setAddressOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendumInfoBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 
-class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
+class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel, FragmentReferendumInfoBinding>() {
 
     companion object {
         private const val KEY_PAYLOAD = "KEY_PAYLOAD"
@@ -29,18 +31,12 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_referendum_info, container, false)
-    }
+    override val binder by viewBinding(FragmentReferendumInfoBinding::bind)
 
     override fun initViews() {
-        referendumInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.referendumInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        referendumInfoProposer.setOnClickListener {
+        binder.referendumInfoProposer.setOnClickListener {
             viewModel.proposerClicked()
         }
     }
@@ -55,15 +51,15 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
     override fun subscribe(viewModel: ReferendumInfoViewModel) {
         setupExternalActions(viewModel)
 
-        viewModel.titleFlow.observe { referendumInfoTitle.text = it }
-        viewModel.subtitleFlow.observe { referendumInfoDescription.text = it }
-        viewModel.idFlow.observe { referendumInfoNumber.setText(it) }
-        viewModel.trackFlow.observe { referendumInfoTrack.setReferendumTrackModel(it) }
-        viewModel.timeEstimation.observe { referendumInfoTime.setReferendumTimeEstimation(it, Gravity.END) }
-        viewModel.proposerAddressModel.observeWhenVisible(referendumInfoProposer::setAddressOrHide)
+        viewModel.titleFlow.observe { binder.referendumInfoTitle.text = it }
+        viewModel.subtitleFlow.observe { binder.referendumInfoDescription.text = it }
+        viewModel.idFlow.observe { binder.referendumInfoNumber.setText(it) }
+        viewModel.trackFlow.observe { binder.referendumInfoTrack.setReferendumTrackModel(it) }
+        viewModel.timeEstimation.observe { binder.referendumInfoTime.setReferendumTimeEstimation(it, Gravity.END) }
+        viewModel.proposerAddressModel.observeWhenVisible(binder.referendumInfoProposer::setAddressOrHide)
         viewModel.isLoadingState.observe {
-            referendumInfoContainer.isGone = it
-            referendumInfoProgress.isVisible = it
+            binder.referendumInfoContainer.isGone = it
+            binder.referendumInfoProgress.isVisible = it
         }
     }
 }

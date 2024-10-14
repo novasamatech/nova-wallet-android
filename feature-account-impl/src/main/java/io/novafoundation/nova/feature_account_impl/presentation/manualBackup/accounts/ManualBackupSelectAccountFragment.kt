@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.acc
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountsAdapter
 import javax.inject.Inject
 
-class ManualBackupSelectAccountFragment : BaseFragment<ManualBackupSelectAccountViewModel>(), ManualBackupAccountsAdapter.AccountHandler {
+class ManualBackupSelectAccountFragment : BaseFragment<ManualBackupSelectAccountViewModel, FragmentManualBackupSelectWalletBinding>(), ManualBackupAccountsAdapter.AccountHandler {
 
     companion object {
 
@@ -27,6 +27,8 @@ class ManualBackupSelectAccountFragment : BaseFragment<ManualBackupSelectAccount
             putParcelable(KEY_PAYLOAD, payload)
         }
     }
+
+    override val binder by viewBinding(FragmentManualBackupSelectWalletBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -52,19 +54,11 @@ class ManualBackupSelectAccountFragment : BaseFragment<ManualBackupSelectAccount
         )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_manual_backup_select_wallet, container, false)
-    }
-
     override fun initViews() {
-        manualBackupWalletsToolbar.applyStatusBarInsets()
-        manualBackupWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.manualBackupWalletsToolbar.applyStatusBarInsets()
+        binder.manualBackupWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        manualBackupWalletsList.adapter = adapter
+        binder.manualBackupWalletsList.adapter = adapter
     }
 
     override fun inject() {
@@ -79,8 +73,8 @@ class ManualBackupSelectAccountFragment : BaseFragment<ManualBackupSelectAccount
 
     override fun subscribe(viewModel: ManualBackupSelectAccountViewModel) {
         viewModel.walletModel.observe {
-            manualBackupWalletsToolbar.setTitleIcon(it.icon)
-            manualBackupWalletsToolbar.setTitle(it.name)
+            binder.manualBackupWalletsToolbar.setTitleIcon(it.icon)
+            binder.manualBackupWalletsToolbar.setTitle(it.name)
         }
 
         viewModel.accountsList.observe {

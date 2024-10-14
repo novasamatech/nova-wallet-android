@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
@@ -13,26 +14,25 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
+import io.novafoundation.nova.feature_onboarding_impl.databinding.FragmentImportWalletOptionsBinding
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.SelectHardwareWalletBottomSheet
 
-class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel>() {
+class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel, FragmentImportWalletOptionsBinding>() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_wallet_options, container, false)
-    }
+    override val binder by viewBinding(FragmentImportWalletOptionsBinding::bind)
 
     override fun initViews() {
-        importOptionsToolbar.applyStatusBarInsets()
-        importOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.importOptionsToolbar.applyStatusBarInsets()
+        binder.importOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        importOptionPassphraseBig.setOnClickListener { importMnemonicClicked() }
-        importOptionPassphraseSmall.setOnClickListener { importMnemonicClicked() }
-        importOptionCloud.setOnClickListener { viewModel.importCloudClicked() }
-        importOptionHardware.setOnClickListener { viewModel.importHardwareClicked() }
-        importOptionWatchOnly.setOnClickListener { viewModel.importWatchOnlyClicked() }
-        importOptionRawSeed.setOnClickListener { viewModel.importRawSeedClicked() }
-        importOptionJson.setOnClickListener { viewModel.importJsonClicked() }
+        binder.importOptionPassphraseBig.setOnClickListener { importMnemonicClicked() }
+        binder.importOptionPassphraseSmall.setOnClickListener { importMnemonicClicked() }
+        binder.importOptionCloud.setOnClickListener { viewModel.importCloudClicked() }
+        binder.importOptionHardware.setOnClickListener { viewModel.importHardwareClicked() }
+        binder.importOptionWatchOnly.setOnClickListener { viewModel.importWatchOnlyClicked() }
+        binder.importOptionRawSeed.setOnClickListener { viewModel.importRawSeedClicked() }
+        binder.importOptionJson.setOnClickListener { viewModel.importJsonClicked() }
     }
 
     override fun inject() {
@@ -53,9 +53,9 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel>()
         }
 
         viewModel.showImportViaCloudButton.observe {
-            importOptionCloud.setVisible(it)
-            importOptionPassphraseSmall.setVisible(it)
-            importOptionPassphraseBig.setVisible(!it)
+            binder.importOptionCloud.setVisible(it)
+            binder.importOptionPassphraseSmall.setVisible(it)
+            binder.importOptionPassphraseBig.setVisible(!it)
         }
     }
 

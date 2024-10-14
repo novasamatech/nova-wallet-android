@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -15,13 +16,14 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentNewDelegationChooseAmountBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.setChips
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 
-class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmountViewModel>() {
+class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmountViewModel, FragmentNewDelegationChooseAmountBinding>() {
 
     companion object {
 
@@ -30,22 +32,16 @@ class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmount
         fun getBundle(payload: NewDelegationChooseAmountPayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_new_delegation_choose_amount, container, false)
-    }
+    override val binder by viewBinding(FragmentNewDelegationChooseAmountBinding::bind)
 
     override fun initViews() {
-        newDelegationChooseAmountContainer.applyStatusBarInsets()
+        binder.newDelegationChooseAmountContainer.applyStatusBarInsets()
 
-        newDelegationChooseAmountToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.newDelegationChooseAmountToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        newDelegationChooseAmountConfirm.prepareForProgress(viewLifecycleOwner)
-        newDelegationChooseAmountConfirm.setOnClickListener { viewModel.continueClicked() }
+        binder.newDelegationChooseAmountConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.newDelegationChooseAmountConfirm.setOnClickListener { viewModel.continueClicked() }
     }
 
     override fun inject() {
@@ -59,34 +55,34 @@ class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmount
     }
 
     override fun subscribe(viewModel: NewDelegationChooseAmountViewModel) {
-        setupAmountChooser(viewModel.amountChooserMixin, newDelegationChooseAmountAmount)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.newDelegationChooseAmountAmount)
         observeValidations(viewModel)
-        observeHints(viewModel.hintsMixin, newDelegationChooseAmountHints)
+        observeHints(viewModel.hintsMixin, binder.newDelegationChooseAmountHints)
 
-        viewModel.title.observe(newDelegationChooseAmountToolbar::setTitle)
+        viewModel.title.observe(binder.newDelegationChooseAmountToolbar::setTitle)
 
-        newDelegationChooseAmountVotePower.votePowerSeekbar.setValues(viewModel.convictionValues)
-        newDelegationChooseAmountVotePower.votePowerSeekbar.bindTo(viewModel.selectedConvictionIndex, viewLifecycleOwner.lifecycleScope)
+        binder.newDelegationChooseAmountVotePower.votePowerSeekbar.setValues(viewModel.convictionValues)
+        binder.newDelegationChooseAmountVotePower.votePowerSeekbar.bindTo(viewModel.selectedConvictionIndex, viewLifecycleOwner.lifecycleScope)
 
         viewModel.locksChangeUiFlow.observe {
-            newDelegationChooseAmountLockedAmountChanges.setAmountChangeModel(it.amountChange)
-            newDelegationChooseAmountLockedPeriodChanges.setAmountChangeModel(it.periodChange)
+            binder.newDelegationChooseAmountLockedAmountChanges.setAmountChangeModel(it.amountChange)
+            binder.newDelegationChooseAmountLockedPeriodChanges.setAmountChangeModel(it.periodChange)
         }
 
         viewModel.amountChips.observe(::setChips)
 
         viewModel.votesFormattedFlow.observe {
-            newDelegationChooseAmountVotePower.votePowerVotesText.text = it
+            binder.newDelegationChooseAmountVotePower.votePowerVotesText.text = it
         }
 
-        viewModel.buttonState.observe(newDelegationChooseAmountConfirm::setState)
+        viewModel.buttonState.observe(binder.newDelegationChooseAmountConfirm::setState)
     }
 
     private fun setChips(newChips: List<AmountChipModel>) {
-        newDelegationChooseAmountAmountChipsContainer.setChips(
+        binder.newDelegationChooseAmountAmountChipsContainer.setChips(
             newChips = newChips,
             onClicked = viewModel::amountChipClicked,
-            scrollingParent = newDelegationChooseAmountAmountChipsScroll
+            scrollingParent = binder.newDelegationChooseAmountAmountChipsScroll
         )
     }
 }

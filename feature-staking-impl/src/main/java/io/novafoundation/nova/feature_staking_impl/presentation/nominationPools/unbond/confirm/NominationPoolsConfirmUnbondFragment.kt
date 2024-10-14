@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -13,11 +14,12 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentNominationPoolsConfirmUnbondBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 
 private const val PAYLOAD_KEY = "NominationPoolsConfirmUnbondFragment.PAYLOAD_KEY"
 
-class NominationPoolsConfirmUnbondFragment : BaseFragment<NominationPoolsConfirmUnbondViewModel>() {
+class NominationPoolsConfirmUnbondFragment : BaseFragment<NominationPoolsConfirmUnbondViewModel, FragmentNominationPoolsConfirmUnbondBinding>() {
 
     companion object {
 
@@ -26,22 +28,16 @@ class NominationPoolsConfirmUnbondFragment : BaseFragment<NominationPoolsConfirm
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_nomination_pools_confirm_unbond, container, false)
-    }
+    override val binder by viewBinding(FragmentNominationPoolsConfirmUnbondBinding::bind)
 
     override fun initViews() {
-        nominationPoolsConfirmUnbondToolbar.applyStatusBarInsets()
+        binder.nominationPoolsConfirmUnbondToolbar.applyStatusBarInsets()
 
-        nominationPoolsConfirmUnbondExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
+        binder.nominationPoolsConfirmUnbondExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
-        nominationPoolsConfirmUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }
-        nominationPoolsConfirmUnbondConfirm.prepareForProgress(viewLifecycleOwner)
-        nominationPoolsConfirmUnbondConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.nominationPoolsConfirmUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.nominationPoolsConfirmUnbondConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.nominationPoolsConfirmUnbondConfirm.setOnClickListener { viewModel.confirmClicked() }
     }
 
     override fun inject() {
@@ -57,14 +53,14 @@ class NominationPoolsConfirmUnbondFragment : BaseFragment<NominationPoolsConfirm
     override fun subscribe(viewModel: NominationPoolsConfirmUnbondViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        observeHints(viewModel.hintsMixin, nominationPoolsConfirmUnbondHints)
+        observeHints(viewModel.hintsMixin, binder.nominationPoolsConfirmUnbondHints)
 
-        viewModel.showNextProgress.observe(nominationPoolsConfirmUnbondConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.nominationPoolsConfirmUnbondConfirm::setProgressState)
 
-        viewModel.amountModelFlow.observe(nominationPoolsConfirmUnbondAmount::setAmount)
+        viewModel.amountModelFlow.observe(binder.nominationPoolsConfirmUnbondAmount::setAmount)
 
-        viewModel.feeStatusFlow.observe(nominationPoolsConfirmUnbondExtrinsicInformation::setFeeStatus)
-        viewModel.walletUiFlow.observe(nominationPoolsConfirmUnbondExtrinsicInformation::setWallet)
-        viewModel.originAddressModelFlow.observe(nominationPoolsConfirmUnbondExtrinsicInformation::setAccount)
+        viewModel.feeStatusFlow.observe(binder.nominationPoolsConfirmUnbondExtrinsicInformation::setFeeStatus)
+        viewModel.walletUiFlow.observe(binder.nominationPoolsConfirmUnbondExtrinsicInformation::setWallet)
+        viewModel.originAddressModelFlow.observe(binder.nominationPoolsConfirmUnbondExtrinsicInformation::setAccount)
     }
 }

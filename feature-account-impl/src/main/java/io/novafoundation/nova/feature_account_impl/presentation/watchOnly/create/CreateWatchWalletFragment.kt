@@ -18,35 +18,33 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
-class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel>() {
+class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, FragmentCreateWatchWalletBinding>() {
 
     private val suggestionsAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ChipActionsAdapter(viewModel::walletSuggestionClicked)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_create_watch_wallet, container, false)
-    }
+    override val binder by viewBinding(FragmentCreateWatchWalletBinding::bind)
 
     override fun initViews() {
-        createWatchWalletToolbar.applyStatusBarInsets()
-        createWatchWalletToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        binder.createWatchWalletToolbar.applyStatusBarInsets()
+        binder.createWatchWalletToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
-        createWatchWalletPresets.adapter = suggestionsAdapter
-        createWatchWalletPresets.setHasFixedSize(true)
+        binder.createWatchWalletPresets.adapter = suggestionsAdapter
+        binder.createWatchWalletPresets.setHasFixedSize(true)
 
-        createWatchWalletContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.createWatchWalletContinue.setOnClickListener { viewModel.nextClicked() }
 
-        createWatchWalletContainer.applyInsetter {
+        binder.createWatchWalletContainer.applyInsetter {
             type(ime = true) {
                 padding()
             }
         }
 
-        createWatchWalletScrollArea.scrollOnFocusTo(
-            createWatchWalletName,
-            createWatchWalletEvmAddress,
-            createWatchWalletSubstrateAddress
+        binder.createWatchWalletScrollArea.scrollOnFocusTo(
+            binder.createWatchWalletName,
+            binder.createWatchWalletEvmAddress,
+            binder.createWatchWalletSubstrateAddress
         )
     }
 
@@ -58,12 +56,12 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel>() {
     }
 
     override fun subscribe(viewModel: CreateWatchWalletViewModel) {
-        setupAddressInput(viewModel.substrateAddressInput, createWatchWalletSubstrateAddress)
-        setupAddressInput(viewModel.evmAddressInput, createWatchWalletEvmAddress)
+        setupAddressInput(viewModel.substrateAddressInput, binder.createWatchWalletSubstrateAddress)
+        setupAddressInput(viewModel.evmAddressInput, binder.createWatchWalletEvmAddress)
 
-        createWatchWalletName.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
+        binder.createWatchWalletName.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
 
-        viewModel.buttonState.observe(createWatchWalletContinue::setState)
+        viewModel.buttonState.observe(binder.createWatchWalletContinue::setState)
 
         viewModel.suggestionChipActionModels.observe(suggestionsAdapter::submitList)
     }

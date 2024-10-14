@@ -4,50 +4,47 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentCurrentValidatorsBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetModel
 
-abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> : BaseFragment<V>(), CurrentStakeTargetAdapter.Handler {
+abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> : BaseFragment<V, FragmentCurrentValidatorsBinding>(),
+    CurrentStakeTargetAdapter.Handler {
+
+    override val binder by viewBinding(FragmentCurrentValidatorsBinding::bind)
 
     lateinit var adapter: CurrentStakeTargetAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_current_validators, container, false)
-    }
-
     override fun initViews() {
-        currentValidatorsContainer.applyStatusBarInsets()
+        binder.currentValidatorsContainer.applyStatusBarInsets()
 
         adapter = CurrentStakeTargetAdapter(this)
-        currentValidatorsList.adapter = adapter
+        binder.currentValidatorsList.adapter = adapter
 
-        currentValidatorsList.setHasFixedSize(true)
+        binder.currentValidatorsList.setHasFixedSize(true)
 
-        currentValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.currentValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        currentValidatorsToolbar.setRightActionClickListener { viewModel.changeClicked() }
+        binder.currentValidatorsToolbar.setRightActionClickListener { viewModel.changeClicked() }
     }
 
     override fun subscribe(viewModel: V) {
         viewModel.currentStakeTargetsFlow.observe { loadingState ->
             when (loadingState) {
                 is LoadingState.Loading -> {
-                    currentValidatorsList.makeGone()
-                    currentValidatorsProgress.makeVisible()
+                    binder.currentValidatorsList.makeGone()
+                    binder.currentValidatorsProgress.makeVisible()
                 }
 
                 is LoadingState.Loaded -> {
-                    currentValidatorsList.makeVisible()
-                    currentValidatorsProgress.makeGone()
+                    binder.currentValidatorsList.makeVisible()
+                    binder.currentValidatorsProgress.makeGone()
 
                     adapter.submitList(loadingState.data)
                 }
@@ -56,14 +53,14 @@ abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> : B
 
         viewModel.warningFlow.observe {
             if (it != null) {
-                currentValidatorsOversubscribedMessage.makeVisible()
-                currentValidatorsOversubscribedMessage.setMessage(it)
+                binder.currentValidatorsOversubscribedMessage.makeVisible()
+                binder.currentValidatorsOversubscribedMessage.setMessage(it)
             } else {
-                currentValidatorsOversubscribedMessage.makeGone()
+                binder.currentValidatorsOversubscribedMessage.makeGone()
             }
         }
 
-        viewModel.titleFlow.observe(currentValidatorsToolbar::setTitle)
+        viewModel.titleFlow.observe(binder.currentValidatorsToolbar::setTitle)
     }
 
     override fun infoClicked(stakeTargetModel: SelectedStakeTargetModel) {

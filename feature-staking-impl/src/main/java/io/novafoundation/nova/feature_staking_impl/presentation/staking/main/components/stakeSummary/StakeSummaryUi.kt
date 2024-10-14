@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.dialog.infoDialog
 
-fun BaseFragment<*>.setupStakeSummaryComponent(component: StakeSummaryComponent, view: StakeSummaryView) {
+fun BaseFragment<*, *>.setupStakeSummaryComponent(component: StakeSummaryComponent, view: StakeSummaryView) {
     // state
     component.state.observe { stakeSummaryState ->
         if (stakeSummaryState == null) {
@@ -41,7 +41,7 @@ fun BaseFragment<*>.setupStakeSummaryComponent(component: StakeSummaryComponent,
     }
 }
 
-private fun BaseFragment<*>.showStatusAlert(titleAndMessage: TitleAndMessage) {
+private fun BaseFragment<*, *>.showStatusAlert(titleAndMessage: TitleAndMessage) {
     infoDialog(requireContext()) {
         setTitle(titleAndMessage.first)
         setMessage(titleAndMessage.second)

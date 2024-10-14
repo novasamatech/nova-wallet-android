@@ -7,17 +7,20 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.viewbinding.ViewBinding
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentSetupVoteBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.setChips
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 
-abstract class SetupVoteFragment<T : SetupVoteViewModel> : BaseFragment<T>() {
+abstract class SetupVoteFragment<T : SetupVoteViewModel> : BaseFragment<T, FragmentSetupVoteBinding>() {
 
     companion object {
 
@@ -26,53 +29,55 @@ abstract class SetupVoteFragment<T : SetupVoteViewModel> : BaseFragment<T>() {
         fun getBundle(payload: SetupVotePayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
+    override val binder by viewBinding(FragmentSetupVoteBinding::bind)
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_setup_vote, container, false)
-        view.setupVoteControlFrame.addView(getControlView(inflater, view))
+    ): View {
+        val view = onCreateView(inflater, container, savedInstanceState)
+        binder.setupVoteControlFrame.addView(getControlView(inflater, view))
         return view
     }
 
     override fun initViews() {
-        setupReferendumVoteContainer.applyStatusBarInsets()
+        binder.setupReferendumVoteContainer.applyStatusBarInsets()
 
-        setupReferendumVoteToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.setupReferendumVoteToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
     }
 
     override fun subscribe(viewModel: T) {
-        setupAmountChooser(viewModel.amountChooserMixin, setupReferendumVoteAmount)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.setupReferendumVoteAmount)
         observeValidations(viewModel)
 
-        setupReferendumVoteVotePower.votePowerSeekbar.setValues(viewModel.convictionValues)
-        setupReferendumVoteVotePower.votePowerSeekbar.bindTo(viewModel.selectedConvictionIndex, viewLifecycleOwner.lifecycleScope)
+        binder.setupReferendumVoteVotePower.votePowerSeekbar.setValues(viewModel.convictionValues)
+        binder.setupReferendumVoteVotePower.votePowerSeekbar.bindTo(viewModel.selectedConvictionIndex, viewLifecycleOwner.lifecycleScope)
 
-        viewModel.title.observe(setupReferendumVoteTitle::setText)
+        viewModel.title.observe(binder.setupReferendumVoteTitle::setText)
 
         viewModel.locksChangeUiFlow.observe {
-            setupReferendumVoteLockedAmountChanges.setAmountChangeModel(it.amountChange)
-            setupReferendumVoteLockedPeriodChanges.setAmountChangeModel(it.periodChange)
+            binder.setupReferendumVoteLockedAmountChanges.setAmountChangeModel(it.amountChange)
+            binder.setupReferendumVoteLockedPeriodChanges.setAmountChangeModel(it.periodChange)
         }
 
         viewModel.amountChips.observe(::setChips)
 
         viewModel.votesFormattedFlow.observe {
-            setupReferendumVoteVotePower.votePowerVotesText.text = it
+            binder.setupReferendumVoteVotePower.votePowerVotesText.text = it
         }
 
         viewModel.abstainVotingSupported.observe {
-            setupReferendumVoteAlertView.isVisible = it
+            binder.setupReferendumVoteAlertView.isVisible = it
         }
     }
 
     private fun setChips(newChips: List<AmountChipModel>) {
-        setupReferendumVoteAmountChipsContainer.setChips(
+        binder.setupReferendumVoteAmountChipsContainer.setChips(
             newChips = newChips,
             onClicked = viewModel::amountChipClicked,
-            scrollingParent = setupReferendumVoteAmountChipsScroll
+            scrollingParent = binder.setupReferendumVoteAmountChipsScroll
         )
     }
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -12,25 +13,20 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentGovernanceConfirmUnlockBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockViewModel>() {
+class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockViewModel, FragmentGovernanceConfirmUnlockBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_governance_confirm_unlock, container, false)
-    }
+    override val binder by viewBinding(FragmentGovernanceConfirmUnlockBinding::bind)
 
     override fun initViews() {
-        confirmGovernanceUnlockToolbar.setHomeButtonListener { viewModel.backClicked() }
-        confirmGovernanceUnlockConfirm.prepareForProgress(viewLifecycleOwner)
-        confirmGovernanceUnlockConfirm.setOnClickListener { viewModel.confirmClicked() }
-        confirmGovernanceUnlockInformation.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.confirmGovernanceUnlockToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.confirmGovernanceUnlockConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.confirmGovernanceUnlockConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.confirmGovernanceUnlockInformation.setOnAccountClickedListener { viewModel.accountClicked() }
     }
 
     override fun inject() {
@@ -46,17 +42,17 @@ class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockView
     override fun subscribe(viewModel: ConfirmGovernanceUnlockViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        observeHints(viewModel.hintsMixin, confirmReferendumUnlockHints)
-        setupFeeLoading(viewModel, confirmGovernanceUnlockInformation.fee)
+        observeHints(viewModel.hintsMixin, binder.confirmReferendumUnlockHints)
+        setupFeeLoading(viewModel, binder.confirmGovernanceUnlockInformation.fee)
 
-        viewModel.currentAddressModelFlow.observe(confirmGovernanceUnlockInformation::setAccount)
-        viewModel.walletModel.observe(confirmGovernanceUnlockInformation::setWallet)
+        viewModel.currentAddressModelFlow.observe(binder.confirmGovernanceUnlockInformation::setAccount)
+        viewModel.walletModel.observe(binder.confirmGovernanceUnlockInformation::setWallet)
 
-        viewModel.amountModelFlow.observe(confirmReferendumUnlockAmount::setAmount)
+        viewModel.amountModelFlow.observe(binder.confirmReferendumUnlockAmount::setAmount)
 
-        viewModel.transferableChange.observe(confirmReferendumUnlockTransferableChange::setAmountChangeModel)
-        viewModel.governanceLockChange.observe(confirmReferendumUnlockGovernanceLockChange::setAmountChangeModel)
+        viewModel.transferableChange.observe(binder.confirmReferendumUnlockTransferableChange::setAmountChangeModel)
+        viewModel.governanceLockChange.observe(binder.confirmReferendumUnlockGovernanceLockChange::setAmountChangeModel)
 
-        viewModel.confirmButtonState.observe(confirmGovernanceUnlockConfirm::setState)
+        viewModel.confirmButtonState.observe(binder.confirmGovernanceUnlockConfirm::setState)
     }
 }

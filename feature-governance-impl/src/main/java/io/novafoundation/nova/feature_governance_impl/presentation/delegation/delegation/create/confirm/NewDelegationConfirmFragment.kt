@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -14,6 +15,7 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentNewDelegationConfirmBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.setVoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateLabelState
@@ -21,7 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackListBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>() {
+class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel, FragmentNewDelegationConfirmBinding>() {
 
     companion object {
 
@@ -30,25 +32,19 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
         fun getBundle(payload: NewDelegationConfirmPayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_new_delegation_confirm, container, false)
-    }
+    override val binder by viewBinding(FragmentNewDelegationConfirmBinding::bind)
 
     override fun initViews() {
-        newDelegationConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.newDelegationConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        newDelegationConfirmConfirm.prepareForProgress(viewLifecycleOwner)
-        newDelegationConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.newDelegationConfirmConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.newDelegationConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
 
-        newDelegationConfirmDelegate.setOnClickListener { viewModel.delegateClicked() }
+        binder.newDelegationConfirmDelegate.setOnClickListener { viewModel.delegateClicked() }
 
-        newDelegationConfirmInformation.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.newDelegationConfirmInformation.setOnAccountClickedListener { viewModel.accountClicked() }
 
-        newDelegationConfirmTracks.setOnClickListener { viewModel.tracksClicked() }
+        binder.newDelegationConfirmTracks.setOnClickListener { viewModel.tracksClicked() }
     }
 
     override fun inject() {
@@ -65,27 +61,27 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
         observeRetries(viewModel.partialRetriableMixin)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        observeHints(viewModel.hintsMixin, newDelegationConfirmHints)
+        observeHints(viewModel.hintsMixin, binder.newDelegationConfirmHints)
 
-        viewModel.title.observe(newDelegationConfirmToolbar::setTitle)
+        viewModel.title.observe(binder.newDelegationConfirmToolbar::setTitle)
 
-        viewModel.amountModelFlow.observe(newDelegationConfirmAmount::setAmount)
+        viewModel.amountModelFlow.observe(binder.newDelegationConfirmAmount::setAmount)
 
-        setupFeeLoading(viewModel, newDelegationConfirmInformation.fee)
-        viewModel.currentAddressModelFlow.observe(newDelegationConfirmInformation::setAccount)
-        viewModel.walletModel.observe(newDelegationConfirmInformation::setWallet)
+        setupFeeLoading(viewModel, binder.newDelegationConfirmInformation.fee)
+        viewModel.currentAddressModelFlow.observe(binder.newDelegationConfirmInformation::setAccount)
+        viewModel.walletModel.observe(binder.newDelegationConfirmInformation::setWallet)
 
-        viewModel.delegateLabelModel.observe(newDelegationConfirmDelegate::setDelegateLabelState)
-        viewModel.tracksModelFlow.observe { newDelegationConfirmTracks.showValue(it.overview) }
-        viewModel.delegationModel.observe(newDelegationConfirmDelegation::setVoteModel)
+        viewModel.delegateLabelModel.observe(binder.newDelegationConfirmDelegate::setDelegateLabelState)
+        viewModel.tracksModelFlow.observe { binder.newDelegationConfirmTracks.showValue(it.overview) }
+        viewModel.delegationModel.observe(binder.newDelegationConfirmDelegation::setVoteModel)
 
         viewModel.locksChangeUiFlow.observe {
-            newDelegationConfirmLockedAmountChanges.setAmountChangeModel(it.amountChange)
-            newDelegationConfirmLockedPeriodChanges.setAmountChangeModel(it.periodChange)
-            newDelegationConfirmTransferableAmountChanges.setAmountChangeModel(it.transferableChange)
+            binder.newDelegationConfirmLockedAmountChanges.setAmountChangeModel(it.amountChange)
+            binder.newDelegationConfirmLockedPeriodChanges.setAmountChangeModel(it.periodChange)
+            binder.newDelegationConfirmTransferableAmountChanges.setAmountChangeModel(it.transferableChange)
         }
 
-        viewModel.showNextProgress.observe(newDelegationConfirmConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.newDelegationConfirmConfirm::setProgressState)
 
         viewModel.showTracksEvent.observeEvent { tracks ->
             TrackListBottomSheet(requireContext(), tracks).show()

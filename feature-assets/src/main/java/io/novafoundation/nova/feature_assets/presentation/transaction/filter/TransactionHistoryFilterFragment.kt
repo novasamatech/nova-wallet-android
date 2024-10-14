@@ -6,17 +6,19 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.bindFromMap
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentTransactionsFilterBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 
-class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterViewModel>() {
+class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterViewModel, FragmentTransactionsFilterBinding>() {
 
     companion object {
 
@@ -24,25 +26,21 @@ class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterVi
         fun getBundle(payload: TransactionHistoryFilterPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_transactions_filter, container, false)
+    override val binder by viewBinding(FragmentTransactionsFilterBinding::bind)
 
     override fun initViews() {
-        transactionsFilterToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.transactionsFilterToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        transactionsFilterToolbar.setRightActionClickListener {
+        binder.transactionsFilterToolbar.setRightActionClickListener {
             viewModel.resetFilter()
         }
 
-        transactionsFilterRewards.bindFilter(TransactionFilter.REWARD)
-        transactionsFilterSwitchTransfers.bindFilter(TransactionFilter.TRANSFER)
-        transactionsFilterOtherTransactions.bindFilter(TransactionFilter.EXTRINSIC)
-        transactionsFilterSwaps.bindFilter(TransactionFilter.SWAP)
+        binder.transactionsFilterRewards.bindFilter(TransactionFilter.REWARD)
+        binder.transactionsFilterSwitchTransfers.bindFilter(TransactionFilter.TRANSFER)
+        binder.transactionsFilterOtherTransactions.bindFilter(TransactionFilter.EXTRINSIC)
+        binder.transactionsFilterSwaps.bindFilter(TransactionFilter.SWAP)
 
-        transactionFilterApplyBtn.setOnClickListener { viewModel.applyClicked() }
+        binder.transactionFilterApplyBtn.setOnClickListener { viewModel.applyClicked() }
     }
 
     override fun inject() {
@@ -56,7 +54,7 @@ class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterVi
 
     override fun subscribe(viewModel: TransactionHistoryFilterViewModel) {
         viewModel.isApplyButtonEnabled.observe {
-            transactionFilterApplyBtn.setState(if (it) ButtonState.NORMAL else ButtonState.DISABLED)
+            binder.transactionFilterApplyBtn.setState(if (it) ButtonState.NORMAL else ButtonState.DISABLED)
         }
     }
 

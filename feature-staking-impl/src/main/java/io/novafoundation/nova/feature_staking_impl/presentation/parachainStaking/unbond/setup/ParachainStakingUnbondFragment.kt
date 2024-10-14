@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -13,32 +14,27 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingUnbondBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
-class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewModel>() {
+class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewModel, FragmentParachainStakingUnbondBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_parachain_staking_unbond, container, false)
-    }
+    override val binder by viewBinding(FragmentParachainStakingUnbondBinding::bind)
 
     override fun initViews() {
-        parachainStakingUnbondContainer.applyStatusBarInsets()
+        binder.parachainStakingUnbondContainer.applyStatusBarInsets()
 
-        parachainStakingUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.parachainStakingUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        parachainStakingUnbondNext.prepareForProgress(viewLifecycleOwner)
-        parachainStakingUnbondNext.setOnClickListener { viewModel.nextClicked() }
+        binder.parachainStakingUnbondNext.prepareForProgress(viewLifecycleOwner)
+        binder.parachainStakingUnbondNext.setOnClickListener { viewModel.nextClicked() }
 
-        parachainStakingUnbondCollator.setOnClickListener { viewModel.selectCollatorClicked() }
+        binder.parachainStakingUnbondCollator.setOnClickListener { viewModel.selectCollatorClicked() }
     }
 
     override fun inject() {
@@ -54,16 +50,16 @@ class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewMo
     override fun subscribe(viewModel: ParachainStakingUnbondViewModel) {
         observeRetries(viewModel)
         observeValidations(viewModel)
-        setupAmountChooser(viewModel.amountChooserMixin, parachainStakingUnbondAmountField)
-        setupFeeLoading(viewModel, parachainStakingUnbondFee)
-        observeHints(viewModel.hintsMixin, parachainStakingUnbondHints)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.parachainStakingUnbondAmountField)
+        setupFeeLoading(viewModel, binder.parachainStakingUnbondFee)
+        observeHints(viewModel.hintsMixin, binder.parachainStakingUnbondHints)
 
-        viewModel.selectedCollatorModel.observe(parachainStakingUnbondCollator::setSelectedCollator)
+        viewModel.selectedCollatorModel.observe(binder.parachainStakingUnbondCollator::setSelectedCollator)
 
-        viewModel.buttonState.observe(parachainStakingUnbondNext::setState)
+        viewModel.buttonState.observe(binder.parachainStakingUnbondNext::setState)
 
-        viewModel.minimumStake.observe(parachainStakingUnbondMinStake::showAmount)
-        viewModel.transferable.observe(parachainStakingUnbondTransferable::showAmount)
+        viewModel.minimumStake.observe(binder.parachainStakingUnbondMinStake::showAmount)
+        viewModel.transferable.observe(binder.parachainStakingUnbondTransferable::showAmount)
 
         viewModel.chooseCollatorAction.awaitableActionLiveData.observeEvent { action ->
             ChooseStakedStakeTargetsBottomSheet(

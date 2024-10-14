@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
-class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
+class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel, FragmentStartCreateWalletBinding>() {
 
     companion object {
         private const val KEY_PAYLOAD = "display_back"
@@ -29,23 +29,21 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_start_create_wallet, container, false)
-    }
+    override val binder by viewBinding(FragmentStartCreateWalletBinding::bind)
 
     override fun initViews() {
-        startCreateWalletToolbar.applyStatusBarInsets()
-        startCreateWalletToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.startCreateWalletToolbar.applyStatusBarInsets()
+        binder.startCreateWalletToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        startCreateWalletConfirmName.setOnClickListener { viewModel.confirmNameClicked() }
+        binder. startCreateWalletConfirmName.setOnClickListener { viewModel.confirmNameClicked() }
 
         onBackPressed { viewModel.backClicked() }
 
-        startCreateWalletCloudBackupButton.setOnClickListener { viewModel.cloudBackupClicked() }
-        startCreateWalletManualBackupButton.setOnClickListener { viewModel.manualBackupClicked() }
+        binder.startCreateWalletCloudBackupButton.setOnClickListener { viewModel.cloudBackupClicked() }
+        binder.startCreateWalletManualBackupButton.setOnClickListener { viewModel.manualBackupClicked() }
 
-        startCreateWalletCloudBackupButton.prepareForProgress(viewLifecycleOwner)
-        startCreateWalletConfirmName.prepareForProgress(viewLifecycleOwner)
+        binder.startCreateWalletCloudBackupButton.prepareForProgress(viewLifecycleOwner)
+        binder.startCreateWalletConfirmName.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -58,41 +56,41 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel>() {
     override fun subscribe(viewModel: StartCreateWalletViewModel) {
         setupCustomDialogDisplayer(viewModel)
         observeActionBottomSheet(viewModel)
-        startCreateWalletNameInput.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
+        binder.startCreateWalletNameInput.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
 
         viewModel.continueButtonState.observe { state ->
-            startCreateWalletConfirmName.setState(state)
+            binder.startCreateWalletConfirmName.setState(state)
         }
 
         viewModel.isSyncWithCloudEnabled.observe {
-            startCreateWalletSyncWithCloudEnabled.isVisible = it
+            binder.startCreateWalletSyncWithCloudEnabled.isVisible = it
         }
 
         viewModel.createWalletState.observe {
-            startCreateWalletNameInputLayout.isEndIconVisible = it == CreateWalletState.SETUP_NAME
-            startCreateWalletNameInput.isFocusable = it == CreateWalletState.SETUP_NAME
-            startCreateWalletNameInput.isFocusableInTouchMode = it == CreateWalletState.SETUP_NAME
+            binder.startCreateWalletNameInputLayout.isEndIconVisible = it == CreateWalletState.SETUP_NAME
+            binder.startCreateWalletNameInput.isFocusable = it == CreateWalletState.SETUP_NAME
+            binder.startCreateWalletNameInput.isFocusableInTouchMode = it == CreateWalletState.SETUP_NAME
         }
 
         viewModel.titleText.observe {
-            startCreateWalletTitle.text = it
+            binder.startCreateWalletTitle.text = it
         }
 
         viewModel.explanationText.observe {
-            startCreateWalletExplanation.text = it
+            binder.startCreateWalletExplanation.text = it
         }
 
         viewModel.progressFlow.observe {
-            startCreateWalletCloudBackupButton.showProgress(it)
-            startCreateWalletManualBackupButton.isEnabled = !it
+            binder.startCreateWalletCloudBackupButton.showProgress(it)
+            binder.startCreateWalletManualBackupButton.isEnabled = !it
         }
 
         viewModel.showCloudBackupButton.observe {
-            startCreateWalletCloudBackupButton.isVisible = it
+            binder.startCreateWalletCloudBackupButton.isVisible = it
         }
 
         viewModel.showManualBackupButton.observe {
-            startCreateWalletManualBackupButton.isVisible = it
+            binder.startCreateWalletManualBackupButton.isVisible = it
         }
     }
 }

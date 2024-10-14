@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -12,6 +13,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStakingBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.setupAlertsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.setupNetworkInfoComponent
@@ -23,22 +25,16 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 
 import javax.inject.Inject
 
-class StakingFragment : BaseFragment<StakingViewModel>() {
+class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>() {
+
+    override val binder by viewBinding(FragmentStakingBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_staking, container, false)
-    }
-
     override fun initViews() {
-        stakingToolbar.applyStatusBarInsets()
-        stakingToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.stakingToolbar.applyStatusBarInsets()
+        binder.stakingToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {
@@ -55,14 +51,14 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
 
-        setupNetworkInfoComponent(viewModel.networkInfoComponent, stakingNetworkInfo)
-        setupStakeSummaryComponent(viewModel.stakeSummaryComponent, stakingStakeSummary)
-        setupUserRewardsComponent(viewModel.userRewardsComponent, stakingUserRewards, viewModel.router)
-        setupUnbondingComponent(viewModel.unbondingComponent, stakingStakeUnbondings)
-        setupStakeActionsComponent(viewModel.stakeActionsComponent, stakingStakeManage)
-        setupAlertsComponent(viewModel.alertsComponent, stakingAlertsInfo)
-        setupYourPoolComponent(viewModel.yourPoolComponent, stakingYourPool)
+        setupNetworkInfoComponent(viewModel.networkInfoComponent, binder.stakingNetworkInfo)
+        setupStakeSummaryComponent(viewModel.stakeSummaryComponent, binder.stakingStakeSummary)
+        setupUserRewardsComponent(viewModel.userRewardsComponent, binder.stakingUserRewards, viewModel.router)
+        setupUnbondingComponent(viewModel.unbondingComponent, binder.stakingStakeUnbondings)
+        setupStakeActionsComponent(viewModel.stakeActionsComponent, binder.stakingStakeManage)
+        setupAlertsComponent(viewModel.alertsComponent, binder.stakingAlertsInfo)
+        setupYourPoolComponent(viewModel.yourPoolComponent, binder.stakingYourPool)
 
-        viewModel.titleFlow.observe(stakingToolbar::setTitle)
+        viewModel.titleFlow.observe(binder.stakingToolbar::setTitle)
     }
 }

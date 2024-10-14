@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -13,6 +14,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentMoreStakingOptionsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardSectionAdapter
@@ -21,9 +23,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.l
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.StakingDAppModel
 
 class MoreStakingOptionsFragment :
-    BaseFragment<MoreStakingOptionsViewModel>(),
+    BaseFragment<MoreStakingOptionsViewModel, FragmentMoreStakingOptionsBinding>(),
     DashboardNoStakeAdapter.Handler,
     StakingDappsAdapter.Handler {
+
+    override val binder by viewBinding(FragmentMoreStakingOptionsBinding::bind)
 
     private val noStakeAdapter = DashboardNoStakeAdapter(this)
 
@@ -31,14 +35,6 @@ class MoreStakingOptionsFragment :
 
     private val dAppAdapter = StakingDappsAdapter(this)
     private val dAppLoadingAdapter = CustomPlaceholderAdapter(R.layout.layout_dapps_shimmering)
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_more_staking_options, container, false)
-    }
 
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(
@@ -51,10 +47,10 @@ class MoreStakingOptionsFragment :
     }
 
     override fun initViews() {
-        moreStakingOptionsToolbar.applyStatusBarInsets()
-        moreStakingOptionsToolbar.setHomeButtonListener { viewModel.goBack() }
+        binder.moreStakingOptionsToolbar.applyStatusBarInsets()
+        binder.moreStakingOptionsToolbar.setHomeButtonListener { viewModel.goBack() }
 
-        with(moreStakingOptionsContent) {
+        with(binder.moreStakingOptionsContent) {
             setHasFixedSize(true)
             adapter = ConcatAdapter(
                 noStakeAdapter,
@@ -70,7 +66,7 @@ class MoreStakingOptionsFragment :
 
     override fun subscribe(viewModel: MoreStakingOptionsViewModel) {
         viewModel.moreStakingOptionsUiFlow.observe { stakingOptionsModel ->
-            noStakeAdapter.submitListPreservingViewPoint(stakingOptionsModel.inAppStaking, moreStakingOptionsContent)
+            noStakeAdapter.submitListPreservingViewPoint(stakingOptionsModel.inAppStaking, binder.moreStakingOptionsContent)
 
             when (val browserStakingState = stakingOptionsModel.browserStaking) {
                 is ExtendedLoadingState.Loaded -> {

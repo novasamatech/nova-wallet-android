@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.importing.source
 
 import javax.inject.Inject
 
-class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
+class ImportAccountFragment : BaseFragment<ImportAccountViewModel, FragmentImportAccountBinding>() {
+
+    override val binder by viewBinding(FragmentImportAccountBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -34,22 +36,14 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_import_account, container, false)
-    }
-
     override fun initViews() {
-        importAccountToolbar.setRightActionClickListener {
+        binder.importAccountToolbar.setRightActionClickListener {
             viewModel.optionsClicked()
         }
-        importAccountToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        binder.importAccountToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
-        importAccountContinue.setOnClickListener { viewModel.nextClicked() }
-        importAccountContinue.prepareForProgress(viewLifecycleOwner)
+        binder.importAccountContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.importAccountContinue.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -63,16 +57,16 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
     }
 
     override fun subscribe(viewModel: ImportAccountViewModel) {
-        importAccountTitle.setText(viewModel.importSource.nameRes)
+        binder.importAccountTitle.setText(viewModel.importSource.nameRes)
 
         val sourceView = viewModel.importSource.initializeView(viewModel, fragment = this)
-        importAccountSourceContainer.addView(sourceView)
+        binder.importAccountSourceContainer.addView(sourceView)
 
         observeFeatures(viewModel.importSource)
 
-        importAccountToolbar.setRightIconVisible(viewModel.importSource.encryptionOptionsAvailable)
+        binder.importAccountToolbar.setRightIconVisible(viewModel.importSource.encryptionOptionsAvailable)
 
-        viewModel.nextButtonState.observe(importAccountContinue::setState)
+        viewModel.nextButtonState.observe(binder.importAccountContinue::setState)
     }
 
     private fun observeFeatures(source: ImportSource) {

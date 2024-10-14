@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentDelegateDetailsBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModel
@@ -31,7 +33,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.track.list.Tr
 
 import javax.inject.Inject
 
-class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
+class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel, FragmentDelegateDetailsBinding>() {
 
     companion object {
         private const val PAYLOAD = "DelegateDetailsFragment.Payload"
@@ -43,34 +45,28 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         }
     }
 
+    override val binder by viewBinding(FragmentDelegateDetailsBinding::bind)
+
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_delegate_details, container, false)
-    }
-
     override fun initViews() {
-        delegateDetailsToolbar.applyStatusBarInsets()
-        delegateDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.delegateDetailsToolbar.applyStatusBarInsets()
+        binder.delegateDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        delegateDetailsDelegations.setOnClickListener { viewModel.delegationsClicked() }
-        delegateDetailsVotedRecently.setOnClickListener { viewModel.recentVotesClicked() }
-        delegateDetailsVotedOverall.setOnClickListener { viewModel.allVotesClicked() }
+        binder.delegateDetailsDelegations.setOnClickListener { viewModel.delegationsClicked() }
+        binder.delegateDetailsVotedRecently.setOnClickListener { viewModel.recentVotesClicked() }
+        binder.delegateDetailsVotedOverall.setOnClickListener { viewModel.allVotesClicked() }
 
-        delegateDetailsAccount.setOnClickListener { viewModel.accountActionsClicked() }
+        binder.delegateDetailsAccount.setOnClickListener { viewModel.accountActionsClicked() }
 
-        delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
+        binder.delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
 
-        delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegationClicked() }
+        binder.delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegationClicked() }
 
-        delegateDetailsYourDelegation.onTracksClicked { viewModel.tracksClicked() }
-        delegateDetailsYourDelegation.onEditClicked { viewModel.editDelegationClicked() }
-        delegateDetailsYourDelegation.onRevokeClicked { viewModel.revokeDelegationClicked() }
+        binder.delegateDetailsYourDelegation.onTracksClicked { viewModel.tracksClicked() }
+        binder.delegateDetailsYourDelegation.onEditClicked { viewModel.editDelegationClicked() }
+        binder.delegateDetailsYourDelegation.onRevokeClicked { viewModel.revokeDelegationClicked() }
     }
 
     override fun inject() {
@@ -85,21 +81,21 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
 
     override fun subscribe(viewModel: DelegateDetailsViewModel) {
         setupExternalActions(viewModel)
-        setupIdentityMixin(viewModel.identityMixin, delegateDetailsIdentity)
+        setupIdentityMixin(viewModel.identityMixin, binder.delegateDetailsIdentity)
         observeValidations(viewModel)
 
         viewModel.delegateDetailsLoadingState.observeWhenVisible { loadingState ->
             when (loadingState) {
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
-                    delegateDetailsContent.makeVisible()
-                    delegateDetailsProgress.makeGone()
+                    binder.delegateDetailsContent.makeVisible()
+                    binder.delegateDetailsProgress.makeGone()
 
                     setContent(loadingState.data)
                 }
                 ExtendedLoadingState.Loading -> {
-                    delegateDetailsContent.makeGone()
-                    delegateDetailsProgress.makeVisible()
+                    binder.delegateDetailsContent.makeGone()
+                    binder.delegateDetailsProgress.makeVisible()
                 }
             }
         }
@@ -109,34 +105,34 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
                 .show()
         }
 
-        viewModel.addDelegationButtonState.observeWhenVisible(delegateDetailsAddDelegation::setState)
+        viewModel.addDelegationButtonState.observeWhenVisible(binder.delegateDetailsAddDelegation::setState)
     }
 
     private fun setContent(delegate: DelegateDetailsModel) {
         val stats = delegate.stats
 
-        delegateDetailsDelegatedVotes.showValueOrHide(stats?.delegatedVotes)
+        binder.delegateDetailsDelegatedVotes.showValueOrHide(stats?.delegatedVotes)
 
-        delegateDetailsDelegations.setVotesModel(stats?.delegations)
-        delegateDetailsVotedOverall.setVotesModel(stats?.allVotes)
-        delegateDetailsVotedRecently.setVotesModel(stats?.recentVotes)
+        binder.delegateDetailsDelegations.setVotesModel(stats?.delegations)
+        binder.delegateDetailsVotedOverall.setVotesModel(stats?.allVotes)
+        binder.delegateDetailsVotedRecently.setVotesModel(stats?.recentVotes)
 
         if (delegate.metadata.description != null) {
-            delegateDetailsMetadataGroup.makeVisible()
+            binder.delegateDetailsMetadataGroup.makeVisible()
 
             with(delegate.metadata) {
-                delegateDetailsIcon.setDelegateIcon(icon, imageLoader, 12)
-                delegateDetailsTitle.text = name
-                delegateDetailsType.setDelegateTypeModel(accountType)
+                binder.delegateDetailsIcon.setDelegateIcon(icon, imageLoader, 12)
+                binder.delegateDetailsTitle.text = name
+                binder.delegateDetailsType.setDelegateTypeModel(accountType)
                 setDescription(description)
             }
         } else {
-            delegateDetailsMetadataGroup.makeGone()
+            binder.delegateDetailsMetadataGroup.makeGone()
         }
 
-        delegateDetailsAccount.setAddressModel(delegate.addressModel)
+        binder.delegateDetailsAccount.setAddressModel(delegate.addressModel)
 
-        delegateDetailsYourDelegation.setModel(delegate.userDelegation)
+        binder.delegateDetailsYourDelegation.setModel(delegate.userDelegation)
     }
 
     private fun TableCellView.setVotesModel(model: DelegateDetailsModel.VotesModel?) = letOrHide(model) { votesModel ->
@@ -148,6 +144,6 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
     }
 
     private fun setDescription(maybeModel: ShortenedTextModel?) {
-        maybeModel.applyTo(delegateDetailsDescription, delegateDetailsDescriptionReadMore, viewModel.markwon)
+        maybeModel.applyTo(binder.delegateDetailsDescription, binder.delegateDetailsDescriptionReadMore, viewModel.markwon)
     }
 }

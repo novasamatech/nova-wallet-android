@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -17,6 +18,7 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentDappMainBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdapter
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
@@ -24,10 +26,12 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.s
 import javax.inject.Inject
 
 class MainDAppFragment :
-    BaseFragment<MainDAppViewModel>(),
+    BaseFragment<MainDAppViewModel, FragmentDappMainBinding>(),
     DappListAdapter.Handler,
     DAppHeaderAdapter.Handler,
     DappCategoriesAdapter.Handler {
+
+    override val binder by viewBinding(FragmentDappMainBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -46,18 +50,10 @@ class MainDAppFragment :
 
     private val dappListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappListAdapter(this) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_dapp_main, container, false)
-    }
-
     override fun initViews() {
-        dappRecyclerView.applyStatusBarInsets()
-        dappRecyclerView.adapter = ConcatAdapter(headerAdapter, categoriesAdapter, dappsShimmering, dappListAdapter)
-        dappRecyclerView.addItemDecoration(DAppItemDecoration(requireContext()))
+        binder.dappRecyclerView.applyStatusBarInsets()
+        binder.dappRecyclerView.adapter = ConcatAdapter(headerAdapter, categoriesAdapter, dappsShimmering, dappListAdapter)
+        binder.dappRecyclerView.addItemDecoration(DAppItemDecoration(requireContext()))
     }
 
     override fun inject() {

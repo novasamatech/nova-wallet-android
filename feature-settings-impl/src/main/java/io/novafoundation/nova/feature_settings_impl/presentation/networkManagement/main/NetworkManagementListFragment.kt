@@ -6,15 +6,17 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.FragmentNetworkManagementBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 
-class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewModel>() {
+class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewModel, FragmentNetworkManagementBinding>() {
 
     companion object {
 
@@ -27,22 +29,16 @@ class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewMode
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_network_management, container, false)
-    }
+    override val binder by viewBinding(FragmentNetworkManagementBinding::bind)
 
     override fun initViews() {
-        networkManagementToolbar.applyStatusBarInsets()
-        networkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
-        networkManagementToolbar.setRightActionClickListener { viewModel.addNetworkClicked() }
+        binder.networkManagementToolbar.applyStatusBarInsets()
+        binder.networkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.networkManagementToolbar.setRightActionClickListener { viewModel.addNetworkClicked() }
 
         val adapter = NetworkManagementPagerAdapter(this)
-        networkManagementViewPager.adapter = adapter
-        networkManagementTabLayout.setupWithViewPager2(networkManagementViewPager, adapter::getPageTitle)
+        binder.networkManagementViewPager.adapter = adapter
+        binder.networkManagementTabLayout.setupWithViewPager2(binder.networkManagementViewPager, adapter::getPageTitle)
 
         Handler(Looper.getMainLooper()).post {
             setDefaultTab(adapter)
@@ -52,7 +48,7 @@ class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewMode
     private fun setDefaultTab(adapter: NetworkManagementPagerAdapter) {
         val openAddedTab = argumentOrNull<Boolean>(KEY_OPEN_ADDED_TAB) ?: return
         val tabIndex = if (openAddedTab) adapter.addedTabIndex() else adapter.defaultTabIndex()
-        networkManagementViewPager.currentItem = tabIndex
+        binder.networkManagementViewPager.currentItem = tabIndex
     }
 
     override fun inject() {
