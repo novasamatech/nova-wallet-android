@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -16,17 +17,20 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.showChains
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
+import io.novafoundation.nova.feature_wallet_connect_impl.databinding.FragmentWcSessionDetailsBinding
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
 
 import javax.inject.Inject
 
-class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDetailsViewModel>() {
+class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDetailsViewModel, FragmentWcSessionDetailsBinding>() {
 
     companion object {
 
         private const val KEY_PAYLOAD = "WalletConnectSessionsFragment.Payload"
         fun getBundle(payload: WalletConnectSessionDetailsPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
+
+    override val binder by viewBinding(FragmentWcSessionDetailsBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -38,14 +42,14 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
     ) = layoutInflater.inflate(R.layout.fragment_wc_session_details, container, false)
 
     override fun initViews() {
-        wcSessionDetailsToolbar.setHomeButtonListener { viewModel.exit() }
-        wcSessionDetailsToolbar.applyStatusBarInsets()
+        binder.wcSessionDetailsToolbar.setHomeButtonListener { viewModel.exit() }
+        binder.wcSessionDetailsToolbar.applyStatusBarInsets()
 
-        wcSessionDetailsDisconnect.setOnClickListener { viewModel.disconnect() }
-        wcSessionDetailsDisconnect.prepareForProgress(viewLifecycleOwner)
-        wcSessionDetailsNetworks.setOnClickListener { viewModel.networksClicked() }
+        binder.wcSessionDetailsDisconnect.setOnClickListener { viewModel.disconnect() }
+        binder.wcSessionDetailsDisconnect.prepareForProgress(viewLifecycleOwner)
+        binder.wcSessionDetailsNetworks.setOnClickListener { viewModel.networksClicked() }
 
-        wcSessionDetailsStatus.showValue(getString(R.string.common_active))
+        binder.wcSessionDetailsStatus.showValue(getString(R.string.common_active))
     }
 
     override fun inject() {
@@ -60,17 +64,17 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
 
     override fun subscribe(viewModel: WalletConnectSessionDetailsViewModel) {
         viewModel.sessionUi.observe { sessionUi ->
-            wcSessionDetailsWallet.showWallet(sessionUi.wallet)
-            wcSessionDetailsDApp.showValueOrHide(sessionUi.dappUrl)
-            wcSessionDetailsNetworks.showChainsOverview(sessionUi.networksOverview)
+            binder.wcSessionDetailsWallet.showWallet(sessionUi.wallet)
+            binder.wcSessionDetailsDApp.showValueOrHide(sessionUi.dappUrl)
+            binder.wcSessionDetailsNetworks.showChainsOverview(sessionUi.networksOverview)
 
-            wcSessionDetailsTitle.text = sessionUi.dappTitle
-            wcSessionDetailsIcon.showDAppIcon(sessionUi.dappIcon, imageLoader)
+            binder.wcSessionDetailsTitle.text = sessionUi.dappTitle
+            binder.wcSessionDetailsIcon.showDAppIcon(sessionUi.dappIcon, imageLoader)
 
             with(sessionUi.status) {
-                wcSessionDetailsStatus.setImage(icon, sizeDp = 14)
-                wcSessionDetailsStatus.setPrimaryValueStyle(labelStyle)
-                wcSessionDetailsStatus.showValue(label)
+                binder.wcSessionDetailsStatus.setImage(icon, sizeDp = 14)
+                binder.wcSessionDetailsStatus.setPrimaryValueStyle(labelStyle)
+                binder.wcSessionDetailsStatus.showValue(label)
             }
         }
 
@@ -81,6 +85,6 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
             ).show()
         }
 
-        viewModel.disconnectButtonState.observe(wcSessionDetailsDisconnect::setState)
+        viewModel.disconnectButtonState.observe(binder.wcSessionDetailsDisconnect::setState)
     }
 }

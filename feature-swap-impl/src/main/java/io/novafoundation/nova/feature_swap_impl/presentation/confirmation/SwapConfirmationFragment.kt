@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -18,11 +19,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapConfirmationSettingsBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
+class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, FragmentSwapConfirmationSettingsBinding>() {
 
     companion object {
         private const val KEY_PAYLOAD = "SwapConfirmationFragment.Payload"
@@ -30,24 +32,18 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         fun getBundle(payload: SwapConfirmationPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_swap_confirmation_settings, container, false)
-    }
+    override val binder by viewBinding(FragmentSwapConfirmationSettingsBinding::bind)
 
     override fun initViews() {
-        swapConfirmationToolbar.applyStatusBarInsets()
-        swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
-        swapConfirmationButton.prepareForProgress(this)
-        swapConfirmationRate.setOnClickListener { viewModel.rateClicked() }
-        swapConfirmationPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
-        swapConfirmationSlippage.setOnClickListener { viewModel.slippageClicked() }
-        swapConfirmationNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
-        swapConfirmationAccount.setOnClickListener { viewModel.accountClicked() }
-        swapConfirmationButton.setOnClickListener { viewModel.confirmButtonClicked() }
+        binder.swapConfirmationToolbar.applyStatusBarInsets()
+        binder.swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.swapConfirmationButton.prepareForProgress(this)
+        binder.swapConfirmationRate.setOnClickListener { viewModel.rateClicked() }
+        binder.swapConfirmationPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
+        binder.swapConfirmationSlippage.setOnClickListener { viewModel.slippageClicked() }
+        binder.swapConfirmationNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
+        binder.swapConfirmationAccount.setOnClickListener { viewModel.accountClicked() }
+        binder.swapConfirmationButton.setOnClickListener { viewModel.confirmButtonClicked() }
     }
 
     override fun inject() {
@@ -64,20 +60,20 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         observeDescription(viewModel)
-        setupFeeLoading(viewModel.feeMixin, swapConfirmationNetworkFee)
+        setupFeeLoading(viewModel.feeMixin, binder.swapConfirmationNetworkFee)
 
         viewModel.swapDetails.observe {
-            swapConfirmationAssets.setModel(it.assets)
-            swapConfirmationRate.showValue(it.rate)
-            swapConfirmationPriceDifference.showValueOrHide(it.priceDifference)
-            swapConfirmationSlippage.showValue(it.slippage)
+            binder.swapConfirmationAssets.setModel(it.assets)
+            binder.swapConfirmationRate.showValue(it.rate)
+            binder.swapConfirmationPriceDifference.showValueOrHide(it.priceDifference)
+            binder.swapConfirmationSlippage.showValue(it.slippage)
         }
 
-        viewModel.wallet.observe { swapConfirmationWallet.showWallet(it) }
-        viewModel.addressFlow.observe { swapConfirmationAccount.showAddress(it) }
+        viewModel.wallet.observe { binder.swapConfirmationWallet.showWallet(it) }
+        viewModel.addressFlow.observe { binder.swapConfirmationAccount.showAddress(it) }
 
-        viewModel.slippageAlertMessage.observe { swapConfirmationAlert.setMessageOrHide(it) }
+        viewModel.slippageAlertMessage.observe { binder.swapConfirmationAlert.setMessageOrHide(it) }
 
-        viewModel.validationProgress.observe(swapConfirmationButton::setProgressState)
+        viewModel.validationProgress.observe(binder.swapConfirmationButton::setProgressState)
     }
 }

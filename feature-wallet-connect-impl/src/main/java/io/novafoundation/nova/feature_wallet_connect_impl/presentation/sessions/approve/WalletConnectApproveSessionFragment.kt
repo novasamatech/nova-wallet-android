@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,12 +16,15 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWall
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
+import io.novafoundation.nova.feature_wallet_connect_impl.databinding.FragmentWcSessionApproveBinding
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.view.WCNetworksBottomSheet
 
 import javax.inject.Inject
 
-class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSessionViewModel>() {
+class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSessionViewModel, FragmentWcSessionApproveBinding>() {
+
+    override val binder by viewBinding(FragmentWcSessionApproveBinding::bind)
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -34,16 +38,16 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
     override fun initViews() {
         onBackPressed { viewModel.exit() }
 
-        wcApproveSessionToolbar.setHomeButtonListener { viewModel.exit() }
-        wcApproveSessionToolbar.applyStatusBarInsets()
+        binder.wcApproveSessionToolbar.setHomeButtonListener { viewModel.exit() }
+        binder.wcApproveSessionToolbar.applyStatusBarInsets()
 
-        wcApproveSessionReject.setOnClickListener { viewModel.rejectClicked() }
-        wcApproveSessionReject.prepareForProgress(viewLifecycleOwner)
+        binder.wcApproveSessionReject.setOnClickListener { viewModel.rejectClicked() }
+        binder.wcApproveSessionReject.prepareForProgress(viewLifecycleOwner)
 
-        wcApproveSessionAllow.prepareForProgress(viewLifecycleOwner)
-        wcApproveSessionAllow.setOnClickListener { viewModel.approveClicked() }
+        binder.wcApproveSessionAllow.prepareForProgress(viewLifecycleOwner)
+        binder.wcApproveSessionAllow.setOnClickListener { viewModel.approveClicked() }
 
-        wcApproveSessionNetworks.setOnClickListener { viewModel.networksClicked() }
+        binder.wcApproveSessionNetworks.setOnClickListener { viewModel.networksClicked() }
     }
 
     override fun inject() {
@@ -57,24 +61,24 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
     }
 
     override fun subscribe(viewModel: WalletConnectApproveSessionViewModel) {
-        setupSelectWalletMixin(viewModel.selectWalletMixin, wcApproveSessionWallet)
+        setupSelectWalletMixin(viewModel.selectWalletMixin, binder.wcApproveSessionWallet)
 
         viewModel.sessionMetadata.observe { sessionMetadata ->
-            wcApproveSessionDApp.showValueOrHide(sessionMetadata.dAppUrl)
-            wcApproveSessionIcon.showDAppIcon(sessionMetadata.icon, imageLoader)
+            binder.wcApproveSessionDApp.showValueOrHide(sessionMetadata.dAppUrl)
+            binder.wcApproveSessionIcon.showDAppIcon(sessionMetadata.icon, imageLoader)
         }
 
-        viewModel.chainsOverviewFlow.observe(wcApproveSessionNetworks::showChainsOverview)
+        viewModel.chainsOverviewFlow.observe(binder.wcApproveSessionNetworks::showChainsOverview)
 
-        viewModel.title.observe(wcApproveSessionTitle::setText)
+        viewModel.title.observe(binder.wcApproveSessionTitle::setText)
 
         viewModel.sessionAlerts.observe { sessionAlerts ->
-            wcApproveSessionChainsAlert.setMessageOrHide(sessionAlerts.unsupportedChains?.alertContent)
-            wcApproveSessionAccountsAlert.setMessageOrHide(sessionAlerts.missingAccounts?.alertContent)
+            binder.wcApproveSessionChainsAlert.setMessageOrHide(sessionAlerts.unsupportedChains?.alertContent)
+            binder.wcApproveSessionAccountsAlert.setMessageOrHide(sessionAlerts.missingAccounts?.alertContent)
         }
 
-        viewModel.allowButtonState.observe(wcApproveSessionAllow::setState)
-        viewModel.rejectButtonState.observe(wcApproveSessionReject::setState)
+        viewModel.allowButtonState.observe(binder.wcApproveSessionAllow::setState)
+        viewModel.rejectButtonState.observe(binder.wcApproveSessionReject::setState)
 
         viewModel.showNetworksBottomSheet.observeEvent { data ->
             WCNetworksBottomSheet(context = requireContext(), data = data)

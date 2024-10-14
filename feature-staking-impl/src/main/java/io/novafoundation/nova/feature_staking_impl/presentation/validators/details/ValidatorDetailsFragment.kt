@@ -9,6 +9,7 @@ import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
 import androidx.core.view.children
 import androidx.core.view.updateMarginsRelative
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.addAfter
@@ -20,12 +21,13 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.s
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentValidatorDetailsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorAlert
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 
-class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
+class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel, FragmentValidatorDetailsBinding>() {
 
     companion object {
         private const val PAYLOAD = "ValidatorDetailsFragment.Payload"
@@ -37,24 +39,18 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_validator_details, container, false)
-    }
+    override val binder by viewBinding(FragmentValidatorDetailsBinding::bind)
 
     private val activeStakingFields by lazy(LazyThreadSafetyMode.NONE) {
-        listOf(validatorStakingStakers, validatorStakingTotalStake, validatorStakingEstimatedReward, validatorStakingMinimumStake)
+        listOf(binder.validatorStakingStakers, binder.validatorStakingTotalStake, binder.validatorStakingEstimatedReward, binder.validatorStakingMinimumStake)
     }
 
     override fun initViews() {
-        validatorDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.validatorDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        validatorStakingTotalStake.setOnClickListener { viewModel.totalStakeClicked() }
+        binder.validatorStakingTotalStake.setOnClickListener { viewModel.totalStakeClicked() }
 
-        validatorAccountInfo.setOnClickListener { viewModel.accountActionsClicked() }
+        binder.validatorAccountInfo.setOnClickListener { viewModel.accountActionsClicked() }
     }
 
     override fun inject() {
@@ -69,49 +65,49 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 
     override fun subscribe(viewModel: ValidatorDetailsViewModel) {
         setupExternalActions(viewModel)
-        setupIdentityMixin(viewModel.identityMixin, validatorIdentity)
+        setupIdentityMixin(viewModel.identityMixin, binder.validatorIdentity)
 
         viewModel.stakeTargetDetails.observe { validator ->
             with(validator.stake) {
-                validatorStakingStatus.showValue(status.text)
-                validatorStakingStatus.setPrimaryValueEndIcon(status.icon, tint = status.iconTint)
+                binder.validatorStakingStatus.showValue(status.text)
+                binder.validatorStakingStatus.setPrimaryValueEndIcon(status.icon, tint = status.iconTint)
 
                 if (activeStakeModel != null) {
                     activeStakingFields.forEach(View::makeVisible)
 
-                    validatorStakingStakers.showValue(activeStakeModel.nominatorsCount, activeStakeModel.maxNominations)
-                    validatorStakingTotalStake.showAmount(activeStakeModel.totalStake)
-                    validatorStakingMinimumStake.showAmountOrHide(activeStakeModel.minimumStake)
-                    validatorStakingEstimatedReward.showValue(activeStakeModel.apy)
+                    binder.validatorStakingStakers.showValue(activeStakeModel.nominatorsCount, activeStakeModel.maxNominations)
+                    binder.validatorStakingTotalStake.showAmount(activeStakeModel.totalStake)
+                    binder.validatorStakingMinimumStake.showAmountOrHide(activeStakeModel.minimumStake)
+                    binder.validatorStakingEstimatedReward.showValue(activeStakeModel.apy)
                 } else {
                     activeStakingFields.forEach(View::makeGone)
                 }
             }
 
-            validatorIdentity.setModelOrHide(validator.identity)
+            binder.validatorIdentity.setModelOrHide(validator.identity)
 
-            validatorAccountInfo.setAddressModel(validator.addressModel)
+            binder.validatorAccountInfo.setAddressModel(validator.addressModel)
         }
 
         viewModel.errorFlow.observe { alerts ->
             removeAllAlerts()
 
             val alertViews = alerts.map(::createAlertView)
-            validatorDetailsContainer.addAfter(validatorAccountInfo, alertViews)
+            binder.validatorDetailsContainer.addAfter(binder.validatorAccountInfo, alertViews)
         }
 
         viewModel.totalStakeEvent.observeEvent {
             ValidatorStakeBottomSheet(requireContext(), it).show()
         }
 
-        validatorDetailsToolbar.setTitle(viewModel.displayConfig.titleRes)
-        validatorStakingStakers.setTitle(viewModel.displayConfig.stakersLabelRes)
+        binder.validatorDetailsToolbar.setTitle(viewModel.displayConfig.titleRes)
+        binder.validatorStakingStakers.setTitle(viewModel.displayConfig.stakersLabelRes)
     }
 
     private fun removeAllAlerts() {
-        validatorDetailsContainer.children
+        binder.validatorDetailsContainer.children
             .filterIsInstance<AlertView>()
-            .forEach(validatorDetailsContainer::removeView)
+            .forEach(binder.validatorDetailsContainer::removeView)
     }
 
     private fun createAlertView(alert: ValidatorAlert): AlertView {

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
@@ -11,11 +12,12 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSetupStakingTypeBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.SetupStakingTypeAdapter
 
-class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), SetupStakingTypeAdapter.ItemAssetHandler {
+class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel, FragmentSetupStakingTypeBinding>(), SetupStakingTypeAdapter.ItemAssetHandler {
 
     companion object {
 
@@ -28,22 +30,16 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         }
     }
 
+    override val binder by viewBinding(FragmentSetupStakingTypeBinding::bind)
+
     private val adapter = SetupStakingTypeAdapter(this)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_setup_staking_type, container, false)
-    }
-
     override fun initViews() {
-        setupStakingTypeToolbar.applyStatusBarInsets()
-        setupStakingTypeToolbar.setRightActionClickListener { viewModel.donePressed() }
-        setupStakingTypeToolbar.setHomeButtonListener { viewModel.backPressed() }
-        setupStakingTypeList.adapter = adapter
-        setupStakingTypeList.itemAnimator = null
+        binder.setupStakingTypeToolbar.applyStatusBarInsets()
+        binder.setupStakingTypeToolbar.setRightActionClickListener { viewModel.donePressed() }
+        binder.setupStakingTypeToolbar.setHomeButtonListener { viewModel.backPressed() }
+        binder.setupStakingTypeList.adapter = adapter
+        binder.setupStakingTypeList.itemAnimator = null
 
         onBackPressed { viewModel.backPressed() }
     }
@@ -62,7 +58,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.closeConfirmationAction)
         observeValidations(viewModel)
 
-        viewModel.dataHasBeenChanged.observe { setupStakingTypeToolbar.setRightActionEnabled(it) }
+        viewModel.dataHasBeenChanged.observe { binder.setupStakingTypeToolbar.setRightActionEnabled(it) }
 
         viewModel.stakingTypeModels.observe {
             adapter.submitList(it)

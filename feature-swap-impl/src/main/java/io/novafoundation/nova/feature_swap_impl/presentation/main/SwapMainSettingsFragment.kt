@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -23,13 +24,14 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
 import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
+import io.novafoundation.nova.feature_swap_impl.databinding.FragmentMainSwapSettingsBinding
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupSelectableFeeToken
 
 import javax.inject.Inject
 
-class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
+class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, FragmentMainSwapSettingsBinding>() {
 
     companion object {
 
@@ -42,34 +44,28 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
     }
 
+    override val binder by viewBinding(FragmentMainSwapSettingsBinding::bind)
+
     @Inject
     lateinit var buyMixinUi: BuyMixinUi
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_main_swap_settings, container, false)
-    }
-
     override fun initViews() {
-        swapMainSettingsToolbar.applyStatusBarInsets()
-        swapMainSettingsContinue.prepareForProgress(this)
-        swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
+        binder.swapMainSettingsToolbar.applyStatusBarInsets()
+        binder.swapMainSettingsContinue.prepareForProgress(this)
+        binder.swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
 
-        swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
-        swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
-        swapMainSettingsFlip.setOnClickListener {
+        binder.swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
+        binder.swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
+        binder.swapMainSettingsFlip.setOnClickListener {
             viewModel.flipAssets()
         }
-        swapMainSettingsDetailsRate.setOnClickListener { viewModel.rateDetailsClicked() }
-        swapMainSettingsDetailsNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
-        swapMainSettingsContinue.setOnClickListener { viewModel.continueButtonClicked() }
-        swapMainSettingsContinue.prepareForProgress(this)
+        binder.swapMainSettingsDetailsRate.setOnClickListener { viewModel.rateDetailsClicked() }
+        binder.swapMainSettingsDetailsNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
+        binder.swapMainSettingsContinue.setOnClickListener { viewModel.continueButtonClicked() }
+        binder.swapMainSettingsContinue.prepareForProgress(this)
 
-        swapMainSettingsGetAssetIn.setOnClickListener { viewModel.getAssetInClicked() }
+        binder.swapMainSettingsGetAssetIn.setOnClickListener { viewModel.getAssetInClicked() }
     }
 
     override fun inject() {
@@ -85,24 +81,24 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
         observeDescription(viewModel)
         observeValidations(viewModel)
-        setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput, swapMainSettingsMaxAmount)
-        setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, maxAvailableView = null)
-        setupFeeLoading(viewModel.feeMixin, swapMainSettingsDetailsNetworkFee)
-        setupSelectableFeeToken(viewModel.canChangeFeeToken, swapMainSettingsDetailsNetworkFee) {
+        setupSwapAmountInput(viewModel.amountInInput, binder.swapMainSettingsPayInput, binder.swapMainSettingsMaxAmount)
+        setupSwapAmountInput(viewModel.amountOutInput, binder.swapMainSettingsReceiveInput, maxAvailableView = null)
+        setupFeeLoading(viewModel.feeMixin, binder.swapMainSettingsDetailsNetworkFee)
+        setupSelectableFeeToken(viewModel.canChangeFeeToken, binder.swapMainSettingsDetailsNetworkFee) {
             viewModel.editFeeTokenClicked()
         }
 
         buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
 
-        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
-        viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
-        viewModel.buttonState.observe(swapMainSettingsContinue::setState)
+        viewModel.rateDetails.observe { binder.swapMainSettingsDetailsRate.showLoadingValue(it) }
+        viewModel.showDetails.observe { binder.swapMainSettingsDetails.setVisible(it) }
+        viewModel.buttonState.observe(binder.swapMainSettingsContinue::setState)
 
         viewModel.swapDirectionFlipped.observeEvent {
             postToUiThread {
                 val field = when (it) {
-                    SwapDirection.SPECIFIED_IN -> swapMainSettingsPayInput
-                    SwapDirection.SPECIFIED_OUT -> swapMainSettingsReceiveInput
+                    SwapDirection.SPECIFIED_IN -> binder.swapMainSettingsPayInput
+                    SwapDirection.SPECIFIED_OUT -> binder.swapMainSettingsReceiveInput
                 }
 
                 field.requestFocus()
@@ -110,7 +106,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             }
         }
 
-        viewModel.minimumBalanceBuyAlert.observe(swapMainSettingsMinBalanceAlert::setModel)
+        viewModel.minimumBalanceBuyAlert.observe(binder.swapMainSettingsMinBalanceAlert::setModel)
 
         viewModel.changeFeeTokenEvent.awaitableActionLiveData.observeEvent {
             FeeAssetSelectorBottomSheet(
@@ -121,9 +117,9 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             ).show()
         }
 
-        viewModel.validationProgress.observe(swapMainSettingsContinue::setProgressState)
+        viewModel.validationProgress.observe(binder.swapMainSettingsContinue::setProgressState)
 
-        viewModel.getAssetInOptionsButtonState.observe(swapMainSettingsGetAssetIn::setState)
+        viewModel.getAssetInOptionsButtonState.observe(binder.swapMainSettingsGetAssetIn::setState)
 
         viewModel.selectGetAssetInOption.awaitableActionLiveData.observeEvent {
             GetAssetInBottomSheet(
