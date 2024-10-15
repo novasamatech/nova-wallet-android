@@ -19,8 +19,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.StartStakingLandingValidationSystem
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.StartSwipeGovValidationFailure
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.StartSwipeGovValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.startSwipeGovValidation
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset

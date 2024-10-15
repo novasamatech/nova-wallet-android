@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -74,7 +73,8 @@ class ReferendaListViewModel(
     private val tinderGovInteractor: TinderGovInteractor,
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
     private val validationExecutor: ValidationExecutor,
-) : BaseViewModel(), WithAssetSelector,
+) : BaseViewModel(),
+    WithAssetSelector,
     Validatable by validationExecutor {
 
     override val assetSelectorMixin = assetSelectorFactory.create(
