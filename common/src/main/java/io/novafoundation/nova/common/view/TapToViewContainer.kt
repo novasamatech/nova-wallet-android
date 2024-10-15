@@ -14,9 +14,11 @@ import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewTapToViewContainerBinding
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getParcelableCompat
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 
@@ -31,6 +33,8 @@ open class TapToViewContainer @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewTapToViewContainerBinding.inflate(inflater(), this)
+
     private var onShowContentClicked: OnClickListener? = null
 
     private var isContentVisible = false
@@ -44,13 +48,12 @@ open class TapToViewContainer @JvmOverloads constructor(
     }
 
     init {
-        inflate(context, R.layout.view_tap_to_view_container, this)
         layoutTransition = LayoutTransition() // To animate this layout size change and children visibility
 
-        tapToViewContainer.setOnClickListener {
+        binder.tapToViewContainer.setOnClickListener {
             isContentVisible = true
             onShowContentClicked?.onClick(this)
-            tapToViewContainer.visibility = GONE
+            binder.tapToViewContainer.visibility = GONE
             requestLayout()
         }
 
@@ -79,8 +82,8 @@ open class TapToViewContainer @JvmOverloads constructor(
      * Measure the height of the tap to view container background based on the its background aspect ratio
      */
     private fun measureTapToViewContainerBackground(width: Int): Int {
-        val tapToViewBackgroundHeight = tapToViewContainer.background?.intrinsicHeight ?: 0
-        val tabToViewBackgroundWidth = tapToViewContainer.background?.intrinsicWidth ?: 0
+        val tapToViewBackgroundHeight = binder.tapToViewContainer.background?.intrinsicHeight ?: 0
+        val tabToViewBackgroundWidth = binder.tapToViewContainer.background?.intrinsicWidth ?: 0
         val height = tapToViewBackgroundHeight * (width.toFloat() / tabToViewBackgroundWidth.toFloat())
         return height.roundToInt()
     }

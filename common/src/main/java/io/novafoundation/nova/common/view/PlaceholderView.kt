@@ -10,9 +10,11 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewPlaceholderBinding
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -31,9 +33,9 @@ class PlaceholderView @JvmOverloads constructor(
         NO_BACKGROUND(false, null, R.color.text_secondary)
     }
 
-    init {
-        View.inflate(context, R.layout.view_placeholder, this)
+    private val binder = ViewPlaceholderBinding.inflate(inflater(), this)
 
+    init {
         setPadding(16.dp(context), 16.dp(context), 16.dp(context), 32.dp(context))
 
         orientation = VERTICAL
@@ -59,27 +61,27 @@ class PlaceholderView @JvmOverloads constructor(
         } else {
             null
         }
-        viewPlaceholderText.setTextColorRes(style.textColorRes)
+        binder.viewPlaceholderText.setTextColorRes(style.textColorRes)
     }
 
     fun setImage(@DrawableRes image: Int) {
-        viewPlaceholderImage.setImageResource(image)
+        binder.viewPlaceholderImage.setImageResource(image)
     }
 
     fun setImageTint(@ColorInt tint: Int?) {
-        viewPlaceholderImage.setImageTint(tint)
+        binder.viewPlaceholderImage.setImageTint(tint)
     }
 
     fun setText(text: String) {
-        viewPlaceholderText.text = text
+        binder.viewPlaceholderText.text = text
     }
 
     fun setText(@StringRes textRes: Int) {
-        viewPlaceholderText.setText(textRes)
+        binder.viewPlaceholderText.setText(textRes)
     }
 
     fun setButtonText(text: String?) {
-        viewPlaceholderButton.setTextOrHide(text)
+        binder.viewPlaceholderButton.setTextOrHide(text)
     }
 
     fun setButtonText(@StringRes textRes: Int) {
@@ -95,7 +97,7 @@ class PlaceholderView @JvmOverloads constructor(
     }
 
     fun setButtonClickListener(listener: OnClickListener?) {
-        viewPlaceholderButton.setOnClickListener(listener)
+        binder.viewPlaceholderButton.setOnClickListener(listener)
     }
 }
 

@@ -6,9 +6,11 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ButtonLargeBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
@@ -19,6 +21,8 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
+
+    private val binder = ButtonLargeBinding.inflate(inflater(), this)
 
     init {
         View.inflate(context, R.layout.button_large, this)
@@ -48,15 +52,15 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     }
 
     private fun setTitle(title: String?) {
-        buttonLargeTitle.text = title
+        binder.buttonLargeTitle.text = title
     }
 
     private fun setSubtitle(subtitle: String?) {
-        buttonLargeSubtitle.setTextOrHide(subtitle)
+        binder.buttonLargeSubtitle.setTextOrHide(subtitle)
     }
 
     private fun setIcon(icon: Drawable?) {
-        buttonLargeIcon.setImageDrawable(icon)
+        binder.buttonLargeIcon.setImageDrawable(icon)
     }
 
     private fun setStyle(style: Style) = with(context) {

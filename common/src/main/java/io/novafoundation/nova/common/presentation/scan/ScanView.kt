@@ -13,7 +13,9 @@ import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewScanBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.useAttributes
 
@@ -23,14 +25,14 @@ class ScanView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
-    init {
-        View.inflate(context, R.layout.view_scan, this)
+    val binder = ViewScanBinding.inflate(inflater(), this)
 
+    init {
         setupDecoder()
 
-        viewScanViewFinder.setCameraPreview(viewScanScanner)
+        binder.viewScanViewFinder.setCameraPreview(binder.viewScanScanner)
 
-        viewScanViewFinder.onFinderRectChanges {
+        binder.viewScanViewFinder.onFinderRectChanges {
             positionLabels(it)
         }
 
@@ -38,18 +40,18 @@ class ScanView @JvmOverloads constructor(
     }
 
     val subtitle: TextView
-        get() = viewScanSubtitle
+        get() = binder.viewScanSubtitle
 
     fun resume() {
-        viewScanScanner.resume()
+        binder.viewScanScanner.resume()
     }
 
     fun pause() {
-        viewScanScanner.pause()
+        binder.viewScanScanner.pause()
     }
 
     inline fun startDecoding(crossinline onScanned: (String) -> Unit) {
-        viewScanScanner.decodeSingle(object : BarcodeCallback {
+        binder.viewScanScanner.decodeSingle(object : BarcodeCallback {
             override fun barcodeResult(result: BarcodeResult) {
                 onScanned(result.toString())
             }
@@ -63,21 +65,21 @@ class ScanView @JvmOverloads constructor(
 
         if (!changed) return
 
-        viewScanViewFinder.framingRect?.let {
+        binder.viewScanViewFinder.framingRect?.let {
             positionLabels(it)
         }
     }
 
     fun setTitle(title: String) {
-        viewScanTitle.text = title
+        binder.viewScanTitle.text = title
     }
 
     fun setSubtitle(subtitle: String) {
-        viewScanSubtitle.text = subtitle
+        binder.viewScanSubtitle.text = subtitle
     }
 
     private fun setupDecoder() {
-        viewScanScanner.decoderFactory = AlternatingDecoderFactory(
+        binder.viewScanScanner.decoderFactory = AlternatingDecoderFactory(
             decodeFormats = listOf(BarcodeFormat.QR_CODE),
             hints = null,
             characterSet = null,
@@ -85,8 +87,8 @@ class ScanView @JvmOverloads constructor(
     }
 
     private fun positionLabels(finderRect: Rect) {
-        viewScanTitle.doIfHasText { positionTitle(finderRect) }
-        viewScanSubtitle.doIfHasText { positionSubTitle(finderRect) }
+        binder.viewScanTitle.doIfHasText { positionTitle(finderRect) }
+        binder.viewScanSubtitle.doIfHasText { positionSubTitle(finderRect) }
     }
 
     private inline fun TextView.doIfHasText(action: () -> Unit) {
@@ -97,26 +99,26 @@ class ScanView @JvmOverloads constructor(
         val rectTop = finderRect.top
 
         // how much finderRect offsets from center of the screen + half of textView height since it is originally centered itself
-        val requiredBottomMargin = height / 2 - rectTop + viewScanTitle.height / 2
+        val requiredBottomMargin = height / 2 - rectTop + binder.viewScanTitle.height / 2
 
-        viewScanTitle.layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+        binder.viewScanTitle.layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             gravity = Gravity.CENTER
             setMargins(16.dp, 0, 16.dp, requiredBottomMargin + 24.dp)
         }
-        viewScanTitle.makeVisible()
+        binder.viewScanTitle.makeVisible()
     }
 
     private fun positionSubTitle(finderRect: Rect) {
         val rectBottom = finderRect.bottom
 
         // how much finderRect offsets from center of the screen + half of textView height since it is originally centered itself
-        val requiredTopMargin = rectBottom - height / 2 + viewScanSubtitle.height / 2
+        val requiredTopMargin = rectBottom - height / 2 + binder.viewScanSubtitle.height / 2
 
-        viewScanSubtitle.layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+        binder.viewScanSubtitle.layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             gravity = Gravity.CENTER
             setMargins(16.dp, requiredTopMargin + 24.dp, 16.dp, 0)
         }
-        viewScanSubtitle.makeVisible()
+        binder.viewScanSubtitle.makeVisible()
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ScanView) { typedArray ->

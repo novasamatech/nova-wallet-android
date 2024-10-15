@@ -2,9 +2,11 @@ package io.novafoundation.nova.common.presentation
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.BottomSheeetCopierBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
@@ -15,12 +17,12 @@ class CopierBottomSheet(
     private val value: String,
     private val buttonName: String,
     private val onClipboardMessage: String,
-) : FixedListBottomSheet(
+) : FixedListBottomSheet<BottomSheeetCopierBinding>(
     context,
-    viewConfiguration = ViewConfiguration(
-        layout = R.layout.bottom_sheeet_copier,
-        title = { copierValue },
-        container = { copierContainer }
+    viewConfiguration = FixedListBottomSheet.ViewConfiguration(
+        configurationBinder = BottomSheeetCopierBinding.inflate(LayoutInflater.from(context)),
+        title = { configurationBinder.copierValue },
+        container = { configurationBinder.copierContainer }
     )
 ) {
 

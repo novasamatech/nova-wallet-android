@@ -8,9 +8,11 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewAdvertisementCardBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.updatePadding
@@ -22,12 +24,12 @@ class AdvertisementCard @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : MaterialCardView(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
+    private val binder = ViewAdvertisementCardBinding.inflate(inflater(), this)
+
     val action: PrimaryButton
-        get() = advertisementCardButton
+        get() = binder.advertisementCardButton
 
     init {
-        View.inflate(context, R.layout.view_advertisement_card, this)
-
         cardElevation = 0f
         radius = 12f.dpF(context)
         strokeWidth = 1.dp(context)
@@ -44,19 +46,19 @@ class AdvertisementCard @JvmOverloads constructor(
     }
 
     fun setOnLearnMoreClickedListener(onClicked: (View) -> Unit) {
-        advertisementCardLearnMoreArrow.setOnClickListener(onClicked)
-        advertisementCardLearnMoreContent.setOnClickListener(onClicked)
+        binder.advertisementCardLearnMoreArrow.setOnClickListener(onClicked)
+        binder.advertisementCardLearnMoreContent.setOnClickListener(onClicked)
     }
 
     fun setOnCloseClickListener(listener: OnClickListener?) {
-        advertisementCardClose.setOnClickListener(listener)
+        binder.advertisementCardClose.setOnClickListener(listener)
     }
 
     fun setModel(model: AdvertisementCardModel) {
-        advertisementCardTitle.text = model.title
-        advertisementCardSubTitle.text = model.subtitle
-        advertisementCardImage.setImageResource(model.imageRes)
-        advertisementCardBackground.setBackgroundResource(model.bannerBackgroundRes)
+        binder.advertisementCardTitle.text = model.title
+        binder.advertisementCardSubTitle.text = model.subtitle
+        binder.advertisementCardImage.setImageResource(model.imageRes)
+        binder.advertisementCardBackground.setBackgroundResource(model.bannerBackgroundRes)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AdvertisementCard) {
@@ -64,23 +66,23 @@ class AdvertisementCard @JvmOverloads constructor(
         action.setTextOrHide(actionLabel)
 
         val learnMore = it.getString(R.styleable.AdvertisementCard_learnMore)
-        advertisementCardLearnMoreGroup.setVisible(learnMore != null)
-        advertisementCardLearnMoreContent.text = learnMore
+        binder.advertisementCardLearnMoreGroup.setVisible(learnMore != null)
+        binder.advertisementCardLearnMoreContent.text = learnMore
 
         val title = it.getString(R.styleable.AdvertisementCard_title)
-        advertisementCardTitle.text = title
+        binder.advertisementCardTitle.text = title
 
         val subtitle = it.getString(R.styleable.AdvertisementCard_subtitle)
-        advertisementCardSubTitle.text = subtitle
+        binder.advertisementCardSubTitle.text = subtitle
 
         val image = it.getDrawable(R.styleable.AdvertisementCard_image)
-        advertisementCardImage.setImageDrawable(image)
+        binder.advertisementCardImage.setImageDrawable(image)
 
         val bannerBackground = it.getDrawable(R.styleable.AdvertisementCard_advertisementCardBackground)
-        advertisementCardBackground.background = bannerBackground
+        binder.advertisementCardBackground.background = bannerBackground
 
         val showClose = it.getBoolean(R.styleable.AdvertisementCard_showClose, false)
-        advertisementCardClose.isVisible = showClose
+        binder.advertisementCardClose.isVisible = showClose
     }
 }
 

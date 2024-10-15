@@ -7,16 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import kotlinx.android.extensions.LayoutContainer
 
-abstract class BaseListAdapter<T, VH : BaseViewHolder<*>>(diffCallback: DiffUtil.ItemCallback<T>) : ListAdapter<T, VH>(diffCallback) {
+abstract class BaseListAdapter<T, VH : BaseViewHolder>(diffCallback: DiffUtil.ItemCallback<T>) : ListAdapter<T, VH>(diffCallback) {
 
     override fun onViewRecycled(holder: VH) {
         holder.unbind()
     }
 }
 
-abstract class BaseViewHolder<B : ViewBinding>(val binder: B) : RecyclerView.ViewHolder(binder.root), LayoutContainer {
-
-    override val containerView: View = binder.root
+abstract class BaseViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     open fun unbind() {}
 }

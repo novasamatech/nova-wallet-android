@@ -13,7 +13,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewGoNextBinding
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 
@@ -23,6 +25,8 @@ class GoNextView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewGoNextBinding.inflate(inflater(), this)
+
     init {
         View.inflate(context, R.layout.view_go_next, this)
 
@@ -30,24 +34,24 @@ class GoNextView @JvmOverloads constructor(
     }
 
     val icon: ImageView
-        get() = goNextIcon
+        get() = binder.goNextIcon
 
     val title: TextView
-        get() = goNextTitle
+        get() = binder.goNextTitle
 
     fun setInProgress(inProgress: Boolean) {
         isEnabled = !inProgress
 
-        goNextActionImage.setVisible(!inProgress)
-        goNextProgress.setVisible(inProgress)
+        binder.goNextActionImage.setVisible(!inProgress)
+        binder.goNextProgress.setVisible(inProgress)
     }
 
     fun setDividerVisible(visible: Boolean) {
-        goNextDivider.setVisible(visible)
+        binder.goNextDivider.setVisible(visible)
     }
 
     fun setBadgeText(badgeText: String?) {
-        goNextBadgeText.setTextOrHide(badgeText)
+        binder.goNextBadgeText.setTextOrHide(badgeText)
     }
 
     fun loadIcon(iconLink: String, imageLoader: ImageLoader) {
@@ -56,7 +60,7 @@ class GoNextView @JvmOverloads constructor(
     }
 
     fun setProgressTint(@ColorRes tintColor: Int) {
-        goNextProgress.indeterminateTintList = ColorStateList.valueOf(context.getColor(tintColor))
+        binder.goNextProgress.indeterminateTintList = ColorStateList.valueOf(context.getColor(tintColor))
     }
 
     fun setIcon(drawable: Drawable?) {
@@ -69,8 +73,8 @@ class GoNextView @JvmOverloads constructor(
     }
 
     fun setActionTint(@ColorInt color: Int) {
-        goNextActionImage.imageTintList = ColorStateList.valueOf(color)
-        goNextBadgeText.setTextColor(color)
+        binder.goNextActionImage.imageTintList = ColorStateList.valueOf(color)
+        binder.goNextBadgeText.setTextColor(color)
     }
 
     private fun applyAttributes(attributeSet: AttributeSet?) {
@@ -89,7 +93,7 @@ class GoNextView @JvmOverloads constructor(
         setIconTint(iconTint)
 
         val actionIconDrawable = typedArray.getDrawable(R.styleable.GoNextView_actionIcon)
-        goNextActionImage.setImageDrawable(actionIconDrawable)
+        binder.goNextActionImage.setImageDrawable(actionIconDrawable)
 
         val dividerVisible = typedArray.getBoolean(R.styleable.GoNextView_dividerVisible, true)
         setDividerVisible(dividerVisible)

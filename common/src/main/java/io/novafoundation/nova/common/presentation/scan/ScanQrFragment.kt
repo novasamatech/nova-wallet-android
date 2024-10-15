@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.presentation.scan
 
 import android.view.WindowManager
 import androidx.annotation.CallSuper
+import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 

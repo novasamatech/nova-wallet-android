@@ -10,7 +10,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewChooseAmountOldBinding
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
@@ -21,16 +23,16 @@ class AmountView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
+    private val binder = ViewChooseAmountOldBinding.inflate(inflater(), this)
+
     val amountInput: EditText
-        get() = stakingAmountInput
+        get() = binder.stakingAmountInput
 
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
         FeatureUtils.getCommonApi(context).imageLoader()
     }
 
     init {
-        View.inflate(context, R.layout.view_choose_amount_old, this)
-
         setBackground()
 
         applyAttributes(attrs)
@@ -79,22 +81,22 @@ class AmountView @JvmOverloads constructor(
     }
 
     fun setAssetImage(image: Drawable) {
-        stakingAssetImage.setImageDrawable(image)
+        binder.stakingAssetImage.setImageDrawable(image)
     }
 
     fun loadAssetImage(imageUrl: String?) {
-        stakingAssetImage.load(imageUrl, imageLoader)
+        binder.stakingAssetImage.load(imageUrl, imageLoader)
     }
 
     fun setAssetName(name: String) {
-        stakingAssetToken.text = name
+        binder.stakingAssetToken.text = name
     }
 
     fun setAssetBalance(balance: String) {
-        stakingAssetBalance.text = balance
+        binder.stakingAssetBalance.text = balance
     }
 
     fun setFiatAmount(priceAmount: String?) {
-        stakingAssetPriceAmount.setTextOrHide(priceAmount)
+        binder.stakingAssetPriceAmount.setTextOrHide(priceAmount)
     }
 }

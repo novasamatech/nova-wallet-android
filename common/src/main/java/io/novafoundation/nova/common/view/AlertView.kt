@@ -8,9 +8,11 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewAlertBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -51,6 +53,8 @@ class AlertView @JvmOverloads constructor(
         }
     }
 
+    private val binder = ViewAlertBinding.inflate(inflater(), this)
+
     init {
         View.inflate(context, R.layout.view_alert, this)
 
@@ -69,26 +73,26 @@ class AlertView @JvmOverloads constructor(
     }
 
     fun setMessage(text: String) {
-        alertMessage.text = text
+        binder.alertMessage.text = text
     }
 
     fun setMessage(@StringRes textRes: Int) {
-        alertMessage.setText(textRes)
+        binder.alertMessage.setText(textRes)
     }
 
     fun setSubMessage(text: CharSequence?) {
-        alertSubMessage.setTextOrHide(text)
+        binder.alertSubMessage.setTextOrHide(text)
     }
 
     fun setActionText(actionText: String?) {
-        alertActionGroup.letOrHide(actionText) { text ->
-            alertActionContent.text = text
+        binder.alertActionGroup.letOrHide(actionText) { text ->
+            binder.alertActionContent.text = text
         }
     }
 
     fun setOnActionClickedListener(listener: () -> Unit) {
-        alertActionContent.setOnClickListener { listener() }
-        alertActionArrow.setOnClickListener { listener() }
+        binder.alertActionContent.setOnClickListener { listener() }
+        binder.alertActionArrow.setOnClickListener { listener() }
     }
 
     fun setModel(maybeModel: SimpleAlertModel?) = letOrHide(maybeModel) { model ->
@@ -100,8 +104,8 @@ class AlertView @JvmOverloads constructor(
     }
 
     private fun setStyleIcon(@DrawableRes iconRes: Int, iconTintRes: Int? = null) {
-        alertIcon.setImageResource(iconRes)
-        alertIcon.setImageTintRes(iconTintRes)
+        binder.alertIcon.setImageResource(iconRes)
+        binder.alertIcon.setImageTintRes(iconTintRes)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {

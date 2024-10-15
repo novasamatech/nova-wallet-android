@@ -6,7 +6,9 @@ import android.view.View
 import android.widget.CompoundButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewSwitchBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 
@@ -18,8 +20,10 @@ class Switch @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
+    private val binder = ViewSwitchBinding.inflate(inflater(), this)
+
     val field: CompoundButton
-        get() = viewSwitchField
+        get() = binder.viewSwitchField
 
     init {
         View.inflate(context, R.layout.view_switch, this)
@@ -28,11 +32,11 @@ class Switch @JvmOverloads constructor(
     }
 
     fun setTitle(title: String) {
-        viewSwitchTitle.text = title
+        binder.viewSwitchTitle.text = title
     }
 
     fun setSubtitle(subtitle: String?) {
-        viewSwitchSubtitle.setTextOrHide(subtitle)
+        binder.viewSwitchSubtitle.setTextOrHide(subtitle)
     }
 
     fun setDividerVisible(dividerVisible: Boolean) {

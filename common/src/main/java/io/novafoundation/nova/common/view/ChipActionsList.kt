@@ -3,9 +3,11 @@ package io.novafoundation.nova.common.view
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ItemChipActionBinding
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 
 class ChipActionsModel(
     val action: String
@@ -21,7 +23,7 @@ class ChipActionsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChipActionsViewHolder {
-        return ChipActionsViewHolder(parent, handler)
+        return ChipActionsViewHolder(ItemChipActionBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: ChipActionsViewHolder, position: Int) {
@@ -29,17 +31,17 @@ class ChipActionsAdapter(
     }
 }
 
-class ChipActionsViewHolder constructor(
-    parent: ViewGroup,
+class ChipActionsViewHolder(
+    private val binder: ItemChipActionBinding,
     handler: ChipActionsAdapter.Handler
-) : BaseViewHolder(parent.inflateChild(R.layout.item_chip_action)) {
+) : BaseViewHolder(binder.root) {
 
     init {
-        containerView.setOnClickListener { handler.chipActionClicked(bindingAdapterPosition) }
+        binder.root.setOnClickListener { handler.chipActionClicked(bindingAdapterPosition) }
     }
 
     fun bind(item: ChipActionsModel) {
-        containerView.itemChipAction.text = item.action
+        binder.itemChipAction.text = item.action
     }
 
     override fun unbind() {}
