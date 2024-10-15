@@ -220,6 +220,18 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts WHERE isSelected = 1")
     suspend fun selectedMetaAccount(): RelationJoinedMetaAccountInfo?
 
+    @Query(
+        """
+        DELETE FROM meta_accounts
+        WHERE id IN (
+            SELECT proxiedMetaId
+            FROM proxy_accounts
+            WHERE chainId = :chainId
+        )
+    """
+    )
+    fun deleteProxiedMetaAccountsByChain(chainId: String)
+
     @Transaction
     suspend fun insertMetaAndChainAccounts(
         metaAccount: MetaAccountLocal,

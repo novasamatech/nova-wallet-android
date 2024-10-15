@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.ext.isCustomNetwork
@@ -15,12 +16,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeS
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.repository.ChainRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 
 class ChainNetworkState(
     val chain: Chain,
@@ -62,7 +65,8 @@ interface NetworkManagementChainInteractor {
 class RealNetworkManagementChainInteractor(
     private val chainRegistry: ChainRegistry,
     private val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory,
-    private val chainRepository: ChainRepository
+    private val chainRepository: ChainRepository,
+    private val accountInteractor: AccountInteractor
 ) : NetworkManagementChainInteractor {
 
     override fun chainStateFlow(chainId: String, coroutineScope: CoroutineScope): Flow<ChainNetworkState> {
@@ -106,6 +110,8 @@ class RealNetworkManagementChainInteractor(
         val chain = chainRegistry.getChain(chainId)
 
         require(chain.isCustomNetwork)
+
+        withContext(Dispatchers.Default) { accountInteractor.deleteProxiedMetaAccountsByChain(chainId) } // Delete proxied meta accounts manually
         chainRepository.deleteNetwork(chainId)
     }
 
