@@ -31,9 +31,10 @@ fun TextView.startTimer(
     value: TimerValue,
     @StringRes customMessageFormat: Int? = null,
     lifecycle: Lifecycle? = null,
+    timerDurationFormatter: DurationFormatter? = null,
     onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
-) = startTimer(value.millis, value.millisCalculatedAt, lifecycle, customMessageFormat, onTick, onFinish)
+) = startTimer(value.millis, value.millisCalculatedAt, lifecycle, customMessageFormat, timerDurationFormatter, onTick, onFinish)
 
 @OptIn(ExperimentalTime::class)
 fun TextView.startTimer(
@@ -41,10 +42,11 @@ fun TextView.startTimer(
     millisCalculatedAt: Long? = null,
     lifecycle: Lifecycle? = null,
     @StringRes customMessageFormat: Int? = null,
+    timerDurationFormatter: DurationFormatter? = null,
     onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
 ) {
-    val durationFormatter = getTimerDurationFormatter(context)
+    val durationFormatter = timerDurationFormatter ?: getTimerDurationFormatter(context)
 
     val timePassedSinceCalculation = if (millisCalculatedAt != null) System.currentTimeMillis() - millisCalculatedAt else 0L
 
@@ -91,7 +93,7 @@ private fun getTimerDurationFormatter(context: Context): DurationFormatter {
             dayFormatter = DayDurationFormatter(context),
             hoursFormatter = HoursDurationFormatter(context)
         ),
-        TimeDurationFormatter(),
+        timeDurationFormatter,
         ZeroDurationFormatter(timeDurationFormatter)
     )
 

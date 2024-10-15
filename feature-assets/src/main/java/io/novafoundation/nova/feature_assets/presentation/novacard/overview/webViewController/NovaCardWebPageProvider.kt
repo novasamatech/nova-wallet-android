@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController
 
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
 
 class NovaCardWebPageProvider(
@@ -8,6 +9,7 @@ class NovaCardWebPageProvider(
 ) {
 
     private val containerId = "widget-container"
+    private val scriptUrl = getScriptUrl()
     private val callbackName: String = "NovaCallback"
 
     fun getCallbackName() = callbackName
@@ -19,11 +21,18 @@ class NovaCardWebPageProvider(
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                }
+            </style>
         </head>
         <body>
             <div id="$containerId"></div>
         
-            <script src="https://widget.mercuryo.io/embed.2.0.js"></script>
+            <script src="$scriptUrl"></script>
         </body>
         </html>
         """.trimIndent()
@@ -33,7 +42,7 @@ class NovaCardWebPageProvider(
         return """
             mercuryoWidget.run({ 
                 widgetId: '$widgetId',
-                host: document.getElementById('widget-container'),
+                host: document.getElementById('$containerId'),
                 type: 'sell',
                 currency: '${setupConfig.spendToken.symbol.value}',
                 fiatCurrency: 'EUR',
@@ -53,5 +62,13 @@ class NovaCardWebPageProvider(
                 }
             });
         """.trimIndent()
+    }
+
+    private fun getScriptUrl(): String {
+        if (BuildConfig.DEBUG) {
+            return "https://sandbox-exchange.mrcr.io/embed.2.0.js"
+        } else {
+            return "https://widget.mercuryo.io/embed.2.0.js"
+        }
     }
 }

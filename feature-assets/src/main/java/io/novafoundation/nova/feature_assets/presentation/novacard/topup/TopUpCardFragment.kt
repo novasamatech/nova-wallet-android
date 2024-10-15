@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.topup
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
@@ -39,8 +38,6 @@ class TopUpCardFragment : BaseFragment<TopUpCardViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_top_up_card, container, false)
 
     override fun initViews() {
-        requireView().findViewById<View>(R.id.topUpCardToolbar)
-
         topUpCardContainer.applyStatusBarInsets(false)
 
         topUpCardToolbar.setHomeButtonListener { viewModel.backClicked() }
