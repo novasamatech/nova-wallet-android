@@ -51,6 +51,7 @@ import io.novafoundation.nova.core_db.migrations.AddBalanceModesToAssets_51_52
 import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
+import io.novafoundation.nova.core_db.migrations.AddChainForeignKeyForProxy_63_64
 import io.novafoundation.nova.core_db.migrations.AddConnectionStateToChains_53_54
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
@@ -150,7 +151,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 63,
+    version = 64,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -248,7 +249,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddFungibleNfts_55_56, ChainPushSupport_56_57)
                     .addMigrations(AddLocalMigratorVersionToChainRuntimes_57_58, AddGloballyUniqueIdToMetaAccounts_58_59)
                     .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
-                    .addMigrations(TinderGovBasket_62_63)
+                    .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64)
                     .build()
             }
             return instance!!

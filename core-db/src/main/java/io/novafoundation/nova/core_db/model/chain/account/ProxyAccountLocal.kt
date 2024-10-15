@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
 import io.novafoundation.nova.common.utils.Identifiable
+import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novasama.substrate_sdk_android.extensions.toHexString
 
 @Entity(
@@ -19,6 +20,12 @@ import io.novasama.substrate_sdk_android.extensions.toHexString
             parentColumns = ["id"],
             childColumns = ["proxyMetaId"],
             entity = MetaAccountLocal::class,
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["chainId"],
+            entity = ChainLocal::class,
             onDelete = ForeignKey.CASCADE
         ),
     ],
