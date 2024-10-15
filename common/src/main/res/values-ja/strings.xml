@@ -1123,7 +1123,7 @@
     <string name="settings_biometric_not_ready_message">設定で生体認証が有効になっていることを確認してください</string>
     <string name="settings_biometric_not_ready_title">設定で生体認証が無効になっています</string>
     <string name="settings_community">コミュニティ</string>
-    <string name="settings_email">Eメール</string>
+    <string name="settings_email">メールでサポートを受ける</string>
     <string name="settings_general">一般</string>
     <string name="settings_pin_code_verification_confirmation_message">ウォレットでの署名操作（Nova Walletで作成またはインポートされたもの）は、署名の作成前にPIN確認が必要です</string>
     <string name="settings_pin_code_verification_confirmation_title">操作の署名に認証を要求</string>
@@ -1135,7 +1135,7 @@
     <string name="settings_security">セキュリティ</string>
     <string name="settings_support">サポート＆フィードバック</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">ウィキ</string>
+    <string name="settings_wiki">ウィキとヘルプセンター</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">棄権時には信念が0.1xに設定されます</string>
     <string name="setup_staking_conflict_message">Direct StakingとNomination Poolsを同時にステークすることはできません</string>

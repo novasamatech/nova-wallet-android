@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <!--<string name="settings_wiki">Wiki</string>-->
     <string name="settings_wiki">Wiki &amp; Help Center</string>
 
-    <!--<string name="settings_email">Email</string>-->
     <string name="settings_email">Get support via Email</string>
 
     <string name="swipe_gov_card_placeholder_basket_full_text">You have already voted for all available referenda</string>

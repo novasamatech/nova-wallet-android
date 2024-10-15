@@ -564,8 +564,8 @@
     <string name="crowdloan_ended_title">크라우드론 종료됨</string>
     <string name="crowdloan_enter_referral">추천 코드를 입력하세요</string>
     <string name="crowdloan_info">크라우드론 정보</string>
-    <string name="crowdloan_learn"><![CDATA[<font>크라우드론</font> %s 배우기]]></string>
-    <string name="crowdloan_learn_v2_2_0"><![CDATA[%s의 <font>크라우드론</font> 웹사이트]]></string>
+    <string name="crowdloan_learn">크라우드론 %s 배우기</string>
+    <string name="crowdloan_learn_v2_2_0">%s의 크라우드론 웹사이트</string>
     <string name="crowdloan_leasing_period">임대 기간</string>
     <string name="crowdloan_main_description_v2_2_0">파라체인을 선택하여 %s을(를) 기여하세요. 기여한 토큰을 돌려받게 되며, 파라체인이 슬롯에 당선되면 경매 종료 후 보상을 받게 됩니다.</string>
     <string name="crowdloan_missing_account_message">기여를 위해 지갑에 %s 계정을 추가해야 합니다.</string>
@@ -821,7 +821,7 @@
     <string name="manual_backup_warning_title">비밀번호 구절을 공유하지 마세요!</string>
     <string name="mnemonic_card_reveal_subtitle">아무도 화면을 볼 수 없도록 하고\n스크린샷을 찍지 마세요</string>
     <string name="mnemonic_card_title">아무에게도 %s 하지 마세요</string>
-    <string name="mnemonic_card_title_highlight"><font>공유하지 마세요</font></string>
+    <string name="mnemonic_card_title_highlight">공유하지 마세요</string>
     <string name="mnemonic_error_try_another_one">다른 것을 시도해 보세요.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">유효하지 않은 니모닉 구절입니다. 단어 순서를 다시 한번 확인하세요</string>
     <string name="multiple_wallets_selection_max_message">%d 개 이상의 지갑을 선택할 수 없습니다</string>
@@ -1123,7 +1123,7 @@
     <string name="settings_biometric_not_ready_message">설정에서 생체 인식이 활성화되었는지 확인하세요</string>
     <string name="settings_biometric_not_ready_title">설정에서 생체 인식이 비활성화되었습니다</string>
     <string name="settings_community">커뮤니티</string>
-    <string name="settings_email">이메일</string>
+    <string name="settings_email">이메일을 통해 지원 받기</string>
     <string name="settings_general">일반</string>
     <string name="settings_pin_code_verification_confirmation_message">키 페어가 있는 지갑(Nova Wallet에서 생성 또는 가져옴)에 대한 각 서명 작업은 서명을 생성하기 전에 PIN 확인이 필요합니다</string>
     <string name="settings_pin_code_verification_confirmation_title">작업 서명을 위해 인증 요청</string>
@@ -1135,9 +1135,9 @@
     <string name="settings_security">보안</string>
     <string name="settings_support">지원 및 피드백</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">위키</string>
+    <string name="settings_wiki">위키 및 도움말 센터</string>
     <string name="settings_youtube">Youtube</string>
-    <string name="setup_referendum_vote_conviction_info"><font>기권</font> 시 확신도가 0.1x로 설정됩니다</string>
+    <string name="setup_referendum_vote_conviction_info">기권 시 확신도가 0.1x로 설정됩니다</string>
     <string name="setup_staking_conflict_message">직접 Staking과 Nomination Pools를 동시에 사용할 수 없습니다</string>
     <string name="setup_staking_conflict_title">이미 Staking 중</string>
     <string name="setup_staking_type_advanced_options_condition">고급 Staking 관리</string>
