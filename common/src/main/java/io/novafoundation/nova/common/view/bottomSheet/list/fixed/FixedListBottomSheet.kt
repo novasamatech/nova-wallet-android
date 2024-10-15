@@ -26,8 +26,8 @@ typealias ViewGetter<B, V> = FixedListBottomSheet.ViewConfiguration<B>.() -> V
 
 abstract class FixedListBottomSheet<B : ViewBinding>(
     context: Context,
-    onCancel: (() -> Unit)? = null,
-    private val viewConfiguration: ViewConfiguration<B>
+    private val viewConfiguration: ViewConfiguration<B>,
+    onCancel: (() -> Unit)? = null
 ) : BaseBottomSheet<B>(context, onCancel = onCancel) {
 
     class ViewConfiguration<B : ViewBinding>(

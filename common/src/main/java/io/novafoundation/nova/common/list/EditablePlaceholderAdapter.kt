@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ItemPlaceholderBinding
 import io.novafoundation.nova.common.utils.ViewSpace
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.PlaceholderModel
 
@@ -17,7 +18,7 @@ class EditablePlaceholderAdapter : SingleItemAdapter<EditableStubHolder>() {
     private var clickListener: OnClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableStubHolder {
-        return EditableStubHolder(ItemPlaceholderBinding.bind(parent))
+        return EditableStubHolder(ItemPlaceholderBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: EditableStubHolder, position: Int) {
@@ -46,7 +47,7 @@ class EditablePlaceholderAdapter : SingleItemAdapter<EditableStubHolder>() {
     }
 }
 
-class EditableStubHolder(binder: ItemPlaceholderBinding) : BaseViewHolder<ItemPlaceholderBinding>(binder) {
+class EditableStubHolder(private val binder: ItemPlaceholderBinding) : BaseViewHolder(binder.root) {
 
     fun bind(model: PlaceholderModel?, padding: ViewSpace?, clickListener: OnClickListener?) {
         model?.let { binder.itemPlaceholder.setModel(model) }

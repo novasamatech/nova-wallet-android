@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.EncryptionType
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface SelectLedgerAddressInterScreenRequester : InterScreenRequester<SelectLedgerPayload, LedgerChainAccount>
 

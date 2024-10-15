@@ -7,7 +7,9 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewSettingsItemBinding
 import io.novafoundation.nova.common.utils.getDrawableCompat
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
 
 class SettingsItemView @JvmOverloads constructor(
@@ -16,9 +18,9 @@ class SettingsItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    init {
-        View.inflate(context, R.layout.view_settings_item, this)
+    private val binder = ViewSettingsItemBinding.inflate(inflater(), this)
 
+    init {
         orientation = HORIZONTAL
         background = context.getDrawableCompat(R.drawable.bg_primary_list_item)
 
@@ -26,16 +28,16 @@ class SettingsItemView @JvmOverloads constructor(
     }
 
     fun setTitle(title: String?) {
-        settingsItemTitle.text = title
+        binder.settingsItemTitle.text = title
     }
 
     fun setValue(value: String?) {
-        settingsItemValue.text = value
+        binder.settingsItemValue.text = value
     }
 
     fun setIcon(icon: Drawable?) {
-        settingsItemIcon.isVisible = icon != null
-        settingsItemIcon.setImageDrawable(icon)
+        binder.settingsItemIcon.isVisible = icon != null
+        binder.settingsItemIcon.setImageDrawable(icon)
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.SettingsItemView) {

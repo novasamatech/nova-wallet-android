@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class RangeDateValidator(private val start: Long?, private val end: Long?) : DateValidator {

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ItemNestedListBinding
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 
 class NestedAdapter<T, TH : ViewHolder>(
     private val nestedAdapter: ListAdapter<T, TH>,
@@ -24,7 +25,7 @@ class NestedAdapter<T, TH : ViewHolder>(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NestedListViewHolder<T, TH> {
         return NestedListViewHolder(
-            ItemNestedListBinding.bind(parent),
+            ItemNestedListBinding.inflate(parent.inflater(), parent, false),
             nestedAdapter,
             orientation,
             paddingInDp,
@@ -65,7 +66,7 @@ class NestedListViewHolder<T, TH : ViewHolder>(
     @Orientation orientation: Int,
     padding: Rect?,
     disableItemAnimations: Boolean,
-) : BaseViewHolder<ItemNestedListBinding>(binder) {
+) : BaseViewHolder(binder.root) {
 
     init {
         binder.itemNestedList.adapter = nestedAdapter

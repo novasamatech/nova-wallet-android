@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.send.amount
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed class SendPayload : Parcelable {
 

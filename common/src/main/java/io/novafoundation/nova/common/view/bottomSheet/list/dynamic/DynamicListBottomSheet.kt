@@ -70,7 +70,7 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
     }
 }
 
-abstract class DynamicListBottomSheet<T>(
+abstract class DynamicListBottomSheet<T : Any>(
     context: Context,
     private val payload: Payload<T>,
     private val diffCallback: DiffUtil.ItemCallback<T>,

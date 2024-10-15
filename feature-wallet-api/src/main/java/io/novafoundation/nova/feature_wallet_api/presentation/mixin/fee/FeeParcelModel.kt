@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.runtime.util.ChainAssetParcel
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.math.BigInteger
 

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_swap_api.presentation.model
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 enum class SwapDirectionModel : Parcelable {

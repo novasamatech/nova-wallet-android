@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_versions_impl.presentation.update.adapters
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_versions_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_versions_impl.databinding.ItemUpdateNotificationHeaderBinding
 import io.novafoundation.nova.feature_versions_impl.presentation.update.models.UpdateNotificationBannerModel
 
 class UpdateNotificationsBannerAdapter : RecyclerView.Adapter<UpdateNotificationBannerHolder>() {
@@ -13,7 +12,7 @@ class UpdateNotificationsBannerAdapter : RecyclerView.Adapter<UpdateNotification
     private var bannerModel: UpdateNotificationBannerModel? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UpdateNotificationBannerHolder {
-        return UpdateNotificationBannerHolder(parent.inflateChild(R.layout.item_update_notification_header))
+        return UpdateNotificationBannerHolder(ItemUpdateNotificationHeaderBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: UpdateNotificationBannerHolder, position: Int) {
@@ -40,12 +39,12 @@ class UpdateNotificationsBannerAdapter : RecyclerView.Adapter<UpdateNotification
     }
 }
 
-class UpdateNotificationBannerHolder(view: View) : GroupedListHolder(view) {
+class UpdateNotificationBannerHolder(private val binder: ItemUpdateNotificationHeaderBinding) : GroupedListHolder(binder.root) {
 
     fun bind(item: UpdateNotificationBannerModel) {
-        itemView.itemUpdateNotificationBanner.setImage(item.iconRes)
-        itemView.itemUpdateNotificationBanner.setBannerBackground(item.backgroundRes)
-        itemView.itemUpdateNotificationAlertTitle.text = item.title
-        itemView.itemUpdateNotificationAlertSubtitle.text = item.message
+        binder.itemUpdateNotificationBanner.setImage(item.iconRes)
+        binder.itemUpdateNotificationBanner.setBannerBackground(item.backgroundRes)
+        binder.itemUpdateNotificationAlertTitle.text = item.title
+        binder.itemUpdateNotificationAlertSubtitle.text = item.message
     }
 }

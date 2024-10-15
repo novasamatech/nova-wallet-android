@@ -27,7 +27,7 @@ class RealDescriptionBottomSheetLauncher : DescriptionBottomSheetLauncher {
     }
 }
 
-fun BaseFragment<*>.observeDescription(launcher: DescriptionBottomSheetLauncher) {
+fun BaseFragment<*, *>.observeDescription(launcher: DescriptionBottomSheetLauncher) {
     launcher.showDescriptionEvent.observeEvent { event ->
         val dialog = DescriptionBottomSheet(
             context = requireContext(),

@@ -3,15 +3,15 @@ package io.novafoundation.nova.feature_account_api.presenatation.account.externa
 import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.databinding.ItemExternalAccountIdentifierBinding
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputState
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.ExternalAccount
 
@@ -28,40 +28,39 @@ class ExternalAccountsBottomSheet(
     }
 
     override fun holderCreator(): HolderCreator<ExternalAccount> = {
-        AccountHolder(it.inflateChild(R.layout.item_external_account_identifier))
+        AccountHolder(ItemExternalAccountIdentifierBinding.inflate(it.inflater(), it, false))
     }
 }
 
 class AccountHolder(
-    itemView: View
-) : DynamicListSheetAdapter.Holder<ExternalAccount>(itemView) {
+    private val binder: ItemExternalAccountIdentifierBinding
+) : DynamicListSheetAdapter.Holder<ExternalAccount>(binder.root) {
 
     override fun bind(item: ExternalAccount, isSelected: Boolean, handler: DynamicListSheetAdapter.Handler<ExternalAccount>) {
         super.bind(item, isSelected, handler)
 
         with(itemView) {
             setIdenticonState(item.icon)
-            externalAccountIdentifierTitle.text = item.description ?: item.address
-            externalAccountIdentifierSubtitle.isVisible = item.description != null
-            externalAccountIdentifierSubtitle.text = item.address
-            externalAccountIdentifierIsSelected.isChecked = isSelected
+            binder.externalAccountIdentifierTitle.text = item.description ?: item.address
+            binder.externalAccountIdentifierSubtitle.isVisible = item.description != null
+            binder.externalAccountIdentifierSubtitle.text = item.address
+            binder.externalAccountIdentifierIsSelected.isChecked = isSelected
 
             if (item.description == null) {
-                externalAccountIdentifierTitle.ellipsize = TextUtils.TruncateAt.MIDDLE
+                binder.externalAccountIdentifierTitle.ellipsize = TextUtils.TruncateAt.MIDDLE
             } else {
-                externalAccountIdentifierTitle.ellipsize = TextUtils.TruncateAt.END
+                binder.externalAccountIdentifierTitle.ellipsize = TextUtils.TruncateAt.END
             }
         }
     }
 
-    private fun setIdenticonState(state: AddressInputState.IdenticonState) = with(itemView) {
-        when (state) {
-            is AddressInputState.IdenticonState.Address -> {
-                externalAccountIcon.setImageDrawable(state.drawable)
-            }
-            AddressInputState.IdenticonState.Placeholder -> {
-                externalAccountIcon.setImageResource(R.drawable.ic_identicon_placeholder)
-            }
+    private fun setIdenticonState(state: AddressInputState.IdenticonState) = when (state) {
+        is AddressInputState.IdenticonState.Address -> {
+            binder.externalAccountIcon.setImageDrawable(state.drawable)
+        }
+
+        AddressInputState.IdenticonState.Placeholder -> {
+            binder.externalAccountIcon.setImageResource(R.drawable.ic_identicon_placeholder)
         }
     }
 }

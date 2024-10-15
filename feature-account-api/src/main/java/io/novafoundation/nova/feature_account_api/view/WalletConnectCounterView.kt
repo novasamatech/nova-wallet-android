@@ -6,10 +6,12 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.databinding.ViewWalletConnectBinding
 
 class WalletConnectCounterView @JvmOverloads constructor(
     context: Context,
@@ -17,9 +19,10 @@ class WalletConnectCounterView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewWalletConnectBinding.inflate(inflater(), this)
+
     init {
-        View.inflate(context, R.layout.view_wallet_connect, this)
-        viewWalletConnectIconContainer.background = context.addRipple(
+        binder.viewWalletConnectIconContainer.background = context.addRipple(
             drawable = context.getRoundedCornerDrawable(
                 fillColorRes = R.color.button_wallet_connect_background,
                 cornerSizeInDp = 80,
@@ -30,9 +33,9 @@ class WalletConnectCounterView @JvmOverloads constructor(
     }
 
     fun setConnectionCount(count: String?) {
-        viewWalletConnectConnectedCount.text = count
-        viewWalletConnectConnectedCount.isVisible = count != null
-        viewWalletConnectConnectionsIcon.isVisible = count != null
+        binder.viewWalletConnectConnectedCount.text = count
+        binder.viewWalletConnectConnectedCount.isVisible = count != null
+        binder.viewWalletConnectConnectionsIcon.isVisible = count != null
 
         background = if (count != null) {
             context.getRoundedCornerDrawable(

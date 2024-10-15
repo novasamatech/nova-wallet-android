@@ -5,7 +5,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewListChooserBinding
 import io.novafoundation.nova.common.utils.ensureSuffix
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
 
 class ListChooserView @JvmOverloads constructor(
@@ -14,9 +16,9 @@ class ListChooserView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    init {
-        View.inflate(context, R.layout.view_list_chooser, this)
+    private val binder = ViewListChooserBinding.inflate(inflater(), this)
 
+    init {
         orientation = HORIZONTAL
 
         attrs?.let(::applyAttributes)
@@ -25,11 +27,11 @@ class ListChooserView @JvmOverloads constructor(
     fun setLabel(label: String) {
         val suffixedLabel = label.ensureSuffix(":")
 
-        viewListChooserLabel.text = suffixedLabel
+        binder.viewListChooserLabel.text = suffixedLabel
     }
 
     fun setValueDisplay(value: String?) {
-        viewListChooserValue.text = value
+        binder.viewListChooserValue.text = value
     }
 
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.ListChooserView) {

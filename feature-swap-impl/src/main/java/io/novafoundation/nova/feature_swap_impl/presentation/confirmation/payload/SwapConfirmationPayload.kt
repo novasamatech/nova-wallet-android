@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionM
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 
 @Parcelize

@@ -6,8 +6,11 @@ import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_currency_api.presentation.model.CurrencyModel
 import io.novafoundation.nova.feature_currency_impl.R
+import io.novafoundation.nova.feature_currency_impl.databinding.ItemCurrencyBinding
+import io.novafoundation.nova.feature_currency_impl.databinding.ItemCurrencyTypeBinding
 
 class CurrencyAdapter(
     private val handler: Handler
@@ -18,11 +21,11 @@ class CurrencyAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return CurrencyTypeHolder(parent)
+        return CurrencyTypeHolder(ItemCurrencyTypeBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return CurrencyHolder(parent, handler)
+        return CurrencyHolder(ItemCurrencyBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: TextHeader) {
@@ -53,19 +56,19 @@ private object DiffCallback : BaseGroupedDiffCallback<TextHeader, CurrencyModel>
     }
 }
 
-private class CurrencyTypeHolder(parentView: ViewGroup) : GroupedListHolder(parentView.inflateChild(R.layout.item_currency_type)) {
+private class CurrencyTypeHolder(private val binder: ItemCurrencyTypeBinding) : GroupedListHolder(binder.root) {
 
     fun bind(item: TextHeader) {
-        containerView.itemCurrencyType.text = item.content
+        binder.itemCurrencyType.text = item.content
     }
 }
 
 private class CurrencyHolder(
-    parentView: ViewGroup,
+    private val binder: ItemCurrencyBinding,
     private val itemHandler: CurrencyAdapter.Handler
-) : GroupedListHolder(parentView.inflateChild(R.layout.item_currency)) {
+) : GroupedListHolder(binder.root) {
 
-    fun bind(item: CurrencyModel) = with(containerView) {
+    fun bind(item: CurrencyModel) = with(binder) {
         itemCurrencySign.text = item.displayCode
 
         bindTitle(item)
@@ -77,7 +80,7 @@ private class CurrencyHolder(
     }
 
     fun bindTitle(item: CurrencyModel) = with(containerView) {
-        itemCurrencyName.text = item.name
+        binder.itemCurrencyName.text = item.name
     }
 
     private fun bindClick(item: CurrencyModel) = with(containerView) {

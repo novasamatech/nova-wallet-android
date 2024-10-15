@@ -102,7 +102,7 @@ open class TapToViewContainer @JvmOverloads constructor(
         if (child.id == R.id.tapToViewContainer || child.id == R.id.tapToViewHiddenContent) {
             super.addView(child, params)
         } else {
-            tapToViewHiddenContent.addView(child, params)
+            binder.tapToViewHiddenContent.addView(child, params)
         }
     }
 
@@ -120,7 +120,7 @@ open class TapToViewContainer @JvmOverloads constructor(
             super.onRestoreInstanceState(state.getParcelableCompat<Parcelable>(SUPER_STATE))
 
             isContentVisible = state.getBoolean(REVEAL_CONTAINER_VISIBILITY)
-            tapToViewContainer.isVisible = !isContentVisible
+            binder.tapToViewContainer.isVisible = !isContentVisible
         } else {
             super.onRestoreInstanceState(state)
         }
@@ -133,15 +133,15 @@ open class TapToViewContainer @JvmOverloads constructor(
     }
 
     fun setTitleOrHide(title: String?) {
-        tapToViewTitle.setTextOrHide(title)
+        binder.tapToViewTitle.setTextOrHide(title)
     }
 
     fun setSubtitleOrHide(subtitle: String?) {
-        tapToViewSbutitle.setTextOrHide(subtitle)
+        binder.tapToViewSbutitle.setTextOrHide(subtitle)
     }
 
     fun setTapToViewBackground(@DrawableRes background: Int) {
-        tapToViewContainer.setBackgroundResource(background)
+        binder.tapToViewContainer.setBackgroundResource(background)
         requestLayout()
     }
 
@@ -152,7 +152,7 @@ open class TapToViewContainer @JvmOverloads constructor(
 
     fun showContent(show: Boolean) {
         isContentVisible = show
-        tapToViewContainer.isVisible = !show
+        binder.tapToViewContainer.isVisible = !show
         requestLayout()
     }
 

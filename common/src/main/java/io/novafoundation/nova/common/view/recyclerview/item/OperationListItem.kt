@@ -11,7 +11,9 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.setPadding
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ItemOperationListItemBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setImageTintRes
 
@@ -25,27 +27,27 @@ class OperationListItem @kotlin.jvm.JvmOverloads constructor(
         BORDERED_CIRCLE, DEFAULT
     }
 
+    private val binder = ItemOperationListItemBinding.inflate(inflater(), this)
+
     val icon: ImageView
-        get() = itemOperationIcon
+        get() = binder.itemOperationIcon
 
     val header: TextView
-        get() = itemOperationHeader
+        get() = binder.itemOperationHeader
 
     val subHeader: TextView
-        get() = itemOperationSubHeader
+        get() = binder.itemOperationSubHeader
 
     val valuePrimary: TextView
-        get() = itemOperationValuePrimary
+        get() = binder.itemOperationValuePrimary
 
     val valueSecondary: TextView
-        get() = itemOperationValueSecondary
+        get() = binder.itemOperationValueSecondary
 
     val status: ImageView
-        get() = itemOperationValueStatus
+        get() = binder.itemOperationValueStatus
 
     init {
-        View.inflate(context, R.layout.item_operation_list_item, this)
-
         layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
 
         setBackgroundResource(R.drawable.bg_primary_list_item)

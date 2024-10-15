@@ -2,11 +2,13 @@ package io.novafoundation.nova.feature_account_api.presenatation.actions
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.databinding.BottomSheetExternalActionsBinding
 import io.novafoundation.nova.runtime.ext.availableExplorersFor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -18,12 +20,12 @@ open class ExternalActionsSheet(
     protected val payload: ExternalActions.Payload,
     val onCopy: CopyCallback,
     val onViewExternal: ExternalViewCallback,
-) : FixedListBottomSheet(
+) : FixedListBottomSheet<BottomSheetExternalActionsBinding>(
     context,
     viewConfiguration = ViewConfiguration(
-        layout = R.layout.bottom_sheet_external_actions,
-        title = { externalActionsValue },
-        container = { externalActionsContainer }
+        configurationBinder = BottomSheetExternalActionsBinding.inflate(LayoutInflater.from(context)),
+        title = { configurationBinder.externalActionsValue },
+        container = { configurationBinder.externalActionsContainer }
     )
 ) {
 
@@ -31,17 +33,17 @@ open class ExternalActionsSheet(
         super.onCreate(savedInstanceState)
 
         if (payload.chainUi != null) {
-            externalActionsChain.makeVisible()
-            externalActionsChain.setChain(payload.chainUi)
+            binder.externalActionsChain.makeVisible()
+            binder.externalActionsChain.setChain(payload.chainUi)
         } else {
-            externalActionsChain.makeGone()
+            binder.externalActionsChain.makeGone()
         }
 
         if (payload.icon != null) {
-            externalActionsIcon.makeVisible()
-            externalActionsIcon.setImageDrawable(payload.icon)
+            binder.externalActionsIcon.makeVisible()
+            binder.externalActionsIcon.setImageDrawable(payload.icon)
         } else {
-            externalActionsIcon.makeGone()
+            binder.externalActionsIcon.makeGone()
         }
 
         val primaryValue = payload.type.primaryValue

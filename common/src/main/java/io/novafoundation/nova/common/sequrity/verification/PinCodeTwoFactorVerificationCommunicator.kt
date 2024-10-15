@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationRequester.Request
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationResponder.Response
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface PinCodeTwoFactorVerificationRequester : InterScreenRequester<Request, Response> {
 
