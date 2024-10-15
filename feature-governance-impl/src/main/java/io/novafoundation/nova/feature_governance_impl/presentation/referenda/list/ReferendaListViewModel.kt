@@ -170,7 +170,8 @@ class ReferendaListViewModel(
             validationFailureTransformerCustom = { validationFailure, _ ->
                 handleStartSwipeGovValidationFailure(
                     resourceManager,
-                    validationFailure
+                    validationFailure,
+                    governanceRouter
                 )
             }
         ) {
