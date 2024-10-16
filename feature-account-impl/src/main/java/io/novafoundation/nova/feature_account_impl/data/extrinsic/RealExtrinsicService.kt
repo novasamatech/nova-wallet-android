@@ -135,7 +135,7 @@ class RealExtrinsicService(
     ): Fee {
         val nativeFee = estimateNativeFee(chain, extrinsic, usedSigner.submissionOrigin(chain))
 
-        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
+        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
         val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         return feePayment.convertNativeFee(nativeFee)
@@ -176,7 +176,7 @@ class RealExtrinsicService(
             submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
         )
 
-        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
+        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
         val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         return feePayment.convertNativeFee(totalNativeFee)
@@ -216,7 +216,7 @@ class RealExtrinsicService(
         val callBuilder = SimpleCallBuilder(runtime).apply { formExtrinsic() }
         val splitCalls = extrinsicSplitter.split(feeSigner, callBuilder, chain)
 
-        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
+        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
         val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         val extrinsicBuilderIterator = extrinsicBuilderSequence.iterator()
@@ -250,7 +250,7 @@ class RealExtrinsicService(
         val extrinsicBuilder = extrinsicBuilderFactory.create(chain, signer, requestedOrigin)
         extrinsicBuilder.formExtrinsic(submissionOrigin)
 
-        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain)
+        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
         val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         feePayment.modifyExtrinsic(extrinsicBuilder)

@@ -32,14 +32,14 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
-import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -48,6 +48,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
@@ -161,4 +162,6 @@ interface WalletFeatureDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val customFeeCapabilityFacade: CustomFeeCapabilityFacade
+
+    val parachainInfoRepository: ParachainInfoRepository
 }

@@ -86,7 +86,7 @@ class RealCrossChainWeigher(
         val maxWeight = feeConfig.estimatedWeight()
 
         return when (val mode = feeConfig.to.xcmFeeType.mode) {
-            is Mode.Proportional -> CrossChainFeeModel(holdingPart = mode.weightToFee(maxWeight))
+            is Mode.Proportional -> CrossChainFeeModel(paidFromHoldingRegister = mode.weightToFee(maxWeight))
 
             Mode.Standard -> {
                 val xcmMessage = xcmMessage(feeConfig.to.xcmFeeType.instructions, chain, amount)
@@ -95,7 +95,7 @@ class RealCrossChainWeigher(
                     xcmExecute(xcmMessage, maxWeight)
                 }
 
-                CrossChainFeeModel(holdingPart = paymentInfo.partialFee)
+                CrossChainFeeModel(paidFromHoldingRegister = paymentInfo.partialFee)
             }
 
             Mode.Unknown -> CrossChainFeeModel.zero()
@@ -122,9 +122,9 @@ class RealCrossChainWeigher(
 
         val isSenderPaysOriginDelivery = !deliveryConfig.alwaysHoldingPays
         return if (isSenderPaysOriginDelivery && isSendingFromOrigin) {
-            CrossChainFeeModel(senderPart = deliveryFee)
+            CrossChainFeeModel(paidByOrigin = deliveryFee)
         } else {
-            CrossChainFeeModel(holdingPart = deliveryFee)
+            CrossChainFeeModel(paidFromHoldingRegister = deliveryFee)
         }
     }
 

@@ -45,7 +45,9 @@ class AssetSwapFlowViewModel(
 
     init {
         launch {
-            swapAvailabilityInteractor.sync(viewModelScope)
+            if (payload is SwapFlowPayload.InitialSelecting) {
+                swapAvailabilityInteractor.sync(viewModelScope)
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
@@ -38,7 +39,8 @@ class SendInteractor(
     private val crossChainWeigher: CrossChainWeigher,
     private val crossChainTransactor: CrossChainTransactor,
     private val crossChainTransfersRepository: CrossChainTransfersRepository,
-    private val parachainInfoRepository: ParachainInfoRepository
+    private val parachainInfoRepository: ParachainInfoRepository,
+    private val extrinsicService: ExtrinsicService,
 ) {
 
     // TODO wallet
@@ -70,10 +72,12 @@ class SendInteractor(
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
-            val originFee = crossChainTransactor.estimateOriginFee(config, transfer)
+            val originFee = with(crossChainTransactor) {
+                extrinsicService.estimateOriginFee(config, transfer)
+            }
             val crossChainFeeModel = crossChainWeigher.estimateFee(amount, config)
 
-            val deliveryPartFee = getDeliveryFee(transfer.originChain, crossChainFeeModel.senderPart, transfer.senderAccountId())
+            val deliveryPartFee = getDeliveryFee(transfer.originChain, crossChainFeeModel.paidByOrigin, transfer.senderAccountId())
             val originFeeWithSenderPart = OriginFee(originFee, deliveryPartFee, transfer.commissionAssetToken.configuration)
 
             TransferFeeModel(originFeeWithSenderPart, crossChainFeeModel.toSubstrateFee(transfer))
@@ -95,7 +99,9 @@ class SendInteractor(
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
-            crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amountByRequestedAccount)
+            with(crossChainTransactor) {
+                extrinsicService.performTransfer(config, transfer, crossChainFee!!.amountByRequestedAccount)
+            }
         } else {
             val networkFee = originFee.networkFeePart()
 
@@ -133,7 +139,7 @@ class SendInteractor(
     }
 
     private fun CrossChainFeeModel.toSubstrateFee(transfer: AssetTransfer) = SubstrateFee(
-        amount = holdingPart,
+        amount = paidFromHoldingRegister,
         submissionOrigin = SubmissionOrigin.singleOrigin(transfer.sender.requireAccountIdIn(transfer.originChain)),
         asset = transfer.originChain.commissionAsset // TODO: Support custom assets for xcm transfers
     )

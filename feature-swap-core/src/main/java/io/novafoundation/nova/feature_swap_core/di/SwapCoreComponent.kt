@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_core.di
 import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(

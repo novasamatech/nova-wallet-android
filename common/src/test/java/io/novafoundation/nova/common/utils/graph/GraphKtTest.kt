@@ -1,63 +1,11 @@
 package io.novafoundation.nova.common.utils.graph
 
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.test_shared.assertListEquals
-import io.novafoundation.nova.test_shared.assertMapEquals
-import io.novafoundation.nova.test_shared.assertSetEquals
 import org.junit.Test
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 internal class GraphKtTest {
-
-    @Test
-    fun shouldFindConnectedComponents() {
-        // 3 and 2 are connected through 1
-        testConnectedComponents(
-            1 to listOf(2, 3),
-            2 to listOf(1),
-            3 to listOf(1),
-            expectedComponents = listOf(listOf(1, 2, 3))
-        )
-
-        testConnectedComponents(
-            1 to listOf(2),
-            2 to listOf(1),
-            3 to emptyList(),
-            expectedComponents = listOf(listOf(1, 2), listOf(3))
-        )
-
-        testConnectedComponents(
-            1 to listOf(2, 3),
-            2 to listOf(1),
-            3 to listOf(1),
-            4 to listOf(5),
-            5 to listOf(4),
-            6 to emptyList(),
-            expectedComponents = listOf(listOf(1, 2, 3), listOf(4, 5), listOf(6))
-        )
-    }
-
-    @Test
-    fun shouldFindAllPossibleDirections() {
-        val graph = Graph.createSimple(
-            1 to listOf(2, 3),
-            2 to listOf(1),
-            3 to listOf(1),
-            4 to listOf(5),
-            5 to listOf(4),
-            6 to emptyList(),
-        )
-        val actual = graph.findAllPossibleDirections()
-        val expected = mapOf(
-            1 to setOf(2, 3),
-            2 to setOf(1, 3),
-            3 to setOf(1, 2),
-            4 to setOf(5),
-            5 to setOf(4),
-            6 to emptySet()
-        )
-
-        assertMapEquals(expected, actual)
-    }
 
     @Test
     fun shouldFindPaths() {
@@ -84,18 +32,32 @@ internal class GraphKtTest {
         assertListEquals(expected, actual)
     }
 
-    private fun testConnectedComponents(
-        vararg adjacencyPairs: Pair<Int, List<Int>>,
-        expectedComponents: List<ConnectedComponent<Int>>
-    ) {
-        val graph = Graph.createSimple(*adjacencyPairs)
-        val actualComponents = graph.findConnectedComponents().unordered()
-        val expectedUnordered = expectedComponents.unordered()
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun testPerformance() {
+        val graphSize = 200
+        val graph = fullyConnectedGraph(graphSize)
 
-        assertSetEquals(expectedUnordered, actualComponents)
+        val time = measureTime {
+            repeat(100) { i ->
+                graph.findDijkstraPathsBetween(i, graphSize - i, limit = 10)
+            }
+
+        }
+
+        print("Execution time: ${time / 100}")
     }
 
-    private fun <N> Iterable<Iterable<N>>.unordered(): Set<Set<N>> {
-        return mapToSet { it.toSet() }
+    private fun fullyConnectedGraph(size: Int): SimpleGraph<Int> {
+        return Graph.build {
+            (0..size).onEach { i ->
+                (0..size).onEach { j ->
+                    if (i != j) {
+                        val edge = SimpleEdge(i, j)
+                        addEdge(edge)
+                    }
+                }
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -55,7 +56,7 @@ abstract class BaseAssetTransfers(
         val submissionOptions = ExtrinsicService.SubmissionOptions(feePaymentCurrency)
 
         return extrinsicServiceFactory
-            .create(coroutineScope)
+            .createDefault(coroutineScope)
             .submitExtrinsic(transfer.originChain, transfer.sender.intoOrigin(), submissionOptions = submissionOptions) {
                 transfer(transfer)
             }
@@ -66,7 +67,7 @@ abstract class BaseAssetTransfers(
         val submissionOptions = ExtrinsicService.SubmissionOptions(feePaymentCurrency)
 
         return extrinsicServiceFactory
-            .create(coroutineScope)
+            .createDefault(coroutineScope)
             .estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet, submissionOptions = submissionOptions) {
                 transfer(transfer)
             }

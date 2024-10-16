@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
-import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetId
-import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.runtime.ext.decodeOrNull
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -47,9 +47,5 @@ internal class RealHydraDxAssetIdConverter(
             is Chain.Asset.Type.Native -> systemAssetId
             else -> null
         }
-    }
-
-    private fun Chain.Asset.requireHydraDxAssetId(runtimeSnapshot: RuntimeSnapshot): HydraDxAssetId {
-        return requireNotNull(omniPoolTokenIdOrNull(runtimeSnapshot))
     }
 }

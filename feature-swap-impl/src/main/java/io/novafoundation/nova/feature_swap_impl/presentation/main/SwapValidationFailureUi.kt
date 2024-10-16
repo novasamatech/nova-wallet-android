@@ -70,54 +70,12 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
 
         is AmountOutIsTooLowToStayAboveED -> handleErrorToSwapMin(reason, resourceManager, amountOutSwapMinAction)
 
-        is TooSmallRemainingBalance.NoNeedsToBuyMainAssetED -> handleTooSmallRemainingBalance(
-            title = resourceManager.getString(R.string.swap_failure_too_small_remaining_balance_title),
-            message = resourceManager.getString(
-                R.string.swap_failure_too_small_remaining_balance_message,
-                reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
-                reason.remainingBalance.formatPlanks(reason.assetIn)
-            ),
-            resourceManager = resourceManager,
-            actions = actions,
-            positiveButtonClick = amountInSwapMaxAction
-        )
-
-        is TooSmallRemainingBalance.NeedsToBuyMainAssetED -> handleTooSmallRemainingBalance(
-            title = resourceManager.getString(R.string.swap_failure_too_small_remaining_balance_title),
-            message = resourceManager.getString(
-                R.string.swap_failure_too_small_remaining_balance_with_buy_ed_message,
-                reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
-                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset),
-                reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
-                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
-                reason.nativeAsset.symbol,
-                reason.remainingBalance.formatPlanks(reason.assetIn)
-            ),
-            resourceManager = resourceManager,
-            actions = actions,
-            positiveButtonClick = amountInSwapMaxAction
-        )
-
-        is InsufficientBalance.NoNeedsToBuyMainAssetED -> handleInsufficientBalance(
+        is InsufficientBalance.CannotPayFee -> handleInsufficientBalance(
             title = resourceManager.getString(R.string.common_not_enough_funds_title),
             message = resourceManager.getString(
                 R.string.swap_failure_insufficient_balance_message,
                 reason.maxSwapAmount.formatPlanks(reason.assetIn),
                 reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset)
-            ),
-            resourceManager = resourceManager,
-            positiveButtonClick = amountInSwapMaxAction
-        )
-
-        is InsufficientBalance.NeedsToBuyMainAssetED -> handleInsufficientBalance(
-            title = resourceManager.getString(R.string.common_not_enough_funds_title),
-            message = resourceManager.getString(
-                R.string.swap_failure_insufficient_balance_with_buy_ed_message,
-                reason.maxSwapAmount.formatPlanks(reason.assetIn),
-                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset),
-                reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
-                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
-                reason.nativeAsset.symbol
             ),
             resourceManager = resourceManager,
             positiveButtonClick = amountInSwapMaxAction
@@ -146,6 +104,18 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             resourceManager = resourceManager,
             actions = actions,
             setFee = { setNewFee(it.newFee.genericFee) },
+        )
+
+        is TooSmallRemainingBalance -> handleTooSmallRemainingBalance(
+            title = resourceManager.getString(R.string.swap_failure_too_small_remaining_balance_title),
+            message = resourceManager.getString(
+                R.string.swap_failure_too_small_remaining_balance_message,
+                reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
+                reason.remainingBalance.formatPlanks(reason.assetIn)
+            ),
+            resourceManager = resourceManager,
+            actions = actions,
+            positiveButtonClick = amountInSwapMaxAction
         )
     }
 }
