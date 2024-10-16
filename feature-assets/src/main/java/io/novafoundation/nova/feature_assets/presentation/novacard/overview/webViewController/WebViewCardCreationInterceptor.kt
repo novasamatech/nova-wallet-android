@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController
 
+import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import com.google.gson.Gson
@@ -113,6 +114,7 @@ class WebViewCardCreationInterceptor(
             val responseBody = okHttpResponse.body
 
             val data = responseBody!!.byteStream().readText()
+            Log.d("WebViewCardCreationInterceptor", "data: $data")
             val cardsResponse = gson.fromJson<CardsResponse>(data)
             val cards = cardsResponse.data
             val containsMercurioCard = cards.any { it.issuedByMercurio }
