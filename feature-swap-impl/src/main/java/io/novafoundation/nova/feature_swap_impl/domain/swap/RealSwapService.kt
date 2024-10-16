@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
+import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Graph
-import io.novafoundation.nova.common.utils.graph.NodeVisitFilter
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
@@ -324,7 +324,7 @@ internal class RealSwapService(
     }
 
 
-    private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): NodeVisitFilter<FullChainAssetId> {
+    private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): EdgeVisitFilter<SwapGraphEdge> {
         return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
             CanPayFeeNodeVisitFilter(this)
         }
@@ -516,16 +516,9 @@ internal class RealSwapService(
     /**
      * Check that it is possible to pay fees in moving asset
      */
-    private inner class CanPayFeeNodeVisitFilter(val computationScope: CoroutineScope) : NodeVisitFilter<FullChainAssetId> {
+    private inner class CanPayFeeNodeVisitFilter(val computationScope: CoroutineScope) : EdgeVisitFilter<SwapGraphEdge> {
 
         private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
-
-        override suspend fun shouldVisit(node: FullChainAssetId): Boolean {
-            if (node.isUtility) return true
-
-            val feeCapability = getFeeCustomFeeCapability(node.chainId)
-            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(node.assetId)
-        }
 
         private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability? {
             val fromCache = feePaymentCapabilityCache.getOrPut(chainId) {
@@ -538,6 +531,18 @@ internal class RealSwapService(
         private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability? {
             val feePaymentRegistry = exchangeRegistry(computationScope).getFeePaymentRegistry()
             return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
+        }
+
+        override suspend fun shouldVisit(edge: SwapGraphEdge, pathPredecessor: SwapGraphEdge?): Boolean {
+            // Utility payments and first path segments are always allowed
+            if (edge.from.isUtility || pathPredecessor == null) return true
+
+            // Edge might request us to ignore the default requirement based on its direct predecessor
+            if (edge.shouldIgnoreFeeRequirementAfter(pathPredecessor)) return true
+
+            val feeCapability = getFeeCustomFeeCapability(edge.from.chainId)
+
+            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId)
         }
     }
 

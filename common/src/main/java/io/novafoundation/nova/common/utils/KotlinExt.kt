@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -29,6 +30,8 @@ import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
@@ -63,6 +66,14 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
         null -> this
         else -> Result.failure(transform(exception))
     }
+}
+
+@OptIn(ExperimentalTime::class)
+inline fun <R> measureExecution(label: String, function: () -> R): R {
+    val (value, time) = measureTimedValue(function)
+    Log.d("Performance", "$label took $time")
+
+    return value
 }
 
 inline fun <T, reified E : Throwable> Result<T>.mapErrorNotInstance(transform: (throwable: Throwable) -> Throwable): Result<T> {

@@ -90,6 +90,10 @@ class CrossChainTransferAssetExchange(
             return "Transfer"
         }
 
+        override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
+            return false
+        }
+
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             return amount
         }

@@ -34,9 +34,9 @@ fun Graph<*, *>.numberOfEdges(): Int {
     return adjacencyList.values.sumOf { it.size }
 }
 
-fun interface NodeVisitFilter<N> {
+fun interface EdgeVisitFilter<E : Edge<*>> {
 
-    suspend fun shouldVisit(node: N): Boolean
+    suspend fun shouldVisit(edge: E, pathPredecessor: E?): Boolean
 }
 
 /**
@@ -48,11 +48,11 @@ fun interface NodeVisitFilter<N> {
  */
 suspend fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDestinations(
     origin: N,
-    nodeVisitFilter: NodeVisitFilter<N>? = null
+    nodeVisitFilter: EdgeVisitFilter<E>? = null
 ): Set<N> {
-    val actualNodeListFilter =  nodeVisitFilter ?: NodeVisitFilter { true }
+    val actualNodeListFilter = nodeVisitFilter ?: EdgeVisitFilter { _, _ -> true }
 
-    return reachabilityDfs(origin, adjacencyList, actualNodeListFilter).toSet()
+    return reachabilityDfs(origin, adjacencyList, actualNodeListFilter, predecessor = null).toSet()
 }
 
 fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
@@ -65,9 +65,9 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
     from: N,
     to: N,
     limit: Int,
-    nodeVisitFilter: NodeVisitFilter<N>?
+    nodeVisitFilter: EdgeVisitFilter<E>?
 ): List<Path<E>> {
-    val actualNodeListFilter =  nodeVisitFilter ?: NodeVisitFilter { true }
+    val actualNodeListFilter = nodeVisitFilter ?: EdgeVisitFilter { _, _ -> true }
 
     data class QueueElement(val currentPath: Path<E>, val score: Int) : Comparable<QueueElement> {
 
@@ -99,6 +99,8 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
         val newCount = count.getValue(lastNode) + 1
         count[lastNode] = newCount
 
+        val predecessor = minimumQueueElement.currentPath.lastOrNull()
+
         if (lastNode == to) {
             paths.add(minimumQueueElement.currentPath)
             continue
@@ -106,7 +108,7 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
 
         if (newCount <= limit) {
             adjacencyList.getValue(lastNode).forEach { edge ->
-                if (edge.to in minimumQueueElement || !actualNodeListFilter.shouldVisit(edge.to)) return@forEach
+                if (edge.to in minimumQueueElement || !actualNodeListFilter.shouldVisit(edge, predecessor)) return@forEach
 
                 val newElement = QueueElement(
                     currentPath = minimumQueueElement.currentPath + edge,
@@ -124,7 +126,8 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
 private suspend fun <N, E : Edge<N>> reachabilityDfs(
     node: N,
     adjacencyList: Map<N, List<E>>,
-    nodeVisitFilter: NodeVisitFilter<N>,
+    nodeVisitFilter: EdgeVisitFilter<E>,
+    predecessor: E?,
     visited: MutableSet<N> = mutableSetOf(),
     connectedComponentState: MutableList<N> = mutableListOf()
 ): List<N> {
@@ -132,8 +135,8 @@ private suspend fun <N, E : Edge<N>> reachabilityDfs(
     connectedComponentState.add(node)
 
     for (edge in adjacencyList.getValue(node)) {
-        if (edge.to !in visited && nodeVisitFilter.shouldVisit(node)) {
-            reachabilityDfs(edge.to, adjacencyList, nodeVisitFilter, visited, connectedComponentState)
+        if (edge.to !in visited && nodeVisitFilter.shouldVisit(edge, predecessor)) {
+            reachabilityDfs(edge.to, adjacencyList, nodeVisitFilter, predecessor = edge, visited, connectedComponentState)
         }
     }
 

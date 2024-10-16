@@ -17,6 +17,12 @@ interface SwapGraphEdge : QuotableEdge {
     suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
 
     suspend fun debugLabel(): String
+
+    /**
+     * Whether this Edge fee check should be skipped when adding to after a specified [predecessor]
+     *
+     */
+    suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean
 }
 
 

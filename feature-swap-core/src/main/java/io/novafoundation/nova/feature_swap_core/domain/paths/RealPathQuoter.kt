@@ -2,11 +2,12 @@ package io.novafoundation.nova.feature_swap_core.domain.paths
 
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Graph
-import io.novafoundation.nova.common.utils.graph.NodeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.mapAsync
+import io.novafoundation.nova.common.utils.measureExecution
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.BestPathQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
@@ -19,8 +20,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import java.math.BigInteger
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTimedValue
 
 private const val PATHS_LIMIT = 4
 private const val QUOTES_CACHE = "RealSwapService.QuotesCache"
@@ -32,7 +31,7 @@ class RealPathQuoterFactory(
     override fun <E : QuotableEdge> create(
         graph: Graph<FullChainAssetId, E>,
         computationalScope: CoroutineScope,
-        filter: NodeVisitFilter<FullChainAssetId>?
+        filter: EdgeVisitFilter<E>?
     ): PathQuoter<E> {
         return RealPathQuoter(computationalCache, graph, computationalScope, filter)
     }
@@ -42,10 +41,9 @@ private class RealPathQuoter<E : QuotableEdge>(
     private val computationalCache: ComputationalCache,
     private val graph: Graph<FullChainAssetId, E>,
     private val computationalScope: CoroutineScope,
-    private val filter: NodeVisitFilter<FullChainAssetId>?
+    private val filter: EdgeVisitFilter<E>?
 ) : PathQuoter<E> {
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun findBestPath(
         chainAssetIn: Chain.Asset,
         chainAssetOut: Chain.Asset,
@@ -56,11 +54,9 @@ private class RealPathQuoter<E : QuotableEdge>(
         val to = chainAssetOut.fullId
 
         val paths = pathsFromCacheOrCompute(from, to, computationalScope) {
-            val (paths, duration) = measureTimedValue {
+            val paths = measureExecution("Finding ${chainAssetIn.symbol} -> ${chainAssetOut.symbol} paths") {
                 graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT, filter)
             }
-
-            Log.d("Swaps", "${chainAssetIn.symbol} -> ${chainAssetOut.symbol}: finding ${paths.size} paths took $duration")
 
             paths
         }
