@@ -65,10 +65,6 @@ class NovaCardWebPageProvider(
     }
 
     private fun getScriptUrl(): String {
-        if (BuildConfig.DEBUG) {
-            return "https://sandbox-exchange.mrcr.io/embed.2.0.js"
-        } else {
-            return "https://widget.mercuryo.io/embed.2.0.js"
-        }
+        return "https://widget.mercuryo.io/embed.2.0.js"
     }
 }

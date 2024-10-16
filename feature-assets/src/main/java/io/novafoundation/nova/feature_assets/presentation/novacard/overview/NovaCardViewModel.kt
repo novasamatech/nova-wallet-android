@@ -74,10 +74,6 @@ class NovaCardViewModel(
     }
 
     private suspend fun getTopUpChain(): Chain {
-        return if (BuildConfig.DEBUG) {
-            chainRegistry.getChain(ChainIds.ETHEREUM_SEPOLIA)
-        } else {
-            chainRegistry.getChain(ChainGeneses.POLKADOT)
-        }
+        return chainRegistry.getChain(ChainGeneses.POLKADOT)
     }
 }
