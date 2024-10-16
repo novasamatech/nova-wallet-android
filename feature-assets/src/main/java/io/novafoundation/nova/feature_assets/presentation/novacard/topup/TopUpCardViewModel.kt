@@ -140,8 +140,6 @@ class TopUpCardViewModel(
         ) {
             sendInProgressFlow.value = false
             transferTokensAndFinishFlow(it)
-
-            router.back()
         }
     }
 
