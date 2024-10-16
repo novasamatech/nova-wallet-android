@@ -224,8 +224,12 @@ private class HydraDxExchange(
         }
 
         override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
-            // When staking multiple hydra edges together, the fee is always paid with the starting edge
+            // When chaining multiple hydra edges together, the fee is always paid with the starting edge
             return predecessor is HydraDxSwapEdge
+        }
+
+        override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
+            return true
         }
     }
 

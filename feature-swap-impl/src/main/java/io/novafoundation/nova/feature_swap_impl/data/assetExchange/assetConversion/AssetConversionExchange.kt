@@ -177,6 +177,10 @@ private class AssetConversionExchange(
             return false
         }
 
+        override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
+            return true
+        }
+
         override suspend fun quote(
             amount: Balance,
             direction: SwapDirection

@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_impl.domain
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.combineToPair
-import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -28,7 +27,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.assets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.CoroutineScope
@@ -99,10 +97,10 @@ internal class RealCrossChainTransfersUseCase(
         }.catch { emit(emptyList()) }
     }
 
-    override suspend fun allDirections(): List<Edge<FullChainAssetId>> {
-        val config = crossChainTransfersRepository.getConfiguration()
-        return config.availableInDestinations()
+    override suspend fun getConfiguration(): CrossChainTransfersConfiguration {
+       return crossChainTransfersRepository.getConfiguration()
     }
+
 
     override suspend fun ExtrinsicService.estimateFee(
         transfer: AssetTransferBase,

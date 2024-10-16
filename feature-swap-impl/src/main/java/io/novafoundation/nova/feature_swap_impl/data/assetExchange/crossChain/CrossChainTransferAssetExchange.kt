@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 
+import android.util.Log
+import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -17,12 +19,15 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import java.math.BigInteger
 
@@ -55,12 +60,17 @@ class CrossChainTransferAssetExchange(
     private val swapHost: AssetExchange.SwapHost,
 ) : AssetExchange {
 
+    private val crossChainConfig = MutableStateFlow<CrossChainTransfersConfiguration?>(null)
+
     override suspend fun sync() {
         crossChainTransfersUseCase.syncCrossChainConfig()
+
+        crossChainConfig.emit(crossChainTransfersUseCase.getConfiguration())
     }
 
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
-        return crossChainTransfersUseCase.allDirections().map(::CrossChainTransferEdge)
+        val config = crossChainConfig.firstNotNull()
+        return config.availableInDestinations().map(::CrossChainTransferEdge)
     }
 
     override fun feePaymentOverrides(): List<FeePaymentProviderOverride> {
@@ -92,6 +102,17 @@ class CrossChainTransferAssetExchange(
 
         override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
             return false
+        }
+
+        override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
+            val config = crossChainConfig.value ?: return false
+
+            // Delivery fees cannot be paid in non-native assets
+            return (delegate.from.chainId !in config.deliveryFeeConfigurations).also {
+                if (!it) {
+                    Log.d("Swaps", "Filtered out $delegate due to delivery fee restrictions")
+                }
+            }
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
