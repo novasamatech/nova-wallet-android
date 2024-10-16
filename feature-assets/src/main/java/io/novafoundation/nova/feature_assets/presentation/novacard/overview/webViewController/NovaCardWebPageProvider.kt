@@ -53,6 +53,8 @@ class NovaCardWebPageProvider(
                 hideRefundAddress: true,
                 refundAddress: '${setupConfig.refundAddress}',
                 fixPaymentMethod: true,
+                fiatCurrency: true,
+                fixFiatCurrency: true,
                 showSpendCardDetails: true,
                 onStatusChange: data => {
                     $callbackName.onStatusChange(JSON.stringify(data));
