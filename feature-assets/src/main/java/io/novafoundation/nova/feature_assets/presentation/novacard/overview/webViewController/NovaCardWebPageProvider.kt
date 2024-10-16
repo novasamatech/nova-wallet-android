@@ -53,7 +53,7 @@ class NovaCardWebPageProvider(
                 hideRefundAddress: true,
                 refundAddress: '${setupConfig.refundAddress}',
                 fixPaymentMethod: true,
-                fiatCurrency: true,
+                fixCurrency: true,
                 fixFiatCurrency: true,
                 showSpendCardDetails: true,
                 onStatusChange: data => {
