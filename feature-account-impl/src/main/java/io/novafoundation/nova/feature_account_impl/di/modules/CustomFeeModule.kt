@@ -9,9 +9,10 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProviderRegistry
-import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProvider
+import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProviderFactory
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.HydrationFeePaymentProvider
+import io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub.AssetHubFeePaymentAssetsFetcherFactory
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQuoteSharedComputation
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.RealHydrationFeeInjector
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
@@ -61,16 +62,25 @@ class CustomFeeModule {
 
     @Provides
     @FeatureScope
-    fun provideAssetHubFeePaymentProvider(
-        chainRegistry: ChainRegistry,
-        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
+    fun provideAssetHubFeePaymentAssetsFetcher(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        multiLocationConverterFactory: MultiLocationConverterFactory
+    ): AssetHubFeePaymentAssetsFetcherFactory {
+        return AssetHubFeePaymentAssetsFetcherFactory(remoteStorageSource, multiLocationConverterFactory)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAssetHubFeePaymentProviderFactory(
+        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
         multiLocationConverterFactory: MultiLocationConverterFactory,
-    ) = AssetHubFeePaymentProvider(
-        chainRegistry,
-        multiChainRuntimeCallsApi,
-        remoteStorageSource,
-        multiLocationConverterFactory
+        assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
+        chainRegistry: ChainRegistry
+    ) = AssetHubFeePaymentProviderFactory(
+        multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
+        multiLocationConverterFactory = multiLocationConverterFactory,
+        assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher,
+        chainRegistry = chainRegistry
     )
 
     @Provides
@@ -103,11 +113,11 @@ class CustomFeeModule {
     @FeatureScope
     fun provideFeePaymentProviderRegistry(
         defaultFeePaymentProvider: DefaultFeePaymentProvider,
-        assetHubFeePaymentProvider: AssetHubFeePaymentProvider,
+        assetHubFeePaymentProviderFactory: AssetHubFeePaymentProviderFactory,
         hydrationFeePaymentProvider: HydrationFeePaymentProvider
     ): FeePaymentProviderRegistry = RealFeePaymentProviderRegistry(
         defaultFeePaymentProvider,
-        assetHubFeePaymentProvider,
+        assetHubFeePaymentProviderFactory,
         hydrationFeePaymentProvider
     )
 }

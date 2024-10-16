@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_core_api.data.paths
 
 import io.novafoundation.nova.common.utils.graph.Graph
+import io.novafoundation.nova.common.utils.graph.NodeVisitFilter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.BestPathQuote
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -15,7 +16,8 @@ interface PathQuoter<E : QuotableEdge> {
 
         fun <E : QuotableEdge> create(
             graph: Graph<FullChainAssetId, E>,
-            computationalScope: CoroutineScope
+            computationalScope: CoroutineScope,
+            filter: NodeVisitFilter<FullChainAssetId>? = null
         ): PathQuoter<E>
     }
 

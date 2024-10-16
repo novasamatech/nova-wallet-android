@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.chains
 
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
+import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.chains.CustomOrNativeFeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -18,13 +19,17 @@ class HydrationFeePaymentProvider(
 ) : CustomOrNativeFeePaymentProvider() {
 
     override suspend fun feePaymentFor(customFeeAsset: Chain.Asset, coroutineScope: CoroutineScope?): FeePayment {
-       return HydrationConversionFeePayment(
-           paymentAsset = customFeeAsset,
-           chainRegistry = chainRegistry,
-           hydrationFeeInjector = hydrationFeeInjector,
-           hydraDxQuoteSharedComputation = hydraDxQuoteSharedComputation,
-           accountRepository = accountRepository,
-           coroutineScope = coroutineScope!!
-       )
+        return HydrationConversionFeePayment(
+            paymentAsset = customFeeAsset,
+            chainRegistry = chainRegistry,
+            hydrationFeeInjector = hydrationFeeInjector,
+            hydraDxQuoteSharedComputation = hydraDxQuoteSharedComputation,
+            accountRepository = accountRepository,
+            coroutineScope = coroutineScope!!
+        )
+    }
+
+    override suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability? {
+        return null
     }
 }

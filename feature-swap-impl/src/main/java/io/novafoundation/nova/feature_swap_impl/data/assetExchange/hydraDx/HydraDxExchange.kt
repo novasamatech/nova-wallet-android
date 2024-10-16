@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.chains.CustomOrNativeFeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector.ResetMode
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.acceptedCurrencies
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.accountCurrencyMap
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.multiTransactionPayment
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
@@ -49,6 +51,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
@@ -388,6 +391,10 @@ private class HydraDxExchange(
         override suspend fun feePaymentFor(customFeeAsset: Chain.Asset, coroutineScope: CoroutineScope?): FeePayment {
             return ReusableQuoteFeePayment(customFeeAsset)
         }
+
+        override suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability {
+            return HydrationFastLookupFeeCapability()
+        }
     }
 
     private inner class ReusableQuoteFeePayment(
@@ -431,6 +438,29 @@ private class HydraDxExchange(
 
         override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
             return delegate.canPayFeeInNonUtilityToken(chainAsset)
+        }
+    }
+
+    private inner class HydrationFastLookupFeeCapability: FastLookupCustomFeeCapability {
+
+        private var acceptedCurrenciesCache: Set<HydraDxAssetId>? = null
+
+        override suspend fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
+            val asset = chain.assetsById[chainAssetId] ?: return false
+            val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)
+
+            val acceptedCurrencies = getAcceptedCurrencies()
+            return onChainId in acceptedCurrencies
+        }
+
+        private suspend fun getAcceptedCurrencies(): Set<HydraDxAssetId> {
+            if (acceptedCurrenciesCache != null) return acceptedCurrenciesCache!!
+
+            acceptedCurrenciesCache = remoteStorageSource.query(chain.id) {
+                metadata.multiTransactionPayment.acceptedCurrencies.keys()
+            }.toSet()
+
+            return acceptedCurrenciesCache!!
         }
     }
 

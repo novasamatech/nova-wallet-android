@@ -10,11 +10,23 @@ class MultiLocationConverterFactory(private val chainRegistry: ChainRegistry) {
 
     fun defaultAsync(chain: Chain, coroutineScope: CoroutineScope): MultiLocationConverter {
         val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chain.id) }
+        val runtimeSource = RuntimeSource.Async(runtimeAsync)
 
         return CompoundMultiLocationConverter(
             NativeAssetLocationConverter(chain),
-            LocalAssetsLocationConverter(chain, RuntimeSource.Async(runtimeAsync)),
-            ForeignAssetsLocationConverter(chain, runtimeAsync)
+            LocalAssetsLocationConverter(chain, runtimeSource),
+            ForeignAssetsLocationConverter(chain, runtimeSource)
+        )
+    }
+
+    suspend fun defaultSync(chain: Chain): MultiLocationConverter {
+        val runtimeAsync = chainRegistry.getRuntime(chain.id)
+        val runtimeSource = RuntimeSource.Sync(runtimeAsync)
+
+        return CompoundMultiLocationConverter(
+            NativeAssetLocationConverter(chain),
+            LocalAssetsLocationConverter(chain, runtimeSource),
+            ForeignAssetsLocationConverter(chain, runtimeSource)
         )
     }
 

@@ -196,6 +196,9 @@ val Chain.Asset.isUtilityAsset: Boolean
 inline val Chain.Asset.isCommissionAsset: Boolean
     get() = isUtilityAsset
 
+inline val FullChainAssetId.isUtility: Boolean
+    get() = assetId == UTILITY_ASSET_ID
+
 private const val MOONBEAM_XC_PREFIX = "xc"
 
 fun Chain.Asset.unifiedSymbol(): String {

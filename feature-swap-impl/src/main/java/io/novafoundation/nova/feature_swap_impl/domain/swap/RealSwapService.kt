@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.Graph
+import io.novafoundation.nova.common.utils.graph.NodeVisitFilter
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
@@ -52,7 +54,6 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.compound.CompoundAssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -61,6 +62,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatP
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
+import io.novafoundation.nova.runtime.ext.isUtility
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -83,6 +85,7 @@ private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
 private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 private const val EXTRINSIC_SERVICE_CACHE = "RealSwapService.ExtrinsicService"
 private const val QUOTER_CACHE = "RealSwapService.QUOTER"
+private const val NODE_VISIT_FILTER = "RealSwapService.NodeVisitFilter"
 
 
 internal class RealSwapService(
@@ -104,7 +107,7 @@ internal class RealSwapService(
         val paymentRegistry = exchangeRegistry.getFeePaymentRegistry()
 
         val chain = chainRegistry.getChain(asset.chainId)
-        val feePayment = paymentRegistry.providerFor(chain).feePaymentFor(asset.toFeePaymentCurrency(), computationScope)
+        val feePayment = paymentRegistry.providerFor(chain.id).feePaymentFor(asset.toFeePaymentCurrency(), computationScope)
 
         customFeeCapabilityFacade.canPayFeeInNonUtilityToken(asset, feePayment)
     }
@@ -128,7 +131,8 @@ internal class RealSwapService(
         computationScope: CoroutineScope
     ): Flow<Set<FullChainAssetId>> {
         return directionsGraph(computationScope).map {
-            it.findAllPossibleDestinations(asset.fullId)
+            val filter = canPayFeeNodeFilter(computationScope)
+            it.findAllPossibleDestinations(asset.fullId, filter)
         }
     }
 
@@ -319,6 +323,13 @@ internal class RealSwapService(
         }
     }
 
+
+    private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): NodeVisitFilter<FullChainAssetId> {
+        return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
+            CanPayFeeNodeVisitFilter(this)
+        }
+    }
+
     private suspend fun extrinsicService(computationScope: CoroutineScope): ExtrinsicService {
         return computationalCache.useCache(EXTRINSIC_SERVICE_CACHE, computationScope) {
             createExtrinsicService(this)
@@ -391,7 +402,9 @@ internal class RealSwapService(
     private suspend fun getPathQuoter(computationScope: CoroutineScope): PathQuoter<SwapGraphEdge> {
         return computationalCache.useCache(QUOTER_CACHE, computationScope) {
             val graph = directionsGraph(computationScope).first()
-            quoterFactory.create(graph, computationScope)
+            val filter = canPayFeeNodeFilter(computationScope)
+
+            quoterFactory.create(graph, this, filter)
         }
     }
 
@@ -466,19 +479,6 @@ internal class RealSwapService(
 
         private val feePaymentRegistry = SwapFeePaymentRegistry()
 
-        fun getExchange(chainId: ChainId): AssetExchange {
-            val relevantExchanges = buildList {
-                singleChainExchanges[chainId]?.let { add(it) }
-                addAll(multiChainExchanges)
-            }
-
-            return when (relevantExchanges.size) {
-                0 -> error("No exchanges found")
-                1 -> relevantExchanges.single()
-                else -> CompoundAssetExchange(relevantExchanges)
-            }
-        }
-
         fun getFeePaymentRegistry(): FeePaymentProviderRegistry {
             return feePaymentRegistry
         }
@@ -494,9 +494,9 @@ internal class RealSwapService(
 
             private val paymentRegistryOverrides = createFeePaymentOverrides()
 
-            override suspend fun providerFor(chain: Chain): FeePaymentProvider {
-                return paymentRegistryOverrides.find { it.chain.id == chain.id }?.provider
-                    ?: defaultFeePaymentProviderRegistry.providerFor(chain)
+            override suspend fun providerFor(chainId: ChainId): FeePaymentProvider {
+                return paymentRegistryOverrides.find { it.chain.id == chainId }?.provider
+                    ?: defaultFeePaymentProviderRegistry.providerFor(chainId)
             }
 
             private fun createFeePaymentOverrides(): List<FeePaymentProviderOverride> {
@@ -512,6 +512,41 @@ internal class RealSwapService(
             }
         }
     }
+
+    /**
+     * Check that it is possible to pay fees in moving asset
+     */
+    private inner class CanPayFeeNodeVisitFilter(val computationScope: CoroutineScope) : NodeVisitFilter<FullChainAssetId> {
+
+        private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
+
+        override suspend fun shouldVisit(node: FullChainAssetId): Boolean {
+            if (node.isUtility) return true
+
+            val feeCapability = getFeeCustomFeeCapability(node.chainId)
+            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(node.assetId)
+        }
+
+        private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability? {
+            val fromCache = feePaymentCapabilityCache.getOrPut(chainId) {
+                createFastLookupFeeCapability(chainId, computationScope).boxNullable()
+            }
+
+            return fromCache.unboxNullable()
+        }
+
+        private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability? {
+            val feePaymentRegistry = exchangeRegistry(computationScope).getFeePaymentRegistry()
+            return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
+        }
+    }
+
+    private object NULL
+
+    fun <T> T.boxNullable(): Any = this ?: NULL
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> Any.unboxNullable(): T? = if (this == NULL) null else this as T
 }
 
 private typealias QuotedTrade = QuotedPath<SwapGraphEdge>

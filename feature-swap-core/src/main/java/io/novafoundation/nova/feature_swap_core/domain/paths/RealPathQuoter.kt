@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_core.domain.paths
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.graph.Graph
+import io.novafoundation.nova.common.utils.graph.NodeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.mapAsync
@@ -26,35 +27,37 @@ private const val QUOTES_CACHE = "RealSwapService.QuotesCache"
 
 class RealPathQuoterFactory(
     private val computationalCache: ComputationalCache,
-): PathQuoter.Factory {
+) : PathQuoter.Factory {
 
     override fun <E : QuotableEdge> create(
         graph: Graph<FullChainAssetId, E>,
-        computationalScope: CoroutineScope
+        computationalScope: CoroutineScope,
+        filter: NodeVisitFilter<FullChainAssetId>?
     ): PathQuoter<E> {
-        return RealPathQuoter(computationalCache, graph, computationalScope)
+        return RealPathQuoter(computationalCache, graph, computationalScope, filter)
     }
 }
 
 private class RealPathQuoter<E : QuotableEdge>(
     private val computationalCache: ComputationalCache,
     private val graph: Graph<FullChainAssetId, E>,
-    private val computationalScope: CoroutineScope
-): PathQuoter<E> {
+    private val computationalScope: CoroutineScope,
+    private val filter: NodeVisitFilter<FullChainAssetId>?
+) : PathQuoter<E> {
 
     @OptIn(ExperimentalTime::class)
     override suspend fun findBestPath(
         chainAssetIn: Chain.Asset,
         chainAssetOut: Chain.Asset,
         amount: BigInteger,
-        swapDirection: SwapDirection
+        swapDirection: SwapDirection,
     ): BestPathQuote<E> {
         val from = chainAssetIn.fullId
         val to = chainAssetOut.fullId
 
         val paths = pathsFromCacheOrCompute(from, to, computationalScope) {
             val (paths, duration) = measureTimedValue {
-                graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT)
+                graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT, filter)
             }
 
             Log.d("Swaps", "${chainAssetIn.symbol} -> ${chainAssetOut.symbol}: finding ${paths.size} paths took $duration")
@@ -84,6 +87,7 @@ private class RealPathQuoter<E : QuotableEdge>(
             computation()
         }
     }
+
     private fun pathsCacheKey(from: FullChainAssetId, to: FullChainAssetId): String {
         val fromKey = "${from.chainId}:${from.assetId}"
         val toKey = "${to.chainId}:${to.assetId}"

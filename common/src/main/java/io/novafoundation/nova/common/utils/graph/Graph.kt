@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.utils.graph
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.MultiMapList
 import java.util.PriorityQueue
 
@@ -31,6 +30,15 @@ fun <N> Graph<N, *>.vertices(): Set<N> {
     return adjacencyList.keys
 }
 
+fun Graph<*, *>.numberOfEdges(): Int {
+    return adjacencyList.values.sumOf { it.size }
+}
+
+fun interface NodeVisitFilter<N> {
+
+    suspend fun shouldVisit(node: N): Boolean
+}
+
 /**
  * Finds all nodes reachable from [origin]
  *
@@ -38,8 +46,13 @@ fun <N> Graph<N, *>.vertices(): Set<N> {
  *
  * Complexity: O(V + E)
  */
-fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDestinations(origin: N): Set<N> {
-    return reachabilityDfs(origin, adjacencyList).toSet()
+suspend fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDestinations(
+    origin: N,
+    nodeVisitFilter: NodeVisitFilter<N>? = null
+): Set<N> {
+    val actualNodeListFilter =  nodeVisitFilter ?: NodeVisitFilter { true }
+
+    return reachabilityDfs(origin, adjacencyList, actualNodeListFilter).toSet()
 }
 
 fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
@@ -48,9 +61,14 @@ fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
 }
 
 
-fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
-    from: N, to: N, limit: Int
+suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
+    from: N,
+    to: N,
+    limit: Int,
+    nodeVisitFilter: NodeVisitFilter<N>?
 ): List<Path<E>> {
+    val actualNodeListFilter =  nodeVisitFilter ?: NodeVisitFilter { true }
+
     data class QueueElement(val currentPath: Path<E>, val score: Int) : Comparable<QueueElement> {
 
         override fun compareTo(other: QueueElement): Int {
@@ -88,19 +106,12 @@ fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
 
         if (newCount <= limit) {
             adjacencyList.getValue(lastNode).forEach { edge ->
-                if (edge.to in minimumQueueElement) return@forEach
+                if (edge.to in minimumQueueElement || !actualNodeListFilter.shouldVisit(edge.to)) return@forEach
 
-                val newElement: QueueElement
-
-                try {
-                    newElement = QueueElement(
-                        currentPath = minimumQueueElement.currentPath + edge,
-                        score = minimumQueueElement.score + edge.weight
-                    )
-                } catch (e: AbstractMethodError) {
-                    Log.e("Swaps", "Asbract method in ${edge::class.java}")
-                    throw e
-                }
+                val newElement = QueueElement(
+                    currentPath = minimumQueueElement.currentPath + edge,
+                    score = minimumQueueElement.score + edge.weight
+                )
 
                 heap.add(newElement)
             }
@@ -110,9 +121,10 @@ fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
     return paths
 }
 
-private fun <N, E : Edge<N>> reachabilityDfs(
+private suspend fun <N, E : Edge<N>> reachabilityDfs(
     node: N,
     adjacencyList: Map<N, List<E>>,
+    nodeVisitFilter: NodeVisitFilter<N>,
     visited: MutableSet<N> = mutableSetOf(),
     connectedComponentState: MutableList<N> = mutableListOf()
 ): List<N> {
@@ -120,8 +132,8 @@ private fun <N, E : Edge<N>> reachabilityDfs(
     connectedComponentState.add(node)
 
     for (edge in adjacencyList.getValue(node)) {
-        if (edge.to !in visited) {
-            reachabilityDfs(edge.to, adjacencyList, visited, connectedComponentState)
+        if (edge.to !in visited && nodeVisitFilter.shouldVisit(node)) {
+            reachabilityDfs(edge.to, adjacencyList, nodeVisitFilter, visited, connectedComponentState)
         }
     }
 
