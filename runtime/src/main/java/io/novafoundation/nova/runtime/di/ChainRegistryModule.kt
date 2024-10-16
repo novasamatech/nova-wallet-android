@@ -5,8 +5,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -140,14 +140,15 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
-    fun provideAutoBalanceProvider() = NodeSelectionStrategyProvider()
+    fun provideAutoBalanceProvider(
+        connectionSecrets: ConnectionSecrets
+    ) = NodeSelectionStrategyProvider(connectionSecrets)
 
     @Provides
     @ApplicationScope
     fun provideNodeAutoBalancer(
         nodeSelectionStrategyProvider: NodeSelectionStrategyProvider,
-        connectionSecrets: ConnectionSecrets
-    ) = NodeAutobalancer(nodeSelectionStrategyProvider, connectionSecrets)
+    ) = NodeAutobalancer(nodeSelectionStrategyProvider)
 
     @Provides
     @ApplicationScope
@@ -173,12 +174,10 @@ class ChainRegistryModule {
         socketProvider: Provider<SocketService>,
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         nodeAutobalancer: NodeAutobalancer,
-        connectionSecrets: ConnectionSecrets
     ) = ChainConnectionFactory(
         externalRequirementsFlow,
         nodeAutobalancer,
         socketProvider,
-        connectionSecrets
     )
 
     @Provides
@@ -195,7 +194,6 @@ class ChainRegistryModule {
     @Provides
     @ApplicationScope
     fun provideWeb3ApiFactory(
-        connectionSecrets: ConnectionSecrets,
         strategyProvider: NodeSelectionStrategyProvider,
     ): Web3ApiFactory {
         val builder = HttpService.getOkHttpClientBuilder()
@@ -207,7 +205,7 @@ class ChainRegistryModule {
 
         val okHttpClient = builder.build()
 
-        return Web3ApiFactory(connectionSecrets = connectionSecrets, strategyProvider = strategyProvider, httpClient = okHttpClient)
+        return Web3ApiFactory(strategyProvider = strategyProvider, httpClient = okHttpClient)
     }
 
     @Provides

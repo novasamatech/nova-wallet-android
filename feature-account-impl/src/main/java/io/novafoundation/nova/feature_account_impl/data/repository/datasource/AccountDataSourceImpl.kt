@@ -152,6 +152,10 @@ class AccountDataSourceImpl(
         return metaAccountDao.getMetaAccountIdsByType(mapMetaAccountTypeToLocal(type))
     }
 
+    override suspend fun deleteProxiedMetaAccountsByChain(chainId: String) {
+        return metaAccountDao.deleteProxiedMetaAccountsByChain(chainId)
+    }
+
     override suspend fun hasSecretsAccounts(): Boolean {
         return metaAccountDao.hasMetaAccountsByType(MetaAccountLocal.Type.SECRETS)
     }

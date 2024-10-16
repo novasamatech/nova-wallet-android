@@ -23,7 +23,7 @@ interface ExternalSignCommunicator : ExternalSignRequester, ExternalSignResponde
         class Rejected(override val requestId: String) : Response()
 
         @Parcelize
-        class Signed(override val requestId: String, val signature: String) : Response()
+        class Signed(override val requestId: String, val signature: String, val modifiedTransaction: String? = null) : Response()
 
         @Parcelize
         class Sent(override val requestId: String, val txHash: String) : Response()

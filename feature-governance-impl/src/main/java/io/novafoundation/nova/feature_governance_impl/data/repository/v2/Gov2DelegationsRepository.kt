@@ -184,7 +184,7 @@ class Gov2DelegationsRepository(
                 val standardVote = delegatedVoteRemote.vote
 
                 UserVote.Delegated(
-                    delegate = chain.accountIdOf(delegatedVoteRemote.parent.delegate.address),
+                    delegate = chain.accountIdOf(delegatedVoteRemote.parent.delegateId),
                     vote = AccountVote.Standard(
                         balance = standardVote.amount,
                         vote = Vote(

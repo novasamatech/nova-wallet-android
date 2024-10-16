@@ -18,7 +18,7 @@ class PolkadotSignRequest(
 ) : SignWalletConnectRequest(sessionRequest, context) {
 
     override suspend fun signedResponse(response: ExternalSignCommunicator.Response.Signed): Wallet.Params.SessionRequestResponse {
-        val responseData = PolkadotSignerResult(id, response.signature)
+        val responseData = PolkadotSignerResult(id, signature = response.signature, response.modifiedTransaction)
         val responseJson = gson.toJson(responseData)
 
         return sessionRequest.approved(responseJson)

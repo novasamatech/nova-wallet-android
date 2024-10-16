@@ -1131,7 +1131,7 @@
     <string name="settings_biometric_not_ready_message">Por favor, certifique-se de que a biometria está ativada nas Configurações</string>
     <string name="settings_biometric_not_ready_title">Biometria desativada nas Configurações</string>
     <string name="settings_community">Comunidade</string>
-    <string name="settings_email">Escrever para os desenvolvedores</string>
+    <string name="settings_email">Obtenha suporte via Email</string>
     <string name="settings_general">Geral</string>
     <string name="settings_pin_code_verification_confirmation_message">Cada operação de assinatura em carteiras com par de chaves (criada na nova wallet ou importada) deve exigir a verificação do PIN antes da construção da assinatura</string>
     <string name="settings_pin_code_verification_confirmation_title">Solicitar autenticação para assinatura de operações</string>
@@ -1143,7 +1143,7 @@
     <string name="settings_security">Segurança</string>
     <string name="settings_support">Suporte &amp; Feedback</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki e Central de Ajuda</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">A convicção será definida como 0.1x quando Abstain</string>
     <string name="setup_staking_conflict_message">Você não pode fazer staking com Staking Direto e Pools de Nomeação ao mesmo tempo</string>

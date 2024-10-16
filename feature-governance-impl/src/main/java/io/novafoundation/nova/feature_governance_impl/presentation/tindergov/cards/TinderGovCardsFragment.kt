@@ -122,8 +122,6 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
                 }
         }
 
-        viewModel.manageVotingPowerAvailable.observe(tinderGovCardsSettings::setVisible)
-
         viewModel.basketModelFlow.observe {
             tinderGovCardsBasketItems.text = it.items.toString()
             tinderGovCardsBasketItems.setTextColorRes(it.textColorRes)
@@ -164,6 +162,7 @@ class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel>(), TinderGo
         }
 
         viewModel.hasReferendaToVote.observe {
+            tinderGovCardsSettings.isVisible = it
             tinderGovCardsControlView.setVisible(it, falseState = View.INVISIBLE)
 
             // To avoid click if referenda cards is empty

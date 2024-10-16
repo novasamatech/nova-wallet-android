@@ -122,17 +122,20 @@ data class Chain(
     }
 
     data class Nodes(
-        val nodeSelectionStrategy: NodeSelectionStrategy,
+        val autoBalanceStrategy: AutoBalanceStrategy,
+        val wssNodeSelectionStrategy: NodeSelectionStrategy,
         val nodes: List<Node>,
     ) {
 
-        sealed interface NodeSelectionStrategy {
+        enum class AutoBalanceStrategy {
+            ROUND_ROBIN, UNIFORM
+        }
 
-            enum class AutoBalance : NodeSelectionStrategy {
-                ROUND_ROBIN, UNIFORM
-            }
+        sealed class NodeSelectionStrategy {
 
-            class SelectedNode(val nodeUrl: String?, val autoBalanceStrategy: AutoBalance) : NodeSelectionStrategy
+            object AutoBalance : NodeSelectionStrategy()
+
+            class SelectedNode(val unformattedNodeUrl: String) : NodeSelectionStrategy()
         }
     }
 

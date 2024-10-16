@@ -64,7 +64,7 @@ fun chainOf(
     supportProxy = false,
     swap = "",
     hasSubstrateRuntime = true,
-    nodeSelectionStrategy = ChainLocal.NodeSelectionStrategyLocal.ROUND_ROBIN,
+    nodeSelectionStrategy = ChainLocal.AutoBalanceStrategyLocal.ROUND_ROBIN,
     source = ChainLocal.Source.CUSTOM,
     customFee = ""
 )
