@@ -108,6 +108,7 @@ class WebViewCardCreationInterceptor(
      * Notify onCardCreatedListener if data value contains mercurio cards
      */
     private fun makeRequest(requestBuilder: Request.Builder): Boolean {
+        Log.d("WebViewCardCreationInterceptor", "request: ${requestBuilder.build()}")
         val okHttpResponse = okHttpClient.newCall(requestBuilder.build()).execute()
 
         if (okHttpResponse.isSuccessful) {
