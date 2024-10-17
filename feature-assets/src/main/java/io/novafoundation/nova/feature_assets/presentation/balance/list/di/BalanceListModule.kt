@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -34,8 +36,9 @@ class BalanceListModule {
     fun provideInteractor(
         accountRepository: AccountRepository,
         nftRepository: NftRepository,
-        bannerVisibilityRepository: BannerVisibilityRepository
-    ) = AssetsListInteractor(accountRepository, nftRepository, bannerVisibilityRepository)
+        bannerVisibilityRepository: BannerVisibilityRepository,
+        assetsViewModeRepository: AssetsViewModeRepository
+    ) = AssetsListInteractor(accountRepository, nftRepository, bannerVisibilityRepository, assetsViewModeRepository)
 
     @Provides
     @ScreenScope
@@ -52,6 +55,22 @@ class BalanceListModule {
     }
 
     @Provides
+    @ScreenScope
+    fun provideAssetListMixinFactory(
+        walletInteractor: WalletInteractor,
+        assetsListInteractor: AssetsListInteractor,
+        currencyInteractor: CurrencyInteractor,
+        externalBalancesInteractor: ExternalBalancesInteractor
+    ): AssetListMixinFactory {
+        return AssetListMixinFactory(
+            walletInteractor,
+            assetsListInteractor,
+            currencyInteractor,
+            externalBalancesInteractor
+        )
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(BalanceListViewModel::class)
     fun provideViewModel(
@@ -64,7 +83,8 @@ class BalanceListModule {
         externalBalancesInteractor: ExternalBalancesInteractor,
         resourceManager: ResourceManager,
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
-        swapAvailabilityInteractor: SwapAvailabilityInteractor
+        swapAvailabilityInteractor: SwapAvailabilityInteractor,
+        assetListMixinFactory: AssetListMixinFactory
     ): ViewModel {
         return BalanceListViewModel(
             walletInteractor = walletInteractor,
@@ -76,7 +96,8 @@ class BalanceListModule {
             externalBalancesInteractor = externalBalancesInteractor,
             resourceManager = resourceManager,
             walletConnectSessionsUseCase = walletConnectSessionsUseCase,
-            swapAvailabilityInteractor = swapAvailabilityInteractor
+            swapAvailabilityInteractor = swapAvailabilityInteractor,
+            assetListMixinFactory = assetListMixinFactory
         )
     }
 

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.Bala
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
@@ -86,7 +87,7 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        viewModel.assetModelsFlow.observe {
+        viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
                 balanceListAssets?.invalidateItemDecorations()
             }
@@ -129,10 +130,16 @@ class BalanceListFragment :
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
 
         viewModel.shouldShowCrowdloanBanner.observe(headerAdapter::setCrowdloanBannerVisible)
+
+        viewModel.assetViewModeModelFlow.observe { headerAdapter.setAssetViewModeModel(it) }
     }
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+    }
+
+    override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
+        showMessage("Not implemented yet")
     }
 
     override fun totalBalanceClicked() {
@@ -181,6 +188,10 @@ class BalanceListFragment :
 
     override fun crowdloanBannerCloseClicked() {
         viewModel.crowdloanBannerCloseClicked()
+    }
+
+    override fun assetViewModeClicked() {
+        viewModel.switchViewMode()
     }
 
     override fun swapClicked() {

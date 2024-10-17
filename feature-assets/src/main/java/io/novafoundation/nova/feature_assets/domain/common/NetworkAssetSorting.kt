@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigDecimal
 
-class AssetGroup(
+class NetworkAssetGroup(
     val chain: Chain,
     val groupTotalBalanceFiat: BigDecimal,
     val groupTransferableBalanceFiat: BigDecimal,
@@ -21,34 +21,23 @@ class AssetGroup(
 
 class AssetWithOffChainBalance(
     val asset: Asset,
-    val balanceWithOffchain: Balance,
-) {
-
-    class Balance(
-        val total: Amount,
-        val transferable: Amount
-    )
-}
-
-class Amount(
-    val amount: BigDecimal,
-    val fiat: BigDecimal
+    val balanceWithOffchain: TotalAndTransferableBalance,
 )
 
 fun groupAndSortAssetsByNetwork(
     assets: List<Asset>,
     externalBalances: Map<FullChainAssetId, Balance>,
     chainsById: Map<String, Chain>,
-    assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
+    assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
     assetComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator()
-): Map<AssetGroup, List<AssetWithOffChainBalance>> {
+): Map<NetworkAssetGroup, List<AssetWithOffChainBalance>> {
     return assets
         .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances)) }
         .filter { chainsById.containsKey(it.asset.token.configuration.chainId) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
         .mapValues { (_, assets) -> assets.sortedWith(assetComparator) }
         .mapKeys { (chain, assets) ->
-            AssetGroup(
+            NetworkAssetGroup(
                 chain = chain,
                 groupTotalBalanceFiat = assets.sumByBigDecimal { it.balanceWithOffchain.total.fiat },
                 groupTransferableBalanceFiat = assets.sumByBigDecimal { it.balanceWithOffchain.transferable.fiat },
@@ -67,14 +56,14 @@ fun getAssetBaseComparator(
 }
 
 fun getAssetGroupBaseComparator(
-    comparing: (AssetGroup) -> Comparable<*> = AssetGroup::groupTotalBalanceFiat
-): Comparator<AssetGroup> {
+    comparing: (NetworkAssetGroup) -> Comparable<*> = NetworkAssetGroup::groupTotalBalanceFiat
+): Comparator<NetworkAssetGroup> {
     return compareByDescending(comparing)
         .thenByDescending { it.zeroBalance } // non-zero balances first
-        .then(Chain.defaultComparatorFrom(AssetGroup::chain))
+        .then(Chain.defaultComparatorFrom(NetworkAssetGroup::chain))
 }
 
-private fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): AssetWithOffChainBalance.Balance {
+fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): TotalAndTransferableBalance {
     val onChainTotal = total
     val offChainTotal = externalBalances[token.configuration.fullId]
         ?.let(token::amountFromPlanks)
@@ -83,7 +72,7 @@ private fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Bala
     val overallTotal = onChainTotal + offChainTotal
     val overallFiat = token.amountToFiat(overallTotal)
 
-    return AssetWithOffChainBalance.Balance(
+    return TotalAndTransferableBalance(
         Amount(overallTotal, overallFiat),
         Amount(transferable, token.amountToFiat(transferable))
     )
