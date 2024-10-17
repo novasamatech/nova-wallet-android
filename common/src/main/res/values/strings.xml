@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="asset_view_tokens">Tokens</string>
+    <string name="asset_view_networks">Networks</string>
+
     <string name="settings_wiki">Wiki &amp; Help Center</string>
 
     <string name="settings_email">Get support via Email</string>

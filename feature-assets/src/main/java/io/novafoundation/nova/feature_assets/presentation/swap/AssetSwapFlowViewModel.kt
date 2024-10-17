@@ -7,11 +7,13 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
-import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
+import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.TotalAndTransferableBalance
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
@@ -57,7 +59,7 @@ class AssetSwapFlowViewModel(
         }
     }
 
-    override fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+    override fun searchAssetsFlow(): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
         return interactor.searchSwapAssetsFlow(
             forAsset = payload.constraintDirectionsAsset?.fullChainAssetId,
             queryFlow = query,
@@ -73,7 +75,7 @@ class AssetSwapFlowViewModel(
         }
     }
 
-    override fun mapAssets(assets: Map<AssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<Any> {
-        return assets.mapGroupedAssetsToUi(currency, AssetGroup::groupTransferableBalanceFiat, AssetWithOffChainBalance.Balance::transferable)
+    override fun mapAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
+        return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, TotalAndTransferableBalance::transferable)
     }
 }

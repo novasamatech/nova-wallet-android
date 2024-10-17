@@ -8,9 +8,12 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
-import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
+import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
+import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByToken
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -168,12 +171,21 @@ class WalletInteractorImpl(
         }
     }
 
-    override suspend fun groupAssets(
+    override suspend fun groupAssetsByNetwork(
         assets: List<Asset>,
         externalBalances: List<ExternalBalance>
-    ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
+    ): Map<NetworkAssetGroup, List<AssetWithOffChainBalance>> {
         val chains = chainRegistry.enabledChainByIdFlow().first()
 
         return groupAndSortAssetsByNetwork(assets, externalBalances.aggregatedBalanceByAsset(), chains)
+    }
+
+    override suspend fun groupAssetsByToken(
+        assets: List<Asset>,
+        externalBalances: List<ExternalBalance>
+    ): Map<TokenAssetGroup, List<AssetWithNetwork>> {
+        val chains = chainRegistry.enabledChainByIdFlow().first()
+
+        return groupAndSortAssetsByToken(assets, externalBalances.aggregatedBalanceByAsset(), chains)
     }
 }

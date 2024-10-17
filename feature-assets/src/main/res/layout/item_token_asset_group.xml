@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemAssetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_weight="1"
+    android:background="@drawable/bg_primary_list_item"
+    tools:background="@color/block_background">
+
+    <ImageView
+        android:id="@+id/itemTokenGroupAssetImage"
+        style="@style/Widget.Nova.AssetIcon.Primary"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_token_container"
+        android:padding="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_nova" />
+
+    <TextView
+        android:id="@+id/itemAssetTokenGroupToken"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/itemAssetTokenGroupRate"
+        app:layout_constraintStart_toEndOf="@+id/itemTokenGroupAssetImage"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="KSM" />
+
+    <TextView
+        android:id="@+id/itemAssetTokenGroupRate"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/itemAssetTokenGroupToken"
+        app:layout_constraintTop_toBottomOf="@+id/itemAssetTokenGroupToken"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="$10.25" />
+
+    <TextView
+        android:id="@+id/itemAssetTokenGroupRateChange"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:textColor="@color/text_positive"
+        app:layout_constraintBottom_toBottomOf="@+id/itemAssetTokenGroupRate"
+        app:layout_constraintStart_toEndOf="@+id/itemAssetTokenGroupRate"
+        app:layout_constraintTop_toTopOf="@+id/itemAssetTokenGroupRate"
+        tools:text="+25%" />
+
+    <TextView
+        android:id="@+id/itemAssetTokenGroupPriceAmount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBaseline_toBaselineOf="@id/itemAssetTokenGroupRateChange"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/itemAssetTokenGroupRateChange"
+        tools:text="$1,000.05" />
+
+    <TextView
+        android:id="@+id/itemAssetTokenGroupBalance"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBaseline_toBaselineOf="@id/itemAssetTokenGroupToken"
+        app:layout_constraintEnd_toEndOf="@+id/itemAssetTokenGroupPriceAmount"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/itemAssetTokenGroupToken"
+        tools:text="120.0849" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

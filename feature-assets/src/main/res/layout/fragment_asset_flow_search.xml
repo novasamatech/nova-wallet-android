@@ -24,7 +24,7 @@
         android:paddingTop="12dp"
         android:paddingBottom="24dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_asset" />
+        tools:listitem="@layout/item_network_asset" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/assetFlowPlaceholder"

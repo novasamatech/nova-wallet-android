@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.domain.assets.search
 
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
+import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.getAssetBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.getAssetGroupBaseComparator
@@ -41,7 +41,7 @@ class AssetSearchInteractor(
     fun buyAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
         return searchAssetsInternalFlow(queryFlow, externalBalancesFlow) {
             it.token.configuration.buyProviders.isNotEmpty()
         }
@@ -50,7 +50,7 @@ class AssetSearchInteractor(
     fun sendAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
         val groupComparator = getAssetGroupBaseComparator { it.groupTransferableBalanceFiat }
         val assetsComparator = getAssetBaseComparator { it.balanceWithOffchain.transferable.fiat }
 
@@ -64,7 +64,7 @@ class AssetSearchInteractor(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
-    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
         val filterFlow = getAvailableSwapAssets(forAsset, coroutineScope).map { availableAssetsForSwap ->
             val filter: AssetSearchFilter = { asset ->
                 val chainAsset = asset.token.configuration
@@ -81,7 +81,7 @@ class AssetSearchInteractor(
     fun searchAssetsFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
         return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, filter = null)
     }
 
@@ -100,10 +100,10 @@ class AssetSearchInteractor(
     private fun searchAssetsInternalFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-        assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
+        assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
         filter: AssetSearchFilter?,
-    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
         val filterFlow = flowOf(filter)
 
         return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
@@ -112,10 +112,10 @@ class AssetSearchInteractor(
     private fun searchAssetsInternalFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-        assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
+        assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
         filterFlow: Flow<AssetSearchFilter?>,
-    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
         var assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 

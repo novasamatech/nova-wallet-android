@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetList
@@ -100,5 +101,9 @@ class AssetSearchFragment :
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+    }
+
+    override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
+        showMessage("Not implemented yet")
     }
 }

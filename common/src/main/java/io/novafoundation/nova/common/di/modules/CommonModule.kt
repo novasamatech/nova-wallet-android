@@ -19,7 +19,9 @@ import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
+import io.novafoundation.nova.common.data.repository.RealAssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
@@ -347,4 +349,8 @@ class CommonModule {
     fun provideCoinGeckoLinkParser(): CoinGeckoLinkParser {
         return CoinGeckoLinkParser()
     }
+
+    @Provides
+    @ApplicationScope
+    fun assetsViewModeRepository(preferences: Preferences): AssetsViewModeRepository = RealAssetsViewModeRepository(preferences)
 }
