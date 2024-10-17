@@ -154,10 +154,6 @@ class BalanceListFragment :
         viewModel.searchClicked()
     }
 
-    override fun filtersClicked() {
-        viewModel.filtersClicked()
-    }
-
     override fun avatarClicked() {
         viewModel.avatarClicked()
     }

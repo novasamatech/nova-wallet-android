@@ -323,10 +323,6 @@ class Navigator(
         navController?.navigate(R.id.action_open_receive, ReceiveFragment.getBundle(assetPayload))
     }
 
-    override fun openAssetFilters() {
-        navController?.navigate(R.id.action_mainFragment_to_assetFiltersFragment)
-    }
-
     override fun openAssetSearch() {
         navController?.navigate(R.id.action_mainFragment_to_assetSearchFragment)
     }

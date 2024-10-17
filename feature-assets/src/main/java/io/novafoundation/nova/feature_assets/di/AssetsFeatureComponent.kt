@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.BalanceDetailComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.AssetFiltersComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
@@ -73,8 +72,6 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun extrinsicDetailComponentFactory(): ExtrinsicDetailComponent.Factory
 
     fun receiveComponentFactory(): ReceiveComponent.Factory
-
-    fun assetFiltersComponentFactory(): AssetFiltersComponent.Factory
 
     fun assetSearchComponentFactory(): AssetSearchComponent.Factory
 
