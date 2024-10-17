@@ -55,8 +55,6 @@ class ManageTokensFragment :
             }
         }
 
-        manageTokensSwitchZeroBalances.setOnClickListener { viewModel.zeroBalancesClicked() }
-
         manageTokensList.setHasFixedSize(true)
         manageTokensList.adapter = tokensAdapter
 

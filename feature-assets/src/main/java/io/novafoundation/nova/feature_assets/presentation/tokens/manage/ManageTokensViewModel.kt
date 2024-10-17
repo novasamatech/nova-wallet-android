@@ -4,8 +4,6 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.checkEnabled
 import io.novafoundation.nova.common.utils.combineIdentity
-import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFilter
 import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFiltersInteractor
@@ -30,10 +28,6 @@ class ManageTokensViewModel(
     private val commonUiMapper: MultiChainTokenMapper,
     private val assetFiltersInteractor: AssetFiltersInteractor,
 ) : BaseViewModel() {
-
-    private val initialFilters = flowOf { assetFiltersInteractor.currentFilters() }
-        .inBackground()
-        .share()
 
     val filtersEnabledMap = assetFiltersInteractor.allFilters.associateWith { MutableStateFlow(false) }
 
@@ -74,9 +68,6 @@ class ManageTokensViewModel(
         )
     }
 
-    fun zeroBalancesClicked() {
-    }
-
     private suspend fun getMultiChainTokenAt(position: Int): MultiChainToken? {
         return multiChainTokensFlow.first().getOrNull(position)
     }
@@ -90,7 +81,7 @@ class ManageTokensViewModel(
     }
 
     private fun applyFiltersInitialState() = launch {
-        val initialFilters = initialFilters.first()
+        val initialFilters = assetFiltersInteractor.currentFilters()
 
         filtersEnabledMap.forEach { (filter, checked) ->
             checked.value = filter in initialFilters
