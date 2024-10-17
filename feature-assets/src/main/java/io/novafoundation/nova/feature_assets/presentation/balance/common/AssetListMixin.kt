@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.data.model.switch
+import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -27,11 +29,12 @@ class AssetListMixinFactory(
     private val externalBalancesInteractor: ExternalBalancesInteractor
 ) {
 
-    fun create(): AssetListMixin = RealAssetListMixin(
+    fun create(coroutineScope: CoroutineScope): AssetListMixin = RealAssetListMixin(
         walletInteractor,
         assetsListInteractor,
         currencyInteractor,
-        externalBalancesInteractor
+        externalBalancesInteractor,
+        coroutineScope
     )
 }
 
@@ -52,20 +55,26 @@ class RealAssetListMixin(
     private val walletInteractor: WalletInteractor,
     private val assetsListInteractor: AssetsListInteractor,
     private val currencyInteractor: CurrencyInteractor,
-    private val externalBalancesInteractor: ExternalBalancesInteractor
-) : AssetListMixin {
+    private val externalBalancesInteractor: ExternalBalancesInteractor,
+    private val coroutineScope: CoroutineScope
+) : AssetListMixin, CoroutineScope by coroutineScope {
 
     override val assetsFlow = walletInteractor.assetsFlow()
+        .shareInBackground()
 
     override val filteredAssetsFlow = walletInteractor.filterAssets(assetsFlow)
+        .shareInBackground()
 
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
+        .shareInBackground()
 
     private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
+        .shareInBackground()
 
     private val expandedTokenIdsFlow = MutableStateFlow(setOf<String>())
 
     override val assetsViewModeFlow = assetsListInteractor.assetsViewModeFlow()
+        .shareInBackground()
 
     override val assetModelsFlow = combine(
         filteredAssetsFlow,
@@ -81,6 +90,7 @@ class RealAssetListMixin(
                 .mapGroupedAssetsToUi()
         }
     }.distinctUntilChanged()
+        .shareInBackground()
 
     override suspend fun switchViewMode() {
         val assetViewMode = assetsViewModeFlow.first()

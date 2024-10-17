@@ -139,7 +139,7 @@ class BalanceListFragment :
     }
 
     override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
-        showMessage("Not implemented yet")
+        viewModel.assetListMixin.expandToken(tokenGroup)
     }
 
     override fun totalBalanceClicked() {

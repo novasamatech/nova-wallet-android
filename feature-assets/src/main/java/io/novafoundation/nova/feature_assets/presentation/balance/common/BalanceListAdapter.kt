@@ -79,7 +79,7 @@ class BalanceListAdapter(
             }
 
             is TokenAssetViewHolder -> {
-                val item = getItem(position) as NetworkAssetUi
+                val item = getItem(position) as TokenAssetUi
                 resolvePayload(holder, position, payloads) {
                     when (it) {
                         AssetModel::amount -> holder.bindTotal(item.asset)

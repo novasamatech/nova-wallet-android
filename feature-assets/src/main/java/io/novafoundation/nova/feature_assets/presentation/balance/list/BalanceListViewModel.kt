@@ -93,7 +93,7 @@ class BalanceListViewModel(
 
     private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
-    val assetListMixin = assetListMixinFactory.create()
+    val assetListMixin = assetListMixinFactory.create(viewModelScope)
 
     private val isFiltersEnabledFlow = walletInteractor.isFiltersEnabledFlow()
 
