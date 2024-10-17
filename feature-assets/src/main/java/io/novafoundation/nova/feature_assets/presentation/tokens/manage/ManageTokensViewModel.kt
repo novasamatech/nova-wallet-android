@@ -1,7 +1,14 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.manage
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.checkEnabled
+import io.novafoundation.nova.common.utils.combineIdentity
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFilter
+import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFiltersInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.manage.ManageTokenInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.manage.MultiChainToken
 import io.novafoundation.nova.feature_assets.domain.tokens.manage.allChainAssetIds
@@ -11,14 +18,24 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.Ma
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenMapper
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class ManageTokensViewModel(
     private val router: AssetsRouter,
     private val interactor: ManageTokenInteractor,
-    private val commonUiMapper: MultiChainTokenMapper
+    private val commonUiMapper: MultiChainTokenMapper,
+    private val assetFiltersInteractor: AssetFiltersInteractor,
 ) : BaseViewModel() {
+
+    private val initialFilters = flowOf { assetFiltersInteractor.currentFilters() }
+        .inBackground()
+        .share()
+
+    val filtersEnabledMap = assetFiltersInteractor.allFilters.associateWith { MutableStateFlow(false) }
 
     val query = MutableStateFlow("")
 
@@ -28,6 +45,10 @@ class ManageTokensViewModel(
     val searchResults = multiChainTokensFlow
         .mapList(::mapMultiChainTokenToUi)
         .shareInBackground()
+
+    init {
+        applyFiltersInitialState()
+    }
 
     fun closeClicked() {
         router.back()
@@ -53,6 +74,9 @@ class ManageTokensViewModel(
         )
     }
 
+    fun zeroBalancesClicked() {
+    }
+
     private suspend fun getMultiChainTokenAt(position: Int): MultiChainToken? {
         return multiChainTokensFlow.first().getOrNull(position)
     }
@@ -63,5 +87,25 @@ class ManageTokensViewModel(
             enabled = multiChainToken.isEnabled(),
             switchable = multiChainToken.isSwitchable
         )
+    }
+
+    private fun applyFiltersInitialState() = launch {
+        val initialFilters = initialFilters.first()
+
+        filtersEnabledMap.forEach { (filter, checked) ->
+            checked.value = filter in initialFilters
+        }
+
+        filtersEnabledMap.applyOnChange()
+    }
+
+    private fun Map<AssetFilter, MutableStateFlow<Boolean>>.applyOnChange() {
+        combineIdentity(this.values)
+            .drop(1)
+            .onEach {
+                val enabledFilters = assetFiltersInteractor.allFilters.filter(filtersEnabledMap::checkEnabled)
+                assetFiltersInteractor.updateFilters(enabledFilters)
+            }
+            .launchIn(viewModelScope)
     }
 }
