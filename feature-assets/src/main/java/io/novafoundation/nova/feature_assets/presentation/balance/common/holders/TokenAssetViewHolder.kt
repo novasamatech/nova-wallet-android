@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
+import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetImage
 import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetToken
 import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetBalance
@@ -24,15 +25,14 @@ class TokenAssetViewHolder(
         itemTokenAssetChainIcon.loadTokenIcon(tokenAsset.chain.icon, imageLoader)
         itemTokenAssetChainName.text = tokenAsset.chain.name
 
-        bindTotal(tokenAsset)
+        bindTotal(asset)
 
         itemTokenAssetToken.text = asset.token.configuration.symbol.value
 
         setOnClickListener { itemHandler.assetClicked(asset) }
     }
 
-    fun bindTotal(networkAsset: TokenAssetUi) {
-        val asset = networkAsset.asset
+    fun bindTotal(asset: AssetModel) {
         containerView.itemTokenAssetBalance.text = asset.amount.token
         containerView.itemTokenAssetPriceAmount.text = asset.amount.fiat
     }

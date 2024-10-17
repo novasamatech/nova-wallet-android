@@ -21,9 +21,13 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 
-private val priceRateExtractor = { assetModel: NetworkAssetUi -> assetModel.asset.token.rate }
-private val recentChangeExtractor = { assetModel: NetworkAssetUi -> assetModel.asset.token.recentRateChange }
-private val amountExtractor = { assetModel: NetworkAssetUi -> assetModel.asset.amount }
+private val priceRateExtractor = { asset: AssetModel -> asset.token.rate }
+private val recentChangeExtractor = { asset: AssetModel -> asset.token.recentRateChange }
+private val amountExtractor = { asset: AssetModel -> asset.amount }
+
+private val tokenGroupPriceRateExtractor = { group: TokenGroupUi -> group.rate }
+private val tokenGroupRecentChangeExtractor = { group: TokenGroupUi -> group.recentRateChange }
+private val tokenGroupAmountExtractor = { group: TokenGroupUi -> group.balance }
 
 const val TYPE_NETWORK_GROUP = 0
 const val TYPE_NETWORK_ASSET = 1
@@ -67,9 +71,29 @@ class BalanceListAdapter(
                 val item = getItem(position) as NetworkAssetUi
                 resolvePayload(holder, position, payloads) {
                     when (it) {
-                        priceRateExtractor -> holder.bindPriceInfo(item)
-                        recentChangeExtractor -> holder.bindRecentChange(item)
-                        AssetModel::amount -> holder.bindTotal(item)
+                        priceRateExtractor -> holder.bindPriceInfo(item.asset)
+                        recentChangeExtractor -> holder.bindRecentChange(item.asset)
+                        amountExtractor -> holder.bindTotal(item.asset)
+                    }
+                }
+            }
+
+            is TokenAssetViewHolder -> {
+                val item = getItem(position) as NetworkAssetUi
+                resolvePayload(holder, position, payloads) {
+                    when (it) {
+                        AssetModel::amount -> holder.bindTotal(item.asset)
+                    }
+                }
+            }
+
+            is TokenAssetGroupViewHolder -> {
+                val item = getItem(position) as TokenGroupUi
+                resolvePayload(holder, position, payloads) {
+                    when (it) {
+                        tokenGroupPriceRateExtractor -> holder.bindPriceRate(item)
+                        tokenGroupRecentChangeExtractor -> holder.bindRecentChange(item)
+                        tokenGroupAmountExtractor -> holder.bindTotal(item)
                     }
                 }
             }
@@ -101,16 +125,30 @@ private object DiffCallback : DiffUtil.ItemCallback<BalanceListRvItem>() {
     }
 
     override fun getChangePayload(oldItem: BalanceListRvItem, newItem: BalanceListRvItem): Any? {
-        if (oldItem is NetworkAssetUi && newItem is NetworkAssetUi) {
-            return AssetPayloadGenerator.diff(oldItem, newItem)
-        }
+        return when {
+            oldItem is NetworkAssetUi && newItem is NetworkAssetUi -> NetworkAssetPayloadGenerator.diff(oldItem.asset, newItem.asset)
 
-        return null
+            oldItem is TokenAssetUi && newItem is TokenAssetUi -> TokenAssetPayloadGenerator.diff(oldItem.asset, newItem.asset)
+
+            oldItem is TokenGroupUi && newItem is TokenGroupUi -> TokenGroupAssetPayloadGenerator.diff(oldItem, newItem)
+
+            else -> null
+        }
     }
 }
 
-private object AssetPayloadGenerator : PayloadGenerator<NetworkAssetUi>(
+private object NetworkAssetPayloadGenerator : PayloadGenerator<AssetModel>(
     priceRateExtractor,
     recentChangeExtractor,
     amountExtractor
+)
+
+private object TokenAssetPayloadGenerator : PayloadGenerator<AssetModel>(
+    amountExtractor
+)
+
+private object TokenGroupAssetPayloadGenerator : PayloadGenerator<TokenGroupUi>(
+    tokenGroupPriceRateExtractor,
+    tokenGroupRecentChangeExtractor,
+    tokenGroupAmountExtractor
 )

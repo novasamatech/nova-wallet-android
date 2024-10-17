@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkAssetUi
+import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.item_network_asset.view.itemAssetBalance
 import kotlinx.android.synthetic.main.item_network_asset.view.itemAssetImage
 import kotlinx.android.synthetic.main.item_network_asset.view.itemAssetPriceAmount
@@ -23,31 +24,28 @@ class NetworkAssetViewHolder(
         val asset = networkAsset.asset
         itemAssetImage.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
 
-        bindPriceInfo(networkAsset)
+        bindPriceInfo(asset)
 
-        bindRecentChange(networkAsset)
+        bindRecentChange(asset)
 
-        bindTotal(networkAsset)
+        bindTotal(asset)
 
         itemAssetToken.text = asset.token.configuration.symbol.value
 
         setOnClickListener { itemHandler.assetClicked(asset) }
     }
 
-    fun bindTotal(networkAsset: NetworkAssetUi) {
-        val asset = networkAsset.asset
+    fun bindTotal(asset: AssetModel) {
         containerView.itemAssetBalance.text = asset.amount.token
         containerView.itemAssetPriceAmount.text = asset.amount.fiat
     }
 
-    fun bindRecentChange(networkAsset: NetworkAssetUi) = with(containerView) {
-        val asset = networkAsset.asset
+    fun bindRecentChange(asset: AssetModel) = with(containerView) {
         itemAssetRateChange.setTextColorRes(asset.token.rateChangeColorRes)
         itemAssetRateChange.text = asset.token.recentRateChange
     }
 
-    fun bindPriceInfo(networkAsset: NetworkAssetUi) = with(containerView) {
-        val asset = networkAsset.asset
+    fun bindPriceInfo(asset: AssetModel) = with(containerView) {
         itemAssetRate.text = asset.token.rate
     }
 }

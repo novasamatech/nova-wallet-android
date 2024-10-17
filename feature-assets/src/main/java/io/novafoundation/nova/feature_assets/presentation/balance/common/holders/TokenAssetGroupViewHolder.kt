@@ -22,7 +22,7 @@ class TokenAssetGroupViewHolder(
     fun bind(tokenGroup: TokenGroupUi, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
         itemTokenGroupAssetImage.loadTokenIcon(tokenGroup.tokenIcon, imageLoader)
 
-        bindPriceInfo(tokenGroup)
+        bindPriceRate(tokenGroup)
 
         bindRecentChange(tokenGroup)
 
@@ -44,7 +44,7 @@ class TokenAssetGroupViewHolder(
         itemAssetTokenGroupRateChange.text = networkAsset.recentRateChange
     }
 
-    fun bindPriceInfo(networkAsset: TokenGroupUi) = with(containerView) {
+    fun bindPriceRate(networkAsset: TokenGroupUi) = with(containerView) {
         itemAssetTokenGroupRate.text = networkAsset.rate
     }
 }
