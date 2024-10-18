@@ -48,6 +48,7 @@ import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -169,7 +170,7 @@ class BalanceListViewModel(
             AssetViewMode.NETWORKS -> AssetViewModeModel(R.drawable.ic_asset_view_networks, R.string.asset_view_networks)
             AssetViewMode.TOKENS -> AssetViewModeModel(R.drawable.ic_asset_view_tokens, R.string.asset_view_tokens)
         }
-    }
+    }.distinctUntilChanged()
 
     init {
         selectedCurrency
