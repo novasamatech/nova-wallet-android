@@ -11,5 +11,5 @@ data class TokenGroupUi(
     val tokenSymbol: String,
     val balance: AmountModel
 ) : AssetGroupRvItem {
-    override val id: String = tokenSymbol
+    override val itemId: String = tokenSymbol
 }

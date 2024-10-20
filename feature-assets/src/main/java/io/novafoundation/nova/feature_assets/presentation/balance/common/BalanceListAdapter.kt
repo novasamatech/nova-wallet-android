@@ -9,6 +9,9 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAdapter
+import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableViewHolder
+import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableBaseItem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetGroupViewHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetViewHolder
@@ -37,7 +40,7 @@ const val TYPE_TOKEN_ASSET = 3
 class BalanceListAdapter(
     private val imageLoader: ImageLoader,
     private val itemHandler: ItemAssetHandler,
-) : ListAdapter<BalanceListRvItem, ViewHolder>(DiffCallback) {
+) : ListAdapter<BalanceListRvItem, ViewHolder>(DiffCallback), ExpandableAdapter {
 
     interface ItemAssetHandler {
         fun assetClicked(asset: AssetModel)
@@ -111,12 +114,16 @@ class BalanceListAdapter(
             else -> error("Unknown item type")
         }
     }
+
+    override fun getItems(): List<ExpandableBaseItem> {
+        return currentList
+    }
 }
 
 private object DiffCallback : DiffUtil.ItemCallback<BalanceListRvItem>() {
 
     override fun areItemsTheSame(oldItem: BalanceListRvItem, newItem: BalanceListRvItem): Boolean {
-        return oldItem.id == newItem.id
+        return oldItem.itemId == newItem.itemId
     }
 
     @SuppressLint("DiffUtilEquals")

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.holder
 import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableViewHolder
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
@@ -14,10 +15,11 @@ import kotlinx.android.synthetic.main.item_token_asset_group.view.itemAssetToken
 import kotlinx.android.synthetic.main.item_token_asset_group.view.itemAssetTokenGroupToken
 import kotlinx.android.synthetic.main.item_token_asset_group.view.itemTokenGroupAssetImage
 
+
 class TokenAssetGroupViewHolder(
     containerView: View,
     private val imageLoader: ImageLoader,
-) : GroupedListHolder(containerView) {
+) : GroupedListHolder(containerView), ExpandableViewHolder {
 
     fun bind(tokenGroup: TokenGroupUi, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
         itemTokenGroupAssetImage.loadTokenIcon(tokenGroup.tokenIcon, imageLoader)

@@ -61,6 +61,7 @@
     <color name="secondary_screen_background">#08090E</color>
     <color name="bottom_sheet_background">#181920</color>
     <color name="block_background">#1A999EC7</color>
+    <color name="hided_networks_block_background">#3D999EC7</color>
     <!--    TODO update name once in design system-->
     <color name="block_background_dark">#5205081C</color>
     <color name="cell_background_pressed">#291F78FF</color>

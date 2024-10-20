@@ -50,3 +50,29 @@ fun <T> List<T>.rangeCheck(fromIndex: Int, toIndex: Int) {
         toIndex > size -> throw IndexOutOfBoundsException("toIndex ($toIndex) is greater than size ($size).")
     }
 }
+
+fun <T> List<T>.findByStep(fromPosition: Int, step: Int, predicate: (T) -> Boolean): T? {
+    return findIndexByStep(fromPosition, step, predicate)?.let { get(it) }
+}
+
+fun <T> List<T>.findIndexByStep(fromPosition: Int, step: Int, predicate: (T) -> Boolean): Int? {
+    if (fromPosition < 0) return null
+    if (fromPosition >= size) return null
+    if (step == 0) return null
+
+    var currentPosition = fromPosition
+    while (currentPosition in 0 until size) {
+        if (predicate(get(currentPosition))) {
+            return currentPosition
+        }
+
+        currentPosition += step
+    }
+
+    return null
+}
+
+fun <T> Sequence<T>.subList(fromIndex: Int, toIndex: Int): List<T> {
+    return toList().subList(fromIndex, toIndex)
+}
+

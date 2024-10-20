@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/drawable_background_image">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListRecyclerView
         android:id="@+id/balanceListAssets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

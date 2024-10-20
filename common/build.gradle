@@ -93,6 +93,7 @@ dependencies {
     implementation viewModelKtxDep
 
     implementation daggerDep
+    implementation 'androidx.asynclayoutinflater:asynclayoutinflater:1.0.0'
     kapt daggerKapt
 
     implementation lifecycleDep

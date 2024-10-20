@@ -264,6 +264,10 @@ fun RecyclerView.findFirstVisiblePosition(): Int {
     return (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 }
 
+fun RecyclerView.findLastVisiblePosition(): Int {
+    return (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+}
+
 fun ScrollView.scrollOnFocusTo(vararg focusableTargets: View) {
     val listener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {

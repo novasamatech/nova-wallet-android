@@ -6,5 +6,5 @@ import io.novafoundation.nova.runtime.ext.fullId
 
 data class TokenAssetUi(override val asset: AssetModel, val chain: ChainUi) : AssetRvItem {
 
-    override val id: String = asset.token.configuration.fullId.toString()
+    override val itemId: String = asset.token.configuration.fullId.toString()
 }

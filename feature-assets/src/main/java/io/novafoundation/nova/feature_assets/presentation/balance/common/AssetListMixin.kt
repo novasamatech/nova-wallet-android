@@ -99,7 +99,7 @@ class RealAssetListMixin(
     }
 
     override fun expandToken(tokenGroupUi: TokenGroupUi) {
-        expandedTokenIdsFlow.updateValue { it.toggle(tokenGroupUi.id) }
+        expandedTokenIdsFlow.updateValue { it.toggle(tokenGroupUi.itemId) }
     }
 
     private fun filterExpandedItems(entry: Map.Entry<TokenAssetGroup, List<AssetWithNetwork>>, expandedTokens: Set<String>): List<AssetWithNetwork> {
