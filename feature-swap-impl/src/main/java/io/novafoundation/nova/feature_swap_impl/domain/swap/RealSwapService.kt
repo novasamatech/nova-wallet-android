@@ -18,7 +18,6 @@ import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
-import io.novafoundation.nova.common.utils.requireInnerNotNull
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -28,19 +27,25 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.replaceAmountIn
+import io.novafoundation.nova.feature_swap_api.domain.model.totalFeeEnsuringSubmissionAsset
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
@@ -68,6 +73,7 @@ import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -75,10 +81,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
@@ -153,36 +161,86 @@ internal class RealSwapService(
         }
     }
 
-    override suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {
+    override suspend fun estimateFee(executeArgs: SwapFeeArgs): SwapFee {
         val atomicOperations = executeArgs.constructAtomicOperations()
 
-        val fees = atomicOperations.mapAsync { it.estimateFee() }
+        val fees = atomicOperations.mapAsync { SwapFee.SwapSegment(it.estimateFee(), it) }
+        val convertedFees = fees.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
 
-        return SwapFee(fees).also(::logFee)
+        return SwapFee(segments = fees, intermediateSegmentFeesInAssetIn = convertedFees).also(::logFee)
     }
 
-    override suspend fun swap(args: SwapExecuteArgs): Result<SwapExecutionCorrection> {
-        val atomicOperations = args.constructAtomicOperations()
+    override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
+        val atomicOperations = calculatedFee.segments
 
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
 
-        return atomicOperations.fold(initialCorrection) { prevStepCorrection, operation ->
-            prevStepCorrection.flatMap { operation.submit(it) }
-        }.requireInnerNotNull()
+        return flow {
+            // Zip assumes atomicOperations and atomicOperationFees were constructed the same way
+            atomicOperations.fold(initialCorrection) { prevStepCorrection, (_, operation) ->
+                prevStepCorrection.flatMap { correction ->
+                    emit(SwapProgress.StepStarted(operation.inProgressLabel()))
+
+                    val newAmountIn = if (correction != null) {
+                        correction.actualReceivedAmount
+                    } else {
+                        val amountIn = operation.estimatedSwapLimit.estimatedAmountIn()
+                        amountIn + calculatedFee.additionalAmountForSwap.amount
+                    }
+
+                    val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn)
+                    val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
+
+                    Log.d("Swaps", operation.inProgressLabel() + " with $actualSwapLimit")
+
+                    operation.submit(segmentSubmissionArgs).onFailure {
+                        Log.e("Swaps", "Swap failed on stage '${operation.inProgressLabel()}'", it)
+
+                        emit(SwapProgress.Failure(it))
+                    }
+                }
+            }.onSuccess {
+                emit(SwapProgress.Done)
+            }
+        }
     }
 
-    private suspend fun SwapExecuteArgs.constructAtomicOperations(): List<AtomicSwapOperation> {
+    private fun SwapLimit.estimatedAmountIn(): Balance {
+        return when (this) {
+            is SwapLimit.SpecifiedIn -> amountIn
+            is SwapLimit.SpecifiedOut -> amountInQuote
+        }
+    }
+
+    private suspend fun List<SwapFee.SwapSegment>.convertIntermediateSegmentsFeesToAssetIn(assetIn: Chain.Asset): FeeBase {
+        val convertedFees = foldRightIndexed(BigInteger.ZERO) { index, (operationFee, swapOperation), futureFeePlanks ->
+            val amountInToGetFeesForOut = if (futureFeePlanks.isPositive()) {
+                swapOperation.requiredAmountInToGetAmountOut(futureFeePlanks)
+            } else {
+                BigInteger.ZERO
+            }
+
+            amountInToGetFeesForOut + if (index != 0) {
+                // Ensure everything is in the same asset
+                operationFee.totalFeeEnsuringSubmissionAsset()
+            } else {
+                // First segment is not included
+                BigInteger.ZERO
+            }
+        }
+
+        return SubstrateFeeBase(convertedFees, assetIn)
+    }
+
+    private suspend fun SwapFeeArgs.constructAtomicOperations(): List<AtomicSwapOperation> {
         var currentSwapTx: AtomicSwapOperation? = null
         val finishedSwapTxs = mutableListOf<AtomicSwapOperation>()
-
-        // TODO this will result in lower total slippage if some segments are appendable
-        val perSegmentSlippage = slippage / executionPath.size
 
         executionPath.forEachIndexed { index, segmentExecuteArgs ->
             val quotedEdge = segmentExecuteArgs.quotedSwapEdge
 
             val operationArgs = AtomicSwapOperationArgs(
-                swapLimit = SwapLimit(direction, quotedEdge.quotedAmount, perSegmentSlippage, quotedEdge.quote),
+                estimatedSwapLimit = SwapLimit(direction, quotedEdge.quotedAmount, slippage, quotedEdge.quote),
                 feePaymentCurrency = segmentExecuteArgs.quotedSwapEdge.edge.identifySegmentCurrency(
                     isFirstSegment = index == 0,
                     firstSegmentFees = firstSegmentFees,
@@ -429,10 +487,11 @@ internal class RealSwapService(
     }
 
     private fun logFee(fee: SwapFee) {
-        val route = fee.atomicOperationFees.joinToString(separator = "\n") {
+        val route = fee.segments.joinToString(separator = "\n") { segment ->
             val allFees = buildList {
-                add(it.submissionFee)
-                addAll(it.additionalFees)
+                add(segment.fee.submissionFee)
+                addAll(segment.fee.postSubmissionFees.paidByAccount)
+                addAll(segment.fee.postSubmissionFees.paidFromAmount)
             }
 
             allFees.joinToString { it.amount.formatPlanks(it.asset) }

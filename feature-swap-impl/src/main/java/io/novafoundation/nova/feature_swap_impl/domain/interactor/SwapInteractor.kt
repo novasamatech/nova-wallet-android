@@ -9,9 +9,9 @@ import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.hasProvidersFor
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
@@ -86,8 +86,8 @@ class SwapInteractor(
         return swapService.quote(quoteArgs, computationalScope)
     }
 
-    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs): Result<SwapExecutionCorrection> = withContext(Dispatchers.IO) {
-        swapService.swap(swapExecuteArgs)
+    suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = withContext(Dispatchers.IO) {
+        swapService.swap(calculatedFee)
 //            .onSuccess { submission ->
 //                swapTransactionHistoryRepository.insertPendingSwap(
 //                    chainAsset = swapExecuteArgs.assetIn,
@@ -109,7 +109,7 @@ class SwapInteractor(
         return swapService.canPayFeeInNonUtilityAsset(asset)
     }
 
-    suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {
+    suspend fun estimateFee(executeArgs: SwapFeeArgs): SwapFee {
         return swapService.estimateFee(executeArgs)
     }
 

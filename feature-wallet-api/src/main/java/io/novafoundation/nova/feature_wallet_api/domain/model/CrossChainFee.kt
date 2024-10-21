@@ -16,7 +16,7 @@ class CrossChainTransferFee(
      * and is always paid in native currency
      *
      */
-    val fromOriginInNativeCurrency: FeeBase?,
+    val fromOriginInNativeCurrency: SubmissionFee?,
 
     /**
      *  Total sum of all execution and delivery fees paid from holding register throughout xcm transfer

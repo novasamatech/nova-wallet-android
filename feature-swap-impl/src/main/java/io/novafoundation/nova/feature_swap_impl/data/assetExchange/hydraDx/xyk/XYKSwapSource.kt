@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.XYKSwapQuotingSourceFactory
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxStandaloneSwapBuilder
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
@@ -48,7 +47,7 @@ private class XYKSwapSource(
             return DictEnum.Entry("XYK", null)
         }
 
-        override val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder? = null
+        override val standaloneSwap = null
 
         override suspend fun debugLabel(): String {
             return "XYK"

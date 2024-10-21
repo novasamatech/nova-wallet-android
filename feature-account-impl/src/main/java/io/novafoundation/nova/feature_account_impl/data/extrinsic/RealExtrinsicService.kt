@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
 import io.novafoundation.nova.common.utils.orZero
@@ -15,6 +17,11 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWi
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.DispatchError
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.bindDispatchError
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
@@ -33,9 +40,15 @@ import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findExtrinsicFailureOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.isSuccess
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
@@ -52,6 +65,7 @@ class RealExtrinsicService(
     private val signerProvider: SignerProvider,
     private val extrinsicSplitter: ExtrinsicSplitter,
     private val feePaymentProviderRegistry: FeePaymentProviderRegistry,
+    private val eventsRepository: EventsRepository,
     private val coroutineScope: CoroutineScope? // TODO: Make it non-nullable
 ) : ExtrinsicService {
 
@@ -99,6 +113,17 @@ class RealExtrinsicService(
             .takeWhileInclusive { !it.terminal }
     }
 
+    override suspend fun submitExtrinsicAndAwaitExecution(
+        chain: Chain,
+        origin: TransactionOrigin,
+        submissionOptions: SubmissionOptions,
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): Result<ExtrinsicExecutionResult> {
+        return submitAndWatchExtrinsic(chain, origin, submissionOptions, formExtrinsic)
+            .awaitInBlock()
+            .map { determineExtrinsicOutcome(it, chain) }
+    }
+
     override suspend fun paymentInfo(
         chain: Chain,
         origin: TransactionOrigin,
@@ -122,9 +147,15 @@ class RealExtrinsicService(
         val signer = getFeeSigner(chain, origin)
         val extrinsicBuilder = extrinsicBuilderFactory.createForFee(signer, chain)
         extrinsicBuilder.formExtrinsic()
+
+        val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
+        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
+
+        feePayment.modifyExtrinsic(extrinsicBuilder)
         val extrinsic = extrinsicBuilder.buildExtrinsic(submissionOptions.batchMode).extrinsicHex
 
-        return estimateFee(chain, extrinsic, signer, submissionOptions)
+        val nativeFee = estimateNativeFee(chain, extrinsic, signer.submissionOrigin(chain))
+        return feePayment.convertNativeFee(nativeFee)
     }
 
     override suspend fun estimateFee(
@@ -180,6 +211,49 @@ class RealExtrinsicService(
         val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
 
         return feePayment.convertNativeFee(totalNativeFee)
+    }
+
+    private suspend fun determineExtrinsicOutcome(
+        inBlock: ExtrinsicStatus.InBlock,
+        chain: Chain
+    ): ExtrinsicExecutionResult {
+        val outcome = runCatching {
+            val extrinsicWithEvents = eventsRepository.getExtrinsicWithEvents(chain.id, inBlock.extrinsicHash, inBlock.blockHash)
+            val runtime = chainRegistry.getRuntime(chain.id)
+
+            requireNotNull(extrinsicWithEvents) {
+                "No extrinsic included into expected block"
+            }
+
+            extrinsicWithEvents.determineOutcome(runtime)
+        }.getOrElse {
+            Log.w(LOG_TAG, "Failed to determine extrinsic outcome", it)
+
+            ExtrinsicDispatch.Unknown
+        }
+
+        return ExtrinsicExecutionResult(
+            extrinsicHash = inBlock.extrinsicHash,
+            blockHash = inBlock.blockHash,
+            outcome = outcome
+        )
+    }
+
+    private fun ExtrinsicWithEvents.determineOutcome(runtimeSnapshot: RuntimeSnapshot): ExtrinsicDispatch {
+        return if (isSuccess()) {
+            ExtrinsicDispatch.Ok(events)
+        } else {
+            val errorEvent = events.findExtrinsicFailureOrThrow()
+            val dispatchError = parseErrorEvent(errorEvent, runtimeSnapshot)
+
+            ExtrinsicDispatch.Failed(dispatchError)
+        }
+    }
+
+    private fun parseErrorEvent(errorEvent: GenericEvent.Instance, runtimeSnapshot: RuntimeSnapshot): DispatchError {
+        val dispatchError = errorEvent.arguments.first()
+
+        return bindDispatchError(dispatchError, runtimeSnapshot)
     }
 
     private suspend fun constructSplitExtrinsicsForSubmission(

@@ -61,8 +61,22 @@ fun List<GenericEvent.Instance>.requireNativeFee(): BigInteger {
     }
 }
 
+fun List<GenericEvent.Instance>.findExtrinsicFailure(): GenericEvent.Instance? {
+    return findEvent(Modules.SYSTEM, FAILURE_EVENT)
+}
+
+fun List<GenericEvent.Instance>.findExtrinsicFailureOrThrow(): GenericEvent.Instance {
+    return requireNotNull(findExtrinsicFailure()) {
+        "No Extrinsic Failure event found"
+    }
+}
+
 fun List<GenericEvent.Instance>.findEvent(module: String, event: String): GenericEvent.Instance? {
     return find { it.instanceOf(module, event) }
+}
+
+fun List<GenericEvent.Instance>.findEventOrThrow(module: String, event: String): GenericEvent.Instance {
+    return first { it.instanceOf(module, event) }
 }
 
 fun List<GenericEvent.Instance>.findLastEvent(module: String, event: String): GenericEvent.Instance? {

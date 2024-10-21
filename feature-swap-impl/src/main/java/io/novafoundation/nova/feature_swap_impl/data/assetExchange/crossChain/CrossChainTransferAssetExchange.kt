@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -9,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.implementations.availabl
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
@@ -108,11 +109,7 @@ class CrossChainTransferAssetExchange(
             val config = crossChainConfig.value ?: return false
 
             // Delivery fees cannot be paid in non-native assets
-            return (delegate.from.chainId !in config.deliveryFeeConfigurations).also {
-                if (!it) {
-                    Log.d("Swaps", "Filtered out $delegate due to delivery fee restrictions")
-                }
-            }
+            return delegate.from.chainId !in config.deliveryFeeConfigurations
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
@@ -122,11 +119,13 @@ class CrossChainTransferAssetExchange(
 
     inner class CrossChainTransferOperation(
         private val transactionArgs: AtomicSwapOperationArgs,
-        private val edge: Edge<FullChainAssetId>
+        private val edge: Edge<FullChainAssetId>,
     ) : AtomicSwapOperation {
 
+        override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
+
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            val transfer = createTransfer(amount = transactionArgs.swapLimit.crossChainTransferAmount)
+            val transfer = createTransfer(amount = estimatedSwapLimit.crossChainTransferAmount)
 
             val crossChainFee = with(crossChainTransfersUseCase) {
                 swapHost.extrinsicService().estimateFee(transfer, computationalScope)
@@ -134,14 +133,29 @@ class CrossChainTransferAssetExchange(
 
             return AtomicSwapOperationFee(
                 submissionFee = crossChainFee.fromOriginInFeeCurrency,
-                additionalFees = listOfNotNull(
-                    crossChainFee.fromOriginInNativeCurrency,
-                    crossChainFee.fromHoldingRegister
-                )
+                postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
+                    paidByAccount = listOfNotNull(
+                        crossChainFee.fromOriginInNativeCurrency,
+                    ),
+                    paidFromAmount = listOf(
+                        crossChainFee.fromHoldingRegister
+                    )
+                ),
             )
         }
 
-        override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
+        override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {
+            return extraOutAmount
+        }
+
+        override suspend fun inProgressLabel(): String {
+            val chainTo = chainRegistry.getChain(edge.to.chainId)
+            val assetFrom = chainRegistry.asset(edge.from)
+
+            return "Transferring ${assetFrom.symbol} to ${chainTo.name}"
+        }
+
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             return Result.failure(UnsupportedOperationException("TODO"))
         }
 
@@ -164,9 +178,8 @@ class CrossChainTransferAssetExchange(
 
         private val SwapLimit.crossChainTransferAmount: Balance
             get() = when (this) {
-                // We cannot use slippage since we cannot guarantee slippage compliance in transfers
-                is SwapLimit.SpecifiedIn -> amountOutQuote
-                is SwapLimit.SpecifiedOut -> amountInQuote
+                is SwapLimit.SpecifiedIn -> amountIn
+                is SwapLimit.SpecifiedOut -> amountOut
             }
     }
 }

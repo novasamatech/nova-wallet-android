@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
 import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -21,7 +21,7 @@ data class SwapValidationPayload(
     val decimalFee: GenericDecimalFee<SwapFee>,
     val swapQuote: SwapQuote,
     val swapQuoteArgs: SwapQuoteArgs,
-    val swapExecuteArgs: SwapExecuteArgs
+    val swapExecuteArgs: SwapFeeArgs
 ) {
 
     data class SwapAssetData(

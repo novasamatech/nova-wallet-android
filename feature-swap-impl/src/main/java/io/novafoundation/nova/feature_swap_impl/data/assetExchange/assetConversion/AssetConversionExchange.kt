@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQu
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -56,7 +58,7 @@ class AssetConversionExchangeFactory(
 
     override suspend fun create(
         chain: Chain,
-        parentQuoter: AssetExchange.SwapHost,
+        swapHost: AssetExchange.SwapHost,
         coroutineScope: CoroutineScope
     ): AssetExchange {
         val converter = multiLocationConverterFactory.defaultAsync(chain, coroutineScope)
@@ -68,6 +70,7 @@ class AssetConversionExchangeFactory(
             multiChainRuntimeCallsApi = runtimeCallsApi,
             coroutineScope = coroutineScope,
             chainStateRepository = chainStateRepository,
+            swapHost = swapHost,
             extrinsicServiceFactory = extrinsicServiceFactory
         )
     }
@@ -80,6 +83,7 @@ private class AssetConversionExchange(
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val chainStateRepository: ChainStateRepository,
+    private val swapHost: AssetExchange.SwapHost,
     coroutineScope: CoroutineScope
 ) : AssetExchange {
 
@@ -205,6 +209,8 @@ private class AssetConversionExchange(
         private val toAsset: Chain.Asset
     ) : AtomicSwapOperation {
 
+        override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
+
         override suspend fun estimateFee(): AtomicSwapOperationFee {
             val submissionFee = extrinsicService.estimateFee(
                 chain = chain,
@@ -213,15 +219,28 @@ private class AssetConversionExchange(
                     feePaymentCurrency = transactionArgs.feePaymentCurrency
                 )
             ) {
-                executeSwap(sendTo = chain.emptyAccountId())
+                executeSwap(swapLimit = estimatedSwapLimit, sendTo = chain.emptyAccountId())
             }
 
             return AtomicSwapOperationFee(submissionFee)
         }
 
-        override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
-            // TODO use `previousStepCorrection` to correct used call arguments
-            // TODO implement watching for extrinsic events
+        override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {
+            val quoteArgs = ParentQuoterArgs(
+                chainAssetIn =fromAsset,
+                chainAssetOut = toAsset,
+                amount = extraOutAmount,
+                swapDirection = SwapDirection.SPECIFIED_OUT
+            )
+
+            return swapHost.quote(quoteArgs)
+        }
+
+        override suspend fun inProgressLabel(): String {
+           return "Swapping ${fromAsset.symbol} to ${toAsset.symbol} on ${chain.name}"
+        }
+
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             return extrinsicService.submitAndWatchExtrinsic(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
@@ -230,19 +249,22 @@ private class AssetConversionExchange(
                 )
             ) { submissionOrigin ->
                 // Send swapped funds to the requested origin since it the account doing the swap
-                executeSwap(sendTo = submissionOrigin.requestedOrigin)
+                executeSwap(swapLimit = args.actualSwapLimit, sendTo = submissionOrigin.requestedOrigin)
             }.awaitInBlock().map {
-                SwapExecutionCorrection()
+               TODO()
             }
         }
 
-        private suspend fun ExtrinsicBuilder.executeSwap(sendTo: AccountId) {
+        private suspend fun ExtrinsicBuilder.executeSwap(
+            swapLimit: SwapLimit,
+            sendTo: AccountId
+        ) {
             val path = listOf(fromAsset, toAsset)
                 .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset) }
 
             val keepAlive = false
 
-            when (val swapLimit = transactionArgs.swapLimit) {
+            when (swapLimit) {
                 is SwapLimit.SpecifiedIn -> call(
                     moduleName = Modules.ASSET_CONVERSION,
                     callName = "swap_exact_tokens_for_tokens",

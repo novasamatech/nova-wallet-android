@@ -41,7 +41,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
@@ -401,7 +400,6 @@ class SwapMainSettingsViewModel(
             assetOutFlow = assetOutFlow,
             field = Asset::transferableInPlanks,
             feeLoaderMixin = feeMixin,
-            extractTotalFee = SwapFee::totalDeductedPlanks
         )
     }
 

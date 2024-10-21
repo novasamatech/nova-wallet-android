@@ -4,7 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -79,7 +79,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
         val wnd = westmint.wnd()
         val siri = westmint.siri()
 
-        val swapArgs = SwapExecuteArgs(
+        val swapArgs = SwapFeeArgs(
             assetIn = wnd,
             assetOut = siri,
             swapLimit = SwapLimit.SpecifiedIn(
@@ -103,7 +103,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
         val wnd = westmint.wnd()
         val siri = westmint.siri()
 
-        val swapArgs = SwapExecuteArgs(
+        val swapArgs = SwapFeeArgs(
             assetIn = siri,
             assetOut = wnd,
             swapLimit = SwapLimit.SpecifiedIn(

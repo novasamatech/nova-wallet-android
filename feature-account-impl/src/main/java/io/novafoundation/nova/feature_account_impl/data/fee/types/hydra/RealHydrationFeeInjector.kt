@@ -17,11 +17,11 @@ internal class RealHydrationFeeInjector(
         paymentAsset: Chain.Asset,
         mode: HydrationFeeInjector.SetFeesMode
     ) {
-        val baseCall = extrinsicBuilder.getCall()
+        val baseCalls = extrinsicBuilder.getCalls()
         extrinsicBuilder.resetCalls()
 
         val justSetFees = getSetPhase(mode.setMode).setFees(extrinsicBuilder, paymentAsset)
-        extrinsicBuilder.call(baseCall)
+        extrinsicBuilder.calls(baseCalls)
         getResetPhase(mode.resetMode).resetFees(extrinsicBuilder, justSetFees)
     }
 

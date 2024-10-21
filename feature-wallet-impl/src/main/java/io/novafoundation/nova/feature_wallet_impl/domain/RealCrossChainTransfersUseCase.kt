@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -123,7 +124,9 @@ internal class RealCrossChainTransfersUseCase(
         return CrossChainTransferFee(
             fromOriginInFeeCurrency = originFee,
             fromOriginInNativeCurrency = crossChainFee.paidByOriginOrNull()?.let {
-                SubstrateFee(it, originFee.submissionOrigin, transfer.originChain.commissionAsset)
+                // Delivery fees are also paid by an actual account
+                val submissionOrigin = SubmissionOrigin.singleOrigin(originFee.submissionOrigin.actualOrigin)
+                SubstrateFee(it, submissionOrigin, transfer.originChain.commissionAsset)
             },
             fromHoldingRegister = SubstrateFeeBase(
                 amount = crossChainFee.paidFromHoldingRegister,

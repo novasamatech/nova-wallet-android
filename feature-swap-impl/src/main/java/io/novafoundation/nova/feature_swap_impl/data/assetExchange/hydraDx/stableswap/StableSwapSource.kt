@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdC
 import io.novafoundation.nova.feature_swap_core_api.data.network.toChainAssetOrThrow
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxStandaloneSwapBuilder
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
@@ -54,7 +53,7 @@ private class StableSwapSource(
         private val delegate: StableSwapQuotingSource.Edge
     ) : HydraDxSourceEdge, QuotableEdge by delegate {
 
-        override val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder? = null
+        override val standaloneSwap = null
 
         override suspend fun debugLabel(): String {
             val poolAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, delegate.poolId)

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -10,13 +11,18 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxStandaloneSwapBuilder
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.StandaloneHydraSwap
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
+
+private const val AMOUNT_OUT_POSITION = 4
 
 class OmniPoolSwapSourceFactory : HydraDxSwapSource.Factory<OmniPoolQuotingSource> {
 
@@ -48,25 +54,24 @@ private class OmniPoolSwapSource(
 
     private inner class OmniPoolSwapEdge(
         private val delegate: OmniPoolQuotingSource.Edge
-    ) : HydraDxSourceEdge, QuotableEdge by delegate {
+    ) : HydraDxSourceEdge, QuotableEdge by delegate, StandaloneHydraSwap {
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
             return DictEnum.Entry("Omnipool", null)
         }
 
-        override val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder = {
-            executeSwap(it)
-        }
+        override val standaloneSwap = this
 
         override suspend fun debugLabel(): String {
             return "OmniPool"
         }
 
-        private fun ExtrinsicBuilder.executeSwap(args: AtomicSwapOperationArgs) {
+        context(ExtrinsicBuilder)
+        override fun addSwapCall(args: AtomicSwapOperationArgs) {
             val assetIdIn = delegate.fromAsset.first
             val assetIdOut = delegate.toAsset.first
 
-            when (val limit = args.swapLimit) {
+            when (val limit = args.estimatedSwapLimit) {
                 is SwapLimit.SpecifiedIn -> sell(
                     assetIdIn = assetIdIn,
                     assetIdOut = assetIdOut,
@@ -81,6 +86,14 @@ private class OmniPoolSwapSource(
                     maxSellAmount = limit.amountInMax
                 )
             }
+        }
+
+        override fun extractReceivedAmount(events: List<GenericEvent.Instance>): Balance {
+            val swapExecutedEvent = events.findEvent(Modules.OMNIPOOL, "BuyExecuted")
+                ?: events.findEventOrThrow(Modules.OMNIPOOL, "SellExecuted")
+
+            val amountOut = swapExecutedEvent.arguments[AMOUNT_OUT_POSITION]
+            return bindNumber(amountOut)
         }
 
         private fun ExtrinsicBuilder.sell(

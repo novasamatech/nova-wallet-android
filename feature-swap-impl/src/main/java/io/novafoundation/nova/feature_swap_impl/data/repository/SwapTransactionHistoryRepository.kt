@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.data.repository
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal.AssetWithAmount
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.localId
@@ -14,7 +14,7 @@ interface SwapTransactionHistoryRepository {
 
     suspend fun insertPendingSwap(
         chainAsset: Chain.Asset,
-        swapArgs: SwapExecuteArgs,
+        swapArgs: SwapFeeArgs,
         fee: SwapFee,
         txSubmission: ExtrinsicSubmission
     )
@@ -27,7 +27,7 @@ class RealSwapTransactionHistoryRepository(
 
     override suspend fun insertPendingSwap(
         chainAsset: Chain.Asset,
-        swapArgs: SwapExecuteArgs,
+        swapArgs: SwapFeeArgs,
         fee: SwapFee,
         txSubmission: ExtrinsicSubmission
     ) {

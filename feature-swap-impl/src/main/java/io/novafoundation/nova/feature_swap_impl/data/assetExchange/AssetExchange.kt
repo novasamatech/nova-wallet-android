@@ -17,7 +17,7 @@ interface AssetExchange {
 
         suspend fun create(
             chain: Chain,
-            parentQuoter: SwapHost,
+            swapHost: SwapHost,
             coroutineScope: CoroutineScope
         ): AssetExchange?
     }

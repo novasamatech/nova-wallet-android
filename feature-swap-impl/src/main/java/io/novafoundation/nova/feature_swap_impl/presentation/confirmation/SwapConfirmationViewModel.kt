@@ -23,12 +23,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.icon
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
@@ -52,6 +52,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
@@ -69,6 +70,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -160,9 +162,9 @@ class SwapConfirmationViewModel(
 
     private val maxActionProvider = createMaxActionProvider()
 
-    private val _validationProgress = MutableStateFlow(false)
+    private val _submissionInProgress = MutableStateFlow(false)
 
-    val validationProgress = _validationProgress
+    val validationProgress = _submissionInProgress
 
     val swapDetails = confirmationStateFlow.filterNotNull().map {
         formatToSwapDetailsModel(it)
@@ -240,23 +242,26 @@ class SwapConfirmationViewModel(
             assetOutFlow = assetOutFlow,
             field = Asset::transferableInPlanks,
             feeLoaderMixin = feeMixin,
-            extractTotalFee = SwapFee::totalDeductedPlanks
         )
     }
 
     private fun executeSwap() = launch {
-        val quote = confirmationStateFlow.value?.swapQuote ?: return@launch
-        val swapState = initialSwapState.first()
-        val executeArgs = quote.toExecuteArgs(
-            slippage = swapState.slippage,
-            firstSegmentFees = swapState.fee.firstSegmentFee.asset
-        )
+        val fee = feeMixin.awaitDecimalFee().genericFee
+        val quote = confirmationStateFlow.first()?.swapQuote ?: return@launch
 
-        swapInteractor.executeSwap(executeArgs)
-            .onSuccess { navigateToNextScreen(quote.assetIn) }
-            .onFailure(::showError)
+        _submissionInProgress.value = true
 
-        _validationProgress.value = false
+        swapInteractor.executeSwap(fee)
+            .onEach { progressResult ->
+                when(progressResult) {
+                    SwapProgress.Done -> navigateToNextScreen(quote.assetOut)
+                    is SwapProgress.Failure -> showError(progressResult.error)
+                    is SwapProgress.StepStarted -> showMessage(progressResult.step)
+                }
+            }
+            .onCompletion {
+                _submissionInProgress.value = false
+            }.launchIn(viewModelScope)
     }
 
     private fun navigateToNextScreen(asset: Chain.Asset) {
@@ -353,6 +358,9 @@ class SwapConfirmationViewModel(
     }
 
     private fun runQuoting(newSwapQuoteArgs: SwapQuoteArgs) {
+        // TODO
+        return
+
         launch {
             val confirmationState = confirmationStateFlow.value ?: return@launch
             val swapQuote = swapInteractor.quote(newSwapQuoteArgs, viewModelScope)
@@ -361,7 +369,7 @@ class SwapConfirmationViewModel(
 
             val executeArgs = swapQuote.toExecuteArgs(
                 slippage = slippageFlow.first(),
-                firstSegmentFees = initialSwapState.first().fee.firstSegmentFee.asset
+                firstSegmentFees = initialSwapState.first().fee.intermediateSegmentFeesInAssetIn.asset
             )
 
             feeMixin.loadFeeV2Generic(

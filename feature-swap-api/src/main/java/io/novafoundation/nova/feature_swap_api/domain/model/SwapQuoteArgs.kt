@@ -17,7 +17,8 @@ data class SwapQuoteArgs(
     val swapDirection: SwapDirection,
 )
 
-class SwapExecuteArgs(
+open class SwapFeeArgs(
+    val assetIn: Chain.Asset,
     val slippage: Percent,
     val executionPath: Path<SegmentExecuteArgs>,
     val direction: SwapDirection,
@@ -30,21 +31,71 @@ class SegmentExecuteArgs(
 
 sealed class SwapLimit {
 
-    class SpecifiedIn(
+    data class SpecifiedIn(
         val amountIn: Balance,
         val amountOutQuote: Balance,
         val amountOutMin: Balance
     ) : SwapLimit()
 
-    class SpecifiedOut(
+    data class SpecifiedOut(
         val amountOut: Balance,
         val amountInQuote: Balance,
         val amountInMax: Balance
     ) : SwapLimit()
 }
 
-fun SwapQuote.toExecuteArgs(slippage: Percent, firstSegmentFees: Chain.Asset): SwapExecuteArgs {
-    return SwapExecuteArgs(
+/**
+ * Adjusts SwapLimit to the [newAmountIn] based on the quoted swap rate
+ * This is only suitable for small changes amount in, as it implicitly assumes the swap rate stays the same
+ */
+fun SwapLimit.replaceAmountIn(newAmountIn: Balance): SwapLimit {
+    return when(this) {
+        is SwapLimit.SpecifiedIn -> updateInAmount(newAmountIn)
+        is SwapLimit.SpecifiedOut -> updateInAmount(newAmountIn)
+    }
+}
+
+private fun SwapLimit.SpecifiedIn.replaceInMultiplier(amount: Balance): BigDecimal {
+    val amountDecimal = amount.toBigDecimal()
+    val amountInDecimal = amountIn.toBigDecimal()
+
+    return amountDecimal / amountInDecimal
+}
+
+private fun SwapLimit.SpecifiedIn.replacingInAmount(newInAmount: Balance, replacingAmount: Balance): Balance {
+    return (replaceInMultiplier(replacingAmount) * newInAmount.toBigDecimal()).toBigInteger()
+}
+
+private fun SwapLimit.SpecifiedIn.updateInAmount(newAmountIn: Balance): SwapLimit.SpecifiedIn {
+    return SwapLimit.SpecifiedIn(
+        amountIn = newAmountIn,
+        amountOutQuote = replacingInAmount(newAmountIn, replacingAmount = amountOutQuote),
+        amountOutMin = replacingInAmount(newAmountIn, replacingAmount = amountOutMin)
+    )
+}
+
+private fun SwapLimit.SpecifiedOut.replaceInQuoteMultiplier(amount: Balance): BigDecimal {
+    val amountDecimal = amount.toBigDecimal()
+    val amountInQuoteDecimal = amountInQuote.toBigDecimal()
+
+    return amountDecimal / amountInQuoteDecimal
+}
+
+private fun SwapLimit.SpecifiedOut.replacedInQuoteAmount(newInQuoteAmount: Balance, replacingAmount: Balance): Balance {
+    return (replaceInQuoteMultiplier(replacingAmount) * newInQuoteAmount.toBigDecimal()).toBigInteger()
+}
+
+private fun SwapLimit.SpecifiedOut.updateInAmount(newAmountInQuote: Balance): SwapLimit.SpecifiedOut {
+    return SwapLimit.SpecifiedOut(
+        amountOut = replacedInQuoteAmount(newAmountInQuote, amountOut),
+        amountInQuote = newAmountInQuote,
+        amountInMax = replacedInQuoteAmount(newAmountInQuote, amountInMax)
+    )
+}
+
+fun SwapQuote.toExecuteArgs(slippage: Percent, firstSegmentFees: Chain.Asset): SwapFeeArgs {
+    return SwapFeeArgs(
+        assetIn = amountIn.chainAsset,
         slippage = slippage,
         direction = quotedPath.direction,
         executionPath = quotedPath.path.map { quotedSwapEdge -> SegmentExecuteArgs(quotedSwapEdge) },

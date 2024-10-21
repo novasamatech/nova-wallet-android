@@ -5,12 +5,20 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 
-typealias HydraDxStandaloneSwapBuilder = ExtrinsicBuilder.(args: AtomicSwapOperationArgs) -> Unit
+interface StandaloneHydraSwap {
+
+    context(ExtrinsicBuilder)
+    fun addSwapCall(args: AtomicSwapOperationArgs)
+
+    fun extractReceivedAmount(events: List<GenericEvent.Instance>): Balance
+}
 
 interface HydraDxSourceEdge : QuotableEdge {
 
@@ -19,7 +27,7 @@ interface HydraDxSourceEdge : QuotableEdge {
     /**
      * Whether hydra swap source is able to perform optimized standalone swap without using Router
      */
-    val standaloneSwapBuilder: HydraDxStandaloneSwapBuilder?
+    val standaloneSwap: StandaloneHydraSwap?
 
     suspend fun debugLabel(): String
 }

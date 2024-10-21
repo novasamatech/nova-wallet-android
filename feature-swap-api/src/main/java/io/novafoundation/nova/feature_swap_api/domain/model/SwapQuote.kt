@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
@@ -58,17 +56,7 @@ infix fun ChainAssetWithAmount.rateAgainst(assetOut: ChainAssetWithAmount): BigD
     return amountOut / amountIn
 }
 
-class SwapFee(
-    val atomicOperationFees: List<AtomicSwapOperationFee>
-) : GenericFee {
 
-    val firstSegmentFee: Fee
-        get() = atomicOperationFees.first().submissionFee
-
-    // TODO handle multi-segment fee display
-    override val networkFee: Fee
-        get() = firstSegmentFee
-}
 
 val SwapFee.totalDeductedPlanks: Balance
     get() = networkFee.amountByRequestedAccount

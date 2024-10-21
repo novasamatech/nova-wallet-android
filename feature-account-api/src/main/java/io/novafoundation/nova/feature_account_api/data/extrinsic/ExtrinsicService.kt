@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_api.data.extrinsic
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -10,10 +11,8 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -21,25 +20,6 @@ typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: Submission
 
 typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: SubmissionOrigin) -> Unit
 typealias FormMultiExtrinsic = suspend CallBuilder.() -> Unit
-
-class SubmissionOrigin(
-    /**
-     * Origin that was originally requested to sign the transaction
-     */
-    val requestedOrigin: AccountId,
-
-    /**
-     * Origin that was actually used to sign the transaction.
-     * It might differ from [requestedOrigin] if [Signer] modified the origin, for example in the case of Proxied wallet
-     */
-    val actualOrigin: AccountId
-) {
-
-    companion object {
-
-        fun singleOrigin(origin: AccountId) = SubmissionOrigin(origin, origin)
-    }
-}
 
 class ExtrinsicSubmission(val hash: String, val submissionOrigin: SubmissionOrigin)
 
@@ -78,6 +58,13 @@ interface ExtrinsicService {
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<Flow<ExtrinsicStatus>>
+
+    suspend fun submitExtrinsicAndAwaitExecution(
+        chain: Chain,
+        origin: TransactionOrigin,
+        submissionOptions: SubmissionOptions = SubmissionOptions(),
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): Result<ExtrinsicExecutionResult>
 
     suspend fun submitMultiExtrinsicAwaitingInclusion(
         chain: Chain,

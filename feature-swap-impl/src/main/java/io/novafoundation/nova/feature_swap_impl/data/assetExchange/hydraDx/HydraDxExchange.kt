@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.common.utils.forEachAsync
@@ -9,7 +10,7 @@ import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -47,15 +49,19 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.refer
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -80,7 +86,7 @@ class HydraDxExchangeFactory(
     private val hydrationFeeInjector: HydrationFeeInjector
 ) : AssetExchange.SingleChainFactory {
 
-    override suspend fun create(chain: Chain, parentQuoter: AssetExchange.SwapHost, coroutineScope: CoroutineScope): AssetExchange {
+    override suspend fun create(chain: Chain, swapHost: AssetExchange.SwapHost, coroutineScope: CoroutineScope): AssetExchange {
         return HydraDxExchange(
             remoteStorageSource = remoteStorageSource,
             chain = chain,
@@ -89,12 +95,14 @@ class HydraDxExchangeFactory(
             hydraDxNovaReferral = hydraDxNovaReferral,
             swapSourceFactories = swapSourceFactories,
             assetSourceRegistry = assetSourceRegistry,
-            swapHost = parentQuoter,
+            swapHost = swapHost,
             hydrationFeeInjector = hydrationFeeInjector,
             delegate = quotingFactory.create(chain),
         )
     }
 }
+
+private const val ROUTE_EXECUTED_AMOUNT_OUT_IDX = 3
 
 private class HydraDxExchange(
     private val delegate: HydraDxQuoting,
@@ -238,11 +246,13 @@ private class HydraDxExchange(
         val feePaymentCurrency: FeePaymentCurrency,
     ) : AtomicSwapOperation {
 
+        override val estimatedSwapLimit: SwapLimit = aggregatedSwapLimit()
+
         constructor(sourceEdge: HydraDxSourceEdge, args: AtomicSwapOperationArgs)
-            : this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.swapLimit)), args.feePaymentCurrency)
+            : this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency)
 
         fun appendSegment(nextEdge: HydraDxSourceEdge, nextSwapArgs: AtomicSwapOperationArgs): HydraDxOperation {
-            val nextSegment = HydraDxSwapTransactionSegment(nextEdge, nextSwapArgs.swapLimit)
+            val nextSegment = HydraDxSwapTransactionSegment(nextEdge, nextSwapArgs.estimatedSwapLimit)
 
             // Ignore nextSwapArgs.feePaymentCurrency - we are using configuration from the very first segment
             return HydraDxOperation(segments + nextSegment, feePaymentCurrency)
@@ -257,14 +267,41 @@ private class HydraDxExchange(
                     feePaymentCurrency = feePaymentCurrency
                 )
             ) {
-                executeSwap()
+                executeSwap(estimatedSwapLimit)
             }
 
             return AtomicSwapOperationFee(submissionFee)
         }
 
-        override suspend fun submit(previousStepCorrection: SwapExecutionCorrection?): Result<SwapExecutionCorrection> {
-            return swapHost.extrinsicService().submitAndWatchExtrinsic(
+        override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {
+            val assetInId = segments.first().edge.from.assetId
+            val assetIn = chain.assetsById.getValue(assetInId)
+
+            val assetOutId = segments.last().edge.to.assetId
+            val assetOut = chain.assetsById.getValue(assetOutId)
+
+            val quoteArgs = ParentQuoterArgs(
+                chainAssetIn = assetIn,
+                chainAssetOut = assetOut,
+                amount = extraOutAmount,
+                swapDirection = SwapDirection.SPECIFIED_OUT
+            )
+
+            return swapHost.quote(quoteArgs)
+        }
+
+        override suspend fun inProgressLabel(): String {
+            val assetInId = segments.first().edge.from.assetId
+            val assetIn = chain.assetsById.getValue(assetInId)
+
+            val assetOutId = segments.last().edge.to.assetId
+            val assetOut = chain.assetsById.getValue(assetOutId)
+
+            return "Swapping ${assetIn.symbol} to ${assetOut.symbol} on ${chain.name}"
+        }
+
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
+            return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
@@ -272,64 +309,80 @@ private class HydraDxExchange(
                     feePaymentCurrency = feePaymentCurrency
                 )
             ) {
-                executeSwap()
-            }.awaitInBlock().map {
-                SwapExecutionCorrection()
+                executeSwap(args.actualSwapLimit)
+            }.requireOk().mapCatching { (events) ->
+                SwapExecutionCorrection(
+                    actualReceivedAmount = events.determineActualSwappedAmount()
+                )
             }
         }
 
-        private suspend fun ExtrinsicBuilder.executeSwap() {
+        private fun List<GenericEvent.Instance>.determineActualSwappedAmount(): Balance {
+            val standaloneHydraSwap = getStandaloneSwap()
+            if (standaloneHydraSwap != null) {
+                return standaloneHydraSwap.extractReceivedAmount(this)
+            }
+
+            val swapExecutedEvent = findEvent(Modules.ROUTER, "RouteExecuted")
+                ?: findEventOrThrow(Modules.ROUTER, "Executed")
+
+            val amountOut = swapExecutedEvent.arguments[ROUTE_EXECUTED_AMOUNT_OUT_IDX]
+            return bindNumber(amountOut)
+        }
+
+        private suspend fun ExtrinsicBuilder.executeSwap(actualSwapLimit: SwapLimit) {
             maybeSetReferral()
 
-            addSwapCall()
+            addSwapCall(actualSwapLimit)
         }
 
-        private suspend fun ExtrinsicBuilder.addSwapCall() {
-            val optimizationSucceeded = tryOptimizedSwap()
+        private suspend fun ExtrinsicBuilder.addSwapCall(actualSwapLimit: SwapLimit) {
+            val optimizationSucceeded = tryOptimizedSwap(actualSwapLimit)
 
             if (!optimizationSucceeded) {
-                executeRouterSwap()
+                executeRouterSwap(actualSwapLimit)
             }
         }
 
-        private fun ExtrinsicBuilder.tryOptimizedSwap(): Boolean {
-            if (segments.size != 1) return false
+        private fun ExtrinsicBuilder.tryOptimizedSwap(actualSwapLimit: SwapLimit): Boolean {
+            val standaloneSwap = getStandaloneSwap() ?: return false
 
-            val onlySegment = segments.single()
-            val standaloneSwapBuilder = onlySegment.edge.standaloneSwapBuilder ?: return false
-
-            val args = AtomicSwapOperationArgs(onlySegment.swapLimit, feePaymentCurrency)
-            standaloneSwapBuilder(args)
+            val args = AtomicSwapOperationArgs(actualSwapLimit, feePaymentCurrency)
+            standaloneSwap.addSwapCall(args)
 
             return true
         }
 
-        private suspend fun ExtrinsicBuilder.executeRouterSwap() {
+        private fun getStandaloneSwap(): StandaloneHydraSwap? {
+            if (segments.size != 1) return null
+
+            val onlySegment = segments.single()
+            return onlySegment.edge.standaloneSwap
+        }
+
+        private suspend fun ExtrinsicBuilder.executeRouterSwap(actualSwapLimit: SwapLimit) {
             val firstSegment = segments.first()
             val lastSegment = segments.last()
 
-            when (val firstLimit = firstSegment.swapLimit) {
+            when (actualSwapLimit) {
                 is SwapLimit.SpecifiedIn -> executeRouterSell(
                     firstEdge = firstSegment.edge,
-                    firstLimit = firstLimit,
                     lastEdge = lastSegment.edge,
-                    lastLimit = lastSegment.swapLimit as SwapLimit.SpecifiedIn
+                    limit = actualSwapLimit,
                 )
 
                 is SwapLimit.SpecifiedOut -> executeRouterBuy(
                     firstEdge = firstSegment.edge,
-                    firstLimit = firstLimit,
                     lastEdge = lastSegment.edge,
-                    lastLimit = lastSegment.swapLimit as SwapLimit.SpecifiedOut
+                    limit = actualSwapLimit,
                 )
             }
         }
 
         private suspend fun ExtrinsicBuilder.executeRouterBuy(
             firstEdge: HydraDxSourceEdge,
-            firstLimit: SwapLimit.SpecifiedOut,
             lastEdge: HydraDxSourceEdge,
-            lastLimit: SwapLimit.SpecifiedOut
+            limit: SwapLimit.SpecifiedOut,
         ) {
             call(
                 moduleName = Modules.ROUTER,
@@ -337,8 +390,8 @@ private class HydraDxExchange(
                 arguments = mapOf(
                     "asset_in" to hydraDxAssetIdConverter.toOnChainIdOrThrow(firstEdge.from),
                     "asset_out" to hydraDxAssetIdConverter.toOnChainIdOrThrow(lastEdge.to),
-                    "amount_out" to lastLimit.amountOut,
-                    "max_amount_in" to firstLimit.amountInMax,
+                    "amount_out" to limit.amountOut,
+                    "max_amount_in" to limit.amountInMax,
                     "route" to routerTradePath()
                 )
             )
@@ -346,9 +399,8 @@ private class HydraDxExchange(
 
         private suspend fun ExtrinsicBuilder.executeRouterSell(
             firstEdge: HydraDxSourceEdge,
-            firstLimit: SwapLimit.SpecifiedIn,
             lastEdge: HydraDxSourceEdge,
-            lastLimit: SwapLimit.SpecifiedIn
+            limit: SwapLimit.SpecifiedIn,
         ) {
             call(
                 moduleName = Modules.ROUTER,
@@ -356,8 +408,8 @@ private class HydraDxExchange(
                 arguments = mapOf(
                     "asset_in" to hydraDxAssetIdConverter.toOnChainIdOrThrow(firstEdge.from),
                     "asset_out" to hydraDxAssetIdConverter.toOnChainIdOrThrow(lastEdge.to),
-                    "amount_in" to firstLimit.amountIn,
-                    "min_amount_out" to lastLimit.amountOutMin,
+                    "amount_in" to limit.amountIn,
+                    "min_amount_out" to limit.amountOutMin,
                     "route" to routerTradePath()
                 )
             )
@@ -391,6 +443,33 @@ private class HydraDxExchange(
                     "code" to referralCode.encodeToByteArray()
                 )
             )
+        }
+
+        private fun aggregatedSwapLimit(): SwapLimit {
+            val firstSegment = segments.first()
+            val lastSegment = segments.last()
+
+            return when (val firstLimit = firstSegment.swapLimit) {
+                is SwapLimit.SpecifiedIn -> {
+                    val lastLimit = lastSegment.swapLimit as SwapLimit.SpecifiedIn
+
+                    SwapLimit.SpecifiedIn(
+                        amountIn = firstLimit.amountIn,
+                        amountOutQuote = lastLimit.amountOutQuote,
+                        amountOutMin = lastLimit.amountOutMin
+                    )
+                }
+
+                is SwapLimit.SpecifiedOut -> {
+                    val lastLimit = lastSegment.swapLimit as SwapLimit.SpecifiedOut
+
+                    SwapLimit.SpecifiedOut(
+                        amountOut = lastLimit.amountOut,
+                        amountInQuote = firstLimit.amountInQuote,
+                        amountInMax = firstLimit.amountInMax
+                    )
+                }
+            }
         }
     }
 
@@ -450,7 +529,7 @@ private class HydraDxExchange(
         }
     }
 
-    private inner class HydrationFastLookupFeeCapability: FastLookupCustomFeeCapability {
+    private inner class HydrationFastLookupFeeCapability : FastLookupCustomFeeCapability {
 
         private var acceptedCurrenciesCache: Set<HydraDxAssetId>? = null
 

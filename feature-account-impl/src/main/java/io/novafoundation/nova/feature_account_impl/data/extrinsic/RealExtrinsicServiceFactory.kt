@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 
 class RealExtrinsicServiceFactory(
@@ -16,6 +17,7 @@ class RealExtrinsicServiceFactory(
     private val extrinsicBuilderFactory: ExtrinsicBuilderFactory,
     private val signerProvider: SignerProvider,
     private val extrinsicSplitter: ExtrinsicSplitter,
+    private val eventsRepository: EventsRepository,
     private val feePaymentProviderRegistry: FeePaymentProviderRegistry
 ) : ExtrinsicService.Factory {
 
@@ -29,6 +31,7 @@ class RealExtrinsicServiceFactory(
             signerProvider = signerProvider,
             extrinsicSplitter = extrinsicSplitter,
             feePaymentProviderRegistry = registry,
+            eventsRepository = eventsRepository,
             coroutineScope = feeConfig.coroutineScope
         )
     }

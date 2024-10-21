@@ -57,6 +57,7 @@ import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
@@ -189,4 +190,6 @@ interface AccountFeatureDependencies {
     val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
     val storageCache: StorageCache
+
+    val eventsRepository: EventsRepository
 }

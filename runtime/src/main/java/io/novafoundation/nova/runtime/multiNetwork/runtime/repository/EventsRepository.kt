@@ -12,6 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
@@ -31,6 +32,18 @@ interface EventsRepository {
      * Unparsed events & extrinsics are not included
      */
     suspend fun getExtrinsicsWithEvents(chainId: ChainId, blockHash: BlockHash? = null): List<ExtrinsicWithEvents>
+
+    suspend fun getExtrinsicWithEvents(chainId: ChainId, extrinsicHash: String, blockHash: BlockHash? = null): ExtrinsicWithEvents?
+}
+
+suspend fun EventsRepository.getExtrinsicWithEvents(
+    chainId: ChainId,
+    extrinsicHash: String,
+    blockHash: BlockHash
+): ExtrinsicWithEvents? {
+    val allExtrinsics = getExtrinsicsWithEvents(chainId, blockHash)
+
+    return allExtrinsics.find { it.extrinsicHash == extrinsicHash }
 }
 
 class RemoteEventsRepository(
@@ -81,5 +94,43 @@ class RemoteEventsRepository(
                 )
             }
         }.filterNotNull()
+    }
+
+    override suspend fun getExtrinsicWithEvents(
+        chainId: ChainId,
+        extrinsicHash: String,
+        blockHash: BlockHash?
+    ): ExtrinsicWithEvents? {
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        val block = rpcCalls.getBlock(chainId, blockHash)
+        val events = getEventsInBlock(chainId, blockHash)
+
+        return block.block.extrinsics.withIndex().tryFindNonNull { (index, extrinsicScale) ->
+            val hash = extrinsicScale.extrinsicHash()
+            if (hash != extrinsicHash) return@tryFindNonNull null
+
+            val extrinsic = Extrinsic.fromHexOrNull(runtime, extrinsicScale) ?: return@tryFindNonNull null
+
+            val extrinsicEvents = events.findByExtrinsicIndex(index)
+
+            ExtrinsicWithEvents(
+                extrinsicHash = hash,
+                extrinsic = extrinsic,
+                events = extrinsicEvents
+            )
+        }
+    }
+
+    private fun List<EventRecord>.findByExtrinsicIndex(index: Int): List<GenericEvent.Instance> {
+        return mapNotNull { eventRecord ->
+            val phase = eventRecord.phase
+            if (phase !is Phase.ApplyExtrinsic) return@mapNotNull null
+
+            val extrinsicIndex = phase.extrinsicId.toInt()
+            if (extrinsicIndex != index) return@mapNotNull null
+
+            eventRecord.event
+        }
     }
 }
