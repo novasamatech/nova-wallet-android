@@ -36,14 +36,18 @@ interface EventsRepository {
     suspend fun getExtrinsicWithEvents(chainId: ChainId, extrinsicHash: String, blockHash: BlockHash? = null): ExtrinsicWithEvents?
 }
 
-suspend fun EventsRepository.getExtrinsicWithEvents(
-    chainId: ChainId,
-    extrinsicHash: String,
-    blockHash: BlockHash
-): ExtrinsicWithEvents? {
-    val allExtrinsics = getExtrinsicsWithEvents(chainId, blockHash)
+class InherentEvents(
+    val initialization: List<GenericEvent.Instance>,
+    val finalization: List<GenericEvent.Instance>
+)
 
-    return allExtrinsics.find { it.extrinsicHash == extrinsicHash }
+suspend fun EventsRepository.getInherentEvents(chainId: ChainId, at: BlockHash) : InherentEvents {
+    val allEvents = getEventsInBlock(chainId, at)
+
+    return InherentEvents(
+        initialization = allEvents.mapNotNull { record -> record.event.takeIf { record.phase is Phase.Initialization } },
+        finalization = allEvents.mapNotNull { record -> record.event.takeIf { record.phase is Phase.Finalization } },
+    )
 }
 
 class RemoteEventsRepository(

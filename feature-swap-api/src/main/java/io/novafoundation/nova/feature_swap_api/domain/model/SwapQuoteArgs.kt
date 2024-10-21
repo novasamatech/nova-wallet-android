@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.common.utils.fraction
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
@@ -56,10 +57,7 @@ fun SwapLimit.replaceAmountIn(newAmountIn: Balance): SwapLimit {
 }
 
 private fun SwapLimit.SpecifiedIn.replaceInMultiplier(amount: Balance): BigDecimal {
-    val amountDecimal = amount.toBigDecimal()
-    val amountInDecimal = amountIn.toBigDecimal()
-
-    return amountDecimal / amountInDecimal
+    return amount.divideToDecimal(amountIn)
 }
 
 private fun SwapLimit.SpecifiedIn.replacingInAmount(newInAmount: Balance, replacingAmount: Balance): Balance {
@@ -75,10 +73,7 @@ private fun SwapLimit.SpecifiedIn.updateInAmount(newAmountIn: Balance): SwapLimi
 }
 
 private fun SwapLimit.SpecifiedOut.replaceInQuoteMultiplier(amount: Balance): BigDecimal {
-    val amountDecimal = amount.toBigDecimal()
-    val amountInQuoteDecimal = amountInQuote.toBigDecimal()
-
-    return amountDecimal / amountInQuoteDecimal
+    return amount.divideToDecimal(amountInQuote)
 }
 
 private fun SwapLimit.SpecifiedOut.replacedInQuoteAmount(newInQuoteAmount: Balance, replacingAmount: Balance): Balance {

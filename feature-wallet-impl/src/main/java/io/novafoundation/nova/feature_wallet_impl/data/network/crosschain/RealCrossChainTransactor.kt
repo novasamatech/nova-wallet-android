@@ -1,15 +1,23 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.utils.transformResult
+import io.novafoundation.nova.common.utils.wrapInResult
 import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.tryDetectDeposit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -34,8 +42,20 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.valida
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.getInherentEvents
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.hasEvent
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withTimeout
 import java.math.BigInteger
+import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration.Companion.seconds
 
 class RealCrossChainTransactor(
     private val weigher: CrossChainWeigher,
@@ -43,6 +63,7 @@ class RealCrossChainTransactor(
     private val phishingValidationFactory: PhishingValidationFactory,
     private val palletXcmRepository: PalletXcmRepository,
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+    private val eventsRepository: EventsRepository
 ) : CrossChainTransactor {
 
     override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
@@ -97,6 +118,100 @@ class RealCrossChainTransactor(
         ) {
             crossChainTransfer(configuration, transfer, crossChainFee)
         }
+    }
+
+    context(ExtrinsicService)
+    override suspend fun performAndTrackTransfer(
+        configuration: CrossChainTransferConfiguration,
+        transfer: AssetTransferBase,
+    ): Result<Balance> {
+        // Start balances updates eagerly to not to miss events in case tx has been included to block right after submission
+        val balancesUpdates = observeTransferableBalance(transfer)
+            .wrapInResult()
+            .shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly, replay = 100)
+
+        Log.d("CrossChain", "Starting cross-chain transfer")
+
+        return performTransferOfExactAmount(configuration, transfer)
+            .requireOk()
+            .flatMap {
+                Log.d("CrossChain", "Cross chain transfer for successfully executed on origin, waiting for destination")
+
+                balancesUpdates.awaitCrossChainArrival(transfer)
+            }
+    }
+
+    private suspend fun Flow<Result<TransferableBalanceUpdate>>.awaitCrossChainArrival(transfer: AssetTransferBase): Result<Balance> {
+        return runCatching {
+            withTimeout(30.seconds) {
+                transformResult { balanceUpdate ->
+                    Log.d("CrossChain", "Destination balance update detected: $balanceUpdate")
+
+                    val updatedAt = balanceUpdate.updatedAt
+
+                    if (updatedAt == null) {
+                        Log.w("CrossChain", "Update block hash was not present, maybe wrong datasource is used?")
+                        return@transformResult
+                    }
+
+                    val inherentEvents = eventsRepository.getInherentEvents(transfer.destinationChain.id, updatedAt)
+
+                    val xcmArrivedDeposit = searchForXcmArrival(inherentEvents.initialization, transfer)
+                        ?: searchForXcmArrival(inherentEvents.finalization, transfer)
+
+                    if (xcmArrivedDeposit != null) {
+                        Log.d("CrossChain", "Found destination xcm arrival event, amount is $xcmArrivedDeposit")
+
+                        emit(xcmArrivedDeposit)
+                    } else {
+                        Log.d("CrossChain", "No destination xcm arrival event found for the received balance update")
+                    }
+                }
+                    .first()
+                    .getOrThrow()
+            }
+        }
+    }
+
+    private suspend fun searchForXcmArrival(
+        events: List<GenericEvent.Instance>,
+        transfer: AssetTransferBase
+    ): Balance? {
+        if (!events.hasEvent("MessageQueue", "Processed")) return null
+
+        val eventDetector = assetSourceRegistry.getEventDetector(transfer.destinationChainAsset)
+
+        val depositEvent = events.mapNotNull { event -> eventDetector.tryDetectDeposit(event) }
+            .find { it.destination.contentEquals(transfer.recipientAccountId) }
+
+        return depositEvent?.amount
+    }
+
+    private suspend fun ExtrinsicService.performTransferOfExactAmount(
+        configuration: CrossChainTransferConfiguration,
+        transfer: AssetTransferBase,
+    ): Result<ExtrinsicExecutionResult> {
+        return submitExtrinsicAndAwaitExecution(
+            chain = transfer.originChain,
+            origin = TransactionOrigin.SelectedWallet,
+            submissionOptions = ExtrinsicService.SubmissionOptions(
+                feePaymentCurrency = transfer.feePaymentCurrency
+            )
+        ) {
+            // We are transferring the exact amount, so we should nothing on top of the transfer amount
+            crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
+        }
+    }
+
+    private suspend fun observeTransferableBalance(transfer: AssetTransferBase): Flow<TransferableBalanceUpdate> {
+        val destinationAssetBalances = assetSourceRegistry.sourceFor(transfer.destinationChainAsset)
+
+        return destinationAssetBalances.balance.subscribeTransferableAccountBalance(
+            chain = transfer.destinationChain,
+            chainAsset = transfer.destinationChainAsset,
+            accountId = transfer.recipientAccountId,
+            sharedSubscriptionBuilder = null
+        )
     }
 
     private suspend fun ExtrinsicBuilder.crossChainTransfer(

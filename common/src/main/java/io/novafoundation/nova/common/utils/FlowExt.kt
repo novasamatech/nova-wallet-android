@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
 import io.novafoundation.nova.common.view.InsertableInputField
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,12 +45,12 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.time.Duration
 
 inline fun <T> Flow<List<T>>.filterList(crossinline handler: suspend (T) -> Boolean) = map { list ->
@@ -230,6 +231,37 @@ fun <T, R> Flow<T>.withLoadingSingle(sourceSupplier: suspend (T) -> R): Flow<Loa
         val newSource = LoadingState.Loaded(sourceSupplier(item))
 
         emit(newSource)
+    }
+}
+
+fun <T> Flow<T>.wrapInResult(): Flow<Result<T>> {
+    return map { Result.success(it) }
+        .catch { emit(Result.failure(it)) }
+}
+
+@Suppress("UNCHECKED_CAST")
+@OptIn(ExperimentalTypeInference::class)
+inline fun <reified T, reified R> Flow<Result<T>>.transformResult(
+    @BuilderInference crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit
+): Flow<Result<R>> {
+    return transform { upstream ->
+        upstream.onFailure {
+            emit(upstream as Result<R>)
+        }.onSuccess {
+            val innerCollector = FlowCollector<R> {
+                emit(Result.success(it))
+            }
+
+            runCatching {
+                transform(innerCollector, it)
+            }.onFailure {
+                if (it is CancellationException) {
+                    throw it
+                }
+
+                emit(Result.failure(it))
+            }
+        }
     }
 }
 

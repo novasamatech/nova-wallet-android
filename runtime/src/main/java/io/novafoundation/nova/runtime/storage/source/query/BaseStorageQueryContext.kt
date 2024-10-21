@@ -43,7 +43,7 @@ abstract class BaseStorageQueryContext(
 
     protected abstract suspend fun queryKey(key: String, at: BlockHash?): String?
 
-    protected abstract fun observeKey(key: String): Flow<String?>
+    protected abstract fun observeKey(key: String): Flow<StorageUpdate>
 
     protected abstract suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>>
 
@@ -156,8 +156,8 @@ abstract class BaseStorageQueryContext(
     ): Flow<V> {
         val storageKey = storageKeyWith(keyArguments)
 
-        return observeKey(storageKey).map { scale ->
-            decodeStorageValue(scale, binding)
+        return observeKey(storageKey).map { storageUpdate ->
+            decodeStorageValue(storageUpdate.value, binding)
         }
     }
 
@@ -167,13 +167,14 @@ abstract class BaseStorageQueryContext(
     ): Flow<WithRawValue<V>> {
         val storageKey = storageKeyWith(keyArguments)
 
-        return observeKey(storageKey).map { scale ->
-            val decoded = decodeStorageValue(scale, binding)
+        return observeKey(storageKey).map { storageUpdate ->
+            val decoded = decodeStorageValue(storageUpdate.value, binding)
 
             WithRawValue(
-                raw = StorageEntryValue(storageKey, scale),
+                raw = StorageEntryValue(storageKey, storageUpdate.value),
                 chainId = chainId,
-                value = decoded
+                value = decoded,
+                at = storageUpdate.at,
             )
         }
     }
@@ -263,6 +264,13 @@ abstract class BaseStorageQueryContext(
         }
     }
 
+
+    protected class StorageUpdate(
+        val value: String?,
+        // Might be null in case the source does not support identifying the block at which value was changed
+        val at: BlockHash?
+    )
+
     private fun StorageEntry.takeDefaultIfAllowed(): Any? {
         if (!applyStorageDefault) return null
 
@@ -271,6 +279,7 @@ abstract class BaseStorageQueryContext(
 
     @JvmInline
     private value class MultiQueryResult(val delegate: Map<MultiQueryBuilder.Descriptor<*, *>, Map<Any?, Any?>>) : MultiQueryBuilder.Result {
+
         @Suppress("UNCHECKED_CAST")
         override fun <K, V> get(descriptor: MultiQueryBuilder.Descriptor<K, V>): Map<K, V> {
             return delegate.getValue(descriptor) as Map<K, V>

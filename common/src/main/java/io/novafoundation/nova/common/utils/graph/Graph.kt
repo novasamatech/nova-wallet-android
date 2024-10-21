@@ -52,7 +52,10 @@ suspend fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDestinations(
 ): Set<N> {
     val actualNodeListFilter = nodeVisitFilter ?: EdgeVisitFilter { _, _ -> true }
 
-    return reachabilityDfs(origin, adjacencyList, actualNodeListFilter, predecessor = null).toSet()
+    val reachableNodes = reachabilityDfs(origin, adjacencyList, actualNodeListFilter, predecessor = null)
+    reachableNodes.removeAt(reachableNodes.indexOf(origin))
+
+    return reachableNodes.toSet()
 }
 
 fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
@@ -130,7 +133,7 @@ private suspend fun <N, E : Edge<N>> reachabilityDfs(
     predecessor: E?,
     visited: MutableSet<N> = mutableSetOf(),
     connectedComponentState: MutableList<N> = mutableListOf()
-): List<N> {
+): MutableList<N> {
     visited.add(node)
     connectedComponentState.add(node)
 

@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginDecimalFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -19,6 +20,9 @@ import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
 
 interface AssetTransferBase {
+
+    val recipientAccountId: AccountId
+        get() = destinationChain.accountIdOf(recipient)
 
     val recipient: String
 

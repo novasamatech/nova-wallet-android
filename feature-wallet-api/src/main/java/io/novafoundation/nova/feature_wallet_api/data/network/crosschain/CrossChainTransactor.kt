@@ -22,4 +22,13 @@ interface CrossChainTransactor {
         transfer: AssetTransferBase,
         crossChainFee: Balance
     ): Result<ExtrinsicSubmission>
+
+    /**
+     * @return result of actual received balance on destination
+     */
+    context(ExtrinsicService)
+    suspend fun performAndTrackTransfer(
+        configuration: CrossChainTransferConfiguration,
+        transfer: AssetTransferBase,
+    ): Result<Balance>
 }

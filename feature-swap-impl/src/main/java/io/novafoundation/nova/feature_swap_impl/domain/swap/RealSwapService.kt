@@ -44,6 +44,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.amountToLeaveOnOriginToPayTxFees
 import io.novafoundation.nova.feature_swap_api.domain.model.replaceAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.totalFeeEnsuringSubmissionAsset
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
@@ -140,7 +141,7 @@ internal class RealSwapService(
     ): Flow<Set<FullChainAssetId>> {
         return directionsGraph(computationScope).map {
             val filter = canPayFeeNodeFilter(computationScope)
-            it.findAllPossibleDestinations(asset.fullId, filter)
+            it.findAllPossibleDestinations(asset.fullId, filter) - asset.fullId
         }
     }
 
@@ -177,12 +178,12 @@ internal class RealSwapService(
 
         return flow {
             // Zip assumes atomicOperations and atomicOperationFees were constructed the same way
-            atomicOperations.fold(initialCorrection) { prevStepCorrection, (_, operation) ->
+            atomicOperations.fold(initialCorrection) { prevStepCorrection, (segmentFee, operation) ->
                 prevStepCorrection.flatMap { correction ->
                     emit(SwapProgress.StepStarted(operation.inProgressLabel()))
 
                     val newAmountIn = if (correction != null) {
-                        correction.actualReceivedAmount
+                        correction.actualReceivedAmount - segmentFee.amountToLeaveOnOriginToPayTxFees()
                     } else {
                         val amountIn = operation.estimatedSwapLimit.estimatedAmountIn()
                         amountIn + calculatedFee.additionalAmountForSwap.amount

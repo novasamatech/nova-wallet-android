@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.totalAmount
 import io.novafoundation.nova.feature_account_api.data.model.totalPlanksEnsuringAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
@@ -48,6 +49,11 @@ class AtomicSwapOperationFee(
          */
         val paidFromAmount: List<FeeWithLabel> = emptyList()
     )
+}
+
+fun AtomicSwapOperationFee.amountToLeaveOnOriginToPayTxFees(): Balance {
+    val submissionAsset = submissionFee.asset
+    return submissionFee.amount + postSubmissionFees.paidByAccount.totalAmount(submissionAsset, submissionFee.submissionOrigin.requestedOrigin)
 }
 
 fun AtomicSwapOperationFee.totalFeeEnsuringSubmissionAsset(): Balance {

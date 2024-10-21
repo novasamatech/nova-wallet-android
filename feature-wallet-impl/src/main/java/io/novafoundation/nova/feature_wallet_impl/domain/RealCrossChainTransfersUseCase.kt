@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -133,6 +134,21 @@ internal class RealCrossChainTransfersUseCase(
                 asset = transfer.originChainAsset,
             ),
         )
+    }
+
+    override suspend fun ExtrinsicService.performTransfer(
+        transfer: AssetTransferBase,
+        computationalScope: CoroutineScope
+    ): Result<Balance> {
+        val configuration = cachedConfigurationFlow(computationalScope).first()
+        val transferConfiguration = configuration.transferConfiguration(
+            originChain = transfer.originChain,
+            originAsset = transfer.originChainAsset,
+            destinationChain = transfer.destinationChain,
+            destinationParaId = parachainInfoRepository.paraId(transfer.destinationChain.id)
+        )!!
+
+        return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer)
     }
 
     private fun cachedConfigurationFlow(computationScope: CoroutineScope): Flow<CrossChainTransfersConfiguration> {

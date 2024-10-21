@@ -158,7 +158,15 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
-            return Result.failure(UnsupportedOperationException("TODO"))
+            val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
+
+            val outcome = with(crossChainTransfersUseCase) {
+                swapHost.extrinsicService().performTransfer(transfer, computationalScope)
+            }
+
+            return outcome.map { receivedAmount ->
+                SwapExecutionCorrection(receivedAmount)
+            }
         }
 
         private suspend fun createTransfer(amount: Balance): AssetTransferBase {

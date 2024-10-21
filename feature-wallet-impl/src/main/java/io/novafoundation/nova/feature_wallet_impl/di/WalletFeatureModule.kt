@@ -289,13 +289,15 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         phishingValidationFactory: PhishingValidationFactory,
         palletXcmRepository: PalletXcmRepository,
-        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+        eventsRepository: EventsRepository
     ): CrossChainTransactor = RealCrossChainTransactor(
         weigher = weigher,
         assetSourceRegistry = assetSourceRegistry,
         phishingValidationFactory = phishingValidationFactory,
         palletXcmRepository = palletXcmRepository,
-        enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory
+        enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory,
+        eventsRepository = eventsRepository
     )
 
     @Provides
