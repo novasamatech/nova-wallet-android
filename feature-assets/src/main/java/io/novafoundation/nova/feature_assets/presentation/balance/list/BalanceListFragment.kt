@@ -78,7 +78,7 @@ class BalanceListFragment :
         //balanceListAssets.addItemDecoration(decoration)
         //balanceListAssets.itemAnimator = AssetTokensItemAnimator(assetsAdapter, decoration, balanceListAssets)
 
-        val settings = ExpandableAnimationSettings(5000, AccelerateDecelerateInterpolator())
+        val settings = ExpandableAnimationSettings(400, AccelerateDecelerateInterpolator())
         val animator = ExpandableAnimator(balanceListAssets, settings, assetsAdapter)
         val decoration = AssetTokensDecoration(requireContext(), assetsAdapter, animator)
         val itemAnimator = ExpandableItemAnimator(assetsAdapter, settings, animator)

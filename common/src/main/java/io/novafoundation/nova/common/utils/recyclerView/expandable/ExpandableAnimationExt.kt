@@ -20,7 +20,7 @@ fun ExpandableAnimationItemState.expandingFraction(): Float {
 }
 
 fun ExpandableAdapter.getItemFor(viewHolder: ViewHolder): ExpandableBaseItem? {
-    if (viewHolder !is ExpandableViewHolder) return null
+    if (viewHolder !is ExpandableBaseViewHolder<*>) return null
 
     return getItems().getOrNull(viewHolder.absoluteAdapterPosition - 1)
 }

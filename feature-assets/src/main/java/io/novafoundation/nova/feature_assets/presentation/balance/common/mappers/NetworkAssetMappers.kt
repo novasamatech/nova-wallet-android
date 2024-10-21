@@ -20,23 +20,24 @@ fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToU
     balance: (TotalAndTransferableBalance) -> Amount = TotalAndTransferableBalance::total,
 ): List<BalanceListRvItem> {
     return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
-        .mapValues { (_, assets) -> mapAssetsToAssetModels(assets, balance) }
+        .mapValues { (group, assets) -> mapAssetsToAssetModels(group, assets, balance) }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
 }
 
 private fun mapAssetsToAssetModels(
+    group: NetworkGroupUi,
     assets: List<AssetWithOffChainBalance>,
     balance: (TotalAndTransferableBalance) -> Amount
 ): List<BalanceListRvItem> {
-    return assets.map { NetworkAssetUi(mapAssetToAssetModel(it.asset, balance(it.balanceWithOffchain))) }
+    return assets.map { NetworkAssetUi(group.getId(), mapAssetToAssetModel(it.asset, balance(it.balanceWithOffchain))) }
 }
 
 private fun mapAssetGroupToUi(
     assetGroup: NetworkAssetGroup,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal
-): BalanceListRvItem {
+): NetworkGroupUi {
     return NetworkGroupUi(
         chainUi = mapChainToUi(assetGroup.chain),
         groupBalanceFiat = groupBalance(assetGroup).formatAsCurrency(currency)

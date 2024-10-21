@@ -21,22 +21,23 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
     balance: (TotalAndTransferableBalance) -> Amount = TotalAndTransferableBalance::total,
 ): List<BalanceListRvItem> {
     return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, groupBalance) }
-        .mapValues { (_, assets) -> mapAssetsToAssetModels(assets, balance) }
+        .mapValues { (group, assets) -> mapAssetsToAssetModels(group, assets, balance) }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
 }
 
 private fun mapAssetsToAssetModels(
+    group: TokenGroupUi,
     assets: List<AssetWithNetwork>,
     balance: (TotalAndTransferableBalance) -> Amount
 ): List<BalanceListRvItem> {
-    return assets.map { TokenAssetUi(mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
+    return assets.map { TokenAssetUi(group.getId(), mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
 }
 
 private fun mapAssetGroupToUi(
     assetGroup: TokenAssetGroup,
     groupBalance: (TokenAssetGroup) -> Amount
-): BalanceListRvItem {
+): TokenGroupUi {
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(
         tokenIcon = assetGroup.token.icon,

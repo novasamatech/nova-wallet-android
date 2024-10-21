@@ -2,28 +2,19 @@ package io.novafoundation.nova.common.utils.recyclerView.expandable
 
 import android.graphics.Canvas
 import android.graphics.Rect
+import android.util.Log
 import android.view.View
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.findByStep
-import io.novafoundation.nova.common.utils.groupSequentially
+import io.novafoundation.nova.common.utils.indexOfFirstOrNull
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimationItemState
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableBaseItem
+import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 
-private class ItemWithViewHolder(val position: Int, val item: ExpandableBaseItem, val viewHolder: RecyclerView.ViewHolder?)
-
-interface GroupAnimationDecoration {
-    fun onDraw(
-        canvas: Canvas,
-        expandableItemState: ExpandableAnimationItemState,
-        parent: RecyclerView,
-        groupViewHolder: ViewHolder,
-        items: List<ViewHolder>
-    )
-}
+private data class ItemWithViewHolder(val position: Int, val item: ExpandableBaseItem, val viewHolder: ViewHolder?)
 
 abstract class ExpandableItemDecoration(
     private val adapter: ExpandableAdapter,
@@ -42,38 +33,50 @@ abstract class ExpandableItemDecoration(
 
     }
 
-    override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        val items = try {
-            getParentAndChildren(parent)
-        } catch (e: Exception) {
-            emptyMap()
-        }
+    override fun onDraw(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
+        val items = getParentAndChildren(recyclerView)
+
+        Log.d(
+            "ExpandableItemDecoration",
+            items.map { (key, values) -> key.item.getId() + " " + values.map { it.item.getId() }.joinToString { it } }.joinToString { it }
+        )
 
         for ((parentItem, children) in items) {
             val animationState = animator.getStateForPosition(parentItem.position) ?: continue
             val childViewHolders = children.mapNotNull { it.viewHolder }
-            onDrawGroup(canvas, animationState, parent, parentItem.viewHolder, childViewHolders)
+            onDrawGroup(canvas, animationState, recyclerView, parentItem.viewHolder, childViewHolders)
         }
     }
 
-    private fun getParentAndChildren(parent: RecyclerView): Map<ItemWithViewHolder, List<ItemWithViewHolder>> {
-        return parent.children.toList()
+    private fun getParentAndChildren(recyclerView: RecyclerView): Map<ItemWithViewHolder, List<ItemWithViewHolder>> {
+        val items = recyclerView.children.toList()
             .mapNotNull {
-                val position = parent.getChildAdapterPosition(it) - 1
-                val viewHolder = parent.getChildViewHolder(it)
-                val item = adapter.getItemFor(viewHolder) ?: return@mapNotNull null
-                ItemWithViewHolder(position, item, viewHolder)
+                val viewHolder = recyclerView.getChildViewHolder(it)
+                val expandableViewHolder = viewHolder as? ExpandableBaseViewHolder<*> ?: return@mapNotNull null
+                val item = expandableViewHolder.expandableItem ?: return@mapNotNull null
+                ItemWithViewHolder(viewHolder.bindingAdapterPosition, item, viewHolder)
             }
-            .sortedBy { it.position }
-            .groupSequentially(
-                isKey = { it.item is ExpandableParentItem },
-                keyForEmptyValue = { getParentForPosition(it.position) }
-            )
+
+        val parents = items.filter { it.item is ExpandableParentItem }.associateBy { it.item.getId() }
+        val children = items.filter { it.item is ExpandableChildItem }
+        val parentsWithChildren = mutableMapOf<ItemWithViewHolder, MutableList<ItemWithViewHolder>>()
+
+        parents.values.forEach { parentsWithChildren[it] = mutableListOf() }
+
+        children.forEach { child ->
+            val item = child.item as ExpandableChildItem
+            val parent = parents[item.groupId] ?: getParentForItem(recyclerView, item) ?: return@forEach
+            val parentChildren = parentsWithChildren[parent] ?: mutableListOf()
+            parentChildren.add(child)
+            parentsWithChildren[parent] = parentChildren
+        }
+
+        return parentsWithChildren
     }
 
-    private fun getParentForPosition(position: Int): ItemWithViewHolder {
-        val item = adapter.getItems().findByStep(fromPosition = position, -1) { it is ExpandableParentItem }
-
-        return ItemWithViewHolder(position, item as ExpandableParentItem, null)
+    private fun getParentForItem(recyclerView: RecyclerView, item: ExpandableChildItem): ItemWithViewHolder? {
+        val position = adapter.getItems().indexOfFirstOrNull { it.getId() == item.groupId } ?: return null
+        val parentItem = adapter.getItems()[position]
+        return ItemWithViewHolder(position, parentItem as ExpandableParentItem, recyclerView.findViewHolderForAdapterPosition(position + 1))
     }
 }

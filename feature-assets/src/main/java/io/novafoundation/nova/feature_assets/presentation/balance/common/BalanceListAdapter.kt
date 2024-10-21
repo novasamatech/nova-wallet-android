@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAdapter
-import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableViewHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableBaseItem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetGroupViewHolder

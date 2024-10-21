@@ -2,12 +2,10 @@ package io.novafoundation.nova.common.utils.recyclerView.expandable
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.findIndexByStep
-import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
+import androidx.recyclerview.widget.SimpleItemAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimationItemState
-import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
+import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 
 
@@ -15,68 +13,118 @@ class ExpandableItemAnimator(
     private val adapter: ExpandableAdapter,
     private val settings: ExpandableAnimationSettings,
     private val expandableAnimator: ExpandableAnimator
-) : ItemAnimator() {
+) : SimpleItemAnimator() {
 
-    private var isRunning = false
+    private val addAnimations = mutableMapOf<ItemKey, List<ViewHolder>>() // Item id to ViewHolder
+    private val removeAnimations = mutableMapOf<ItemKey, List<ViewHolder>>() // Item id to ViewHolder
+    private val moveAnimations = mutableListOf<ViewHolder>() // Item id to ViewHolder
 
-    private val pendingAnimations = mutableMapOf<ItemKey, List<ViewHolder>>() // Item id to ViewHolder
+    private val pendingAddAnimations = mutableSetOf<ViewHolder>() // Item id to ViewHolder
+    private val pendingRemoveAnimations = mutableSetOf<ViewHolder>() // Item id to ViewHolder
+    private val pendingMoveAnimations = mutableSetOf<ViewHolder>() // Item id to ViewHolder
 
     init {
         addDuration = settings.duration
-        moveDuration = 500
-        changeDuration = 500
+        removeDuration = settings.duration
+        moveDuration = settings.duration
+
+        supportsChangeAnimations = false
     }
 
-    override fun animateDisappearance(viewHolder: ViewHolder, preLayoutInfo: ItemHolderInfo, postLayoutInfo: ItemHolderInfo?): Boolean {
-        viewHolder.itemView.alpha = 0f
-        return true
-    }
+    override fun animateAdd(holder: ViewHolder): Boolean {
+        if (holder !is ExpandableChildViewHolder) return false
+        val item = holder.expandableItem ?: return false
 
-    override fun animateAppearance(viewHolder: ViewHolder, preLayoutInfo: ItemHolderInfo?, postLayoutInfo: ItemHolderInfo): Boolean {
-        val item = adapter.getItemFor(viewHolder)
+        val parentItem = adapter.getItems().firstOrNull { it.getId() == item.groupId } as? ExpandableParentItem ?: return false
 
-        if (item !is ExpandableChildItem) return false
+        if (pendingRemoveAnimations.contains(holder)) {
+            holder.itemView.animate().cancel()
+            pendingRemoveAnimations.remove(holder)
+        } else {
+            holder.itemView.alpha = 0f
+            holder.itemView.scaleX = 0.95f
+            holder.itemView.scaleY = 0.95f
+        }
 
-
-        val (parentPosition, parentItem) = findParentFor(viewHolder) ?: return false
-
-        viewHolder.itemView.alpha = 0f
-        viewHolder.itemView.scaleX = 0.7f
-        viewHolder.itemView.scaleY = 0.7f
-
-        val position = viewHolder.absoluteAdapterPosition - parentPosition
+        //val position = viewHolder.absoluteAdapterPosition - parentPosition
         //viewHolder.itemView.translationY = 50f - viewHolder.itemView.height / 2f * 0.7f * position
         val itemKey = parentItem.toKey()
-        val currentViewHolders = pendingAnimations[itemKey] ?: emptyList()
-        pendingAnimations[itemKey] = currentViewHolders + listOf(viewHolder)
+        val currentViewHolders = addAnimations[itemKey] ?: emptyList()
+        addAnimations[itemKey] = currentViewHolders + listOf(holder)
         return true
     }
 
-    override fun animatePersistence(viewHolder: ViewHolder, preLayoutInfo: ItemHolderInfo, postLayoutInfo: ItemHolderInfo): Boolean {
+    override fun animateRemove(holder: ViewHolder): Boolean {
+        if (holder !is ExpandableChildViewHolder) return false
+        val item = holder.expandableItem ?: return false
+
+        val parentItem = adapter.getItems().firstOrNull { it.getId() == item.groupId } as? ExpandableParentItem ?: return false
+
+        if (pendingAddAnimations.contains(holder)) {
+            holder.itemView.animate().cancel()
+            pendingAddAnimations.remove(holder)
+        } else {
+            holder.itemView.alpha = 1f
+            holder.itemView.scaleX = 1f
+            holder.itemView.scaleY = 1f
+            holder.itemView.translationY = 0f
+        }
+
+        val itemKey = parentItem.toKey()
+        val currentViewHolders = removeAnimations[itemKey] ?: emptyList()
+        removeAnimations[itemKey] = currentViewHolders + listOf(holder)
+        return true
+    }
+
+    override fun animateMove(holder: ViewHolder, fromX: Int, fromY: Int, toX: Int, toY: Int): Boolean {
+        if (pendingMoveAnimations.contains(holder)) {
+            //holder.itemView.animate().cancel()
+            //pendingMoveAnimations.remove(holder)
+        } else {
+            val yDelta = toY - fromY
+            holder.itemView.translationY = -yDelta.toFloat()
+        }
+
+        val yDelta = toY - fromY
+        holder.itemView.translationY = -yDelta.toFloat()
+        moveAnimations.add(holder)
+        return true
+    }
+
+    override fun animateChange(oldHolder: ViewHolder?, newHolder: ViewHolder?, fromLeft: Int, fromTop: Int, toLeft: Int, toTop: Int): Boolean {
         return false
     }
 
-    override fun animateChange(
-        oldHolder: ViewHolder,
-        newHolder: ViewHolder,
-        preLayoutInfo: ItemHolderInfo,
-        postLayoutInfo: ItemHolderInfo
-    ): Boolean {
-        return true
-    }
-
     override fun runPendingAnimations() {
-        val parentItems = pendingAnimations.keys.toList()
-        val animatingViewHolders = pendingAnimations.flatMap { (_, viewHolders) -> viewHolders }
-        pendingAnimations.clear()
-        val adder = Runnable {
-            for (holder in animatingViewHolders) {
-                animateAddImpl(holder)
-            }
+        runAnimationFor(addAnimations, pendingAddAnimations, ExpandableAnimationItemState.Type.EXPANDING) { animateAddImpl(it) }
+        runAnimationFor(removeAnimations, pendingRemoveAnimations, ExpandableAnimationItemState.Type.COLLAPSING) { animateRemoveImpl(it) }
+
+        val animatingViewHolders = moveAnimations.toList()
+        moveAnimations.clear()
+
+        for (holder in animatingViewHolders) {
+            animateMoveImpl(holder)
         }
 
-        parentItems.forEach { expandableAnimator.animateItemToState(it.item, ExpandableAnimationItemState.Type.EXPANDING) }
-        adder.run()
+        pendingMoveAnimations.addAll(animatingViewHolders)
+    }
+
+    private fun runAnimationFor(
+        animationGroup: MutableMap<ItemKey, List<ViewHolder>>,
+        pendingAnimations: MutableSet<ViewHolder>,
+        toState: ExpandableAnimationItemState.Type,
+        runAnimation: (ViewHolder) -> Unit
+    ) {
+        val parentItems = animationGroup.keys.toList()
+        val animatingViewHolders = animationGroup.flatMap { (_, viewHolders) -> viewHolders }
+        animationGroup.clear()
+
+        parentItems.forEach { expandableAnimator.animateItemToState(it.item, toState) }
+        for (holder in animatingViewHolders) {
+            runAnimation(holder)
+        }
+
+        pendingAnimations.addAll(animatingViewHolders)
     }
 
     fun animateAddImpl(holder: ViewHolder) {
@@ -86,43 +134,108 @@ class ExpandableItemAnimator(
             .scaleX(1f)
             .scaleY(1f)
             .setDuration(settings.duration)
-            .translationY(0f)
             .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animator: Animator) {
-                    isRunning = true
-                }
+                override fun onAnimationStart(animator: Animator) {}
 
                 override fun onAnimationCancel(animator: Animator) {
-                    isRunning = false
+                    dispatchAnimationFinished(holder)
+                    pendingAddAnimations.remove(holder)
                     view.alpha = 1f
                     view.scaleX = 1f
                 }
 
                 override fun onAnimationEnd(animator: Animator) {
-                    isRunning = false
+                    dispatchAnimationFinished(holder)
+                    pendingAddAnimations.remove(holder)
+                    animation.setListener(null)
+                }
+            }).start()
+    }
+
+    fun animateRemoveImpl(holder: ViewHolder) {
+        val view = holder.itemView
+        val animation = view.animate()
+        animation.alpha(0f)
+            .scaleX(0.95f)
+            .scaleY(0.95f)
+            .setDuration(settings.duration)
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animator: Animator) {}
+
+                override fun onAnimationCancel(animator: Animator) {
+                    dispatchAnimationFinished(holder)
+                    pendingRemoveAnimations.remove(holder)
+                    view.alpha = 0f
+                    view.scaleX = 0.95f
+                }
+
+                override fun onAnimationEnd(animator: Animator) {
+                    dispatchAnimationFinished(holder)
+                    pendingRemoveAnimations.remove(holder)
+                    animation.setListener(null)
+                }
+            }).start()
+    }
+
+    fun animateMoveImpl(holder: ViewHolder) {
+        val view = holder.itemView
+        val animation = view.animate()
+        animation.translationY(0f)
+            .setDuration(settings.duration)
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animator: Animator) {}
+
+                override fun onAnimationCancel(animator: Animator) {
+                    dispatchAnimationFinished(holder)
+                    pendingRemoveAnimations.remove(holder)
+                    view.translationY = 0f
+                }
+
+                override fun onAnimationEnd(animator: Animator) {
+                    dispatchAnimationFinished(holder)
+                    pendingRemoveAnimations.remove(holder)
                     animation.setListener(null)
                 }
             }).start()
     }
 
     override fun endAnimation(viewHolder: ViewHolder) {
-        // Nothing to do
+        viewHolder.itemView.clearAnimation()
+        dispatchAnimationFinished(viewHolder)
+        pendingAddAnimations.remove(viewHolder)
+        pendingRemoveAnimations.remove(viewHolder)
+        pendingMoveAnimations.remove(viewHolder)
     }
 
     override fun endAnimations() {
+        pendingAddAnimations.forEach {
+            it.itemView.clearAnimation()
+            dispatchAnimationFinished(it)
+        }
+        pendingAddAnimations.clear()
+
+        pendingRemoveAnimations.forEach {
+            it.itemView.clearAnimation()
+            dispatchAnimationFinished(it)
+        }
+        pendingRemoveAnimations.clear()
+
+        pendingMoveAnimations.forEach {
+            it.itemView.clearAnimation()
+            dispatchAnimationFinished(it)
+        }
+        pendingMoveAnimations.clear()
+
         expandableAnimator.cancelAnimations()
     }
 
     override fun isRunning(): Boolean {
-        return isRunning
-    }
-
-    private fun findParentFor(viewHolder: ViewHolder): Pair<Int, ExpandableParentItem>? {
-        val items = adapter.getItems()
-        val adapterPosition = viewHolder.absoluteAdapterPosition
-        val groupPosition = items.findIndexByStep(fromPosition = adapterPosition, -1) { it is ExpandableParentItem } ?: return null
-
-        return groupPosition to items[groupPosition] as ExpandableParentItem
+        return addAnimations.isNotEmpty() ||
+            removeAnimations.isNotEmpty() ||
+            moveAnimations.isNotEmpty() ||
+            pendingAddAnimations.isNotEmpty() ||
+            pendingRemoveAnimations.isNotEmpty() ||
+            pendingMoveAnimations.isNotEmpty()
     }
 }
 

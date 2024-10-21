@@ -9,6 +9,7 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
 import android.view.View
+import androidx.core.graphics.toRect
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
@@ -20,6 +21,7 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.expandingFrac
 import io.novafoundation.nova.common.utils.recyclerView.expandable.flippedFraction
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetGroupViewHolder
+import kotlin.math.roundToInt
 
 class AssetTokensDecoration(
     private val context: Context,
@@ -79,6 +81,25 @@ class AssetTokensDecoration(
 
         val childrenBlockBounds = getChildrenBlockBounds(animationState, recyclerView, parent, children)
         drawChildrenBlock(expandingFraction, childrenBlockBounds, canvas)
+        clipChildren(children, childrenBlockBounds)
+    }
+
+    private fun clipChildren(children: List<RecyclerView.ViewHolder>, childrenBlockBounds: RectF) {
+        val childrenBlock = childrenBlockBounds.toRect()
+        children.forEach {
+            val childrenBottomClipInset = it.itemView.bottom - childrenBlock.bottom
+            val childrenTopClipInset = it.itemView.top - childrenBlock.top
+            if (childrenBottomClipInset > 0) {
+                it.itemView.clipBounds = Rect(
+                    0,
+                    childrenTopClipInset.coerceAtLeast(0),
+                    it.itemView.width,
+                    it.itemView.height - childrenBottomClipInset
+                )
+            } else {
+                it.itemView.clipBounds = null
+            }
+        }
     }
 
     private fun drawChildrenBlock(expandingFraction: Float, childrenBlockBounds: RectF, canvas: Canvas) {
@@ -105,19 +126,31 @@ class AssetTokensDecoration(
 
     private fun drawParentDivider(
         expandingFraction: Float,
-        dividerMargin: Float,
+        dividerHorizontalMargin: Float,
         canvas: Canvas,
         parentBounds: RectF
     ) {
         linePaint.color = argbEvaluator.evaluate(expandingFraction, transparentColor, dividerColor) as Int
-        canvas.drawLine(parentBounds.left + dividerMargin, parentBounds.bottom, parentBounds.right - dividerMargin, parentBounds.bottom, linePaint)
+        canvas.drawLine(
+            parentBounds.left + dividerHorizontalMargin,
+            parentBounds.bottom,
+            parentBounds.right - dividerHorizontalMargin,
+            parentBounds.bottom,
+            linePaint
+        )
     }
-
 
     private fun parentBounds(parent: RecyclerView.ViewHolder?): RectF? {
         if (parent == null) return null
 
-        return parent.itemView.let { RectF(it.left.toFloat(), it.top.toFloat(), it.right.toFloat(), it.bottom.toFloat()) }
+        return parent.itemView.let {
+            RectF(
+                it.left.toFloat(),
+                it.top.toFloat() + it.translationY,
+                it.right.toFloat(),
+                it.bottom.toFloat() + it.translationY
+            )
+        }
     }
 
     private fun getChildrenBlockBounds(
@@ -126,10 +159,12 @@ class AssetTokensDecoration(
         parent: RecyclerView.ViewHolder?,
         children: List<RecyclerView.ViewHolder>
     ): RectF {
-        val lastChild = children.lastOrNull()
+        val lastChild = children.maxByOrNull { it.itemView.bottom }
 
-        val top = parent?.itemView?.bottom ?: recyclerView.top
-        val bottom = lastChild?.itemView?.bottom ?: top // In case if last child is null -> content is empty and we will draw the empty and collapsed block
+        val translationY = parent?.itemView?.translationY ?: 0f
+
+        val top = (parent?.itemView?.bottom ?: recyclerView.top) + translationY
+        val bottom = (lastChild?.itemView?.bottom?.toFloat() ?: top).coerceAtLeast(top)
         val left = parent?.itemView?.left ?: lastChild?.itemView?.left ?: recyclerView.left
         val right = parent?.itemView?.right ?: lastChild?.itemView?.right ?: recyclerView.right
 
@@ -138,7 +173,7 @@ class AssetTokensDecoration(
         val heightDelta = (bottom - top)
         return RectF(
             left + childrenBlockCollapsedHorizontalMargin * flippedExpandingFraction,
-            top.toFloat(),
+            top,
             right - childrenBlockCollapsedHorizontalMargin * flippedExpandingFraction,
             top + childrenBlockCollapsedHeight + heightDelta * expandingFraction
         )
