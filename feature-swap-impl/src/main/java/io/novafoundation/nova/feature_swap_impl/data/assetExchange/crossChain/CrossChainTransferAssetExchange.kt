@@ -98,7 +98,7 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun debugLabel(): String {
-            return "Transfer"
+            return "To ${chainRegistry.getChain(delegate.to.chainId).name}"
         }
 
         override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {

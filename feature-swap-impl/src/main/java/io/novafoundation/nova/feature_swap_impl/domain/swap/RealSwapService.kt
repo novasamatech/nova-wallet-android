@@ -515,16 +515,30 @@ internal class RealSwapService(
     private suspend fun formatTrade(trade: QuotedTrade): String {
         return buildString {
             trade.path.onEachIndexed { index, quotedSwapEdge ->
+                val amountIn: Balance
+                val amountOut: Balance
+
+                when(trade.direction) {
+                    SwapDirection.SPECIFIED_IN -> {
+                        amountIn = quotedSwapEdge.quotedAmount
+                        amountOut = quotedSwapEdge.quote
+                    }
+                    SwapDirection.SPECIFIED_OUT -> {
+                        amountIn = quotedSwapEdge.quote
+                        amountOut = quotedSwapEdge.quotedAmount
+                    }
+                }
+
                 if (index == 0) {
                     val assetIn = chainRegistry.asset(quotedSwapEdge.edge.from)
-                    val initialAmount = quotedSwapEdge.quotedAmount.formatPlanks(assetIn)
+                    val initialAmount = amountIn.formatPlanks(assetIn)
                     append(initialAmount)
                 }
 
                 append(" --- " + quotedSwapEdge.edge.debugLabel() + " ---> ")
 
                 val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
-                val outAmount = quotedSwapEdge.quote.formatPlanks(assetOut)
+                val outAmount = amountOut.formatPlanks(assetOut)
 
                 append(outAmount)
             }

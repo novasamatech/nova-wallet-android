@@ -228,7 +228,7 @@ private class HydraDxExchange(
         }
 
         override suspend fun debugLabel(): String {
-            return "Hydration.${sourceQuotableEdge.debugLabel()}"
+            return sourceQuotableEdge.debugLabel()
         }
 
         override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
