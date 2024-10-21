@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationA
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
+import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
@@ -270,7 +271,7 @@ private class HydraDxExchange(
                 executeSwap(estimatedSwapLimit)
             }
 
-            return AtomicSwapOperationFee(submissionFee)
+            return AtomicSwapOperationFee(SubmissionFeeWithLabel(submissionFee))
         }
 
         override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {

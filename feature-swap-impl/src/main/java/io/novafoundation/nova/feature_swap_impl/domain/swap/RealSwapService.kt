@@ -494,7 +494,7 @@ internal class RealSwapService(
                 addAll(segment.fee.postSubmissionFees.paidFromAmount)
             }
 
-            allFees.joinToString { it.amount.formatPlanks(it.asset) }
+            allFees.joinToString { "${it.amount.formatPlanks(it.asset)} (${it.debugLabel})" }
         }
 
         Log.d("Swaps", "---- Fees -----")

@@ -9,7 +9,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.FeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
+import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
@@ -132,13 +134,13 @@ class CrossChainTransferAssetExchange(
             }
 
             return AtomicSwapOperationFee(
-                submissionFee = crossChainFee.fromOriginInFeeCurrency,
+                submissionFee = SubmissionFeeWithLabel(crossChainFee.fromOriginInFeeCurrency),
                 postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
                     paidByAccount = listOfNotNull(
-                        crossChainFee.fromOriginInNativeCurrency,
+                        SubmissionFeeWithLabel(crossChainFee.fromOriginInNativeCurrency, debugLabel = "Delivery"),
                     ),
                     paidFromAmount = listOf(
-                        crossChainFee.fromHoldingRegister
+                        FeeWithLabel(crossChainFee.fromHoldingRegister, debugLabel = "Execution")
                     )
                 ),
             )
