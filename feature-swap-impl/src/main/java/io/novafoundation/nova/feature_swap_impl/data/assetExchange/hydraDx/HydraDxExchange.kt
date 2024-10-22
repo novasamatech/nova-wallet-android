@@ -264,7 +264,7 @@ private class HydraDxExchange(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
-                    batchMode = BatchMode.FORCE_BATCH,
+                    batchMode = BatchMode.BATCH_ALL,
                     feePaymentCurrency = feePaymentCurrency
                 )
             ) {
@@ -306,7 +306,7 @@ private class HydraDxExchange(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
-                    batchMode = BatchMode.FORCE_BATCH,
+                    batchMode = BatchMode.BATCH_ALL,
                     feePaymentCurrency = feePaymentCurrency
                 )
             ) {
