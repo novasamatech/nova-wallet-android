@@ -126,7 +126,7 @@ internal class RealCrossChainTransfersUseCase(
             fromOriginInFeeCurrency = originFee,
             fromOriginInNativeCurrency = crossChainFee.paidByOriginOrNull()?.let {
                 // Delivery fees are also paid by an actual account
-                val submissionOrigin = SubmissionOrigin.singleOrigin(originFee.submissionOrigin.actualOrigin)
+                val submissionOrigin = SubmissionOrigin.singleOrigin(originFee.submissionOrigin.signingAccount)
                 SubstrateFee(it, submissionOrigin, transfer.originChain.commissionAsset)
             },
             fromHoldingRegister = SubstrateFeeBase(

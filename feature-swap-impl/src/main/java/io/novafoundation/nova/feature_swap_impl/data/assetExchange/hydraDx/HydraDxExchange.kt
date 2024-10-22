@@ -49,7 +49,6 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.refer
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -511,15 +510,8 @@ private class HydraDxExchange(
 
             val quotedFee = swapHost.quote(args)
 
-            // TODO
-            // There is a issue in Router implementation in Hydra that doesn't allow asset balance to go below ED. We add it to fee for simplicity instead
-            // of refactoring SwapExistentialDepositAwareMaxActionProvider
-            // This should be removed once Router issue is fixed
-            val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, customFeeAsset)
-            val fee = quotedFee + existentialDeposit
-
             return SubstrateFee(
-                amount = fee,
+                amount = quotedFee,
                 submissionOrigin = nativeFee.submissionOrigin,
                 asset = customFeeAsset
             )

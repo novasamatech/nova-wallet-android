@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_account_api.data.model.amountByExecutingAccount
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -59,4 +59,4 @@ infix fun ChainAssetWithAmount.rateAgainst(assetOut: ChainAssetWithAmount): BigD
 
 
 val SwapFee.totalDeductedPlanks: Balance
-    get() = networkFee.amountByRequestedAccount
+    get() = networkFee.amountByExecutingAccount

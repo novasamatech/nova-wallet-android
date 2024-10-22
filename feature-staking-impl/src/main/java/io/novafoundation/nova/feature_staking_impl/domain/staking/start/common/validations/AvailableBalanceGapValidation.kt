@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
-import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_account_api.data.model.amountByExecutingAccount
 import io.novafoundation.nova.feature_staking_impl.data.asset
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
@@ -19,7 +19,7 @@ class AvailableBalanceGapValidation(
     override suspend fun validate(value: StartMultiStakingValidationPayload): ValidationStatus<StartMultiStakingValidationFailure> {
         val amount = value.selection.stake
         val stakingOption = value.selection.stakingOption
-        val fee = value.fee.networkFee.amountByRequestedAccount
+        val fee = value.fee.networkFee.amountByExecutingAccount
 
         val maxToStakeWithMinStakes = candidates.map {
             val maximumToStake = it.maximumToStake(value.asset, fee)

@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_account_api.data.model.amountByExecutingAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFeeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -100,7 +100,7 @@ class SendInteractor(
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
             with(crossChainTransactor) {
-                extrinsicService.performTransfer(config, transfer, crossChainFee!!.amountByRequestedAccount)
+                extrinsicService.performTransfer(config, transfer, crossChainFee!!.amountByExecutingAccount)
             }
         } else {
             val networkFee = originFee.networkFeePart()

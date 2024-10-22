@@ -267,7 +267,7 @@ class RealExtrinsicService(
 
         val requestedOrigin = metaAccount.requireAccountIdIn(chain)
         val actualOrigin = signer.signerAccountId(chain)
-        val submissionOrigin = SubmissionOrigin(requestedOrigin = requestedOrigin, actualOrigin = actualOrigin)
+        val submissionOrigin = SubmissionOrigin(executingAccount = requestedOrigin, signingAccount = actualOrigin)
 
         val extrinsicBuilderSequence = extrinsicBuilderFactory.createMulti(chain, signer, requestedOrigin)
 
@@ -319,7 +319,7 @@ class RealExtrinsicService(
         val requestedOrigin = metaAccount.requireAccountIdIn(chain)
         val actualOrigin = signer.signerAccountId(chain)
 
-        val submissionOrigin = SubmissionOrigin(requestedOrigin = requestedOrigin, actualOrigin = actualOrigin)
+        val submissionOrigin = SubmissionOrigin(executingAccount = requestedOrigin, signingAccount = actualOrigin)
 
         val extrinsicBuilder = extrinsicBuilderFactory.create(chain, signer, requestedOrigin)
         extrinsicBuilder.formExtrinsic(submissionOrigin)

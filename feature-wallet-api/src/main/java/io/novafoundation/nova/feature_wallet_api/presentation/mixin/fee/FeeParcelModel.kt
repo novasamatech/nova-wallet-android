@@ -23,8 +23,8 @@ sealed interface FeeParcelModel : Parcelable {
 
 @Parcelize
 class SubmissionOriginParcelModel(
-    val requested: AccountId,
-    val actual: AccountId
+    val executingAccount: AccountId,
+    val signingAccount: AccountId
 ) : Parcelable
 
 @Parcelize
@@ -67,7 +67,7 @@ fun mapFeeToParcel(decimalFee: GenericDecimalFee<*>): FeeParcelModel {
 }
 
 private fun mapSubmissionOriginToParcel(submissionOrigin: SubmissionOrigin): SubmissionOriginParcelModel {
-    return with(submissionOrigin) { SubmissionOriginParcelModel(requested = requestedOrigin, actual = actualOrigin) }
+    return with(submissionOrigin) { SubmissionOriginParcelModel(executingAccount = executingAccount, signingAccount = signingAccount) }
 }
 
 fun mapFeeFromParcel(parcelFee: FeeParcelModel): DecimalFee {
@@ -88,5 +88,5 @@ fun mapFeeFromParcel(parcelFee: FeeParcelModel): DecimalFee {
 }
 
 private fun mapSubmissionOriginFromParcel(submissionOrigin: SubmissionOriginParcelModel): SubmissionOrigin {
-    return with(submissionOrigin) { SubmissionOrigin(requestedOrigin = requested, actualOrigin = actual) }
+    return with(submissionOrigin) { SubmissionOrigin(executingAccount = executingAccount, signingAccount = signingAccount) }
 }

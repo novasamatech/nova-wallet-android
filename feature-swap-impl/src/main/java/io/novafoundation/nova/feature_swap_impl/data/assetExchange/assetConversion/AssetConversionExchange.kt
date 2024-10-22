@@ -250,7 +250,7 @@ private class AssetConversionExchange(
                 )
             ) { submissionOrigin ->
                 // Send swapped funds to the requested origin since it the account doing the swap
-                executeSwap(swapLimit = args.actualSwapLimit, sendTo = submissionOrigin.requestedOrigin)
+                executeSwap(swapLimit = args.actualSwapLimit, sendTo = submissionOrigin.executingAccount)
             }.awaitInBlock().map {
                TODO()
             }

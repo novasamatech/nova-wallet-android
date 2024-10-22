@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.isTrueOrWarning
-import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
+import io.novafoundation.nova.feature_account_api.data.model.amountByExecutingAccount
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -72,7 +72,7 @@ class PoolAvailableBalanceValidation<P, E>(
         val asset = asset(value)
         val chainAsset = asset.token.configuration
 
-        val fee = fee(value)?.networkFee?.amountByRequestedAccount.orZero()
+        val fee = fee(value)?.networkFee?.amountByExecutingAccount.orZero()
         val availableBalance = poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
         val maxToStake = poolsAvailableBalanceResolver.maximumBalanceToStake(asset, fee)
         val enteredAmount = chainAsset.planksFromAmount(amount(value))

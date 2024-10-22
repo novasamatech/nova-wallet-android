@@ -73,11 +73,11 @@ class SubstrateFeeBase(
     override val asset: Chain.Asset
 ) : FeeBase
 
-val Fee.requestedAccountPaysFees: Boolean
-    get() = submissionOrigin.requestedOrigin.contentEquals(submissionOrigin.actualOrigin)
+val Fee.executingAccountPaysFee: Boolean
+    get() = submissionOrigin.executingAccount.contentEquals(submissionOrigin.signingAccount)
 
-val Fee.amountByRequestedAccount: BigInteger
-    get() = amount.asAmountByRequestedAccount
+val Fee.amountByExecutingAccount: BigInteger
+    get() = amount.asAmountByExecutingAccount
 
 fun List<FeeBase>.totalAmount(chainAsset: Chain.Asset): BigInteger {
     return sumOf { it.getAmount(chainAsset) }
@@ -90,7 +90,7 @@ fun List<SubmissionFee>.totalAmount(chainAsset: Chain.Asset, origin: AccountId):
 fun List<FeeBase>.totalPlanksEnsuringAsset(requireAsset: Chain.Asset): BigInteger {
     return sumOf {
         require(it.asset.fullId == requireAsset.fullId) {
-            "Atomic operation fee contains fee in different assets"
+            "Fees contain fee in different assets: ${it.asset.fullId}"
         }
 
         it.amount
@@ -98,7 +98,7 @@ fun List<FeeBase>.totalPlanksEnsuringAsset(requireAsset: Chain.Asset): BigIntege
 }
 
 fun SubmissionFee.getAmount(chainAsset: Chain.Asset, origin: AccountId): BigInteger {
-    return if (asset.fullId == chainAsset.fullId && submissionOrigin.actualOrigin.contentEquals(origin)) {
+    return if (asset.fullId == chainAsset.fullId && submissionOrigin.signingAccount.contentEquals(origin)) {
         amount
     } else {
         BigInteger.ZERO
@@ -110,8 +110,8 @@ fun FeeBase.getAmount(expectedAsset: Chain.Asset): BigInteger {
 }
 
 context(Fee)
-val BigInteger.asAmountByRequestedAccount: BigInteger
-    get() = if (requestedAccountPaysFees) {
+val BigInteger.asAmountByExecutingAccount: BigInteger
+    get() = if (executingAccountPaysFee) {
         this
     } else {
         BigInteger.ZERO

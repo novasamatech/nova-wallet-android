@@ -34,10 +34,10 @@ class SwapFee(
     override val networkFee: Fee = determineNetworkFee()
 
     override fun deductionFor(amountAsset: Chain.Asset): Balance {
-        val requestedAccount = submissionFee.submissionOrigin.requestedOrigin
+        val executingAccount = submissionFee.submissionOrigin.executingAccount
 
-        val submissionFeeAmount = submissionFee.getAmount(amountAsset, requestedAccount)
-        val additionalFeesAmount = postSubmissionFees.paidByAccount.totalAmount(amountAsset, requestedAccount)
+        val submissionFeeAmount = submissionFee.getAmount(amountAsset, executingAccount)
+        val additionalFeesAmount = postSubmissionFees.paidByAccount.totalAmount(amountAsset, executingAccount)
 
         return submissionFeeAmount + additionalFeesAmount + additionalAmountForSwap.getAmount(amountAsset)
     }

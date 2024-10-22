@@ -41,7 +41,7 @@ private class RealPathQuoter<E : QuotableEdge>(
     private val computationalCache: ComputationalCache,
     private val graph: Graph<FullChainAssetId, E>,
     private val computationalScope: CoroutineScope,
-    private val filter: EdgeVisitFilter<E>?
+    private val filter: EdgeVisitFilter<E>?,
 ) : PathQuoter<E> {
 
     override suspend fun findBestPath(

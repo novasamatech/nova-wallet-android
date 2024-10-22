@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.model
 
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.requestedAccountPaysFees
+import io.novafoundation.nova.feature_account_api.data.model.executingAccountPaysFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
@@ -37,7 +37,7 @@ class GenericDecimalFee<F : GenericFee>(
 }
 
 val <F : GenericFee> GenericDecimalFee<F>.networkFeeByRequestedAccount: BigDecimal
-    get() = if (networkFee.requestedAccountPaysFees) networkFeeDecimalAmount else BigDecimal.ZERO
+    get() = if (networkFee.executingAccountPaysFee) networkFeeDecimalAmount else BigDecimal.ZERO
 
 val <F : GenericFee> GenericDecimalFee<F>?.networkFeeByRequestedAccountOrZero: BigDecimal
     get() = this?.networkFeeByRequestedAccount.orZero()

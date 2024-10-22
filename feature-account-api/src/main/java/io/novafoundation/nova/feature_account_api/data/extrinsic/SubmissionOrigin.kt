@@ -5,15 +5,16 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
 
 data class SubmissionOrigin(
     /**
-     * Origin that was originally requested to sign the transaction
+     * Account on which behalf the operation will be executed
      */
-    val requestedOrigin: AccountId,
+    val executingAccount: AccountId,
 
     /**
-     * Origin that was actually used to sign the transaction.
-     * It might differ from [requestedOrigin] if [Signer] modified the origin, for example in the case of Proxied wallet
+     * Account that will sign and submit transaction
+     * It might differ from [executingAccount] if [Signer] modified the origin.
+     * For example in the case of Proxied wallet [executingAccount] is proxied and [signingAccount] is proxy
      */
-    val actualOrigin: AccountId
+    val signingAccount: AccountId
 ) {
 
     companion object {
@@ -27,13 +28,13 @@ data class SubmissionOrigin(
 
         other as SubmissionOrigin
 
-        if (!requestedOrigin.contentEquals(other.requestedOrigin)) return false
-        return actualOrigin.contentEquals(other.actualOrigin)
+        if (!executingAccount.contentEquals(other.executingAccount)) return false
+        return signingAccount.contentEquals(other.signingAccount)
     }
 
     override fun hashCode(): Int {
-        var result = requestedOrigin.contentHashCode()
-        result = 31 * result + actualOrigin.contentHashCode()
+        var result = executingAccount.contentHashCode()
+        result = 31 * result + signingAccount.contentHashCode()
         return result
     }
 }
