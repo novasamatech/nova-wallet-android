@@ -192,10 +192,10 @@ internal class RealSwapService(
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn)
                     val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
 
-                    Log.d("Swaps", operation.inProgressLabel() + " with $actualSwapLimit")
+                    Log.d("SwapSubmission", operation.inProgressLabel() + " with $actualSwapLimit")
 
                     operation.submit(segmentSubmissionArgs).onFailure {
-                        Log.e("Swaps", "Swap failed on stage '${operation.inProgressLabel()}'", it)
+                        Log.e("SwapSubmission", "Swap failed on stage '${operation.inProgressLabel()}'", it)
 
                         emit(SwapProgress.Failure(it))
                     }

@@ -21,6 +21,9 @@ interface SubmissionFee : FeeBase {
     val submissionOrigin: SubmissionOrigin
 }
 
+val SubmissionFee.submissionFeesPayer: AccountId
+    get() = submissionOrigin.signingAccount
+
 /**
  * Fee that doesn't have a particular origin
  * For example, fees paid during cross chain transfers do not have a specific account that pays them
@@ -30,22 +33,6 @@ interface FeeBase {
     val amount: BigInteger
 
     val asset: Chain.Asset
-}
-
-infix fun FeeBase.hasSameAssetAs(other: FeeBase): Boolean {
-    return asset.fullId == other.asset.fullId
-}
-
-infix fun Fee.addPreservingOrigin(other: FeeBase): Fee {
-    require(this hasSameAssetAs other) {
-        "Cannot sum fees with different assets"
-    }
-
-    return addPlanks(other.amount)
-}
-
-infix fun Fee.addPlanks(planks: BigInteger): Fee {
-    return SubstrateFee(amount + planks, submissionOrigin, asset)
 }
 
 fun Fee.replacePlanks(newPlanks: BigInteger): Fee {
@@ -74,7 +61,7 @@ class SubstrateFeeBase(
 ) : FeeBase
 
 val Fee.executingAccountPaysFee: Boolean
-    get() = submissionOrigin.executingAccount.contentEquals(submissionOrigin.signingAccount)
+    get() = submissionOrigin.executingAccount.contentEquals(submissionFeesPayer)
 
 val Fee.amountByExecutingAccount: BigInteger
     get() = amount.asAmountByExecutingAccount
@@ -98,7 +85,7 @@ fun List<FeeBase>.totalPlanksEnsuringAsset(requireAsset: Chain.Asset): BigIntege
 }
 
 fun SubmissionFee.getAmount(chainAsset: Chain.Asset, origin: AccountId): BigInteger {
-    return if (asset.fullId == chainAsset.fullId && submissionOrigin.signingAccount.contentEquals(origin)) {
+    return if (asset.fullId == chainAsset.fullId && submissionFeesPayer.contentEquals(origin)) {
         amount
     } else {
         BigInteger.ZERO

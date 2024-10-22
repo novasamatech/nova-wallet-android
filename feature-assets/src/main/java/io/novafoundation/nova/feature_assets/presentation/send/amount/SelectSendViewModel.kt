@@ -162,7 +162,7 @@ class SelectSendViewModel(
         coroutineScope,
         configuration = Configuration(
             initialState = Configuration.InitialState(
-                supportCustomFee = true
+                supportCustomFee = false
             )
         )
     )
