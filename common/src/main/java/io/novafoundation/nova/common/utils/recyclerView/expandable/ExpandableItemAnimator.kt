@@ -53,7 +53,7 @@ class ExpandableItemAnimator(
         val currentViewHolders = addAnimations[itemKey] ?: emptyList()
         addAnimations[itemKey] = currentViewHolders + listOf(holder)
 
-        expandableAnimator.animateItemToState(parentItem, ExpandableAnimationItemState.Type.EXPANDING)
+        expandableAnimator.prepareAnimationToState(parentItem, ExpandableAnimationItemState.Type.EXPANDING)
 
         return true
     }
@@ -77,7 +77,7 @@ class ExpandableItemAnimator(
         val currentViewHolders = removeAnimations[itemKey] ?: emptyList()
         removeAnimations[itemKey] = currentViewHolders + listOf(holder)
 
-        expandableAnimator.animateItemToState(parentItem, ExpandableAnimationItemState.Type.COLLAPSING)
+        expandableAnimator.prepareAnimationToState(parentItem, ExpandableAnimationItemState.Type.COLLAPSING)
 
         return true
     }
@@ -101,8 +101,8 @@ class ExpandableItemAnimator(
     }
 
     override fun runPendingAnimations() {
-        runAnimationFor(addAnimations, pendingAddAnimations, ExpandableAnimationItemState.Type.EXPANDING) { animateAddImpl(it) }
-        runAnimationFor(removeAnimations, pendingRemoveAnimations, ExpandableAnimationItemState.Type.COLLAPSING) { animateRemoveImpl(it) }
+        runAnimationFor(addAnimations, pendingAddAnimations) { animateAddImpl(it) }
+        runAnimationFor(removeAnimations, pendingRemoveAnimations) { animateRemoveImpl(it) }
 
         val animatingViewHolders = moveAnimations.toList()
         moveAnimations.clear()
@@ -117,14 +117,13 @@ class ExpandableItemAnimator(
     private fun runAnimationFor(
         animationGroup: MutableMap<ItemKey, List<ViewHolder>>,
         pendingAnimations: MutableSet<ViewHolder>,
-        toState: ExpandableAnimationItemState.Type,
         runAnimation: (ViewHolder) -> Unit
     ) {
         val parentItems = animationGroup.keys.toList()
         val animatingViewHolders = animationGroup.flatMap { (_, viewHolders) -> viewHolders }
         animationGroup.clear()
 
-        //parentItems.forEach { expandableAnimator.animateItemToState(it.item, toState) }
+        parentItems.forEach { expandableAnimator.runAnimationFor(it.item) }
         for (holder in animatingViewHolders) {
             runAnimation(holder)
         }
@@ -138,6 +137,7 @@ class ExpandableItemAnimator(
         animation.alpha(1f)
             .scaleX(1f)
             .scaleY(1f)
+            .setInterpolator(settings.interpolator)
             .setDuration(settings.duration)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animator: Animator) {
@@ -153,6 +153,7 @@ class ExpandableItemAnimator(
         animation.alpha(0f)
             .scaleX(0.90f)
             .scaleY(0.90f)
+            .setInterpolator(settings.interpolator)
             .setDuration(settings.duration)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animator: Animator) {
@@ -167,6 +168,7 @@ class ExpandableItemAnimator(
         val animation = view.animate()
         animation.translationY(0f)
             .setDuration(settings.duration)
+            .setInterpolator(settings.interpolator)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animator: Animator) {
                     moveFinished(holder)

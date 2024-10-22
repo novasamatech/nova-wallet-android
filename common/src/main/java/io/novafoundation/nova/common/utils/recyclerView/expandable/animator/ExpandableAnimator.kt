@@ -44,13 +44,13 @@ class ExpandableAnimator(
         return runningAnimations[item.getId()]?.currentState ?: getExpandableItemState(position, items)
     }
 
-    fun animateItemToState(item: ExpandableParentItem, type: ExpandableAnimationItemState.Type) {
+    fun prepareAnimationToState(item: ExpandableParentItem, type: ExpandableAnimationItemState.Type) {
         val existingSettings = runningAnimations[item.getId()]
 
         // No need to run animation if animation state is running and current type is the same
         if (existingSettings == null) {
             val state = ExpandableAnimationItemState(type, 0f)
-            runAnimationFor(item, state)
+            setAnimationFor(item, state)
         } else {
             // No need to update animation state if it's the same and already running
             if (existingSettings.currentState.animationType == type) {
@@ -59,11 +59,16 @@ class ExpandableAnimator(
 
             // Toggle animation state and flipping fraction to continue the animation but to another side
             val state = ExpandableAnimationItemState(type, existingSettings.currentState.flippedFraction())
-            runAnimationFor(item, state)
+            setAnimationFor(item, state)
         }
     }
 
-    private fun runAnimationFor(item: ExpandableParentItem, state: ExpandableAnimationItemState) {
+    fun runAnimationFor(item: ExpandableParentItem) {
+        val existingSettings = runningAnimations[item.getId()]
+        existingSettings?.animator?.start()
+    }
+
+    private fun setAnimationFor(item: ExpandableParentItem, state: ExpandableAnimationItemState) {
         runningAnimations[item.getId()]?.animator?.cancel() // Cancel previous animation if it's exist
 
         val animator = ValueAnimator.ofFloat(state.animationFraction, 1f)
@@ -74,13 +79,9 @@ class ExpandableAnimator(
             state.animationFraction = it.animatedValue as Float
             recyclerView.invalidate()
         } // Invalidate recycler view to trigger onDraw in Item Decoration
-        animator.addListener(
-            onEnd = { runningAnimations.remove(item.getId()) },
-            onCancel = { runningAnimations.remove(item.getId()) }
-        )
+        animator.addListener(onEnd = { runningAnimations.remove(item.getId()) })
 
         runningAnimations[item.getId()] = RunningAnimation(state, animator)
-        animator.start()
     }
 
     fun cancelAnimations() {
