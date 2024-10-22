@@ -19,9 +19,11 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
@@ -71,17 +73,12 @@ class BalanceListFragment :
         balanceListAssets.setHasFixedSize(true)
         balanceListAssets.adapter = adapter
 
-        //AssetGroupingDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
-
-        // modification animations only harm here
-        //val decoration = AssetTokensDecoration(requireContext(), assetsAdapter)
-        //balanceListAssets.addItemDecoration(decoration)
-        //balanceListAssets.itemAnimator = AssetTokensItemAnimator(assetsAdapter, decoration, balanceListAssets)
-
         val settings = ExpandableAnimationSettings(400, AccelerateDecelerateInterpolator())
         val animator = ExpandableAnimator(balanceListAssets, settings, assetsAdapter)
         val decoration = AssetTokensDecoration(requireContext(), assetsAdapter, animator)
         val itemAnimator = ExpandableItemAnimator(assetsAdapter, settings, animator)
+
+        AssetGroupingDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
 
         balanceListAssets.addItemDecoration(decoration)
         balanceListAssets.itemAnimator = itemAnimator

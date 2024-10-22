@@ -9,6 +9,7 @@ data class TokenGroupUi(
     val recentRateChange: String,
     @ColorRes val rateChangeColorRes: Int,
     val tokenSymbol: String,
+    val groupWithOneItem: Boolean,
     val balance: AmountModel
 ) : AssetGroupRvItem {
     override val itemId: String = tokenSymbol

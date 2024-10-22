@@ -2,13 +2,17 @@ package io.novafoundation.nova.common.utils.recyclerView.expandable
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.recyclerview.widget.SimpleItemAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimationItemState
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 
-
+/**
+ * Potential problems:
+ * - If in one time point we have add and move animation or remove and move animation and we cancel move animation - the add or remove animation will be also canceled
+ */
 class ExpandableItemAnimator(
     private val adapter: ExpandableAdapter,
     private val settings: ExpandableAnimationSettings,
@@ -42,8 +46,8 @@ class ExpandableItemAnimator(
             pendingRemoveAnimations.remove(holder)
         } else {
             holder.itemView.alpha = 0f
-            holder.itemView.scaleX = 0.95f
-            holder.itemView.scaleY = 0.95f
+            holder.itemView.scaleX = 0.90f
+            holder.itemView.scaleY = 0.90f
         }
 
         //val position = viewHolder.absoluteAdapterPosition - parentPosition
@@ -51,6 +55,9 @@ class ExpandableItemAnimator(
         val itemKey = parentItem.toKey()
         val currentViewHolders = addAnimations[itemKey] ?: emptyList()
         addAnimations[itemKey] = currentViewHolders + listOf(holder)
+
+        expandableAnimator.animateItemToState(parentItem, ExpandableAnimationItemState.Type.EXPANDING)
+
         return true
     }
 
@@ -67,26 +74,30 @@ class ExpandableItemAnimator(
             holder.itemView.alpha = 1f
             holder.itemView.scaleX = 1f
             holder.itemView.scaleY = 1f
-            holder.itemView.translationY = 0f
         }
 
         val itemKey = parentItem.toKey()
         val currentViewHolders = removeAnimations[itemKey] ?: emptyList()
         removeAnimations[itemKey] = currentViewHolders + listOf(holder)
+
+        expandableAnimator.animateItemToState(parentItem, ExpandableAnimationItemState.Type.COLLAPSING)
+
         return true
     }
 
     override fun animateMove(holder: ViewHolder, fromX: Int, fromY: Int, toX: Int, toY: Int): Boolean {
+        if (holder !is ExpandableBaseViewHolder<*>) return false
+
         if (pendingMoveAnimations.contains(holder)) {
-            //holder.itemView.animate().cancel()
-            //pendingMoveAnimations.remove(holder)
+            holder.itemView.animate().cancel()
+            pendingMoveAnimations.remove(holder)
         } else {
-            val yDelta = toY - fromY
-            holder.itemView.translationY = -yDelta.toFloat()
+            //val yDelta = toY - fromY
+            //holder.itemView.translationY = -yDelta.toFloat()
         }
 
-        val yDelta = toY - fromY
-        holder.itemView.translationY = -yDelta.toFloat()
+        val yDelta = toY - fromY - holder.itemView.translationY
+        holder.itemView.translationY = -yDelta
         moveAnimations.add(holder)
         return true
     }
@@ -119,7 +130,7 @@ class ExpandableItemAnimator(
         val animatingViewHolders = animationGroup.flatMap { (_, viewHolders) -> viewHolders }
         animationGroup.clear()
 
-        parentItems.forEach { expandableAnimator.animateItemToState(it.item, toState) }
+        //parentItems.forEach { expandableAnimator.animateItemToState(it.item, toState) }
         for (holder in animatingViewHolders) {
             runAnimation(holder)
         }
@@ -138,15 +149,11 @@ class ExpandableItemAnimator(
                 override fun onAnimationStart(animator: Animator) {}
 
                 override fun onAnimationCancel(animator: Animator) {
-                    dispatchAnimationFinished(holder)
-                    pendingAddAnimations.remove(holder)
-                    view.alpha = 1f
-                    view.scaleX = 1f
+                    //addFinished(holder)
                 }
 
                 override fun onAnimationEnd(animator: Animator) {
-                    dispatchAnimationFinished(holder)
-                    pendingAddAnimations.remove(holder)
+                    addFinished(holder)
                     animation.setListener(null)
                 }
             }).start()
@@ -156,22 +163,18 @@ class ExpandableItemAnimator(
         val view = holder.itemView
         val animation = view.animate()
         animation.alpha(0f)
-            .scaleX(0.95f)
-            .scaleY(0.95f)
+            .scaleX(0.90f)
+            .scaleY(0.90f)
             .setDuration(settings.duration)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animator: Animator) {}
 
                 override fun onAnimationCancel(animator: Animator) {
-                    dispatchAnimationFinished(holder)
-                    pendingRemoveAnimations.remove(holder)
-                    view.alpha = 0f
-                    view.scaleX = 0.95f
+                    //removeFinished(holder)
                 }
 
                 override fun onAnimationEnd(animator: Animator) {
-                    dispatchAnimationFinished(holder)
-                    pendingRemoveAnimations.remove(holder)
+                    removeFinished(holder)
                     animation.setListener(null)
                 }
             }).start()
@@ -186,45 +189,58 @@ class ExpandableItemAnimator(
                 override fun onAnimationStart(animator: Animator) {}
 
                 override fun onAnimationCancel(animator: Animator) {
-                    dispatchAnimationFinished(holder)
-                    pendingRemoveAnimations.remove(holder)
-                    view.translationY = 0f
+                    //moveFinished(holder)
                 }
 
                 override fun onAnimationEnd(animator: Animator) {
-                    dispatchAnimationFinished(holder)
-                    pendingRemoveAnimations.remove(holder)
+                    moveFinished(holder)
                     animation.setListener(null)
                 }
             }).start()
     }
 
     override fun endAnimation(viewHolder: ViewHolder) {
+        Log.d("ExpandableItemAnimator", "add:" + addAnimations.size.toString())
+        Log.d("ExpandableItemAnimator", "remove:" + removeAnimations.size.toString())
+        Log.d("ExpandableItemAnimator", "move:" + moveAnimations.size.toString())
+
         viewHolder.itemView.clearAnimation()
+
+        if (pendingAddAnimations.remove(viewHolder)) {
+            viewHolder.itemView.alpha = 1f
+        }
+        if (pendingRemoveAnimations.remove(viewHolder)) {
+            viewHolder.itemView.alpha = 0f
+        }
+        if (pendingMoveAnimations.remove(viewHolder)) {
+            viewHolder.itemView.translationY = 0f
+        }
+
         dispatchAnimationFinished(viewHolder)
-        pendingAddAnimations.remove(viewHolder)
-        pendingRemoveAnimations.remove(viewHolder)
-        pendingMoveAnimations.remove(viewHolder)
     }
 
     override fun endAnimations() {
         pendingAddAnimations.forEach {
             it.itemView.clearAnimation()
-            dispatchAnimationFinished(it)
+            dispatchAddFinished(it)
         }
         pendingAddAnimations.clear()
 
         pendingRemoveAnimations.forEach {
             it.itemView.clearAnimation()
-            dispatchAnimationFinished(it)
+            dispatchRemoveFinished(it)
         }
         pendingRemoveAnimations.clear()
 
         pendingMoveAnimations.forEach {
             it.itemView.clearAnimation()
-            dispatchAnimationFinished(it)
+            dispatchMoveFinished(it)
         }
         pendingMoveAnimations.clear()
+
+        addAnimations.clear()
+        removeAnimations.clear()
+        moveAnimations.clear()
 
         expandableAnimator.cancelAnimations()
     }
@@ -236,6 +252,29 @@ class ExpandableItemAnimator(
             pendingAddAnimations.isNotEmpty() ||
             pendingRemoveAnimations.isNotEmpty() ||
             pendingMoveAnimations.isNotEmpty()
+    }
+
+    private fun addFinished(holder: ViewHolder) {
+        pendingAddAnimations.remove(holder)
+        internalDispatchAnimationFinished(holder)
+    }
+
+    private fun removeFinished(holder: ViewHolder) {
+        pendingRemoveAnimations.remove(holder)
+        internalDispatchAnimationFinished(holder)
+    }
+
+    private fun moveFinished(holder: ViewHolder) {
+        pendingMoveAnimations.remove(holder)
+        internalDispatchAnimationFinished(holder)
+    }
+
+    private fun internalDispatchAnimationFinished(holder: ViewHolder) {
+        if (holder in pendingAddAnimations) return
+        if (holder in pendingRemoveAnimations) return
+        if (holder in pendingMoveAnimations) return
+
+        dispatchAnimationFinished(holder)
     }
 }
 

@@ -14,8 +14,6 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetGroupViewHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetViewHolder
-import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetGroupViewHolder
-import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetViewHolder
 import kotlin.math.roundToInt
 
 /**
@@ -113,16 +111,14 @@ class AssetGroupingDecoration(
     }
 
     private fun isFinalItemInGroup(nextType: Int?): Boolean {
-        return nextType == TYPE_NETWORK_GROUP || nextType == TYPE_TOKEN_GROUP || nextType == null
+        return nextType == TYPE_NETWORK_GROUP || nextType == null
     }
 
     private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
-        val isGroupViewHolder = viewHolder is NetworkAssetViewHolder ||
-            viewHolder is NetworkAssetGroupViewHolder ||
-            viewHolder is TokenAssetViewHolder ||
-            viewHolder is TokenAssetGroupViewHolder
+        val isNetworkViewHolder = viewHolder is NetworkAssetViewHolder ||
+            viewHolder is NetworkAssetGroupViewHolder
 
-        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isGroupViewHolder
+        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isNetworkViewHolder
     }
 }
 

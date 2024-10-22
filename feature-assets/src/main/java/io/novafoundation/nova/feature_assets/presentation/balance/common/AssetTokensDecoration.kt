@@ -19,8 +19,10 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.Expa
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.expandingFraction
 import io.novafoundation.nova.common.utils.recyclerView.expandable.flippedFraction
+import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetGroupViewHolder
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import kotlin.math.roundToInt
 
 class AssetTokensDecoration(
@@ -68,6 +70,7 @@ class AssetTokensDecoration(
         canvas: Canvas,
         animationState: ExpandableAnimationItemState,
         recyclerView: RecyclerView,
+        parentItem: ExpandableParentItem,
         parent: RecyclerView.ViewHolder?,
         children: List<RecyclerView.ViewHolder>
     ) {
@@ -79,6 +82,9 @@ class AssetTokensDecoration(
             drawParentBlock(flippedExpandingFraction, parentBounds, canvas, expandingFraction)
         }
 
+        //Don't draw children background if it's a single item
+        if (parentItem is TokenGroupUi && parentItem.groupWithOneItem) return
+
         val childrenBlockBounds = getChildrenBlockBounds(animationState, recyclerView, parent, children)
         drawChildrenBlock(expandingFraction, childrenBlockBounds, canvas)
         clipChildren(children, childrenBlockBounds)
@@ -87,8 +93,8 @@ class AssetTokensDecoration(
     private fun clipChildren(children: List<RecyclerView.ViewHolder>, childrenBlockBounds: RectF) {
         val childrenBlock = childrenBlockBounds.toRect()
         children.forEach {
-            val childrenBottomClipInset = it.itemView.bottom - childrenBlock.bottom
-            val childrenTopClipInset = it.itemView.top - childrenBlock.top
+            val childrenBottomClipInset = (it.itemView.bottom - it.itemView.translationY.roundToInt()) - childrenBlock.bottom
+            val childrenTopClipInset = childrenBlock.top - (it.itemView.top - it.itemView.translationY.roundToInt())
             if (childrenBottomClipInset > 0) {
                 it.itemView.clipBounds = Rect(
                     0,
@@ -161,9 +167,10 @@ class AssetTokensDecoration(
     ): RectF {
         val lastChild = children.maxByOrNull { it.itemView.bottom }
 
-        val translationY = parent?.itemView?.translationY ?: 0f
+        val parentTranslationY = parent?.itemView?.translationY ?: 0f
+        val childTranslationY = lastChild?.itemView?.translationY ?: 0f
 
-        val top = (parent?.itemView?.bottom ?: recyclerView.top) + translationY
+        val top = (parent?.itemView?.bottom ?: recyclerView.top) + parentTranslationY
         val bottom = (lastChild?.itemView?.bottom?.toFloat() ?: top).coerceAtLeast(top)
         val left = parent?.itemView?.left ?: lastChild?.itemView?.left ?: recyclerView.left
         val right = parent?.itemView?.right ?: lastChild?.itemView?.right ?: recyclerView.right
@@ -175,7 +182,7 @@ class AssetTokensDecoration(
             left + childrenBlockCollapsedHorizontalMargin * flippedExpandingFraction,
             top,
             right - childrenBlockCollapsedHorizontalMargin * flippedExpandingFraction,
-            top + childrenBlockCollapsedHeight + heightDelta * expandingFraction
+            top + childrenBlockCollapsedHeight + heightDelta * expandingFraction + childTranslationY
         )
     }
 

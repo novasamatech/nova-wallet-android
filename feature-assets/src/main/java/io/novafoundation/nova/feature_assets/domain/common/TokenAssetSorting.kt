@@ -13,7 +13,8 @@ import java.math.BigDecimal
 
 class TokenAssetGroup(
     val token: Token,
-    val groupBalance: TotalAndTransferableBalance
+    val groupBalance: TotalAndTransferableBalance,
+    val itemsCount: Int
 ) {
 
     data class Token(
@@ -46,6 +47,7 @@ fun groupAndSortAssetsByToken(
             TokenAssetGroup(
                 token = token,
                 groupBalance = assets.fold(TotalAndTransferableBalance.ZERO) { acc, element -> acc + element.balanceWithOffChain },
+                itemsCount = assets.size
             )
         }.toSortedMap(assetGroupComparator)
 }

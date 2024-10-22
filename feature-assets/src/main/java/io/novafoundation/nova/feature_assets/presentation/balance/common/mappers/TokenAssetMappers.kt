@@ -20,7 +20,7 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
     groupBalance: (TokenAssetGroup) -> Amount = { it.groupBalance.total },
     balance: (TotalAndTransferableBalance) -> Amount = TotalAndTransferableBalance::total,
 ): List<BalanceListRvItem> {
-    return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, groupBalance) }
+    return mapKeys { (group, _) -> mapAssetGroupToUi(group, groupBalance) }
         .mapValues { (group, assets) -> mapAssetsToAssetModels(group, assets, balance) }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
@@ -45,6 +45,7 @@ private fun mapAssetGroupToUi(
         recentRateChange = assetGroup.token.coinRate?.recentRateChange.orZero().formatAsChange(),
         rateChangeColorRes = mapCoinRateChangeColorRes(assetGroup.token.coinRate),
         tokenSymbol = assetGroup.token.symbol.value,
+        groupWithOneItem = assetGroup.itemsCount == 1,
         balance = AmountModel(
             token = balance.amount.formatTokenAmount(),
             fiat = balance.fiat.formatAsCurrency(assetGroup.token.currency)

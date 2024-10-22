@@ -25,6 +25,7 @@ abstract class ExpandableItemDecoration(
         canvas: Canvas,
         animationState: ExpandableAnimationItemState,
         recyclerView: RecyclerView,
+        parentItem: ExpandableParentItem,
         parent: ViewHolder?,
         children: List<ViewHolder>
     )
@@ -35,16 +36,10 @@ abstract class ExpandableItemDecoration(
 
     override fun onDraw(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
         val items = getParentAndChildren(recyclerView)
-
-        Log.d(
-            "ExpandableItemDecoration",
-            items.map { (key, values) -> key.item.getId() + " " + values.map { it.item.getId() }.joinToString { it } }.joinToString { it }
-        )
-
         for ((parentItem, children) in items) {
             val animationState = animator.getStateForPosition(parentItem.position) ?: continue
             val childViewHolders = children.mapNotNull { it.viewHolder }
-            onDrawGroup(canvas, animationState, recyclerView, parentItem.viewHolder, childViewHolders)
+            onDrawGroup(canvas, animationState, recyclerView, parentItem.item as ExpandableParentItem, parentItem.viewHolder, childViewHolders)
         }
     }
 
