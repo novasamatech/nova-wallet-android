@@ -19,4 +19,3 @@ interface ExpandableParentViewHolder : ExpandableBaseViewHolder<ExpandableParent
  * It's used to check the type of viewHolder in [ExpandableItemDecoration]
  */
 interface ExpandableChildViewHolder : ExpandableBaseViewHolder<ExpandableChildItem>
-

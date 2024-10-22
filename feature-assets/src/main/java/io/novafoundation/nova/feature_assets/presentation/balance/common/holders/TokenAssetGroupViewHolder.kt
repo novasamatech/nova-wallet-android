@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.item_token_asset_group.view.itemAssetToken
 import kotlinx.android.synthetic.main.item_token_asset_group.view.itemAssetTokenGroupToken
 import kotlinx.android.synthetic.main.item_token_asset_group.view.itemTokenGroupAssetImage
 
-
 class TokenAssetGroupViewHolder(
     containerView: View,
     private val imageLoader: ImageLoader,

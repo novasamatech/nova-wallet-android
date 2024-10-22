@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.holder
 import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableChildViewHolder
-import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
@@ -23,7 +21,6 @@ class NetworkAssetViewHolder(
 ) : GroupedListHolder(containerView) {
 
     fun bind(networkAsset: NetworkAssetUi, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
-
         val asset = networkAsset.asset
         itemAssetImage.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
 

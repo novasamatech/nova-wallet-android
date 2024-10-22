@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.items.Expanda
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 
 /**
- * Where animationFraction = 0f - fully collapsed and animationFraction = 1f - fully expanded
+ * EXPANDING: animationFraction = 0f - fully collapsed and animationFraction = 1f - fully expanded
+ * COLLAPSING: animationFraction = 0f - fully expanded and animationFraction = 1f - fully collapsed
+ * So animationFraction is always move from 0f to 1f
  */
 class ExpandableAnimationItemState(val animationType: Type, animationFraction: Float) {
 
@@ -36,6 +38,7 @@ class ExpandableAnimator(
     // It contains only items that is animating right now
     private val runningAnimations = mutableMapOf<String, RunningAnimation>()
 
+    // Return current animation state for parent position or calculate state in [getExpandableItemState] if it isn't animating now
     fun getStateForPosition(position: Int): ExpandableAnimationItemState? {
         val items = expandableAdapter.getItems()
         val item = items[position]
@@ -44,6 +47,7 @@ class ExpandableAnimator(
         return runningAnimations[item.getId()]?.currentState ?: getExpandableItemState(position, items)
     }
 
+    // Just prepare an animation without running
     fun prepareAnimationToState(item: ExpandableParentItem, type: ExpandableAnimationItemState.Type) {
         val existingSettings = runningAnimations[item.getId()]
 

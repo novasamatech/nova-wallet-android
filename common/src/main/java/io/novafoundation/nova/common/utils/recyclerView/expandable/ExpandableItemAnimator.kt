@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.items.Expanda
 
 /**
  * Potential problems:
- * - If in one time we will run add and move animation or remove and move animation - one of the animation will be cancelled
+ * - If in one time we will run add and move animation or remove and move animation - one of an animation will be cancelled
  */
 abstract class ExpandableItemAnimator(
     private val adapter: ExpandableAdapter,
@@ -42,6 +42,13 @@ abstract class ExpandableItemAnimator(
 
         val parentItem = getParentFor(item) ?: return false
 
+        // Reset move state helps clear translationY when animation is being to be canceled
+        if (pendingMoveAnimations.contains(holder)) {
+            holder.itemView.animate().cancel()
+
+            resetMoveState(holder)
+        }
+
         if (pendingRemoveAnimations.contains(holder)) {
             holder.itemView.animate().cancel()
         } else {
@@ -64,6 +71,13 @@ abstract class ExpandableItemAnimator(
 
         val parentItem = getParentFor(item) ?: return false
 
+        // Reset move state helps clear translationY when animation is being to be canceled
+        if (pendingMoveAnimations.contains(holder)) {
+            holder.itemView.animate().cancel()
+
+            resetMoveState(holder)
+        }
+
         if (pendingAddAnimations.contains(holder)) {
             holder.itemView.animate().cancel()
         } else {
@@ -83,6 +97,18 @@ abstract class ExpandableItemAnimator(
     override fun animateMove(holder: ViewHolder, fromX: Int, fromY: Int, toX: Int, toY: Int): Boolean {
         if (holder !is ExpandableBaseViewHolder<*>) return false
 
+        // Reset add state helps clear alpha and scale when animation is being to be canceled
+        if (pendingAddAnimations.contains(holder)) {
+            holder.itemView.animate().cancel()
+            resetAddState(holder)
+        }
+
+        // Reset remove state helps clear alpha and scale when animation is being to be canceled
+        if (pendingRemoveAnimations.contains(holder)) {
+            holder.itemView.animate().cancel()
+            resetRemoveState(holder)
+        }
+
         if (pendingMoveAnimations.contains(holder)) {
             holder.itemView.animate().cancel()
         }
@@ -97,13 +123,13 @@ abstract class ExpandableItemAnimator(
     }
 
     override fun runPendingAnimations() {
-        //Add animation + expand items
+        // Add animation + expand items
         runExpandableAnimationFor(addAnimations, pendingAddAnimations) { animateAddImpl(it) }
 
-        //Remove animation + collapse items
+        // Remove animation + collapse items
         runExpandableAnimationFor(removeAnimations, pendingRemoveAnimations) { animateRemoveImpl(it) }
 
-        //Move animation
+        // Move animation
         val animatingViewHolders = moveAnimations.toList()
         moveAnimations.clear()
 
@@ -142,6 +168,12 @@ abstract class ExpandableItemAnimator(
     abstract fun preMoveImpl(holder: ViewHolder, fromY: Int, toY: Int)
 
     abstract fun getMoveAnimator(holder: ViewHolder): ViewPropertyAnimator
+
+    abstract fun resetAddState(holder: ViewHolder)
+
+    abstract fun resetRemoveState(holder: ViewHolder)
+
+    abstract fun resetMoveState(holder: ViewHolder)
 
     private fun animateAddImpl(holder: ViewHolder) {
         val animation = getAddAnimator(holder)
@@ -196,6 +228,8 @@ abstract class ExpandableItemAnimator(
         addAnimations.clear()
         removeAnimations.clear()
         moveAnimations.clear()
+
+        expandableAnimator.cancelAnimations()
     }
 
     override fun isRunning(): Boolean {

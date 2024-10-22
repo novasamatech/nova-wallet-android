@@ -82,7 +82,7 @@ class AssetTokensDecoration(
             drawParentBlock(flippedExpandingFraction, parentBounds, canvas, expandingFraction)
         }
 
-        //Don't draw children background if it's a single item
+        // Don't draw children background if it's a single item
         if (parentItem is TokenGroupUi && parentItem.groupWithOneItem) return
 
         val childrenBlockBounds = getChildrenBlockBounds(animationState, recyclerView, parent, children)

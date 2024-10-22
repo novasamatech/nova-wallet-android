@@ -42,5 +42,4 @@ class TokenAssetViewHolder(
         containerView.itemTokenAssetBalance.text = asset.amount.token
         containerView.itemTokenAssetPriceAmount.text = asset.amount.fiat
     }
-
 }

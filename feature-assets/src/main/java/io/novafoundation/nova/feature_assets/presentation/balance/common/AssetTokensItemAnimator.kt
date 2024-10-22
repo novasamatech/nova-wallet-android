@@ -16,10 +16,9 @@ class AssetTokensItemAnimator(
     settings,
     expandableAnimator
 ) {
+
     override fun preAddImpl(holder: RecyclerView.ViewHolder) {
-        holder.itemView.alpha = 0f
-        holder.itemView.scaleX = 0.90f
-        holder.itemView.scaleY = 0.90f
+        resetRemoveState(holder)
     }
 
     override fun getAddAnimator(holder: RecyclerView.ViewHolder): ViewPropertyAnimator {
@@ -30,9 +29,7 @@ class AssetTokensItemAnimator(
     }
 
     override fun preRemoveImpl(holder: RecyclerView.ViewHolder) {
-        holder.itemView.alpha = 1f
-        holder.itemView.scaleX = 1f
-        holder.itemView.scaleY = 1f
+        resetAddState(holder)
     }
 
     override fun getRemoveAnimator(holder: RecyclerView.ViewHolder): ViewPropertyAnimator {
@@ -61,5 +58,20 @@ class AssetTokensItemAnimator(
         viewHolder.itemView.scaleX = 1f
         viewHolder.itemView.scaleY = 1f
     }
-}
 
+    override fun resetAddState(holder: RecyclerView.ViewHolder) {
+        holder.itemView.alpha = 1f
+        holder.itemView.scaleX = 1f
+        holder.itemView.scaleY = 1f
+    }
+
+    override fun resetRemoveState(holder: RecyclerView.ViewHolder) {
+        holder.itemView.alpha = 0f
+        holder.itemView.scaleX = 0.90f
+        holder.itemView.scaleY = 0.90f
+    }
+
+    override fun resetMoveState(holder: RecyclerView.ViewHolder) {
+        holder.itemView.translationY = 0f
+    }
+}

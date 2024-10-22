@@ -38,7 +38,6 @@ class AssetViewModeView @JvmOverloads constructor(
         }
 
         override fun onAnimationRepeat(animation: Animation?) {
-
         }
     }
 

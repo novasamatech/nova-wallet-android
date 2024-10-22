@@ -6,4 +6,3 @@ package io.novafoundation.nova.common.utils.recyclerView.expandable.items
 interface ExpandableBaseItem {
     fun getId(): String
 }
-

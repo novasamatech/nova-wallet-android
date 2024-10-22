@@ -6,4 +6,3 @@ interface ExpandableAdapter {
 
     fun getItems(): List<ExpandableBaseItem>
 }
-

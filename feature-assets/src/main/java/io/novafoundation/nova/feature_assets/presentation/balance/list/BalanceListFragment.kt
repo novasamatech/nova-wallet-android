@@ -71,15 +71,13 @@ class BalanceListFragment :
         balanceListAssets.setHasFixedSize(true)
         balanceListAssets.adapter = adapter
 
-        val settings = ExpandableAnimationSettings(400, AccelerateDecelerateInterpolator())
-        val animator = ExpandableAnimator(balanceListAssets, settings, assetsAdapter)
-        val decoration = AssetTokensDecoration(requireContext(), assetsAdapter, animator)
-        val itemAnimator = AssetTokensItemAnimator(assetsAdapter, settings, animator)
+        val animationSettings = ExpandableAnimationSettings(400, AccelerateDecelerateInterpolator())
+        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
+
+        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        balanceListAssets.itemAnimator = AssetTokensItemAnimator(assetsAdapter, animationSettings, animator)
 
         AssetNetworkDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
-
-        balanceListAssets.addItemDecoration(decoration)
-        balanceListAssets.itemAnimator = itemAnimator
 
         walletContainer.setOnRefreshListener {
             viewModel.fullSync()

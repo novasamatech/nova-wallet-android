@@ -2,10 +2,11 @@ package io.novafoundation.nova.common.utils.recyclerView.expandable
 
 import android.graphics.Canvas
 import android.graphics.Rect
-import android.util.Log
 import android.view.View
 import androidx.core.view.children
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.indexOfFirstOrNull
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
@@ -31,7 +32,6 @@ abstract class ExpandableItemDecoration(
     )
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-
     }
 
     override fun onDraw(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
@@ -44,6 +44,7 @@ abstract class ExpandableItemDecoration(
     }
 
     private fun getParentAndChildren(recyclerView: RecyclerView): Map<ItemWithViewHolder, List<ItemWithViewHolder>> {
+        // Searching all view holders in recycler view and match them with adapter items
         val items = recyclerView.children.toList()
             .mapNotNull {
                 val viewHolder = recyclerView.getChildViewHolder(it)
@@ -52,10 +53,11 @@ abstract class ExpandableItemDecoration(
                 ItemWithViewHolder(viewHolder.bindingAdapterPosition, item, viewHolder)
             }
 
-        val parents = items.filter { it.item is ExpandableParentItem }.associateBy { it.item.getId() }
-        val children = items.filter { it.item is ExpandableChildItem }
+        // Grouping view holders by parents
         val parentsWithChildren = mutableMapOf<ItemWithViewHolder, MutableList<ItemWithViewHolder>>()
 
+        val parents = items.filter { it.item is ExpandableParentItem }.associateBy { it.item.getId() }
+        val children = items.filter { it.item is ExpandableChildItem }
         parents.values.forEach { parentsWithChildren[it] = mutableListOf() }
 
         children.forEach { child ->
@@ -70,8 +72,27 @@ abstract class ExpandableItemDecoration(
     }
 
     private fun getParentForItem(recyclerView: RecyclerView, item: ExpandableChildItem): ItemWithViewHolder? {
-        val position = adapter.getItems().indexOfFirstOrNull { it.getId() == item.groupId } ?: return null
-        val parentItem = adapter.getItems()[position]
-        return ItemWithViewHolder(position, parentItem as ExpandableParentItem, recyclerView.findViewHolderForAdapterPosition(position + 1))
+        val positionInAdapter = adapter.getItems().indexOfFirstOrNull { it.getId() == item.groupId } ?: return null
+        val parentItem = adapter.getItems()[positionInAdapter]
+        val globalAdapterPosition = positionInAdapter.convertToGlobalAdapterPosition(recyclerView, adapter as Adapter<*>)
+        val viewHolder = recyclerView.findViewHolderForAdapterPosition(globalAdapterPosition)
+        return ItemWithViewHolder(positionInAdapter, parentItem as ExpandableParentItem, viewHolder)
+    }
+
+    // Useful to find global position if ConcatAdapter is used
+    private fun Int.convertToGlobalAdapterPosition(recyclerView: RecyclerView, localAdapter: Adapter<*>): Int {
+        val globalAdapter = recyclerView.adapter
+        return if (globalAdapter is ConcatAdapter) {
+            val localAdapterIndex = globalAdapter.adapters.indexOf(localAdapter)
+            if (localAdapterIndex > 0) {
+                val adaptersBeforeTarget = globalAdapter.adapters.subList(0, localAdapterIndex - 1)
+                val offset = adaptersBeforeTarget.sumOf { it.itemCount }
+                this + offset
+            } else {
+                this
+            }
+        } else {
+            this
+        }
     }
 }
