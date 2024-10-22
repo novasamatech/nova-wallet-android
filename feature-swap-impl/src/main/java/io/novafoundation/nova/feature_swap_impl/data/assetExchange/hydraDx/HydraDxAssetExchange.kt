@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.structOf
+import io.novafoundation.nova.common.utils.times
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -48,7 +49,6 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterA
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -77,24 +77,21 @@ import kotlinx.coroutines.flow.onEach
 class HydraDxExchangeFactory(
     private val remoteStorageSource: StorageDataSource,
     private val sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-    private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val quotingFactory: HydraDxQuoting.Factory,
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val hydrationFeeInjector: HydrationFeeInjector
 ) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(chain: Chain, swapHost: AssetExchange.SwapHost, coroutineScope: CoroutineScope): AssetExchange {
-        return HydraDxExchange(
+        return HydraDxAssetExchange(
             remoteStorageSource = remoteStorageSource,
             chain = chain,
             storageSharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             hydraDxNovaReferral = hydraDxNovaReferral,
             swapSourceFactories = swapSourceFactories,
-            assetSourceRegistry = assetSourceRegistry,
             swapHost = swapHost,
             hydrationFeeInjector = hydrationFeeInjector,
             delegate = quotingFactory.create(chain),
@@ -103,8 +100,9 @@ class HydraDxExchangeFactory(
 }
 
 private const val ROUTE_EXECUTED_AMOUNT_OUT_IDX = 3
+private const val FEE_QUOTE_BUFFER = 1.1
 
-private class HydraDxExchange(
+private class HydraDxAssetExchange(
     private val delegate: HydraDxQuoting,
     private val remoteStorageSource: StorageDataSource,
     private val chain: Chain,
@@ -112,7 +110,6 @@ private class HydraDxExchange(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val hydraDxNovaReferral: HydraDxNovaReferral,
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val swapHost: AssetExchange.SwapHost,
     private val hydrationFeeInjector: HydrationFeeInjector,
 ) : AssetExchange {
@@ -510,8 +507,11 @@ private class HydraDxExchange(
 
             val quotedFee = swapHost.quote(args)
 
+            // Fees in non-native assets are especially volatile since conversion happens through swaps so we add some buffer to mitigate volatility
+            val quotedFeeWithBuffer = quotedFee * FEE_QUOTE_BUFFER
+
             return SubstrateFee(
-                amount = quotedFee,
+                amount = quotedFeeWithBuffer,
                 submissionOrigin = nativeFee.submissionOrigin,
                 asset = customFeeAsset
             )
