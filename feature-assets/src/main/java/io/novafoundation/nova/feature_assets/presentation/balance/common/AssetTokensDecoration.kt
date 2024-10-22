@@ -93,8 +93,8 @@ class AssetTokensDecoration(
     private fun clipChildren(children: List<RecyclerView.ViewHolder>, childrenBlockBounds: RectF) {
         val childrenBlock = childrenBlockBounds.toRect()
         children.forEach {
-            val childrenBottomClipInset = (it.itemView.bottom - it.itemView.translationY.roundToInt()) - childrenBlock.bottom
-            val childrenTopClipInset = childrenBlock.top - (it.itemView.top - it.itemView.translationY.roundToInt())
+            val childrenBottomClipInset = (it.itemView.bottom + it.itemView.translationY.roundToInt()) - childrenBlock.bottom
+            val childrenTopClipInset = childrenBlock.top - (it.itemView.top + it.itemView.translationY.roundToInt())
             if (childrenBottomClipInset > 0) {
                 it.itemView.clipBounds = Rect(
                     0,
