@@ -143,7 +143,7 @@ class RealCrossChainTransactor(
 
     private suspend fun Flow<Result<TransferableBalanceUpdate>>.awaitCrossChainArrival(transfer: AssetTransferBase): Result<Balance> {
         return runCatching {
-            withTimeout(30.seconds) {
+            withTimeout(60.seconds) {
                 transformResult { balanceUpdate ->
                     Log.d("CrossChain", "Destination balance update detected: $balanceUpdate")
 
