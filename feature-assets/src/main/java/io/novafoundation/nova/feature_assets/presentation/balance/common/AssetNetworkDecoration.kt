@@ -21,7 +21,7 @@ import kotlin.math.roundToInt
  * The issue is that this decoration does not currently support partial list updates and assumes it will be iterated over whole list
  * TODO update decoration to not require this invalidation
  */
-class AssetGroupingDecoration(
+class AssetNetworkDecoration(
     private val background: Drawable,
     private val assetsAdapter: ListAdapter<*, *>,
     context: Context,
@@ -122,14 +122,14 @@ class AssetGroupingDecoration(
     }
 }
 
-fun AssetGroupingDecoration.Companion.applyDefaultTo(
+fun AssetNetworkDecoration.Companion.applyDefaultTo(
     recyclerView: RecyclerView,
     adapter: ListAdapter<*, *>
 ) {
     val groupBackground = with(recyclerView.context) {
         addRipple(getRoundedCornerDrawable(R.color.block_background))
     }
-    val decoration = AssetGroupingDecoration(
+    val decoration = AssetNetworkDecoration(
         background = groupBackground,
         assetsAdapter = adapter,
         context = recyclerView.context,

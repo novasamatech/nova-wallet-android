@@ -1,13 +1,10 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
-import android.animation.ValueAnimator
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.core.animation.addListener
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
@@ -15,14 +12,12 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
-import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableItemAnimator
-import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableItemDecoration
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetNetworkDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
@@ -79,9 +74,9 @@ class BalanceListFragment :
         val settings = ExpandableAnimationSettings(400, AccelerateDecelerateInterpolator())
         val animator = ExpandableAnimator(balanceListAssets, settings, assetsAdapter)
         val decoration = AssetTokensDecoration(requireContext(), assetsAdapter, animator)
-        val itemAnimator = ExpandableItemAnimator(assetsAdapter, settings, animator)
+        val itemAnimator = AssetTokensItemAnimator(assetsAdapter, settings, animator)
 
-        AssetGroupingDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        AssetNetworkDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
 
         balanceListAssets.addItemDecoration(decoration)
         balanceListAssets.itemAnimator = itemAnimator
